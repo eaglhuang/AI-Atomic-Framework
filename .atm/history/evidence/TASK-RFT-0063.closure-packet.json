@@ -1,0 +1,184 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0063",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "08077b8df74c4e06ad918d8ea3b935cd1966f38a",
+  "governedTreeSha": "34b1aed873a56d6be60e77372997c06a10fdff59",
+  "targetCommitDelta": {
+    "currentCommitSha": "08077b8df74c4e06ad918d8ea3b935cd1966f38a",
+    "parentCommitShas": [
+      "08077b8df74c4e06ad918d8ea3b935cd1966f38a"
+    ],
+    "governedTreeSha": "34b1aed873a56d6be60e77372997c06a10fdff59",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-police-family.ts",
+      "scripts/validate-police-family/context.ts",
+      "scripts/validate-police-family/core-scenarios.ts",
+      "scripts/validate-police-family/decomposition-evolution-scenarios.ts",
+      "scripts/validate-police-family/deps.ts",
+      "scripts/validate-police-family/final-contract-scenarios.ts",
+      "scripts/validate-police-family/gate-scenarios.ts",
+      "scripts/validate-police-family/main.ts",
+      "scripts/validate-police-family/polymorph-rollback-scenarios.ts",
+      "tests/scripts/validate-police-family-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/scripts/validate-police-family-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d4d4116b3ac4f4057787eebe7a811645d3119e35e52b0d072a3455f201714670",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:police-family",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5e06d0bbd5c457a77b1e0abcbd971f90d16d5642ee3fda6ebd8f63bfe2df1b56",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f42be7fa4b6055769d1034d3bf71251c4d39ecd68114937aa51b56ee5609700",
+      "stderrSha256": "sha256:58c6d425ac7906c646114dd2113827b7dcbe272543febf4cd8ce7e0b7ca9e158",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/scripts/validate-police-family-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:police-family"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T04:56:31.566Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0063.*",
+      ".atm/history/task-events/TASK-RFT-0063/**",
+      ".atm/history/tasks/TASK-RFT-0063.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+      "scripts/validate-police-family.ts",
+      "scripts/validate-police-family/**/*.ts",
+      "scripts/validate-police-family/context.ts",
+      "scripts/validate-police-family/core-scenarios.ts",
+      "scripts/validate-police-family/decomposition-evolution-scenarios.ts",
+      "scripts/validate-police-family/deps.ts",
+      "scripts/validate-police-family/final-contract-scenarios.ts",
+      "scripts/validate-police-family/gate-scenarios.ts",
+      "scripts/validate-police-family/main.ts",
+      "scripts/validate-police-family/polymorph-rollback-scenarios.ts",
+      "tests/scripts/validate-police-family-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-police-family.ts",
+      "scripts/validate-police-family/**/*.ts",
+      "scripts/validate-police-family/context.ts",
+      "scripts/validate-police-family/core-scenarios.ts",
+      "scripts/validate-police-family/decomposition-evolution-scenarios.ts",
+      "scripts/validate-police-family/deps.ts",
+      "scripts/validate-police-family/final-contract-scenarios.ts",
+      "scripts/validate-police-family/gate-scenarios.ts",
+      "scripts/validate-police-family/main.ts",
+      "scripts/validate-police-family/polymorph-rollback-scenarios.ts",
+      "tests/scripts/validate-police-family-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0063.json",
+  "closedAt": "2026-07-16T04:56:31.567Z",
+  "closedByActor": "codex-task-rft-0063",
+  "sessionId": "session-20260716044821-codex-task-rft-0063-TASK-RFT-0063-cc389eff06",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "08077b8df74c4e06ad918d8ea3b935cd1966f38a",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-police-family.ts",
+      "scripts/validate-police-family/context.ts",
+      "scripts/validate-police-family/core-scenarios.ts",
+      "scripts/validate-police-family/decomposition-evolution-scenarios.ts",
+      "scripts/validate-police-family/deps.ts",
+      "scripts/validate-police-family/final-contract-scenarios.ts",
+      "scripts/validate-police-family/gate-scenarios.ts",
+      "scripts/validate-police-family/main.ts",
+      "scripts/validate-police-family/polymorph-rollback-scenarios.ts",
+      "tests/scripts/validate-police-family-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0063.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-48-16-292Z-import-fc2fbd90dac0.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-48-21-819Z-reserve-bed167e96685.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-48-21-821Z-promote-4e173ee6b4ef.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-48-25-032Z-claim-a1d676b16850.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-53-07-482Z-scope-amendment-f6138c248df7.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-53-53-714Z-scope-amendment-becf8a322ca9.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-53-54-851Z-scope-amendment-d7475dd6cdea.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-53-56-002Z-scope-amendment-3c7522375437.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-53-57-176Z-scope-amendment-9764343d4ea4.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-53-58-389Z-scope-amendment-0f6880c899a3.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-53-59-559Z-scope-amendment-acea54f76856.json",
+      ".atm/history/task-events/TASK-RFT-0063/2026-07-16T04-54-00-780Z-scope-amendment-d800a15187c8.json",
+      ".atm/history/tasks/TASK-RFT-0063.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

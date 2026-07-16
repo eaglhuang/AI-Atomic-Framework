@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T04-56-31-581Z-close-ac7ccae9be42",
+  "taskId": "TASK-RFT-0063",
+  "action": "close",
+  "actorId": "codex-task-rft-0063",
+  "sessionId": "session-20260716044821-codex-task-rft-0063-TASK-RFT-0063-cc389eff06",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0063.json",
+  "taskSha256": "sha256:03e2aad76d41a1065657c14c3397a6215b167f43b725e58d4278307950216377",
+  "createdAt": "2026-07-16T04:56:31.581Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0063 --actor codex-task-rft-0063 --status done --historical-delivery 08077b8df74c4e06ad918d8ea3b935cd1966f38a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716044821-codex-task-rft-0063-TASK-RFT-0063-cc389eff06",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0063.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/scripts/validate-police-family-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:police-family"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T04:56:31.566Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0063.*",
+        ".atm/history/task-events/TASK-RFT-0063/**",
+        ".atm/history/tasks/TASK-RFT-0063.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+        "scripts/validate-police-family.ts",
+        "scripts/validate-police-family/**/*.ts",
+        "scripts/validate-police-family/context.ts",
+        "scripts/validate-police-family/core-scenarios.ts",
+        "scripts/validate-police-family/decomposition-evolution-scenarios.ts",
+        "scripts/validate-police-family/deps.ts",
+        "scripts/validate-police-family/final-contract-scenarios.ts",
+        "scripts/validate-police-family/gate-scenarios.ts",
+        "scripts/validate-police-family/main.ts",
+        "scripts/validate-police-family/polymorph-rollback-scenarios.ts",
+        "tests/scripts/validate-police-family-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-police-family.ts",
+        "scripts/validate-police-family/**/*.ts",
+        "scripts/validate-police-family/context.ts",
+        "scripts/validate-police-family/core-scenarios.ts",
+        "scripts/validate-police-family/decomposition-evolution-scenarios.ts",
+        "scripts/validate-police-family/deps.ts",
+        "scripts/validate-police-family/final-contract-scenarios.ts",
+        "scripts/validate-police-family/gate-scenarios.ts",
+        "scripts/validate-police-family/main.ts",
+        "scripts/validate-police-family/polymorph-rollback-scenarios.ts",
+        "tests/scripts/validate-police-family-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
