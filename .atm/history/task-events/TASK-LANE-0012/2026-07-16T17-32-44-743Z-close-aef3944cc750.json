@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T17-32-44-743Z-close-aef3944cc750",
+  "taskId": "TASK-LANE-0012",
+  "action": "close",
+  "actorId": "codex-lane-0012",
+  "sessionId": "session-20260716171634-codex-lane-0012-TASK-LANE-0012-f804364589",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0012.json",
+  "taskSha256": "sha256:6c1773abcf6432d077cf13c580f582e94256e29bcbb7f78fba782673cc463c1c",
+  "createdAt": "2026-07-16T17:32:44.743Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0012 --actor codex-lane-0012 --status done --historical-delivery 5a4bc4d472bb9d773406e59082740cb884b449ac",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716171634-codex-lane-0012-TASK-LANE-0012-f804364589",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0012.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "node --strip-types tests/cli/cli-result-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T17:32:44.735Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0012.*",
+        ".atm/history/task-events/TASK-LANE-0012/**",
+        ".atm/history/tasks/TASK-LANE-0012.json",
+        "packages/cli/src/commands/lane-session/resolve.ts",
+        "packages/cli/src/commands/next/claim-helpers.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-preparation.ts",
+        "packages/cli/src/commands/tasks/task-ledger-readers.ts",
+        "packages/cli/src/commands/tasks/task-transition-helpers.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/lane-session/resolve.ts",
+        "packages/cli/src/commands/next/claim-helpers.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-preparation.ts",
+        "packages/cli/src/commands/tasks/task-ledger-readers.ts",
+        "packages/cli/src/commands/tasks/task-transition-helpers.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
