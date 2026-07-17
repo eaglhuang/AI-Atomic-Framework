@@ -98,12 +98,13 @@ why it is the closest match; a new prefix without an approved plan must be
 rejected at review.
 
 Series legitimacy check: a series is legitimate only if its parent
-directory exists under the planning repository (3KLife
-`docs/ai_atomic_framework/<family-dir>/tasks/`). A prefix that appears only
-in the target-repo ledger with no planning-repo parent directory is itself an
-illegally invented series - do not reuse it; report it to the owner and remap
-the work onto the correct family. Task ids are assigned from the planning
-repository state, never inferred from the local target-repo ledger.
+directory exists under the resolved planning repository / governance workbench
+repo, for example `docs/ai_atomic_framework/<family-dir>/tasks/` within that
+repo. A prefix that appears only in the target-repo ledger with no
+planning-repo parent directory is itself an illegally invented series - do not
+reuse it; report it to the owner and remap the work onto the correct family.
+Task ids are assigned from the planning repository state, never inferred from
+the local target-repo ledger.
 
 ## Dispatch Rules
 
