@@ -7,75 +7,7 @@ import {
   normalizeTaskId,
   parseMarkdownTableCells
 } from '../packages/cli/src/commands/tasks/task-import-validators.ts';
-
-type NormalizedTaskStatus = ReturnType<typeof coerceStatus>;
-
-interface Options {
-  readonly planningRoot: string;
-  readonly handoffPath: string | null;
-  readonly outPath: string;
-  readonly overlayPath: string | null;
-}
-
-interface TaskCardEntry {
-  readonly taskId: string;
-  readonly title: string;
-  readonly rawStatus: string;
-  readonly normalizedStatus: NormalizedTaskStatus;
-  readonly laneKey: string;
-  readonly laneTitle: string;
-  readonly filePath: string;
-  readonly planningRepo: string | null;
-  readonly targetRepo: string | null;
-  readonly relatedPlan: string | null;
-}
-
-interface ReadmeRowEntry {
-  readonly taskId: string;
-  readonly laneKey: string;
-  readonly laneTitle: string;
-  readonly sourcePath: string;
-  readonly rawStatus: string | null;
-  readonly title: string | null;
-  readonly notes: string | null;
-  readonly rowKind: 'roster' | 'future-queue' | 'other';
-  readonly relatedPlan: string | null;
-}
-
-interface LaneSummary {
-  readonly laneKey: string;
-  readonly laneTitle: string;
-  readonly taskCards: readonly TaskCardEntry[];
-  readonly readmeOnly: readonly ReadmeRowEntry[];
-  readonly overlayItems: readonly OverlayEntry[];
-}
-
-interface LaneMetadata {
-  readonly laneKey: string;
-  readonly laneTitle: string;
-  readonly relatedPlan: string | null;
-}
-
-interface OverlayEntry {
-  readonly taskId: string;
-  readonly laneKey: string;
-  readonly laneTitle: string;
-  readonly status: string | null;
-  readonly title: string | null;
-  readonly relatedPlan: string | null;
-  readonly gapType: string | null;
-  readonly notes: string | null;
-  readonly sourceThreadId: string | null;
-  readonly sourceThreadTitle: string | null;
-}
-
-interface OverlaySource {
-  readonly threadId: string;
-  readonly title: string;
-  readonly status: string;
-  readonly unfinishedTaskIds: readonly string[];
-  readonly note: string | null;
-}
+import type { LaneMetadata, LaneSummary, NormalizedTaskStatus, Options, OverlayEntry, OverlaySource, ReadmeRowEntry, TaskCardEntry } from './generate-unfinished-plan-summary-types.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');

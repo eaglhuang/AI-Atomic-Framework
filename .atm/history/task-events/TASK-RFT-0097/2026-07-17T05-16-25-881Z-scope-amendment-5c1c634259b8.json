@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T05-16-25-881Z-scope-amendment-5c1c634259b8",
+  "taskId": "TASK-RFT-0097",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0097",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0097.json",
+  "taskSha256": "sha256:9f3d48ca08119ec2a803b103737632c3c4882a6d8d11b627b4fa16a0828a20c3",
+  "createdAt": "2026-07-17T05:16:25.881Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0097 --actor codex-task-rft-0097 --add scripts/generate-unfinished-plan-summary-types.ts --reason \"TASK-RFT-0097 needs a type-only helper so generate-unfinished-plan-summary.ts falls below 600 lines without touching mojibake markdown string literals.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0097 needs a type-only helper so generate-unfinished-plan-summary.ts falls below 600 lines without touching mojibake markdown string literals."
+  }
+}

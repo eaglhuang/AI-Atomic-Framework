@@ -1,0 +1,207 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0097",
+  "title": "Establish global physical-line-budget gate",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0096"
+  ],
+  "acceptance": [
+    "The new gate scans `packages/**`, `scripts/**`, and canonical `tests/**` sources while excluding generated, release, dist, fixture, and dependency paths.",
+    "The hard limit is 600 physical lines and the report also exposes a 500-line soft-warning inventory for future splits.",
+    "Current oversized residuals are reduced to 600 lines or fewer so the gate passes with zero hard violations.",
+    "The old rollout test no longer requires oversized inventory to exist.",
+    "Validation evidence includes the hard-violation count, soft-warning count, scanned file count, and top scanned file by line count."
+  ],
+  "deliverables": [
+    "scripts/validate-physical-line-budget.ts",
+    "tests/cli/physical-line-budget-gate.test.ts",
+    "tests/cli/rft-atomization-rollout.test.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/core/src/broker/steward.ts",
+    "scripts/src/atomize-score.js",
+    "packages/core/src/manager/atom-generator.ts",
+    "scripts/generate-unfinished-plan-summary.ts",
+    "scripts/captain-dispatch-mailbox/render.ts",
+    "package.json"
+  ],
+  "scopePaths": [
+    "scripts/validate-physical-line-budget.ts",
+    "tests/cli/physical-line-budget-gate.test.ts",
+    "tests/cli/rft-atomization-rollout.test.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/core/src/broker/steward.ts",
+    "scripts/src/atomize-score.js",
+    "packages/core/src/manager/atom-generator.ts",
+    "scripts/generate-unfinished-plan-summary.ts",
+    "scripts/captain-dispatch-mailbox/render.ts",
+    "package.json"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-physical-line-budget.ts --json",
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/cli/rft-atomization-rollout.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.global-physical-line-budget",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.global-physical-line-budget",
+        "pattern": "Global Gate",
+        "source": "scripts/validate-physical-line-budget.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.rft-residual-line-budget-closure",
+        "pattern": "Facade Cap Repair",
+        "source": "packages/cli/src/commands/next/claim-orchestration.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/validate-physical-line-budget.ts",
+        "tests/cli/physical-line-budget-gate.test.ts",
+        "tests/cli/rft-atomization-rollout.test.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/core/src/broker/steward.ts",
+        "scripts/src/atomize-score.js",
+        "packages/core/src/manager/atom-generator.ts",
+        "scripts/generate-unfinished-plan-summary.ts",
+        "scripts/captain-dispatch-mailbox/render.ts",
+        "package.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "- This card establishes the invariant only. Touched-file admission wiring, semantic atomization metrics, auto continuation-card generation, and validator blocker owner/session projection are follow-up cards.\n- Keep residual shrinkage behavior-preserving; do not redesign the affected command, broker, generator, mailbox, or summary surfaces.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0097-global-physical-line-budget-gate.task.md",
+    "sectionTitle": "TASK-RFT-0097",
+    "headingLine": 61,
+    "hash": "f3dc2547b81bcea2",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0097-global-physical-line-budget-gate.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f3dc2547b81bcea2ded0223131d49b63632a63bf839ca82ea37cb8f2aa420f65",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-17T05:11:54.943Z"
+    }
+  },
+  "importedAt": "2026-07-17T05:11:54.943Z",
+  "lastTransitionId": "2026-07-17T05-16-25-881Z-scope-amendment-5c1c634259b8",
+  "lastTransitionAt": "2026-07-17T05:16:25.881Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0097",
+  "reservedAt": "2026-07-17T05:12:06.026Z",
+  "promotedAt": "2026-07-17T05:12:06.029Z",
+  "claim": {
+    "actorId": "codex-task-rft-0097",
+    "leaseId": "lease-84a768868da1",
+    "claimedAt": "2026-07-17T05:12:06.033Z",
+    "heartbeatAt": "2026-07-17T05:12:06.033Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0097.*",
+      ".atm/history/task-events/TASK-RFT-0097/**",
+      ".atm/history/tasks/TASK-RFT-0097.json",
+      "package.json",
+      "packages/cli/src/commands/next/claim-lane-session.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/manager/atom-generator.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/generate-unfinished-plan-summary-types.ts",
+      "scripts/generate-unfinished-plan-summary.ts",
+      "scripts/src/atomize-score.js",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/rft-atomization-rollout.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260717051211-codex-task-rft-0097-5d0194229d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717051211-codex-task-rft-0097-5d0194229d\""
+    }
+  },
+  "startedAt": "2026-07-17T05:12:06.033Z",
+  "startedByActor": "codex-task-rft-0097",
+  "startedBySessionId": "session-20260717051206-codex-task-rft-0097-TASK-RFT-0097-0a65543c97",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0097",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0097.*",
+      ".atm/history/task-events/TASK-RFT-0097/**",
+      ".atm/history/tasks/TASK-RFT-0097.json",
+      "package.json",
+      "packages/cli/src/commands/next/claim-lane-session.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/manager/atom-generator.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/generate-unfinished-plan-summary-types.ts",
+      "scripts/generate-unfinished-plan-summary.ts",
+      "scripts/src/atomize-score.js",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/rft-atomization-rollout.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0097-global-physical-line-budget-gate.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0097-global-physical-line-budget-gate.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "d9c4d72a23c530d962ffe6f0446fa13a3bcfa03a378e9b612288fbd861a14f28",
+    "actorId": "codex-task-rft-0097",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260717051211-codex-task-rft-0097-5d0194229d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717051211-codex-task-rft-0097-5d0194229d\""
+    },
+    "createdAt": "2026-07-17T05:12:11.529Z",
+    "status": "active"
+  }
+}

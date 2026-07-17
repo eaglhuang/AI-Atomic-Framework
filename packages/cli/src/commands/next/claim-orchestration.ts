@@ -30,6 +30,7 @@ import { quoteCliValue, uniqueSorted } from './view-projections.ts';
 import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueForIntent, assertPromptBatchDoesNotConflict, reconcilePromptScopeRuntimeForClaim, inspectImportedTaskQueue, createDeterministicTaskIntent, checkPendingTaskArtifactScopeExpansion } from './route-resolution.ts';
 import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.ts';
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
+import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
 export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
 export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
@@ -240,7 +241,6 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   let claimAllowedFiles = (input.claimFiles && input.claimFiles.length > 0)
     ? uniqueSorted(input.claimFiles.map(normalizeWorkPath).filter(Boolean))
     : buildAllowedFilesForTask(claimableTask);
-  // Parallel preflight check
   const parallelStartedAt = Date.now();
   const parallelPreflight = await runClaimParallelPreflight({
     cwd: input.cwd,
@@ -546,11 +546,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     reason: recommendedChannel === 'batch'
       ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
       : 'This task can use an optional team run for role/permission coordination.',
-    knowledgeSummary: buildTeamKnowledgeSummary({
-      cwd: input.cwd,
-      taskId: claimableTask.workItemId,
-      top: 3
-    }),
+    knowledgeSummary: buildTeamKnowledgeSummary({ cwd: input.cwd, taskId: claimableTask.workItemId, top: 3 }),
     parallelAdvisory
   });
   const userNotice = buildFirstUseUserNotice(nextAction);
@@ -560,27 +556,15 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     cwd: input.cwd,
     messages: [
       ...buildNextMessages(
-        nextAction,
-        userNotice,
-        input.integrationBootstrap,
-        input.runtimeAdapterReadiness,
-        message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
+        nextAction, userNotice, input.integrationBootstrap, input.runtimeAdapterReadiness,
+        buildClaimedMessage({
           taskId: claimableTask.workItemId,
           actorId: resolvedActor.actorId,
-          actorSource: resolvedActor.source,
+          actorSource: resolvedActor.source ?? 'unknown',
           actorResolution,
-          recommendedChannel: nextAction.recommendedChannel,
+          recommendedChannel: nextAction.recommendedChannel ?? recommendedChannel,
           claimIntent: resolvedClaimIntent,
-          batchCheckpointCommand: nextAction.recommendedChannel === 'batch'
-            ? 'node atm.mjs batch checkpoint --actor <id> --json'
-            : null,
-          blockedPattern: nextAction.recommendedChannel === 'batch'
-            ? 'manual tasks claim/close loop'
-            : null,
-          ignoredUntrackedFiles: scopeDiagnostic.ignoredUntrackedFiles,
-          ignoredUntrackedNote: scopeDiagnostic.ignoredUntrackedFiles.length > 0
-            ? 'These files are NOT blocking the claim. If any of them is actually a deliverable for this task, run `node atm.mjs tasks scope --add <paths>` to widen the scope and then `git add` them.'
-            : null
+          ignoredUntrackedFiles: scopeDiagnostic.ignoredUntrackedFiles
         })
       ),
       ...laneSessionMessages
@@ -611,28 +595,4 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       }
     }
   });
-}
-
-function resolveCurrentLaneSessionIdForFreshReservation(cwd: string, actorId: string): string | null {
-  return normalizeOptionalLaneSessionId(process.env.ATM_LANE_SESSION_ID)
-    ?? normalizeOptionalLaneSessionId(resolveActorWorkSession(cwd, { actorId })?.guidanceSessionId);
-}
-
-function normalizeOptionalLaneSessionId(value: unknown): string | null {
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
-}
-
-function normalizeClaimLaneSessionEnvelope(value: Record<string, unknown> | null): {
-  readonly laneSessionId: string;
-  readonly status: string;
-  readonly source: string;
-  readonly exportHint: string;
-} | null {
-  if (!value) return null;
-  const laneSessionId = typeof value.laneSessionId === 'string' ? value.laneSessionId.trim() : '';
-  const status = typeof value.status === 'string' ? value.status.trim() : '';
-  const source = typeof value.source === 'string' ? value.source.trim() : '';
-  const exportHint = typeof value.exportHint === 'string' ? value.exportHint.trim() : '';
-  if (!laneSessionId || !status || !source || !exportHint) return null;
-  return { laneSessionId, status, source, exportHint };
 }

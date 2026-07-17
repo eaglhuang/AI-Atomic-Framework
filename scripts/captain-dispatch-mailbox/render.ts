@@ -39,7 +39,6 @@ import {
   toPortablePath,
   uniquePath
 } from './fs-utils.ts';
-
 export { formatTimestampTag, listFiles, sanitizeFileName, toPortablePath, uniquePath } from './fs-utils.ts';
 export {
   ensureDispatchBody,
@@ -47,7 +46,6 @@ export {
   isThinReportBody,
   loadWorkerReportFile
 } from './frontmatter.ts';
-
 export function computeBacklog(layout: MailboxLayout, options: MailboxOptions): BacklogSnapshot {
   const agents: Record<string, AgentBacklog> = {};
   for (const agent of options.agents) {
@@ -59,7 +57,6 @@ export function computeBacklog(layout: MailboxLayout, options: MailboxOptions): 
       reports: listFiles(agentLayout.reports, ['.md']).length
     };
   }
-
   return {
     captain: {
       queue: listFiles(layout.captain.queue, ['.json', '.md']).length,
@@ -70,7 +67,6 @@ export function computeBacklog(layout: MailboxLayout, options: MailboxOptions): 
     agents
   };
 }
-
 export function writeCaptainHandoff(layout: MailboxLayout, ledger: Ledger, summary: MailboxSummary): string {
   const handoffPath = path.join(layout.captain.handoff, 'latest-handoff.md');
   const activeDispatches = Object.values(ledger.dispatches)
@@ -121,17 +117,14 @@ export function writeCaptainHandoff(layout: MailboxLayout, ledger: Ledger, summa
     '3. Keep decision output in Captain Decision Packet format.',
     ''
   ].join('\n');
-
   writeFileSync(handoffPath, markdown, 'utf8');
   return toPortablePath(handoffPath);
 }
-
 export function writeWorkerHandoff(layout: MailboxLayout, options: MailboxOptions, summary: MailboxSummary): string | null {
   if (!options.agentId) {
     return null;
   }
   const agentLayout = requireAgentLayout(layout, options.agentId);
-
   const handoffPath = path.join(agentLayout.handoff, 'latest-handoff.md');
   const markdown = [
     `# Worker ${options.agentId} Handoff`,
@@ -164,11 +157,9 @@ export function writeWorkerHandoff(layout: MailboxLayout, options: MailboxOption
     '4. If no active work exists, run worker mode to claim the next inbox dispatch.',
     ''
   ].join('\n');
-
   writeFileSync(handoffPath, markdown, 'utf8');
   return toPortablePath(handoffPath);
 }
-
 export function loadQueueJob(queuePath: string): QueueJob {
   if (path.extname(queuePath).toLowerCase() === '.json') {
     const parsed = JSON.parse(readFileSync(queuePath, 'utf8'));
@@ -178,7 +169,6 @@ export function loadQueueJob(queuePath: string): QueueJob {
       sourceFrontMatterRaw: null
     }, queuePath);
   }
-
   const parsed = parseMarkdownFile(queuePath);
   return normalizeJob({
     ...parsed.frontMatter,
@@ -189,7 +179,6 @@ export function loadQueueJob(queuePath: string): QueueJob {
     sourceFrontMatterRaw: parsed.rawFrontMatter
   }, queuePath);
 }
-
 export function normalizeJob(raw: Record<string, unknown>, queuePath: string): QueueJob {
   const id = normalizeOptionalString(raw.task_id || raw.taskId || raw.id || raw.job_id)
     || path.basename(queuePath, path.extname(queuePath));
@@ -228,7 +217,6 @@ export function normalizeJob(raw: Record<string, unknown>, queuePath: string): Q
     sourceBody: raw.sourceBody ? String(raw.sourceBody).trim() : null
   };
 }
-
 export function normalizeStringList(value: unknown, fallback: string[] = []): string[] {
   if (Array.isArray(value)) {
     const normalized = value.map((entry) => String(entry).trim()).filter(Boolean);
@@ -242,12 +230,10 @@ export function normalizeStringList(value: unknown, fallback: string[] = []): st
   }
   return fallback;
 }
-
 export function resolveAssignee(job: QueueJob, agents: AgentRef[], layout: MailboxLayout): AgentRef | null {
   if (job.assignee) {
     return agents.find((agent) => agent.id === job.assignee) || null;
   }
-
   return [...agents].sort((left, right) => {
     const leftLayout = requireAgentLayout(layout, left.id);
     const rightLayout = requireAgentLayout(layout, right.id);
@@ -256,12 +242,10 @@ export function resolveAssignee(job: QueueJob, agents: AgentRef[], layout: Mailb
     return leftLoad - rightLoad || left.id.localeCompare(right.id);
   })[0];
 }
-
 export function createDispatchId(job: QueueJob, agent: AgentRef, isoTimestamp: string): string {
   const stamp = formatTimestampTag(isoTimestamp);
   return `${sanitizeFileName(job.id)}--captain-to-${sanitizeFileName(agent.id)}--${stamp}`;
 }
-
 export function renderDispatchMarkdown({ dispatchId, job, agent, captainModel, createdAt }: { dispatchId: string; job: QueueJob; agent: AgentRef; captainModel: string; createdAt: string }): string {
   if (job.sourceKind === 'markdown' && job.sourceFrontMatterRaw) {
     const body = ensureDispatchBody(job.sourceBody, {
@@ -304,7 +288,6 @@ export function renderDispatchMarkdown({ dispatchId, job, agent, captainModel, c
       ''
     ].join('\n'), { fromAgent: 'captain', toAgent: agent.id, taskId: job.id, dispatchId });
   }
-
   const originalBody = job.sourceBody && job.sourceBody !== job.objective ? job.sourceBody : null;
   return finalizeDispatchMarkdown([
     '---',
@@ -347,7 +330,7 @@ export function renderDispatchMarkdown({ dispatchId, job, agent, captainModel, c
     `title: ${quoteYamlValue(job.title)}`,
     '---',
     '',
-    `派工方代號：captain；接收方代號：${agent.id}；任務：${job.id}`,
+    `瘣曉極?嫣誨??captain嚗?嗆隞??嚗?{agent.id}嚗遙??${job.id}`,
     '',
     `# ${job.title}`,
     '',
@@ -419,39 +402,32 @@ export function renderDispatchMarkdown({ dispatchId, job, agent, captainModel, c
     ''
   ].join('\n'), { fromAgent: 'captain', toAgent: agent.id, taskId: job.id, dispatchId });
 }
-
 export function renderYamlList(items: string[] | null | undefined, indent = '  '): string[] {
   if (!items || items.length === 0) {
     return [`${indent}- none`];
   }
   return items.map((item) => `${indent}- ${quoteYamlValue(item)}`);
 }
-
 export function renderMarkdownList(items: string[] | null | undefined): string[] {
   if (!items || items.length === 0) {
     return ['- None'];
   }
   return items.map((item) => `- ${item}`);
 }
-
 export function buildDispatchFileName(taskId: string, fromAgent: string, toAgent: string, isoTimestamp: string): string {
   return `${sanitizeFileName(taskId)}--${sanitizeFileName(fromAgent)}-to-${sanitizeFileName(toAgent)}--${formatTimestampTag(isoTimestamp)}.dispatch.md`;
 }
-
 export function buildArchiveFileName(taskId: string, fromAgent: string, toAgent: string, isoTimestamp: string, extension = '.md'): string {
   const normalizedExtension = extension.startsWith('.') ? extension : `.${extension}`;
   return `${sanitizeFileName(taskId)}--${sanitizeFileName(fromAgent)}-to-${sanitizeFileName(toAgent)}--${formatTimestampTag(isoTimestamp)}.queue${normalizedExtension}`;
 }
-
 export function buildReportFileName(taskId: string, fromAgent: string, toAgent: string, isoTimestamp: string): string {
   return `${sanitizeFileName(taskId)}--${sanitizeFileName(fromAgent)}-to-${sanitizeFileName(toAgent)}--${formatTimestampTag(isoTimestamp)}.report.md`;
 }
-
 export function finalizeDispatchMarkdown(markdown: string, options: { fromAgent: string; toAgent: string; taskId: string; dispatchId: string }): string {
   const lines = String(markdown || '').split('\n');
   let inFrontMatter = false;
   let frontMatterBoundaries = 0;
-
   for (let index = 0; index < lines.length; index += 1) {
     if (lines[index] === '---') {
       frontMatterBoundaries += 1;
@@ -467,10 +443,8 @@ export function finalizeDispatchMarkdown(markdown: string, options: { fromAgent:
     lines[index] = `Dispatch: ${options.fromAgent} -> ${options.toAgent} | Task: ${options.taskId} | Dispatch: ${options.dispatchId}`;
     break;
   }
-
   return lines.join('\n');
 }
-
 export function buildDecisionBasis(summary: MailboxSummary, options: MailboxOptions): string[] {
   const basis: string[] = [];
   if (summary.stopLoss.shouldStop) {
@@ -480,7 +454,6 @@ export function buildDecisionBasis(summary: MailboxSummary, options: MailboxOpti
   } else if (summary.stopLoss.paused) {
     basis.push(`${summary.stopLoss.actor} is paused by stop-loss; no mailbox work was processed.`);
   }
-
   if (options.role === 'captain' || options.role === 'all') {
     if (summary.seededDemoJobs.length > 0) {
       basis.push(`Seeded ${summary.seededDemoJobs.length} demo job(s) because --seed-demo was requested and the queue was empty.`);
@@ -498,7 +471,6 @@ export function buildDecisionBasis(summary: MailboxSummary, options: MailboxOpti
       basis.push(`Detected ${summary.staleUnclaimed.length} stale unclaimed dispatch(es) for captain review.`);
     }
   }
-
   if (options.role === 'worker') {
     if (summary.completed.length > 0) {
       basis.push(`Worker ${options.agentId} completed active dispatch and sent a report to captain/inbox.`);
@@ -510,14 +482,11 @@ export function buildDecisionBasis(summary: MailboxSummary, options: MailboxOpti
       basis.push(`Worker ${options.agentId} inbox was empty and it had no active work.`);
     }
   }
-
   if (summary.errors.length > 0) {
     basis.push(`Encountered ${summary.errors.length} error(s); review errors before continuing.`);
   }
-
   return basis;
 }
-
 export function chooseNextAction(summary: MailboxSummary, options: MailboxOptions): string {
   if (summary.stopLoss.shouldStop || summary.stopLoss.paused) {
     return 'pause-automation-stop-loss';
@@ -536,13 +505,11 @@ export function chooseNextAction(summary: MailboxSummary, options: MailboxOption
   }
   return 'continue-polling';
 }
-
 export function emitSummary(summary: MailboxSummary, json: boolean): void {
   if (json) {
     console.log(JSON.stringify(summary, null, 2));
     return;
   }
-
   console.log(`Captain mailbox cycle: ${summary.ok ? 'ok' : 'needs attention'}`);
   console.log(`Root: ${summary.root}`);
   console.log(`Dispatched: ${summary.dispatched.length}`);
@@ -558,7 +525,6 @@ export function emitSummary(summary: MailboxSummary, json: boolean): void {
     }
   }
 }
-
 export function createSummary(root: string, options: MailboxOptions): MailboxSummary {
   return {
     ok: true,

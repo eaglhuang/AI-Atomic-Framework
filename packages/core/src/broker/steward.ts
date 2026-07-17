@@ -8,9 +8,8 @@ import { validateBrokerProposal } from './proposal.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
 import type { BrokerOperationRunRecordEnvelope, DecompositionRequest, MergePlan, MergeVerdict, PatchProposal } from './types.ts';
-
 // ---------------------------------------------------------------------------
-// Steward arbitration verdict — the four possible outcomes per implementation
+// Steward arbitration verdict ??the four possible outcomes per implementation
 // contract (TASK-MAO-0009).
 // ---------------------------------------------------------------------------
 export type StewardArbitrationVerdict =
@@ -18,7 +17,6 @@ export type StewardArbitrationVerdict =
   | 'merge-required'
   | 'blocked'
   | 'human-required';
-
 export type StewardValidationCode =
   | 'scope-lock-mismatch'
   | 'stale-base-commit'
@@ -29,18 +27,15 @@ export type StewardValidationCode =
   | 'missing-proposal'
   | 'invalid-steward-identity'
   | 'human-review-required';
-
 export interface StewardValidationIssue {
   readonly code: StewardValidationCode;
   readonly detail: string;
 }
-
 export interface StewardPlanStep {
   readonly proposalId: string;
   readonly targetFile: string;
   readonly applyMethod: MergePlan['applyMethod'];
 }
-
 export interface StewardPlan {
   readonly schemaId: 'atm.stewardPlan.v1';
   readonly specVersion: '0.1.0';
@@ -51,17 +46,14 @@ export interface StewardPlan {
   readonly targetFiles: readonly string[];
   readonly issues: readonly StewardValidationIssue[];
 }
-
 export interface StewardPlanResult {
   readonly ok: boolean;
   readonly plan: StewardPlan;
 }
-
 export interface StewardApplyResult {
   readonly ok: boolean;
   readonly evidence: StewardApplyEvidence;
 }
-
 // ---------------------------------------------------------------------------
 // Steward identity & permission check.
 // ---------------------------------------------------------------------------
@@ -75,14 +67,12 @@ export interface StewardIdentity {
   readonly authorisedByRouteId?: string;
   readonly authorisedByTaskId?: string;
 }
-
 export interface StewardPermissionCheckResult {
   readonly ok: boolean;
   readonly stewardId: string;
   readonly kind: StewardIdentity['kind'];
   readonly issues: readonly StewardValidationIssue[];
 }
-
 /**
  * Validates that a steward identity is well-formed and authorised.
  * Derived-artifact writers must declare a route or task authorisation.
@@ -102,9 +92,8 @@ export function checkStewardPermission(identity: StewardIdentity): StewardPermis
   }
   return { ok: issues.length === 0, stewardId: identity.stewardId, kind: identity.kind, issues };
 }
-
 // ---------------------------------------------------------------------------
-// Steward arbitration result — the top-level output of arbitrateStewardRequest.
+// Steward arbitration result ??the top-level output of arbitrateStewardRequest.
 // ---------------------------------------------------------------------------
 export interface StewardArbitrationResult {
   readonly schemaId: 'atm.stewardArbitrationResult.v1';
@@ -117,7 +106,6 @@ export interface StewardArbitrationResult {
   readonly applyEvidence: StewardApplyEvidence | null;
   readonly issues: readonly StewardValidationIssue[];
 }
-
 export interface BrokerScopedWriteExecutionEvidence {
   readonly schemaId: 'atm.brokerScopedWriteExecution.v1';
   readonly specVersion: '0.1.0';
@@ -131,12 +119,10 @@ export interface BrokerScopedWriteExecutionEvidence {
   readonly verdict: 'applied' | 'blocked';
   readonly blockedReasons: readonly string[];
 }
-
 export interface BrokerScopedWriteExecutionResult {
   readonly ok: boolean;
   readonly evidence: BrokerScopedWriteExecutionEvidence;
 }
-
 export function planStewardApply(input: {
   readonly cwd: string;
   readonly stewardId: string;
@@ -153,7 +139,6 @@ export function planStewardApply(input: {
         applyMethod: input.mergePlan.applyMethod
       }))
     : [];
-
   const plan: StewardPlan = {
     schemaId: 'atm.stewardPlan.v1',
     specVersion: '0.1.0',
@@ -164,10 +149,8 @@ export function planStewardApply(input: {
     targetFiles: [...new Set(sorted.map((proposal) => proposal.targetFile))].sort((left, right) => left.localeCompare(right)),
     issues
   };
-
   return { ok: plan.ok, plan };
 }
-
 export function applyStewardPlan(input: {
   readonly cwd: string;
   readonly stewardId: string;
@@ -199,12 +182,10 @@ export function applyStewardPlan(input: {
     if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
     return { ok: false, evidence };
   }
-
   const sorted = sortProposalsForCompose(input.proposals);
   const fileBeforeHashes: Record<string, string> = {};
   const fileAfterHashes: Record<string, string> = {};
   const appliedFiles: string[] = [];
-
   for (const proposal of sorted) {
     const targetPath = path.resolve(input.cwd, proposal.targetFile);
     const before = readFileSync(targetPath, 'utf8');
@@ -215,7 +196,6 @@ export function applyStewardPlan(input: {
     fileAfterHashes[proposal.targetFile] = hashText(after);
     if (!appliedFiles.includes(proposal.targetFile)) appliedFiles.push(proposal.targetFile);
   }
-
   appliedFiles.sort((left, right) => left.localeCompare(right));
   const brokerOperationRun = buildStewardBrokerOperationRun({
     mergePlan: input.mergePlan,
@@ -237,7 +217,6 @@ export function applyStewardPlan(input: {
   if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
   return { ok: true, evidence };
 }
-
 export function executeBrokerScopedWrite(input: {
   readonly cwd: string;
   readonly stewardId: string;
@@ -252,7 +231,6 @@ export function executeBrokerScopedWrite(input: {
   const scopeFiles = [...new Set(input.scopeFiles.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right));
   const decompositionRequest = input.handshake.brokerLane.decision.decompositionRequest ?? null;
-
   if (!input.handshake.scopedWriteExecution.approved) {
     return {
       ok: false,
@@ -273,7 +251,6 @@ export function executeBrokerScopedWrite(input: {
       }
     };
   }
-
   if (allowedFiles.length !== scopeFiles.length || allowedFiles.some((entry, index) => entry !== scopeFiles[index])) {
     return {
       ok: false,
@@ -292,7 +269,6 @@ export function executeBrokerScopedWrite(input: {
       }
     };
   }
-
   const applyResult = applyStewardPlan({
     cwd: input.cwd,
     stewardId: input.stewardId,
@@ -301,7 +277,6 @@ export function executeBrokerScopedWrite(input: {
     scopeFiles,
     evidenceOutPath: input.evidenceOutPath
   });
-
   return {
     ok: applyResult.ok,
     evidence: {
@@ -319,7 +294,6 @@ export function executeBrokerScopedWrite(input: {
     }
   };
 }
-
 // ---------------------------------------------------------------------------
 // Top-level steward arbitration entry point (TASK-MAO-0009).
 // Wraps planning, identity checks, and verdict production. Records
@@ -337,7 +311,6 @@ export function arbitrateStewardRequest(input: {
 }): StewardArbitrationResult {
   const owningRouteId = input.owningRouteId ?? input.identity.authorisedByRouteId ?? null;
   const owningTaskId = input.owningTaskId ?? input.identity.authorisedByTaskId ?? null;
-
   // 1. Identity / permission gate
   const permResult = checkStewardPermission(input.identity);
   if (!permResult.ok) {
@@ -353,7 +326,6 @@ export function arbitrateStewardRequest(input: {
       issues: permResult.issues
     };
   }
-
   // 2. Human-required verdict: fail closed, steward cannot auto-resolve
   if (input.mergePlan.verdict === 'human-required') {
     return {
@@ -368,7 +340,6 @@ export function arbitrateStewardRequest(input: {
       issues: [{ code: 'human-review-required', detail: 'Merge plan verdict is human-required; steward cannot auto-resolve.' }]
     };
   }
-
   // 3. Plan the apply
   const planResult = planStewardApply({
     cwd: input.cwd,
@@ -377,7 +348,6 @@ export function arbitrateStewardRequest(input: {
     proposals: input.proposals,
     scopeFiles: input.scopeFiles
   });
-
   if (!planResult.ok) {
     // Determine if this is a merge-required or hard-blocked situation
     const hasBlockingConflict = planResult.plan.issues.some(
@@ -396,7 +366,6 @@ export function arbitrateStewardRequest(input: {
       issues: planResult.plan.issues
     };
   }
-
   // 4. Apply the plan
   const applyResult = applyStewardPlan({
     cwd: input.cwd,
@@ -406,7 +375,6 @@ export function arbitrateStewardRequest(input: {
     scopeFiles: input.scopeFiles,
     evidenceOutPath: input.evidenceOutPath
   });
-
   return {
     schemaId: 'atm.stewardArbitrationResult.v1',
     specVersion: '0.1.0',
@@ -419,7 +387,6 @@ export function arbitrateStewardRequest(input: {
     issues: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? []).map((reason) => ({ code: 'blocked-merge-plan' as StewardValidationCode, detail: reason }))
   };
 }
-
 function validateStewardInputs(input: {
   readonly cwd: string;
   readonly mergePlan: MergePlan;
@@ -429,7 +396,6 @@ function validateStewardInputs(input: {
   const issues: StewardValidationIssue[] = [];
   const cwd = path.resolve(input.cwd);
   const scopeSet = new Set(input.scopeFiles.map((entry) => normalizeRepoPath(cwd, entry)).filter(Boolean));
-
   if (input.mergePlan.schemaId !== 'atm.mergePlan.v1') {
     issues.push({ code: 'invalid-merge-plan', detail: `Unexpected merge plan schemaId '${input.mergePlan.schemaId}'.` });
   }
@@ -442,7 +408,6 @@ function validateStewardInputs(input: {
   if (input.mergePlan.verdict === 'human-required') {
     issues.push({ code: 'human-review-required', detail: 'Merge plan verdict is human-required; steward cannot auto-resolve.' });
   }
-
   const proposalIds = new Set(input.proposals.map((proposal) => proposal.proposalId));
   for (const expectedId of input.mergePlan.inputProposals) {
     if (!proposalIds.has(expectedId)) {
@@ -452,7 +417,6 @@ function validateStewardInputs(input: {
   if (input.mergePlan.inputProposals.length !== input.proposals.length) {
     issues.push({ code: 'invalid-merge-plan', detail: 'Proposal count does not match merge plan inputProposals.' });
   }
-
   for (const proposal of input.proposals) {
     const normalizedTarget = normalizeRepoPath(cwd, proposal.targetFile);
     if (!normalizedTarget || isPathOutsideRoot(cwd, path.resolve(cwd, proposal.targetFile))) {
@@ -462,7 +426,6 @@ function validateStewardInputs(input: {
     if (scopeSet.size > 0 && !scopeSet.has(normalizedTarget)) {
       issues.push({ code: 'scope-lock-mismatch', detail: `Target file '${proposal.targetFile}' is outside steward scope lock.` });
     }
-
     const validation = validateBrokerProposal(proposal, { cwd });
     for (const issue of validation.issues) {
       if (issue.kind === 'stale-base-commit') {
@@ -476,17 +439,14 @@ function validateStewardInputs(input: {
       }
     }
   }
-
   return dedupeIssues(issues);
 }
-
 export function applyUnifiedPatch(content: string, patch: string): string {
   const lines = content.split(/\r?\n/);
   const patchLines = patch.split(/\r?\n/);
   let lineIndex = 0;
   let output: string[] = [];
   let hunkIndex = 0;
-
   while (hunkIndex < patchLines.length) {
     const header = patchLines[hunkIndex];
     const match = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(header.trim());
@@ -498,7 +458,6 @@ export function applyUnifiedPatch(content: string, patch: string): string {
     output.push(...lines.slice(lineIndex, oldStart));
     lineIndex = oldStart;
     hunkIndex += 1;
-
     while (hunkIndex < patchLines.length && !patchLines[hunkIndex].startsWith('@@')) {
       const patchLine = patchLines[hunkIndex];
       if (patchLine.startsWith('--- ') || patchLine.startsWith('+++ ')) {
@@ -521,16 +480,13 @@ export function applyUnifiedPatch(content: string, patch: string): string {
       hunkIndex += 1;
     }
   }
-
   output.push(...lines.slice(lineIndex));
   return output.join('\n');
 }
-
 function writeEvidenceFile(filePath: string, evidence: StewardApplyEvidence): void {
   mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
 }
-
 function buildStewardBrokerOperationRun(input: {
   readonly mergePlan: MergePlan;
   readonly proposals: readonly PatchProposal[];
@@ -570,7 +526,6 @@ function buildStewardBrokerOperationRun(input: {
     ...(commitShas.length === 1 ? { commit_sha: commitShas[0] } : {}),
     ...(transactionIds.length > 0 ? { transaction_ids: transactionIds } : {})
   };
-
   return {
     schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
     specVersion: '0.1.0',
@@ -580,7 +535,6 @@ function buildStewardBrokerOperationRun(input: {
     records: [record]
   };
 }
-
 function extractProposalTransactionIds(proposal: PatchProposal): readonly string[] {
   const values = [
     proposal.transactionId,
@@ -591,16 +545,13 @@ function extractProposalTransactionIds(proposal: PatchProposal): readonly string
     .map((value) => typeof value === 'string' ? value.trim() : '')
     .filter(Boolean);
 }
-
 function mapStewardMergeVerdict(verdict: MergePlan['verdict']): MergeVerdict {
   if (verdict === 'parallel-safe' || verdict === 'needs-steward') return 'mergeable';
   return 'conflict';
 }
-
 function hashText(value: string): string {
   return crypto.createHash('sha256').update(value).digest('hex');
 }
-
 function normalizeRepoPath(cwd: string, candidate: string): string {
   const normalized = path.normalize(candidate).replace(/\\/g, '/');
   if (!normalized) return '';
@@ -609,12 +560,10 @@ function normalizeRepoPath(cwd: string, candidate: string): string {
   if (relative.startsWith('..') || path.isAbsolute(relative)) return '';
   return relative;
 }
-
 function isPathOutsideRoot(root: string, candidatePath: string): boolean {
   const relative = path.relative(path.resolve(root), path.resolve(candidatePath));
   return relative.startsWith('..') || path.isAbsolute(relative);
 }
-
 function dedupeIssues(issues: readonly StewardValidationIssue[]): StewardValidationIssue[] {
   const seen = new Set<string>();
   const unique: StewardValidationIssue[] = [];
@@ -626,7 +575,6 @@ function dedupeIssues(issues: readonly StewardValidationIssue[]): StewardValidat
   }
   return unique.sort((left, right) => `${left.code}::${left.detail}`.localeCompare(`${right.code}::${right.detail}`));
 }
-
 export function readGitHeadCommit(cwd: string): string | null {
   const result = spawnSync('git', ['-C', cwd, 'rev-parse', '--verify', 'HEAD'], { encoding: 'utf8' });
   if (result.status !== 0) return null;

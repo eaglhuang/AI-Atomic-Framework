@@ -1,26 +1,22 @@
 #!/usr/bin/env node
 /**
- * atomize-score.js - ATM 自我原子化 dogfood 分數報告
- * 對應: TASK-ASA-0003
+ * atomize-score.js - ATM ?芣?????dogfood ??勗?
+ * 撠?: TASK-ASA-0003
  *
- * 使用: node atm.mjs atomize score --repo . --json
+ * 雿輻: node atm.mjs atomize score --repo . --json
  *
- * 行為：
- * - 重用 atomize-inventory 的 production source / owned / unowned 統計
- * - 對 atomic-registry.json entries 評估 evidence coverage（test / rollback / provenance / report）
- * - 對 packages/cli/src/commands 估計 public command coverage
- * - 對 integrations/* 估計 integration health
- * - 對 packages/core 與 atom-callsite-readability 報告估計 readable_callsite_coverage
- * - 依 DogfoodScore schema（docs/ATOMIZATION_COVERAGE_TAXONOMY.md §3.4）輸出 atm.dogfoodScore.v1
- * - 同時寫出 atomic_workbench/atomization-coverage/dogfood-score.json
- *   與 atomic_workbench/atomization-coverage/dogfood-score.md
+ * 銵嚗? * - ? atomize-inventory ??production source / owned / unowned 蝯梯?
+ * - 撠?atomic-registry.json entries 閰摯 evidence coverage嚗est / rollback / provenance / report嚗? * - 撠?packages/cli/src/commands 隡啗? public command coverage
+ * - 撠?integrations/* 隡啗? integration health
+ * - 撠?packages/core ??atom-callsite-readability ?勗?隡啗? readable_callsite_coverage
+ * - 靘?DogfoodScore schema嚗ocs/ATOMIZATION_COVERAGE_TAXONOMY.md 禮3.4嚗撓??atm.dogfoodScore.v1
+ * - ??撖怠 atomic_workbench/atomization-coverage/dogfood-score.json
+ *   ??atomic_workbench/atomization-coverage/dogfood-score.md
  */
-
 import { execSync } from 'child_process';
 import { resolve, dirname } from 'path';
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from 'fs';
 import { pathToFileURL, fileURLToPath } from 'url';
-
 const COMPONENT_WEIGHTS = {
   source_ownership_coverage: 0.30,
   public_command_coverage: 0.20,
@@ -29,7 +25,6 @@ const COMPONENT_WEIGHTS = {
   readable_callsite_coverage: 0.10,
   integration_health: 0.10
 };
-
 const PASS_THRESHOLDS = {
   source_ownership_coverage: 95,
   public_command_coverage: 95,
@@ -39,7 +34,6 @@ const PASS_THRESHOLDS = {
   runAtm_with_readable_ref: 100,
   overall_atomization_score: 85
 };
-
 const FAIL_THRESHOLDS = {
   source_ownership_coverage: 80,
   public_command_coverage: 80,
@@ -49,14 +43,12 @@ const FAIL_THRESHOLDS = {
   runAtm_with_readable_ref: 95,
   overall_atomization_score: 70
 };
-
 function gradeFor(score) {
   if (score >= 90) return 'A';
   if (score >= 80) return 'B';
   if (score >= 70) return 'C';
   return 'F';
 }
-
 function stageFor(score) {
   if (score >= 90) return 'dogfood-excellent';
   if (score >= 70) return 'dogfood-complete';
@@ -64,7 +56,6 @@ function stageFor(score) {
   if (score >= 30) return 'dogfood-essential';
   return 'dogfood-foundation';
 }
-
 function countLineMatches(content, regex) {
   let count = 0;
   for (const line of content.split(/\r?\n/)) {
@@ -72,7 +63,6 @@ function countLineMatches(content, regex) {
   }
   return count;
 }
-
 function listDirIfExists(dirPath) {
   if (!existsSync(dirPath)) return [];
   try {
@@ -81,7 +71,6 @@ function listDirIfExists(dirPath) {
     return [];
   }
 }
-
 function evaluateRegistryEvidence(registry) {
   const entries = Array.isArray(registry.entries) ? registry.entries : [];
   if (entries.length === 0) {
@@ -94,12 +83,10 @@ function evaluateRegistryEvidence(registry) {
       coverage: 0
     };
   }
-
   let withTest = 0;
   let withRollback = 0;
   let withProvenance = 0;
   let withReport = 0;
-
   for (const entry of entries) {
     const ev = Array.isArray(entry.evidence) ? entry.evidence : [];
     const text = ev.join('\n').toLowerCase();
@@ -108,7 +95,6 @@ function evaluateRegistryEvidence(registry) {
     if (/provenance/.test(text)) withProvenance += 1;
     if (/report|attest|verify/.test(text)) withReport += 1;
   }
-
   const evidenceWeights = [withTest, withRollback, withProvenance, withReport];
   const avg = evidenceWeights.reduce((sum, v) => sum + v, 0) / (4 * entries.length);
   return {
@@ -120,12 +106,11 @@ function evaluateRegistryEvidence(registry) {
     coverage: Math.round(avg * 100)
   };
 }
-
 /**
  * TASK-AAO-0020: public_command_coverage uses packages/cli/src/commands/command-specs.ts as
  * the canonical public command catalog. A command is public when its registry entry does not
  * use `withVisibility(spec, 'internal')`. Each public command must ship a per-command help
- * spec file under packages/cli/src/commands/command-specs/<name>.spec.ts — missing files are
+ * spec file under packages/cli/src/commands/command-specs/<name>.spec.ts ??missing files are
  * counted as coverage gaps.
  */
 function evaluateCommandCoverage(cwd) {
@@ -139,7 +124,6 @@ function evaluateCommandCoverage(cwd) {
   );
   const specsDir = resolve(cwd, 'packages', 'cli', 'src', 'commands', 'command-specs');
   const relativeRegistry = 'packages/cli/src/commands/command-specs.ts';
-
   if (!existsSync(specsRegistryPath)) {
     return {
       total: 0,
@@ -152,7 +136,6 @@ function evaluateCommandCoverage(cwd) {
       notes: ['command-specs.ts not found; scorer cannot evaluate public command coverage']
     };
   }
-
   const content = readFileSync(specsRegistryPath, 'utf8');
   const blockMatch = content.match(
     /export\s+const\s+commandSpecs\s*=\s*Object\.freeze\(\{([\s\S]*?)\}\s*\)\s*;/
@@ -169,7 +152,6 @@ function evaluateCommandCoverage(cwd) {
       notes: ['commandSpecs Object.freeze block not found in command-specs.ts']
     };
   }
-
   const block = blockMatch[1];
   const publicCommands = [];
   const internalCommands = [];
@@ -190,10 +172,8 @@ function evaluateCommandCoverage(cwd) {
       publicCommands.push(name);
     }
   }
-
   publicCommands.sort();
   internalCommands.sort();
-
   const missing = [];
   let withSpec = 0;
   for (const name of publicCommands) {
@@ -204,7 +184,6 @@ function evaluateCommandCoverage(cwd) {
       missing.push(name);
     }
   }
-
   const total = publicCommands.length;
   const coverage = total === 0 ? 0 : Math.round((withSpec / total) * 100);
   return {
@@ -217,7 +196,6 @@ function evaluateCommandCoverage(cwd) {
     internalCommands
   };
 }
-
 function evaluateRuntimeBehaviorCoverage(cwd, pathMap) {
   const requiredAreas = [
     'packages/core/src/**',
@@ -241,7 +219,6 @@ function evaluateRuntimeBehaviorCoverage(cwd, pathMap) {
     coverage: Math.round((covered / requiredAreas.length) * 100)
   };
 }
-
 function evaluateReadableCallsiteCoverage(cwd) {
   const report = resolve(cwd, 'atomic_workbench', 'reports', 'atom-callsite-readability.report.json');
   if (!existsSync(report)) {
@@ -269,7 +246,6 @@ function evaluateReadableCallsiteCoverage(cwd) {
         ?? data.readableRefCallsites
     ) ?? (total === null ? null : Math.max(0, total - violationCount));
     const unreadableReasons = summarizeViolationReasons(data.violations);
-
     if (total === null && data.ok === true && violationCount === 0) {
       return {
         coverage: 100,
@@ -280,7 +256,6 @@ function evaluateReadableCallsiteCoverage(cwd) {
         unreadableReasons
       };
     }
-
     if (total === null) {
       return {
         coverage: 0,
@@ -291,7 +266,6 @@ function evaluateReadableCallsiteCoverage(cwd) {
         unreadableReasons
       };
     }
-
     if (total === 0) {
       return {
         coverage: 0,
@@ -302,7 +276,6 @@ function evaluateReadableCallsiteCoverage(cwd) {
         unreadableReasons
       };
     }
-
     return {
       coverage: Math.round((readable / total) * 100),
       total,
@@ -314,13 +287,11 @@ function evaluateReadableCallsiteCoverage(cwd) {
     return { coverage: 0, total: 0, withReadable: 0, missing: 'report-unreadable' };
   }
 }
-
 function toNonNegativeNumber(value) {
   if (value === undefined || value === null || value === '') return null;
   const numeric = Number(value);
   return Number.isFinite(numeric) && numeric >= 0 ? numeric : null;
 }
-
 function summarizeViolationReasons(violations) {
   if (!Array.isArray(violations) || violations.length === 0) return [];
   const counts = new Map();
@@ -332,7 +303,6 @@ function summarizeViolationReasons(violations) {
   }
   return [...counts.entries()].map(([code, count]) => ({ code, count }));
 }
-
 function evaluateIntegrationHealth(cwd) {
   const integrationRoot = resolve(cwd, 'integrations');
   const adapters = listDirIfExists(integrationRoot).filter((entry) => {
@@ -355,7 +325,6 @@ function evaluateIntegrationHealth(cwd) {
     coverage: Math.round((installed / adapters.length) * 100)
   };
 }
-
 function evaluateExclusionCoverage(exclusions) {
   if (!Array.isArray(exclusions) || exclusions.length === 0) return 0;
   let withReason = 0;
@@ -364,7 +333,6 @@ function evaluateExclusionCoverage(exclusions) {
   }
   return Math.round((withReason / exclusions.length) * 100);
 }
-
 function stableInventorySnapshot(inventory) {
   const categoryBreakdown = inventory?.category_breakdown && typeof inventory.category_breakdown === 'object'
     ? Object.fromEntries(Object.entries(inventory.category_breakdown).filter(([key]) => key !== 'uncategorized'))
@@ -380,7 +348,6 @@ function stableInventorySnapshot(inventory) {
   }
   return snapshot;
 }
-
 function buildRunMetadata(input) {
   const uncategorizedPathCount = typeof input.inventory?.category_breakdown?.uncategorized === 'number'
     ? input.inventory.category_breakdown.uncategorized
@@ -397,7 +364,6 @@ function buildRunMetadata(input) {
     }
   };
 }
-
 function buildMarkdownReport(score, inventory) {
   const lines = [
     `# ATM Self-Atomization Dogfood Score`,
@@ -415,10 +381,10 @@ function buildMarkdownReport(score, inventory) {
       const pass = PASS_THRESHOLDS[key];
       const fail = FAIL_THRESHOLDS[key];
       const status = pass !== undefined && value >= pass
-        ? '✅ pass'
+        ? '??pass'
         : fail !== undefined && value < fail
-          ? '❌ fail'
-          : '⚠️ at-risk';
+          ? '??fail'
+          : '?? at-risk';
       return `| ${key} | ${value} | ${pass ?? 'n/a'} | ${fail ?? 'n/a'} | ${status} |`;
     }),
     '',
@@ -432,7 +398,7 @@ function buildMarkdownReport(score, inventory) {
     '## Priority gaps',
     '',
     ...(score.priority_gaps ?? []).map((gap) =>
-      `- ${gap.area}: ${gap.current} → ${gap.target}${gap.task ? ` (driven by ${gap.task})` : ''}`
+      `- ${gap.area}: ${gap.current} ??${gap.target}${gap.task ? ` (driven by ${gap.task})` : ''}`
     ),
     '',
     `## Next high-ROI area`,
@@ -441,22 +407,19 @@ function buildMarkdownReport(score, inventory) {
     '',
     '## Notes',
     '',
-    '- Score schema: `atm.dogfoodScore.v1` (see docs/ATOMIZATION_COVERAGE_TAXONOMY.md §3.4)',
-    '- Grade thresholds: A ≥ 90, B ≥ 80, C ≥ 70, F < 70',
+    '- Score schema: `atm.dogfoodScore.v1` (see docs/ATOMIZATION_COVERAGE_TAXONOMY.md 禮3.4)',
+    '- Grade thresholds: A ??90, B ??80, C ??70, F < 70',
     ''
   ];
   return lines.join('\n');
 }
-
 export async function atomizeScore(options) {
   const repoPath = options.repo || options.cwd || '.';
   const fullPath = resolve(repoPath);
-
   const pathMapPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json');
   const exclusionPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json');
   const taxonomyPath = resolve(fullPath, 'docs', 'ATOMIZATION_COVERAGE_TAXONOMY.md');
   const registryPath = resolve(fullPath, 'atomic-registry.json');
-
   if (!existsSync(taxonomyPath)) {
     return {
       status: 'error',
@@ -464,7 +427,6 @@ export async function atomizeScore(options) {
       suggestedFix: 'Execute TASK-ASA-0001: coverage-taxonomy-exclusion-policy'
     };
   }
-
   const pathMap = existsSync(pathMapPath)
     ? JSON.parse(readFileSync(pathMapPath, 'utf8'))
     : { mappings: [] };
@@ -474,7 +436,6 @@ export async function atomizeScore(options) {
   const registry = existsSync(registryPath)
     ? JSON.parse(readFileSync(registryPath, 'utf8'))
     : { entries: [] };
-
   // Reuse inventory CLI for source ownership
   const inventoryScript = resolve(fullPath, 'scripts', 'src', 'atomize-inventory.js');
   let inventoryReport = null;
@@ -485,7 +446,6 @@ export async function atomizeScore(options) {
   } catch {
     inventoryReport = null;
   }
-
   const inv = inventoryReport?.inventory ?? {
     production_source_count: 0,
     owned_by_registry: 0,
@@ -494,14 +454,12 @@ export async function atomizeScore(options) {
     category_breakdown: {}
   };
   const scoreInventory = stableInventorySnapshot(inv);
-
   const evidenceEval = evaluateRegistryEvidence(registry);
   const commandEval = evaluateCommandCoverage(fullPath);
   const runtimeEval = evaluateRuntimeBehaviorCoverage(fullPath, pathMap);
   const readableEval = evaluateReadableCallsiteCoverage(fullPath);
   const integrationEval = evaluateIntegrationHealth(fullPath);
   const exclusionCoverage = evaluateExclusionCoverage(exclusions);
-
   const scores = {
     source_ownership_coverage: inv.coverage_percentage,
     public_command_coverage: commandEval.coverage,
@@ -510,7 +468,6 @@ export async function atomizeScore(options) {
     excluded_paths_with_reason: exclusionCoverage,
     runAtm_with_readable_ref: readableEval.coverage
   };
-
   const weightedScores = {
     source_ownership_coverage: scores.source_ownership_coverage,
     public_command_coverage: scores.public_command_coverage,
@@ -519,11 +476,9 @@ export async function atomizeScore(options) {
     readable_callsite_coverage: scores.runAtm_with_readable_ref,
     integration_health: integrationEval.coverage
   };
-
   const overall = Math.round(
     Object.entries(weightedScores).reduce((sum, [key, value]) => sum + value * (COMPONENT_WEIGHTS[key] ?? 0), 0)
   );
-
   const grade = gradeFor(overall);
   const stage = stageFor(overall);
   const previousScorePath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.json');
@@ -539,7 +494,6 @@ export async function atomizeScore(options) {
   const trend = previousOverall === null
     ? 'stable'
     : overall > previousOverall ? 'improving' : overall < previousOverall ? 'regressing' : 'stable';
-
   const priorityGaps = [];
   for (const [key, value] of Object.entries(scores)) {
     const pass = PASS_THRESHOLDS[key];
@@ -552,11 +506,9 @@ export async function atomizeScore(options) {
       });
     }
   }
-
   const nextHighRoi = priorityGaps.length === 0
     ? 'maintain-quality'
     : priorityGaps.sort((a, b) => Number.parseInt(a.current, 10) - Number.parseInt(b.current, 10))[0].area;
-
   const generatedAt = new Date().toISOString();
   const report = {
     schemaId: 'atm.dogfoodScore.v1',
@@ -581,11 +533,10 @@ export async function atomizeScore(options) {
       exclusion_coverage: exclusionCoverage
     },
     notes: [
-      'Score schema atm.dogfoodScore.v1 (docs/ATOMIZATION_COVERAGE_TAXONOMY.md §3.4).',
+      'Score schema atm.dogfoodScore.v1 (docs/ATOMIZATION_COVERAGE_TAXONOMY.md 禮3.4).',
       'TASK-ASA-0003 emits both dogfood-score.json and dogfood-score.md for human + machine consumers.'
     ]
   };
-
   // Persist reports
   const scoreJsonPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.json');
   const scoreMdPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.md');
@@ -607,7 +558,6 @@ export async function atomizeScore(options) {
   writeFileSync(scoreJsonPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
   writeFileSync(scoreMdPath, buildMarkdownReport(report, scoreInventory), 'utf8');
   writeFileSync(runMetadataPath, JSON.stringify(runMetadata, null, 2) + '\n', 'utf8');
-
   return {
     status: 'success',
     schemaId: 'atm.dogfoodScore.v1',
@@ -616,7 +566,6 @@ export async function atomizeScore(options) {
     artifacts
   };
 }
-
 function nextTaskForGap(component) {
   switch (component) {
     case 'source_ownership_coverage': return 'TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009';
@@ -628,7 +577,6 @@ function nextTaskForGap(component) {
     default: return null;
   }
 }
-
 if (import.meta.url === `file://${process.argv[1]}`) {
   const result = await atomizeScore({ repo: '.' });
   console.log(JSON.stringify(result, null, 2));

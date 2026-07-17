@@ -1,0 +1,96 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0097",
+  "updatedAt": "2026-07-17T05:20:33.684Z",
+  "updatedBy": "codex-task-rft-0097",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/cli/rft-atomization-rollout.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:physical-line-budget"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/rft-atomization-rollout.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b9a9a0b4cdb913976bcc504732b66e6ed8a35fa5bb66ec01ef9c870c7bcb0352",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/rft-atomization-rollout.test.ts"
+      ],
+      "generatedAt": "2026-07-17T05:19:17.591Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b174160e372644a7487edbb8ebd3efef910529",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7d88df83c3853a965da6d38bf5067ccb6b53fe9c1c3368a96c160450c9df3c7b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+      ],
+      "generatedAt": "2026-07-17T05:19:17.693Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b174160e372644a7487edbb8ebd3efef910529",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:physical-line-budget",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f8390b9fda982f9762c081481f6dd01d1f09eb958296dc0bd0bf312bdb860e0e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:physical-line-budget"
+      ],
+      "generatedAt": "2026-07-17T05:19:18.313Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b174160e372644a7487edbb8ebd3efef910529",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-17T05:19:30.271Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b174160e372644a7487edbb8ebd3efef910529",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:3bacfb5d0a2e59b4790667d08958a4f76becf127e23adc261c3069cb663a0965",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-17T05:19:36.864Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b174160e372644a7487edbb8ebd3efef910529",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-17T05:20:33.741Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b174160e372644a7487edbb8ebd3efef910529",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

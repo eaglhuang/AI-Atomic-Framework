@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T05-12-42-578Z-scope-amendment-6e08da3195f5",
+  "taskId": "TASK-RFT-0097",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0097",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0097.json",
+  "taskSha256": "sha256:7a7a3a74aad618c8d1b1fe3c7ed738bf8a958c53e87527b8d9c6b38ccbbf02c8",
+  "createdAt": "2026-07-17T05:12:42.578Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0097 --actor codex-task-rft-0097 --add packages/cli/src/commands/next/claim-lane-session.ts --reason \"TASK-RFT-0097 needs a bounded helper module to reduce claim-orchestration.ts below the hard 600-line gate without compressing readability.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0097 needs a bounded helper module to reduce claim-orchestration.ts below the hard 600-line gate without compressing readability."
+  }
+}
