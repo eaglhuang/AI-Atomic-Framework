@@ -107,6 +107,25 @@ Installed skill copies under agent or integration directories are derived
 artifacts; direct-only edits to those copies are not sufficient and must fail
 review because reinstalling or refreshing adapters can overwrite them.
 
+## Task Series Governance
+
+Never invent a new task-series prefix (a new TASK-XXX family) on your own.
+Before opening a card, survey the existing families in the target repository
+task ledger and in the planning repository, and reuse the semantically closest
+existing family at its next free id. Opening a brand-new series is only legal
+after a complete written plan for that series has been approved by the project
+owner. Every dispatch or card header must state which family was chosen and
+why it is the closest match; a new prefix without an approved plan must be
+rejected at review.
+
+Series legitimacy check: a series is legitimate only if its parent
+directory exists under the planning repository (3KLife
+`docs/ai_atomic_framework/<family-dir>/tasks/`). A prefix that appears only
+in the target-repo ledger with no planning-repo parent directory is itself an
+illegally invented series - do not reuse it; report it to the owner and remap
+the work onto the correct family. Task ids are assigned from the planning
+repository state, never inferred from the local target-repo ledger.
+
 ## Required Card Contract
 
 Every task card must include frontmatter or an equivalent machine-readable block:

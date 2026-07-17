@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T08-51-54-450Z-reserve-61ad9daa3017",
+  "taskId": "ATM-GOV-0155",
+  "action": "reserve",
+  "actorId": "codex-atm-gov-0155-cleanup",
+  "sessionId": null,
+  "fromStatus": "open",
+  "toStatus": "reserved",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:347b7436025242fb1a58183663e1e5c9ea9716d50658c1f8abbaf4e5ff64204f",
+  "createdAt": "2026-07-17T08:51:54.450Z",
+  "command": "node atm.mjs next --claim --task ATM-GOV-0155 --actor codex-atm-gov-0155-cleanup --auto-intent --json"
+}

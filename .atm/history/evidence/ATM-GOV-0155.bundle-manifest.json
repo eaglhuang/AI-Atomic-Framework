@@ -1,10 +1,37 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0155",
-  "updatedAt": "2026-07-17T05:12:54.059Z",
-  "updatedBy": "codex-atm-gov-0156",
-  "freshValidationPasses": [],
+  "updatedAt": "2026-07-17T08:53:28.564Z",
+  "updatedBy": "codex-atm-gov-0155-cleanup",
+  "freshValidationPasses": [
+    "typecheck"
+  ],
   "staleValidationPasses": [],
-  "commandRuns": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b93fa68d4a9cace32d2ff5a7f10567805c1147e674f979e29731c4044ca52aad",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-17T08:53:15.278Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6847b417b0879976cb6b0f3a2dd085b9088a3974",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-17T08:53:28.644Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6847b417b0879976cb6b0f3a2dd085b9088a3974",
+      "cached": false
+    }
+  ],
   "artifactPaths": []
 }

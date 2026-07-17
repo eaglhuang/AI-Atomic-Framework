@@ -28,6 +28,25 @@ assert.equal(blocked.stewardActorId, 'release-steward');
 assert.equal(blocked.sealedSourceSha, 'abc123');
 assert.equal(blocked.ordinaryTaskReleaseAutoStageAllowed, false);
 
+const nonBuildDirty = inspectRunnerSyncAdmission({
+  cwd: process.cwd(),
+  stewardActorId: 'release-steward',
+  sealedSourceSha: 'non-build-dirty',
+  runnerSyncSteward: {
+    stewardWorkId: 'runner-sync-non-build-dirty',
+    queuePosition: 1,
+    suggestedNextAction: 'run runner sync'
+  },
+  dirtyFiles: [
+    '.atm/history/evidence/TASK-LANE-0019.json',
+    '.claude/skills/atm-memory-consolidate/SKILL.md',
+    'templates/skills/atm-task-card-authoring.skill.md',
+    'docs/governance/parallel-governance-charter.md'
+  ]
+});
+assert.equal(nonBuildDirty.ok, true);
+assert.deepEqual(nonBuildDirty.foreignNonReleaseWip, []);
+
 const releaseOnly = inspectRunnerSyncAdmission({
   cwd: process.cwd(),
   stewardActorId: 'release-steward',
@@ -85,7 +104,15 @@ assert.match(ownedByAnother.requiredCommand ?? '', /other-steward/);
 const tempRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-admission-'));
 try {
   const queuePath = path.join(tempRepo, '.atm', 'runtime', 'runner-sync-steward-queue.json');
+  const taskPath = path.join(tempRepo, '.atm', 'history', 'tasks', 'TASK-A.json');
   mkdirSync(path.dirname(queuePath), { recursive: true });
+  mkdirSync(path.dirname(taskPath), { recursive: true });
+  writeFileSync(taskPath, `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-A',
+    title: 'Runner sync owner fixture',
+    status: 'running'
+  }, null, 2)}\n`, 'utf8');
   writeFileSync(queuePath, `${JSON.stringify({
     schemaId: 'atm.runnerSyncStewardQueue.v1',
     specVersion: '0.1.0',

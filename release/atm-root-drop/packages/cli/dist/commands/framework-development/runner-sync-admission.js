@@ -4,7 +4,7 @@ import path from 'node:path';
 export function inspectRunnerSyncAdmission(input) {
     const dirtyFiles = normalizePaths(input.dirtyFiles ?? readGitDirtyFiles(input.cwd));
     const releaseWip = dirtyFiles.filter(isReleasePath);
-    const foreignNonReleaseWip = dirtyFiles.filter((file) => !isReleasePath(file));
+    const foreignNonReleaseWip = dirtyFiles.filter((file) => !isReleasePath(file) && isRunnerBuildInputPath(file));
     const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input);
     return {
         schemaId: 'atm.runnerSyncAdmission.v1',
@@ -63,6 +63,15 @@ function normalizePaths(paths) {
 }
 function isReleasePath(file) {
     return file === 'release' || file.startsWith('release/');
+}
+function isRunnerBuildInputPath(file) {
+    const normalized = file.replace(/\\/g, '/').replace(/^\.\//, '');
+    return normalized === 'package.json'
+        || normalized === 'package-lock.json'
+        || normalized === 'tsconfig.json'
+        || normalized === 'tsconfig.build.json'
+        || normalized.startsWith('packages/')
+        || normalized.startsWith('scripts/');
 }
 function inspectRunnerSyncQueueHeadOwnership(input) {
     const steward = input.runnerSyncSteward ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
