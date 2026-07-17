@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0097",
   "title": "Establish global physical-line-budget gate",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-RFT-0096"
@@ -116,8 +116,8 @@
     }
   },
   "importedAt": "2026-07-17T05:11:54.943Z",
-  "lastTransitionId": "2026-07-17T05-16-25-881Z-scope-amendment-5c1c634259b8",
-  "lastTransitionAt": "2026-07-17T05:16:25.881Z",
+  "lastTransitionId": "2026-07-17T05-30-50-470Z-close-67f9a90e6ff3",
+  "lastTransitionAt": "2026-07-17T05:30:50.470Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-task-rft-0097",
   "reservedAt": "2026-07-17T05:12:06.026Z",
@@ -126,7 +126,7 @@
     "actorId": "codex-task-rft-0097",
     "leaseId": "lease-84a768868da1",
     "claimedAt": "2026-07-17T05:12:06.033Z",
-    "heartbeatAt": "2026-07-17T05:12:06.033Z",
+    "heartbeatAt": "2026-07-17T05:30:50.463Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-RFT-0097.*",
@@ -145,14 +145,14 @@
       "tests/cli/physical-line-budget-gate.test.ts",
       "tests/cli/rft-atomization-rollout.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260717051211-codex-task-rft-0097-5d0194229d",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717051211-codex-task-rft-0097-5d0194229d\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-17T05:12:06.033Z",
   "startedByActor": "codex-task-rft-0097",
@@ -203,5 +203,9 @@
     },
     "createdAt": "2026-07-17T05:12:11.529Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-17T05:30:50.463Z",
+  "closedByActor": "codex-task-rft-0097",
+  "closedBySessionId": "session-20260717051206-codex-task-rft-0097-TASK-RFT-0097-0a65543c97",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0097.closure-packet.json"
 }

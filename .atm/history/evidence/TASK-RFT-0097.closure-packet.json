@@ -1,0 +1,200 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0097",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "20106deebb51b2edda3cbe69b9f818c8113bfcbc",
+  "governedTreeSha": "74f271f3356bb744455fc183cf2f5445b4c414d2",
+  "targetCommitDelta": {
+    "currentCommitSha": "20106deebb51b2edda3cbe69b9f818c8113bfcbc",
+    "parentCommitShas": [
+      "20106deebb51b2edda3cbe69b9f818c8113bfcbc"
+    ],
+    "governedTreeSha": "74f271f3356bb744455fc183cf2f5445b4c414d2",
+    "changedFiles": [
+      "atm.mjs",
+      "package.json",
+      "packages/cli/src/commands/next/claim-lane-session.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/manager/atom-generator.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/core/src/broker/steward.ts",
+      "release/atm-root-drop/packages/core/src/manager/atom-generator.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/captain-dispatch-mailbox/render.ts",
+      "release/atm-root-drop/scripts/generate-unfinished-plan-summary.ts",
+      "release/atm-root-drop/scripts/src/atomize-score.js",
+      "release/atm-root-drop/tests/cli/rft-atomization-rollout.test.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/generate-unfinished-plan-summary-types.ts",
+      "scripts/generate-unfinished-plan-summary.ts",
+      "scripts/src/atomize-score.js",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/rft-atomization-rollout.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/rft-atomization-rollout.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b9a9a0b4cdb913976bcc504732b66e6ed8a35fa5bb66ec01ef9c870c7bcb0352",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7d88df83c3853a965da6d38bf5067ccb6b53fe9c1c3368a96c160450c9df3c7b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:physical-line-budget",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f8390b9fda982f9762c081481f6dd01d1f09eb958296dc0bd0bf312bdb860e0e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:3bacfb5d0a2e59b4790667d08958a4f76becf127e23adc261c3069cb663a0965",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/cli/rft-atomization-rollout.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:physical-line-budget"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-17T05:30:50.454Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0097.*",
+      ".atm/history/task-events/TASK-RFT-0097/**",
+      ".atm/history/tasks/TASK-RFT-0097.json",
+      "package.json",
+      "packages/cli/src/commands/next/claim-lane-session.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/manager/atom-generator.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/generate-unfinished-plan-summary-types.ts",
+      "scripts/generate-unfinished-plan-summary.ts",
+      "scripts/src/atomize-score.js",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/rft-atomization-rollout.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/next/claim-lane-session.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/manager/atom-generator.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/generate-unfinished-plan-summary-types.ts",
+      "scripts/generate-unfinished-plan-summary.ts",
+      "scripts/src/atomize-score.js",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/rft-atomization-rollout.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0097.json",
+  "closedAt": "2026-07-17T05:30:50.455Z",
+  "closedByActor": "codex-task-rft-0097",
+  "sessionId": "session-20260717051206-codex-task-rft-0097-TASK-RFT-0097-0a65543c97",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "20106deebb51b2edda3cbe69b9f818c8113bfcbc",
+    "taskMatchedFiles": [
+      "package.json",
+      "packages/cli/src/commands/next/claim-lane-session.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/manager/atom-generator.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/generate-unfinished-plan-summary-types.ts",
+      "scripts/generate-unfinished-plan-summary.ts",
+      "scripts/src/atomize-score.js",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/rft-atomization-rollout.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0097.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0097/2026-07-17T05-11-55-173Z-import-3b1e17aa99b9.json",
+      ".atm/history/task-events/TASK-RFT-0097/2026-07-17T05-12-06-026Z-reserve-b26b1af6293c.json",
+      ".atm/history/task-events/TASK-RFT-0097/2026-07-17T05-12-06-029Z-promote-6888ad847b05.json",
+      ".atm/history/task-events/TASK-RFT-0097/2026-07-17T05-12-11-520Z-claim-0695ccf6c1f1.json",
+      ".atm/history/task-events/TASK-RFT-0097/2026-07-17T05-12-42-578Z-scope-amendment-6e08da3195f5.json",
+      ".atm/history/task-events/TASK-RFT-0097/2026-07-17T05-16-25-881Z-scope-amendment-5c1c634259b8.json",
+      ".atm/history/tasks/TASK-RFT-0097.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
