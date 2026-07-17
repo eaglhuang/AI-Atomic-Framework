@@ -138,3 +138,16 @@ agents and tools that need stable per-session governance identity.
 Sweeps are intentionally report-only unless `--write` is present. This keeps
 lane cleanup auditable and prevents maintenance commands from silently
 destroying active coordination state.
+
+## Task Import Ledger Admission
+
+`node atm.mjs tasks import --write` is a governance ledger-ingestion surface when
+it writes only `.atm/history/**` task records and import events. In that Tier 1
+mode it is allowed to proceed while unrelated framework source, release,
+runner-sync, or skill adapter work is dirty.
+
+`tasks import --force --write` remains task-local: it may refresh open or planned
+ledger records from the same planning authority without a human emergency lease.
+It must still stop or escalate for same-task active claims, closed
+target-authority history overwrites, unresolved planning authority, or any import
+path that would mutate outside `.atm/history/**`.

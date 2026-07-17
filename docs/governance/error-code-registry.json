@@ -341,6 +341,70 @@
       "sourceOwner": "packages/cli/src/commands/next.ts"
     },
     {
+      "code": "ATM_TASKS_IMPORT_DRIFT",
+      "category": "task-ledger",
+      "shortDescription": "Task import found an existing task ledger record with a different planning source hash.",
+      "commonCauses": [
+        "A planning card was amended after the target ledger was imported.",
+        "The operator retried import without --force for an open or planned task ledger refresh."
+      ],
+      "remediation": [
+        "Verify that the planning card path and planning authority are correct.",
+        "For open or planned task ledger refreshes, rerun node atm.mjs tasks import --from <card> --force --write --json.",
+        "Do not use --force to overwrite closed target-authority history or a task with an active claim."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <card> --dry-run --json",
+        "node atm.mjs tasks import --from <card> --force --write --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    },
+    {
+      "code": "ATM_RUNNER_STALE_LEDGER_WRITE_ALLOWED",
+      "category": "runner-mode",
+      "shortDescription": "A stale frozen runner warning was downgraded because the command writes only task ledger import records.",
+      "commonCauses": [
+        "The frozen runner is older than source files, but the current command is limited to .atm/history task import writes.",
+        "Another lane owns runner-sync or release artifacts while a planning card still needs target ledger ingestion."
+      ],
+      "remediation": [
+        "Continue the ledger import; no human emergency lease is required for clean Tier 1 ledger ingestion.",
+        "Run runner-sync separately before code, build, release, or validation work that depends on frozen runner freshness."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <card> --write --json",
+        "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    },
+    {
+      "code": "ATM_EMERGENCY_LANE_APPROVAL_REQUIRED",
+      "category": "emergency",
+      "shortDescription": "A protected backend flag requires a human-approved emergency lease.",
+      "commonCauses": [
+        "The command would overwrite closed target-authority history.",
+        "The command would overwrite a same-task active claim or unreadable task claim state.",
+        "A protected backend override flag was used for a non-ledger mutation surface."
+      ],
+      "remediation": [
+        "For open or planned task import drift, retry tasks import --force after confirming the source planning authority; this should not require emergency approval.",
+        "For active claims, use handoff, release, or repair-claim before importing.",
+        "For closed target-authority history overwrites, obtain explicit human approval only when a governed repair or migration requires it."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": true,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json",
+        "node atm.mjs tasks import --from <card> --force --write --json",
+        "node atm.mjs emergency approve --permission backend.tasks.import.write --actor <actor> --allowed-flag --force --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/emergency/gate.ts"
+    },
+    {
       "code": "ATM_RUNNER_STALE_WRITE_REFUSED",
       "category": "runner-mode",
       "shortDescription": "ATM refused a frozen-runner write because the stable runner is older than source changes.",

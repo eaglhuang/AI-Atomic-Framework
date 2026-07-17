@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0157",
+  "title": "Classify task import force writes as Tier 1 ledger ingestion",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`tasks import --force` can import or refresh open planned task cards into the target `.atm/history/**` ledger while unrelated code/build/release/skill WIP exists in the shared worktree.",
+    "Import admission still blocks or escalates when the same target task has a fresh active claim/lane session.",
+    "Import admission still blocks or requires explicit repair/migration mode when the import would overwrite closed target-authority history.",
+    "Import admission still enforces Planning Authority Resolution Gate failures when the source planning authority cannot be resolved or is not allowed.",
+    "Import admission still refuses non-ledger mutations. Any import path that would write outside `.atm/history/**` must go through the normal shared-write broker/steward path.",
+    "Error codes and user-facing guidance distinguish ledger-ingestion conflicts from code/build/release shared-write conflicts. No human emergency lease is required for clean Tier 1 task import.",
+    "Regression tests reproduce the original dogfood failure: unrelated dirty skills/release artifacts exist, yet `tasks import --force` for an unrelated planned task succeeds or returns a task-local conflict, not an emergency lease requirement."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/import-planning-authority.ts",
+    "packages/cli/src/commands/tasks/import-validation.ts",
+    "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+    "docs/governance/command-surface.md",
+    "docs/governance/error-code-registry.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/import-planning-authority.ts",
+    "packages/cli/src/commands/tasks/import-validation.ts",
+    "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+    "docs/governance/command-surface.md",
+    "docs/governance/error-code-registry.json"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+    "node --strip-types tests/cli/cli-result-contract.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-import-ledger-ingestion",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.task-import-tier1-admission",
+        "pattern": "Admission Policy",
+        "source": "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-planning-authority.ts",
+        "packages/cli/src/commands/tasks/import-validation.ts",
+        "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "- Prefer extracting the admission rule into a small import admission helper\n  rather than expanding a large command module.\n- The helper should classify import writes as:\n  - `tier1-ledger-ingestion` when every write is `.atm/history/**`;\n  - `task-local-conflict` for same-task active claim/lane or closed-history\n    overwrite conflicts;\n  - `tier2-shared-write` for any non-ledger mutation.\n- The error details should report `taskId`, `sourcePlanPath`,\n  `planningRepoRoot`, `targetRepoRoot`, `admissionClass`, and the concrete\n  blocking reason.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0157-ledger-import-tier1-admission.task.md",
+    "sectionTitle": "ATM-GOV-0157",
+    "headingLine": 47,
+    "hash": "e46a0852b6b20715",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0157-ledger-import-tier1-admission.task.md",
+      "planningCommitSha": "553de9d8752ab2e3b05288370a29d0318ca3c93b",
+      "contentDigest": "sha256:e46a0852b6b207151770bb8fd2f83f608f1e0d1428c19069305a190021ef1163",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-17T07:02:04.132Z"
+    }
+  },
+  "importedAt": "2026-07-17T07:02:04.132Z",
+  "lastTransitionId": "2026-07-17T07-02-04-348Z-import-9d69cb1e48b5",
+  "lastTransitionAt": "2026-07-17T07:02:04.348Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
