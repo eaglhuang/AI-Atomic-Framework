@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-SYNC-0001",
   "title": "Runner sync after dispatch planning gate adapter parity",
-  "status": "running",
+  "status": "blocked",
   "milestone": null,
   "dependencies": [
     "TASK-SKL-0013"
@@ -63,17 +63,16 @@
     }
   },
   "importedAt": "2026-07-17T03:40:15.074Z",
-  "lastTransitionId": "2026-07-17T03-48-49-041Z-scope-amendment-c5fd78907dce",
-  "lastTransitionAt": "2026-07-17T03:48:49.041Z",
+  "lastTransitionId": "2026-07-17T05-11-49-727Z-release-004623a9933c",
+  "lastTransitionAt": "2026-07-17T05:11:49.727Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-runner-sync-0001",
   "reservedAt": "2026-07-17T03:40:29.525Z",
   "promotedAt": "2026-07-17T03:40:29.527Z",
   "claim": {
     "actorId": "codex-runner-sync-0001",
     "leaseId": "lease-76369c0b8564",
     "claimedAt": "2026-07-17T03:40:29.530Z",
-    "heartbeatAt": "2026-07-17T03:40:29.530Z",
+    "heartbeatAt": "2026-07-17T05:11:49.695Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-SYNC-0001.*",
@@ -83,42 +82,15 @@
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/**"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "Superseded by canonical ATM-GOV-0155 after planning card rename; release old owner lease for ledger convergence."
   },
   "startedAt": "2026-07-17T03:40:29.530Z",
   "startedByActor": "codex-runner-sync-0001",
   "startedBySessionId": "session-20260717034029-codex-runner-sync-0001-TASK-SYNC-0001-401d72cd8b",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
-    "taskId": "TASK-SYNC-0001",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/TASK-SYNC-0001.*",
-      ".atm/history/task-events/TASK-SYNC-0001/**",
-      ".atm/history/tasks/TASK-SYNC-0001.json",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-onefile/release-manifest.json",
-      "release/atm-root-drop/**"
-    ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-SYNC-0001-runner-sync-after-dispatch-adapter-parity.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-SYNC-0001-runner-sync-after-dispatch-adapter-parity.task.md"
-    ],
-    "allowPlanningMirror": false,
-    "promptHash": "b37f968540d660fa0ea445e005b48b5d091f91a0b771b2c46a440e0e7d9754eb",
-    "actorId": "codex-runner-sync-0001",
-    "sessionId": null,
-    "createdAt": "2026-07-17T03:40:33.533Z",
-    "status": "active"
-  }
+  "owner": "codex-atm-gov-0156",
+  "closedAt": "2026-07-17T05:11:07.307Z",
+  "closedByActor": "codex-atm-gov-0156",
+  "closedBySessionId": null,
+  "closeReason": "Superseded by canonical ATM-GOV-0155; original planning card was intentionally removed after rename."
 }

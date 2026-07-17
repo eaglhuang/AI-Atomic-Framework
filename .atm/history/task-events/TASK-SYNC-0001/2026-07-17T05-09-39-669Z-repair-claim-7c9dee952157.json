@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T05-09-39-669Z-repair-claim-7c9dee952157",
+  "taskId": "TASK-SYNC-0001",
+  "action": "repair-claim",
+  "actorId": "codex-atm-gov-0156",
+  "sessionId": "session-20260717034029-codex-runner-sync-0001-TASK-SYNC-0001-401d72cd8b",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-SYNC-0001.json",
+  "taskSha256": "sha256:251e3c3bc2e0f72ab91843eaade79cf6a4da39d734ada6b57ddf66d4fabaa3b7",
+  "createdAt": "2026-07-17T05:09:39.669Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-SYNC-0001 --actor codex-atm-gov-0156 --write --reason \"TASK-SYNC-0001 was superseded by canonical ATM-GOV-0155; its expired claim blocks governed continuation for ATM-GOV-0156.\" --json"
+}
