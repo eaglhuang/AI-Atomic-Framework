@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0155",
   "title": "Runner sync after dispatch planning gate adapter parity",
-  "status": "planned",
+  "status": "open",
   "milestone": null,
   "dependencies": [
     "TASK-SKL-0013",
@@ -70,7 +70,67 @@
     }
   },
   "importedAt": "2026-07-17T05:06:49.226Z",
-  "lastTransitionId": "2026-07-17T05-06-49-339Z-import-973bf38bca00",
-  "lastTransitionAt": "2026-07-17T05:06:49.339Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-17T05-14-56-939Z-release-ca8f499e38c9",
+  "lastTransitionAt": "2026-07-17T05:14:56.939Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-atm-gov-0156",
+  "reservedAt": "2026-07-17T05:12:21.815Z",
+  "promotedAt": "2026-07-17T05:12:21.818Z",
+  "claim": {
+    "actorId": "codex-atm-gov-0156",
+    "leaseId": "lease-acedeaa5f39b",
+    "claimedAt": "2026-07-17T05:12:21.821Z",
+    "heartbeatAt": "2026-07-17T05:14:56.893Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0155.json",
+      ".atm/history/evidence/ATM-GOV-0155.*",
+      ".atm/history/task-events/ATM-GOV-0155/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260717051223-codex-atm-gov-0156-2cfba3cc38",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717051223-codex-atm-gov-0156-2cfba3cc38\""
+    },
+    "reason": "Interrupt ATM-GOV-0155 closeout attempt; runner-sync validators are blocked by unrelated foreign WIP, so release claim before continuing."
+  },
+  "startedAt": "2026-07-17T05:12:21.821Z",
+  "startedByActor": "codex-atm-gov-0156",
+  "startedBySessionId": "session-20260717051221-codex-atm-gov-0156-ATM-GOV-0155-b1d561675e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0155",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0155.*",
+      ".atm/history/task-events/ATM-GOV-0155/**",
+      ".atm/history/tasks/ATM-GOV-0155.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "370713c67efe8264f6b5648913cea07dab7a638b19e11c112d153c35a252aced",
+    "actorId": "codex-atm-gov-0156",
+    "sessionId": "session-20260717051221-codex-atm-gov-0156-ATM-GOV-0155-b1d561675e",
+    "laneSession": {
+      "laneSessionId": "lane-20260717051223-codex-atm-gov-0156-2cfba3cc38",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717051223-codex-atm-gov-0156-2cfba3cc38\""
+    },
+    "createdAt": "2026-07-17T05:12:23.192Z",
+    "status": "active"
+  }
 }

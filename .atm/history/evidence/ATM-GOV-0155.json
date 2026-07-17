@@ -1,0 +1,63 @@
+{
+  "taskId": "ATM-GOV-0155",
+  "updatedAt": "2026-07-17T05:12:54.059Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: powershell -NoProfile -Command \" =1",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-atm-gov-0156",
+      "sessionId": "session-20260717051221-codex-atm-gov-0156-ATM-GOV-0155-b1d561675e",
+      "createdAt": "2026-07-17T05:12:54.059Z",
+      "details": {
+        "actorId": "codex-atm-gov-0156",
+        "sessionId": "session-20260717051221-codex-atm-gov-0156-ATM-GOV-0155-b1d561675e",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-sync.coalescing-steward-queue",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "powershell -NoProfile -Command \" =1",
+            "exitCode": 1,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "1343b0a5414db647817524e9eb730c2ccd11d4f5",
+            "cacheKey": "sha256:67525a9168d0b0c90cde3c9b11a388c91e700c49b66d66645866d0500076f3e4",
+            "cached": false,
+            "generatedAt": "2026-07-17T05:12:54.119Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e085c6d959a548dd955674182694f83e255f846054190c66ce1237bb4990b32e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
