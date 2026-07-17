@@ -30,7 +30,7 @@ owner: atm-release
 priority: P0
 depends_on: []
 related_plan: docs/path/to/work-record.md
-planning_repo: 3KLife
+planning_repo: governance-workbench
 target_repo: AI-Atomic-Framework
 closure_authority: target_repo
 scopePaths:

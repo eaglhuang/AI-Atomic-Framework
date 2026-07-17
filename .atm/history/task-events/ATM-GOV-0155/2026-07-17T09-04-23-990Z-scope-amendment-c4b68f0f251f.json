@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T09-04-23-990Z-scope-amendment-c4b68f0f251f",
+  "taskId": "ATM-GOV-0155",
+  "action": "scope-amendment",
+  "actorId": "codex-atm-gov-0155-cleanup",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:8b0e7820b09955bb3cd2b5bdf8b2f7e50ad9e4f18357fb21c5e3a330965a6ef8",
+  "createdAt": "2026-07-17T09:04:23.990Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0155 --actor codex-atm-gov-0155-cleanup --add \"templates/skills/atm-dispatch.skill.md,templates/skills/atm-task-card-authoring.skill.md,.agents/skills/atm-dispatch/SKILL.md,.claude/skills/atm-dispatch/SKILL.md,integrations/codex-skills/atm-dispatch/SKILL.md,.github/instructions/atm-dispatch.instructions.md,.github/prompts/atm-dispatch.prompt.md,.cursor/rules/skills/atm-dispatch/SKILL.md,.gemini/commands/atm-dispatch.toml,.agents/skills/atm-task-card-authoring/SKILL.md,.claude/skills/atm-task-card-authoring/SKILL.md,integrations/codex-skills/atm-task-card-authoring/SKILL.md,.github/instructions/atm-task-card-authoring.instructions.md,.github/prompts/atm-task-card-authoring.prompt.md,.cursor/rules/skills/atm-task-card-authoring/SKILL.md,.gemini/commands/atm-task-card-authoring.toml,.atm/integrations/*.manifest.json\" --reason \"Close validators show adapter parity is still incomplete: source skill templates and installed adapter copies must not hard-code a concrete governance workbench repo name such as 3KLife.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Close validators show adapter parity is still incomplete: source skill templates and installed adapter copies must not hard-code a concrete governance workbench repo name such as 3KLife."
+  }
+}

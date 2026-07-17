@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T09-06-39-719Z-scope-amendment-160929a642bf",
+  "taskId": "ATM-GOV-0155",
+  "action": "scope-amendment",
+  "actorId": "codex-atm-gov-0155-cleanup",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:049a828ef28575bb838887fa7a614d437f5c98ca03872507bc524620321017bd",
+  "createdAt": "2026-07-17T09:06:39.719Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0155 --actor codex-atm-gov-0155-cleanup --add .agents/skills/atm-atom-map-refactor/references/patterns.md --reason \"Remove concrete governance workbench repo name from installed ATM skill memory reference so the skill remains repository-neutral.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Remove concrete governance workbench repo name from installed ATM skill memory reference so the skill remains repository-neutral."
+  }
+}

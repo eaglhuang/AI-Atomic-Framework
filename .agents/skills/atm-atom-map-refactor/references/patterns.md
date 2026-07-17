@@ -108,7 +108,7 @@ Use at host or adopter boundaries.
 
 Good fits:
 
-- 3KLife planning repo opener/closeback
+- Planning repo / governance workbench opener/closeback
 - taskflow profile host opener
 - future adopter repo integration
 - broker-owned write actor boundary
