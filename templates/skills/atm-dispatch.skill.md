@@ -34,6 +34,22 @@ Delegation modes:
 External write is forbidden unless the user explicitly grants write authority
 and scope.
 
+## Highest Parallel Governance Principle
+
+Treat ATM parallel governance as a tiered authority model:
+
+- Tier 0 read work never queues behind write lanes.
+- Tier 1 private writes to the actor's own ledger, evidence, notes, or planning
+  artifacts never queue behind unrelated lanes.
+- Tier 2 shared writes to the git index, release mirrors, build artifacts,
+  protected runtime state, or other shared mutation surfaces must go through the
+  broker or steward lane.
+
+Do not serialize Tier 0 or Tier 1 work merely because another lane has active
+work. Before blocking parallel progress, identify the concrete Tier 2 shared
+surface and the intersecting task, actor, or file set that requires
+broker/steward coordination.
+
 {{ACTOR_IDENTITY_HANDOFF_GATE}}
 
 ## Dispatch Identity Rule

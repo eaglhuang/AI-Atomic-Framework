@@ -29,6 +29,24 @@ remediation, or repeatedly mishandled, route the code explanation through
 `atm-error-code-resolver`. The card should update the shared registry instead
 of adding private error-code prose to one skill.
 
+## Highest Parallel Governance Principle
+
+Use the Tier model as the first design boundary for any ATM task card that
+affects concurrency, closeout, runner sync, build, git, release mirrors, or
+broker/steward behavior:
+
+- Tier 0 read work never queues behind write lanes.
+- Tier 1 private writes to the actor's own ledger, evidence, notes, or planning
+  artifacts never queue behind unrelated lanes.
+- Tier 2 shared writes to the git index, release mirrors, build artifacts,
+  protected runtime state, or other shared mutation surfaces must go through the
+  broker or steward lane.
+
+A card that introduces or preserves a queue must name the Tier 2 shared surface
+that justifies serialization. A card that touches only Tier 0 or Tier 1 surfaces
+must not require runner-sync, build, release-mirror, or git-index serialization
+unless it also declares a concrete shared-surface intersection.
+
 ## Planning Authority Gate
 
 Before creating a plan, task-card directory, or task card, classify the request

@@ -44,6 +44,21 @@ sidecar is the default for review, preflight, grep, checklist, planning-only
 checks, and post-report verification. External dispatch is opt-in, and external
 write is forbidden unless the user explicitly grants write authority and scope.
 
+## Highest Parallel Governance Principle
+
+ATM parallel governance uses a Tier model:
+
+- Tier 0 read work never queues behind write lanes.
+- Tier 1 private writes to the actor's own ledger, evidence, notes, or planning
+  artifacts never queue behind unrelated lanes.
+- Tier 2 shared writes to the git index, release mirrors, build artifacts,
+  protected runtime state, or other shared mutation surfaces must go through the
+  broker or steward lane.
+
+Use this model before widening a blocker. A natural-language request for
+inspection, planning, evidence, or private ledger work should remain parallel
+unless ATM identifies a concrete Tier 2 shared surface intersection.
+
 ## Delivery Principle
 
 The objective is to deliver the task content, not to close task cards. A task

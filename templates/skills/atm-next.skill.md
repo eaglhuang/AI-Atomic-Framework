@@ -33,6 +33,21 @@ when the editor cannot run the semantic intent skill.
 
 {{ACTOR_IDENTITY_HANDOFF_GATE}}
 
+## Highest Parallel Governance Principle
+
+When interpreting ATM concurrency guidance, preserve this Tier model:
+
+- Tier 0 read work never queues behind write lanes.
+- Tier 1 private writes to the actor's own ledger, evidence, notes, or planning
+  artifacts never queue behind unrelated lanes.
+- Tier 2 shared writes to the git index, release mirrors, build artifacts,
+  protected runtime state, or other shared mutation surfaces must go through the
+  broker or steward lane.
+
+If a route blocks parallel work, surface the concrete Tier 2 shared surface and
+the intersecting task, actor, or file set. Do not treat an unrelated active lane
+as a reason to block Tier 0 reading or Tier 1 private evidence/ledger progress.
+
 First command:
 
 ```bash
