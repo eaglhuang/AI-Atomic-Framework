@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T09-51-44-428Z-scope-amendment-6acdb8ee934e",
+  "taskId": "ATM-GOV-0155",
+  "action": "scope-amendment",
+  "actorId": "codex-atm-gov-0155-cleanup",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:e50833c6e4a66f83a8d276a08c8e76dbff6901bdf441d4d9ecf8d78852b1faee",
+  "createdAt": "2026-07-17T09:51:44.428Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0155 --actor codex-atm-gov-0155-cleanup --add .atm/history/evidence/ATM-GOV-0155.runner-sync-receipt-fe3b05ab.json --reason \"Attach runner-sync receipt for sealed source fe3b05ab to ATM-GOV-0155 evidence context before close.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Attach runner-sync receipt for sealed source fe3b05ab to ATM-GOV-0155 evidence context before close."
+  }
+}

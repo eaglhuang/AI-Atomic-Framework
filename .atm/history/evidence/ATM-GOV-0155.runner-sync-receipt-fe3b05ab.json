@@ -1,0 +1,27 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "taskId": "ATM-GOV-0155",
+  "actorId": "codex-atm-gov-0155-cleanup",
+  "stewardWorkId": "runner-sync-202cd78f",
+  "sealedSourceSha": "fe3b05abf021855bea2c174fcdcf2f7279ba0c40",
+  "builtAt": "2026-07-17T09:51:25.702Z",
+  "command": "ATM_RETAIN_RELEASE_ARTIFACTS=1 ATM_ACTOR_ID=codex-atm-gov-0155-cleanup npm run build",
+  "result": "passed",
+  "artifactHashes": {
+    "atm.mjs": {
+      "sha256": "sha256:7dfda82fba40fd02cff5b79b8c008f548e9465828484d5e3163620638aa8df64",
+      "bytes": 1050
+    },
+    "release/atm-onefile/atm.mjs": {
+      "sha256": "sha256:3c4e32c6cf48ca5daf1a639d95580cccc8ac9dc56ce6ee21f9b40bc74d39d8ef",
+      "bytes": 3252179
+    },
+    "release/atm-onefile/release-manifest.json": {
+      "sha256": "sha256:21973e4a55dac5767f1608b525e1365e7430bac2b27e9c2f1c7f2285427c066b",
+      "bytes": 1051
+    }
+  },
+  "notes": [
+    "Rebuilt sealed runner after delivery commit fe3b05ab; release artifact content matched tracked output."
+  ]
+}
