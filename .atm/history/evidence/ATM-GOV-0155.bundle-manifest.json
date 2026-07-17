@@ -1,11 +1,12 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0155",
-  "updatedAt": "2026-07-17T09:07:38.200Z",
+  "updatedAt": "2026-07-17T09:11:38.644Z",
   "updatedBy": "codex-atm-gov-0155-cleanup",
   "freshValidationPasses": [
     "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
     "typecheck",
+    "validate:cli",
     "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
@@ -58,6 +59,32 @@
       "generatedAt": "2026-07-17T09:07:38.262Z",
       "runnerKind": "dev-source",
       "sourceCommit": "d6e261cb5a409d952c6a9a0aedeb1fc079ef9e6f",
+      "cached": false
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4b1515811af2e9e4ceb070de430eb5cb0f9ea0a60ee8323beaba4974c3e254e1",
+      "stderrSha256": "sha256:6e6cd13cb1861dd3ce6167de9b1622f617250e0aec1b83dc37ac75ea2045583d",
+      "validators": [
+        "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+      ],
+      "generatedAt": "2026-07-17T09:10:14.969Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:d7e5c03ef8ed3b50cb80b84bc02a6700d691be52940864a94c3e091830a24c97",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-17T09:11:38.718Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0de9a493e5bd18dc455272137a1a2c077f9e161",
       "cached": false
     }
   ],

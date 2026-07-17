@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T09-17-21-638Z-scope-amendment-423c8af3be05",
+  "taskId": "ATM-GOV-0155",
+  "action": "scope-amendment",
+  "actorId": "codex-atm-gov-0155-cleanup",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:6a2a4cefee5843f3a9c0128ea78857d3f13fc6e52ffc4ed6fc28a64ee5c43198",
+  "createdAt": "2026-07-17T09:17:21.638Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0155 --actor codex-atm-gov-0155-cleanup --add .atm/history/evidence/ATM-GOV-0155.runner-sync-receipt.json --reason \"Attach runner-sync steward receipt to ATM-GOV-0155 evidence bundle so build ticket release evidence travels with task context.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Attach runner-sync steward receipt to ATM-GOV-0155 evidence bundle so build ticket release evidence travels with task context."
+  }
+}
