@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0013",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "257fa2d0482af7b00828d5ccf16460af19dcc687",
+  "governedTreeSha": "fe975af2c5832df2484d62c54c32d92f5639e1a3",
+  "targetCommitDelta": {
+    "currentCommitSha": "257fa2d0482af7b00828d5ccf16460af19dcc687",
+    "parentCommitShas": [
+      "257fa2d0482af7b00828d5ccf16460af19dcc687"
+    ],
+    "governedTreeSha": "fe975af2c5832df2484d62c54c32d92f5639e1a3",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-task-card-authoring/SKILL.md",
+      ".atm/history/evidence/TASK-SKL-0013.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0013.json",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "integrations/codex-skills/atm-task-card-authoring/SKILL.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da1f87a2321706989652c0f294c29b7a6c134c183c63abfdee52486ebc9e8375",
+      "stderrSha256": "sha256:b563ea8d611cf1040782c6d2493fc8647d4a0f37d25b89c2c1d0e4eb56dd7892",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs next --prompt \" Author an ATM framework improvement plan without using the target repository as the planning queue\\",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node -e 'const fs=require(\" fs\\);",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:54db0a3b370cc6d943bfd53ceedb8fe2ef838c2377103e9e400b4d4fb060a1d3",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs next --prompt Author",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a6b244a1852f8f90531ad13d703b39df212a7786a36cf3061ffac2a8032cc2f3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs next --prompt \"Author an ATM framework improvement plan without using the target repository as the planning queue\" --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8c41069a5d87100c38c5185a503d8271c1849bfde969cd4b7893f48462547d10",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node atm.mjs next --prompt \"Author an ATM framework improvement plan without using the target repository as the planning queue\" --json",
+    "node atm.mjs next --prompt Author",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-17T02:02:56.928Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-task-card-authoring/SKILL.md",
+      ".atm/history/evidence/TASK-SKL-0013.*",
+      ".atm/history/task-events/TASK-SKL-0013/**",
+      ".atm/history/tasks/TASK-SKL-0013.json",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "integrations/codex-skills/atm-task-card-authoring/SKILL.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0013.json",
+  "closedAt": "2026-07-17T02:02:56.928Z",
+  "closedByActor": "codex-skl-0013",
+  "sessionId": "session-20260716151944-codex-skl-0013-TASK-SKL-0013-0ce5a5afd2",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+    "taskMatchedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-task-card-authoring/SKILL.md",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "integrations/codex-skills/atm-task-card-authoring/SKILL.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0013.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0013/2026-07-16T15-15-22-737Z-import-40ef1a00a72a.json",
+      ".atm/history/task-events/TASK-SKL-0013/2026-07-16T15-19-44-924Z-reserve-f84e69266051.json",
+      ".atm/history/task-events/TASK-SKL-0013/2026-07-16T15-19-44-927Z-promote-243fabd45c4c.json",
+      ".atm/history/task-events/TASK-SKL-0013/2026-07-16T15-19-48-853Z-claim-942aeaaca48a.json",
+      ".atm/history/tasks/TASK-SKL-0013.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

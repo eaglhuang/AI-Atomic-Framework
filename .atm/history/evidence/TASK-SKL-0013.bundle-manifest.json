@@ -1,9 +1,11 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-SKL-0013",
-  "updatedAt": "2026-07-16T15:24:58.604Z",
+  "updatedAt": "2026-07-17T02:01:59.871Z",
   "updatedBy": "codex-skl-0013",
   "freshValidationPasses": [
+    "node atm.mjs next --prompt \"Author an ATM framework improvement plan without using the target repository as the planning queue\" --json",
+    "node atm.mjs next --prompt Author",
     "typecheck",
     "validate:cli",
     "validate:git-head-evidence"
@@ -47,6 +49,32 @@
       "generatedAt": "2026-07-16T15:24:58.765Z",
       "runnerKind": "dev-source",
       "sourceCommit": "006ed57836652e19f47561c75e9d71fd2bb44cc9",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs next --prompt Author",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a6b244a1852f8f90531ad13d703b39df212a7786a36cf3061ffac2a8032cc2f3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs next --prompt Author"
+      ],
+      "generatedAt": "2026-07-17T02:01:11.832Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs next --prompt \"Author an ATM framework improvement plan without using the target repository as the planning queue\" --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8c41069a5d87100c38c5185a503d8271c1849bfde969cd4b7893f48462547d10",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs next --prompt \"Author an ATM framework improvement plan without using the target repository as the planning queue\" --json"
+      ],
+      "generatedAt": "2026-07-17T02:02:00.024Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
