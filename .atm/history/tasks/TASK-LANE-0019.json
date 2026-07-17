@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0019",
+  "title": "Persist lane session event history and wire analyzer evidence",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0018"
+  ],
+  "acceptance": [
+    "Lane heartbeat, adopt, sweep, expire, and session lifecycle transitions write append-only history records.",
+    "Tests cover event append behavior and confirm historical records are not overwritten when the runtime snapshot changes.",
+    "Analyzer output contains lane evidence fields and preserves the existing task-event based report.",
+    "Analyzer output can identify the observed `TASK-CODEX-0204` plus `TASK-LANE-0001`/`0002`/`0003`/`0010` hard-overlap sample with `maxConcurrency >= 2`.",
+    "No source planning cards are created in the ATM target repo; target receives only imported `.atm/history/**` ledger state for this card."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/lane-session/events.ts",
+    "packages/cli/src/commands/lane-session/store.ts",
+    "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+    "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "scripts/analyze-captain-parallel-ledger.ts",
+    "docs/reports/mao-parallel-routing-benchmark.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/lane-session/events.ts",
+    "packages/cli/src/commands/lane-session/store.ts",
+    "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+    "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "scripts/analyze-captain-parallel-ledger.ts",
+    "docs/reports/mao-parallel-routing-benchmark.md",
+    ".atm/history/evidence/TASK-LANE-0019.*",
+    ".atm/history/task-events/TASK-LANE-0019/**",
+    ".atm/history/tasks/TASK-LANE-0019.json"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "node --strip-types scripts/analyze-captain-parallel-ledger.ts --json",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane-session-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane-session-event-history",
+        "pattern": "Append-only Event Store",
+        "source": "packages/cli/src/commands/lane-session/events.ts",
+        "disposition": "inline",
+        "inlineReason": "Existing lane-session event helpers are the intended owner surface for this durable history."
+      },
+      {
+        "atom": "atm.parallel-ledger-analyzer-lane-evidence",
+        "pattern": "Analyzer Input Adapter",
+        "source": "scripts/analyze-captain-parallel-ledger.ts",
+        "disposition": "inline",
+        "inlineReason": "The analyzer already owns parallel ledger evidence projection; this card adds lane evidence as a bounded input."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0019-lane-session-event-history-analyzer.task.md",
+    "sectionTitle": "TASK-LANE-0019",
+    "headingLine": 57,
+    "hash": "4fc15d723a3fc144",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0019-lane-session-event-history-analyzer.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4fc15d723a3fc144d147fc497686038102d33b017e9e22419e85a57f77d32a38",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-17T01:59:33.008Z"
+    }
+  },
+  "importedAt": "2026-07-17T01:59:33.008Z",
+  "lastTransitionId": "2026-07-17T01-59-33-309Z-import-bea37172f440",
+  "lastTransitionAt": "2026-07-17T01:59:33.309Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
