@@ -89,6 +89,11 @@ export declare const minimumAtmEntrySkillDefinitions: readonly [{
     readonly title: "ATM Atom Map Refactor";
     readonly summary: "Plan ATM framework refactors by preserving atom/map semantics before splitting large governance modules.";
     readonly command: "node atm.mjs next --prompt \"$ARGUMENTS\" --json";
+}, {
+    readonly id: "atm-memory-consolidate";
+    readonly title: "ATM Memory Consolidate";
+    readonly summary: "Reflective consolidation pass over a repository's keep-memory notes — merge duplicates, retire stale entries, rebuild the summary index.";
+    readonly command: "node atm.mjs next --prompt \"$ARGUMENTS\" --json";
 }];
 export declare function parseSkillTemplate(content: string, sourcePath?: string): AtmSkillTemplate;
 export declare function loadSkillTemplates(templateDirectory?: string): readonly AtmSkillTemplate[];

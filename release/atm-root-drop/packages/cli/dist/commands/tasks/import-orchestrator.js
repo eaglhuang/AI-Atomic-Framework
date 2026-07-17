@@ -10,6 +10,7 @@ import { assertEmergencyApproval } from '../emergency/gate.js';
 import { buildExtractionFirstPatrolDiagnostics, validateDeliverablesList } from './task-import-validators.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
+import { classifyForceImportAdmission } from './import-validation.js';
 import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
 export async function runTasksImport(argv) {
     const options = parseImportOptions(argv);
@@ -40,12 +41,11 @@ export async function runTasksImport(argv) {
         resetOpenClassification = classifyResetOpenImportForOptions(options);
     }
     const resetOpenNeedsEmergency = options.resetOpen && (resetOpenClassification?.resetOpenEmergencyRequired ?? true);
-    const importEmergencyRequired = options.write && (options.force
-        || options.forceOverwriteClaims
+    let emergencyUse = null;
+    const earlyEmergencyRequired = options.write && (options.forceOverwriteClaims
         || resetOpenNeedsEmergency
         || options.allowStaleRunner);
-    let emergencyUse = null;
-    if (importEmergencyRequired) {
+    if (earlyEmergencyRequired) {
         emergencyUse = assertEmergencyApproval({
             cwd: options.cwd,
             surface: 'tasks import --write recovery flags',
@@ -54,7 +54,6 @@ export async function runTasksImport(argv) {
             actorId: null,
             emergencyApproval: options.emergencyApproval,
             flags: [
-                ...(options.force ? ['--force'] : []),
                 ...(options.forceOverwriteClaims ? ['--force-overwrite-claims'] : []),
                 ...(resetOpenNeedsEmergency ? ['--reset-open'] : []),
                 ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
@@ -145,6 +144,22 @@ export async function runTasksImport(argv) {
         ...enrichedParsed,
         tasks: enrichedParsed.tasks.map((task) => attachPlanningSourceSeal(task, planningSourceSeal))
     };
+    const forceImportAdmission = options.write
+        ? classifyForceImportAdmission({ cwd: options.cwd, tasks: parsed.tasks, force: options.force })
+        : null;
+    if (forceImportAdmission?.emergencyRequired) {
+        emergencyUse = assertEmergencyApproval({
+            cwd: options.cwd,
+            surface: 'tasks import --write recovery flags',
+            permission: 'backend.tasks.import.write',
+            taskId: forceImportAdmission.taskIds[0] ?? options.from.match(/TASK-[A-Z]+-\d+/i)?.[0] ?? null,
+            actorId: null,
+            emergencyApproval: options.emergencyApproval,
+            flags: forceImportAdmission.blockingFlags,
+            reason: forceImportAdmission.reason,
+            command: `node atm.mjs tasks import --from ${options.from} --write --force --json`
+        });
+    }
     // TASK-AAO-FABLE-007: extraction-first patrol — advisory only.
     parsed = {
         ...parsed,

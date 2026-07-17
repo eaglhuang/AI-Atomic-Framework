@@ -2,8 +2,12 @@
   "schemaId": "atm.charterInvariants",
   "schemaVersion": "atm.invariants.v0.1",
   "specVersion": "0.1.0",
-  "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial installation by atm init." },
-  "charterVersion": "2.0.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial installation by atm init."
+  },
+  "charterVersion": "2.2.0",
   "projectName": "{{PROJECT_NAME}}",
   "lastAmendedAt": "{{LAST_AMENDED_DATE}}",
   "charterHash": "{{ATOMIC_CHARTER_SHA256}}",
@@ -11,9 +15,18 @@
   "scheduleA": {
     "scheduleId": "schedule-a-economic-thresholds",
     "economicRatios": {
-      "production": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 1.1 },
-      "preferred": { "maxCostRatio": 1.05, "maxEndToEndTimeRatio": 1.05 },
-      "breakthrough": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 0.8 }
+      "production": {
+        "maxCostRatio": 1.1,
+        "maxEndToEndTimeRatio": 1.1
+      },
+      "preferred": {
+        "maxCostRatio": 1.05,
+        "maxEndToEndTimeRatio": 1.05
+      },
+      "breakthrough": {
+        "maxCostRatio": 1.1,
+        "maxEndToEndTimeRatio": 0.8
+      }
     },
     "tokenDiagnostics": {
       "required": true,
@@ -21,9 +34,21 @@
       "rationale": "Raw token counts are required diagnostics, but actual monetary cost is the economic authority across providers and models."
     },
     "teamThresholds": {
-      "production": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 1.0, "requiresMeasuredAcceleration": true },
-      "preferred": { "maxCostRatio": 1.05, "maxEndToEndTimeRatio": 0.95, "requiresMeasuredAcceleration": true },
-      "breakthrough": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 0.8, "requiresMeasuredAcceleration": true }
+      "production": {
+        "maxCostRatio": 1.1,
+        "maxEndToEndTimeRatio": 1,
+        "requiresMeasuredAcceleration": true
+      },
+      "preferred": {
+        "maxCostRatio": 1.05,
+        "maxEndToEndTimeRatio": 0.95,
+        "requiresMeasuredAcceleration": true
+      },
+      "breakthrough": {
+        "maxCostRatio": 1.1,
+        "maxEndToEndTimeRatio": 0.8,
+        "requiresMeasuredAcceleration": true
+      }
     }
   },
   "invariants": [
@@ -33,7 +58,10 @@
       "rule": "A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.",
       "enforcement": "gate",
       "breakingChange": true,
-      "tags": ["registry", "core-boundary"],
+      "tags": [
+        "registry",
+        "core-boundary"
+      ],
       "rationale": "A second registry would split the source of truth for atom identity and lifecycle, making cross-tool governance impossible."
     },
     {
@@ -42,7 +70,11 @@
       "rule": "No governed file mutation may occur without a valid ScopeLock recorded in .atm/locks/ for the current WorkItem. Agents must call atm lock before editing files.",
       "enforcement": "doctor",
       "breakingChange": false,
-      "tags": ["lock", "governance", "default-guard"],
+      "tags": [
+        "lock",
+        "governance",
+        "default-guard"
+      ],
       "rationale": "Scope locks are the primary contention signal that lets multiple agents or humans work in the same repository without stepping on each other."
     },
     {
@@ -51,7 +83,11 @@
       "rule": "An UpgradeProposal must pass all automatedGates (including JSON Schema validation) before promotion. Direct registry mutation that bypasses the UpgradeProposal path is forbidden.",
       "enforcement": "gate",
       "breakingChange": true,
-      "tags": ["upgrade", "registry", "schema"],
+      "tags": [
+        "upgrade",
+        "registry",
+        "schema"
+      ],
       "rationale": "Schema validation gates are the deterministic backbone that makes ATM governance auditable and reproducible."
     },
     {
@@ -60,7 +96,10 @@
       "rule": "No host project rule, profile, or configuration may declare itself to have authority equal to or higher than the AtomicCharter. Any rule that contradicts an invariant must go through a charter waiver proposal.",
       "enforcement": "doctor",
       "breakingChange": true,
-      "tags": ["charter", "authority"],
+      "tags": [
+        "charter",
+        "authority"
+      ],
       "rationale": "A single authoritative charter is what makes ATM composable across different host projects with different conventions."
     },
     {
@@ -69,7 +108,11 @@
       "rule": "When a host project rule conflicts with a charter invariant, the host must submit a behavior.evolve UpgradeProposal with a charterWaiver field and a linked HumanReviewDecision. Silent override is not permitted.",
       "enforcement": "waiver-required",
       "breakingChange": false,
-      "tags": ["charter", "host-rules", "waiver"],
+      "tags": [
+        "charter",
+        "host-rules",
+        "waiver"
+      ],
       "rationale": "Making conflict resolution explicit and auditable prevents silent governance drift across projects that adopt ATM."
     },
     {
@@ -78,7 +121,11 @@
       "rule": "The framework repository must not host coordinating implementation task cards, planning queues, or project-specific work tracking artifacts beyond ATM's own bootstrap/runtime-managed files. Upstream planning cards belong in the coordinating host workspace and may feed evidence back upstream without becoming framework-resident work tracking.",
       "enforcement": "doctor",
       "breakingChange": true,
-      "tags": ["framework-boundary", "work-tracking", "downstream-coordination"],
+      "tags": [
+        "framework-boundary",
+        "work-tracking",
+        "downstream-coordination"
+      ],
       "rationale": "ATM is an open-source governance framework, not the coordinating project workspace. Keeping implementation task tracking downstream prevents the framework repository from becoming host-specific or duplicating a second planning system."
     },
     {
@@ -87,8 +134,26 @@
       "rule": "Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.",
       "enforcement": "doctor",
       "breakingChange": true,
-      "tags": ["documentation", "open-source", "public-surface", "neutrality"],
+      "tags": [
+        "documentation",
+        "open-source",
+        "public-surface",
+        "neutrality"
+      ],
       "rationale": "ATM's framework repository is a public open-source surface. Keeping its contributor-facing documentation English-only and neutral preserves accessibility, reviewability, and downstream portability."
+    },
+    {
+      "id": "INV-ATM-008",
+      "title": "Broker tickets, not refusals",
+      "rule": "Every governed shared-write gate (runner-sync, build windows, release mirrors, git commit, projection regeneration) must respond with a broker ticket - execute now, enqueue with position, or batch into a shared write window - never a bare refusal. Reads and private writes (own ledger, evidence, task events, lane sessions) never queue. The only standing exceptions are the four owner-ruled cases in docs/governance/parallel-governance-charter.md; any new serialization point requires an explicit project-owner ruling before it ships.",
+      "enforcement": "doctor",
+      "breakingChange": false,
+      "tags": [
+        "parallel",
+        "broker",
+        "governance"
+      ],
+      "rationale": "Parallel lane development is the framework mission; a bare refusal at a shared surface silently serializes unrelated work, while a broker ticket keeps every lane moving with a concrete next step and measurable queue time."
     }
   ]
 }

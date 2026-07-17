@@ -29,6 +29,33 @@ remediation, or repeatedly mishandled, route the code explanation through
 `atm-error-code-resolver`. The card should update the shared registry instead
 of adding private error-code prose to one skill.
 
+## Highest Parallel Governance Principle
+
+Use the Tier model as the first design boundary for any ATM task card that
+affects concurrency, closeout, runner sync, build, git, release mirrors, or
+broker/steward behavior:
+
+- Reads never queue behind write lanes.
+- Private writes to the actor's own ledger, evidence, notes, or planning
+  artifacts never queue behind unrelated lanes.
+- Shared writes to the git index, release mirrors, build artifacts, protected
+  runtime state, or other shared mutation surfaces go through the broker, which
+  answers with a ticket: execute now, enqueue with a position, or batch into a
+  shared write window. A bare refusal at a shared-write gate is charter debt
+  (INV-ATM-008), not a design choice.
+
+The only standing serialization exceptions are the four owner-ruled cases in
+`docs/governance/parallel-governance-charter.md` (one lane session per task
+card; dependency gates block code only, never documents; the single-branch
+commit core with related-task batching only; document writes are ungoverned,
+code writes are always governed). Any new serialization point must be surfaced
+to the project owner for an explicit ruling before it ships.
+
+A card that introduces or preserves a queue must name the Tier 2 shared surface
+that justifies serialization. A card that touches only Tier 0 or Tier 1 surfaces
+must not require runner-sync, build, release-mirror, or git-index serialization
+unless it also declares a concrete shared-surface intersection.
+
 ## Planning Authority Gate
 
 Before creating a plan, task-card directory, or task card, classify the request
