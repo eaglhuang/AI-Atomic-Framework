@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T08-21-45-256Z-close-00bc7008914f",
+  "taskId": "TASK-LANE-0020",
+  "action": "close",
+  "actorId": "codex-lane-0020",
+  "sessionId": "session-20260717081614-codex-lane-0020-TASK-LANE-0020-93c651432d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0020.json",
+  "taskSha256": "sha256:2c8a5b6902e1d8324a373672386403e5aa14f4100003ce7131e037e78adce4f5",
+  "createdAt": "2026-07-17T08:21:45.256Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0020 --actor codex-lane-0020 --status done --historical-delivery 0c9de529bb57d91944b3832d5b55b616acf779d0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260717081614-codex-lane-0020-TASK-LANE-0020-93c651432d",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0020.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "node --strip-types tests/cli/cli-result-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-17T08:21:45.246Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0020.*",
+        ".atm/history/task-events/TASK-LANE-0020/**",
+        ".atm/history/tasks/TASK-LANE-0020.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/**",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/reports/lane-session-repair-claim-adjudication.md",
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
