@@ -34,6 +34,30 @@ or governed `git ...` command, resolve this agent's explicit actor id.
 - Never treat repo default identity as authority. It is only a stale-prone hint and may belong to the previous agent.
 - Do not claim, commit, or report as another actor unless ATM returned an explicit takeover route for that actor and task.
 
+## Highest Parallel Governance Principle
+
+When interpreting ATM concurrency guidance, preserve this Tier model:
+
+- Reads never queue behind write lanes.
+- Private writes to the actor's own ledger, evidence, notes, or planning
+  artifacts never queue behind unrelated lanes.
+- Shared writes to the git index, release mirrors, build artifacts, protected
+  runtime state, or other shared mutation surfaces go through the broker, which
+  answers with a ticket: execute now, enqueue with a position, or batch into a
+  shared write window. A bare refusal at a shared-write gate is charter debt
+  (INV-ATM-008), not a design choice.
+
+The only standing serialization exceptions are the four owner-ruled cases in
+`docs/governance/parallel-governance-charter.md` (one lane session per task
+card; dependency gates block code only, never documents; the single-branch
+commit core with related-task batching only; document writes are ungoverned,
+code writes are always governed). Any new serialization point must be surfaced
+to the project owner for an explicit ruling before it ships.
+
+If a route blocks parallel work, surface the concrete Tier 2 shared surface and
+the intersecting task, actor, or file set. Do not treat an unrelated active lane
+as a reason to block Tier 0 reading or Tier 1 private evidence/ledger progress.
+
 First command:
 
 ```bash
