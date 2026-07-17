@@ -86,6 +86,17 @@ If a route, validator, hook, or worker report includes an `ATM_*` error code,
 route interpretation through `atm-error-code-resolver` and its shared registry
 instead of keeping private recovery prose in the dispatch brief.
 
+## Task Series Governance
+
+Never invent a new task-series prefix (a new TASK-XXX family) on your own.
+Before opening a card, survey the existing families in the target repository
+task ledger and in the planning repository, and reuse the semantically closest
+existing family at its next free id. Opening a brand-new series is only legal
+after a complete written plan for that series has been approved by the project
+owner. Every dispatch or card header must state which family was chosen and
+why it is the closest match; a new prefix without an approved plan must be
+rejected at review.
+
 ## Dispatch Rules
 
 - Before drafting a plan or task cards, state `Planning authority`, `Target
