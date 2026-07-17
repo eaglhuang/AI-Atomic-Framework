@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0098",
+  "title": "Touched-file physical-line admission gate",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0097"
+  ],
+  "acceptance": [
+    "Claim admission reports or blocks touched files above the physical line cap.",
+    "Pre-close and governed commit paths run the same touched-file check before accepting source delivery.",
+    "The check ignores generated, release, fixture, dependency, and ATM-managed ledger artifacts consistently with `scripts/validate-physical-line-budget.ts`.",
+    "Diagnostics name each offending file, line count, hard limit, actor/task context when available, and the command needed to reproduce the report.",
+    "Focused regression covers at least one passing touched file and one blocked oversized touched file without requiring a real oversized source file in the repository."
+  ],
+  "deliverables": [
+    "scripts/validate-physical-line-budget.ts",
+    "tests/cli/touched-physical-line-admission.test.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/git-governance/commit-scope-policy.ts"
+  ],
+  "scopePaths": [
+    "package.json",
+    "scripts/validate-physical-line-budget.ts",
+    "tests/cli/physical-line-budget-gate.test.ts",
+    "tests/cli/touched-physical-line-admission.test.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/git-governance/commit-scope-policy.ts"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-physical-line-budget.ts --json",
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Lowering the global 600-line cap.",
+    "Rewriting unrelated claim, close, or commit lifecycle behavior.",
+    "Opening continuation cards automatically."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the touched-file line admission wiring and focused regression if legitimate <=600-line touched files are blocked.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.touched-physical-line-admission",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.touched-physical-line-admission",
+        "pattern": "Policy Object",
+        "source": "scripts/validate-physical-line-budget.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.claim-line-budget-gate",
+        "pattern": "Gate Adapter",
+        "source": "packages/cli/src/commands/next/claim-orchestration.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "package.json",
+        "scripts/validate-physical-line-budget.ts",
+        "tests/cli/physical-line-budget-gate.test.ts",
+        "tests/cli/touched-physical-line-admission.test.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "- Reuse the global scanner/policy from TASK-RFT-0097; do not create a second\n  line-budget implementation.\n- Keep touched-file admission separate from semantic atomization scoring; that\n  belongs to TASK-RFT-0099.",
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0098-touched-file-physical-line-admission.task.md",
+    "sectionTitle": "TASK-RFT-0098",
+    "headingLine": 60,
+    "hash": "2a8ad97206d4ce9f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0098-touched-file-physical-line-admission.task.md",
+      "planningCommitSha": "15eebaf62c8cab90d5558359ea98989b7f577827",
+      "contentDigest": "sha256:2a8ad97206d4ce9fdd55196d0f84d6615f9d608f2aa047e1b83227a81a1db574",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-17T13:20:15.004Z"
+    }
+  },
+  "importedAt": "2026-07-17T13:20:15.004Z",
+  "lastTransitionId": "2026-07-17T13-20-15-092Z-import-f40ac0912575",
+  "lastTransitionAt": "2026-07-17T13:20:15.092Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0100",
+  "title": "Automatic RFT continuation-card generation",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0099"
+  ],
+  "acceptance": [
+    "The generator reads current line-budget and semantic metric evidence and proposes candidate `TASK-RFT` cards with scope, deliverables, validators, rollback notes, and atomization impact.",
+    "Dry-run JSON includes skipped candidates with reasons, duplicate detection, and the next proposed task id.",
+    "The generator refuses to write cards unless the planning repository root and target repository root are explicit.",
+    "Focused regression covers a generated card, a duplicate candidate, and an empty inventory.",
+    "Documentation names the generator as an authoring aid, not as an automatic import/claim/close mechanism."
+  ],
+  "deliverables": [
+    "scripts/generate-rft-continuation-cards.ts",
+    "tests/cli/rft-continuation-card-generation.test.ts",
+    "docs/governance/command-surface.md"
+  ],
+  "scopePaths": [
+    "package.json",
+    "scripts/validate-physical-line-budget.ts",
+    "scripts/generate-rft-continuation-cards.ts",
+    "tests/cli/rft-continuation-card-generation.test.ts",
+    "docs/governance/command-surface.md"
+  ],
+  "validators": [
+    "node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json",
+    "node --strip-types tests/cli/rft-continuation-card-generation.test.ts",
+    "node --strip-types scripts/validate-physical-line-budget.ts --json",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Automatically importing or claiming generated continuation cards without human review.",
+    "Closing any generated cards.",
+    "Changing TASK-RFT-0098 or TASK-RFT-0099 enforcement policy."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the generator, command documentation, and focused regression if generated cards duplicate existing tasks or over-broaden scope.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.rft-continuation-card-generator",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.rft-continuation-card-generator",
+        "pattern": "Generator",
+        "source": "scripts/generate-rft-continuation-cards.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "package.json",
+        "scripts/validate-physical-line-budget.ts",
+        "scripts/generate-rft-continuation-cards.ts",
+        "tests/cli/rft-continuation-card-generation.test.ts",
+        "docs/governance/command-surface.md"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "- Generated card text must still pass the normal task-card import dry-run before\n  it can enter the ATM ledger.\n- This card should preserve the authority split: full source cards live in\n  3KLife; the framework target receives only imported ledger state.",
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0100-continuation-card-generation.task.md",
+    "sectionTitle": "TASK-RFT-0100",
+    "headingLine": 49,
+    "hash": "3fbb60fcc6617fc2",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0100-continuation-card-generation.task.md",
+      "planningCommitSha": "15eebaf62c8cab90d5558359ea98989b7f577827",
+      "contentDigest": "sha256:3fbb60fcc6617fc2d24942128bc896c42869517a32bebfcd2f383ba4407a53ea",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-17T13:20:15.143Z"
+    }
+  },
+  "importedAt": "2026-07-17T13:20:15.143Z",
+  "lastTransitionId": "2026-07-17T13-20-15-237Z-import-d7c06b920bbd",
+  "lastTransitionAt": "2026-07-17T13:20:15.237Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

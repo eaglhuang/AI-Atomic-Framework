@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0099",
+  "title": "Semantic atomization metrics for RFT gate evidence",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0098"
+  ],
+  "acceptance": [
+    "A validator emits JSON with at least owner atom/map id, touched source count, extracted atom count, inline-exception count, follow-up-card count, and files lacking atomization ownership.",
+    "The RFT line-budget report or companion evidence clearly distinguishes hard physical violations from semantic atomization warnings.",
+    "The validator can run on the current repository without requiring new RFT violations to exist.",
+    "Focused regression covers a healthy metric sample and a missing-owner sample.",
+    "Evidence output is stable enough for closure packets and future dashboards to consume without scraping prose."
+  ],
+  "deliverables": [
+    "scripts/validate-rft-atomization-metrics.ts",
+    "tests/cli/rft-atomization-metrics.test.ts",
+    "scripts/validate-physical-line-budget.ts"
+  ],
+  "scopePaths": [
+    "package.json",
+    "scripts/validate-physical-line-budget.ts",
+    "scripts/validate-rft-atomization-metrics.ts",
+    "tests/cli/rft-atomization-metrics.test.ts",
+    "tests/cli/physical-line-budget-gate.test.ts",
+    "atomic_workbench/atomization-coverage/**"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-rft-atomization-metrics.ts --json",
+    "node --strip-types tests/cli/rft-atomization-metrics.test.ts",
+    "node --strip-types scripts/validate-physical-line-budget.ts --json",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Enforcing touched-file physical admission; owned by TASK-RFT-0098.",
+    "Automatically opening continuation cards; owned by TASK-RFT-0100.",
+    "Changing the semantic meaning of existing atom/map ids."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the semantic metric validator and remove any generated metric projection if scoring creates false blockers for valid RFT splits.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.rft-semantic-atomization-metrics",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/**"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.rft-semantic-atomization-metrics",
+        "pattern": "Metric Adapter",
+        "source": "scripts/validate-rft-atomization-metrics.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- This card creates evidence and metrics only. It does not decide whether a\n  semantic warning blocks commit; enforcement can be a later policy card.\n- Prefer reading existing atomization coverage projections over duplicating map\n  discovery logic.",
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0099-semantic-atomization-metrics.task.md",
+    "sectionTitle": "TASK-RFT-0099",
+    "headingLine": 51,
+    "hash": "4b5eb83d785709dd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0099-semantic-atomization-metrics.task.md",
+      "planningCommitSha": "15eebaf62c8cab90d5558359ea98989b7f577827",
+      "contentDigest": "sha256:4b5eb83d785709ddb34efe8025bf1f8ae173523ed1ecca5fc59e8131652662d5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-17T13:20:15.119Z"
+    }
+  },
+  "importedAt": "2026-07-17T13:20:15.119Z",
+  "lastTransitionId": "2026-07-17T13-20-15-214Z-import-15ca1813737f",
+  "lastTransitionAt": "2026-07-17T13:20:15.214Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
