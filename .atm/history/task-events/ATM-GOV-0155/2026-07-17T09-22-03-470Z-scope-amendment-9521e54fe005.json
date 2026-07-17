@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T09-22-03-470Z-scope-amendment-9521e54fe005",
+  "taskId": "ATM-GOV-0155",
+  "action": "scope-amendment",
+  "actorId": "codex-atm-gov-0155-cleanup",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:12c0dc9ff46e4b1c1e72aaa79810068f41a5dd42728e89d436a2a406782b3356",
+  "createdAt": "2026-07-17T09:22:03.470Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0155 --actor codex-atm-gov-0155-cleanup --add packages/cli/src/commands/doctor/run-doctor.ts --reason \"Doctor closure validator still expects npm build script to include tsc; ATM now uses sealed runner build script, so update source validator to match current framework build contract.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Doctor closure validator still expects npm build script to include tsc; ATM now uses sealed runner build script, so update source validator to match current framework build contract."
+  }
+}

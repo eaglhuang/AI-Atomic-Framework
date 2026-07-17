@@ -130,7 +130,7 @@ export async function runDoctor(argv: readonly string[]) {
       validateStandard: rootPackage.scripts?.['validate:standard'] ?? null,
       validateFull: rootPackage.scripts?.['validate:full'] ?? null
     }),
-    createCheck('typescript-build-config', !frameworkContractExpected || (existsSync(path.join(root, 'tsconfig.json')) && existsSync(path.join(root, 'tsconfig.build.json')) && rootPackage.scripts?.build?.includes('tsc') === true), {
+    createCheck('typescript-build-config', !frameworkContractExpected || (existsSync(path.join(root, 'tsconfig.json')) && existsSync(path.join(root, 'tsconfig.build.json')) && (rootPackage.scripts?.build?.includes('tsc') === true || rootPackage.scripts?.build?.includes('scripts/run-sealed-runner-build.ts') === true)), {
       tsconfig: existsSync(path.join(root, 'tsconfig.json')), buildConfig: existsSync(path.join(root, 'tsconfig.build.json')), buildScript: rootPackage.scripts?.build ?? null
     }),
     createCheck('eslint-lint-config', !frameworkContractExpected || (existsSync(path.join(root, 'eslint.config.mjs')) && rootPackage.scripts?.lint?.includes('eslint') === true), {
