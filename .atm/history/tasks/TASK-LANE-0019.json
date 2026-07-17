@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-LANE-0019",
   "title": "Persist lane session event history and wire analyzer evidence",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-LANE-0018"
@@ -94,8 +94,8 @@
     }
   },
   "importedAt": "2026-07-17T08:24:24.579Z",
-  "lastTransitionId": "2026-07-17T08-24-35-536Z-claim-0ae1ed448905",
-  "lastTransitionAt": "2026-07-17T08:24:35.536Z",
+  "lastTransitionId": "2026-07-17T08-51-10-020Z-close-e98a14a9100b",
+  "lastTransitionAt": "2026-07-17T08:51:10.020Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-lane-0019",
   "reservedAt": "2026-07-17T08:24:31.261Z",
@@ -104,7 +104,7 @@
     "actorId": "codex-lane-0019",
     "leaseId": "lease-6b6a17798f5b",
     "claimedAt": "2026-07-17T08:24:31.266Z",
-    "heartbeatAt": "2026-07-17T08:24:31.266Z",
+    "heartbeatAt": "2026-07-17T08:51:10.017Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-LANE-0019.json",
@@ -117,14 +117,14 @@
       "packages/cli/src/commands/lane-session/store.ts",
       "scripts/analyze-captain-parallel-ledger.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260717082435-codex-lane-0019-8cc0fcb210",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717082435-codex-lane-0019-8cc0fcb210\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-17T08:24:31.266Z",
   "startedByActor": "codex-lane-0019",
@@ -162,5 +162,9 @@
     },
     "createdAt": "2026-07-17T08:24:35.535Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-17T08:51:10.017Z",
+  "closedByActor": "codex-lane-0019",
+  "closedBySessionId": "session-20260717082431-codex-lane-0019-TASK-LANE-0019-cf007bc467",
+  "closurePacket": ".atm/history/evidence/TASK-LANE-0019.closure-packet.json"
 }

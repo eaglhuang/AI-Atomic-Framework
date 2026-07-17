@@ -1,0 +1,170 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-LANE-0019",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "7d73ad7cfc654334e2021abaefd7675e8d39d1f6",
+  "governedTreeSha": "1027bc1e38bdda2c79a86c03c44ad949d39124fe",
+  "targetCommitDelta": {
+    "currentCommitSha": "7d73ad7cfc654334e2021abaefd7675e8d39d1f6",
+    "parentCommitShas": [
+      "7d73ad7cfc654334e2021abaefd7675e8d39d1f6"
+    ],
+    "governedTreeSha": "1027bc1e38bdda2c79a86c03c44ad949d39124fe",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-LANE-0019.bundle-manifest.json",
+      ".atm/history/evidence/TASK-LANE-0019.json",
+      "docs/reports/mao-parallel-routing-benchmark.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/reports/mao-parallel-routing-benchmark.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-dispatch/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-governance-router/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-next/SKILL.md",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+      "release/atm-root-drop/templates/skills/atm-task-card-authoring.skill.md",
+      "release/atm-root-drop/tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+      "scripts/analyze-captain-parallel-ledger.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9ecccd68e916e1526b7c4004d2fb1f0b596a3994219b80f78418a4826253576c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7f22b704843788cda702b122d3d5aa826c6038f15043b38fbcebff2bc274953a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/analyze-captain-parallel-ledger.ts --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c16c41bfdbe92d0569e558edf4695f93a03ef90afc59f3e6608d6be4af292fe5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:1f62ad031c7401af2800703fdeb740f961a5037e34dd468c7e63fe131f99a095",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "node --strip-types scripts/analyze-captain-parallel-ledger.ts --json",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-17T08:51:10.010Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-LANE-0019.*",
+      ".atm/history/task-events/TASK-LANE-0019/**",
+      ".atm/history/tasks/TASK-LANE-0019.json",
+      "docs/reports/mao-parallel-routing-benchmark.md",
+      "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/lane-session/store.ts",
+      "scripts/analyze-captain-parallel-ledger.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/lane-session/store.ts",
+      "scripts/analyze-captain-parallel-ledger.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-LANE-0019.json",
+  "closedAt": "2026-07-17T08:51:10.011Z",
+  "closedByActor": "codex-lane-0019",
+  "sessionId": "session-20260717082431-codex-lane-0019-TASK-LANE-0019-cf007bc467",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "bb40bea07ede32269989352e19bba65be1507fa1",
+    "taskMatchedFiles": [
+      "docs/reports/mao-parallel-routing-benchmark.md",
+      "scripts/analyze-captain-parallel-ledger.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-LANE-0019.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-LANE-0019/2026-07-17T08-24-17-421Z-reserve-c376d7ef1178.json",
+      ".atm/history/task-events/TASK-LANE-0019/2026-07-17T08-24-17-423Z-promote-ed238f802c82.json",
+      ".atm/history/task-events/TASK-LANE-0019/2026-07-17T08-24-24-725Z-import-4c5ccca49640.json",
+      ".atm/history/task-events/TASK-LANE-0019/2026-07-17T08-24-31-261Z-reserve-fc428eba471d.json",
+      ".atm/history/task-events/TASK-LANE-0019/2026-07-17T08-24-31-263Z-promote-ef82c8e4f278.json",
+      ".atm/history/task-events/TASK-LANE-0019/2026-07-17T08-24-35-536Z-claim-0ae1ed448905.json",
+      ".atm/history/tasks/TASK-LANE-0019.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

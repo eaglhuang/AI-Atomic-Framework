@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T08-51-10-020Z-close-e98a14a9100b",
+  "taskId": "TASK-LANE-0019",
+  "action": "close",
+  "actorId": "codex-lane-0019",
+  "sessionId": "session-20260717082431-codex-lane-0019-TASK-LANE-0019-cf007bc467",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0019.json",
+  "taskSha256": "sha256:d5be5fb75062309bf6460c83be4493564bf43f90792934405f40c5c78330fe20",
+  "createdAt": "2026-07-17T08:51:10.020Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0019 --actor codex-lane-0019 --status done --historical-delivery bb40bea07ede32269989352e19bba65be1507fa1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260717082431-codex-lane-0019-TASK-LANE-0019-cf007bc467",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0019.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "node --strip-types scripts/analyze-captain-parallel-ledger.ts --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-17T08:51:10.010Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0019.*",
+        ".atm/history/task-events/TASK-LANE-0019/**",
+        ".atm/history/tasks/TASK-LANE-0019.json",
+        "docs/reports/mao-parallel-routing-benchmark.md",
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/lane-session/store.ts",
+        "scripts/analyze-captain-parallel-ledger.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/lane-session/store.ts",
+        "scripts/analyze-captain-parallel-ledger.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
