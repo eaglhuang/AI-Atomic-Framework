@@ -6,8 +6,8 @@
   "milestone": "RFT-M5",
   "dependencies": [],
   "acceptance": [
-    "Simulated post-commit failure leaves ledger consistent with HEAD (roll-forward) and emits a follow-up command.",
-    "Simulated hung validator gets killed at its timeout and close aborts with the lock released and an actionable report."
+    "Simulated post-commit failure leaves ledger consistent with HEAD (roll-forward)",
+    "Simulated hung validator gets killed at its timeout and close aborts with the"
   ],
   "deliverables": [
     "packages/cli/src/commands/taskflow.ts",
@@ -69,8 +69,84 @@
       "sealedAt": "2026-07-17T13:09:18.298Z"
     }
   },
-  "importedAt": "2026-07-17T13:09:18.298Z",
-  "lastTransitionId": "2026-07-17T13-09-18-484Z-import-461390147b87",
-  "lastTransitionAt": "2026-07-17T13:09:18.484Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "importedAt": "2026-07-07T02:00:18.975Z",
+  "lastTransitionId": "2026-07-07T08-32-03-288Z-close-62d0833a323f",
+  "lastTransitionAt": "2026-07-07T08:32:03.288Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex",
+  "reservedAt": "2026-07-07T08:02:23.555Z",
+  "promotedAt": "2026-07-07T08:02:23.560Z",
+  "claim": {
+    "actorId": "codex",
+    "leaseId": "lease-997cbd000f67",
+    "claimedAt": "2026-07-07T08:25:43.850Z",
+    "heartbeatAt": "2026-07-07T08:32:03.285Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-AAO-0149.*",
+      ".atm/history/task-events/TASK-AAO-0149/**",
+      ".atm/history/tasks/TASK-AAO-0149.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/tasks/__tests__/",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "schemas/governance/branch-commit-queue.schema.json",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-schemas.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-07T02:01:16.749Z",
+  "startedByActor": "codex",
+  "startedBySessionId": "session-20260707082543-codex-TASK-AAO-0149-8b897c0f91",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0149",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0149.*",
+      ".atm/history/task-events/TASK-AAO-0149/**",
+      ".atm/history/tasks/TASK-AAO-0149.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/tasks/__tests__/",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "schemas/governance/branch-commit-queue.schema.json",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-schemas.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/rft-hardening/tasks/TASK-AAO-0149-taskflow-close-rollback-resilience.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/rft-hardening/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/TASK-AAO-0149-taskflow-close-rollback-resilience.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "2b757add4ccacb56380164a4693c34afce0a06a2f84813d494f1188587068f2f",
+    "actorId": "codex",
+    "createdAt": "2026-07-07T08:25:44.154Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-07T08:32:03.285Z",
+  "closedByActor": "codex",
+  "closedBySessionId": "session-20260707082543-codex-TASK-AAO-0149-8b897c0f91",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0149.closure-packet.json"
 }
