@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0156",
+  "title": "Add sealed runner build input cache and timing metrics",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0150",
+    "ATM-GOV-0154",
+    "ATM-GOV-0155"
+  ],
+  "acceptance": [
+    "A ledger-only commit after a successful sealed build can run `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` without doing a fresh full worktree checkout and TypeScript build when the build input hash is unchanged.",
+    "A source change under build input paths forces a normal sealed build.",
+    "Missing or modified release artifacts force a normal sealed build or fail closed with a clear error instead of silently trusting stale artifacts.",
+    "Release manifests contain `buildInputsTreeHash`, sealed source commit metadata, build decision, and phase timing metrics.",
+    "The implementation does not introduce a second build registry or untracked cache authority outside the release manifests and git tree hashes.",
+    "Follow-up work for persistent sealed worktrees, `.tsbuildinfo` reuse, and differential artifact copy is explicitly left out of scope."
+  ],
+  "deliverables": [
+    "scripts/run-sealed-runner-build.ts",
+    "tests/cli/sealed-runner-build-input-cache.test.ts",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/release-manifest.json"
+  ],
+  "scopePaths": [
+    "scripts/run-sealed-runner-build.ts",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/release-manifest.json",
+    "tests/cli/sealed-runner-build-input-cache.test.ts",
+    "docs/governance/command-surface.md",
+    "docs/governance/error-code-registry.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+    "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "npm run typecheck",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync.coalescing-steward-queue",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.sealed-runner-build-input-cache",
+        "pattern": "Policy Object",
+        "source": "scripts/run-sealed-runner-build.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/run-sealed-runner-build.ts",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/release-manifest.json",
+        "tests/cli/sealed-runner-build-input-cache.test.ts",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0156-sealed-runner-build-input-cache.task.md",
+    "sectionTitle": "ATM-GOV-0156",
+    "headingLine": 49,
+    "hash": "4ed210abf1c51318",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0156-sealed-runner-build-input-cache.task.md",
+      "planningCommitSha": "dc07b318cfbe8861e47fce9866645a81c01947fe",
+      "contentDigest": "sha256:4ed210abf1c513180658ecc0683d5a4a8f7dcc16d834f6053587482218b61ac1",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-17T05:06:26.844Z"
+    }
+  },
+  "importedAt": "2026-07-17T05:06:26.844Z",
+  "lastTransitionId": "2026-07-17T05-06-26-950Z-import-0a5898f357ee",
+  "lastTransitionAt": "2026-07-17T05:06:26.950Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
