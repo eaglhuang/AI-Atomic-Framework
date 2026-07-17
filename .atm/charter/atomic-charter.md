@@ -5,8 +5,8 @@
 > resolved through a governed charter waiver proposal (`behavior.evolve` +
 > `charterWaiver` + `HumanReviewDecision`), not by silent override.
 
-**Charter version**: 2.1.0
-**Last amended**: 2026-07-14T00:00:00.000Z
+**Charter version**: 2.2.0
+**Last amended**: 2026-07-17T00:00:00.000Z
 **Machine-readable invariants**: `.atm/charter/charter-invariants.json`
 **Normative design schedule**: `.atm/charter/atm-first-principles.md` (version 1.0.0)
 **Schedule SHA-256**: `sha256:488d193397ed56b89f6f526aa882ebcb4fd8e9f81d2c4a5c8b30e5a3d5487f5c`
@@ -52,6 +52,19 @@ See `charter-invariants.json` for the machine-readable form used by ATM guards.
 | INV-ATM-005 | Host rule amendments require waiver flow | waiver-required |
 | INV-ATM-006 | Framework work tracking stays target-local | doctor |
 | INV-ATM-007 | Public framework docs remain English-only | doctor |
+| INV-ATM-008 | Broker tickets, not refusals | doctor |
+
+### INV-ATM-008 — Broker tickets, not refusals (parallel governance principle)
+
+ATM has no concept of "refusal" at shared-write gates. Every governed Tier-2
+(shared write) surface — runner-sync, build windows, release mirrors, git
+commit, projection regeneration — must answer with a broker ticket: execute
+now, enqueue with a position, or batch into a shared write window. Reads and
+private writes (an agent's own ledger, evidence, and task events) never queue.
+The only standing exceptions are the four owner-ruled cases recorded in
+`docs/governance/parallel-governance-charter.md`. Any new serialization point
+an implementer wants to introduce must be surfaced to the project owner for an
+explicit ruling before it ships.
 
 ---
 

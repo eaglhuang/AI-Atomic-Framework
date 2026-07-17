@@ -38,12 +38,21 @@ and scope.
 
 Treat ATM parallel governance as a tiered authority model:
 
-- Tier 0 read work never queues behind write lanes.
-- Tier 1 private writes to the actor's own ledger, evidence, notes, or planning
+- Reads never queue behind write lanes.
+- Private writes to the actor's own ledger, evidence, notes, or planning
   artifacts never queue behind unrelated lanes.
-- Tier 2 shared writes to the git index, release mirrors, build artifacts,
-  protected runtime state, or other shared mutation surfaces must go through the
-  broker or steward lane.
+- Shared writes to the git index, release mirrors, build artifacts, protected
+  runtime state, or other shared mutation surfaces go through the broker, which
+  answers with a ticket: execute now, enqueue with a position, or batch into a
+  shared write window. A bare refusal at a shared-write gate is charter debt
+  (INV-ATM-008), not a design choice.
+
+The only standing serialization exceptions are the four owner-ruled cases in
+`docs/governance/parallel-governance-charter.md` (one lane session per task
+card; dependency gates block code only, never documents; the single-branch
+commit core with related-task batching only; document writes are ungoverned,
+code writes are always governed). Any new serialization point must be surfaced
+to the project owner for an explicit ruling before it ships.
 
 Do not serialize Tier 0 or Tier 1 work merely because another lane has active
 work. Before blocking parallel progress, identify the concrete Tier 2 shared
