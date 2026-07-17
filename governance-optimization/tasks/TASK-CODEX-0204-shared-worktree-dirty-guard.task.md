@@ -1,7 +1,7 @@
 ---
 task_id: TASK-CODEX-0204
 title: Repair shared worktree active-task dirty guard
-status: planned
+status: done
 owner: codex-bug-0204
 priority: High
 amendment_epoch: 1
@@ -31,6 +31,15 @@ atomizationImpact:
   mapUpdates:
     - atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json
   extractionCandidates: []
+completed_at: "2026-07-17T01:53:47.704Z"
+completed_by_agent: "codex-worktree-cleanup"
+closedAt: "2026-07-17T01:53:47.704Z"
+closedByActor: "codex-worktree-cleanup"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-17T01-53-47-704Z-close-6ab308eee66a"
+lastTransitionAt: "2026-07-17T01:53:47.704Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "c30730934753b1b2ab291295dfb156842511d6b5"
 ---
 
 # TASK-CODEX-0204 Repair Shared Worktree Active-Task Dirty Guard

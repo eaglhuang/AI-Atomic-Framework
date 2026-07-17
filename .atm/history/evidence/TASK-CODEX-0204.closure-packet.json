@@ -1,0 +1,157 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CODEX-0204",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "672d9ebe0d2e53c537f8bb46d2f35e184fba9aae",
+  "governedTreeSha": "3f2d13f4463c2d5a18303ac3bfa9c2cfabf70049",
+  "targetCommitDelta": {
+    "currentCommitSha": "672d9ebe0d2e53c537f8bb46d2f35e184fba9aae",
+    "parentCommitShas": [
+      "672d9ebe0d2e53c537f8bb46d2f35e184fba9aae"
+    ],
+    "governedTreeSha": "3f2d13f4463c2d5a18303ac3bfa9c2cfabf70049",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0013.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0013.json",
+      ".atm/history/task-events/TASK-CODEX-0204/2026-07-17T01-53-18-146Z-reserve-ec50b9d86995.json",
+      ".atm/history/task-events/TASK-CODEX-0204/2026-07-17T01-53-18-148Z-promote-478110ca76a8.json",
+      ".atm/history/task-events/TASK-CODEX-0204/2026-07-17T01-53-22-165Z-claim-430d6efc23a2.json",
+      ".atm/history/tasks/TASK-CODEX-0204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "tests/cli/team-admission-projection.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-admission-projection.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d8dd776c15a0a2e69cc98b1f3247bf9560b2dcabe3fa57cd82d02c31f82e668",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:governance-projections",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7327be311a8e3269a2eac54a9ce5dcb43e1308aa6ddc2a62dad64df44433b5a3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:07532c6059819752c88a818067ced5746a6208bb1f17a1de1f42c8ddf1e49421",
+      "stderrSha256": "sha256:4baa6353b1a51ac26b4212be286fe2d7aab91ecde6c88be431f149f4afd26efa",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/team-admission-projection.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-17T01:53:47.569Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CODEX-0204.*",
+      ".atm/history/task-events/TASK-CODEX-0204/**",
+      ".atm/history/tasks/TASK-CODEX-0204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "tests/cli/team-admission-projection.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "tests/cli/team-admission-projection.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CODEX-0204.json",
+  "closedAt": "2026-07-17T01:53:47.569Z",
+  "closedByActor": "codex-worktree-cleanup",
+  "sessionId": "session-20260717015318-codex-worktree-cleanup-TASK-CODEX-0204-cf74a74801",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c30730934753b1b2ab291295dfb156842511d6b5",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "tests/cli/team-admission-projection.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-CODEX-0204.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-CODEX-0204/2026-07-16T14-13-08-585Z-import-6bb9652c91be.json",
+      ".atm/history/task-events/TASK-CODEX-0204/2026-07-16T14-13-16-527Z-reserve-b7c48cb28303.json",
+      ".atm/history/task-events/TASK-CODEX-0204/2026-07-16T14-13-16-530Z-promote-cf00d63dcc06.json",
+      ".atm/history/task-events/TASK-CODEX-0204/2026-07-16T14-13-20-084Z-claim-c998639c9920.json",
+      ".atm/history/task-events/TASK-CODEX-0204/2026-07-16T14-13-51-071Z-scope-amendment-29985a2e556d.json",
+      ".atm/history/tasks/TASK-CODEX-0204.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "governance-optimization/tasks/TASK-CODEX-0204-shared-worktree-dirty-guard.task.md",
+      "packages/cli/src/commands/next/active-work-summary.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "governance-optimization/tasks/TASK-CODEX-0204-shared-worktree-dirty-guard.task.md",
+      "packages/cli/src/commands/next/active-work-summary.ts"
+    ],
+    "waiverReason": "Historical delivery c30730934 intentionally co-delivered the planning card closeback and legacy next active-work-summary wrapper alongside TASK-CODEX-0204 scoped deliverables; reviewed as related governance/sibling surface, not missing delivery."
+  },
+  "teamSummary": null
+}

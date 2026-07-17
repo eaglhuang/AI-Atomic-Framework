@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CODEX-0204",
   "title": "Repair shared worktree active-task dirty guard",
-  "status": "open",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -77,30 +77,32 @@
     }
   },
   "importedAt": "2026-07-16T14:13:08.453Z",
-  "lastTransitionId": "2026-07-17T01-50-44-782Z-release-8e9454578091",
-  "lastTransitionAt": "2026-07-17T01:50:44.782Z",
+  "lastTransitionId": "2026-07-17T01-53-47-582Z-close-b94aef1d6eb4",
+  "lastTransitionAt": "2026-07-17T01:53:47.582Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-07-16T14:13:16.527Z",
-  "promotedAt": "2026-07-16T14:13:16.530Z",
+  "reservedAt": "2026-07-17T01:53:18.145Z",
+  "promotedAt": "2026-07-17T01:53:18.148Z",
   "claim": {
     "actorId": "codex-worktree-cleanup",
-    "leaseId": "lease-fa5ec2d9210c",
-    "claimedAt": "2026-07-17T01:49:11.736Z",
-    "heartbeatAt": "2026-07-17T01:50:44.682Z",
+    "leaseId": "lease-a87a521727e8",
+    "claimedAt": "2026-07-17T01:53:18.152Z",
+    "heartbeatAt": "2026-07-17T01:53:47.579Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CODEX-0204.json",
+      ".atm/history/evidence/TASK-CODEX-0204.*",
+      ".atm/history/task-events/TASK-CODEX-0204/**",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-204.json",
       "docs/governance/atm-bug-and-optimization-backlog.md",
       "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
       "tests/cli/team-admission-projection.test.ts"
     ],
     "state": "released",
-    "reason": "worktree cleanup claim state recorded"
+    "reason": "Historical delivery c30730934 intentionally co-delivered the planning card closeback and legacy next active-work-summary wrapper alongside TASK-CODEX-0204 scoped deliverables; reviewed as related governance/sibling surface, not missing delivery."
   },
   "startedAt": "2026-07-16T14:13:16.533Z",
   "startedByActor": "codex-bug-0204",
-  "startedBySessionId": "session-20260717014911-codex-worktree-cleanup-TASK-CODEX-0204-7b83e8a9b1",
+  "startedBySessionId": "session-20260717015318-codex-worktree-cleanup-TASK-CODEX-0204-cf74a74801",
   "owner": "codex-worktree-cleanup",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
@@ -124,14 +126,13 @@
     "allowPlanningMirror": false,
     "promptHash": "7cf8ce5ef517ab77a6d85897771a45168ce3a9cd73d9751384f20aed9bd66a34",
     "actorId": "codex-worktree-cleanup",
-    "sessionId": "session-20260717014911-codex-worktree-cleanup-TASK-CODEX-0204-7b83e8a9b1",
-    "laneSession": {
-      "laneSessionId": "lane-20260717014917-codex-worktree-cleanup-357d822f0f",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717014917-codex-worktree-cleanup-357d822f0f\""
-    },
-    "createdAt": "2026-07-17T01:49:18.102Z",
+    "sessionId": "session-20260717015318-codex-worktree-cleanup-TASK-CODEX-0204-cf74a74801",
+    "createdAt": "2026-07-17T01:53:22.164Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-17T01:53:47.579Z",
+  "closedByActor": "codex-worktree-cleanup",
+  "closedBySessionId": "session-20260717015318-codex-worktree-cleanup-TASK-CODEX-0204-cf74a74801",
+  "closeReason": "Historical delivery c30730934 intentionally co-delivered the planning card closeback and legacy next active-work-summary wrapper alongside TASK-CODEX-0204 scoped deliverables; reviewed as related governance/sibling surface, not missing delivery.",
+  "closurePacket": ".atm/history/evidence/TASK-CODEX-0204.closure-packet.json"
 }
