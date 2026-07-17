@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-17-004",
+  "date": "2026-07-17",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Open",
+  "area": "Task ledger / planning-source maintenance lane",
+  "finding": "There is no governed lane for bulk planning-source path realignment. After the owner-ordered planning-repo reorganization (79 task cards moved to their canonical family directories), every ledger file's source.planPath went stale, but: (a) git record-commit refuses multi-task record batches (ATM_CROSS_TASK_MUTATION_BLOCKED) and silently drops single task-owned files (see ATM-BUG-2026-07-17-002); (b) tasks claim on done tasks returns ATM_TASK_CLAIM_NOT_READY so git commit --task is unreachable; (c) tasks reconcile requires --delivery-commit; (d) tasks import --write refuses on hash conflict and --force is gated behind the emergency lease lane. Net effect: 79 stale planPath entries cannot be corrected through any normal governed path.",
+  "expectedBehavior": "A first-class maintenance verb (e.g. `atm tasks realign-plan-source --map <from,to json>` or import --refresh-paths) that re-resolves planPath/planningSourceSeal.taskCardPath against the planning repo for closed tasks, verifies contentDigest is unchanged (proving a pure move), and commits the batch as one governed maintenance commit without requiring per-task claims or an emergency lease.",
+  "evidenceOrRepro": "2026-07-17 session after 3KLife commits 1cfaf8e2/15eebaf6/e8f6908b: all four governed routes above were attempted and blocked; the only remaining route was `emergency approve` + `tasks import --write --force` per card.",
+  "proposedDirection": "Build the realign verb on top of the existing planningSourceSeal contentDigest check (content-only digest is move-invariant), classify the resulting ledger diff as low-risk metadata, and allow a single batch commit when every changed field is planPath/taskCardPath only."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-17-002",
+  "date": "2026-07-17",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Git governance / record-commit",
+  "finding": "`atm git record-commit` can report severity success while silently dropping the explicitly staged .atm/history/tasks record file from the resulting commit. Under a concurrent captain lane that resets the shared git index (ATM-GOV-0155 cleanup lane), the commit landed with only the wrapper's own .atm/history/evidence/git-head.jsonl line; the staged task ledger payload was lost without any error or warning. Repeated attempts across a 20-minute window (8 retries x 79 files) never committed a single ledger file, so this is systematic for task-owned record files, not a one-off race.",
+  "expectedBehavior": "record-commit must verify after committing that every explicitly staged record file is actually contained in the created commit, and fail loudly (with rollback guidance) when the payload was dropped. Success with a lost payload is the worst possible outcome for a governance wrapper.",
+  "evidenceOrRepro": "2026-07-17 session: commit 5dafa4416 says 'realign TASK-AAO-0149 ledger planPath' but its stat contains only .atm/history/evidence/git-head.jsonl (1 insertion). Reproduced continuously by scratchpad batch_record_commits.sh while the ATM-GOV-0155 lane was active.",
+  "proposedDirection": "Add a post-commit payload assertion to the record-commit wrapper (diff the created commit against the requested staged set), plus a commit-from-temporary-index path so a concurrent lane's index reset cannot evict the payload between staging and commit."
+}

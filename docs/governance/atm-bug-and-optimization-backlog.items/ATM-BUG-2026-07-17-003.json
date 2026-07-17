@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-17-003",
+  "date": "2026-07-17",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Parallel governance / shared git index",
+  "finding": "Concurrent captain lanes still contaminate each other through the shared git index: one captain's staged rename set (25 files, ATM-GOV-0101..0123 relocation in the planning repo) was swept wholesale into another captain's unrelated commit 15eebaf6 'docs(rft): open follow-up task cards' authored by codex-gpt-5.5. The tree state ended correct by luck, but the commit is mislabeled, attribution is wrong, and the same mechanism can just as easily commit half-finished foreign work.",
+  "expectedBehavior": "Governed commit paths must never include staged paths outside their own declared bundle/claim scope. Every governed commit should stage into a temporary index (or use git commit --only with its declared path set) so foreign staged files are physically excluded, matching the taskflow close temporary-index fix already shipped for AAF.",
+  "evidenceOrRepro": "3KLife commits 15eebaf6 (foreign commit containing this captain's renames) and e8f6908b (follow-up content commit) on 2026-07-17; AAF side repeatedly saw ATM-GOV-0155 lane files appear in this captain's index (ATM_GIT_RECORD_COMMIT_SCOPE_VIOLATION listing packages/cli/src/commands/doctor/run-doctor.ts).",
+  "proposedDirection": "Extend the temporary-index commit discipline to all governed commit surfaces in both repos (record-commit, git commit --task, planning-repo commit helpers), and add a doctor patrol that flags commits whose file set spans multiple task scopes."
+}
