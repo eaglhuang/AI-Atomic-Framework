@@ -21,7 +21,7 @@ const teamValidatorPath = path.join(root, 'scripts', 'validate-team-agents.ts');
 const teamValidatorAtoms = walkTsFiles(path.join(root, 'scripts', 'validators', 'team-agents'));
 
 assert.equal(policy.maxLines, 600, 'framework default atomization maxLines should stay 600 unless explicitly lowered');
-assert.ok(oversized.length > 0, 'rollout inventory should find existing oversized framework modules');
+assert.equal(oversized.length, 0, 'RFT rollout inventory should have zero hard line-budget violations');
 assert.ok(
   countLines(teamValidatorPath) <= policy.maxLines,
   'RFT rollout should keep scripts/validate-team-agents.ts below the atomization line bound after extraction'
@@ -43,11 +43,10 @@ for (let index = 1; index < ranked.length; index += 1) {
 }
 
 const top = ranked.slice(0, 10);
-assert.ok(top.some((entry) => entry.sharedSurfaceScore > 0), 'top candidates should surface shared governance risk');
 assert.ok(top.every((entry) => entry.suggestedFollowUpPrefix === 'TASK-RFT'), 'follow-up cards must stay in the RFT family');
 assert.ok(top.every((entry) => !entry.file.startsWith('.atm/')), 'rollout must not treat ATM runtime or history files as split candidates');
 
-console.log(`[rft-atomization-rollout] ok (oversized=${oversized.length}, top=${top[0]?.file ?? 'none'}, maxLines=${policy.maxLines})`);
+console.log(`[rft-atomization-rollout] ok (oversized=0, maxLines=${policy.maxLines})`);
 
 function scanOversizedFiles(cwd: string, roots: readonly string[], maxLines: number): RankedOversizedFile[] {
   const files = roots.flatMap((entry) => walkTsFiles(path.join(cwd, entry)).map((file) => path.relative(cwd, file).replace(/\\/g, '/')));

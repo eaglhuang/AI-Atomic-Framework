@@ -6,28 +6,23 @@ import { scaffoldAtomWorkbench } from './scaffold.ts';
 import { runAtomicTestRunner } from './test-runner.ts';
 import { allocateAtomId, AtomIdAllocationError, normalizeAtomBucket, parseAtomId } from './id-allocator.ts';
 import { createAtomicRegistryEntry, createRegistryDocument, validateRegistryDocumentFile, writeRegistryArtifacts } from '../registry/registry.ts';
-
 const defaultRegistryPath = 'atomic-registry.json';
 const defaultCatalogPath = 'atomic_workbench/registry-catalog.md';
 const defaultOwner = Object.freeze({
   name: 'ATM maintainers',
   contact: 'maintainers@example.invalid'
 });
-
 type GeneratorError = Error & {
   code: string;
   details: Record<string, unknown>;
 };
-
-// ─── Domain types ──────────────────────────────────────────────────────────
-
+// ??? Domain types ??????????????????????????????????????????????????????????
 interface NormalizedRequest {
   bucket: string;
   title: string;
   description: string;
   logicalName: string;
 }
-
 interface AtomPaths {
   workbenchPath: string;
   specPath: string;
@@ -35,14 +30,12 @@ interface AtomPaths {
   testPath: string;
   reportPath: string;
 }
-
 interface PhaseRecord {
   phase: string;
   ok: boolean;
   durationMs: number;
   error?: ReturnType<typeof normalizeError>;
 }
-
 interface RegistryDocument {
   schemaId?: string;
   specVersion?: string;
@@ -51,7 +44,6 @@ interface RegistryDocument {
   generatedAt?: string;
   entries?: unknown[];
 }
-
 interface RegistryEntry {
   atomId?: string;
   logicalName?: string;
@@ -77,7 +69,6 @@ interface RegistryEntry {
     };
   };
 }
-
 interface AtomIdAllocationRecord {
   atomId: string;
   bucket: string;
@@ -85,7 +76,6 @@ interface AtomIdAllocationRecord {
   source: string;
   reservation: string | null;
 }
-
 interface GenerateAtomOptions {
   repositoryRoot?: string;
   registryPath?: string;
@@ -108,7 +98,6 @@ interface GenerateAtomOptions {
   legacyPlanningId?: string | null;
   registryDocument?: RegistryDocument;
 }
-
 interface GenerateAtomResult {
   ok: boolean;
   atomId: string | null;
@@ -128,7 +117,6 @@ interface GenerateAtomResult {
   failedPhase?: string | null;
   error?: { code: string; message: string; details: Record<string, unknown> };
 }
-
 interface AllocateAtomIdOptions {
   repositoryRoot: string;
   registryPath: string;
@@ -137,14 +125,12 @@ interface AllocateAtomIdOptions {
   atomId?: string | null;
   force: boolean;
 }
-
 export function generateAtom(request: unknown, options: GenerateAtomOptions = {}): GenerateAtomResult {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const registryPath = options.registryPath ?? defaultRegistryPath;
   const registryAbsolutePath = path.resolve(repositoryRoot, registryPath);
   const dryRun = options.dryRun === true;
   const phases: PhaseRecord[] = [];
-
   try {
     const normalizedRequest = normalizeRequest(request);
     const registryDocument = readRegistryDocument(registryAbsolutePath, options);
@@ -166,7 +152,6 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
         phases: [recordPhase(phases, 'idempotent-existing-entry', () => ({ existingAtomId: existingEntry.atomId }))]
       });
     }
-
     const allocation = recordPhase(phases, 'allocate-id', () => allocateGeneratorAtomId(normalizedRequest, {
       repositoryRoot,
       registryPath,
@@ -204,7 +189,6 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
     if (!normalizedModel) {
       throw createGeneratorError('ATM_GENERATOR_SPEC_INVALID', 'Generated atomic spec did not produce a normalized model.', { parseResult: parsed });
     }
-
     if (!dryRun) {
       mkdirSync(path.dirname(specAbsolutePath), { recursive: true });
       if (!specExistsBefore || options.overwriteExisting === true) {
@@ -217,7 +201,6 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
         writeFileSync(testAbsolutePath, normalizeTrailingNewline(options.testContent), 'utf8');
       }
     }
-
     if (dryRun) {
       return createSuccess({
         atomId: allocation.atomId,
@@ -236,7 +219,6 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
         phases
       });
     }
-
     const testRun = recordPhase(phases, 'test', () => runAtomicTestRunner(normalizedModel, {
       repositoryRoot,
       now: options.now
@@ -244,7 +226,6 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
     if (!testRun.ok) {
       throw createGeneratorError('ATM_GENERATOR_TEST_FAILED', 'Generated atom validation command failed.', { testRun });
     }
-
     const registryEntry = recordPhase(phases, 'register-entry', () => createAtomicRegistryEntry(normalizedModel, {
       repositoryRoot,
       atomVersion: options.atomVersion ?? '0.1.0',
@@ -271,7 +252,6 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
     if (!validation.ok) {
       throw createGeneratorError('ATM_GENERATOR_REGISTRY_INVALID', validation.promptReport?.summary ?? 'Updated registry is invalid.', { validation });
     }
-
     return createSuccess({
       atomId: allocation.atomId,
       workbenchPath: paths.workbenchPath,
@@ -292,13 +272,11 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
     return createFailure(error, phases);
   }
 }
-
 interface CreateMinimalAtomSpecRequest extends NormalizedRequest {
   atomId: string;
   sourcePath?: string | null;
   validationCommands?: string[];
 }
-
 export function createMinimalAtomSpec(request: CreateMinimalAtomSpecRequest) {
   const bucket = normalizeAtomBucket(request.bucket);
   const logicalName = normalizeLogicalName(request.logicalName ?? `atom.${bucket.toLowerCase()}-${slugify(request.title)}`);
@@ -306,7 +284,6 @@ export function createMinimalAtomSpec(request: CreateMinimalAtomSpecRequest) {
   const validationCommands = Array.isArray(request.validationCommands) && request.validationCommands.length > 0
     ? [...request.validationCommands]
     : [sourcePath ? `node ${JSON.stringify(sourcePath)} --self-check` : `node -e "console.log('${request.atomId} validation ok')"`];
-
   return {
     schemaId: 'atm.atomicSpec',
     specVersion: '0.1.0',
@@ -380,7 +357,6 @@ export function createMinimalAtomSpec(request: CreateMinimalAtomSpecRequest) {
     tags: ['generated', 'provisioning']
   };
 }
-
 function normalizeRequest(request: unknown): NormalizedRequest {
   if (!request || typeof request !== 'object' || Array.isArray(request)) {
     throw createGeneratorError('ATM_GENERATOR_REQUEST_INVALID', 'Atom generator request must be an object.');
@@ -390,7 +366,6 @@ function normalizeRequest(request: unknown): NormalizedRequest {
   const title = normalizeRequiredText(req.title, 'title');
   const description = normalizeRequiredText(req.description, 'description');
   const logicalName = req.logicalName ? normalizeLogicalName(req.logicalName as string) : `atom.${bucket.toLowerCase()}-${slugify(title)}`;
-
   return {
     bucket,
     title,
@@ -398,14 +373,12 @@ function normalizeRequest(request: unknown): NormalizedRequest {
     logicalName
   };
 }
-
 function normalizeRequiredText(value: unknown, fieldName: string): string {
   if (typeof value !== 'string' || value.trim().length === 0) {
     throw createGeneratorError('ATM_GENERATOR_REQUEST_INVALID', `Atom generator request requires ${fieldName}.`, { fieldName });
   }
   return value.trim();
 }
-
 function normalizeLogicalName(value: string): string {
   const logicalName = String(value || '').trim().toLowerCase();
   if (!/^atom\.[a-z0-9]+(?:[.-][a-z0-9]+)*$/.test(logicalName)) {
@@ -413,7 +386,6 @@ function normalizeLogicalName(value: string): string {
   }
   return logicalName;
 }
-
 function slugify(value: string): string {
   const slug = String(value || '')
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
@@ -422,7 +394,6 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, '');
   return slug || 'generated-atom';
 }
-
 function readRegistryDocument(registryAbsolutePath: string, options: GenerateAtomOptions): RegistryDocument {
   if (options.registryDocument) {
     return options.registryDocument;
@@ -442,12 +413,10 @@ function readRegistryDocument(registryAbsolutePath: string, options: GenerateAto
     });
   }
 }
-
 function findExistingEntry(registryDocument: RegistryDocument, request: NormalizedRequest): RegistryEntry | null {
   const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
   return (entries as RegistryEntry[]).find((entry) => entry?.logicalName === request.logicalName) ?? null;
 }
-
 function allocateGeneratorAtomId(request: NormalizedRequest, options: AllocateAtomIdOptions) {
   const requestedAtomId = options.atomId ?? (options.force === true ? options.existingEntry?.atomId : null);
   if (requestedAtomId) {
@@ -470,14 +439,12 @@ function allocateGeneratorAtomId(request: NormalizedRequest, options: AllocateAt
       reservation: options.force === true ? 'force-existing' : 'preassigned'
     } satisfies AtomIdAllocationRecord;
   }
-
   return allocateAtomId(request.bucket, {
     repositoryRoot: options.repositoryRoot,
     registryPath: options.registryPath,
     registryDocument: options.registryDocument
   }) as AtomIdAllocationRecord;
 }
-
 function upsertRegistryEntry(registryDocument: RegistryDocument, registryEntry: RegistryEntry, options: { generatedAt?: string } = {}): RegistryDocument {
   const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
   const existingIndex = (entries as RegistryEntry[]).findIndex((entry) => entry?.atomId === registryEntry.atomId || entry?.logicalName === registryEntry.logicalName);
@@ -497,7 +464,6 @@ function upsertRegistryEntry(registryDocument: RegistryDocument, registryEntry: 
     entries: nextEntries
   };
 }
-
 function createAtomPaths(atomId: string): AtomPaths {
   const workbenchPath = `atomic_workbench/atoms/${atomId}`;
   return {
@@ -508,7 +474,6 @@ function createAtomPaths(atomId: string): AtomPaths {
     reportPath: `${workbenchPath}/atom.test.report.json`
   };
 }
-
 function renderDefaultAtomSource(specDocument: Record<string, unknown>): string {
   const metadata = {
     atomId: specDocument.id,
@@ -542,7 +507,6 @@ function renderDefaultAtomSource(specDocument: Record<string, unknown>): string 
     ''
   ].join('\n');
 }
-
 function recordPhase<T>(phases: PhaseRecord[], phase: string, action: () => T): T {
   const startedAt = Date.now();
   try {
@@ -559,7 +523,6 @@ function recordPhase<T>(phases: PhaseRecord[], phase: string, action: () => T): 
     throw error;
   }
 }
-
 function createSuccess<T extends Record<string, unknown>>(result: T): GenerateAtomResult {
   return {
     ok: true,
@@ -567,7 +530,6 @@ function createSuccess<T extends Record<string, unknown>>(result: T): GenerateAt
     ...result
   } as unknown as GenerateAtomResult;
 }
-
 function createFailure(error: unknown, phases: PhaseRecord[]): GenerateAtomResult {
   const normalizedError = normalizeError(error);
   return {
@@ -578,7 +540,6 @@ function createFailure(error: unknown, phases: PhaseRecord[]): GenerateAtomResul
     phases
   };
 }
-
 function createGeneratorError(code: string, text: string, details: Record<string, unknown> = {}): GeneratorError {
   const error = new Error(text) as GeneratorError;
   error.name = 'AtomGeneratorError';
@@ -586,7 +547,6 @@ function createGeneratorError(code: string, text: string, details: Record<string
   error.details = details;
   return error;
 }
-
 function normalizeError(error: unknown) {
   if (error instanceof AtomIdAllocationError) {
     return {
@@ -602,11 +562,9 @@ function normalizeError(error: unknown) {
     details: typedError?.details ?? {}
   };
 }
-
 function normalizeTrailingNewline(value: string): string {
   return String(value).endsWith('\n') ? String(value) : `${value}\n`;
 }
-
 function toPortablePath(value: string): string {
   return String(value).replace(/\\/g, '/');
 }

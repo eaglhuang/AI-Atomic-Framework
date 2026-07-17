@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T05-31-29-555Z-scope-amendment-1edd999ad9cd",
+  "taskId": "ATM-GOV-0155",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0097",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:d52088ee98764002e09af067700ef97ee43b25e42b4726270dfbc7105d7b3075",
+  "createdAt": "2026-07-17T05:31:29.555Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0155 --actor codex-task-rft-0097 --add atm.mjs --reason \"Runner sync must update the root frozen runner entrypoint alongside release/atm-onefile/atm.mjs so behavioral write gates no longer see a stale runner.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Runner sync must update the root frozen runner entrypoint alongside release/atm-onefile/atm.mjs so behavioral write gates no longer see a stale runner."
+  }
+}
