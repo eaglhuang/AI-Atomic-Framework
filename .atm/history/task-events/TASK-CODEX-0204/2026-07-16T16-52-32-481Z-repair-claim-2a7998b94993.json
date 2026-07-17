@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T16-52-32-481Z-repair-claim-2a7998b94993",
+  "taskId": "TASK-CODEX-0204",
+  "action": "repair-claim",
+  "actorId": "codex-lane-0011",
+  "sessionId": "session-20260716141316-codex-bug-0204-TASK-CODEX-0204-a1cf514e73",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-CODEX-0204.json",
+  "taskSha256": "sha256:1334edcaca774c57f64a8b05977f46a9ccc36b29a129b329730837b2938cfe49",
+  "createdAt": "2026-07-16T16:52:32.481Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-CODEX-0204 --actor codex-lane-0011 --write --reason \"release expired conflicting claim blocking TASK-LANE-0011 atom-cli-router admission; do not mutate TASK-CODEX-0204 deliverables\" --json"
+}
