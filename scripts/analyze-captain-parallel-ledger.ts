@@ -26,6 +26,30 @@ type ActivityInterval = {
   readonly endAt: string;
 };
 
+type LaneSessionEvent = {
+  readonly schemaId?: string;
+  readonly eventId?: string;
+  readonly laneId?: string;
+  readonly sequence?: number;
+  readonly action?: string;
+  readonly actorId?: string | null;
+  readonly createdAt?: string;
+  readonly details?: Record<string, unknown>;
+};
+
+type LaneEvidenceSummary = {
+  readonly eventRoot: string;
+  readonly eventCount: number;
+  readonly laneCount: number;
+  readonly actorCount: number;
+  readonly taskCount: number;
+  readonly actions: Record<string, number>;
+  readonly firstEventAt: string | null;
+  readonly lastEventAt: string | null;
+  readonly maxEventsPerLane: number;
+  readonly hasAppendOnlyHistory: boolean;
+};
+
 type WaveSummary = {
   readonly label: string;
   readonly taskPattern: string;
@@ -56,10 +80,12 @@ type CaptainParallelLedgerAnalysis = {
   readonly generatedAt: string;
   readonly source: {
     readonly eventRoot: string;
+    readonly sessionEventRoot: string;
     readonly lockRoot: string;
     readonly completedRftIntervals: number;
   };
   readonly waves: readonly WaveSummary[];
+  readonly laneEvidence: LaneEvidenceSummary;
   readonly runtimeFrameworkLockSnapshot: FrameworkLockSnapshot;
   readonly comparison: WaveComparison;
   readonly observabilityGaps: readonly ObservabilityGap[];
@@ -110,24 +136,30 @@ for (let i = 2; i < process.argv.length; i += 1) {
 }
 
 const eventRoot = args.get('event-root') ?? '.atm/history/task-events';
+const sessionEventRoot = args.get('session-event-root') ?? '.atm/history/session-events';
 const lockRoot = args.get('lock-root') ?? '.atm/runtime/locks';
 const reportPath = args.get('report') ?? null;
 const tasks = loadTaskTransitions(eventRoot);
 const intervals = buildIntervals(tasks).filter((interval) => /^TASK-RFT-\d{4}$/.test(interval.taskId));
+const allIntervals = buildIntervals(tasks);
+const laneEvents = loadLaneSessionEvents(sessionEventRoot);
 
 const serial = summarizeWave('serial-baseline-rft-0020-0025', intervals, /^TASK-RFT-00(20|21|22|23|24|25)$/);
 const parallel = summarizeWave('parallel-wave-rft-0030-0082', intervals, /^TASK-RFT-00(3\d|4\d|5\d|6\d|7\d|8[0-2])$/);
 const latest = summarizeWave('latest-rft-0078-0082', intervals, /^TASK-RFT-00(78|79|80|81|82)$/);
+const laneDogfood = summarizeWave('lane-dogfood-hard-overlap-0204-0001-0002-0003-0010', allIntervals, /^TASK-(CODEX-0204|LANE-0001|LANE-0002|LANE-0003|LANE-0010)$/);
 
 const result: CaptainParallelLedgerAnalysis = {
   schemaId: 'atm.captainParallelLedgerAnalysis.v1',
   generatedAt: new Date().toISOString(),
   source: {
     eventRoot,
+    sessionEventRoot,
     lockRoot,
     completedRftIntervals: intervals.length
   },
-  waves: [serial, parallel, latest],
+  waves: [serial, parallel, latest, laneDogfood],
+  laneEvidence: summarizeLaneEvidence(sessionEventRoot, laneEvents),
   runtimeFrameworkLockSnapshot: summarizeFrameworkLocks(lockRoot),
   comparison: compare(serial, parallel),
   observabilityGaps: [
@@ -135,11 +167,6 @@ const result: CaptainParallelLedgerAnalysis = {
       lane: 'framework-mode temp claims',
       status: 'snapshot-only',
       impact: 'Runtime lock files expose current or retained lock state, but do not provide an append-only historical claim/release window comparable to task-events.'
-    },
-    {
-      lane: 'cross-repository planning or implementation',
-      status: 'not-observable-from-this-ledger',
-      impact: 'This repository can only measure local ATM task-events; external planning lanes or other repositories need their own exported event ledger.'
     },
     {
       lane: 'journaling/backlog lightweight writes',
@@ -163,6 +190,7 @@ if (reportPath) {
 
 function loadTaskTransitions(root: string): Map<string, TaskTransition[]> {
   const byTask = new Map<string, TaskTransition[]>();
+  if (!existsSync(root)) return byTask;
   for (const taskDir of readdirSync(root, { withFileTypes: true })) {
     if (!taskDir.isDirectory()) continue;
     const taskPath = join(root, taskDir.name);
@@ -179,6 +207,58 @@ function loadTaskTransitions(root: string): Map<string, TaskTransition[]> {
     list.sort((a, b) => Date.parse(a.createdAt ?? '') - Date.parse(b.createdAt ?? ''));
   }
   return byTask;
+}
+
+function loadLaneSessionEvents(root: string): LaneSessionEvent[] {
+  if (!existsSync(root)) return [];
+  const events: LaneSessionEvent[] = [];
+  for (const laneDir of readdirSync(root, { withFileTypes: true })) {
+    if (!laneDir.isDirectory()) continue;
+    const lanePath = join(root, laneDir.name);
+    for (const entry of readdirSync(lanePath, { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+      try {
+        const parsed = JSON.parse(readFileSync(join(lanePath, entry.name), 'utf8')) as LaneSessionEvent;
+        if (parsed.schemaId !== 'atm.laneSessionEvent.v1' || !parsed.laneId || !parsed.createdAt) continue;
+        events.push(parsed);
+      } catch {
+        // Ignore malformed historical event files so one bad event cannot hide the rest of the ledger.
+      }
+    }
+  }
+  return events.sort((left, right) => Date.parse(left.createdAt ?? '') - Date.parse(right.createdAt ?? ''));
+}
+
+function summarizeLaneEvidence(root: string, events: readonly LaneSessionEvent[]): LaneEvidenceSummary {
+  const actions: Record<string, number> = {};
+  const lanes = new Set<string>();
+  const actors = new Set<string>();
+  const tasks = new Set<string>();
+  const perLane = new Map<string, number>();
+  for (const event of events) {
+    const action = event.action ?? 'event';
+    actions[action] = (actions[action] ?? 0) + 1;
+    if (event.laneId) {
+      lanes.add(event.laneId);
+      perLane.set(event.laneId, (perLane.get(event.laneId) ?? 0) + 1);
+    }
+    if (event.actorId) actors.add(event.actorId);
+    const taskId = typeof event.details?.taskId === 'string' ? event.details.taskId : null;
+    if (taskId) tasks.add(taskId);
+  }
+  const createdAts = events.map((event) => event.createdAt).filter((value): value is string => Boolean(value));
+  return {
+    eventRoot: root,
+    eventCount: events.length,
+    laneCount: lanes.size,
+    actorCount: actors.size,
+    taskCount: tasks.size,
+    actions,
+    firstEventAt: minIso(createdAts),
+    lastEventAt: maxIso(createdAts),
+    maxEventsPerLane: perLane.size ? Math.max(...perLane.values()) : 0,
+    hasAppendOnlyHistory: events.length > 0
+  };
 }
 
 function buildIntervals(tasks: Map<string, TaskTransition[]>): TaskInterval[] {
@@ -374,6 +454,7 @@ function maxIso(values: readonly string[]): string | null {
 function renderMarkdown(result: CaptainParallelLedgerAnalysis): string {
   const serial = result.waves.find((wave: WaveSummary) => wave.label === 'serial-baseline-rft-0020-0025');
   const parallel = result.waves.find((wave: WaveSummary) => wave.label === 'parallel-wave-rft-0030-0082');
+  const laneDogfood = result.waves.find((wave: WaveSummary) => wave.label === 'lane-dogfood-hard-overlap-0204-0001-0002-0003-0010');
   const interpretation = parallel && parallel.maxConcurrency >= 2
     ? 'The task-event ledger contains overlapping active claim windows, so it directly supports task-level captain parallelism for this wave.'
     : 'The task-event ledger does not show overlapping active claim windows for the main RFT wave. This supports the safety story, especially zero repair-closure, but it does not yet prove task-level makespan acceleration.';
@@ -415,6 +496,15 @@ function renderMarkdown(result: CaptainParallelLedgerAnalysis): string {
     `- Active-time throughput ratio: ${formatNullable(result.comparison.activeTimeThroughputRatio)}x`,
     `- Active work density ratio: ${formatNullable(result.comparison.activeWorkDensityRatio)}x`,
     `- Repair-closure delta: ${result.comparison.repairClosureDelta}`,
+    '',
+    '## Lane Session Evidence',
+    '',
+    `- Session event root: \`${result.laneEvidence.eventRoot}\``,
+    `- Lane events: ${result.laneEvidence.eventCount}; lanes: ${result.laneEvidence.laneCount}; actors: ${result.laneEvidence.actorCount}; task-linked events: ${result.laneEvidence.taskCount}.`,
+    `- Event actions: ${Object.entries(result.laneEvidence.actions).map(([action, count]) => `${action}=${count}`).join(', ') || 'none'}.`,
+    laneDogfood
+      ? `- Dogfood overlap sample \`TASK-CODEX-0204\` + \`TASK-LANE-0001/0002/0003/0010\`: max concurrency ${laneDogfood.maxConcurrency}, overlap ${formatMs(laneDogfood.overlapMs)}.`
+      : '',
     '',
     '## Observability Gaps',
     '',
