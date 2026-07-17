@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-bf51cb14b846",
+  "recordedAt": "2026-07-17T13:04:35.906Z",
+  "actorId": "claude-fable-captain",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor claude-fable-captain --message \"t\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-9bad05c36d",
+  "reason": "t",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "failed",
+  "failureCode": "ATM_GIT_COMMIT_FAILED",
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-17T13-04-34-029Z-EMG-GLOBAL-9bad05c36d.json",
+  "parentEventId": "POA-790d09a293f2",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Git commit failed after an authorized hook bypass; fix the commit error and retry without --no-verify when hooks can pass.",
+    "suggestedCommand": "node atm.mjs git commit --actor claude-fable-captain --message \"t\" --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

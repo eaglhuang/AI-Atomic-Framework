@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-790d09a293f2",
+  "recordedAt": "2026-07-17T13:04:34.032Z",
+  "actorId": "claude-fable-captain",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor claude-fable-captain --message \"t\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-9bad05c36d",
+  "reason": "t",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-17T13-04-34-029Z-EMG-GLOBAL-9bad05c36d.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
