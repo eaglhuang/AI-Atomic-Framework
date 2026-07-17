@@ -6,6 +6,7 @@ import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-s
 import { CliError, resolveValue } from '../shared.ts';
 import { diagnoseTaskDirectionLockAllowedFiles } from '../task-direction.ts';
 import { isClaimExpired, parseClaimRecord } from './task-ledger-readers.ts';
+import { compareClaimLifecycleOwners, type ClaimOwnerComparisonMode } from '../next/claim-admission.ts';
 
 export type ClaimRepairIssueKind =
   | 'valid-active-claim'
@@ -28,8 +29,12 @@ export interface ClaimRepairIssue {
 export interface ClaimLifecycleOwnerSummary {
   readonly ownerActorId: string | null;
   readonly claimActorId: string | null;
+  readonly claimLaneSessionId: string | null;
   readonly sessionActorId: string | null;
+  readonly sessionLaneSessionId: string | null;
   readonly lockActorId: string | null;
+  readonly lockLaneSessionId: string | null;
+  readonly comparisonMode: ClaimOwnerComparisonMode;
   readonly closeoutOwnerRule: string;
 }
 
@@ -58,10 +63,14 @@ export interface ClaimRepairApplyResult {
   readonly taskDocument: Record<string, unknown>;
 }
 
-const CLOSEOUT_OWNER_RULE = 'Only the active lifecycle owner (claim.actorId with a valid lease and work session) may mutate deliverables or run taskflow close --write. Other agents remain read-only until handoff, release, or governed repair-claim clears stale drift.';
+const CLOSEOUT_OWNER_RULE = 'Only the active lifecycle owner may mutate deliverables or run taskflow close --write. During lane migration, compare lane ids when both lifecycle records have them; otherwise fall back to claim.actorId with a valid lease and work session.';
 
 function normalizeTaskStatus(value: unknown): string {
   return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+}
+
+function normalizeOptionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
 function quoteCommandValue(value: string): string {
@@ -113,6 +122,25 @@ function readLockActorId(lock: Record<string, unknown> | null): string | null {
   return typeof lockedBy === 'string' && lockedBy.trim() ? lockedBy.trim() : null;
 }
 
+function readLaneSessionId(value: unknown): string | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  const direct = normalizeOptionalString(record.laneSessionId)
+    ?? normalizeOptionalString(record.laneId)
+    ?? normalizeOptionalString(record.guidanceSessionId);
+  if (direct) return direct;
+  const laneSession = record.laneSession;
+  if (laneSession && typeof laneSession === 'object' && !Array.isArray(laneSession)) {
+    return normalizeOptionalString((laneSession as Record<string, unknown>).laneSessionId)
+      ?? normalizeOptionalString((laneSession as Record<string, unknown>).laneId);
+  }
+  const embedded = record.taskDirectionLock;
+  if (embedded && typeof embedded === 'object' && !Array.isArray(embedded)) {
+    return readLaneSessionId(embedded);
+  }
+  return null;
+}
+
 export function diagnoseClaimRepairState(cwd: string, taskId: string, actorId?: string | null): ClaimRepairDiagnosis {
   const root = path.resolve(cwd);
   const nowIso = new Date().toISOString();
@@ -125,10 +153,23 @@ export function diagnoseClaimRepairState(cwd: string, taskId: string, actorId?: 
   const governanceLock = readGovernanceLock(root, taskId);
   const lockReleased = isLockReleased(governanceLock);
   const lockActorId = readLockActorId(governanceLock);
+  const claimLaneSessionId = readLaneSessionId(claim);
+  const lockLaneSessionId = readLaneSessionId(governanceLock);
   const sidecarPath = path.join(root, '.atm', 'runtime', 'task-direction-locks', `${taskId}.json`);
   const activeSession = resolveActorWorkSession(root, { taskId, includeNonActive: false });
+  const sessionLaneSessionId = normalizeOptionalString(activeSession?.guidanceSessionId);
   const directionDiag = diagnoseTaskDirectionLockAllowedFiles(root, taskId);
   const ownerActorId = typeof taskDocument?.owner === 'string' ? taskDocument.owner : null;
+  const claimLockOwnerComparison = compareClaimLifecycleOwners({
+    current: {
+      actorId: claim?.actorId ?? null,
+      laneSessionId: claimLaneSessionId
+    },
+    conflicting: {
+      actorId: lockActorId,
+      laneSessionId: lockLaneSessionId
+    }
+  });
 
   const issues: ClaimRepairIssue[] = [];
   const hasValidActiveClaim = claim?.state === 'active' && !isClaimExpired(claim, nowIso);
@@ -200,14 +241,17 @@ export function diagnoseClaimRepairState(cwd: string, taskId: string, actorId?: 
     });
   }
 
-  if (claim && governanceLock && !lockReleased && lockActorId && claim.actorId !== lockActorId) {
+  if (claim && governanceLock && !lockReleased && lockActorId && !claimLockOwnerComparison.sameOwner) {
     issues.push({
       kind: 'conflicting-lock-actor',
       severity: 'repairable',
-      summary: `Claim actor ${claim.actorId} does not match lock actor ${lockActorId}.`,
+      summary: `Claim lifecycle owner does not match lock lifecycle owner (${claimLockOwnerComparison.mode}).`,
       details: {
         claimActorId: claim.actorId,
-        lockActorId
+        lockActorId,
+        claimLaneSessionId,
+        lockLaneSessionId,
+        comparisonMode: claimLockOwnerComparison.mode
       }
     });
   }
@@ -266,8 +310,12 @@ export function diagnoseClaimRepairState(cwd: string, taskId: string, actorId?: 
     lifecycleOwner: {
       ownerActorId,
       claimActorId: claim?.actorId ?? null,
+      claimLaneSessionId,
       sessionActorId: activeSession?.actorId ?? null,
+      sessionLaneSessionId,
       lockActorId,
+      lockLaneSessionId,
+      comparisonMode: claimLockOwnerComparison.mode,
       closeoutOwnerRule: CLOSEOUT_OWNER_RULE
     },
     writeCommand

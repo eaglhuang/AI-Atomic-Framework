@@ -18,6 +18,7 @@ import { parseClaimLifecycleOptions } from './task-option-parsers.ts';
 import { resolveTaskClaimIntent } from './claim-intent.ts';
 import { writeTakeoverEvidence } from './takeover-evidence.ts';
 import { assertPlanningSourceSealValid } from './import-task.ts';
+import { resolveLaneSession } from '../lane-session/resolve.ts';
 
 function normalizeTaskStatus(value: unknown): string {
   return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
@@ -126,6 +127,12 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
         }
       });
     }
+    const laneSession = resolveLaneSession({
+      cwd: options.cwd,
+      actorId,
+      taskId: options.taskId,
+      command: `node atm.mjs tasks claim --task ${options.taskId} --actor ${actorId} --json`
+    });
     // TASK-CID-0024: persist the declared claim intent so downstream gates
     // (next --claim parallel preflight, hook pre-commit ownership checks) can
     // distinguish mutating write claims from non-mutating closeout-only claims.
@@ -137,7 +144,8 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
         ttlSeconds: options.ttlSeconds,
         timestamp: nowIso
       }),
-      intent: claimIntentResolution.resolvedClaimIntent
+      intent: claimIntentResolution.resolvedClaimIntent,
+      laneSession: laneSession.envelope
     };
     try {
       const lockAcquireStartedAt = Date.now();
@@ -164,7 +172,8 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       claimLeaseId: claim.leaseId,
       status: 'active',
       taskPath: relativeTaskPath,
-      timestamp: nowIso
+      timestamp: nowIso,
+      guidanceSessionId: laneSession.session.laneId
     });
     taskDocument.startedBySessionId = sessionRecord.session.sessionId;
     const previousStatus = String(taskDocument.status ?? '');
@@ -182,7 +191,8 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       planningMirrorPaths: Array.isArray(taskDocument.planningMirrorPaths) ? taskDocument.planningMirrorPaths as string[] : [],
       allowPlanningMirror: taskDocument.allowPlanningMirror === true,
       prompt: options.taskId,
-      sessionId: sessionRecord.session.sessionId
+      sessionId: sessionRecord.session.sessionId,
+      laneSession: laneSession.envelope
     });
     claimLifecyclePhases.push({ phase: 'direction-lock-write', durationMs: Date.now() - directionLockStartedAt });
     taskDocument.taskDirectionLock = directionLock;
@@ -205,8 +215,9 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       messages: [message('info', 'ATM_TASKS_CLAIM_ACQUIRED', `Claim acquired for ${options.taskId}.`, {
         taskId: options.taskId,
         actorId,
-        claimIntent: claimIntentResolution.resolvedClaimIntent
-      })],
+        claimIntent: claimIntentResolution.resolvedClaimIntent,
+        laneSessionId: laneSession.session.laneId
+      }), ...laneSession.messages],
       evidence: {
         action,
         taskId: options.taskId,
@@ -219,6 +230,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
         transitionPath,
         sessionId: sessionRecord.session.sessionId,
         session: sessionRecord.session,
+        laneSession: laneSession.envelope,
         taskDirectionLock: directionLock,
         claimLatency: {
           schemaId: 'atm.claimLatencyTelemetry.v1',

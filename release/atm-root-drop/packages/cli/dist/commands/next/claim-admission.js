@@ -32,6 +32,54 @@
 export function isBrokerVerdictAdmissible(verdict) {
     return verdict === 'allow' || verdict === 'watch' || verdict === 'takeover';
 }
+function normalizeOptionalString(value) {
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+/**
+ * Compare lifecycle ownership during the lane-session migration.
+ * If both sides have lane ids, lane identity is authoritative; otherwise the
+ * legacy actor-id comparison remains the fallback.
+ */
+export function compareClaimLifecycleOwners(input) {
+    const currentActorId = normalizeOptionalString(input.current.actorId);
+    const conflictingActorId = normalizeOptionalString(input.conflicting.actorId);
+    const currentLaneSessionId = normalizeOptionalString(input.current.laneSessionId);
+    const conflictingLaneSessionId = normalizeOptionalString(input.conflicting.laneSessionId);
+    if (currentLaneSessionId && conflictingLaneSessionId) {
+        const sameOwner = currentLaneSessionId === conflictingLaneSessionId;
+        return {
+            schemaId: 'atm.claimOwnerComparison.v1',
+            mode: 'lane-id',
+            sameOwner,
+            currentActorId,
+            conflictingActorId,
+            currentLaneSessionId,
+            conflictingLaneSessionId,
+            reason: sameOwner
+                ? 'Both lifecycle records carry the same lane id; actor metadata drift is treated as a handoff/adoption within one lane.'
+                : 'Both lifecycle records carry lane ids and they differ; ownership is treated as distinct even if actor ids match.'
+        };
+    }
+    const sameOwner = Boolean(currentActorId && conflictingActorId && currentActorId === conflictingActorId);
+    return {
+        schemaId: 'atm.claimOwnerComparison.v1',
+        mode: 'actor-fallback',
+        sameOwner,
+        currentActorId,
+        conflictingActorId,
+        currentLaneSessionId,
+        conflictingLaneSessionId,
+        reason: 'At least one lifecycle record has no lane id, so ATM preserves legacy actor-id ownership comparison.'
+    };
+}
+export function deriveActiveWriteConflictFromOwnerComparison(input) {
+    if (input.conflictIntent === 'closeout-only')
+        return false;
+    const hasConflictingIdentity = input.comparison.mode === 'lane-id'
+        ? Boolean(input.comparison.conflictingLaneSessionId)
+        : Boolean(input.comparison.conflictingActorId);
+    return hasConflictingIdentity && !input.comparison.sameOwner;
+}
 /**
  * Classify whether the broker verdict and the CID diagnostic agree. They
  * "agree" when both would admit or both would block; anything else is
@@ -110,7 +158,8 @@ export function evaluateClaimAdmission(input) {
             blockReason: `Broker arbitration returned '${input.brokerVerdict}' (broker-conflict-blocked) - claim cannot proceed while the underlying conflict is unresolved`
                 + (input.conflictingTaskId ? ` (conflict with ${input.conflictingTaskId}).` : '.'),
             divergence,
-            advisory: null
+            advisory: null,
+            ...(input.ownerComparison ? { ownerComparison: input.ownerComparison } : {})
         };
     }
     let advisory = null;
@@ -131,6 +180,7 @@ export function evaluateClaimAdmission(input) {
         blockCode: null,
         blockReason: null,
         divergence,
-        advisory
+        advisory,
+        ...(input.ownerComparison ? { ownerComparison: input.ownerComparison } : {})
     };
 }

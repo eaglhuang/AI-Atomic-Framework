@@ -44,6 +44,7 @@ import hookSpec from './command-specs/hook.spec.ts';
 import initSpec from './command-specs/init.spec.ts';
 import internalReleaseSpec from './command-specs/internal-release.spec.ts';
 import integrationSpec from './command-specs/integration.spec.ts';
+import laneSpec from './command-specs/lane.spec.ts';
 import lockSpec from './command-specs/lock.spec.ts';
 import migrateSpec from './command-specs/migrate.spec.ts';
 import nextSpec from './command-specs/next.spec.ts';
@@ -110,6 +111,7 @@ export const commandSpecs = Object.freeze({
   init: initSpec,
   'internal-release': internalReleaseSpec,
   integration: integrationSpec,
+  lane: laneSpec,
   lock: lockSpec,
   'map-capsule': withVisibility(mapCapsuleSpec, 'internal'),
   migrate: migrateSpec,

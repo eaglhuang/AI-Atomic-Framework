@@ -24,6 +24,7 @@ import { runHandoff } from './commands/handoff.js';
 import { runInit } from './commands/init.js';
 import { runInternalRelease } from './commands/internal-release.js';
 import { runIntegration } from './commands/integration.js';
+import { runLane } from './commands/lane.js';
 import { runLock } from './commands/lock.js';
 import { runNext } from './commands/next.js';
 import { runOrient } from './commands/orient.js';
@@ -94,6 +95,7 @@ export const cliCommandRunners = {
     'internal-release': runInternalRelease,
     'git-hooks': runGitHooks,
     integration: runIntegration,
+    lane: runLane,
     lock: runLock,
     next: runNext,
     orient: runOrient,

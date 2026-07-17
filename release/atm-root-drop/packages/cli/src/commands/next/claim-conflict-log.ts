@@ -11,7 +11,7 @@
  */
 
 import type { BrokerArbitrationVerdict } from '../../../../core/src/broker/conflict-matrix.ts';
-import type { ClaimAdmissionCidVerdict, ClaimAdmissionDecision } from './claim-admission.ts';
+import type { ClaimAdmissionCidVerdict, ClaimAdmissionDecision, ClaimOwnerComparison } from './claim-admission.ts';
 import type { BrokerQueueAdmission } from './broker-queue-admission.ts';
 
 export interface ClaimAdmissionGateOutcome {
@@ -33,6 +33,7 @@ export interface ClaimAdmissionDecisionLog {
     readonly position: number | null;
     readonly waitingOn: readonly { readonly surfacePath: string; readonly queueHeadTaskId: string; readonly position: number }[];
   };
+  readonly ownerComparison: ClaimOwnerComparison | null;
   readonly privatePathAllowance: {
     readonly granted: boolean;
     readonly allowedFileCount: number;
@@ -50,6 +51,7 @@ export const CLAIM_ADMISSION_DECISION_LOG_KEYS = [
   'gates',
   'sharedPathOrder',
   'queue',
+  'ownerComparison',
   'privatePathAllowance',
   'admitted',
   'blockReason',
@@ -79,6 +81,7 @@ export interface ClaimAdmissionDecisionLogInput {
   readonly queueAdmission: BrokerQueueAdmission | null;
   readonly overlappingFiles: readonly string[];
   readonly decision: ClaimAdmissionDecision;
+  readonly ownerComparison?: ClaimOwnerComparison | null;
   readonly admissionReason: string | null;
 }
 
@@ -94,6 +97,7 @@ export function buildClaimAdmissionDecisionLog(input: ClaimAdmissionDecisionLogI
     ? Math.min(...waitingOn.map((entry) => entry.position))
     : (queueStatus === 'queue-head' ? 1 : null);
   const privateGranted = queueStatus === 'queued-private-work';
+  const ownerComparison = input.ownerComparison ?? input.decision.ownerComparison ?? null;
   const gates: readonly ClaimAdmissionGateOutcome[] = [
     {
       gate: 'claim-intent',
@@ -106,8 +110,8 @@ export function buildClaimAdmissionDecisionLog(input: ClaimAdmissionDecisionLogI
       gate: 'active-write-conflict',
       outcome: input.activeWriteConflict ? 'conflict' : 'clear',
       detail: input.activeWriteConflict
-        ? `an active write claim by another actor overlaps ${input.conflictTaskId ?? 'another task'}`
-        : 'no other actor holds an active write claim on the overlap'
+        ? `an active write claim by another lifecycle owner overlaps ${input.conflictTaskId ?? 'another task'} (${ownerComparison?.mode ?? 'actor-fallback'})`
+        : `no other lifecycle owner holds an active write claim on the overlap (${ownerComparison?.mode ?? 'actor-fallback'})`
     },
     {
       gate: 'broker-confirmation',
@@ -152,6 +156,7 @@ export function buildClaimAdmissionDecisionLog(input: ClaimAdmissionDecisionLogI
       position: queuePosition,
       waitingOn
     },
+    ownerComparison,
     privatePathAllowance: {
       granted: privateGranted,
       allowedFileCount: input.queueAdmission?.allowedFiles.length ?? 0

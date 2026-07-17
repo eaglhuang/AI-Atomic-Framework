@@ -1,4 +1,5 @@
 import type { TaskClaimRecord } from '@ai-atomic-framework/core';
+import { type ClaimOwnerComparisonMode } from '../next/claim-admission.ts';
 export type ClaimRepairIssueKind = 'valid-active-claim' | 'expired-claim' | 'stale-running-without-claim' | 'stale-claim-released' | 'dangling-governance-lock' | 'dangling-direction-sidecar' | 'conflicting-lock-actor' | 'conflicting-session-lease' | 'orphaned-active-session';
 export interface ClaimRepairIssue {
     readonly kind: ClaimRepairIssueKind;
@@ -9,8 +10,12 @@ export interface ClaimRepairIssue {
 export interface ClaimLifecycleOwnerSummary {
     readonly ownerActorId: string | null;
     readonly claimActorId: string | null;
+    readonly claimLaneSessionId: string | null;
     readonly sessionActorId: string | null;
+    readonly sessionLaneSessionId: string | null;
     readonly lockActorId: string | null;
+    readonly lockLaneSessionId: string | null;
+    readonly comparisonMode: ClaimOwnerComparisonMode;
     readonly closeoutOwnerRule: string;
 }
 export interface ClaimRepairDiagnosis {

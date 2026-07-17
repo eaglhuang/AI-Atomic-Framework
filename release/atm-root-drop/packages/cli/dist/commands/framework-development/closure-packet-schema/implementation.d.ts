@@ -10,6 +10,7 @@ export interface FrameworkStaleLockInfo {
     readonly lockTaskId: string;
     readonly lockPath: string;
     readonly actorId: string;
+    readonly laneSessionId: string | null;
     readonly lockedAt: string | null;
     readonly linkedTaskId: string | null;
     readonly currentTaskId: string | null;
@@ -152,11 +153,12 @@ export interface InferredFrameworkTargetRepo {
     readonly targetRepoIdentity: FrameworkRepoIdentity;
 }
 export declare function runFrameworkMode(argv: string[]): import("../../shared.ts").CommandResult | Promise<import("../../shared.ts").CommandResult>;
-export declare function runFrameworkTempClaim(cwd: string, actor: string | null, files: readonly string[], reason: string | null, linkedTaskId?: string | null): Promise<import("../../shared.ts").CommandResult>;
-export declare function runFrameworkTempRelease(cwd: string, actor: string | null): Promise<import("../../shared.ts").CommandResult>;
-export declare function buildFrameworkTempClaimCommand(files?: readonly string[], reason?: string | null, actorId?: string | null): string;
+export declare function runFrameworkTempClaim(cwd: string, actor: string | null, files: readonly string[], reason: string | null, linkedTaskId?: string | null, laneSessionId?: string | null): Promise<import("../../shared.ts").CommandResult>;
+export declare function runFrameworkTempRelease(cwd: string, actor: string | null, laneSessionId?: string | null): Promise<import("../../shared.ts").CommandResult>;
+export declare function buildFrameworkTempClaimCommand(files?: readonly string[], reason?: string | null, actorId?: string | null, laneSessionId?: string | null): string;
 export declare function classifyFrameworkStaleLock(cwd: string, actorId: string, options?: {
     readonly currentTaskId?: string | null;
+    readonly laneSessionId?: string | null;
 }): FrameworkStaleLockInfo | null;
 export declare function detectFrameworkStaleLocks(cwd: string): readonly FrameworkStaleLockInfo[];
 export declare function buildFrameworkStaleCleanupCommand(staleLock: FrameworkStaleLockInfo, files?: readonly string[], reason?: string | null): string;
@@ -195,7 +197,7 @@ export declare function createClosurePacket(input: {
     readonly evidenceFreshness?: 'fresh' | 'historical-reference' | 'draft';
 }): ClosurePacket;
 export declare function writeClosurePacket(cwd: string, taskId: string, packet: ClosurePacket): string;
-export type AtmTasksWriteAction = 'tasks-close' | 'tasks-reconcile' | 'tasks-import-write' | 'tasks-repair-closure-write';
+export type AtmTasksWriteAction = 'tasks-close' | 'tasks-reconcile' | 'tasks-import-write' | 'tasks-create' | 'tasks-mirror' | 'tasks-scope-add' | 'tasks-scope-repair-deliverables' | 'tasks-repair-closure-write';
 export declare function isRunnerSyncRequired(cwd: string): boolean;
 export declare function inspectRunnerSourceDrift(cwd: string): {
     schemaId: string;
@@ -213,12 +215,14 @@ export declare function assertSourceFirstRunnerReadOnlyAction(input: {
     readonly cwd: string;
     readonly action: string;
 }): void;
+export declare function classifyRunnerStaleWriteAction(action: AtmTasksWriteAction): 'ledger-only' | 'behavioral';
 export declare function assertRunnerFreshForWriteAction(input: {
     readonly cwd: string;
     readonly action: AtmTasksWriteAction;
     readonly allowStaleRunner: boolean;
 }): {
     readonly warning: string | null;
+    readonly policy: 'ledger-only' | 'behavioral';
 };
 export declare function closeJournalPath(cwd: string, taskId: string): string;
 export interface TaskCloseTransactionResult {

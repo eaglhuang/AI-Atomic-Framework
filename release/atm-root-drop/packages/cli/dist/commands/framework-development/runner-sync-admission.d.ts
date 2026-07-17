@@ -12,9 +12,11 @@ export type RunnerSyncAdmissionReport = {
         readonly ok: boolean;
         readonly stewardWorkId: string | null;
         readonly queuePosition: number | null;
+        readonly queueHeadHealth: 'task-active' | 'task-missing' | 'task-terminal';
         readonly waitingTasks: readonly string[];
         readonly ownerActorIds: readonly string[];
         readonly reason: string | null;
+        readonly cleanupCommand: string | null;
     };
     readonly foreignNonReleaseWip: readonly string[];
     readonly releaseWip: readonly string[];

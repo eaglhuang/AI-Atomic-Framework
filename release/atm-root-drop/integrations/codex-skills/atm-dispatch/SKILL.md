@@ -82,6 +82,40 @@ instead of keeping private recovery prose in the dispatch brief.
 - For closeout review, verify deliverables and evidence before saying a task is
   complete.
 
+## Planning Authority Resolution Gate
+
+Before drafting any ATM plan, task-card directory, or source task card, classify
+the request as one of:
+
+- ATM framework implementation
+- ATM governance optimization planning
+- adopter or project work
+- dogfood or backlog recording
+
+For ATM framework work that must be planned outside the target ATM ledger,
+resolve an external governance workbench repository first. Do not assume the
+current working directory is the planning repository.
+
+Before writing any plan or task card, state these fields:
+
+- `planning_repo_root`
+- `planning_repo_is_external_to_target`
+- `target_repo_root`
+- `source_plan_path`
+- `source_task_card_path`
+- `target_import_method`
+
+If no external governance workbench can be resolved, stop and ask the user for
+the planning repository, or record a backlog item for missing planning-authority
+discovery. Do not create source planning cards inside the ATM target repository
+by default; the target may receive only CLI-imported `.atm/history/**` ledger
+records unless the source plan itself is an explicit target deliverable.
+
+When changing ATM skills, update the source-of-truth template files first.
+Installed skill copies under agent or integration directories are derived
+artifacts; direct-only edits to those copies are not sufficient and must fail
+review because reinstalling or refreshing adapters can overwrite them.
+
 ## Team Agents Dispatch Surface
 
 When dispatching or reviewing Team Agents work, preserve the current runtime
@@ -170,6 +204,7 @@ ATM flow:
 - Cross-file consistency will block a scoped commit when `team.ts` imports symbols changed in unstaged siblings — `tasks scope add` the coupled files **before** `git commit --auto-stage`, or expect `ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY`.
 - One shared delivery SHA for related bugs is fine: close siblings with `--historical-delivery <sha> --waiver-out-of-scope-delivery --reason "..."`; without the waiver, `MIXED_DELIVERY_COMMIT` / `OUT_OF_SCOPE_WAIVER_REQUIRED` blocks. TASK-AAO-0201 / ATM-BUG-186 now promotes the waiver recipe as the primary shared-delivery blocker (not "missing delivery").
 - After closing a batch under a temporary `framework-mode claim`, **release** that temp lock before the next sibling `taskflow close --write`, or framework-development gates fail with stale-lock / `ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED`.
+- Branch discipline: unless the human gives explicit special approval for a branch/worktree experiment, no AI/agent may create or switch to a development branch or worktree branch. Backlog fixes default to the current `main` lane with formal task-card claim/evidence so concurrency and overlap remain measurable.
 - Card generator scripts under `.atm/runtime/*.js` race with `package.json` `"type":"module"` — use `.cjs` (or write cards with the Write tool) so planning-card generation does not silently fail.
 - Do **not** run `integration add --force` to clear skill drift after editing dogfood lessons in installed copies; update `templates/skills/atm-dispatch.skill.md` first, then reinstall adapters so manifests stay in parity.
 

@@ -4,6 +4,11 @@ import {
   evaluateTaskPromotionAdmission,
   evaluateTaskResetAdmission
 } from '../lifecycle-state.ts';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { writeTaskDirectionLock } from '../../task-direction.ts';
+import { parseClaimRecord } from '../task-ledger-readers.ts';
 
 function fail(message: string): never {
   console.error(`[lifecycle-state.test] ${message}`);
@@ -127,5 +132,35 @@ assert(result.ok, 'historical closeback must allow imported blocked tasks when h
 result = evaluateTaskResetAdmission({ taskId: 'TASK-LIFE', fromStatus: 'done', toStatus: 'open' });
 if (result.ok) fail('done task reset must require reopen flow');
 assert(result.code === 'ATM_TASK_RESET_DONE_REQUIRES_REOPEN', 'done reset must expose stable reopen-required code');
+
+const laneSession = {
+  laneSessionId: 'lane-fixture',
+  status: 'active',
+  source: 'minted',
+  exportHint: 'export ATM_LANE_SESSION_ID="lane-fixture"'
+};
+const parsedClaim = parseClaimRecord({
+  actorId: 'captain',
+  leaseId: 'lease-fixture',
+  claimedAt: '2026-07-16T00:00:00.000Z',
+  heartbeatAt: '2026-07-16T00:00:00.000Z',
+  ttlSeconds: 1800,
+  files: ['packages/cli/src/commands/task-direction.ts'],
+  state: 'active',
+  laneSession
+});
+assert(parsedClaim?.laneSession?.laneSessionId === laneSession.laneSessionId, 'claim parser must preserve lane session metadata');
+
+const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-direction-lane-'));
+writeTaskDirectionLock({
+  cwd: repo,
+  taskId: 'TASK-LIFE',
+  actorId: 'captain',
+  queue: null,
+  allowedFiles: ['packages/cli/src/commands/task-direction.ts'],
+  laneSession
+});
+const sidecar = JSON.parse(readFileSync(path.join(repo, '.atm/runtime/task-direction-locks/TASK-LIFE.json'), 'utf8'));
+assert(sidecar.laneSession?.laneSessionId === laneSession.laneSessionId, 'direction lock must stamp lane session metadata');
 
 console.log('[lifecycle-state.test] ok');

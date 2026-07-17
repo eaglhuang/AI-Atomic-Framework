@@ -1,6 +1,7 @@
 export type TeamLevelRecommendationInput = {
   readonly ownFiles: readonly string[];
   readonly foreignFiles: readonly string[];
+  readonly foreignDirtyFiles?: readonly string[];
   readonly stagedFiles: readonly string[];
   readonly foreignActorIds: readonly string[];
 };
@@ -18,15 +19,17 @@ export function projectTeamLevelRecommendation(input: TeamLevelRecommendationInp
   const ownSet = new Set(ownFiles);
   const overlappingFiles = uniqueSorted([
     ...input.foreignFiles.map(normalizeWorkPath).filter((file) => ownSet.has(file)),
+    ...(input.foreignDirtyFiles ?? []).map(normalizeWorkPath).filter((file) => ownSet.has(file)),
     ...input.stagedFiles.map(normalizeWorkPath).filter((file) => ownSet.has(file))
   ]);
   const foreignActors = uniqueSorted(input.foreignActorIds);
   const sharedIndexActive = input.stagedFiles.length > 0;
+  const foreignDirtyActive = (input.foreignDirtyFiles ?? []).length > 0;
   const frameworkFoundationRisk = ownFiles.some(isFrameworkFoundationPath);
-  if (frameworkFoundationRisk && (foreignActors.length > 0 || sharedIndexActive || overlappingFiles.length > 0)) {
+  if (frameworkFoundationRisk && (foreignActors.length > 0 || sharedIndexActive || foreignDirtyActive || overlappingFiles.length > 0)) {
     return {
       level: 'L5',
-      reason: 'Framework foundation files are in scope while other active work or shared-index state exists; use the full Team Agent Broker lane.',
+      reason: 'Framework foundation files are in scope while other active work, dirty WIP, or shared-index state exists; use the full Team Agent Broker lane.',
       ownFiles,
       overlappingFiles,
       foreignActors
@@ -56,6 +59,15 @@ export function projectTeamLevelRecommendation(input: TeamLevelRecommendationInp
       reason: 'A concrete same-file or shared-index risk is present; use Broker arbitration with implementer and validator lanes.',
       ownFiles,
       overlappingFiles,
+      foreignActors
+    };
+  }
+  if (foreignDirtyActive) {
+    return {
+      level: 'L3',
+      reason: 'Foreign active-task dirty WIP is present in the shared worktree; use Broker arbitration before committing or closing.',
+      ownFiles,
+      overlappingFiles: [],
       foreignActors
     };
   }

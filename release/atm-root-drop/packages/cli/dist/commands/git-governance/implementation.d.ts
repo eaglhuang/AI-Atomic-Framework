@@ -6,6 +6,7 @@ export declare function captureGitHeadEvidencePreparation(cwd: any): {
 };
 export declare function rollbackFailedGitHeadEvidencePreparation(snapshot: any): boolean;
 export declare function reconcileResolvedCrossTaskMutationIncident(cwd: any, taskId: any): boolean;
+export declare function resolveCommitLaneSessionId(input?: {}): string | null;
 export declare function resolveActorGitIdentityForCommit(cwd: any, actorId: any): {
     gitName: any;
     gitEmail: any;

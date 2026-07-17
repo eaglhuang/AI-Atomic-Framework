@@ -31,14 +31,34 @@ of adding private error-code prose to one skill.
 
 ## Planning Authority Gate
 
-Before creating a plan, task-card directory, or task card, resolve and state
-these three authorities:
+Before creating a plan, task-card directory, or task card, classify the request
+as one of:
+
+- ATM framework implementation
+- ATM governance optimization planning
+- adopter or project work
+- dogfood or backlog recording
+
+Then resolve and state these three authorities:
 
 - `planning authority`: repository that owns the human-readable plan and source
   task cards;
 - `target authority`: repository where implementation files may change;
 - `closure authority`: repository whose ATM ledger, evidence, close, and commit
   establish completion.
+
+For ATM framework work that must be planned outside the target ATM ledger,
+resolve an external governance workbench repository first. Do not assume the
+current working directory is the planning repository.
+
+Before writing any plan or task card, state these fields:
+
+- `planning_repo_root`
+- `planning_repo_is_external_to_target`
+- `target_repo_root`
+- `source_plan_path`
+- `source_task_card_path`
+- `target_import_method`
 
 When planning and target authorities differ, keep the complete plan and source
 cards only in the planning repository. The target repository may receive only
@@ -49,6 +69,16 @@ temporary card directory merely because implementation will happen there.
 Treat an existing `planning_repo`, `related_plan`, AGENTS instruction, or human
 decision as binding. If the authority is still unknown, stop authoring until it
 is resolved. Memory and handoff notes are supporting context, not enforcement.
+
+If no external governance workbench can be resolved for external-planning ATM
+framework work, stop and ask the user for the planning repository, or record a
+backlog item for missing planning-authority discovery. Do not create source
+planning cards inside the ATM target repository by default.
+
+When changing ATM skills, update the source-of-truth template files first.
+Installed skill copies under agent or integration directories are derived
+artifacts; direct-only edits to those copies are not sufficient and must fail
+review because reinstalling or refreshing adapters can overwrite them.
 
 ## Required Card Contract
 

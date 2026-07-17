@@ -10,7 +10,9 @@ function tempRoot() {
     return root;
 }
 function writeLock(root, actorId, body) {
-    writeFileSync(path.join(root, '.atm', 'runtime', 'locks', `ATM-FRAMEWORK-TEMP-${actorId}.lock.json`), JSON.stringify({
+    const laneSessionId = typeof body.laneSessionId === 'string' ? body.laneSessionId : null;
+    const laneSuffix = laneSessionId ? `-lane-${laneSessionId.replace(/[^A-Za-z0-9_-]+/g, '-')}` : '';
+    writeFileSync(path.join(root, '.atm', 'runtime', 'locks', `ATM-FRAMEWORK-TEMP-${actorId}${laneSuffix}.lock.json`), JSON.stringify({
         actorId,
         lockedAt: '2026-06-14T00:00:00.000Z',
         ttlSeconds: 1,
@@ -72,4 +74,38 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
     });
     const staleLock = classifyFrameworkStaleLock(root, 'agent-one');
     assert.equal(staleLock, null, 'same-actor unlabeled temp lock must be reusable for scope refresh');
+}
+{
+    const root = tempRoot();
+    writeLock(root, 'agent-one', {
+        workItemId: 'ATM-FRAMEWORK-TEMP-agent-one-lane-lane-a',
+        lockedBy: 'agent-one',
+        laneSessionId: 'lane-a',
+        heartbeatAt: new Date().toISOString(),
+        ttlSeconds: 3600
+    });
+    writeLock(root, 'agent-one', {
+        workItemId: 'ATM-FRAMEWORK-TEMP-agent-one-lane-lane-b',
+        lockedBy: 'agent-one',
+        laneSessionId: 'lane-b',
+        heartbeatAt: new Date().toISOString(),
+        ttlSeconds: 3600
+    });
+    assert.equal(classifyFrameworkStaleLock(root, 'agent-one', { laneSessionId: 'lane-a' }), null, 'lane-a must reuse only its own lane-scoped framework temp lock');
+    assert.equal(classifyFrameworkStaleLock(root, 'agent-one', { laneSessionId: 'lane-b' }), null, 'lane-b must reuse only its own lane-scoped framework temp lock');
+    assert.equal(classifyFrameworkStaleLock(root, 'agent-one'), null, 'legacy actor-only lookup must not collide with lane-scoped locks');
+}
+{
+    const root = tempRoot();
+    writeLock(root, 'agent-one', {
+        linkedTaskId: 'TASK-DONE',
+        laneSessionId: 'lane-a',
+        heartbeatAt: '2026-06-14T00:00:00.000Z'
+    });
+    writeTask(root, 'TASK-DONE', 'done');
+    const staleLock = classifyFrameworkStaleLock(root, 'agent-one', { laneSessionId: 'lane-a' });
+    assert.equal(staleLock?.kind, 'stale-completed');
+    assert.equal(staleLock?.laneSessionId, 'lane-a');
+    assert.match(staleLock?.detail ?? '', /lane lane-a/);
+    assert.match(buildFrameworkStaleCleanupCommand(staleLock, ['x.ts'], 'continue'), /--lane-session "lane-a"/);
 }

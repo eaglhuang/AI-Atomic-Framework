@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import {
+  compareClaimLifecycleOwners,
+  deriveActiveWriteConflictFromOwnerComparison,
   evaluateClaimAdmission,
   isBrokerVerdictAdmissible
 } from '../claim-admission.ts';
@@ -32,6 +34,43 @@ const closeoutOnlyOk = evaluateClaimAdmission({
   candidateTaskId: 'TASK-RFT-0003'
 });
 assert.equal(closeoutOnlyOk.admitted, true);
+
+const sameActorDifferentLane = compareClaimLifecycleOwners({
+  current: { actorId: 'codex-captain', laneSessionId: 'lane-a' },
+  conflicting: { actorId: 'codex-captain', laneSessionId: 'lane-b' }
+});
+assert.equal(sameActorDifferentLane.mode, 'lane-id');
+assert.equal(sameActorDifferentLane.sameOwner, false);
+assert.equal(
+  deriveActiveWriteConflictFromOwnerComparison({
+    comparison: sameActorDifferentLane,
+    conflictIntent: 'write'
+  }),
+  true,
+  'same actor with different lane ids is a distinct lifecycle owner'
+);
+
+const sameLaneDifferentActor = compareClaimLifecycleOwners({
+  current: { actorId: 'codex-after-handoff', laneSessionId: 'lane-shared' },
+  conflicting: { actorId: 'codex-before-handoff', laneSessionId: 'lane-shared' }
+});
+assert.equal(sameLaneDifferentActor.mode, 'lane-id');
+assert.equal(sameLaneDifferentActor.sameOwner, true);
+assert.equal(
+  deriveActiveWriteConflictFromOwnerComparison({
+    comparison: sameLaneDifferentActor,
+    conflictIntent: 'write'
+  }),
+  false,
+  'same lane remains one lifecycle owner even when actor metadata changes'
+);
+
+const actorFallback = compareClaimLifecycleOwners({
+  current: { actorId: 'codex-captain' },
+  conflicting: { actorId: 'codex-captain' }
+});
+assert.equal(actorFallback.mode, 'actor-fallback');
+assert.equal(actorFallback.sameOwner, true);
 
 const before = JSON.stringify({
   brokerVerdict: 'allow',

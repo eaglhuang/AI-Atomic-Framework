@@ -187,6 +187,13 @@ export const plannedCliCommands = [
         outputFormat: 'pretty+json'
     },
     {
+        commandName: 'lane',
+        summary: 'Inspect or lazily mint the current ATM lane session',
+        implemented: true,
+        standaloneMode: true,
+        outputFormat: 'pretty+json'
+    },
+    {
         commandName: 'lock',
         summary: 'Check, acquire, or release a governed scope lock',
         implemented: true,

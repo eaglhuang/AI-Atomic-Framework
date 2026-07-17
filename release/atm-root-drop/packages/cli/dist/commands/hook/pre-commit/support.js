@@ -214,7 +214,7 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
     const pendingBatchCheckpointWindow = activeBatches.map((batchRun) => buildPendingCheckpointCommitWindow(cwd, batchRun, null)).find((window) => window && protectedFiles.every((file) => isPathAllowedByScope(file, uniqueSorted([...window.commitFiles, ...window.changedFiles])))) ?? null;
     const batchDeliverAndCloseCommit = process.env.ATM_BATCH_DELIVER_AND_CLOSE === '1';
     const nonAtmStagedFiles = stagedFiles.map((entry) => normalizeRelativePath(entry)).filter((entry) => !entry.toLowerCase().startsWith('.atm/'));
-    if (stagedBatch?.status === 'active' && !batchDeliverAndCloseCommit && nonAtmStagedFiles.length > 0 && !hasStagedBatchCheckpointClosure(cwd, protectedFiles, stagedBatch.taskIds, stagedBatch.batchId)) {
+    if (stagedBatch?.status === 'active' && !batchDeliverAndCloseCommit && !pendingBatchCheckpointWindow && nonAtmStagedFiles.length > 0 && !hasStagedBatchCheckpointClosure(cwd, protectedFiles, stagedBatch.taskIds, stagedBatch.batchId)) {
         const requiredCommand = `node atm.mjs batch checkpoint --actor <id> --batch ${stagedBatch.batchId} --json`;
         findings.push({ file: nonAtmStagedFiles[0] ?? '<staged-files>', reason: 'batch-commit-before-checkpoint', detail: `Active batch ${stagedBatch.batchId} has not checkpointed the staged deliverable commit. Run ${requiredCommand} first, then commit the deliverables together with the checkpoint task/evidence/events.`, requiredCommand });
     }
@@ -342,7 +342,19 @@ function isNestedEvidenceArtifactPath(value) {
     return relative.includes('/');
 }
 function hasStagedBatchCheckpointClosure(cwd, protectedFiles, batchTaskIds, batchId = null) {
-    const protectedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
+    const protectedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
+    for (const file of protectedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        if (!lower.startsWith('.atm/history/task-events/') || !lower.endsWith('.json')) {
+            continue;
+        }
+        const event = readJsonFile(path.join(cwd, normalized));
+        const closure = event?.closure;
+        if (typeof event?.command === 'string' && event.command.startsWith('node atm.mjs ') && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1') && (!batchId || event.command.includes(`--batch ${batchId}`) || closure?.batchId === batchId)) {
+            return true;
+        }
+    }
     for (const file of protectedFiles) {
         const normalized = normalizeRelativePath(file);
         const lower = normalized.toLowerCase();
@@ -351,17 +363,17 @@ function hasStagedBatchCheckpointClosure(cwd, protectedFiles, batchTaskIds, batc
         }
         const task = readJsonFile(path.join(cwd, normalized));
         const taskId = typeof task?.workItemId === 'string' ? task.workItemId : path.basename(normalized, '.json');
-        if (!batchTaskIds.includes(taskId) || task?.status !== 'done') {
+        if ((!batchId && !batchTaskIds.includes(taskId)) || task?.status !== 'done') {
             continue;
         }
         const lastTransitionId = typeof task?.lastTransitionId === 'string' ? task.lastTransitionId : '';
         const expectedEventPath = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
-        if (!lastTransitionId || !protectedSet.has(expectedEventPath)) {
+        if (!lastTransitionId || !protectedSet.has(expectedEventPath.toLowerCase())) {
             continue;
         }
         const event = readJsonFile(path.join(cwd, expectedEventPath));
         const closure = event?.closure;
-        if (typeof event?.command === 'string' && event.command.startsWith('node atm.mjs tasks close') && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1') && (!batchId || event.command.includes(`--batch ${batchId}`) || closure?.batchId === batchId)) {
+        if (typeof event?.command === 'string' && event.command.startsWith('node atm.mjs ') && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1') && (!batchId || event.command.includes(`--batch ${batchId}`) || closure?.batchId === batchId)) {
             return true;
         }
     }

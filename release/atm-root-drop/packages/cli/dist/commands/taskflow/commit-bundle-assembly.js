@@ -12,6 +12,8 @@ import { validateStrictPathHeuristic } from '../tasks/task-import-validators.js'
 import { listOptionalEvidenceBundleGovernanceArtifacts } from './closeback-orchestration.js';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.js';
 import { listTaskOwnedProtectedOverrideAuditFiles, resolveActorGitIdentityForCommit, runAtmGit } from '../git-governance.js';
+import { resolveCommitLaneSessionId } from '../git-governance/implementation.js';
+import { resolveActorWorkSession } from '../actor-session.js';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { CliError, quoteCliValue } from '../shared.js';
 import { isPathAllowedByScope } from '../work-channels.js';
@@ -56,6 +58,7 @@ catch {
 } }
 function runGitOrThrow(cwd, args) { execFileSync('git', [...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }); }
 function runGitWithEnv(cwd, args, env) { execFileSync('git', [...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env }); }
+function resolveTaskflowCommitLaneSessionId(input) { const session = input.actorId && input.taskId ? resolveActorWorkSession(input.repoRoot, { actorId: input.actorId, taskId: input.taskId, includeNonActive: true }) : null; return resolveCommitLaneSessionId({ session }); }
 function readGitRoot(startPath) {
     const probe = existsSync(startPath) && statSync(startPath).isDirectory() ? startPath : path.dirname(startPath);
     const root = tryGitScalar(probe, ['rev-parse', '--show-toplevel']);
@@ -97,10 +100,10 @@ function writeSealAndCommitReceipt(repoRoot, receipt) {
     writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
     return receipt;
 }
-function appendSealTrailers(messageText, receipt, surface) {
+function appendSealTrailers(messageText, receipt, surface, laneSessionId = null) {
     return [messageText, '',
         `ATM-Seal-Digest: ${receipt.sealDigest}`, `ATM-Payload-Digest: ${surface === 'planning' ? receipt.planningPayloadDigest : receipt.targetPayloadDigest}`, `ATM-Evidence-Digest: ${surface === 'planning' ? receipt.planningEvidenceDigest : receipt.targetEvidenceDigest}`, `ATM-Seal-Manifest: ${receipt.manifestPath}`, `ATM-Target-Head-Before: ${receipt.targetHeadBeforeCommit ?? '<none>'}`,
-        `ATM-Planning-Head-Before: ${receipt.planningHeadBeforeCommit ?? '<none>'}`].join('\n');
+        `ATM-Planning-Head-Before: ${receipt.planningHeadBeforeCommit ?? '<none>'}`, ...(laneSessionId ? [`ATM-Lane-Session: ${laneSessionId}`] : [])].join('\n');
 }
 function extractTaskStringList(taskDocument, key) { const value = taskDocument[key]; return Array.isArray(value) ? value.map((entry) => typeof entry === 'string' ? normalizeMarkdownPathDeclaration(entry) : '').filter(Boolean) : []; }
 function isCanonicalTaskflowDeliverableCandidate(value) { const normalized = normalizeMarkdownPathDeclaration(value); if (!normalized)
@@ -438,12 +441,13 @@ async function commitTaskflowBundle(input) {
     const targetStageFiles = existingBundleFiles(input.bundle.targetRepo);
     const targetPreStagedFiles = input.bundle.targetRepo.repoRoot ? readStagedFiles(input.bundle.targetRepo.repoRoot) : [];
     const targetPreflight = input.bundle.targetRepo.repoRoot ? buildIndexIsolation(input.bundle.targetRepo, targetPreStagedFiles, input.taskId) : null;
+    const laneSessionId = input.bundle.targetRepo.repoRoot ? resolveTaskflowCommitLaneSessionId({ repoRoot: input.bundle.targetRepo.repoRoot, actorId: input.actorId, taskId: input.taskId }) : null;
     if (input.bundle.targetRepo.repoRoot && targetPreflight) {
         parkGitIndexLease(input.bundle.targetRepo.repoRoot, targetPreflight.indexLease);
     }
     try {
         commitRepoWithTemporaryIndex({ repoRoot: input.bundle.targetRepo.repoRoot ?? '', stageFiles: targetStageFiles,
-            args: ['commit', '-m', appendSealTrailers(input.bundle.targetRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'target')], actorId: input.actorId, taskId: input.taskId });
+            args: ['commit', '-m', appendSealTrailers(input.bundle.targetRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'target', laneSessionId)], actorId: input.actorId, taskId: input.taskId, laneSessionId });
     }
     finally {
         if (input.bundle.targetRepo.repoRoot && targetPreflight) {
@@ -463,10 +467,10 @@ async function commitTaskflowBundle(input) {
         const planningPreflight = buildIndexIsolation(planningRepo, planningPreStagedFiles, input.taskId);
         parkGitIndexLease(planningRepo.repoRoot, planningPreflight.indexLease);
         const planningMessage = [
-            appendSealTrailers(planningRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'planning'), '', `ATM-Actor: ${input.actorId}`, `ATM-Task: ${input.taskId}`, 'ATM-Surface: taskflow-close-planning-bundle'
+            appendSealTrailers(planningRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'planning', laneSessionId), '', `ATM-Actor: ${input.actorId}`, `ATM-Task: ${input.taskId}`, 'ATM-Surface: taskflow-close-planning-bundle'
         ].join('\n');
         try {
-            commitRepoWithTemporaryIndex({ repoRoot: planningRepo.repoRoot, stageFiles: planningStageFiles, args: ['commit', '-m', planningMessage], actorId: input.actorId, taskId: input.taskId });
+            commitRepoWithTemporaryIndex({ repoRoot: planningRepo.repoRoot, stageFiles: planningStageFiles, args: ['commit', '-m', planningMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId });
         }
         finally {
             restoreGitIndexLease(planningRepo.repoRoot, planningPreflight.indexLease);
@@ -484,8 +488,9 @@ function commitRepoWithTemporaryIndex(input) {
     const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-taskflow-commit-index-'));
     const tempIndexFile = path.join(tempDir, 'index');
     const identity = input.actorId ? resolveActorGitIdentityForCommit(input.repoRoot, input.actorId) : null;
+    const laneSessionId = input.laneSessionId ?? resolveTaskflowCommitLaneSessionId({ repoRoot: input.repoRoot, actorId: input.actorId, taskId: input.taskId });
     const env = { ...process.env,
-        GIT_INDEX_FILE: tempIndexFile, ...(input.actorId ? { ATM_COMMIT_ACTOR_ID: input.actorId } : {}), ...(input.taskId ? { ATM_COMMIT_TASK_ID: input.taskId } : {}), ...(identity?.gitName ? { GIT_AUTHOR_NAME: identity.gitName, GIT_COMMITTER_NAME: identity.gitName } : {}), ...(identity?.gitEmail ? { GIT_AUTHOR_EMAIL: identity.gitEmail, GIT_COMMITTER_EMAIL: identity.gitEmail } : {}) };
+        GIT_INDEX_FILE: tempIndexFile, ...(input.actorId ? { ATM_COMMIT_ACTOR_ID: input.actorId } : {}), ...(input.taskId ? { ATM_COMMIT_TASK_ID: input.taskId } : {}), ...(laneSessionId ? { ATM_COMMIT_LANE_SESSION_ID: laneSessionId } : {}), ...(identity?.gitName ? { GIT_AUTHOR_NAME: identity.gitName, GIT_COMMITTER_NAME: identity.gitName } : {}), ...(identity?.gitEmail ? { GIT_AUTHOR_EMAIL: identity.gitEmail, GIT_COMMITTER_EMAIL: identity.gitEmail } : {}) };
     try {
         runGitWithEnv(input.repoRoot, ['read-tree', 'HEAD'], env);
         if (input.stageFiles.length > 0) {
@@ -542,12 +547,13 @@ async function finalizeTaskflowCommitBundleWithSeal(input) {
                     indexIsolation: stagedShared.indexIsolation }, planningRepo: { ...sealedInputBundle.planningRepo, status: stagedShared.status, indexIsolation: stagedShared.indexIsolation } };
         }
         const sharedStageFiles = existingBundleFiles(preflightShared);
+        const laneSessionId = resolveTaskflowCommitLaneSessionId({ repoRoot, actorId: input.actorId, taskId: input.taskId });
         const preStagedFiles = readStagedFiles(repoRoot);
         const sharedIndexIsolation = buildIndexIsolation(preflightShared, preStagedFiles, input.taskId);
         parkGitIndexLease(repoRoot, sharedIndexIsolation.indexLease);
-        const sharedMessage = [appendSealTrailers(sealedInputBundle.targetRepo.commitMessage, sealedInputBundle.sealAndCommitReceipt, 'shared'), '', `ATM-Actor: ${input.actorId}`, `ATM-Task: ${input.taskId}`, 'ATM-Surface: taskflow-close-shared-repo-bundle', `ATM-Planning-Commit-Message: ${sealedInputBundle.planningRepo.commitMessage}`].join('\n');
+        const sharedMessage = [appendSealTrailers(sealedInputBundle.targetRepo.commitMessage, sealedInputBundle.sealAndCommitReceipt, 'shared', laneSessionId), '', `ATM-Actor: ${input.actorId}`, `ATM-Task: ${input.taskId}`, 'ATM-Surface: taskflow-close-shared-repo-bundle', `ATM-Planning-Commit-Message: ${sealedInputBundle.planningRepo.commitMessage}`].join('\n');
         try {
-            commitRepoWithTemporaryIndex({ repoRoot, stageFiles: sharedStageFiles, args: ['commit', '-m', sharedMessage], actorId: input.actorId, taskId: input.taskId });
+            commitRepoWithTemporaryIndex({ repoRoot, stageFiles: sharedStageFiles, args: ['commit', '-m', sharedMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId });
         }
         finally {
             restoreGitIndexLease(repoRoot, sharedIndexIsolation.indexLease);

@@ -1,0 +1,85 @@
+{
+  "taskId": "TASK-SYNC-0001",
+  "updatedAt": "2026-07-17T03:50:10.433Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-runner-sync-0001",
+      "sessionId": "session-20260717034029-codex-runner-sync-0001-TASK-SYNC-0001-401d72cd8b",
+      "createdAt": "2026-07-17T03:49:56.516Z",
+      "details": {
+        "actorId": "codex-runner-sync-0001",
+        "sessionId": "session-20260717034029-codex-runner-sync-0001-TASK-SYNC-0001-401d72cd8b",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-sync-steward",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "de8295b61f08ea559997bc12ce3214fcc946accd",
+            "cacheKey": "sha256:5ae48acde76cea9178f831f993e10e566f2454bee3d09561a8a14554b648ede5",
+            "cached": false,
+            "generatedAt": "2026-07-17T03:49:56.801Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4a68946292b9525744c777dc0ce81f8fcf7755e496685c746b8444a4052068f3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "artifact",
+      "summary": "Sealed runner build artifacts retained after ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build; runner-sync released with receipt sha256:5fd5701aa14ac1cc66fe517ca3718c55e4f8a74ee80c35aba5b4c67db6344cda.",
+      "artifactPaths": [
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-runner-sync-0001",
+      "sessionId": "session-20260717034029-codex-runner-sync-0001-TASK-SYNC-0001-401d72cd8b",
+      "createdAt": "2026-07-17T03:50:10.433Z",
+      "details": {
+        "actorId": "codex-runner-sync-0001",
+        "sessionId": "session-20260717034029-codex-runner-sync-0001-TASK-SYNC-0001-401d72cd8b",
+        "kind": "artifact",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-sync-steward",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ]
+      }
+    }
+  ]
+}

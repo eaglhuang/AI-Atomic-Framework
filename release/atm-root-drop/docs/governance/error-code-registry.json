@@ -3,6 +3,220 @@
   "specVersion": "0.1.0",
   "entries": [
     {
+      "code": "ATM_LANE_SESSION_ADOPTABLE",
+      "category": "lane-session",
+      "shortDescription": "Other usable lane sessions exist for the actor and may be exported or adopted.",
+      "commonCauses": [
+        "The same actor minted more than one active lane.",
+        "A previous lane was left open but remains within TTL."
+      ],
+      "remediation": [
+        "Continue with the current lane when the duplicate is expected.",
+        "Export one of the listed ATM_LANE_SESSION_ID values when resuming that lane.",
+        "Run node atm.mjs lane sweep --json to inspect stale lane cleanup candidates."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane status --json",
+        "node atm.mjs lane adopt <lane-id> --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane-session/resolve.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_HEARTBEAT_CLOSED",
+      "category": "lane-session",
+      "shortDescription": "A closed lane session cannot accept a heartbeat.",
+      "commonCauses": [
+        "The lane was already released or expired.",
+        "A stale ATM_LANE_SESSION_ID points at a closed runtime lane."
+      ],
+      "remediation": [
+        "Run node atm.mjs lane status --actor <actor> --json to mint or resolve a usable lane.",
+        "Do not manually edit .atm/runtime/lane-sessions; use lane status, adopt, or sweep."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane heartbeat <lane-id> --actor <actor> --json",
+        "node atm.mjs lane status --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_HEARTBEAT_EXPIRED",
+      "category": "lane-session",
+      "shortDescription": "A TTL-expired lane session cannot be revived by heartbeat.",
+      "commonCauses": [
+        "The lane exceeded its TTL before the heartbeat command ran.",
+        "The operator attempted to reuse an old lane instead of minting or adopting a fresh one."
+      ],
+      "remediation": [
+        "Run node atm.mjs lane status --actor <actor> --json to mint a fresh lane.",
+        "Run node atm.mjs lane sweep --write --json only when explicit cleanup evidence is desired."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane status --actor <actor> --json",
+        "node atm.mjs lane sweep --write --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_HEARTBEAT_RECORDED",
+      "category": "lane-session",
+      "shortDescription": "A lane session heartbeat was recorded and the lane TTL was extended.",
+      "commonCauses": [
+        "An agent or tool intentionally refreshed a live lane session."
+      ],
+      "remediation": [
+        "No remediation is required; inspect evidence.eventPath for the heartbeat event when auditing."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane heartbeat <lane-id> --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_HEARTBEAT_TARGET_REQUIRED",
+      "category": "lane-session",
+      "shortDescription": "Heartbeat requires an explicit lane id or ATM_LANE_SESSION_ID.",
+      "commonCauses": [
+        "The command was run as lane heartbeat without a positional lane id.",
+        "ATM_LANE_SESSION_ID was not exported in the environment."
+      ],
+      "remediation": [
+        "Pass node atm.mjs lane heartbeat <lane-id> --json.",
+        "Run node atm.mjs lane status --json first and export the reported ATM_LANE_SESSION_ID."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane status --json",
+        "node atm.mjs lane heartbeat <lane-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_MINTED",
+      "category": "lane-session",
+      "shortDescription": "A new lane session was lazily minted for the current actor.",
+      "commonCauses": [
+        "No lane id was provided and ATM_LANE_SESSION_ID was unset.",
+        "The requested lane was missing, closed, or expired."
+      ],
+      "remediation": [
+        "Export the reported ATM_LANE_SESSION_ID when subsequent commands should stay on the same lane.",
+        "Use node atm.mjs lane heartbeat <lane-id> --json to refresh long-running lanes."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane status --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane-session/resolve.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_NOT_ADOPTABLE",
+      "category": "lane-session",
+      "shortDescription": "The requested lane session is closed and cannot be adopted.",
+      "commonCauses": [
+        "The lane status is released or expired.",
+        "A stale handoff command referenced an old lane id."
+      ],
+      "remediation": [
+        "Run node atm.mjs lane status --actor <actor> --json to mint or resolve a current lane.",
+        "Use lane sweep only for command-backed cleanup of expired lanes."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane adopt <lane-id> --actor <actor> --json",
+        "node atm.mjs lane status --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_NOT_FOUND",
+      "category": "lane-session",
+      "shortDescription": "The requested lane session id does not exist in the runtime lane store.",
+      "commonCauses": [
+        "ATM_LANE_SESSION_ID points to a lane from another repository or cleaned runtime.",
+        "The lane id was mistyped."
+      ],
+      "remediation": [
+        "Run node atm.mjs lane status --actor <actor> --json to resolve or mint a usable lane.",
+        "Check the reported exportHint before retrying adopt or heartbeat."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane status --json",
+        "node atm.mjs lane adopt <lane-id> --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_STALE_ENV",
+      "category": "lane-session",
+      "shortDescription": "The requested lane environment id is missing, closed, or expired, so ATM minted a new lane.",
+      "commonCauses": [
+        "ATM_LANE_SESSION_ID was copied from an old shell.",
+        "The referenced lane expired before the next command."
+      ],
+      "remediation": [
+        "Export the new lane id from the command output.",
+        "Run node atm.mjs lane sweep --json to inspect stale lane candidates."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane status --json",
+        "node atm.mjs lane sweep --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane-session/resolve.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_SWEEP_APPLIED",
+      "category": "lane-session",
+      "shortDescription": "Lane sweep expired sweepable TTL-expired lane sessions and wrote sweep events.",
+      "commonCauses": [
+        "The operator ran lane sweep with --write after reviewing stale lane candidates."
+      ],
+      "remediation": [
+        "No remediation is required; inspect evidence.sweep and eventPaths for the cleanup record."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane sweep --write --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_SWEEP_REPORTED",
+      "category": "lane-session",
+      "shortDescription": "Lane sweep reported stale lane candidates without mutating runtime state.",
+      "commonCauses": [
+        "The operator ran lane sweep without --write.",
+        "An agent collected lane cleanup evidence before deciding whether to expire stale lanes."
+      ],
+      "remediation": [
+        "If the report is acceptable, rerun with --write to expire sweepable lanes.",
+        "Leave the lanes untouched when another actor may still own the session."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane sweep --json",
+        "node atm.mjs lane sweep --write --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
       "code": "ATM_BROKER_RUNNER_SYNC_RELEASED",
       "category": "team-broker",
       "shortDescription": "Runner-sync steward queue head was released after receipt-backed build/publication evidence.",

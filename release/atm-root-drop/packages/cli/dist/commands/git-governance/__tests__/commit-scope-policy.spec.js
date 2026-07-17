@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { extractGovernanceTaskIdFromPath, isProtectedStagedGovernanceOwnershipPath, normalizeTaskClaimIntent, pathMatchesTaskScope, uniqueSorted } from '../commit-scope-policy.js';
 import { buildTaskScopedCommitFileSet, isFileAllowedInTaskBundle } from '../commit-bundle-filter.js';
+import { resolveCommitLaneSessionId } from '../implementation.js';
 import { isActionableManualResidue, isDeferrableForeignGovernanceResidue } from '../governance-residue-policy.js';
 function residue(path, ownerTaskId) {
     return {
@@ -48,4 +49,8 @@ assert.equal(isDeferrableForeignGovernanceResidue('TASK-RFT-0020', residue('.atm
 assert.equal(isDeferrableForeignGovernanceResidue('TASK-RFT-0020', residue('.atm/history/evidence/TASK-RFT-0020.closure-packet.json', 'TASK-RFT-0020')), false);
 assert.equal(isActionableManualResidue('.atm/history/protected-override-audit/event.json'), true);
 assert.equal(isActionableManualResidue('packages/cli/src/commands/git-governance.ts'), false);
-console.log(JSON.stringify({ ok: true, assertions: 23 }, null, 2));
+assert.equal(resolveCommitLaneSessionId({ env: { ATM_COMMIT_LANE_SESSION_ID: 'lane-commit', ATM_LANE_SESSION_ID: 'lane-runtime' } }), 'lane-commit');
+assert.equal(resolveCommitLaneSessionId({ env: { ATM_LANE_SESSION_ID: 'lane-runtime' } }), 'lane-runtime');
+assert.equal(resolveCommitLaneSessionId({ env: {}, claim: { laneSession: { laneSessionId: 'lane-claim' } } }), 'lane-claim');
+assert.equal(resolveCommitLaneSessionId({ env: {}, session: { guidanceSessionId: 'lane-session' } }), 'lane-session');
+console.log(JSON.stringify({ ok: true, assertions: 27 }, null, 2));

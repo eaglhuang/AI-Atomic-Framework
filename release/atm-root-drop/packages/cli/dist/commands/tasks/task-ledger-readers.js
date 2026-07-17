@@ -24,6 +24,7 @@ export function parseClaimRecord(value) {
     }
     const handoffTo = typeof candidate.handoffTo === 'string' && candidate.handoffTo.trim().length > 0 ? candidate.handoffTo.trim() : undefined;
     const reason = typeof candidate.reason === 'string' && candidate.reason.trim().length > 0 ? candidate.reason.trim() : undefined;
+    const laneSession = parseClaimLaneSession(candidate.laneSession);
     return {
         actorId,
         leaseId,
@@ -33,7 +34,8 @@ export function parseClaimRecord(value) {
         files,
         state,
         ...(handoffTo ? { handoffTo } : {}),
-        ...(reason ? { reason } : {})
+        ...(reason ? { reason } : {}),
+        ...(laneSession ? { laneSession } : {})
     };
 }
 export function createClaimRecord(input) {
@@ -47,6 +49,18 @@ export function createClaimRecord(input) {
         files: Array.from(new Set(input.files.map((entry) => normalizeRelativePath(entry)).filter(Boolean))),
         state: 'active'
     };
+}
+function parseClaimLaneSession(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value))
+        return null;
+    const record = value;
+    const laneSessionId = typeof record.laneSessionId === 'string' ? record.laneSessionId.trim() : '';
+    const status = typeof record.status === 'string' ? record.status.trim() : '';
+    const source = typeof record.source === 'string' ? record.source.trim() : '';
+    const exportHint = typeof record.exportHint === 'string' ? record.exportHint.trim() : '';
+    if (!laneSessionId || !status || !source || !exportHint)
+        return null;
+    return { laneSessionId, status, source, exportHint };
 }
 export function isClaimExpired(claim, nowIso) {
     const heartbeatEpoch = Date.parse(claim.heartbeatAt);

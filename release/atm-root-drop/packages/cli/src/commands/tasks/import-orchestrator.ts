@@ -85,12 +85,14 @@ export async function runTasksImport(argv: string[]) {
       command: `node atm.mjs tasks import --from ${options.from} --write --json`
     });
   }
+  let staleRunnerWarning: string | null = null;
   if (options.write) {
     const staleGate = assertRunnerFreshForWriteAction({
       cwd: options.cwd,
       action: 'tasks-import-write',
       allowStaleRunner: options.allowStaleRunner
     });
+    staleRunnerWarning = staleGate.warning;
     if (options.allowStaleRunner && staleGate.warning) {
       const importTaskId = options.from.match(/TASK-[A-Z]+-\d+/i)?.[0] ?? 'import-batch';
       await recordStaleRunnerOverride({
@@ -361,6 +363,12 @@ export async function runTasksImport(argv: string[]) {
     command: 'tasks',
     cwd: options.cwd,
     messages: [
+      ...(staleRunnerWarning
+        ? [message('warn', 'ATM_RUNNER_STALE_LEDGER_WRITE_ALLOWED', staleRunnerWarning, {
+          action: 'tasks-import-write',
+          policy: 'ledger-only'
+        })]
+        : []),
       message(
         'info',
         options.dryRun ? 'ATM_TASKS_IMPORT_DRY_RUN' : 'ATM_TASKS_IMPORT_WRITE_READY',

@@ -32,7 +32,9 @@ export function assertRunnerSyncAdmission(report) {
         Object.assign(error, {
             code: report.foreignNonReleaseWip.length > 0
                 ? 'ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED'
-                : 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED',
+                : report.queueHeadOwnership.queueHeadHealth !== 'task-active'
+                    ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_ORPHANED'
+                    : 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED',
             details: report
         });
         throw error;
@@ -69,25 +71,35 @@ function inspectRunnerSyncQueueHeadOwnership(input) {
             ok: false,
             stewardWorkId: null,
             queuePosition: null,
+            queueHeadHealth: 'task-active',
             waitingTasks: [],
             ownerActorIds: [],
-            reason: 'runner sync requires a broker runner-sync queue-head reservation before build or internal-release sync'
+            reason: 'runner sync requires a broker runner-sync queue-head reservation before build or internal-release sync',
+            cleanupCommand: null
         };
     }
     const ownerActorIds = normalizeOwnerActorIds(steward.requests);
     const actorOwnsHead = ownerActorIds.length === 0 || ownerActorIds.includes(input.stewardActorId);
-    const ok = steward.queuePosition === 1 && actorOwnsHead;
+    const queueHeadHealth = resolveQueueHeadHealth(input.cwd, steward.requests);
+    const cleanupCommand = queueHeadHealth === 'task-active'
+        ? null
+        : 'node atm.mjs broker runner-sync cleanup --json';
+    const ok = steward.queuePosition === 1 && actorOwnsHead && queueHeadHealth === 'task-active';
     return {
         ok,
         stewardWorkId: steward.stewardWorkId,
         queuePosition: steward.queuePosition,
+        queueHeadHealth,
         waitingTasks: normalizeStringArray(steward.waitingTasks),
         ownerActorIds,
         reason: ok
             ? null
-            : steward.queuePosition !== 1
-                ? `runner sync steward ${steward.stewardWorkId} is queued at position ${steward.queuePosition}; wait for queue head before build or sync`
-                : `runner sync steward ${steward.stewardWorkId} is owned by ${ownerActorIds.join(', ') || 'unknown actor'}, not ${input.stewardActorId}`
+            : queueHeadHealth !== 'task-active'
+                ? `runner sync steward ${steward.stewardWorkId} queue head is orphaned (${queueHeadHealth}); run ${cleanupCommand} before build or sync`
+                : steward.queuePosition !== 1
+                    ? `runner sync steward ${steward.stewardWorkId} is queued at position ${steward.queuePosition}; wait for queue head before build or sync`
+                    : `runner sync steward ${steward.stewardWorkId} is owned by ${ownerActorIds.join(', ') || 'unknown actor'}, not ${input.stewardActorId}`,
+        cleanupCommand
     };
 }
 function readRunnerSyncStewardForSealedSource(cwd, sealedSourceSha) {
@@ -135,4 +147,24 @@ function normalizeStringArray(value) {
         return [];
     return [...new Set(value.map((entry) => String(entry ?? '').trim()).filter(Boolean))]
         .sort((left, right) => left.localeCompare(right));
+}
+function resolveQueueHeadHealth(cwd, requests) {
+    if (!Array.isArray(requests) || requests.length === 0)
+        return 'task-active';
+    const taskId = String(requests[0]?.taskId ?? '').trim();
+    if (!taskId)
+        return 'task-active';
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (!existsSync(taskPath))
+        return 'task-missing';
+    try {
+        const task = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const status = typeof task.status === 'string' ? task.status.trim().toLowerCase() : '';
+        return status === 'done' || status === 'verified' || status === 'abandoned'
+            ? 'task-terminal'
+            : 'task-active';
+    }
+    catch {
+        return 'task-active';
+    }
 }

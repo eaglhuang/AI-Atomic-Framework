@@ -1,6 +1,7 @@
 export type TeamLevelRecommendationInput = {
     readonly ownFiles: readonly string[];
     readonly foreignFiles: readonly string[];
+    readonly foreignDirtyFiles?: readonly string[];
     readonly stagedFiles: readonly string[];
     readonly foreignActorIds: readonly string[];
 };

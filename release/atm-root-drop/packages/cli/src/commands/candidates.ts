@@ -338,6 +338,13 @@ function expandIncludePatterns(cwd: string, includePatterns: readonly string[]):
       continue;
     }
     const regex = globToRegex(normalizedPattern);
+    if (statSync(baseDirectory).isFile()) {
+      const relative = normalizePath(path.relative(cwd, baseDirectory));
+      if (regex.test(relative)) {
+        output.add(relative);
+      }
+      continue;
+    }
     for (const absoluteFilePath of listFilesRecursive(baseDirectory)) {
       const relative = normalizePath(path.relative(cwd, absoluteFilePath));
       if (regex.test(relative)) {

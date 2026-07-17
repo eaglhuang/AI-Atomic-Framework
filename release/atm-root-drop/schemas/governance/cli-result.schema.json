@@ -115,6 +115,10 @@
       "type": ["object", "null"],
       "description": "Optional shared growth payload for reusable routing, exception, and learning-loop hints."
     },
+    "laneSession": {
+      "type": ["object", "null"],
+      "description": "Optional lane-session envelope for callers that need to persist or adopt a conversation lane."
+    },
     "severity": {
       "type": "string",
       "enum": ["success", "advisory", "blocked", "usage-error", "failure"]

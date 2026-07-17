@@ -17,6 +17,7 @@ export const CLAIM_ADMISSION_DECISION_LOG_KEYS = [
     'gates',
     'sharedPathOrder',
     'queue',
+    'ownerComparison',
     'privatePathAllowance',
     'admitted',
     'blockReason',
@@ -43,6 +44,7 @@ export function buildClaimAdmissionDecisionLog(input) {
         ? Math.min(...waitingOn.map((entry) => entry.position))
         : (queueStatus === 'queue-head' ? 1 : null);
     const privateGranted = queueStatus === 'queued-private-work';
+    const ownerComparison = input.ownerComparison ?? input.decision.ownerComparison ?? null;
     const gates = [
         {
             gate: 'claim-intent',
@@ -55,8 +57,8 @@ export function buildClaimAdmissionDecisionLog(input) {
             gate: 'active-write-conflict',
             outcome: input.activeWriteConflict ? 'conflict' : 'clear',
             detail: input.activeWriteConflict
-                ? `an active write claim by another actor overlaps ${input.conflictTaskId ?? 'another task'}`
-                : 'no other actor holds an active write claim on the overlap'
+                ? `an active write claim by another lifecycle owner overlaps ${input.conflictTaskId ?? 'another task'} (${ownerComparison?.mode ?? 'actor-fallback'})`
+                : `no other lifecycle owner holds an active write claim on the overlap (${ownerComparison?.mode ?? 'actor-fallback'})`
         },
         {
             gate: 'broker-confirmation',
@@ -101,6 +103,7 @@ export function buildClaimAdmissionDecisionLog(input) {
             position: queuePosition,
             waitingOn
         },
+        ownerComparison,
         privatePathAllowance: {
             granted: privateGranted,
             allowedFileCount: input.queueAdmission?.allowedFiles.length ?? 0

@@ -192,6 +192,7 @@ export function writeTaskDirectionLock(input) {
         promptHash: input.prompt?.trim() ? sha256(input.prompt.trim()) : input.queue?.sourcePromptHash ?? null,
         actorId: input.actorId,
         sessionId: input.sessionId?.trim() || null,
+        ...(input.laneSession ? { laneSession: input.laneSession } : {}),
         createdAt: new Date().toISOString(),
         status: 'active'
     };
