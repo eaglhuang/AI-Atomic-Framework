@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0157",
-  "updatedAt": "2026-07-17T07:50:54.394Z",
+  "updatedAt": "2026-07-17T08:00:31.788Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -284,6 +284,62 @@
           "runCount": 1,
           "sourcePath": null
         }
+      }
+    },
+    {
+      "evidenceKind": "runtime",
+      "evidenceType": "runner-sync-receipt",
+      "summary": "Runner-sync built receipt for runner-sync-4ecf7e13",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-0157",
+      "sessionId": "session-20260717075939-codex-gov-0157-ATM-GOV-0157-95a0e3ad4b",
+      "createdAt": "2026-07-17T07:57:27.8880182Z",
+      "details": {
+        "schemaId": "atm.runnerSyncReceipt.v1",
+        "taskId": "ATM-GOV-0157",
+        "actorId": "codex-gov-0157",
+        "stewardWorkId": "runner-sync-4ecf7e13",
+        "sealedSourceSha": "4ece6cc10c8c8e402cdca75dc1dac094b2d7231c",
+        "status": "built",
+        "command": "ATM_RETAIN_RELEASE_ARTIFACTS=1 ATM_ACTOR_ID=codex-gov-0157 npm run build",
+        "builtAt": "2026-07-17T07:57:27.8880182Z",
+        "outputs": [
+          {
+            "path": "release/atm-onefile/atm.mjs",
+            "sha256": "sha256:6a6281bc0f7379fb3b9872691e71d500784e5dc3b22d9ba2f4c91bdc80018a91"
+          },
+          {
+            "path": "release/atm-onefile/release-manifest.json",
+            "sha256": "sha256:cf42c31dcb1ab58babda57c0c8b575e265ef70dc34835eff5991a990f88c26df"
+          },
+          {
+            "path": "release/atm-root-drop/release-manifest.json",
+            "sha256": "sha256:1417f4ceaa723faaf607fc7d529cc192e21fcc8052978f82657cf8946719702a"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "runtime",
+      "evidenceType": "runner-sync-receipt",
+      "summary": "Runner-sync superseded-before-build receipt for runner-sync-77903dc9",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-0157",
+      "sessionId": "session-20260717075939-codex-gov-0157-ATM-GOV-0157-95a0e3ad4b",
+      "createdAt": "2026-07-17T07:56:10.9037460Z",
+      "details": {
+        "schemaId": "atm.runnerSyncReceipt.v1",
+        "taskId": "ATM-GOV-0157",
+        "actorId": "codex-gov-0157",
+        "stewardWorkId": "runner-sync-77903dc9",
+        "sealedSourceSha": "18eac650ee471810813380429064ba4db83f37c2",
+        "status": "superseded-before-build",
+        "supersededBySealedSourceSha": "4ece6cc10c8c8e402cdca75dc1dac094b2d7231c",
+        "reason": "Runner-sync queue entry was created for ATM-GOV-0157 before a newer main HEAD landed; sealed runner build must target current HEAD, so this receipt releases the obsolete same-task steward entry and preserves audit trail.",
+        "createdAt": "2026-07-17T07:56:10.9037460Z",
+        "nextStewardWorkId": "runner-sync-4ecf7e13"
       }
     }
   ]

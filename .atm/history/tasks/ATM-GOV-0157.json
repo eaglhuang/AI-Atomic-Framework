@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0157",
   "title": "Classify task import force writes as Tier 1 ledger ingestion",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -99,41 +99,47 @@
     }
   },
   "importedAt": "2026-07-17T07:02:04.132Z",
-  "lastTransitionId": "2026-07-17T08-04-43-465Z-claim-e29c6fa30792",
-  "lastTransitionAt": "2026-07-17T08:04:43.465Z",
+  "lastTransitionId": "2026-07-17T08-06-12-555Z-close-a65afd44b756",
+  "lastTransitionAt": "2026-07-17T08:06:12.555Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gov-0157",
   "reservedAt": "2026-07-17T07:49:16.540Z",
   "promotedAt": "2026-07-17T07:49:16.543Z",
   "claim": {
     "actorId": "codex-gov-0157",
-    "leaseId": "lease-003754d399e7",
-    "claimedAt": "2026-07-17T08:04:42.681Z",
-    "heartbeatAt": "2026-07-17T08:04:42.681Z",
+    "leaseId": "lease-9d0a24d00efd",
+    "claimedAt": "2026-07-17T07:59:39.253Z",
+    "heartbeatAt": "2026-07-17T08:06:12.552Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0157.json",
       ".atm/history/evidence/ATM-GOV-0157.*",
+      ".atm/history/evidence/ATM-GOV-0157.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0157.runner-sync-superseded-18eac650.json",
       ".atm/history/task-events/ATM-GOV-0157/**",
       "docs/governance/command-surface.md",
       "docs/governance/error-code-registry.json",
       "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
       "packages/cli/src/commands/tasks/import-orchestrator.ts",
       "packages/cli/src/commands/tasks/import-planning-authority.ts",
-      "packages/cli/src/commands/tasks/import-validation.ts"
+      "packages/cli/src/commands/tasks/import-validation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/release-manifest.json"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260717080443-codex-gov-0157-2cf2cc99fe",
+      "laneSessionId": "lane-20260717075940-codex-gov-0157-8e564d57be",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717080443-codex-gov-0157-2cf2cc99fe\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717075940-codex-gov-0157-8e564d57be\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-17T07:49:16.546Z",
   "startedByActor": "codex-gov-0157",
-  "startedBySessionId": "session-20260717080442-codex-gov-0157-ATM-GOV-0157-ab92be20d7",
+  "startedBySessionId": "session-20260717075939-codex-gov-0157-ATM-GOV-0157-95a0e3ad4b",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -144,6 +150,8 @@
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0157.*",
+      ".atm/history/evidence/ATM-GOV-0157.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0157.runner-sync-superseded-18eac650.json",
       ".atm/history/task-events/ATM-GOV-0157/**",
       ".atm/history/tasks/ATM-GOV-0157.json",
       "docs/governance/command-surface.md",
@@ -151,21 +159,29 @@
       "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
       "packages/cli/src/commands/tasks/import-orchestrator.ts",
       "packages/cli/src/commands/tasks/import-planning-authority.ts",
-      "packages/cli/src/commands/tasks/import-validation.ts"
+      "packages/cli/src/commands/tasks/import-validation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/release-manifest.json"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "7f56b8f43a110d75addf4cb3e72484506cb3ce79969b4020f9c957e369a74bc5",
     "actorId": "codex-gov-0157",
-    "sessionId": "session-20260717080442-codex-gov-0157-ATM-GOV-0157-ab92be20d7",
+    "sessionId": "session-20260717075939-codex-gov-0157-ATM-GOV-0157-95a0e3ad4b",
     "laneSession": {
-      "laneSessionId": "lane-20260717080443-codex-gov-0157-2cf2cc99fe",
+      "laneSessionId": "lane-20260717075940-codex-gov-0157-8e564d57be",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717080443-codex-gov-0157-2cf2cc99fe\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260717075940-codex-gov-0157-8e564d57be\""
     },
-    "createdAt": "2026-07-17T08:04:43.464Z",
+    "createdAt": "2026-07-17T07:59:40.293Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-17T08:06:12.552Z",
+  "closedByActor": "codex-gov-0157",
+  "closedBySessionId": "session-20260717075939-codex-gov-0157-ATM-GOV-0157-95a0e3ad4b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0157.closure-packet.json"
 }

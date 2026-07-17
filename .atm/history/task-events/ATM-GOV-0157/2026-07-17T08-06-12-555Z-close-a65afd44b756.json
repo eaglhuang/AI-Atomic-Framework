@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-17T08-06-12-555Z-close-a65afd44b756",
+  "taskId": "ATM-GOV-0157",
+  "action": "close",
+  "actorId": "codex-gov-0157",
+  "sessionId": "session-20260717075939-codex-gov-0157-ATM-GOV-0157-95a0e3ad4b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0157.json",
+  "taskSha256": "sha256:39f39c2be6e19b9d1aee63f3bb00236ceb5eb96fcc34b839654890eef2069bfd",
+  "createdAt": "2026-07-17T08:06:12.555Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0157 --actor codex-gov-0157 --status done --historical-delivery 18eac650ee471810813380429064ba4db83f37c2",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260717075939-codex-gov-0157-ATM-GOV-0157-95a0e3ad4b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0157.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+      "node --strip-types tests/cli/cli-result-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-17T08:06:12.546Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0157.*",
+        ".atm/history/evidence/ATM-GOV-0157.runner-sync-receipt.json",
+        ".atm/history/evidence/ATM-GOV-0157.runner-sync-superseded-18eac650.json",
+        ".atm/history/task-events/ATM-GOV-0157/**",
+        ".atm/history/tasks/ATM-GOV-0157.json",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-planning-authority.ts",
+        "packages/cli/src/commands/tasks/import-validation.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "release/atm-root-drop/release-manifest.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-planning-authority.ts",
+        "packages/cli/src/commands/tasks/import-validation.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

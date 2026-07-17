@@ -1,0 +1,191 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0157",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e2c710503953d1d68357a49099539ef6fae2c479",
+  "governedTreeSha": "c843179e285f68d39adf8c580a5e4c12dc2ada49",
+  "targetCommitDelta": {
+    "currentCommitSha": "e2c710503953d1d68357a49099539ef6fae2c479",
+    "parentCommitShas": [
+      "e2c710503953d1d68357a49099539ef6fae2c479"
+    ],
+    "governedTreeSha": "c843179e285f68d39adf8c580a5e4c12dc2ada49",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0157.json",
+      ".atm/history/tasks/ATM-GOV-0157.json",
+      ".atm/history/tasks/TASK-SKL-0013.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-planning-authority.ts",
+      "packages/cli/src/commands/tasks/import-validation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/command-surface.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/fixtures/charter/default-charter.json",
+      "release/atm-root-drop/integrations/codex-skills/atm-atom-map-refactor/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-create/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-dispatch/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-error-code-resolver/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-evidence/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-governance-router/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-handoff/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-internal-build-sync/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-lock/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-next/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-orient/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-task-intent-resolver/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-upgrade-scan/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/mailbox-worker-execution/SKILL.md",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "release/atm-root-drop/packages/integrations-core/dist/compiler/skill-templates.d.ts",
+      "release/atm-root-drop/packages/integrations-core/dist/compiler/skill-templates.js",
+      "release/atm-root-drop/packages/integrations-core/src/compiler/skill-templates.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/root-drop/.atm/charter/charter-invariants.template.json",
+      "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+      "release/atm-root-drop/templates/skills/atm-governance-router.skill.md",
+      "release/atm-root-drop/templates/skills/atm-next.skill.md",
+      "release/atm-root-drop/templates/skills/atm-task-card-authoring.skill.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3177d6dc2a279a3bc64407a0bdd5d975123f5d8809d994f8de6e9fe0c53d6880",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:699dad9e0e3930eefc4e1ccd3aaeccbb06d5c6897368f30eef726364789dcf24",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/cli-result-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:24c88b8cb3232dd28a19f672d712e423ead62c9e19699cbea35790550c5c621f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+    "node --strip-types tests/cli/cli-result-contract.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-17T08:06:12.546Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0157.*",
+      ".atm/history/evidence/ATM-GOV-0157.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0157.runner-sync-superseded-18eac650.json",
+      ".atm/history/task-events/ATM-GOV-0157/**",
+      ".atm/history/tasks/ATM-GOV-0157.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-planning-authority.ts",
+      "packages/cli/src/commands/tasks/import-validation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-planning-authority.ts",
+      "packages/cli/src/commands/tasks/import-validation.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0157.json",
+  "closedAt": "2026-07-17T08:06:12.547Z",
+  "closedByActor": "codex-gov-0157",
+  "sessionId": "session-20260717075939-codex-gov-0157-ATM-GOV-0157-95a0e3ad4b",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "18eac650ee471810813380429064ba4db83f37c2",
+    "taskMatchedFiles": [
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/tasks/__tests__/task-import-tier1-admission.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-planning-authority.ts",
+      "packages/cli/src/commands/tasks/import-validation.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0157.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0157/2026-07-17T07-02-04-348Z-import-9d69cb1e48b5.json",
+      ".atm/history/task-events/ATM-GOV-0157/2026-07-17T07-02-32-065Z-reserve-8e44988509ff.json",
+      ".atm/history/task-events/ATM-GOV-0157/2026-07-17T07-02-32-069Z-promote-8a4092797494.json",
+      ".atm/history/task-events/ATM-GOV-0157/2026-07-17T07-02-39-629Z-claim-5bcb98abf509.json",
+      ".atm/history/tasks/ATM-GOV-0157.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
