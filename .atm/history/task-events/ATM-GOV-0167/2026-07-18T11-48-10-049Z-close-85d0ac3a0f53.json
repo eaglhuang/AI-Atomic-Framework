@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T11-48-10-049Z-close-85d0ac3a0f53",
+  "taskId": "ATM-GOV-0167",
+  "action": "close",
+  "actorId": "cursor-gov-0167",
+  "sessionId": "session-20260718114151-cursor-gov-0167-ATM-GOV-0167-d0c2079974",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0167.json",
+  "taskSha256": "sha256:eafb244e4fbea287b784d30737e8ba613c54bda7489a000281a2119b585600b9",
+  "createdAt": "2026-07-18T11:48:10.049Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0167 --actor cursor-gov-0167 --status done --historical-delivery 14fe24ffb7b9c4344e93478e1a51935d71e4d9b0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718114151-cursor-gov-0167-ATM-GOV-0167-d0c2079974",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0167.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/broker-registry-transaction.test.ts",
+      "node --strip-types tests/cli/lane-dual-session-e2e.test.ts",
+      "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T11:48:10.042Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0167.*",
+        ".atm/history/task-events/ATM-GOV-0167/**",
+        ".atm/history/tasks/ATM-GOV-0167.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "tests/cli/lane-dual-session-e2e.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "tests/cli/lane-dual-session-e2e.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

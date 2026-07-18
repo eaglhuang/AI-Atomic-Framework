@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0167",
+  "title": "Lane Session dual-lane end-to-end acceptance",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "tests/cli/lane-dual-session-e2e.test.ts",
+    "docs/governance/error-code-registry.json"
+  ],
+  "scopePaths": [
+    "tests/cli/lane-dual-session-e2e.test.ts",
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    ".atm/history/evidence/ATM-GOV-0167.*",
+    ".atm/history/task-events/ATM-GOV-0167/**",
+    ".atm/history/tasks/ATM-GOV-0167.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/lane-dual-session-e2e.test.ts",
+    "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "node --strip-types tests/cli/broker-registry-transaction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane-session-dual-e2e",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane-session.dual-e2e",
+        "pattern": "Integration Test",
+        "source": "tests/cli/lane-dual-session-e2e.test.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0167-lane-dual-session-e2e.task.md",
+    "sectionTitle": "ATM-GOV-0167",
+    "headingLine": 50,
+    "hash": "45bb897e62c31f4d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0167-lane-dual-session-e2e.task.md",
+      "planningCommitSha": "be5387c4717fbea3c4b43c974527f82729b4484d",
+      "contentDigest": "sha256:45bb897e62c31f4dd20927fd4fca1df38bb797303996249e87de67816d4c7e34",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T11:41:35.181Z"
+    }
+  },
+  "importedAt": "2026-07-18T11:41:35.181Z",
+  "lastTransitionId": "2026-07-18T11-48-10-049Z-close-85d0ac3a0f53",
+  "lastTransitionAt": "2026-07-18T11:48:10.049Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gov-0167",
+  "reservedAt": "2026-07-18T11:41:51.424Z",
+  "promotedAt": "2026-07-18T11:41:51.426Z",
+  "claim": {
+    "actorId": "cursor-gov-0167",
+    "leaseId": "lease-2f65cc5e2d71",
+    "claimedAt": "2026-07-18T11:41:51.430Z",
+    "heartbeatAt": "2026-07-18T11:48:10.046Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0167.json",
+      ".atm/history/evidence/ATM-GOV-0167.*",
+      ".atm/history/task-events/ATM-GOV-0167/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "tests/cli/lane-dual-session-e2e.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260718114151-cursor-gov-0167-46c09962e5",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718114151-cursor-gov-0167-46c09962e5\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-18T11:41:51.430Z",
+  "startedByActor": "cursor-gov-0167",
+  "startedBySessionId": "session-20260718114151-cursor-gov-0167-ATM-GOV-0167-d0c2079974",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0167",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0167.*",
+      ".atm/history/task-events/ATM-GOV-0167/**",
+      ".atm/history/tasks/ATM-GOV-0167.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "tests/cli/lane-dual-session-e2e.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "45e7b15e5ccc2b08d9a0a118b4820148a2faab2724e6ddbf0bca3f7966357956",
+    "actorId": "cursor-gov-0167",
+    "sessionId": "session-20260718114151-cursor-gov-0167-ATM-GOV-0167-d0c2079974",
+    "laneSession": {
+      "laneSessionId": "lane-20260718114151-cursor-gov-0167-46c09962e5",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718114151-cursor-gov-0167-46c09962e5\""
+    },
+    "createdAt": "2026-07-18T11:42:01.619Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-18T11:48:10.046Z",
+  "closedByActor": "cursor-gov-0167",
+  "closedBySessionId": "session-20260718114151-cursor-gov-0167-ATM-GOV-0167-d0c2079974",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0167.closure-packet.json"
+}
