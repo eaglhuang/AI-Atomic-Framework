@@ -14,6 +14,10 @@ facets such as examples, required-flag sets, related commands, common
 mistakes, playbook notes, maintainer notes, and deprecated guidance belong to
 the command-spec help surface returned by `node atm.mjs <command> --help`.
 
+## Batch Wave Selector
+
+`node atm.mjs batch current --compact --json` now includes a read-only `currentWave` selection envelope for the active batch queue. The selector emits `atm.batchWaveSelection.v1`, a deterministic `atm.waveManifest.v1` candidate, deferred reasons, and a `team wave dispatch` command when two or more queue-head-compatible tasks can run together. It does not claim tasks, write broker tickets, commit, build, project, or close tasks; those write actions remain owned by later Team Wave, Broker, and Checkpoint commands.
+
 ## Drift Guard
 
 Run this guard when a command is added, hidden, removed, or renamed:

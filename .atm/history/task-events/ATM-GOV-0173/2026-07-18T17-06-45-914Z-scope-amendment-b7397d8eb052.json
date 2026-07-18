@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T17-06-45-914Z-scope-amendment-b7397d8eb052",
+  "taskId": "ATM-GOV-0173",
+  "action": "scope-amendment",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0173.json",
+  "taskSha256": "sha256:b0ffc8d35aca37819853e05abaaa40ca0e34a3cab4671e02f19350791d39363b",
+  "createdAt": "2026-07-18T17:06:45.914Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0173 --actor codex-gov-auto-batch --add packages/cli/src/commands/command-specs/batch.spec.ts --reason \"Document batch current compact wave selector command surface\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Document batch current compact wave selector command surface"
+  }
+}

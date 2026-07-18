@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T16-57-48-837Z-scope-amendment-02985465dd60",
+  "taskId": "ATM-GOV-0173",
+  "action": "scope-amendment",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0173.json",
+  "taskSha256": "sha256:dfdf480645ab35d68962febe89aaab5b321a5a03bc434641fb002be175255434",
+  "createdAt": "2026-07-18T16:57:48.837Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0173 --actor codex-gov-auto-batch --add atomic_workbench/atomization-coverage/path-to-atom-map.json --reason \"Generated atomization projection required by validate:atomization-coverage after owner shard update\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Generated atomization projection required by validate:atomization-coverage after owner shard update"
+  }
+}

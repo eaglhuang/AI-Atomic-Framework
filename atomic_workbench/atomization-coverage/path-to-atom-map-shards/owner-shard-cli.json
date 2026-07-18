@@ -957,6 +957,20 @@
       "capability": "ATM-GOV-0181 / ATM-BUG-2026-07-12-147: abandon produces governed residue disposition; next-task commit does not inherit orphan bundle-manifest blockers while audit trail remains admissible.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0181"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch/implementation.ts",
+      "atom_id": "atm.batch-wave-selector",
+      "capability": "ATM-GOV-0173 compact batch current selector that turns eligible queue-head tasks into a deterministic read-only wave manifest candidate with deferred reasons and dispatch guidance.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0173"
+    },
+    {
+      "path_pattern": "tests/cli/batch-wave-selector.test.ts",
+      "atom_id": "atm.batch-wave-selector",
+      "capability": "ATM-GOV-0173 regression coverage for deterministic wave selection, dependency and validator deferrals, incompatible surface deferrals, max wave size, and serial fallback.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0173"
     }
   ]
 }
