@@ -12,14 +12,15 @@ export function inspectRunnerSyncAdmission(input) {
         landedFiles: input.landedFiles ?? null
     });
     const foreignNonReleaseWip = uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
-    const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input);
+    const steward = normalizeInputRunnerSyncSteward(input.runnerSyncSteward) ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
+    const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input, steward);
     const brokerTicket = buildAdmissionBrokerTicket(input, queueHeadOwnership);
     return {
         schemaId: 'atm.runnerSyncAdmission.v1',
         ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok,
         stewardActorId: input.stewardActorId,
         sealedSourceSha: input.sealedSourceSha ?? null,
-        runnerSyncSteward: input.runnerSyncSteward ?? null,
+        runnerSyncSteward: steward,
         queueHeadOwnership,
         foreignNonReleaseWip,
         foreignBuildInputConflicts,
@@ -178,8 +179,7 @@ function hasLandedSinceClaim(cwd, file, claimedAt) {
         return false;
     return result.stdout.trim().length > 0;
 }
-function inspectRunnerSyncQueueHeadOwnership(input) {
-    const steward = input.runnerSyncSteward ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
+function inspectRunnerSyncQueueHeadOwnership(input, steward) {
     if (!steward) {
         return {
             ok: false,
@@ -238,8 +238,9 @@ function readRunnerSyncStewardForSealedSource(cwd, sealedSourceSha) {
                 stewardWorkId: record.stewardWorkId,
                 queuePosition: record.queuePosition,
                 suggestedNextAction: typeof record.suggestedNextAction === 'string' ? record.suggestedNextAction : '',
-                waitingTasks: record.waitingTasks,
-                requests: record.requests
+                requestedSurfaces: normalizeStringArray(record.requestedSurfaces),
+                waitingTasks: normalizeStringArray(record.waitingTasks),
+                requests: normalizeStewardRequests(record.requests)
             };
         }
     }
@@ -247,6 +248,18 @@ function readRunnerSyncStewardForSealedSource(cwd, sealedSourceSha) {
         return null;
     }
     return null;
+}
+function normalizeInputRunnerSyncSteward(value) {
+    if (!value)
+        return null;
+    return {
+        stewardWorkId: value.stewardWorkId,
+        queuePosition: value.queuePosition,
+        suggestedNextAction: value.suggestedNextAction,
+        requestedSurfaces: normalizeStringArray(value.requestedSurfaces),
+        waitingTasks: normalizeStringArray(value.waitingTasks),
+        requests: normalizeStewardRequests(value.requests)
+    };
 }
 function normalizeOwnerActorIds(value) {
     if (!Array.isArray(value))
@@ -261,6 +274,24 @@ function normalizeStringArray(value) {
         return [];
     return [...new Set(value.map((entry) => String(entry ?? '').trim()).filter(Boolean))]
         .sort((left, right) => left.localeCompare(right));
+}
+function normalizeStewardRequests(value) {
+    if (!Array.isArray(value))
+        return [];
+    return value.flatMap((entry) => {
+        if (!entry || typeof entry !== 'object')
+            return [];
+        const record = entry;
+        const taskId = String(record.taskId ?? '').trim();
+        const actorId = String(record.actorId ?? '').trim();
+        if (!taskId || !actorId)
+            return [];
+        return [{
+                taskId,
+                actorId,
+                requestedSurfaces: normalizeStringArray(record.requestedSurfaces)
+            }];
+    });
 }
 function resolveQueueHeadHealth(cwd, requests) {
     if (!Array.isArray(requests) || requests.length === 0)

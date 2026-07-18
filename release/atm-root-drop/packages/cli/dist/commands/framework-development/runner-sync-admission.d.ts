@@ -7,6 +7,9 @@ export type RunnerSyncAdmissionReport = {
         readonly stewardWorkId: string;
         readonly queuePosition: number;
         readonly suggestedNextAction: string;
+        readonly requestedSurfaces: readonly string[];
+        readonly waitingTasks: readonly string[];
+        readonly requests: readonly RunnerSyncAdmissionStewardRequest[];
     } | null;
     readonly queueHeadOwnership: {
         readonly ok: boolean;
@@ -37,6 +40,11 @@ export type RunnerSyncAdmissionBrokerTicket = {
     readonly sharedSurface: string;
     readonly scopeClass: readonly string[];
 };
+export type RunnerSyncAdmissionStewardRequest = {
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly requestedSurfaces: readonly string[];
+};
 export type RunnerSyncForeignBuildInputConflict = {
     readonly blockingTaskId: string;
     readonly blockingActorId: string | null;
@@ -55,6 +63,9 @@ export declare function inspectRunnerSyncAdmission(input: {
         readonly stewardWorkId: string;
         readonly queuePosition: number;
         readonly suggestedNextAction: string;
+        readonly requestedSurfaces?: readonly string[];
+        readonly waitingTasks?: readonly string[];
+        readonly requests?: readonly RunnerSyncAdmissionStewardRequest[];
     } | null;
     readonly dirtyFiles?: readonly string[] | null;
     readonly foreignClaims?: readonly RunnerSyncForeignClaimInput[] | null;

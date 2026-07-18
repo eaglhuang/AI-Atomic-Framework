@@ -80,6 +80,11 @@ try {
   ], 1);
   assert.equal(missingReceipt.messages[0].code, 'ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_REQUIRED');
 
+  writeRunnerSyncReceiptFixture('TASK-A', 'captain-a', stewardWorkId, 'sha256:source-a', [
+    'release/atm-onefile/atm.mjs',
+    'release/atm-root-drop/atm.mjs'
+  ]);
+
   const released = runAtm([
     'broker',
     'runner-sync',
@@ -168,4 +173,39 @@ try {
   console.log('[runner-sync-steward-release.test] ok');
 } finally {
   rmSync(repo, { recursive: true, force: true });
+}
+
+function writeRunnerSyncReceiptFixture(
+  taskId: string,
+  actorId: string,
+  stewardWorkId: string,
+  sealedSourceSha: string,
+  requestedSurfaces: readonly string[]
+): void {
+  const evidenceDir = path.join(repo, '.atm/history/evidence');
+  mkdirSync(evidenceDir, { recursive: true });
+  writeFileSync(path.join(evidenceDir, `${taskId}.runner-sync-receipt.json`), `${JSON.stringify({
+    schemaId: 'atm.runnerSyncReceipt.v1',
+    specVersion: '0.1.0',
+    taskId,
+    actorId,
+    stewardWorkId,
+    sealedSourceSha,
+    requestedSurfaces,
+    buildTarget: 'full',
+    buildInputsTreeHash: 'sha256:fixture',
+    buildDecision: 'cache-hit-skip',
+    phaseTimingsMs: {
+      inputHashCalculation: 0,
+      skipDecision: 0,
+      worktreeSetup: 0,
+      typescriptBuild: 0,
+      rootDropReleaseAssembly: 0,
+      onefileReleaseAssembly: 0,
+      artifactSync: 0,
+      cleanup: 0,
+      totalElapsed: 0
+    },
+    publishedAt: '2026-07-18T00:00:00.000Z'
+  }, null, 2)}\n`, 'utf8');
 }

@@ -17,11 +17,37 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   assertRunnerSyncAdmission,
-  inspectRunnerSyncAdmission
+  inspectRunnerSyncAdmission,
+  type RunnerSyncAdmissionReport
 } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 
 type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 type BuildDecision = 'built' | 'cache-hit-skip' | 'cache-miss-build';
+
+export type RunnerSyncReceipt = {
+  readonly schemaId: 'atm.runnerSyncReceipt.v1';
+  readonly specVersion: '0.1.0';
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly stewardWorkId: string;
+  readonly sealedSourceSha: string;
+  readonly requestedSurfaces: readonly string[];
+  readonly buildTarget: BuildTarget;
+  readonly buildInputsTreeHash: string;
+  readonly buildDecision: BuildDecision;
+  readonly phaseTimingsMs: {
+    readonly inputHashCalculation: number;
+    readonly skipDecision: number;
+    readonly worktreeSetup: number;
+    readonly typescriptBuild: number;
+    readonly rootDropReleaseAssembly: number;
+    readonly onefileReleaseAssembly: number;
+    readonly artifactSync: number;
+    readonly cleanup: number;
+    readonly totalElapsed: number;
+  };
+  readonly publishedAt: string;
+};
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const invokedAsCli = process.argv[1] !== undefined
@@ -105,11 +131,12 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
 
-  assertRunnerSyncAdmission(inspectRunnerSyncAdmission({
+  const admission = inspectRunnerSyncAdmission({
     cwd: repoRoot,
     stewardActorId: actorId,
     sealedSourceSha
-  }));
+  });
+  assertRunnerSyncAdmission(admission);
 
   const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
   const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({
@@ -133,6 +160,16 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       buildDecision: cacheDecision.decision,
       timings
     });
+    writeRunnerSyncReceipt({
+      cwd: repoRoot,
+      admission,
+      actorId,
+      sealedSourceSha,
+      buildTarget,
+      buildInputsTreeHash,
+      buildDecision: cacheDecision.decision,
+      timings
+    });
     console.log(`[sealed-runner-build] cache-hit-skip ${buildTarget} from ${sealedSourceSha}`);
     return;
   }
@@ -149,6 +186,16 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     writeBuildMetadataToReleaseManifests({
       cwd: repoRoot,
       sealedSourceSha,
+      buildInputsTreeHash,
+      buildDecision: cacheDecision.decision,
+      timings
+    });
+    writeRunnerSyncReceipt({
+      cwd: repoRoot,
+      admission,
+      actorId,
+      sealedSourceSha,
+      buildTarget,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
       timings
@@ -298,6 +345,65 @@ export function writeBuildMetadataToReleaseManifests(input: {
     };
     writeFileSync(absolute, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   }
+}
+
+export function buildRunnerSyncReceipt(input: {
+  readonly admission: RunnerSyncAdmissionReport;
+  readonly actorId: string;
+  readonly sealedSourceSha: string;
+  readonly buildTarget: BuildTarget;
+  readonly buildInputsTreeHash: string;
+  readonly buildDecision: BuildDecision;
+  readonly timings: SealedBuildTimings;
+  readonly publishedAt?: string;
+}): RunnerSyncReceipt {
+  const taskId = input.admission.queueHeadOwnership.waitingTasks[0] ?? '';
+  const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
+  if (!taskId || !stewardWorkId) {
+    throw new Error('ATM_RUNNER_SYNC_RECEIPT_INVALID: queue-head task and steward work id are required to publish a runner-sync receipt.');
+  }
+  return {
+    schemaId: 'atm.runnerSyncReceipt.v1',
+    specVersion: '0.1.0',
+    taskId,
+    actorId: input.actorId,
+    stewardWorkId,
+    sealedSourceSha: input.sealedSourceSha,
+    requestedSurfaces: [...input.admission.runnerSyncSteward?.requestedSurfaces ?? []].sort(),
+    buildTarget: input.buildTarget,
+    buildInputsTreeHash: input.buildInputsTreeHash,
+    buildDecision: input.buildDecision,
+    phaseTimingsMs: {
+      inputHashCalculation: input.timings.inputHashCalculationMs,
+      skipDecision: input.timings.skipDecisionMs,
+      worktreeSetup: input.timings.worktreeSetupMs,
+      typescriptBuild: input.timings.typescriptBuildMs,
+      rootDropReleaseAssembly: input.timings.rootDropAssemblyMs,
+      onefileReleaseAssembly: input.timings.onefileAssemblyMs,
+      artifactSync: input.timings.artifactSyncMs,
+      cleanup: input.timings.cleanupMs,
+      totalElapsed: input.timings.totalElapsedMs
+    },
+    publishedAt: input.publishedAt ?? new Date().toISOString()
+  };
+}
+
+export function writeRunnerSyncReceipt(input: {
+  readonly cwd: string;
+  readonly admission: RunnerSyncAdmissionReport;
+  readonly actorId: string;
+  readonly sealedSourceSha: string;
+  readonly buildTarget: BuildTarget;
+  readonly buildInputsTreeHash: string;
+  readonly buildDecision: BuildDecision;
+  readonly timings: SealedBuildTimings;
+}): string {
+  const receipt = buildRunnerSyncReceipt(input);
+  const relative = path.join('.atm', 'history', 'evidence', `${receipt.taskId}.runner-sync-receipt.json`);
+  const absolute = path.join(input.cwd, relative);
+  mkdirSync(path.dirname(absolute), { recursive: true });
+  writeFileSync(absolute, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
+  return relative.replace(/\\/g, '/');
 }
 
 function readJsonRecord(filePath: string): Record<string, unknown> {

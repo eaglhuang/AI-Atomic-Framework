@@ -102,6 +102,13 @@
       "source_task": "TASK-RFT-0051"
     },
     {
+      "path_pattern": "packages/cli/src/commands/broker/steward-queues.ts",
+      "atom_id": "atm.runner-sync.clean-close",
+      "capability": "ATM-GOV-0171 broker runner-sync release validation against atm.runnerSyncReceipt.v1 before clearing steward queue head.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0171"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/command-specs.ts",
       "atom_id": "atom-cli-command-specs",
       "capability": "CLI command help spec registry and public/internal command surface catalog",
@@ -237,6 +244,13 @@
       "atom_id": "atm.framework-mode-governance-map",
       "capability": "framework-mode status, claim, release, closure gates, stale lock classification, and planning-only ledger audit boundary warnings",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "atom_id": "atm.runner-sync.clean-close",
+      "capability": "ATM-GOV-0171 runner-sync admission report exposes queue-head steward request/surface data for receipt publication.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0171"
     },
     {
       "path_pattern": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
@@ -915,6 +929,13 @@
       "capability": "ATM-GOV-0166 ledger realign regression covering pure-move, digest mismatch, protected fields, and payload assertion.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0166"
+    },
+    {
+      "path_pattern": "tests/cli/runner-sync-clean-close-pathway.test.ts",
+      "atom_id": "atm.runner-sync.clean-close",
+      "capability": "ATM-GOV-0171 regression for runner-sync receipt publication and broker release validation, including digest mismatch refusal.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0171"
     }
   ]
 }

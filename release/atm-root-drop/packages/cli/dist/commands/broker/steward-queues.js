@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { CliError, makeResult, message } from '../shared.js';
 import { cleanupRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue } from '../../../../core/dist/broker/runner-sync-steward-queue.js';
 import { cleanupGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../../core/dist/broker/generated-projection-steward.js';
@@ -112,11 +113,20 @@ export function handleBrokerStewardQueues(options, context) {
                 throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --steward-work-id <id>.', { exitCode: 2 });
             }
             try {
-                const release = releaseRunnerSyncStewardQueue(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
+                const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
+                const receipt = validateRunnerSyncReleaseReceipt({
+                    cwd: options.cwd,
+                    queue,
                     taskId: options.task,
                     stewardWorkId: options.stewardWorkId,
                     receiptRef: options.receiptRef,
                     receiptDigest: options.receiptDigest
+                });
+                const release = releaseRunnerSyncStewardQueue(queue, {
+                    taskId: options.task,
+                    stewardWorkId: options.stewardWorkId,
+                    receiptRef: receipt.receiptRef,
+                    receiptDigest: receipt.receiptDigest
                 });
                 writeRunnerSyncStewardQueue(runnerSyncQueuePath, release.queue);
                 return makeResult({
@@ -259,6 +269,66 @@ function resolveRunnerSyncTaskIdHealth(cwd, taskId) {
     catch {
         return 'task-active';
     }
+}
+export function validateRunnerSyncReleaseReceipt(input) {
+    const receiptRef = String(input.receiptRef ?? '').trim();
+    if (!receiptRef) {
+        throw new Error('ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_REQUIRED: release requires --receipt-ref pointing at an atm.runnerSyncReceipt.v1 evidence file.');
+    }
+    const absoluteReceipt = path.resolve(input.cwd, receiptRef);
+    if (!absoluteReceipt.startsWith(path.resolve(input.cwd) + path.sep)) {
+        throw new Error('ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID: receipt reference must stay inside the repository.');
+    }
+    if (!existsSync(absoluteReceipt)) {
+        throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID: receipt file does not exist: ${receiptRef}.`);
+    }
+    const raw = readFileSync(absoluteReceipt, 'utf8');
+    const digest = `sha256:${createHash('sha256').update(raw).digest('hex')}`;
+    const expectedDigest = String(input.receiptDigest ?? '').trim();
+    if (expectedDigest && expectedDigest !== digest) {
+        throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_DIGEST_MISMATCH: receipt digest ${digest} does not match ${expectedDigest}.`);
+    }
+    let receipt;
+    try {
+        receipt = JSON.parse(raw);
+    }
+    catch {
+        throw new Error('ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID: receipt is not valid JSON.');
+    }
+    const group = input.queue.groups.find((candidate) => candidate.stewardWorkId === input.stewardWorkId);
+    if (!group) {
+        throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_NOT_FOUND: steward work ${input.stewardWorkId} is not queued.`);
+    }
+    const ownerRequest = group.requests.find((request) => request.taskId === input.taskId);
+    if (!ownerRequest) {
+        throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_OWNER_MISMATCH: task ${input.taskId} is not waiting on ${input.stewardWorkId}.`);
+    }
+    const receiptSurfaces = normalizeReceiptStringArray(receipt.requestedSurfaces);
+    const expectedSurfaces = normalizeReceiptStringArray(group.requestedSurfaces);
+    const mismatches = [
+        receipt.schemaId === 'atm.runnerSyncReceipt.v1' ? null : 'schemaId',
+        receipt.taskId === input.taskId ? null : 'taskId',
+        receipt.actorId === ownerRequest.actorId ? null : 'actorId',
+        receipt.stewardWorkId === input.stewardWorkId ? null : 'stewardWorkId',
+        receipt.sealedSourceSha === group.sealedSourceSha ? null : 'sealedSourceSha',
+        arraysEqual(receiptSurfaces, expectedSurfaces) ? null : 'requestedSurfaces'
+    ].filter(Boolean);
+    if (mismatches.length > 0) {
+        throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID: receipt does not match queued runner-sync steward fields: ${mismatches.join(', ')}.`);
+    }
+    return {
+        receiptRef: receiptRef.replace(/\\/g, '/'),
+        receiptDigest: digest
+    };
+}
+function normalizeReceiptStringArray(value) {
+    if (!Array.isArray(value))
+        return [];
+    return [...new Set(value.map((entry) => String(entry ?? '').trim().replace(/\\/g, '/')).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+}
+function arraysEqual(left, right) {
+    return left.length === right.length && left.every((entry, index) => entry === right[index]);
 }
 function toRunnerSyncQueueCliError(error) {
     const messageText = error instanceof Error ? error.message : String(error ?? '');

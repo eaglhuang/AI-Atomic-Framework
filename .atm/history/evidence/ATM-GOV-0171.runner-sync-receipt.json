@@ -1,0 +1,28 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0171",
+  "actorId": "codex-gpt-5-captain",
+  "stewardWorkId": "runner-sync-d358ade8",
+  "sealedSourceSha": "46204a359716a697e4c5a5fae6937870eee0e721",
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:2929fa05eef09ec3756519637701c209b1c9b6b9e9b19c932c6e7ed0fe6da4ba",
+  "buildDecision": "cache-miss-build",
+  "phaseTimingsMs": {
+    "inputHashCalculation": 49,
+    "skipDecision": 4,
+    "worktreeSetup": 13571,
+    "typescriptBuild": 22144,
+    "rootDropReleaseAssembly": 10089,
+    "onefileReleaseAssembly": 1946,
+    "artifactSync": 11373,
+    "cleanup": 0,
+    "totalElapsed": 59350
+  },
+  "publishedAt": "2026-07-18T14:01:41.611Z"
+}

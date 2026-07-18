@@ -11,6 +11,9 @@ export type RunnerSyncAdmissionReport = {
     readonly stewardWorkId: string;
     readonly queuePosition: number;
     readonly suggestedNextAction: string;
+    readonly requestedSurfaces: readonly string[];
+    readonly waitingTasks: readonly string[];
+    readonly requests: readonly RunnerSyncAdmissionStewardRequest[];
   } | null;
   readonly queueHeadOwnership: {
     readonly ok: boolean;
@@ -43,6 +46,12 @@ export type RunnerSyncAdmissionBrokerTicket = {
   readonly scopeClass: readonly string[];
 };
 
+export type RunnerSyncAdmissionStewardRequest = {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly requestedSurfaces: readonly string[];
+};
+
 export type RunnerSyncForeignBuildInputConflict = {
   readonly blockingTaskId: string;
   readonly blockingActorId: string | null;
@@ -62,6 +71,9 @@ export function inspectRunnerSyncAdmission(input: {
     readonly stewardWorkId: string;
     readonly queuePosition: number;
     readonly suggestedNextAction: string;
+    readonly requestedSurfaces?: readonly string[];
+    readonly waitingTasks?: readonly string[];
+    readonly requests?: readonly RunnerSyncAdmissionStewardRequest[];
   } | null;
   readonly dirtyFiles?: readonly string[] | null;
   readonly foreignClaims?: readonly RunnerSyncForeignClaimInput[] | null;
@@ -77,14 +89,15 @@ export function inspectRunnerSyncAdmission(input: {
     landedFiles: input.landedFiles ?? null
   });
   const foreignNonReleaseWip = uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
-  const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input);
+  const steward = normalizeInputRunnerSyncSteward(input.runnerSyncSteward) ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
+  const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input, steward);
   const brokerTicket = buildAdmissionBrokerTicket(input, queueHeadOwnership);
   return {
     schemaId: 'atm.runnerSyncAdmission.v1',
     ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok,
     stewardActorId: input.stewardActorId,
     sealedSourceSha: input.sealedSourceSha ?? null,
-    runnerSyncSteward: input.runnerSyncSteward ?? null,
+    runnerSyncSteward: steward,
     queueHeadOwnership,
     foreignNonReleaseWip,
     foreignBuildInputConflicts,
@@ -273,8 +286,7 @@ function inspectRunnerSyncQueueHeadOwnership(input: {
     readonly queuePosition: number;
     readonly suggestedNextAction: string;
   } | null;
-}): RunnerSyncAdmissionReport['queueHeadOwnership'] {
-  const steward = input.runnerSyncSteward ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
+}, steward: RunnerSyncAdmissionReport['runnerSyncSteward']): RunnerSyncAdmissionReport['queueHeadOwnership'] {
   if (!steward) {
     return {
       ok: false,
@@ -316,8 +328,9 @@ function readRunnerSyncStewardForSealedSource(cwd: string, sealedSourceSha: stri
   readonly stewardWorkId: string;
   readonly queuePosition: number;
   readonly suggestedNextAction: string;
-  readonly waitingTasks?: unknown;
-  readonly requests?: unknown;
+  readonly requestedSurfaces: readonly string[];
+  readonly waitingTasks: readonly string[];
+  readonly requests: readonly RunnerSyncAdmissionStewardRequest[];
 } | null) {
   const sealedSource = String(sealedSourceSha ?? '').trim();
   if (!sealedSource) return null;
@@ -333,6 +346,7 @@ function readRunnerSyncStewardForSealedSource(cwd: string, sealedSourceSha: stri
         stewardWorkId?: unknown;
         queuePosition?: unknown;
         suggestedNextAction?: unknown;
+        requestedSurfaces?: unknown;
         waitingTasks?: unknown;
         requests?: unknown;
       };
@@ -342,14 +356,27 @@ function readRunnerSyncStewardForSealedSource(cwd: string, sealedSourceSha: stri
         stewardWorkId: record.stewardWorkId,
         queuePosition: record.queuePosition,
         suggestedNextAction: typeof record.suggestedNextAction === 'string' ? record.suggestedNextAction : '',
-        waitingTasks: record.waitingTasks,
-        requests: record.requests
+        requestedSurfaces: normalizeStringArray(record.requestedSurfaces),
+        waitingTasks: normalizeStringArray(record.waitingTasks),
+        requests: normalizeStewardRequests(record.requests)
       };
     }
   } catch {
     return null;
   }
   return null;
+}
+
+function normalizeInputRunnerSyncSteward(value: Parameters<typeof inspectRunnerSyncAdmission>[0]['runnerSyncSteward']): RunnerSyncAdmissionReport['runnerSyncSteward'] {
+  if (!value) return null;
+  return {
+    stewardWorkId: value.stewardWorkId,
+    queuePosition: value.queuePosition,
+    suggestedNextAction: value.suggestedNextAction,
+    requestedSurfaces: normalizeStringArray(value.requestedSurfaces),
+    waitingTasks: normalizeStringArray(value.waitingTasks),
+    requests: normalizeStewardRequests(value.requests)
+  };
 }
 
 function normalizeOwnerActorIds(value: unknown): readonly string[] {
@@ -364,6 +391,22 @@ function normalizeStringArray(value: unknown): readonly string[] {
   if (!Array.isArray(value)) return [];
   return [...new Set(value.map((entry) => String(entry ?? '').trim()).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeStewardRequests(value: unknown): readonly RunnerSyncAdmissionStewardRequest[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    if (!entry || typeof entry !== 'object') return [];
+    const record = entry as { taskId?: unknown; actorId?: unknown; requestedSurfaces?: unknown };
+    const taskId = String(record.taskId ?? '').trim();
+    const actorId = String(record.actorId ?? '').trim();
+    if (!taskId || !actorId) return [];
+    return [{
+      taskId,
+      actorId,
+      requestedSurfaces: normalizeStringArray(record.requestedSurfaces)
+    }];
+  });
 }
 
 function resolveQueueHeadHealth(
