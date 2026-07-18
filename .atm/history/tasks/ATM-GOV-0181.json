@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0181",
+  "title": "abandon 殘留 governed disposition — 後續卡不再繼承孤兒 residue blocker",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "tests/cli/abandon-residue-governed-disposition.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/**",
+    "packages/cli/src/commands/tasks/**",
+    "packages/cli/src/commands/git-governance/**",
+    "tests/cli/abandon-residue-governed-disposition.test.ts",
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "docs/governance/command-surface.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-12-147.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    ".atm/history/evidence/ATM-GOV-0181.*",
+    ".atm/history/task-events/ATM-GOV-0181/**",
+    ".atm/history/tasks/ATM-GOV-0181.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/abandon-residue-governed-disposition.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow.abandon-residue-disposition",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.taskflow.abandon-residue-disposition",
+        "pattern": "Guard",
+        "source": "packages/cli/src/commands/taskflow/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "AAF backlog item **ATM-BUG-2026-07-12-147** (High) — Taskflow close /\nabandoned-task residue.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0181-abandon-residue-governed-disposition.task.md",
+    "sectionTitle": "ATM-GOV-0181",
+    "headingLine": 54,
+    "hash": "9f0914c308dd0e15",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0181-abandon-residue-governed-disposition.task.md",
+      "planningCommitSha": "ff5bda0ce607c3b085598d8e972287e01c1b1c3f",
+      "contentDigest": "sha256:9f0914c308dd0e156c42c5087a115045a64d8672470457f9e844a46814a1307f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T16:11:58.310Z"
+    }
+  },
+  "importedAt": "2026-07-18T16:11:58.310Z",
+  "lastTransitionId": "2026-07-18T16-36-52-722Z-close-237863f34984",
+  "lastTransitionAt": "2026-07-18T16:36:52.722Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gov-0181",
+  "reservedAt": "2026-07-18T16:12:18.117Z",
+  "promotedAt": "2026-07-18T16:12:18.121Z",
+  "claim": {
+    "actorId": "cursor-gov-0181",
+    "leaseId": "lease-8d1c2facfd85",
+    "claimedAt": "2026-07-18T16:12:18.126Z",
+    "heartbeatAt": "2026-07-18T16:36:52.718Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0181.json",
+      ".atm/history/evidence/ATM-GOV-0181.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/residue.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "tests/cli/abandon-residue-governed-disposition.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260718161218-cursor-gov-0181-f891eaf401",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718161218-cursor-gov-0181-f891eaf401\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-18T16:12:18.126Z",
+  "startedByActor": "cursor-gov-0181",
+  "startedBySessionId": "session-20260718161218-cursor-gov-0181-ATM-GOV-0181-16e1c61d67",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0181",
+    "batchId": null,
+    "scopeKey": "TASK-SYNC",
+    "queueId": "queue-0a5651c7ab89906a",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0181.*",
+      ".atm/history/evidence/ATM-GOV-0181.json",
+      ".atm/history/task-events/ATM-GOV-0181/**",
+      ".atm/history/tasks/ATM-GOV-0181.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/residue.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "tests/cli/abandon-residue-governed-disposition.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b720516f27ea6fe14f5388cfab29d067bed2d9eb1f10812599f7e70289e3f5c2",
+    "actorId": "cursor-gov-0181",
+    "sessionId": "session-20260718161218-cursor-gov-0181-ATM-GOV-0181-16e1c61d67",
+    "laneSession": {
+      "laneSessionId": "lane-20260718161218-cursor-gov-0181-f891eaf401",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718161218-cursor-gov-0181-f891eaf401\""
+    },
+    "createdAt": "2026-07-18T16:12:24.121Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-18T16:36:52.718Z",
+  "closedByActor": "cursor-gov-0181",
+  "closedBySessionId": "session-20260718161218-cursor-gov-0181-ATM-GOV-0181-16e1c61d67",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0181.closure-packet.json"
+}

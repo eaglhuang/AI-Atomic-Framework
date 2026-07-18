@@ -1,0 +1,197 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0181",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2d3eb129bd9e97b5911917f9eda33f3ca1651aae",
+  "governedTreeSha": "554511c0dda4663b258a493a0e5762e009f76845",
+  "targetCommitDelta": {
+    "currentCommitSha": "2d3eb129bd9e97b5911917f9eda33f3ca1651aae",
+    "parentCommitShas": [
+      "2d3eb129bd9e97b5911917f9eda33f3ca1651aae"
+    ],
+    "governedTreeSha": "554511c0dda4663b258a493a0e5762e009f76845",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0181.json",
+      ".atm/history/task-events/ATM-GOV-0181/2026-07-18T16-11-58-553Z-import-b0d79540a9b4.json",
+      ".atm/history/task-events/ATM-GOV-0181/2026-07-18T16-12-18-117Z-reserve-fef119563624.json",
+      ".atm/history/task-events/ATM-GOV-0181/2026-07-18T16-12-18-121Z-promote-144dafae3788.json",
+      ".atm/history/task-events/ATM-GOV-0181/2026-07-18T16-12-24-122Z-claim-b263f5a8ce4b.json",
+      ".atm/history/tasks/ATM-GOV-0181.json",
+      ".atm/integrations/claude-code.manifest.json",
+      ".atm/integrations/codex.manifest.json",
+      ".atm/integrations/copilot.manifest.json",
+      ".atm/integrations/cursor.manifest.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/residue.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-006.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-008.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-009.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-010.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-015.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/__tests__/commit-scope-policy.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/residue.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/close-write.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/close-write.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers/scope-options.js",
+      "release/atm-root-drop/packages/cli/dist/commands/work-channels.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/residue.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/historical-delivery.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "release/atm-root-drop/packages/cli/src/commands/work-channels.ts",
+      "release/atm-root-drop/packages/core/dist/broker/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "tests/cli/abandon-residue-governed-disposition.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/abandon-residue-governed-disposition.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8dc31e6155fcc59b7834340918e7221aa76dd80630b877511e62e62bf911b61d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:a8a09d9afe99823b1aea3732e90f70dc490660d60a73313f4f0d06a6c3eafc1c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/abandon-residue-governed-disposition.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T16:36:52.704Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0181.*",
+      ".atm/history/evidence/ATM-GOV-0181.json",
+      ".atm/history/task-events/ATM-GOV-0181/**",
+      ".atm/history/tasks/ATM-GOV-0181.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-12-147.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/residue.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/tasks/**",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "tests/cli/abandon-residue-governed-disposition.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/residue.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/tasks/**",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "tests/cli/abandon-residue-governed-disposition.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0181.json",
+  "closedAt": "2026-07-18T16:36:52.704Z",
+  "closedByActor": "cursor-gov-0181",
+  "sessionId": "session-20260718161218-cursor-gov-0181-ATM-GOV-0181-16e1c61d67",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "2d3eb129bd9e97b5911917f9eda33f3ca1651aae",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/residue.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "tests/cli/abandon-residue-governed-disposition.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T16-36-52-722Z-close-237863f34984",
+  "taskId": "ATM-GOV-0181",
+  "action": "close",
+  "actorId": "cursor-gov-0181",
+  "sessionId": "session-20260718161218-cursor-gov-0181-ATM-GOV-0181-16e1c61d67",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0181.json",
+  "taskSha256": "sha256:1d548d1b4ba08613d9d61350fd25ddc99452e2ec107e9357195e6c6f05f9030e",
+  "createdAt": "2026-07-18T16:36:52.722Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0181 --actor cursor-gov-0181 --status done --historical-delivery 2d3eb129bd9e97b5911917f9eda33f3ca1651aae",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718161218-cursor-gov-0181-ATM-GOV-0181-16e1c61d67",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0181.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/abandon-residue-governed-disposition.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T16:36:52.704Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0181.*",
+        ".atm/history/evidence/ATM-GOV-0181.json",
+        ".atm/history/task-events/ATM-GOV-0181/**",
+        ".atm/history/tasks/ATM-GOV-0181.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-12-147.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/residue.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+        "tests/cli/abandon-residue-governed-disposition.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/residue.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+        "tests/cli/abandon-residue-governed-disposition.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
