@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0118",
+  "title": "Reference Python LanguageAdapter Governance Implementation",
+  "status": "done",
+  "milestone": "M4",
+  "dependencies": [
+    "ATM-GOV-0112",
+    "ATM-GOV-0116"
+  ],
+  "acceptance": [
+    "Python-only repos can run governance analysis without JS assumptions.",
+    "Capability evidence shows supported vs deferred operations.",
+    "Validators cover Python-specific guidance paths."
+  ],
+  "deliverables": [
+    "packages/language-python/**",
+    "scripts/validate-python-adapter.ts",
+    "docs/SELF_HOSTING_ALPHA.md"
+  ],
+  "scopePaths": [
+    "packages/language-python/**",
+    "scripts/validate-python-adapter.ts",
+    "docs/SELF_HOSTING_ALPHA.md"
+  ],
+  "validators": [
+    "node --experimental-strip-types scripts/validate-python-adapter.ts --mode validate",
+    "node --experimental-strip-types scripts/validate-guidance.ts --mode validate",
+    "npm run validate:python-adapter",
+    "npm run validate:guidance",
+    "npm run typecheck"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.language-python-reference-adapter",
+    "atomCid": null,
+    "mapUpdates": [
+      "packages/language-python/**",
+      "scripts/validate-python-adapter.ts"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.language-python.adapter",
+        "pattern": "LanguageAdapter",
+        "source": "packages/language-python",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "ATM-GOV-0112",
+      "ATM-GOV-0116"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Python adapter behavior is required for real multi-language governance adoption.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0118-reference-python-languageadapter.task.md",
+    "sectionTitle": "ATM-GOV-0118",
+    "headingLine": 65,
+    "hash": "24a4f9b7b812debd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0118-reference-python-languageadapter.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:24a4f9b7b812debd95ad873950e33d84acb50bd53266fe61f0b9ee8707b6577b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:34:03.202Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:34:03.202Z",
+  "lastTransitionId": "2026-07-18T04-42-34-347Z-close-d05d6e80d051",
+  "lastTransitionAt": "2026-07-18T04:42:34.347Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "closedAt": "2026-07-18T04:42:34.345Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit f38767070e227bd70def0026f36a6f6ac3c5197a",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0118.closure-packet.json"
+}

@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0116",
+  "title": "Atomize and Infect Dry-Run Planning via LanguageAdapter",
+  "status": "done",
+  "milestone": "M3",
+  "dependencies": [
+    "ATM-GOV-0114",
+    "ATM-GOV-0115"
+  ],
+  "acceptance": [
+    "Dry-run proposals contain language capability attribution.",
+    "Proposal generation does not mutate host source files.",
+    "Missing capabilities produce advisory-only fallback."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/upgrade.ts",
+    "packages/core/src/guidance/route-engine.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/upgrade.ts",
+    "packages/core/src/guidance/route-engine.ts"
+  ],
+  "validators": [
+    "node atm.mjs upgrade --propose --behavior behavior.atomize --dry-run --json",
+    "node atm.mjs upgrade --propose --behavior behavior.infect --dry-run --json",
+    "npm run validate:guidance",
+    "npm run typecheck"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.language-adapter-dry-run-planning",
+    "atomCid": null,
+    "mapUpdates": [
+      "packages/cli/src/commands/upgrade.ts",
+      "packages/core/src/guidance/route-engine.ts"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.upgrade.atomize-infect-dry-run",
+        "pattern": "LanguageAdapter",
+        "source": "packages/cli/src/commands/upgrade.ts",
+        "disposition": "preserve",
+        "inlineReason": "legacy delivery reconcile"
+      }
+    ]
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "ATM-GOV-0114",
+      "ATM-GOV-0115"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/upgrade.ts",
+        "packages/core/src/guidance/route-engine.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "Dry-run planning for atomize/infect needs language-specific extraction while remaining non-mutating.\nLanguageAdapter capabilities should define the safe planning contract.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0116-atomize-infect-dryrun-planning.task.md",
+    "sectionTitle": "ATM-GOV-0116",
+    "headingLine": 62,
+    "hash": "d97c57e4c661dbf6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0116-atomize-infect-dryrun-planning.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:d97c57e4c661dbf651953dc0e2a2cffbebda46ac07979b2c4c6f03dea9bb4f5e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:34:03.242Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:34:03.242Z",
+  "lastTransitionId": "2026-07-18T04-42-10-539Z-close-e103f7779147",
+  "lastTransitionAt": "2026-07-18T04:42:10.539Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "closedAt": "2026-07-18T04:42:10.533Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 3bb286fcc8dc6f201f6af6274c70e3f9a87a6665",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0116.closure-packet.json"
+}

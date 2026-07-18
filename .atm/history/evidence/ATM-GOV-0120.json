@@ -1,0 +1,36 @@
+{
+  "taskId": "ATM-GOV-0120",
+  "updatedAt": "2026-07-18T04:42:52.336Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Historical reconcile sync completed for ATM-GOV-0120 against commit 03b5748ac722523095fec9ce3ada3e1dea204258.",
+      "artifactPaths": [
+        "scripts/validate-guidance.ts",
+        "fixtures/**",
+        "docs/multi-agent-compatibility-matrix.md"
+      ],
+      "producedBy": "codex-gov-sequence",
+      "createdAt": "2026-07-18T04:42:52.336Z",
+      "evidenceFreshness": "fresh",
+      "validationPasses": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "commandRuns": [
+        {
+          "command": "git show 03b5748ac722523095fec9ce3ada3e1dea204258",
+          "cwd": ".",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:6c3d2f378468894a25665b9f4acb58073c55709f5587a641907b77393a02d749",
+          "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38"
+        }
+      ],
+      "details": {
+        "action": "reconcile",
+        "deliveryCommit": "03b5748ac722523095fec9ce3ada3e1dea204258"
+      }
+    }
+  ]
+}

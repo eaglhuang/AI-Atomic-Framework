@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T04-42-45-123Z-close-c93164ba4a9b",
+  "taskId": "ATM-GOV-0119",
+  "action": "close",
+  "actorId": "codex-gov-sequence",
+  "sessionId": null,
+  "fromStatus": "open",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0119.json",
+  "taskSha256": "sha256:a4d755e4f5610ea76ae9486f7537982d7925ada287891df5d2bd061fd6a92075",
+  "createdAt": "2026-07-18T04:42:45.123Z",
+  "command": "node atm.mjs tasks reconcile --task ATM-GOV-0119 --actor codex-gov-sequence --delivery-commit 4c07214d1 --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0119.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T04:42:45.109Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "docs/SELF_HOSTING_ALPHA.md",
+        "packages/cli/src/commands/runtime-adapter-readiness.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/runtime-adapter-readiness.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

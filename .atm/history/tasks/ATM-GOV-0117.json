@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0117",
+  "title": "Reference JavaScript LanguageAdapter Governance Implementation",
+  "status": "done",
+  "milestone": "M4",
+  "dependencies": [
+    "ATM-GOV-0112",
+    "ATM-GOV-0116"
+  ],
+  "acceptance": [
+    "JS adapter advertises capability map used by guidance engine.",
+    "JS legacy-route and candidate signals match expected fixtures.",
+    "Dry-run planning remains non-mutating and deterministic."
+  ],
+  "deliverables": [
+    "packages/language-js/**",
+    "scripts/validate-guidance.ts"
+  ],
+  "scopePaths": [
+    "packages/language-js/**",
+    "scripts/validate-guidance.ts"
+  ],
+  "validators": [
+    "node --experimental-strip-types scripts/validate-guidance.ts --mode validate",
+    "npm run typecheck"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "ATM-GOV-0112",
+      "ATM-GOV-0116"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "JavaScript adapter behavior should be a governance reference implementation.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0117-reference-javascript-languageadapter.task.md",
+    "sectionTitle": "ATM-GOV-0117",
+    "headingLine": 49,
+    "hash": "3a653cef35748323",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0117-reference-javascript-languageadapter.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:3a653cef35748323293f46d9b3b81c545841ca4378ffde7128eadeab48c55488",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:39:55.032Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:39:55.032Z",
+  "lastTransitionId": "2026-07-18T04-42-22-807Z-close-0821691d3bb3",
+  "lastTransitionAt": "2026-07-18T04:42:22.807Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "closedAt": "2026-07-18T04:42:22.804Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 4c07214d16e51a1f4e1f973290a7b071a2624819",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0117.closure-packet.json"
+}

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0112",
+  "title": "LanguageAdapter Governance Capability Contract",
+  "status": "done",
+  "milestone": "M3",
+  "dependencies": [
+    "ATM-GOV-0110"
+  ],
+  "acceptance": [
+    "Capability declarations are machine-readable.",
+    "Missing capabilities are visible in CLI evidence.",
+    "Contract can serve multiple language adapters."
+  ],
+  "deliverables": [
+    "packages/plugin-sdk/src/**",
+    "packages/core/src/guidance/**",
+    "docs/ADAPTER_GUIDE.md"
+  ],
+  "scopePaths": [
+    "packages/plugin-sdk/src/**",
+    "packages/core/src/guidance/**",
+    "docs/ADAPTER_GUIDE.md"
+  ],
+  "validators": [
+    "node --experimental-strip-types scripts/validate-guidance.ts --mode validate",
+    "node atm.mjs next --json"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "ATM-GOV-0110"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Language behavior must be modeled as explicit capabilities, not hidden heuristics.\nATM needs a formal contract to decide what language adapters can guarantee.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0112-languageadapter-governance-capability-contract.task.md",
+    "sectionTitle": "ATM-GOV-0112",
+    "headingLine": 51,
+    "hash": "dda4c6ac89739d93",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0112-languageadapter-governance-capability-contract.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:dda4c6ac89739d93508516db807e699f2b1e8b34074830d348574ad4112aed80",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:39:55.026Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:39:55.026Z",
+  "lastTransitionId": "2026-07-18T04-41-35-606Z-close-89d1d44951b3",
+  "lastTransitionAt": "2026-07-18T04:41:35.606Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "closedAt": "2026-07-18T04:41:35.603Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 4c07214d16e51a1f4e1f973290a7b071a2624819",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0112.closure-packet.json"
+}

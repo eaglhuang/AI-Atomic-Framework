@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0115",
+  "title": "Source Inventory and Candidate Ranking Signals via LanguageAdapter",
+  "status": "done",
+  "milestone": "M3",
+  "dependencies": [
+    "ATM-GOV-0113"
+  ],
+  "acceptance": [
+    "Ranking reports include language adapter signal blocks.",
+    "Inventory generation works across supported languages.",
+    "Unsupported signals degrade with explicit advisory output."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/candidates.ts",
+    "packages/core/src/guidance/project-probe.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/candidates.ts",
+    "packages/core/src/guidance/project-probe.ts"
+  ],
+  "validators": [
+    "node atm.mjs candidates rank --include \"pipelines/**/*.py\" --json",
+    "node --experimental-strip-types scripts/validate-guidance.ts --mode validate"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "ATM-GOV-0113"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Candidate ranking should consume language-aware source signals.\nAdapter capabilities should drive inventory/scoring inputs.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0115-source-inventory-candidate-ranking-signals.task.md",
+    "sectionTitle": "ATM-GOV-0115",
+    "headingLine": 49,
+    "hash": "721b3ecc77fe085d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0115-source-inventory-candidate-ranking-signals.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:721b3ecc77fe085db17b6bcc16d548827659e7d22a82ff072fd1a27cbcee31a4",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:39:55.023Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:39:55.023Z",
+  "lastTransitionId": "2026-07-18T04-41-58-144Z-close-8bce3dd47094",
+  "lastTransitionAt": "2026-07-18T04:41:58.144Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "closedAt": "2026-07-18T04:41:58.140Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 3bb286fcc8dc6f201f6af6274c70e3f9a87a6665",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0115.closure-packet.json"
+}

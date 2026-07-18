@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0119",
+  "title": "Unsupported Language Advisory and Deferred Apply Contract",
+  "status": "done",
+  "milestone": "M4",
+  "dependencies": [
+    "ATM-GOV-0113",
+    "ATM-GOV-0118"
+  ],
+  "acceptance": [
+    "Unsupported language apply paths are blocked by contract.",
+    "Advisory messages include precise deferred reasons.",
+    "Non-mutating workflows remain available."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/runtime-adapter-readiness.ts",
+    "docs/SELF_HOSTING_ALPHA.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/runtime-adapter-readiness.ts",
+    "docs/SELF_HOSTING_ALPHA.md"
+  ],
+  "validators": [
+    "node atm.mjs next --json",
+    "node atm.mjs explain --why blocked --json"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "ATM-GOV-0113",
+      "ATM-GOV-0118"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Unsupported-language flows must never pretend apply readiness.\nATM should provide useful advisory output while deferring unsafe operations.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0119-unsupported-language-advisory.task.md",
+    "sectionTitle": "ATM-GOV-0119",
+    "headingLine": 49,
+    "hash": "28028014201fc7a7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0119-unsupported-language-advisory.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:28028014201fc7a788b3ac5af5f8449dca25ee8a550793f626feff1b99e17a65",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:39:55.031Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:39:55.031Z",
+  "lastTransitionId": "2026-07-18T04-42-45-123Z-close-c93164ba4a9b",
+  "lastTransitionAt": "2026-07-18T04:42:45.123Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "closedAt": "2026-07-18T04:42:45.120Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 4c07214d16e51a1f4e1f973290a7b071a2624819",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0119.closure-packet.json"
+}

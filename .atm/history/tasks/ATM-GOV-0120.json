@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0120",
+  "title": "Multi-language Onefile Validation Matrix for Governance Analysis",
+  "status": "done",
+  "milestone": "M4",
+  "dependencies": [
+    "ATM-GOV-0117",
+    "ATM-GOV-0118",
+    "ATM-GOV-0119"
+  ],
+  "acceptance": [
+    "Matrix includes supported, deprecated, unsupported capability states.",
+    "Onefile runner outputs consistent evidence across matrix fixtures.",
+    "CI gate can fail on matrix drift."
+  ],
+  "deliverables": [
+    "scripts/validate-guidance.ts",
+    "fixtures/**",
+    "docs/multi-agent-compatibility-matrix.md"
+  ],
+  "scopePaths": [
+    "scripts/validate-guidance.ts",
+    "fixtures/**",
+    "docs/multi-agent-compatibility-matrix.md"
+  ],
+  "validators": [
+    "node --experimental-strip-types scripts/validate-guidance.ts --mode validate",
+    "npm run validate:guidance",
+    "npm run typecheck"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.multilanguage-onefile-validation-matrix",
+    "atomCid": null,
+    "mapUpdates": [
+      "scripts/validate-guidance.ts",
+      "fixtures/**",
+      "docs/multi-agent-compatibility-matrix.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.guidance.multilanguage-matrix",
+        "pattern": "ValidationMatrix",
+        "source": "scripts/validate-guidance.ts",
+        "disposition": "preserve",
+        "inlineReason": "legacy delivery reconcile"
+      }
+    ]
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "ATM-GOV-0117",
+      "ATM-GOV-0118",
+      "ATM-GOV-0119"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Onefile distribution must validate governance behavior across language profiles.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0120-multilanguage-onefile-validation-matrix.task.md",
+    "sectionTitle": "ATM-GOV-0120",
+    "headingLine": 64,
+    "hash": "99517ac5c30aa8c5",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0120-multilanguage-onefile-validation-matrix.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:99517ac5c30aa8c55d07debc689dd774218cbd03edb085ad6791d9d793d3e4d2",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:34:03.242Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:34:03.242Z",
+  "lastTransitionId": "2026-07-18T04-42-56-820Z-close-afe7da3f7f1e",
+  "lastTransitionAt": "2026-07-18T04:42:56.820Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "closedAt": "2026-07-18T04:42:56.817Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 03b5748ac722523095fec9ce3ada3e1dea204258",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0120.closure-packet.json"
+}

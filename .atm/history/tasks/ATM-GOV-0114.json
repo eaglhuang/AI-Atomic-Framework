@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0114",
+  "title": "LegacyRoutePlan via LanguageAdapter",
+  "status": "done",
+  "milestone": "M3",
+  "dependencies": [
+    "ATM-GOV-0113"
+  ],
+  "acceptance": [
+    "Legacy route planning works via adapter capability calls.",
+    "Route evidence includes language adapter attribution.",
+    "Missing capability uses deterministic fallback."
+  ],
+  "deliverables": [
+    "packages/core/src/guidance/legacy-route-plan.ts",
+    "packages/core/src/guidance/route-engine.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/guidance/legacy-route-plan.ts",
+    "packages/core/src/guidance/route-engine.ts"
+  ],
+  "validators": [
+    "node --experimental-strip-types scripts/validate-guidance.ts --mode validate",
+    "node atm.mjs start --goal \"legacy route plan test\" --legacy-flow --json"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "ATM-GOV-0113"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/guidance/legacy-route-plan.ts",
+        "packages/core/src/guidance/route-engine.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "Legacy route planning currently depends on language-specific parsing paths.\nLanguageAdapter should provide the route-plan extraction contract.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0114-legacyrouteplan-via-languageadapter.task.md",
+    "sectionTitle": "ATM-GOV-0114",
+    "headingLine": 49,
+    "hash": "cb98a6cb4ed15051",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0114-legacyrouteplan-via-languageadapter.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:cb98a6cb4ed150513441335a4d97c62b1d33ce4038ea4b3456a0f0c9383e7226",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:39:55.052Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:39:55.052Z",
+  "lastTransitionId": "2026-07-18T04-41-47-854Z-close-ea941c808fce",
+  "lastTransitionAt": "2026-07-18T04:41:47.854Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "closedAt": "2026-07-18T04:41:47.849Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 3bb286fcc8dc6f201f6af6274c70e3f9a87a6665",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0114.closure-packet.json"
+}
