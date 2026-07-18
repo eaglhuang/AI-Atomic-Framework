@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T05-37-23-422Z-close-cdc4c638756d",
+  "taskId": "ATM-GOV-0166",
+  "action": "close",
+  "actorId": "cursor-gov-0166",
+  "sessionId": "session-20260718052124-cursor-gov-0166-ATM-GOV-0166-ac7062f43f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0166.json",
+  "taskSha256": "sha256:d0d46028e45598b29978ef13ddc4359ac7e8914a12fbcbd5cd3b75a8863897d5",
+  "createdAt": "2026-07-18T05:37:23.422Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0166 --actor cursor-gov-0166 --status done --historical-delivery dec63bb676427aaa9d203bbda25aebb11a209a32",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718052124-cursor-gov-0166-ATM-GOV-0166-ac7062f43f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0166.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "git-head-evidence",
+      "node --strip-types tests/cli/ledger-realign.test.ts",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T05:37:23.411Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0166.*",
+        ".atm/history/task-events/ATM-GOV-0166/**",
+        ".atm/history/tasks/ATM-GOV-0166.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/git-governance/record-commit.ts",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/tasks/command-dispatch.ts",
+        "packages/cli/src/commands/tasks/index.ts",
+        "packages/cli/src/commands/tasks/realign-plan-source.ts",
+        "packages/cli/src/commands/tasks/realign-plan-source/**",
+        "tests/cli/ledger-realign.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/git-governance/record-commit.ts",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/tasks/command-dispatch.ts",
+        "packages/cli/src/commands/tasks/index.ts",
+        "packages/cli/src/commands/tasks/realign-plan-source.ts",
+        "packages/cli/src/commands/tasks/realign-plan-source/**",
+        "tests/cli/ledger-realign.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

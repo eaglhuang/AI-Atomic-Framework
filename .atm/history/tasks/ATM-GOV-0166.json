@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0166",
   "title": "Add closed-ledger planning source realign verb",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -97,8 +97,8 @@
     }
   },
   "importedAt": "2026-07-18T05:19:04.814Z",
-  "lastTransitionId": "2026-07-18T05-21-33-927Z-claim-dfaff49a3d7b",
-  "lastTransitionAt": "2026-07-18T05:21:33.927Z",
+  "lastTransitionId": "2026-07-18T05-37-23-422Z-close-cdc4c638756d",
+  "lastTransitionAt": "2026-07-18T05:37:23.422Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-gov-0166",
   "reservedAt": "2026-07-18T05:20:27.147Z",
@@ -107,7 +107,7 @@
     "actorId": "cursor-gov-0166",
     "leaseId": "lease-2068c8da688a",
     "claimedAt": "2026-07-18T05:21:24.876Z",
-    "heartbeatAt": "2026-07-18T05:21:24.876Z",
+    "heartbeatAt": "2026-07-18T05:37:23.419Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0166.json",
@@ -124,14 +124,14 @@
       "packages/cli/src/commands/tasks/realign-plan-source/**",
       "tests/cli/ledger-realign.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718052133-cursor-gov-0166-48b2f38909",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718052133-cursor-gov-0166-48b2f38909\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T05:21:24.876Z",
   "startedByActor": "cursor-gov-0166",
@@ -173,5 +173,9 @@
     },
     "createdAt": "2026-07-18T05:21:33.925Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T05:37:23.419Z",
+  "closedByActor": "cursor-gov-0166",
+  "closedBySessionId": "session-20260718052124-cursor-gov-0166-ATM-GOV-0166-ac7062f43f",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0166.closure-packet.json"
 }
