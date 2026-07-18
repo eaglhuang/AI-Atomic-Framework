@@ -5,7 +5,14 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed",
+  "resolution": {
+    "fixedDate": "2026-07-18",
+    "fixedByTask": "ATM-GOV-0166",
+    "deliveryCommit": "b0c91abd5",
+    "closureCommit": "2c916a6c5",
+    "summary": "record-commit 增設 post-commit payload assertion（ATM_GIT_RECORD_COMMIT_PAYLOAD_DROPPED），假成功真丟包 fail loudly。"
+  },
   "area": "Git governance / record-commit",
   "finding": "`atm git record-commit` can report severity success while silently dropping the explicitly staged .atm/history/tasks record file from the resulting commit. Under a concurrent captain lane that resets the shared git index (ATM-GOV-0155 cleanup lane), the commit landed with only the wrapper's own .atm/history/evidence/git-head.jsonl line; the staged task ledger payload was lost without any error or warning. Repeated attempts across a 20-minute window (8 retries x 79 files) never committed a single ledger file, so this is systematic for task-owned record files, not a one-off race.",
   "expectedBehavior": "record-commit must verify after committing that every explicitly staged record file is actually contained in the created commit, and fail loudly (with rollback guidance) when the payload was dropped. Success with a lost payload is the worst possible outcome for a governance wrapper.",

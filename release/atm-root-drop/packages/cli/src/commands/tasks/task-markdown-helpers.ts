@@ -18,6 +18,7 @@ export interface TaskTableMetadata {
   readonly title: string;
   readonly status: string;
   readonly milestone: string | null;
+  readonly waveId?: string | null;
   readonly dependencies: readonly string[];
   readonly deliverables: readonly string[];
   readonly rowText: string;
@@ -35,6 +36,7 @@ export interface TaskImportRecordShape {
   readonly title: string;
   readonly status: string;
   readonly milestone: string | null;
+  readonly waveId?: string | null;
   readonly dependencies: readonly string[];
   readonly acceptance: readonly string[];
   readonly deliverables: readonly string[];
@@ -95,6 +97,7 @@ export function createTaskFromTableMetadata(input: {
     title: input.metadata.title,
     status: input.metadata.status,
     milestone: input.metadata.milestone,
+    waveId: input.metadata.waveId ?? null,
     dependencies: input.metadata.dependencies,
     acceptance: [],
     deliverables: input.metadata.deliverables,

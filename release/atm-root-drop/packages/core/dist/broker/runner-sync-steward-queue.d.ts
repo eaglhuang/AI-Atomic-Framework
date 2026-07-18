@@ -1,9 +1,13 @@
 import { RUNNER_SYNC_STEWARD_GENERATOR } from './global-resource-projection.ts';
+import { type BrokerBatchEvidence } from './related-task-batching.ts';
 export type RunnerSyncStewardRequestInput = {
     readonly taskId: string;
     readonly actorId: string;
     readonly sealedSourceSha: string;
     readonly requestedSurfaces: readonly string[];
+    readonly waveId?: string | null;
+    readonly surfaceFamily?: string | null;
+    readonly validators?: readonly string[];
     readonly createdAt?: string;
     readonly heartbeatAt?: string;
     readonly ttlSeconds?: number;
@@ -13,6 +17,9 @@ export type RunnerSyncStewardRequest = {
     readonly actorId: string;
     readonly sealedSourceSha: string;
     readonly requestedSurfaces: readonly string[];
+    readonly waveId: string | null;
+    readonly surfaceFamily: string;
+    readonly validators: readonly string[];
     readonly createdAt: string;
     readonly heartbeatAt: string;
     readonly expiresAt: string;
@@ -23,6 +30,8 @@ export type RunnerSyncStewardRequest = {
 export type RunnerSyncStewardGroup = {
     readonly stewardWorkId: string;
     readonly sealedSourceSha: string;
+    readonly waveId: string | null;
+    readonly surfaceFamily: string;
     readonly queuePosition: number;
     readonly status: 'queue-head' | 'waiting';
     readonly queueHeadHealth?: RunnerSyncTaskHealth;
@@ -62,6 +71,9 @@ export type BrokerTicketEnvelope = {
     readonly headOwner: string | null;
     readonly headHealth: RunnerSyncTaskHealth;
     readonly batchEligible: boolean;
+    readonly waveId?: string | null;
+    readonly surfaceFamily?: string;
+    readonly batch?: BrokerBatchEvidence | null;
     readonly enqueuedAt: string;
     readonly waitedMs: number;
     readonly sharedSurface: string;

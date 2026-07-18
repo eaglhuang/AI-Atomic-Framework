@@ -42,6 +42,17 @@ export interface TaskflowScopeAmendmentProposal {
     humanReviewRequired: boolean;
     notes: string[];
 }
+export interface TaskflowCommitBatchEvidence {
+    schemaId: 'atm.brokerBatchEvidence.v1';
+    batchId: string;
+    waveId: string;
+    taskIds: string[];
+    ticketIds: string[];
+    sharedSurfaceFamily: string;
+    validators: string[];
+    batchRate: number;
+    buildsPerWave: number;
+}
 export interface TaskflowGovernedCommitBundle {
     schemaId: 'atm.taskflowGovernedCommitBundle.v1';
     taskId: string;
@@ -80,6 +91,13 @@ export interface DeferredGovernanceDirtyReport {
     restored: boolean;
     skippedMissingSnapshots?: readonly string[];
 }
+export declare function buildTaskflowCommitBatchEvidence(input: {
+    waveId?: string | null;
+    surfaceFamily?: string | null;
+    taskIds: readonly string[];
+    validators?: readonly string[];
+    branchName?: string | null;
+}): TaskflowCommitBatchEvidence | null;
 export declare function readStagedFiles(repoRoot: string): string[];
 export declare function isDeferrableGovernanceDirtyFile(filePath: string, taskId?: string | null): boolean;
 export declare function deferGovernanceDirtyFiles(repoRoot: string, requested: boolean, taskId?: string | null): DeferredGovernanceDirtyReport;

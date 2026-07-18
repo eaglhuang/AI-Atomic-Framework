@@ -5,7 +5,14 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed",
+  "resolution": {
+    "fixedDate": "2026-07-18",
+    "fixedByTask": "ATM-GOV-0166",
+    "deliveryCommit": "b0c91abd5",
+    "closureCommit": "2c916a6c5",
+    "summary": "governed commit 改 temporary-index，foreign staged 檔物理排除。"
+  },
   "area": "Parallel governance / shared git index",
   "finding": "Concurrent captain lanes still contaminate each other through the shared git index: one captain's staged rename set (25 files, ATM-GOV-0101..0123 relocation in the planning repo) was swept wholesale into another captain's unrelated commit 15eebaf6 'docs(rft): open follow-up task cards' authored by codex-gpt-5.5. The tree state ended correct by luck, but the commit is mislabeled, attribution is wrong, and the same mechanism can just as easily commit half-finished foreign work.",
   "expectedBehavior": "Governed commit paths must never include staged paths outside their own declared bundle/claim scope. Every governed commit should stage into a temporary index (or use git commit --only with its declared path set) so foreign staged files are physically excluded, matching the taskflow close temporary-index fix already shipped for AAF.",

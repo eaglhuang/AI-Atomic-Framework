@@ -44,6 +44,7 @@ export function createTaskFromTableMetadata(input) {
         title: input.metadata.title,
         status: input.metadata.status,
         milestone: input.metadata.milestone,
+        waveId: input.metadata.waveId ?? null,
         dependencies: input.metadata.dependencies,
         acceptance: [],
         deliverables: input.metadata.deliverables,

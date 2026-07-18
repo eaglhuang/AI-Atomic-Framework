@@ -23,6 +23,8 @@ import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
+export function buildTaskflowCommitBatchEvidence(input) { const waveId = String(input.waveId ?? '').trim(); const surfaceFamily = String(input.surfaceFamily ?? input.branchName ?? '').trim(); const taskIds = uniqueSorted(input.taskIds); if (!waveId || !surfaceFamily || taskIds.length < 2)
+    return null; return { schemaId: 'atm.brokerBatchEvidence.v1', batchId: `${waveId}:${surfaceFamily}:${input.branchName ?? 'commit-window'}`, waveId, taskIds, ticketIds: taskIds.map((taskId) => `branch-commit:${input.branchName ?? 'detached-head'}:${taskId}`), sharedSurfaceFamily: surfaceFamily, validators: uniqueSorted(input.validators ?? []), batchRate: 1, buildsPerWave: 1 }; }
 function normalizeTaskflowRelativePath(filePath) { return normalizeMarkdownPathDeclaration(filePath).replace(/^\.\//, ''); }
 function normalizeRepoRelativePath(repoRoot, filePath) {
     const resolved = path.isAbsolute(filePath) ? filePath : path.resolve(repoRoot, filePath);

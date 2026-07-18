@@ -1,4 +1,5 @@
 import { GOVERNANCE_BACKLOG_PROJECTION } from './global-resource-projection.js';
+import { buildRelatedTaskBatchEvidence } from './related-task-batching.js';
 const defaultTtlSeconds = 420;
 export function emptyGeneratedProjectionSteward(now = new Date().toISOString()) {
     return {
@@ -128,6 +129,9 @@ function normalizeRequest(request) {
         actorId: String(request.actorId ?? '').trim(),
         projectionKey: String(request.projectionKey ?? '').trim(),
         sourceItemPaths: sortedUnique(request.sourceItemPaths.map(normalizePath).filter(Boolean)),
+        waveId: normalizeOptional(request.waveId),
+        surfaceFamily: normalizeOptional(request.surfaceFamily) ?? `projection:${String(request.projectionKey ?? '').trim()}`,
+        validators: sortedUnique((request.validators ?? []).map((validator) => String(validator ?? '').trim()).filter(Boolean)),
         createdAt,
         heartbeatAt,
         ttlSeconds
@@ -160,18 +164,32 @@ function buildProjectionBrokerTicket(queue, taskId, now, position) {
     const entry = queue.entries.find((candidate) => candidate.taskId === taskId) ?? queue.entries[0];
     const enqueuedAt = entry?.createdAt ?? now;
     const waitedMs = Math.max(0, Date.parse(now) - Date.parse(enqueuedAt));
+    const batch = buildProjectionBatchEvidence(queue, entry);
     return {
         schemaId: 'atm.brokerTicket.v1',
         ticketId: `projection:${queue.projectionKey}:${taskId}`,
         position,
         headOwner: queue.entries[0]?.taskId ?? null,
         headHealth: 'task-active',
-        batchEligible: position > 1,
+        batchEligible: batch !== null,
+        waveId: entry?.waveId ?? null,
+        surfaceFamily: entry?.surfaceFamily ?? `projection:${queue.projectionKey}`,
+        batch,
         enqueuedAt,
         waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
         sharedSurface: queue.projectionKey,
         scopeClass: ['code']
     };
+}
+function buildProjectionBatchEvidence(queue, entry) {
+    return buildRelatedTaskBatchEvidence({
+        batchId: queue.projectionKey,
+        candidate: entry ? { ...entry, ticketId: `projection:${queue.projectionKey}:${entry.taskId}` } : null,
+        candidates: queue.entries.map((candidate) => ({
+            ...candidate,
+            ticketId: `projection:${queue.projectionKey}:${candidate.taskId}`
+        }))
+    });
 }
 function isGovernanceBacklogItemShard(path) {
     return path.startsWith('docs/governance/atm-bug-and-optimization-backlog.items/')
@@ -182,6 +200,10 @@ function sortedUnique(values) {
 }
 function normalizePath(value) {
     return String(value ?? '').trim().replace(/\\/g, '/').replace(/^\.\//, '');
+}
+function normalizeOptional(value) {
+    const normalized = String(value ?? '').trim();
+    return normalized.length > 0 ? normalized : null;
 }
 function validIso(value) {
     return typeof value === 'string' && Number.isFinite(Date.parse(value));
