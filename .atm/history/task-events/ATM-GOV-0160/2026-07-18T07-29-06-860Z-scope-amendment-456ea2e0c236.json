@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T07-29-06-860Z-scope-amendment-456ea2e0c236",
+  "taskId": "ATM-GOV-0160",
+  "action": "scope-amendment",
+  "actorId": "atm-core",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0160.json",
+  "taskSha256": "sha256:734679a59023f0662d01b2345a54cad9bf4485499ffe502faabfaea9ade4e458",
+  "createdAt": "2026-07-18T07:29:06.860Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0160 --actor atm-core --add \"packages/cli/src/commands/next/claim-readiness.ts,packages/cli/src/commands/next/__tests__/claim-readiness.test.ts,packages/cli/src/commands/tasks/legacy/implementation.ts,packages/cli/src/commands/tasks/result-contracts.ts,packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0160",
+  "title": "Make dependency gates block code only and allow planning artifacts",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0159"
+  ],
+  "acceptance": [
+    "A task with an unresolved dependency can claim docs-only files.",
+    "The same task is blocked when the claim includes any code-class file.",
+    "After the dependency closes, the code-class claim is admitted.",
+    "`planningArtifacts` are imported from Markdown cards and preserved in target task snapshots.",
+    "Error details identify the exact code files that made the dependency gate apply."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/dependency-gate.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+    "tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/dependency-gate.ts",
+    "packages/cli/src/commands/tasks/dependency-gates.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+    "tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
+    "docs/governance/command-surface.md",
+    "docs/governance/error-code-registry.json"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+    "node --strip-types tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-dependency-admission",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.dependency-gate-code-scope-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+        "tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0160-dependency-gate-code-only-planning-artifacts.task.md",
+    "sectionTitle": "ATM-GOV-0160",
+    "headingLine": 47,
+    "hash": "9fbeb62a54c65f2e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0160-dependency-gate-code-only-planning-artifacts.task.md",
+      "planningCommitSha": "873b8827ef2fd62480e5b3737ee67e4ecfe82f33",
+      "contentDigest": "sha256:9fbeb62a54c65f2e57ca8dba90aa4ff9f4bf9d6d7a8eea4965ae66d033aa739d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T07:18:53.708Z"
+    }
+  },
+  "importedAt": "2026-07-18T07:18:53.708Z",
+  "lastTransitionId": "2026-07-18T07-29-06-860Z-scope-amendment-456ea2e0c236",
+  "lastTransitionAt": "2026-07-18T07:29:06.860Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "atm-core",
+  "reservedAt": "2026-07-18T07:19:33.488Z",
+  "promotedAt": "2026-07-18T07:19:33.491Z",
+  "claim": {
+    "actorId": "atm-core",
+    "leaseId": "lease-cd13094c6d82",
+    "claimedAt": "2026-07-18T07:19:33.494Z",
+    "heartbeatAt": "2026-07-18T07:19:33.494Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0160.*",
+      ".atm/history/task-events/ATM-GOV-0160/**",
+      ".atm/history/tasks/ATM-GOV-0160.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+      "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718071938-atm-core-8786f0c9c8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718071938-atm-core-8786f0c9c8\""
+    }
+  },
+  "startedAt": "2026-07-18T07:19:33.494Z",
+  "startedByActor": "atm-core",
+  "startedBySessionId": "session-20260718071933-atm-core-ATM-GOV-0160-cb70068969",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0160",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0160.*",
+      ".atm/history/task-events/ATM-GOV-0160/**",
+      ".atm/history/tasks/ATM-GOV-0160.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+      "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0160-dependency-gate-code-only-planning-artifacts.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0160-dependency-gate-code-only-planning-artifacts.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "867d29fe00be1450db2b22fa11122840142423ef6da97a0f8eb268a2cc1d9ae8",
+    "actorId": "atm-core",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260718071938-atm-core-8786f0c9c8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718071938-atm-core-8786f0c9c8\""
+    },
+    "createdAt": "2026-07-18T07:19:38.268Z",
+    "status": "active"
+  }
+}
