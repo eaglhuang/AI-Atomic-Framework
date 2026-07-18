@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T18-49-24-262Z-close-5a6673a290a3",
+  "taskId": "ATM-GOV-0177",
+  "action": "close",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": "session-20260718183433-codex-gov-auto-batch-ATM-GOV-0177-edec90ee5b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0177.json",
+  "taskSha256": "sha256:c2cf7a4eb8f465d808b229d285d113a4b02719474d4c9daa64ee4da74b03b626",
+  "createdAt": "2026-07-18T18:49:24.262Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0177 --actor codex-gov-auto-batch --status done --historical-delivery 99e6822951940990c6b77f7c715aa67cf1870a0f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718183433-codex-gov-auto-batch-ATM-GOV-0177-edec90ee5b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0177.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/shared-build-projection-checkpoint.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T18:49:24.246Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0177.*",
+        ".atm/history/task-events/ATM-GOV-0177/**",
+        ".atm/history/tasks/ATM-GOV-0177.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/command-surface.md",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/wave-broker-scheduler.ts",
+        "packages/core/src/broker/wave-generated-executor.ts",
+        "tests/cli-fixtures/help-snapshots/batch.json",
+        "tests/cli-fixtures/help-snapshots/broker.json",
+        "tests/cli/shared-build-projection-checkpoint.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/wave-broker-scheduler.ts",
+        "packages/core/src/broker/wave-generated-executor.ts",
+        "tests/cli-fixtures/help-snapshots/batch.json",
+        "tests/cli-fixtures/help-snapshots/broker.json",
+        "tests/cli/shared-build-projection-checkpoint.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

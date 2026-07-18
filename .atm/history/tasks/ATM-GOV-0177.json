@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0177",
   "title": "Shared Build/Projection Executor and Atomic Wave Checkpoint",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0172",
@@ -99,8 +99,8 @@
     }
   },
   "importedAt": "2026-07-18T18:34:28.559Z",
-  "lastTransitionId": "2026-07-18T18-34-42-206Z-claim-e066be23bcaa",
-  "lastTransitionAt": "2026-07-18T18:34:42.206Z",
+  "lastTransitionId": "2026-07-18T18-49-24-262Z-close-5a6673a290a3",
+  "lastTransitionAt": "2026-07-18T18:49:24.262Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gov-auto-batch",
   "reservedAt": "2026-07-18T18:34:33.778Z",
@@ -109,7 +109,7 @@
     "actorId": "codex-gov-auto-batch",
     "leaseId": "lease-050293dfc6b1",
     "claimedAt": "2026-07-18T18:34:33.786Z",
-    "heartbeatAt": "2026-07-18T18:34:33.786Z",
+    "heartbeatAt": "2026-07-18T18:49:24.259Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0177.json",
@@ -132,14 +132,14 @@
       "tests/cli-fixtures/help-snapshots/broker.json",
       "tests/cli/shared-build-projection-checkpoint.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718183434-codex-gov-auto-batch-5cbcbcd11c",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718183434-codex-gov-auto-batch-5cbcbcd11c\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T18:34:33.786Z",
   "startedByActor": "codex-gov-auto-batch",
@@ -187,5 +187,9 @@
     },
     "createdAt": "2026-07-18T18:34:42.204Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T18:49:24.259Z",
+  "closedByActor": "codex-gov-auto-batch",
+  "closedBySessionId": "session-20260718183433-codex-gov-auto-batch-ATM-GOV-0177-edec90ee5b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0177.closure-packet.json"
 }
