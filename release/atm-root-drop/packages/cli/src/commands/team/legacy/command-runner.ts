@@ -39,7 +39,8 @@ export async function runTeam(argv: string[]) {
 
   if (route.kind === 'special-action' && route.action === 'wave') {
     // TASK-MAO-0024: Team Agents Wave Mode planning surface.
-    return runTeamWave(route.argv, cwd);
+    const waveIndex = argv.findIndex((entry) => String(entry).toLowerCase() === 'wave');
+    return runTeamWave(waveIndex >= 0 ? argv.slice(waveIndex + 1) : route.argv, cwd);
   }
 
   if (route.kind === 'special-action' && route.action === 'knowledge') {

@@ -6,9 +6,14 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import path from 'node:path';
 import { CliError, makeResult, message } from './shared.js';
 import { validateStrictPathHeuristic } from './tasks/task-import-validators.js';
+import { createTeamShadowWorkspaceProviderPlan } from './team/shadow-workspace.js';
+import { findActiveTaskQueue } from './task-direction.js';
+import { readActiveBatchRun } from './work-channels.js';
 import { planWaves } from '../../../core/dist/broker/team-wave-planner.js';
 import { admitWave } from '../../../core/dist/broker/team-wave-admission.js';
 import { createTeamWaveEnvelope } from '../../../core/dist/broker/team-wave-envelope.js';
+import { createWaveManifest, evaluateWaveEligibility } from '../../../core/dist/broker/wave-manifest.js';
+import { effectiveExecutionState, validateWorkerReport } from '../../../core/dist/broker/team-worker-report.js';
 const TASKS_DIR = '.atm/history/tasks';
 function readLedgerTask(cwd, taskId) {
     const file = path.join(cwd, TASKS_DIR, `${taskId}.json`);
@@ -134,6 +139,179 @@ export function buildWaveRuntimeRecord(cwd, taskIds, coordinatorActorId) {
     }
     return { plan, admission, envelope, missing };
 }
+export function buildManifestRuntimeRecordFromBatch(input) {
+    const batchRun = readActiveBatchRun(input.cwd, { batchId: input.batchId });
+    if (!batchRun)
+        return { ok: false, runtime: null, reason: 'batch-not-found', batchRun: null };
+    const queue = findActiveTaskQueue(input.cwd, batchRun.sourcePrompt, { batchId: batchRun.batchId });
+    if (!queue)
+        return { ok: false, runtime: null, reason: 'active-task-queue-not-found', batchRun };
+    const selected = selectManifestTasksFromQueue(input.cwd, queue.tasks.slice(queue.currentIndex), input.waveId);
+    if (selected.length === 0)
+        return { ok: false, runtime: null, reason: 'wave-has-no-eligible-members', batchRun };
+    const targetRepo = selected[0]?.targetRepo ?? batchRun.targetRepo ?? 'unknown';
+    const manifest = createWaveManifest({
+        waveId: input.waveId,
+        batchRunId: batchRun.batchId,
+        coordinatorActorId: input.coordinatorActorId,
+        targetRepo,
+        executor: input.executor,
+        tasks: selected,
+        sealedBaseSha: readGitHead(input.cwd),
+        state: 'executing',
+        now: input.now
+    });
+    const reports = input.workerReports ?? [];
+    const outOfScopeFindings = buildOutOfScopeFindings(manifest, reports);
+    const invalidReports = reports.filter((report) => !validateWorkerReport(report).ok).map((report) => report.taskId);
+    const deferredTaskIds = reports
+        .filter((report) => {
+        const state = effectiveExecutionState(report);
+        return state === 'partial' || state === 'blocked' || state === 'not-started';
+    })
+        .map((report) => report.taskId);
+    const acceptedTaskIds = manifest.tasks
+        .map((task) => task.taskId)
+        .filter((taskId) => !deferredTaskIds.includes(taskId) && !invalidReports.includes(taskId));
+    const resultState = outOfScopeFindings.length > 0 || invalidReports.length > 0
+        ? 'needs-review'
+        : acceptedTaskIds.length < 2
+            ? 'serial-fallback'
+            : 'ready-for-write';
+    const runtime = {
+        schemaId: 'atm.teamWaveRuntime.v1',
+        specVersion: '0.1.0',
+        waveId: input.waveId,
+        batchId: batchRun.batchId,
+        executor: input.executor,
+        coordinatorActorId: input.coordinatorActorId,
+        taskIds: manifest.tasks.map((task) => task.taskId),
+        manifest: { ...manifest, state: resultState === 'ready-for-write' ? 'ready-for-write' : resultState === 'needs-review' ? 'needs-review' : 'planned' },
+        lanes: manifest.tasks.map((task, index) => ({
+            taskId: task.taskId,
+            laneSessionId: `lane-${input.waveId}-${String(index + 1).padStart(2, '0')}-${task.taskId.toLowerCase()}`,
+            workspace: createTeamShadowWorkspaceProviderPlan({ baseCommit: manifest.sealedBaseSha ?? 'HEAD' }),
+            workerCanCommitOrClose: false,
+            allowedReturnSchemas: ['atm.patchEnvelope.v1', 'atm.teamWorkerReport.v1']
+        })),
+        workerReports: reports,
+        acceptedTaskIds,
+        deferredTaskIds,
+        outOfScopeFindings,
+        resultState,
+        writesPerformed: false,
+        createdAt: input.now ?? new Date().toISOString()
+    };
+    return { ok: resultState !== 'needs-review', runtime, reason: null, batchRun };
+}
+function selectManifestTasksFromQueue(cwd, tasks, waveId) {
+    const selected = [];
+    for (const task of tasks) {
+        const validators = readTaskValidators(cwd, task.taskPath);
+        if (validators.length === 0)
+            continue;
+        const candidate = {
+            taskId: task.workItemId,
+            waveId,
+            targetRepo: task.targetRepo ?? 'unknown',
+            surfaceFamily: inferSurfaceFamily(task.scopePaths),
+            scopePaths: task.scopePaths,
+            validators,
+            dependencyReady: task.dependencies.every((dependency) => readLedgerTask(cwd, dependency)?.status === 'done')
+        };
+        if (!candidate.dependencyReady)
+            continue;
+        if (!evaluateWaveEligibility([...selected, candidate]).ok)
+            continue;
+        selected.push(candidate);
+        if (selected.length >= 4)
+            break;
+    }
+    return selected;
+}
+function buildOutOfScopeFindings(manifest, reports) {
+    const byTask = new Map(manifest.tasks.map((task) => [task.taskId, task]));
+    return reports
+        .map((report) => {
+        const task = byTask.get(report.taskId);
+        const files = task ? report.changedFiles.filter((file) => !pathAllowedByScope(file, task.scopePaths)) : report.changedFiles;
+        return { taskId: report.taskId, files };
+    })
+        .filter((entry) => entry.files.length > 0);
+}
+function pathAllowedByScope(filePath, scopePaths) {
+    const normalized = normalizeRepoPath(filePath);
+    return scopePaths.some((scope) => {
+        const allowed = normalizeRepoPath(scope);
+        if (allowed.endsWith('/**'))
+            return normalized.startsWith(allowed.slice(0, -3));
+        return normalized === allowed || normalized.startsWith(`${allowed.replace(/\/$/, '')}/`);
+    });
+}
+function readTaskValidators(cwd, taskPath) {
+    const file = path.join(cwd, taskPath);
+    if (!existsSync(file))
+        return [];
+    try {
+        const parsed = JSON.parse(readFileSync(file, 'utf8'));
+        return normalizeStringArray(parsed.validators);
+    }
+    catch {
+        return [];
+    }
+}
+function inferSurfaceFamily(scopePaths) {
+    const lower = scopePaths.map((entry) => normalizeRepoPath(entry).toLowerCase());
+    if (lower.some((entry) => entry.startsWith('packages/cli/')))
+        return 'cli';
+    if (lower.some((entry) => entry.startsWith('packages/core/')))
+        return 'core';
+    if (lower.some((entry) => entry.startsWith('scripts/')))
+        return 'scripts';
+    if (lower.some((entry) => entry.startsWith('docs/') || entry.endsWith('.md')))
+        return 'docs';
+    if (lower.some((entry) => entry.startsWith('.atm/')))
+        return 'ledger';
+    return 'mixed';
+}
+function normalizeRepoPath(value) {
+    return value.replace(/\\/g, '/').trim().replace(/^\.\//, '');
+}
+function readGitHead(cwd) {
+    try {
+        const head = readFileSync(path.join(cwd, '.git', 'HEAD'), 'utf8').trim();
+        if (head.startsWith('ref:')) {
+            const ref = head.slice(5).trim();
+            const refPath = path.join(cwd, '.git', ref);
+            return existsSync(refPath) ? readFileSync(refPath, 'utf8').trim() : null;
+        }
+        return head || null;
+    }
+    catch {
+        return null;
+    }
+}
+function parseWaveOptions(argv) {
+    const value = (flag) => {
+        const index = argv.indexOf(flag);
+        return index >= 0 ? String(argv[index + 1] ?? '').trim() : '';
+    };
+    const reports = [];
+    for (let index = 0; index < argv.length; index += 1) {
+        if (argv[index] === '--worker-report')
+            reports.push(String(argv[index + 1] ?? '').trim());
+    }
+    return {
+        batchId: value('--batch'),
+        waveId: value('--wave'),
+        executor: (value('--executor') || 'auto'),
+        actorId: value('--actor') || String(process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'wave-coordinator'),
+        workerReportPaths: reports.filter(Boolean)
+    };
+}
+function readWorkerReports(paths) {
+    return paths.map((filePath) => JSON.parse(readFileSync(path.resolve(filePath), 'utf8')));
+}
 /**
  * Handle `team wave <plan|dispatch> <csv>`. Delegated to from the `team` command
  * so no new top-level command registration is required.
@@ -142,6 +320,36 @@ export function runTeamWave(argv, cwd) {
     const action = String(argv[0] ?? 'plan').toLowerCase();
     if (action !== 'plan' && action !== 'dispatch') {
         throw new CliError('ATM_TEAM_WAVE_USAGE', 'team wave supports: plan, dispatch', { exitCode: 2 });
+    }
+    const waveOptions = parseWaveOptions(argv);
+    if (waveOptions.batchId || waveOptions.waveId) {
+        if (!waveOptions.batchId || !waveOptions.waveId) {
+            throw new CliError('ATM_TEAM_WAVE_MANIFEST_ARGS_REQUIRED', 'team wave manifest runtime requires both --batch <id> and --wave <id>.', { exitCode: 2 });
+        }
+        const record = buildManifestRuntimeRecordFromBatch({
+            cwd,
+            batchId: waveOptions.batchId,
+            waveId: waveOptions.waveId,
+            executor: waveOptions.executor,
+            coordinatorActorId: waveOptions.actorId,
+            workerReports: readWorkerReports(waveOptions.workerReportPaths)
+        });
+        const ok = Boolean(record.runtime) && record.ok;
+        if (action === 'dispatch' && record.runtime) {
+            const dir = path.join(cwd, WAVE_RUNTIME_DIR);
+            if (!existsSync(dir))
+                mkdirSync(dir, { recursive: true });
+            writeFileSync(path.join(dir, `${record.runtime.waveId}.json`), `${JSON.stringify(record.runtime, null, 2)}\n`, 'utf8');
+        }
+        return makeResult({
+            ok,
+            command: 'team',
+            cwd,
+            messages: [
+                message(ok ? 'info' : 'error', ok ? (action === 'dispatch' ? 'ATM_TEAM_WAVE_RUNTIME_DISPATCHED' : 'ATM_TEAM_WAVE_RUNTIME_PLANNED') : 'ATM_TEAM_WAVE_RUNTIME_NEEDS_REVIEW', ok ? `Team wave ${action} prepared executor-neutral runtime ${waveOptions.waveId}.` : `Team wave ${action} could not prepare a ready runtime: ${record.reason ?? record.runtime?.resultState ?? 'needs-review'}.`, { batchId: waveOptions.batchId, waveId: waveOptions.waveId, resultState: record.runtime?.resultState ?? null })
+            ],
+            evidence: { waveRuntime: record.runtime, reason: record.reason }
+        });
     }
     // Tasks are passed as a positional CSV (`team wave plan TASK-A,TASK-B`) so the
     // shared `team` command spec does not need a new `--tasks` flag. A `--tasks`
