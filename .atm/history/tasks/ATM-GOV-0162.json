@@ -1,0 +1,194 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0162",
+  "title": "Add related-task batching for commit build and projection windows",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0161"
+  ],
+  "acceptance": [
+    "Same-wave compatible tasks can share a build/projection/commit window.",
+    "Cross-wave or missing-wave tasks do not batch.",
+    "Incompatible surface families do not batch.",
+    "Batch evidence lists all task ids, ticket ids, shared surface family, and validators used for the shared window.",
+    "Analyzer fixtures can compute `batchRate` and `buildsPerWave`."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "tests/cli/related-task-batching-wave-surface.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+    "packages/cli/src/commands/tasks/import.ts",
+    "tests/cli/related-task-batching-wave-surface.test.ts",
+    "docs/governance/command-surface.md"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "node --strip-types tests/cli/related-task-batching-wave-surface.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.related-task-batching",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.wave-surface-batch-eligibility",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/tasks/import.ts",
+        "tests/cli/related-task-batching-wave-surface.test.ts",
+        "docs/governance/command-surface.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0162-related-task-batching-wave-surface.task.md",
+    "sectionTitle": "ATM-GOV-0162",
+    "headingLine": 47,
+    "hash": "c7d2c98496a39967",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0162-related-task-batching-wave-surface.task.md",
+      "planningCommitSha": "873b8827ef2fd62480e5b3737ee67e4ecfe82f33",
+      "contentDigest": "sha256:c7d2c98496a399678feb8ea3f44e2594e260b8022416c887359b1defa20fdc49",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T08:30:17.714Z"
+    }
+  },
+  "importedAt": "2026-07-18T08:30:17.714Z",
+  "lastTransitionId": "2026-07-18T08-44-35-985Z-scope-amendment-1225fc6e7413",
+  "lastTransitionAt": "2026-07-18T08:44:35.985Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "atm-core",
+  "reservedAt": "2026-07-18T08:30:46.341Z",
+  "promotedAt": "2026-07-18T08:30:46.345Z",
+  "claim": {
+    "actorId": "atm-core",
+    "leaseId": "lease-01520dae2d00",
+    "claimedAt": "2026-07-18T08:30:46.350Z",
+    "heartbeatAt": "2026-07-18T08:30:46.350Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0162.*",
+      ".atm/history/task-events/ATM-GOV-0162/**",
+      ".atm/history/tasks/ATM-GOV-0162.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/import.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/related-task-batching.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/related-task-batching-wave-surface.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718083056-atm-core-df368ccb8c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718083056-atm-core-df368ccb8c\""
+    }
+  },
+  "startedAt": "2026-07-18T08:30:46.350Z",
+  "startedByActor": "atm-core",
+  "startedBySessionId": "session-20260718083046-atm-core-ATM-GOV-0162-3db7b907b5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0162",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0162.*",
+      ".atm/history/task-events/ATM-GOV-0162/**",
+      ".atm/history/tasks/ATM-GOV-0162.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/import.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/related-task-batching.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/related-task-batching-wave-surface.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0162-related-task-batching-wave-surface.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0162-related-task-batching-wave-surface.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "eef666b5aeea79a94342694f35aabfdbe7ec7499213c66b844a82628e598087f",
+    "actorId": "atm-core",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260718083056-atm-core-df368ccb8c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718083056-atm-core-df368ccb8c\""
+    },
+    "createdAt": "2026-07-18T08:30:56.519Z",
+    "status": "active"
+  }
+}

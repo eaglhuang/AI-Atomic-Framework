@@ -1,10 +1,14 @@
 import { RUNNER_SYNC_STEWARD_GENERATOR } from './global-resource-projection.ts';
+import { buildRelatedTaskBatchEvidence, inferBrokerSurfaceFamily, type BrokerBatchEvidence } from './related-task-batching.ts';
 
 export type RunnerSyncStewardRequestInput = {
   readonly taskId: string;
   readonly actorId: string;
   readonly sealedSourceSha: string;
   readonly requestedSurfaces: readonly string[];
+  readonly waveId?: string | null;
+  readonly surfaceFamily?: string | null;
+  readonly validators?: readonly string[];
   readonly createdAt?: string;
   readonly heartbeatAt?: string;
   readonly ttlSeconds?: number;
@@ -15,6 +19,9 @@ export type RunnerSyncStewardRequest = {
   readonly actorId: string;
   readonly sealedSourceSha: string;
   readonly requestedSurfaces: readonly string[];
+  readonly waveId: string | null;
+  readonly surfaceFamily: string;
+  readonly validators: readonly string[];
   readonly createdAt: string;
   readonly heartbeatAt: string;
   readonly expiresAt: string;
@@ -26,6 +33,8 @@ export type RunnerSyncStewardRequest = {
 export type RunnerSyncStewardGroup = {
   readonly stewardWorkId: string;
   readonly sealedSourceSha: string;
+  readonly waveId: string | null;
+  readonly surfaceFamily: string;
   readonly queuePosition: number;
   readonly status: 'queue-head' | 'waiting';
   readonly queueHeadHealth?: RunnerSyncTaskHealth;
@@ -68,6 +77,9 @@ export type BrokerTicketEnvelope = {
   readonly headOwner: string | null;
   readonly headHealth: RunnerSyncTaskHealth;
   readonly batchEligible: boolean;
+  readonly waveId?: string | null;
+  readonly surfaceFamily?: string;
+  readonly batch?: BrokerBatchEvidence | null;
   readonly enqueuedAt: string;
   readonly waitedMs: number;
   readonly sharedSurface: string;
@@ -102,7 +114,6 @@ export type RunnerSyncStewardReleaseInput = {
 };
 
 export type RunnerSyncTaskHealth = 'task-active' | 'task-missing' | 'task-terminal';
-
 export type TaskHealthResolver = (request: RunnerSyncStewardRequest) => RunnerSyncTaskHealth;
 
 export type RunnerSyncStewardCleanupOptions = {
@@ -164,7 +175,7 @@ export function enqueueRunnerSyncStewardRequest(
     throw new Error(`ATM_RUNNER_SYNC_ENQUEUE_TASK_INVALID: task ${normalized.taskId} is ${taskHealth}; runner-sync steward enqueue requires an active task.`);
   }
   const base = normalizeQueue(queue, normalized.createdAt);
-  const existingIndex = base.groups.findIndex((group) => group.sealedSourceSha === normalized.sealedSourceSha);
+  const existingIndex = base.groups.findIndex((group) => isCompatibleRunnerSyncGroup(group, normalized));
   const groups = existingIndex >= 0 ? [...base.groups] : [...base.groups, emptyGroup(normalized)];
   const targetIndex = existingIndex >= 0 ? existingIndex : groups.length - 1;
   const target = groups[targetIndex];
@@ -195,7 +206,7 @@ export function enqueueRunnerSyncStewardRequest(
     waitingTasks: group.waitingTasks,
     requestedSurfaces: group.requestedSurfaces,
     suggestedNextAction: group.suggestedNextAction,
-    brokerTicket: buildBrokerTicket(group, normalized.taskId, normalized.heartbeatAt, status === 'coalesced-waiter'),
+    brokerTicket: buildBrokerTicket(group, normalized.taskId, normalized.heartbeatAt),
     queue: materialized
   };
 }
@@ -322,7 +333,7 @@ function groupToResult(queue: RunnerSyncStewardQueueDocument, group: RunnerSyncS
     waitingTasks: group.waitingTasks,
     requestedSurfaces: group.requestedSurfaces,
     suggestedNextAction: group.suggestedNextAction,
-    brokerTicket: buildBrokerTicket(group, group.waitingTasks[0] ?? group.stewardWorkId, queue.updatedAt, status === 'coalesced-waiter'),
+    brokerTicket: buildBrokerTicket(group, group.waitingTasks[0] ?? group.stewardWorkId, queue.updatedAt),
     queue
   };
 }
@@ -330,12 +341,13 @@ function groupToResult(queue: RunnerSyncStewardQueueDocument, group: RunnerSyncS
 function buildBrokerTicket(
   group: RunnerSyncStewardGroup,
   taskId: string,
-  now: string,
-  batchEligible: boolean
+  now: string
 ): BrokerTicketEnvelope {
   const request = group.requests.find((entry) => entry.taskId === taskId) ?? group.requests[0];
   const enqueuedAt = request?.createdAt ?? group.createdAt;
   const waitedMs = Math.max(0, Date.parse(now) - Date.parse(enqueuedAt));
+  const batch = buildBatchEvidence(group);
+  const batchEligible = batch !== null;
   return {
     schemaId: 'atm.brokerTicket.v1',
     ticketId: `${group.stewardWorkId}:${taskId}`,
@@ -343,11 +355,27 @@ function buildBrokerTicket(
     headOwner: group.waitingTasks[0] ?? null,
     headHealth: group.queueHeadHealth ?? 'task-active',
     batchEligible,
+    waveId: group.waveId,
+    surfaceFamily: group.surfaceFamily,
+    batch,
     enqueuedAt,
     waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
     sharedSurface: 'runner-sync',
     scopeClass: ['code']
   };
+}
+
+function buildBatchEvidence(group: RunnerSyncStewardGroup): BrokerBatchEvidence | null {
+  return buildRelatedTaskBatchEvidence({
+    batchId: group.stewardWorkId,
+    candidate: group.requests[0]
+      ? { ...group.requests[0], ticketId: `${group.stewardWorkId}:${group.requests[0].taskId}` }
+      : null,
+    candidates: group.requests.map((request) => ({
+      ...request,
+      ticketId: `${group.stewardWorkId}:${request.taskId}`
+    }))
+  });
 }
 
 function normalizeQueue(
@@ -383,8 +411,10 @@ function materializeQueue(
 
 function emptyGroup(request: NormalizedRequestInput): RunnerSyncStewardGroup {
   return {
-    stewardWorkId: stewardWorkIdFor(request.sealedSourceSha),
+    stewardWorkId: stewardWorkIdFor(request),
     sealedSourceSha: request.sealedSourceSha,
+    waveId: request.waveId,
+    surfaceFamily: request.surfaceFamily,
     queuePosition: 1,
     status: 'queue-head',
     queueHeadHealth: 'task-active',
@@ -405,6 +435,7 @@ function materializeGroup(
   const queuePosition = groupIndex + 1;
   const requestedSurfaces = sortedUnique(group.requests.flatMap((request) => request.requestedSurfaces));
   const waitingTasks = sortedUnique(group.requests.map((request) => request.taskId));
+  const headRequest = group.requests[0] ?? null;
   const status = queuePosition === 1 ? 'queue-head' : 'waiting';
   const suggestedNextAction = status === 'queue-head'
     ? `Run one runner-sync build for ${group.sealedSourceSha}, publish the steward receipt, then release ${group.stewardWorkId}.`
@@ -413,6 +444,8 @@ function materializeGroup(
     ...group,
     queuePosition,
     status,
+    waveId: headRequest?.waveId ?? group.waveId ?? null,
+    surfaceFamily: headRequest?.surfaceFamily ?? group.surfaceFamily ?? inferBrokerSurfaceFamily(requestedSurfaces, 'runner-sync'),
     queueHeadHealth: resolveQueueHeadHealth(group.requests, taskHealthResolver),
     requestedSurfaces,
     waitingTasks,
@@ -439,7 +472,18 @@ function resolveQueueHeadHealth(
   return owner ? resolveTaskHealth(owner, { taskHealthResolver }) : 'task-active';
 }
 
-type NormalizedRequestInput = Required<RunnerSyncStewardRequestInput>;
+type NormalizedRequestInput = {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly sealedSourceSha: string;
+  readonly requestedSurfaces: readonly string[];
+  readonly waveId: string | null;
+  readonly surfaceFamily: string;
+  readonly validators: readonly string[];
+  readonly createdAt: string;
+  readonly heartbeatAt: string;
+  readonly ttlSeconds: number;
+};
 
 function normalizeRequestInput(request: RunnerSyncStewardRequestInput): NormalizedRequestInput {
   const createdAt = validIso(request.createdAt) ? request.createdAt : new Date().toISOString();
@@ -452,6 +496,9 @@ function normalizeRequestInput(request: RunnerSyncStewardRequestInput): Normaliz
     actorId: String(request.actorId ?? '').trim(),
     sealedSourceSha: String(request.sealedSourceSha ?? '').trim(),
     requestedSurfaces: sortedUnique(request.requestedSurfaces.map(normalizePath).filter(Boolean)),
+    waveId: normalizeOptional(request.waveId),
+    surfaceFamily: normalizeOptional(request.surfaceFamily) ?? inferBrokerSurfaceFamily(request.requestedSurfaces, 'runner-sync'),
+    validators: sortedUnique((request.validators ?? []).map((validator) => String(validator ?? '').trim()).filter(Boolean)),
     createdAt,
     heartbeatAt,
     ttlSeconds
@@ -501,8 +548,14 @@ function buildRetryCommand(request: RunnerSyncStewardRequest): string {
   return `node atm.mjs broker runner-sync enqueue --task ${quoteArg(request.taskId)} --actor ${quoteArg(request.actorId)} --sealed-source-sha ${quoteArg(request.sealedSourceSha)}${surfaces} --json`;
 }
 
-function stewardWorkIdFor(sealedSourceSha: string): string {
-  return `runner-sync-${hash32(sealedSourceSha)}`;
+function isCompatibleRunnerSyncGroup(group: RunnerSyncStewardGroup, request: NormalizedRequestInput): boolean {
+  if (group.sealedSourceSha !== request.sealedSourceSha) return false;
+  if (!group.waveId && !request.waveId) return true;
+  return group.waveId === request.waveId && group.surfaceFamily === request.surfaceFamily;
+}
+
+function stewardWorkIdFor(request: NormalizedRequestInput): string {
+  return `runner-sync-${hash32([request.sealedSourceSha, request.waveId ?? 'no-wave', request.surfaceFamily].join('|'))}`;
 }
 
 function compareGroups(left: RunnerSyncStewardGroup, right: RunnerSyncStewardGroup): number {

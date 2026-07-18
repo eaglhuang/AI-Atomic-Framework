@@ -1,10 +1,14 @@
 import { GOVERNANCE_BACKLOG_PROJECTION } from './global-resource-projection.ts';
+import { buildRelatedTaskBatchEvidence, type BrokerBatchEvidence } from './related-task-batching.ts';
 
 export type GeneratedProjectionRequestInput = {
   readonly taskId: string;
   readonly actorId: string;
   readonly projectionKey: string;
   readonly sourceItemPaths: readonly string[];
+  readonly waveId?: string | null;
+  readonly surfaceFamily?: string | null;
+  readonly validators?: readonly string[];
   readonly createdAt?: string;
   readonly heartbeatAt?: string;
   readonly ttlSeconds?: number;
@@ -15,6 +19,9 @@ export type GeneratedProjectionRequest = {
   readonly actorId: string;
   readonly projectionKey: string;
   readonly sourceItemPaths: readonly string[];
+  readonly waveId: string | null;
+  readonly surfaceFamily: string;
+  readonly validators: readonly string[];
   readonly createdAt: string;
   readonly heartbeatAt: string;
   readonly expiresAt: string;
@@ -54,6 +61,9 @@ export type GeneratedProjectionBrokerTicket = {
   readonly headOwner: string | null;
   readonly headHealth: 'task-active';
   readonly batchEligible: boolean;
+  readonly waveId?: string | null;
+  readonly surfaceFamily?: string;
+  readonly batch?: BrokerBatchEvidence | null;
   readonly enqueuedAt: string;
   readonly waitedMs: number;
   readonly sharedSurface: string;
@@ -217,7 +227,18 @@ function materializeQueue(queue: GeneratedProjectionQueue): GeneratedProjectionQ
   return { ...queue, entries };
 }
 
-type NormalizedRequest = Required<GeneratedProjectionRequestInput>;
+type NormalizedRequest = {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly projectionKey: string;
+  readonly sourceItemPaths: readonly string[];
+  readonly waveId: string | null;
+  readonly surfaceFamily: string;
+  readonly validators: readonly string[];
+  readonly createdAt: string;
+  readonly heartbeatAt: string;
+  readonly ttlSeconds: number;
+};
 
 function normalizeRequest(request: GeneratedProjectionRequestInput): NormalizedRequest {
   const createdAt = validIso(request.createdAt) ? request.createdAt : new Date().toISOString();
@@ -230,6 +251,9 @@ function normalizeRequest(request: GeneratedProjectionRequestInput): NormalizedR
     actorId: String(request.actorId ?? '').trim(),
     projectionKey: String(request.projectionKey ?? '').trim(),
     sourceItemPaths: sortedUnique(request.sourceItemPaths.map(normalizePath).filter(Boolean)),
+    waveId: normalizeOptional(request.waveId),
+    surfaceFamily: normalizeOptional(request.surfaceFamily) ?? `projection:${String(request.projectionKey ?? '').trim()}`,
+    validators: sortedUnique((request.validators ?? []).map((validator) => String(validator ?? '').trim()).filter(Boolean)),
     createdAt,
     heartbeatAt,
     ttlSeconds
@@ -270,18 +294,33 @@ function buildProjectionBrokerTicket(
   const entry = queue.entries.find((candidate) => candidate.taskId === taskId) ?? queue.entries[0];
   const enqueuedAt = entry?.createdAt ?? now;
   const waitedMs = Math.max(0, Date.parse(now) - Date.parse(enqueuedAt));
+  const batch = buildProjectionBatchEvidence(queue, entry);
   return {
     schemaId: 'atm.brokerTicket.v1',
     ticketId: `projection:${queue.projectionKey}:${taskId}`,
     position,
     headOwner: queue.entries[0]?.taskId ?? null,
     headHealth: 'task-active',
-    batchEligible: position > 1,
+    batchEligible: batch !== null,
+    waveId: entry?.waveId ?? null,
+    surfaceFamily: entry?.surfaceFamily ?? `projection:${queue.projectionKey}`,
+    batch,
     enqueuedAt,
     waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
     sharedSurface: queue.projectionKey,
     scopeClass: ['code']
   };
+}
+
+function buildProjectionBatchEvidence(queue: GeneratedProjectionQueue, entry: GeneratedProjectionRequest | undefined): BrokerBatchEvidence | null {
+  return buildRelatedTaskBatchEvidence({
+    batchId: queue.projectionKey,
+    candidate: entry ? { ...entry, ticketId: `projection:${queue.projectionKey}:${entry.taskId}` } : null,
+    candidates: queue.entries.map((candidate) => ({
+      ...candidate,
+      ticketId: `projection:${queue.projectionKey}:${candidate.taskId}`
+    }))
+  });
 }
 
 function isGovernanceBacklogItemShard(path: string): boolean {
@@ -295,6 +334,11 @@ function sortedUnique(values: readonly string[]): readonly string[] {
 
 function normalizePath(value: string): string {
   return String(value ?? '').trim().replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function normalizeOptional(value: string | null | undefined): string | null {
+  const normalized = String(value ?? '').trim();
+  return normalized.length > 0 ? normalized : null;
 }
 
 function validIso(value: string | undefined): value is string {
