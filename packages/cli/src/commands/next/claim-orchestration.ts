@@ -30,8 +30,7 @@ import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueF
 import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.ts';
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
-import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts';
-import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
+import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts'; import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
 export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
   const claimStartedAt = Date.now();
@@ -251,6 +250,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   parallelAdvisory = parallelPreflight.parallelAdvisory;
   brokerQueueAdmission = parallelPreflight.brokerQueueAdmission;
   claimAllowedFiles = parallelPreflight.claimAllowedFiles;
+  const dirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: input.cwd, task: claimableTask, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, claimFiles: claimAllowedFiles });
   const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
   const oversizedExtractionAdmission = assertClaimLineBudgetOrExtractionAdmission({ cwd: input.cwd, taskId: claimableTask.workItemId, taskPath: taskPathFor(input.cwd, claimableTask.workItemId), report: lineBudgetReport });
   claimLatencyPhases.push({ phase: 'parallel-preflight', durationMs: Date.now() - parallelStartedAt });
@@ -293,8 +293,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     taskId: claimableTask.workItemId,
     actorId: resolvedActor.actorId
   });
-  if (!brokerClaimCheck.ok) {
-    throw new CliError('ATM_BROKER_LIFECYCLE_BLOCKED', brokerClaimCheck.reason ?? `Task ${claimableTask.workItemId} cannot claim because broker runtime state is blocked.`, {
+  if (!brokerClaimCheck.ok) { throw new CliError('ATM_BROKER_LIFECYCLE_BLOCKED', brokerClaimCheck.reason ?? `Task ${claimableTask.workItemId} cannot claim because broker runtime state is blocked.`, {
       exitCode: 1,
       details: {
         taskId: claimableTask.workItemId,
@@ -594,6 +593,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       totalMs: Date.now() - claimStartedAt,
       phases: claimLatencyPhases
     },
+    dirtyWipAdmission,
     ...(oversizedExtractionAdmission ? { oversizedExtractionAdmission } : {})
   }
   });

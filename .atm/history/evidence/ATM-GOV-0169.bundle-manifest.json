@@ -1,0 +1,110 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0169",
+  "updatedAt": "2026-07-18T13:24:19.481Z",
+  "updatedBy": "codex-gpt-5-captain",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+    "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:governance-projections",
+    "validate:physical-line-budget"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:79261341175af208281f001de5cd0d66358d3b5ccba599f1558a46322674b33a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts"
+      ],
+      "generatedAt": "2026-07-18T13:23:25.138Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4dd1fbbda74d18150b88a034d37747466af1abae",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:500d1ed0378f136be6f0da11f7f27c228e7b32ad4fb03f0675fbd1c1efac5f7b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts"
+      ],
+      "generatedAt": "2026-07-18T13:23:25.979Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4dd1fbbda74d18150b88a034d37747466af1abae",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:140430092f1720f25b18e0e17aea8ed271b4dddbb1e93b167ca3a1133daf11e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts"
+      ],
+      "generatedAt": "2026-07-18T13:23:28.693Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4dd1fbbda74d18150b88a034d37747466af1abae",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-18T13:23:36.003Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4dd1fbbda74d18150b88a034d37747466af1abae",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-physical-line-budget.ts --json --touched packages/cli/src/commands/next/claim-orchestration.ts,packages/cli/src/commands/next/foreign-dirty-wip-admission.ts,packages/cli/src/commands/next/playbook-projection/active-work-summary.ts,tests/cli/claim-foreign-unstaged-wip.test.ts --task ATM-GOV-0169 --actor codex-gpt-5-captain --gate claim",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60cb3255e29c1826e44b73312705cbbfe0c32797c06bcc4932e93af7821178a2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:physical-line-budget"
+      ],
+      "generatedAt": "2026-07-18T13:23:58.019Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4dd1fbbda74d18150b88a034d37747466af1abae",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:254463d8b31d8decad7575d374957ede5cc5cd5f59b161d526122495191c3ee1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:governance-projections"
+      ],
+      "generatedAt": "2026-07-18T13:23:58.038Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4dd1fbbda74d18150b88a034d37747466af1abae",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:2c6ac2bbe6c09824baf77e09854b4fcc60b23d67688a226190b5793a5a755b68",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-18T13:24:19.788Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4dd1fbbda74d18150b88a034d37747466af1abae",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

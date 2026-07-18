@@ -3,6 +3,29 @@
   "specVersion": "0.1.0",
   "entries": [
     {
+      "code": "ATM_CLAIM_FOREIGN_UNSTAGED_WIP",
+      "category": "claim-admission",
+      "shortDescription": "A candidate claim intersects foreign or unowned dirty WIP in the shared worktree.",
+      "commonCauses": [
+        "Another lane has uncommitted changes in the task's code scope.",
+        "A previous agent or editor left unstaged or staged changes without an active task owner.",
+        "The candidate task scope includes a code file already dirty in the shared worktree."
+      ],
+      "remediation": [
+        "Ask the owning lane to commit, close, release, or hand off before claiming the overlapping code scope.",
+        "If ownership is unowned, inspect the dirty file and either bind it to the right task or clear it through a governed cleanup.",
+        "Docs-only or ledger-only claims can proceed because this gate applies only to candidate code scope."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json",
+        "node atm.mjs lane status --json",
+        "node atm.mjs broker status --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts"
+    },
+    {
       "code": "ATM_LANE_ADOPT_ACTOR_REQUIRED",
       "category": "lane-session",
       "shortDescription": "lane adopt requires an explicit actor id.",

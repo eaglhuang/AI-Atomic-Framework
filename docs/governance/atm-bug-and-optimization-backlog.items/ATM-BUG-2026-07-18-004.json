@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-18-004",
+  "date": "2026-07-18",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Runner / Atomization",
+  "finding": "node atm.mjs atomize register-receipt routed through the frozen onefile cache and failed because scripts/src/atomization-register-receipt.js was not present in the cache.",
+  "expectedBehavior": "The frozen atomize wrapper should either bundle the required helper script or resolve it from the framework repo root so register-receipt works in normal frozen-runner mode.",
+  "evidenceOrRepro": "ATM-GOV-0169 attempted `node atm.mjs atomize register-receipt ...` and received ATM_ATOMIZE_REGISTRATION_TOOL_FAILED with MODULE_NOT_FOUND for AppData/Local/Temp/atm-onefile-cache/.../scripts/src/atomization-register-receipt.js. Direct `node scripts/src/atomization-register-receipt.js register-path ...` succeeded.",
+  "followUp": "Add a task for frozen atomize helper packaging/resolution coverage, including a regression that register-receipt works from node atm.mjs without relying on source-tree-only paths."
+}
