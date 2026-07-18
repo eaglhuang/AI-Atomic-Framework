@@ -105,7 +105,8 @@ const releaseOnly = inspectRunnerSyncAdmission({
     queuePosition: 1,
     suggestedNextAction: 'run runner sync'
   },
-  dirtyFiles: ['release/atm-root-drop/release-manifest.json']
+  dirtyFiles: ['release/atm-root-drop/release-manifest.json'],
+  foreignClaims: []
 });
 assert.equal(releaseOnly.ok, true);
 assert.equal(releaseOnly.queueHeadOwnership.ok, true);
@@ -115,7 +116,8 @@ const missingReservation = inspectRunnerSyncAdmission({
   cwd: process.cwd(),
   stewardActorId: 'release-steward',
   sealedSourceSha: 'missing-reservation',
-  dirtyFiles: []
+  dirtyFiles: [],
+  foreignClaims: []
 });
 assert.equal(missingReservation.ok, false);
 assert.equal(missingReservation.queueHeadOwnership.ok, false);
@@ -130,7 +132,8 @@ const waiting = inspectRunnerSyncAdmission({
     queuePosition: 2,
     suggestedNextAction: 'wait'
   },
-  dirtyFiles: []
+  dirtyFiles: [],
+  foreignClaims: []
 });
 assert.equal(waiting.ok, false);
 assert.match(waiting.requiredCommand ?? '', /queued at position 2/);
@@ -145,7 +148,8 @@ const ownedByAnother = inspectRunnerSyncAdmission({
     suggestedNextAction: 'run runner sync',
     requests: [{ actorId: 'other-steward' }]
   } as any,
-  dirtyFiles: []
+  dirtyFiles: [],
+  foreignClaims: []
 });
 assert.equal(ownedByAnother.ok, false);
 assert.match(ownedByAnother.requiredCommand ?? '', /other-steward/);
@@ -195,7 +199,8 @@ try {
     cwd: tempRepo,
     stewardActorId: 'release-steward',
     sealedSourceSha: 'sha-from-queue',
-    dirtyFiles: []
+    dirtyFiles: [],
+    foreignClaims: []
   });
   assert.equal(fileBacked.ok, true);
   assert.equal(fileBacked.queueHeadOwnership.stewardWorkId, 'runner-sync-file-backed');
