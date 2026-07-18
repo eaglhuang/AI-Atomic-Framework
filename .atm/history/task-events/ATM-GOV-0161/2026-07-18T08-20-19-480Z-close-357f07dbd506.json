@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T08-20-19-480Z-close-357f07dbd506",
+  "taskId": "ATM-GOV-0161",
+  "action": "close",
+  "actorId": "atm-core",
+  "sessionId": "session-20260718080319-atm-core-ATM-GOV-0161-781a19bd57",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0161.json",
+  "taskSha256": "sha256:29656d309287facca8d30b00ac7504fcd7faf8fe333c1eb779d05d1f3ec136f3",
+  "createdAt": "2026-07-18T08:20:19.480Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0161 --actor atm-core --status done --historical-delivery f3310cd32c02fab9f972a7b5ce94d6f07956d653",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718080319-atm-core-ATM-GOV-0161-781a19bd57",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0161.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "node --strip-types tests/cli/tier2-broker-ticket-exit.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T08:20:19.465Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0161.*",
+        ".atm/history/task-events/ATM-GOV-0161/**",
+        ".atm/history/tasks/ATM-GOV-0161.json",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/core/src/broker/generated-projection-steward.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/packages/cli/dist/commands/broker/steward-queues.js",
+        "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.d.ts",
+        "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/branch-commit-queue-gate.d.ts",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/branch-commit-queue-gate.js",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/broker-gate.d.ts",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/broker-gate.js",
+        "release/atm-root-drop/packages/cli/src/commands/broker/steward-queues.ts",
+        "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "release/atm-root-drop/packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "release/atm-root-drop/packages/cli/src/commands/taskflow/broker-gate.ts",
+        "release/atm-root-drop/packages/core/dist/broker/generated-projection-steward.d.ts",
+        "release/atm-root-drop/packages/core/dist/broker/generated-projection-steward.js",
+        "release/atm-root-drop/packages/core/dist/broker/runner-sync-steward-queue.d.ts",
+        "release/atm-root-drop/packages/core/dist/broker/runner-sync-steward-queue.js",
+        "release/atm-root-drop/packages/core/src/broker/generated-projection-steward.ts",
+        "release/atm-root-drop/packages/core/src/broker/runner-sync-steward-queue.ts",
+        "release/atm-root-drop/release-manifest.json",
+        "tests/cli/tier2-broker-ticket-exit.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/core/src/broker/generated-projection-steward.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "tests/cli/tier2-broker-ticket-exit.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
