@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Fixed in ATM-GOV-0180 / d66c3b2de",
   "area": "Governance",
   "finding": "The tasks scope add command accepted multiple repeated --add flags during TASK-RFT-0063, but only the last path was recorded as an allowed file. Pre-close then treated the other newly created validator modules as outside task scope.",
   "expectedBehavior": "Repeated --add flags should add every supplied path, or the CLI should reject ambiguous multi-add syntax with a clear required command.",
   "evidenceOrRepro": "TASK-RFT-0063: node atm.mjs tasks scope add --task TASK-RFT-0063 --actor codex-task-rft-0063 --add <path1> ... --add <pathN> --json reported only scripts/validate-police-family/polymorph-rollback-scenarios.ts in addedPaths; taskflow pre-close excluded the remaining new modules until each path was added individually.",
-  "followUp": "Add parser coverage for repeated --add handling in tasks scope add, plus a taskflow regression that new files under a declared glob are not silently excluded from governed close bundles."
+  "followUp": "Regression coverage: tests/cli/tasks-scope-add-multi-flag.test.ts"
 }
