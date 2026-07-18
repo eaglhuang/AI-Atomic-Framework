@@ -108,6 +108,12 @@ reuse it; report it to the owner and remap the work onto the correct family.
 Task ids are assigned from the planning repository state, never inferred from
 the local target-repo ledger.
 
+## Windows Text Document IO Rule
+
+On Windows, read, write, and compare Markdown, JSON, and text planning documents with Node.js UTF-8 helpers. Do not use PowerShell content commands such as `Get-Content`, `Set-Content`, or `Out-File` as the basis for document authoring or content comparison, because console encoding can make valid Traditional Chinese UTF-8 look corrupted.
+
+PowerShell may still launch `node`, `git`, and ATM CLI commands; the restriction is on document content IO and document content comparison.
+
 ## Dispatch Rules
 
 - Before drafting a plan or task cards, state `Planning authority`, `Target

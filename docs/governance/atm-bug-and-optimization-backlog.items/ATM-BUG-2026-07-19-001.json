@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-001",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "High",
+  "status": "Fixed",
+  "area": "Agent operating rules / Encoding safety",
+  "finding": "Codex used PowerShell to read and diff Traditional Chinese Markdown planning files after the user had repeatedly stated that document read/write/compare work must use Node.js. PowerShell console encoding made valid UTF-8 content appear as mojibake and created avoidable confusion.",
+  "expectedBehavior": "ATM agent-facing highest principles should explicitly require Node.js-based UTF-8 document IO/diff checks for Markdown/JSON/text planning files on Windows, and discourage PowerShell for document content comparison or authoring except for launching Node.js commands.",
+  "evidenceOrRepro": "Conversation on 2026-07-19 during ATM auto-batch plan localization: PowerShell Get-Content displayed mojibake for C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan.md; user corrected that PowerShell must not be used for document write/compare work.",
+  "followUp": "Rebuild the human-readable backlog projection when the generated projection surface is free; the source item records the completed principle-intake fix.",
+  "fixedBy": "Principle intake: added Windows text document IO rule to atm-dispatch personal skills, repo template, and generated adapter skills."
+}
