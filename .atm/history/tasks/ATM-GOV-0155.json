@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0155",
   "title": "Runner sync after dispatch planning gate adapter parity",
-  "status": "running",
+  "status": "open",
   "milestone": null,
   "dependencies": [
     "TASK-SKL-0013",
@@ -70,8 +70,8 @@
     }
   },
   "importedAt": "2026-07-17T05:06:49.226Z",
-  "lastTransitionId": "2026-07-18T02-31-00-871Z-claim-b18e1d262c37",
-  "lastTransitionAt": "2026-07-18T02:31:00.871Z",
+  "lastTransitionId": "2026-07-18T02-31-50-745Z-release-98d39632e313",
+  "lastTransitionAt": "2026-07-18T02:31:50.745Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-07-17T08:51:54.450Z",
   "promotedAt": "2026-07-17T08:51:54.453Z",
@@ -79,7 +79,7 @@
     "actorId": "codex-main",
     "leaseId": "lease-0e0f623e8744",
     "claimedAt": "2026-07-18T02:31:00.202Z",
-    "heartbeatAt": "2026-07-18T02:31:00.202Z",
+    "heartbeatAt": "2026-07-18T02:31:50.709Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0155.json",
@@ -92,14 +92,14 @@
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/**"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718023100-codex-main-b4b158f349",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718023100-codex-main-b4b158f349\""
-    }
+    },
+    "reason": "Stale ownership repair and release artifact commit completed; leaving ATM-GOV-0155 available for its full original closeout evidence."
   },
   "startedAt": "2026-07-17T05:12:21.821Z",
   "startedByActor": "codex-atm-gov-0156",
