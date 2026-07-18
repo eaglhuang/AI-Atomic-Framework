@@ -1,0 +1,161 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0099",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f33f37749bac08b0dcf7d00e4c7c8807ad1b8b97",
+  "governedTreeSha": "03fb87d0f61ca11a4480a4381411de9329d4988b",
+  "targetCommitDelta": {
+    "currentCommitSha": "f33f37749bac08b0dcf7d00e4c7c8807ad1b8b97",
+    "parentCommitShas": [
+      "f33f37749bac08b0dcf7d00e4c7c8807ad1b8b97"
+    ],
+    "governedTreeSha": "03fb87d0f61ca11a4480a4381411de9329d4988b",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0099.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0099.json",
+      "package.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/validate-rft-atomization-metrics.ts",
+      "tests/cli/rft-atomization-metrics.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-rft-atomization-metrics.ts --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c2f530c7c27eb00f7defa56a82fd8b855f2e93ee01abb7c77e753ac5e44b5234",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/rft-atomization-metrics.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7810846ebe10d7f5447248b715d56532e60c6e56a44f756c0a09c5fc59bc561a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-physical-line-budget.ts --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d2c72345db7d8e4d89e2e82fdacee387da3cda2d2cd9eb40672336a59a134a1e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:049d8eca7c0663f0e57a3d5ad71273a0bc3d0ffe36f18216f5e61a38cce94647",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/rft-atomization-metrics.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:physical-line-budget",
+    "validate:rft-atomization-metrics"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T02:29:39.580Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0099.*",
+      ".atm/history/task-events/TASK-RFT-0099/**",
+      ".atm/history/tasks/TASK-RFT-0099.json",
+      "atomic_workbench/atomization-coverage/**",
+      "package.json",
+      "scripts/validate-physical-line-budget.ts",
+      "scripts/validate-rft-atomization-metrics.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/rft-atomization-metrics.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "scripts/validate-physical-line-budget.ts",
+      "scripts/validate-rft-atomization-metrics.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/rft-atomization-metrics.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0099.json",
+  "closedAt": "2026-07-18T02:29:39.580Z",
+  "closedByActor": "codex-main",
+  "sessionId": "session-20260718021637-codex-main-TASK-RFT-0099-4a9a4fb74e",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f33f37749bac08b0dcf7d00e4c7c8807ad1b8b97",
+    "taskMatchedFiles": [
+      "package.json",
+      "scripts/validate-rft-atomization-metrics.ts",
+      "tests/cli/rft-atomization-metrics.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0099.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0099/2026-07-18T02-16-37-472Z-reserve-3be46f7596c2.json",
+      ".atm/history/task-events/TASK-RFT-0099/2026-07-18T02-16-37-474Z-promote-995c4976dca4.json",
+      ".atm/history/task-events/TASK-RFT-0099/2026-07-18T02-16-42-538Z-claim-dc3e153bca8b.json",
+      ".atm/history/tasks/TASK-RFT-0099.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

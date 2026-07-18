@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T02-29-39-588Z-close-dce865a41cc4",
+  "taskId": "TASK-RFT-0099",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260718021637-codex-main-TASK-RFT-0099-4a9a4fb74e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0099.json",
+  "taskSha256": "sha256:7e9696ed1527587ff2d241e6eb42639ccde12547227de08739cb05242ce34447",
+  "createdAt": "2026-07-18T02:29:39.588Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0099 --actor codex-main --status done --historical-delivery f33f37749bac08b0dcf7d00e4c7c8807ad1b8b97",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718021637-codex-main-TASK-RFT-0099-4a9a4fb74e",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0099.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/rft-atomization-metrics.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:physical-line-budget",
+      "validate:rft-atomization-metrics"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T02:29:39.580Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0099.*",
+        ".atm/history/task-events/TASK-RFT-0099/**",
+        ".atm/history/tasks/TASK-RFT-0099.json",
+        "atomic_workbench/atomization-coverage/**",
+        "package.json",
+        "scripts/validate-physical-line-budget.ts",
+        "scripts/validate-rft-atomization-metrics.ts",
+        "tests/cli/physical-line-budget-gate.test.ts",
+        "tests/cli/rft-atomization-metrics.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/validate-physical-line-budget.ts",
+        "scripts/validate-rft-atomization-metrics.ts",
+        "tests/cli/physical-line-budget-gate.test.ts",
+        "tests/cli/rft-atomization-metrics.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
