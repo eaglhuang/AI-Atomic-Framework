@@ -1,0 +1,175 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0174",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "ed3de81e0a01bb72929d5539380fdf53cb3178a9",
+  "governedTreeSha": "19c5b9ccd01a2bd564efa9612e258b6b87f50b2b",
+  "targetCommitDelta": {
+    "currentCommitSha": "ed3de81e0a01bb72929d5539380fdf53cb3178a9",
+    "parentCommitShas": [
+      "ed3de81e0a01bb72929d5539380fdf53cb3178a9"
+    ],
+    "governedTreeSha": "19c5b9ccd01a2bd564efa9612e258b6b87f50b2b",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0174.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0174.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/docs/governance/command-surface.md",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/team.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team-wave.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team-wave.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team/legacy/command-runner.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/team.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team-wave.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team/legacy/command-runner.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/team-wave-runtime-manifest.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-wave-runtime-manifest.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:03779d5d027aad33d7b7fbbf3df5cbe612981abe87a3d5b24916691e8a38d12c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:d9b488cb4275df1425003fa439372511f24afc7d612f9385bb3731f8e147184d",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/team-wave-runtime-manifest.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T17:33:48.472Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0174.*",
+      ".atm/history/task-events/ATM-GOV-0174/**",
+      ".atm/history/tasks/ATM-GOV-0174.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/**",
+      "packages/core/src/broker/team-wave-envelope.ts",
+      "packages/core/src/broker/team-worker-report.ts",
+      "packages/core/src/broker/wave-manifest.ts",
+      "tests/cli/team-wave-runtime-manifest.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/**",
+      "packages/core/src/broker/team-wave-envelope.ts",
+      "packages/core/src/broker/team-worker-report.ts",
+      "packages/core/src/broker/wave-manifest.ts",
+      "tests/cli/team-wave-runtime-manifest.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0174.json",
+  "closedAt": "2026-07-18T17:33:48.472Z",
+  "closedByActor": "codex-gov-auto-batch",
+  "sessionId": "session-20260718172237-codex-gov-auto-batch-ATM-GOV-0174-5260c2e3a5",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "ed3de81e0a01bb72929d5539380fdf53cb3178a9",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "tests/cli/team-wave-runtime-manifest.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0174.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0174/2026-07-18T17-22-30-537Z-import-c2c315003323.json",
+      ".atm/history/task-events/ATM-GOV-0174/2026-07-18T17-22-37-652Z-reserve-9e9b79469fb3.json",
+      ".atm/history/task-events/ATM-GOV-0174/2026-07-18T17-22-37-655Z-promote-a743a7144450.json",
+      ".atm/history/task-events/ATM-GOV-0174/2026-07-18T17-22-45-112Z-claim-a0d32feea8fe.json",
+      ".atm/history/task-events/ATM-GOV-0174/2026-07-18T17-28-17-551Z-scope-amendment-73414c9d7160.json",
+      ".atm/history/tasks/ATM-GOV-0174.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

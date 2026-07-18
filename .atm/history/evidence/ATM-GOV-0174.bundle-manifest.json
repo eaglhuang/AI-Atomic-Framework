@@ -1,12 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0174",
-  "updatedAt": "2026-07-18T17:28:56.212Z",
+  "updatedAt": "2026-07-18T17:31:38.077Z",
   "updatedBy": "codex-gov-auto-batch",
   "freshValidationPasses": [
     "node --strip-types tests/cli/team-wave-runtime-manifest.test.ts",
     "typecheck",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -47,6 +48,19 @@
       "generatedAt": "2026-07-18T17:28:56.406Z",
       "runnerKind": "dev-source",
       "sourceCommit": "f0d983e359346ead7f0dd05daf8879d2bc007b3f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-18T17:31:38.386Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ed3de81e0a01bb72929d5539380fdf53cb3178a9",
       "cached": false
     }
   ],
