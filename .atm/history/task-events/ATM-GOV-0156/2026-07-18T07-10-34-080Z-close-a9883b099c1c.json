@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T07-10-34-080Z-close-a9883b099c1c",
+  "taskId": "ATM-GOV-0156",
+  "action": "close",
+  "actorId": "atm-core",
+  "sessionId": "session-20260718065955-atm-core-ATM-GOV-0156-e68fcf2c41",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0156.json",
+  "taskSha256": "sha256:3ac7a623c294364733d4c6118315f46ecad6cee5b7bc47158c8062dd0eb36583",
+  "createdAt": "2026-07-18T07:10:34.080Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0156 --actor atm-core --status done --historical-delivery b26ca22eed11d5d9022ca70c5e8f9184caa97eb1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718065955-atm-core-ATM-GOV-0156-e68fcf2c41",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0156.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+      "doctor",
+      "node --strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T07:10:34.067Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0156.*",
+        ".atm/history/task-events/ATM-GOV-0156/**",
+        ".atm/history/tasks/ATM-GOV-0156.json",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/release-manifest.json",
+        "scripts/run-sealed-runner-build.ts",
+        "tests/cli/sealed-runner-build-input-cache.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/run-sealed-runner-build.ts",
+        "tests/cli/sealed-runner-build-input-cache.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0156",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AppData\\Local\\Temp\\atm-gov-0159-push",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b26ca22eed11d5d9022ca70c5e8f9184caa97eb1",
+  "governedTreeSha": "c74213c0a19316454d586f0478017584cef61b23",
+  "targetCommitDelta": {
+    "currentCommitSha": "b26ca22eed11d5d9022ca70c5e8f9184caa97eb1",
+    "parentCommitShas": [
+      "b26ca22eed11d5d9022ca70c5e8f9184caa97eb1"
+    ],
+    "governedTreeSha": "c74213c0a19316454d586f0478017584cef61b23",
+    "changedFiles": [
+      ".atm/integrations/codex.manifest.json",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "powershell -NoProfile -Command \" =1",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "cmd /c set",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8841ceaa8b085ab24d99bda2e4f07f4e4100c2e3422f3a808cbceb02f0efd421",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:80caa0bd859e79cccb50f08f0e78a0a7dcaac5449151ee463dd9012eced17d00",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ada84b041df961b4b223801798be1580f5be74b9876565dd2904497168c97257",
+      "stderrSha256": "sha256:35bfb96d157e6fd5a76599f124f4774eb856959c3d35bc4495a9dab85c5c60c6",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e65dccfb8b13ace01c0a378d0b9c0433b187166a635e4ff59a373c960f7e3999",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "doctor",
+    "node --strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T07:10:34.067Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0156.*",
+      ".atm/history/task-events/ATM-GOV-0156/**",
+      ".atm/history/tasks/ATM-GOV-0156.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/sealed-runner-build-input-cache.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/sealed-runner-build-input-cache.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0156.json",
+  "closedAt": "2026-07-18T07:10:34.067Z",
+  "closedByActor": "atm-core",
+  "sessionId": "session-20260718065955-atm-core-ATM-GOV-0156-e68fcf2c41",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "b26ca22eed11d5d9022ca70c5e8f9184caa97eb1",
+    "taskMatchedFiles": [],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
