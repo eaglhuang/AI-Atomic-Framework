@@ -7,6 +7,9 @@ export default defineCommandSpec({
   options: [
     commonCwdOption,
     { flag: '--actor', value: 'id', summary: 'Actor id used for checkpoint, skip, resume, or abandon actions.' },
+    { flag: '--auto-batch', value: 'on|off', summary: 'For current/status wave selection: disable auto-batch wave dispatch with --auto-batch off.' },
+    { flag: '--auto-batch-collection-timeout-ms', value: 'ms', summary: 'For current/status wave selection: override the auto-batch collection timeout evidence value.' },
+    { flag: '--auto-batch-max-wave-size', value: 'n', summary: 'For current/status wave selection: override the maximum selected wave size.' },
     { flag: '--batch', value: 'id', summary: 'Select a specific active batch run by batchId.' },
     { flag: '--compact', summary: 'Return only the current queue head, selected currentWave, deferredReasons, progress, allowed files, validators, and next commands for fast agent routing.' },
     { flag: '--delivery-commit', value: 'commit', summary: 'For checkpoint: verify a scoped delivery commit, equivalent to tasks close --historical-delivery.' },
@@ -31,6 +34,7 @@ export default defineCommandSpec({
     'node atm.mjs batch status --json',
     'node atm.mjs batch status --batch batch-abc123 --compact --json',
     'node atm.mjs batch current --compact --json',
+    'node atm.mjs batch current --auto-batch off --json',
     'node atm.mjs batch current --batch batch-abc123 --compact --json',
     'node atm.mjs batch deliver-and-close --actor codex-main --batch batch-abc123 --json',
     'node atm.mjs batch repair --actor codex-main --batch batch-abc123 --json',

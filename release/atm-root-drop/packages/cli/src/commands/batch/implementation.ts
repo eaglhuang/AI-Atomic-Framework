@@ -29,7 +29,8 @@ const batchHistoricalDeliveryRefs = action === 'checkpoint' ? parseBatchHistoric
 const batchHistoricalBatchRefs = action === 'checkpoint' ? parseBatchHistoricalBatchRefs(argv) : [];
 const batchDeliverAndCloseExtras = action === 'deliver-and-close' ? parseBatchDeliverAndCloseExtras(argv) : null;
 const checkpointReadinessInput = action === 'checkpoint-readiness' ? parseBatchCheckpointReadinessArgs(argv) : null;
-const { options } = parseOptions( action === 'checkpoint' ? stripBatchCheckpointCloseArgs(argv) : action === 'deliver-and-close' ? stripBatchDeliverAndCloseExtras(argv) : action === 'checkpoint-readiness' ? stripBatchCheckpointReadinessArgs(argv) : argv, 'batch' ); if (action === 'status' || action === 'current') {
+const autoBatch = parseAutoBatchControls(argv);
+const { options } = parseOptions( action === 'checkpoint' ? stripBatchCheckpointCloseArgs(argv) : action === 'deliver-and-close' ? stripBatchDeliverAndCloseExtras(argv) : action === 'checkpoint-readiness' ? stripBatchCheckpointReadinessArgs(argv) : stripAutoBatchArgs(argv), 'batch' ); if (action === 'status' || action === 'current') {
 const selector = buildBatchSelector(options);
 const compact = options.compact === true || action === 'current';
 const selection = Object.keys(selector).length > 0 ? activeBatchSelectionStatus(options.cwd, selector) : activeBatchSelectionStatus(options.cwd);
@@ -46,7 +47,7 @@ return makeResult({ ok: false, command: 'batch', cwd: options.cwd, messages: [me
 });
 }
 if (compact) {
-const compactStatus = buildCompactBatchStatus(options.cwd, batchRun, taskQueue, consistency, allActiveBatches.length, pendingCommitWindow); return makeResult({ ok: consistency.ok, command: 'batch', cwd: options.cwd, messages: [consistency.ok ? message('info', 'ATM_BATCH_CURRENT', batchRun ? 'Current batch queue head resolved.' : 'No active batch run found.', { active: Boolean(batchRun),
+const compactStatus = buildCompactBatchStatus(options.cwd, batchRun, taskQueue, consistency, allActiveBatches.length, pendingCommitWindow, autoBatch); return makeResult({ ok: consistency.ok, command: 'batch', cwd: options.cwd, messages: [consistency.ok ? message('info', 'ATM_BATCH_CURRENT', batchRun ? 'Current batch queue head resolved.' : 'No active batch run found.', { active: Boolean(batchRun),
 batchId: batchRun?.batchId ?? null, currentTaskId: batchRun?.currentTaskId ?? null, pendingCommitTaskId: pendingCommitWindow?.taskId ?? null, checkpointCommand: batchRun ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchRun.batchId} --json` : null })
 : message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'Active batch runtime is inconsistent and must be repaired before continuing.', { active: Boolean(batchRun), batchHeadTaskId: consistency.batchHeadTaskId, queueHeadTaskId: consistency.queueHeadTaskId, reason: consistency.reason, requiredCommand: batchRun ? `node atm.mjs batch repair --actor <id> --batch ${batchRun.batchId} --json`
 : 'node atm.mjs batch repair --actor <id> --json' })], evidence: { action, compact: true, current: compactStatus }
@@ -301,6 +302,11 @@ const arg = argv[index]; if (arg !== '--historical-batch') continue;
 const value = argv[index + 1]; if (!value || value.startsWith('--')) { throw new CliError('ATM_CLI_USAGE', `batch checkpoint ${arg} requires a batch id or path.`, { exitCode: 2 }); }
 refs.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean)); index += 1; }
 return uniqueStrings(refs); }
+function stripAutoBatchArgs(argv: readonly string[]) {
+const stripped: string[] = []; for (let index = 0; index < argv.length; index += 1) {
+const arg = argv[index]; if (arg === '--auto-batch' || arg === '--auto-batch-max-wave-size' || arg === '--auto-batch-collection-timeout-ms') { index += 1; continue; }
+stripped.push(arg); }
+return stripped; }
 function selectRequiredBatch(cwd: string, selector: ReturnType<typeof buildBatchSelector>, actorId: string, action: string) {
 const selection = activeBatchSelectionStatus(cwd, { ...selector, actorId: selector.batchId || selector.scopeKey ? null : actorId });
 if (selection.ok) return selection.batchRun; if (selection.reason === 'batch-selection-required') { throw new CliError('ATM_BATCH_SELECTION_REQUIRED', `batch ${action} found multiple active batch runs; choose one with --batch <batchId> or --scope <scopeKey>.`, { exitCode: 2, details: { action, activeBatches: selection.candidates.map(toBatchCandidate) }
@@ -314,7 +320,7 @@ function toCompactBatchCandidate(batchRun: { readonly batchId: string; readonly 
 scopeKey: batchRun.scopeKey ?? null, currentTaskId: batchRun.currentTaskId ?? null, held: Boolean(batchRun.hold), resumeCommand: batchRun.hold?.resumeCommand ?? null, currentIndex: batchRun.currentIndex ?? null, totalTasks: batchRun.taskIds.length, createdByActor: batchRun.createdByActor ?? null, statusCommand: `node atm.mjs batch current --batch ${batchRun.batchId} --compact --json`,
 checkpointCommand: `node atm.mjs batch checkpoint --actor <id> --batch ${batchRun.batchId} --json` };
 }
-function buildCompactBatchStatus( cwd: string, batchRun: BatchRunRecord | null | undefined, taskQueue: TaskQueueRecord | null | undefined, consistency: { readonly ok: boolean; readonly [key: string]: unknown }, activeBatchCount: number, pendingCommitWindow: ReturnType<typeof buildPendingCheckpointCommitWindow> ) {
+function buildCompactBatchStatus( cwd: string, batchRun: BatchRunRecord | null | undefined, taskQueue: TaskQueueRecord | null | undefined, consistency: { readonly ok: boolean; readonly [key: string]: unknown }, activeBatchCount: number, pendingCommitWindow: ReturnType<typeof buildPendingCheckpointCommitWindow>, autoBatch = parseAutoBatchControls([]) ) {
 const queueHead = taskQueue?.tasks?.[taskQueue.currentIndex] ?? null;
 const scope = queueHead ? partitionTaskScope(queueHead) : null;
 const validators = queueHead ? readTaskValidators(cwd, queueHead.taskPath) : [];
@@ -322,7 +328,7 @@ const batchId = batchRun?.batchId ?? null;
 const currentTaskId = batchRun?.currentTaskId ?? taskQueue?.taskIds?.[taskQueue?.currentIndex ?? 0] ?? null;
 const commitInstructionTaskId = pendingCommitWindow?.taskId ?? batchRun?.pendingCommitTaskId ?? currentTaskId;
 const held = Boolean(batchRun?.hold);
-const currentWave = buildCurrentWaveSelection(cwd, batchRun, taskQueue);
+const currentWave = buildCurrentWaveSelection(cwd, batchRun, taskQueue, autoBatch);
 const resumeCommand = batchRun?.hold?.resumeCommand ?? (batchId ? `node atm.mjs batch resume --actor <id> --batch ${batchId} --json` : null); return { schemaId: 'atm.batchCurrent.v1', ok: consistency.ok, active: Boolean(batchRun), activeBatchCount, batchId, scopeKey: batchRun?.scopeKey ?? null, queueId: taskQueue?.queueId ?? batchRun?.queueId ?? null,
 currentIndex: batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null, totalTasks: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0, progress: buildCompactProgress(batchRun, taskQueue), held, hold: batchRun?.hold ?? null, skippedTasks: batchRun?.skippedTasks ?? [], auditSummary: buildBatchAuditSummary(batchRun), currentTaskId, currentTask: queueHead ? { workItemId: queueHead.workItemId,
 title: queueHead.title, taskPath: queueHead.taskPath, sourcePlanPath: queueHead.sourcePlanPath, targetRepo: queueHead.targetRepo }
@@ -332,15 +338,19 @@ title: queueHead.title, taskPath: queueHead.taskPath, sourcePlanPath: queueHead.
 : null, nextCommand: batchRun?.sourcePrompt ? `node atm.mjs next --claim --actor <id> --prompt "${batchRun.sourcePrompt}" --json` : null, resumeCommand, repairCommand: batchId ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json` : 'node atm.mjs batch repair --actor <id> --json', omitted: { taskIds: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0, fullTaskQueue: true, fullBatchRun: true,
 useVerboseCommand: batchId ? `node atm.mjs batch status --batch ${batchId} --json` : 'node atm.mjs batch status --json' }, consistency };
 }
-function buildCurrentWaveSelection(cwd: string, batchRun: BatchRunRecord | null | undefined, taskQueue: TaskQueueRecord | null | undefined) {
+function buildCurrentWaveSelection(cwd: string, batchRun: BatchRunRecord | null | undefined, taskQueue: TaskQueueRecord | null | undefined, autoBatch = parseAutoBatchControls([])) {
 const batchId = batchRun?.batchId ?? null;
 const tasks = taskQueue?.tasks ?? [];
 const startIndex = batchRun?.currentIndex ?? taskQueue?.currentIndex ?? 0;
-const maxWaveSize = 4;
+const maxWaveSize = autoBatch.maxWaveSize;
 const selected: WaveManifestTask[] = [];
 const deferredReasons: Array<{ readonly taskId: string; readonly reasonCode: string; readonly detail: string }> = [];
 const seed = buildTaskWaveSeed(batchRun, taskQueue);
 const waveId = buildDeterministicWaveId(batchId, seed, tasks.slice(startIndex).map((task) => task.workItemId));
+if (!autoBatch.enabled) {
+for (let index = Math.max(0, startIndex); index < tasks.length; index += 1) deferredReasons.push({ taskId: tasks[index].workItemId, reasonCode: 'auto-batch-disabled', detail: autoBatch.reason });
+return { schemaId: 'atm.batchWaveSelection.v1' as const, status: 'serial-fallback', serialFallback: true, maxWaveSize, selectedTaskIds: [], currentWave: null, deferredReasons, dispatchCommand: null, autoBatch };
+}
 for (let index = Math.max(0, startIndex); index < tasks.length; index += 1) {
 const task = tasks[index];
 if (selected.length >= maxWaveSize) {
@@ -368,7 +378,25 @@ const targetRepo = selected[0]?.targetRepo ?? null;
 const status = selected.length > 1 ? 'wave-ready' : selected.length === 1 ? 'serial-fallback' : 'empty';
 const currentWave = selected.length > 0 && batchId && targetRepo ? createWaveManifest({ waveId, batchRunId: batchId, coordinatorActorId: batchRun?.createdByActor ?? 'unknown', targetRepo, executor: 'local-lanes', tasks: selected, sealedBaseSha: readGitHead(cwd), now: new Date(0).toISOString() }) : null;
 const dispatchCommand = status === 'wave-ready' && batchId ? `node atm.mjs team wave dispatch --batch ${batchId} --wave ${waveId} --executor local-lanes --json` : null;
-return { schemaId: 'atm.batchWaveSelection.v1' as const, status, serialFallback: status === 'serial-fallback', maxWaveSize, selectedTaskIds: selected.map((task) => task.taskId), currentWave, deferredReasons, dispatchCommand };
+return { schemaId: 'atm.batchWaveSelection.v1' as const, status, serialFallback: status === 'serial-fallback', maxWaveSize, selectedTaskIds: selected.map((task) => task.taskId), currentWave, deferredReasons, dispatchCommand, autoBatch };
+}
+function parseAutoBatchControls(argv: readonly string[]) {
+const option = readOptionValue(argv, '--auto-batch');
+const envOff = process.env.ATM_AUTO_BATCH === '0';
+const circuitOpen = Boolean(process.env.ATM_AUTO_BATCH_CIRCUIT_OPEN);
+const optionOff = option === 'off' || option === 'false' || option === '0';
+const maxWaveSize = Math.max(1, parsePositiveInteger(readOptionValue(argv, '--auto-batch-max-wave-size') ?? process.env.ATM_AUTO_BATCH_MAX_WAVE_SIZE, 4));
+const collectionTimeoutMs = Math.max(0, parsePositiveInteger(readOptionValue(argv, '--auto-batch-collection-timeout-ms') ?? process.env.ATM_AUTO_BATCH_COLLECTION_TIMEOUT_MS, 120000));
+const reason = circuitOpen ? 'ATM_AUTO_BATCH_CIRCUIT_OPEN' : envOff ? 'ATM_AUTO_BATCH=0' : optionOff ? '--auto-batch off' : 'enabled';
+return { schemaId: 'atm.autoBatchControls.v1' as const, enabled: !(envOff || circuitOpen || optionOff), reason, maxWaveSize, collectionTimeoutMs };
+}
+function parsePositiveInteger(value: string | undefined | null, fallback: number): number {
+const parsed = Number(value);
+return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+function readOptionValue(argv: readonly string[], flag: string): string | null {
+const index = argv.indexOf(flag);
+return index >= 0 && index + 1 < argv.length ? String(argv[index + 1]) : null;
 }
 function buildWaveCandidate(task: TaskDirectionTask, waveId: string, validators: readonly string[]): WaveManifestTask {
 return { taskId: task.workItemId, waveId, targetRepo: task.targetRepo ?? 'unknown', surfaceFamily: inferSurfaceFamily(task.scopePaths), scopePaths: task.scopePaths, validators, dependencyReady: true };

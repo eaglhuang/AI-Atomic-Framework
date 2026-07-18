@@ -92,6 +92,7 @@ type CaptainParallelLedgerAnalysis = {
   readonly laneEvidence: LaneEvidenceSummary;
   readonly runtimeFrameworkLockSnapshot: FrameworkLockSnapshot;
   readonly comparison: WaveComparison;
+  readonly autoBatchPipeline: ReturnType<typeof summarizeAutoBatchPipeline>;
   readonly observabilityGaps: readonly ObservabilityGap[];
   readonly notes: readonly string[];
 };
@@ -166,12 +167,14 @@ const result: CaptainParallelLedgerAnalysis = {
   laneEvidence: summarizeLaneEvidence(sessionEventRoot, laneEvents),
   runtimeFrameworkLockSnapshot: summarizeFrameworkLocks(lockRoot),
   comparison: compare(serial, parallel),
+  autoBatchPipeline: summarizeAutoBatchPipeline(laneEvents),
   observabilityGaps: [
     {
       lane: 'framework-mode temp claims',
       status: 'snapshot-only',
       impact: 'Runtime lock files expose current or retained lock state, but do not provide an append-only historical claim/release window comparable to task-events.'
     },
+    { lane: 'cross-repository planning or implementation', status: 'not-observable-from-this-ledger', impact: 'Single-repo task events cannot prove work performed in external planning or implementation repositories without imported evidence.' },
     {
       lane: 'journaling/backlog lightweight writes',
       status: 'not-observable-from-this-ledger',
@@ -308,7 +311,13 @@ function summarizeLaneSessionConcurrency(events: readonly LaneSessionEvent[]): {
     concurrentLaneIds: intervals.map((interval) => interval.id).sort()
   };
 }
-
+function summarizeAutoBatchPipeline(events: readonly LaneSessionEvent[]) {
+  const tickets = events.map((event) => event.details?.brokerTicket).filter((ticket): ticket is Record<string, unknown> => Boolean(ticket && typeof ticket === 'object'));
+  const waited = tickets.map((ticket) => Number(ticket.waitedMs)).filter((value) => Number.isFinite(value) && value >= 0).sort((a, b) => a - b);
+  const waveTickets = tickets.filter((ticket) => typeof ticket.waveId === 'string' && ticket.waveId);
+  const bySurface = (needle: string) => tickets.filter((ticket) => String(ticket.sharedSurface ?? ticket.surfaceFamily ?? '').includes(needle)).length;
+  return { schemaId: 'atm.autoBatchPipelineAnalysis.v1' as const, evidenceSources: { brokerTickets: tickets.length, waveTickets: waveTickets.length, laneEvents: events.length }, metrics: { waitedMs: { p50: percentile(waited, 0.5), p95: percentile(waited, 0.95) }, batchRate: tickets.length ? tickets.filter((ticket) => ticket.batchEligible === true).length / tickets.length : null, commitsPerWave: bySurface('commit'), buildsPerWave: bySurface('build'), projectionsPerWave: bySurface('projection'), laneInterventionCount: events.filter((event) => event.action === 'repair-claim' || event.action === 'takeover' || event.action === 'adopt').length }, rolloutVerdict: !tickets.length ? { verdict: 'inconclusive', reason: 'missing broker ticket evidence' } : tickets.filter((ticket) => ticket.batchEligible === true).length / tickets.length >= 0.7 && bySurface('build') <= 1 && bySurface('projection') <= 1 ? { verdict: 'improved', reason: 'eligible batchRate and generated-write thresholds satisfied' } : { verdict: 'regressed', reason: 'auto-batch thresholds not satisfied' }, failureMatrix: ['happy-path-wave', 'conflict', 'docs-only-runner-skip', 'worker-partial-failure', 'head-moved', 'build-retry', 'projection-retry', 'checkpoint-retry', 'lane-conflict', 'kill-switch', 'serial-fallback'].map((scenario) => ({ scenario, status: tickets.length ? 'observable' : 'observability-gap' })), observabilityGaps: tickets.length ? [] : ['broker ticket lane-session events are absent'] };
+}
 function buildIntervals(tasks: Map<string, TaskTransition[]>): TaskInterval[] {
   const intervals: TaskInterval[] = [];
   for (const [taskId, events] of tasks) {
@@ -557,6 +566,9 @@ function renderMarkdown(result: CaptainParallelLedgerAnalysis): string {
     '',
     '## Observability Gaps',
     '',
+    '## Auto-Batch Pipeline', '',
+    `- Broker tickets: ${result.autoBatchPipeline.evidenceSources.brokerTickets}; wave tickets: ${result.autoBatchPipeline.evidenceSources.waveTickets}; waitedMs p50/p95: ${formatNullable(result.autoBatchPipeline.metrics.waitedMs.p50)} / ${formatNullable(result.autoBatchPipeline.metrics.waitedMs.p95)}; batchRate: ${result.autoBatchPipeline.metrics.batchRate === null ? 'n/a' : formatPct(result.autoBatchPipeline.metrics.batchRate)}; build/projection/commit signals: ${result.autoBatchPipeline.metrics.buildsPerWave}/${result.autoBatchPipeline.metrics.projectionsPerWave}/${result.autoBatchPipeline.metrics.commitsPerWave}; rollout verdict: ${result.autoBatchPipeline.rolloutVerdict.verdict} (${result.autoBatchPipeline.rolloutVerdict.reason}).`,
+    `- Failure matrix: ${result.autoBatchPipeline.failureMatrix.map((entry: { scenario: string; status: string }) => `${entry.scenario}=${entry.status}`).join(', ')}.`, '',
     `- Framework temp claims: ${result.runtimeFrameworkLockSnapshot.lockCount} retained runtime lock files observed; ${result.runtimeFrameworkLockSnapshot.freshLockCount} fresh, ${result.runtimeFrameworkLockSnapshot.staleLockCount} stale. ${result.runtimeFrameworkLockSnapshot.caveat}`,
     ...result.observabilityGaps.map((gap) => `- ${gap.lane}: ${gap.status}. ${gap.impact}`),
     '',
@@ -579,11 +591,9 @@ function formatMs(ms: number): string {
 function formatPct(value: number): string {
   return `${formatNumber(value * 100)}%`;
 }
-
 function formatNullable(value: number | null): string {
   return value === null ? 'n/a' : formatNumber(value);
 }
-
 function formatNumber(value: number): string {
   return value.toFixed(2);
 }
