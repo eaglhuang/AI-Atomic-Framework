@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T14-16-06-500Z-scope-amendment-b3c8f6a6cff1",
+  "taskId": "ATM-GOV-0180",
+  "action": "scope-amendment",
+  "actorId": "cursor-gov-0180",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0180.json",
+  "taskSha256": "sha256:c96301873e4e74d2122d15a36edab07dca433965d2a6ee8734a557f066793740",
+  "createdAt": "2026-07-18T14:16:06.500Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0180 --actor cursor-gov-0180 --add packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts --class test-alignment --phase during-implementation --reason \"ATM-GOV-0180 extend commit-scope-policy glob regression coverage\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "test-alignment",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0180 extend commit-scope-policy glob regression coverage"
+  }
+}
