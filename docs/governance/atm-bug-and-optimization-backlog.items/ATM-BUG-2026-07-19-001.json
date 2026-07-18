@@ -3,13 +3,12 @@
   "id": "ATM-BUG-2026-07-19-001",
   "date": "2026-07-19",
   "repo": "AI-Atomic-Framework",
-  "type": "Documentation / AI routing",
+  "type": "Bug",
   "severity": "High",
-  "status": "Fixed",
-  "area": "Agent operating rules / Encoding safety",
-  "finding": "Codex used PowerShell to read and diff Traditional Chinese Markdown planning files after the user had repeatedly stated that document read/write/compare work must use Node.js. PowerShell console encoding made valid UTF-8 content appear as mojibake and created avoidable confusion.",
-  "expectedBehavior": "ATM agent-facing highest principles should explicitly require Node.js-based UTF-8 document IO/diff checks for Markdown/JSON/text planning files on Windows, and discourage PowerShell for document content comparison or authoring except for launching Node.js commands.",
-  "evidenceOrRepro": "Conversation on 2026-07-19 during ATM auto-batch plan localization: PowerShell Get-Content displayed mojibake for C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan.md; user corrected that PowerShell must not be used for document write/compare work.",
-  "followUp": "Rebuild the human-readable backlog projection when the generated projection surface is free; the source item records the completed principle-intake fix.",
-  "fixedBy": "Principle intake: added Windows text document IO rule to atm-dispatch personal skills, repo template, and generated adapter skills."
+  "status": "Open",
+  "area": "Runner-sync / lane events / git governance",
+  "finding": "After ATM-GOV-0173 closed successfully, runner-sync left .atm/history/evidence/ATM-GOV-0173.runner-sync-receipt.json and .atm/history/session-events/<laneId>/... untracked. The governed git wrapper could not commit the runner-sync receipt after close because pre-commit classified the singleton evidence file as ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT, while residue classified both the receipt and lane session event as manual-review with no requiredCommand.",
+  "expectedBehavior": "Runner-sync release should either stage/commit its receipt and broker lane events in the close bundle, write them to a committable record-only surface, or classify them as safe runtime residue with an exact cleanup command. A completed task should not leave the operator choosing between dirty worktree residue and unguided manual deletion.",
+  "evidenceOrRepro": "ATM-GOV-0173 on 2026-07-18: runner-sync enqueue/release for stewardWorkId runner-sync-dad1be23 succeeded, taskflow close --write auto-committed target close 09aa7ec6600a58c1eb940408032275ec1b781832 and planning close 1b1ea179ff9121446c6adf30881b4fff8bce510b, then node atm.mjs git commit --task ATM-GOV-0173 --auto-stage failed on .atm/history/evidence/ATM-GOV-0173.runner-sync-receipt.json with ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT. node atm.mjs residue --json reported the receipt and lane event as manual-review.",
+  "followUp": "Add a formal runner-sync receipt/lane-event persistence path: include those artifacts in taskflow close commit bundles when runnerGateDecision is required, or add a governed runner-sync record-commit/cleanup verb and residue classifier coverage with regression tests."
 }
