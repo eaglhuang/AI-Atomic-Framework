@@ -14,6 +14,7 @@ export function parseBrokerArgs(argv) {
         runnerSyncAction: null,
         projectionAction: null,
         scheduleAction: null,
+        batchAction: null,
         task: null,
         actorId: null,
         sealedSourceSha: null,
@@ -25,6 +26,9 @@ export function parseBrokerArgs(argv) {
         surfaceKind: null,
         surfaceFamily: null,
         payloadDigest: null,
+        manifestDigest: null,
+        currentHeadSha: null,
+        expectedHeadSha: null,
         expectedTasks: [],
         collectionTimeoutMs: 120000,
         intentFile: null,
@@ -38,6 +42,9 @@ export function parseBrokerArgs(argv) {
         proposalStorePath: null,
         mergePlanFile: null,
         scopeFiles: [],
+        claimedTasks: [],
+        validatorTasks: [],
+        fileSlices: [],
         stewardId: null,
         evidenceOutPath: null,
         requestFiles: [],
@@ -111,6 +118,21 @@ export function parseBrokerArgs(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--manifest-digest') {
+            state.manifestDigest = requireValue(argv, index, '--manifest-digest');
+            index += 1;
+            continue;
+        }
+        if (arg === '--current-head') {
+            state.currentHeadSha = requireValue(argv, index, '--current-head');
+            index += 1;
+            continue;
+        }
+        if (arg === '--expected-head') {
+            state.expectedHeadSha = requireValue(argv, index, '--expected-head');
+            index += 1;
+            continue;
+        }
         if (arg === '--expected-task') {
             state.expectedTasks.push(requireValue(argv, index, '--expected-task'));
             index += 1;
@@ -174,6 +196,21 @@ export function parseBrokerArgs(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--claimed-task') {
+            state.claimedTasks.push(requireValue(argv, index, '--claimed-task'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--validator-task') {
+            state.validatorTasks.push(requireValue(argv, index, '--validator-task'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--file-slice') {
+            state.fileSlices.push(requireValue(argv, index, '--file-slice'));
+            index += 1;
+            continue;
+        }
         if (arg === '--steward-id') {
             state.stewardId = requireValue(argv, index, '--steward-id');
             index += 1;
@@ -230,6 +267,12 @@ export function parseBrokerArgs(argv) {
         else if (state.action === 'schedule' && !state.scheduleAction) {
             state.scheduleAction = arg;
         }
+        else if (state.action === 'batch' && !state.batchAction) {
+            state.batchAction = arg;
+        }
+        else if (state.action === 'batch' && state.batchAction === 'execute' && arg === 'commit') {
+            state.surfaces.push(arg);
+        }
         else {
             throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
         }
@@ -248,6 +291,7 @@ export function parseBrokerArgs(argv) {
         runnerSyncAction: state.runnerSyncAction,
         projectionAction: state.projectionAction,
         scheduleAction: state.scheduleAction,
+        batchAction: state.batchAction,
         task: state.task,
         actorId: state.actorId,
         sealedSourceSha: state.sealedSourceSha,
@@ -259,6 +303,9 @@ export function parseBrokerArgs(argv) {
         surfaceKind: state.surfaceKind,
         surfaceFamily: state.surfaceFamily,
         payloadDigest: state.payloadDigest,
+        manifestDigest: state.manifestDigest,
+        currentHeadSha: state.currentHeadSha,
+        expectedHeadSha: state.expectedHeadSha,
         expectedTasks: state.expectedTasks,
         collectionTimeoutMs: state.collectionTimeoutMs,
         intentFile: state.intentFile,
@@ -271,6 +318,9 @@ export function parseBrokerArgs(argv) {
         proposalStorePath: state.proposalStorePath,
         mergePlanFile: state.mergePlanFile,
         scopeFiles: state.scopeFiles,
+        claimedTasks: state.claimedTasks,
+        validatorTasks: state.validatorTasks,
+        fileSlices: state.fileSlices,
         stewardId: state.stewardId,
         evidenceOutPath: state.evidenceOutPath,
         requestFiles: state.requestFiles,

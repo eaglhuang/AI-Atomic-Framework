@@ -20,5 +20,6 @@ export * from './runner-sync-steward-queue.js';
 export * from './generated-projection-steward.js';
 export * from './wave-manifest.js';
 export * from './wave-broker-scheduler.js';
+export * from './shared-delivery-commit.js';
 export * from './adapters/index.js';
 export * from './cross-task-mutation-guard.js';

@@ -1006,6 +1006,20 @@
       "capability": "ATM-GOV-0175 regression for durable scheduler idempotency, state transitions, same-wave batching, cross-wave separation, timeout fallback, and CLI persistence.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0175"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "atom_id": "atm.shared-delivery-commit-executor",
+      "capability": "ATM-GOV-0176 broker batch execute commit CLI handler that consumes durable scheduler decisions and emits shared write receipts.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0176"
+    },
+    {
+      "path_pattern": "tests/cli/shared-delivery-commit-executor.test.ts",
+      "atom_id": "atm.shared-delivery-commit-executor",
+      "capability": "ATM-GOV-0176 regression coverage for same-wave receipt planning, unrelated task rejection, stale HEAD, missing validators, and CLI evidence output.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0176"
     }
   ]
 }

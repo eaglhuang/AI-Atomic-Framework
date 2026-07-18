@@ -8,6 +8,7 @@ import { handleBrokerProposalActions } from './proposal-actions.js';
 import { handleBrokerStewardRuntimeActions } from './steward-runtime-actions.js';
 import { handleBrokerPlanBatch } from './plan-batch-action.js';
 import { handleBrokerWaveScheduler } from './wave-scheduler-actions.js';
+import { handleBrokerBatchExecute } from './batch-execute-actions.js';
 export async function runBroker(argv) {
     const options = parseBrokerArgs(argv);
     const context = {
@@ -36,5 +37,8 @@ export async function runBroker(argv) {
     const waveSchedulerResult = handleBrokerWaveScheduler(options, context);
     if (waveSchedulerResult)
         return waveSchedulerResult;
-    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule', { exitCode: 2 });
+    const batchExecuteResult = handleBrokerBatchExecute(options, context);
+    if (batchExecuteResult)
+        return batchExecuteResult;
+    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch', { exitCode: 2 });
 }
