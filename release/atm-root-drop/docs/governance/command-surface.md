@@ -94,6 +94,17 @@ The guard checks that:
 | `node atm.mjs verify` | Run verification checks for hashes, neutrality, or agents. |
 | `node atm.mjs welcome` | Print first-touch onboarding guidance. |
 
+## Claim Admission Dirty-WIP Gate
+
+`node atm.mjs next --claim` inspects staged, unstaged, and untracked Git paths
+before admitting a code-scope task claim. If the candidate claim scope intersects
+dirty WIP that is owned by another active lane or has no provable task owner, ATM
+refuses the claim with `ATM_CLAIM_FOREIGN_UNSTAGED_WIP`.
+
+The diagnostic includes `taskId`, `intersectingFiles`, ownership
+(`foreign` / `unowned`), and any known owner actor, task, session, or lane.
+Docs-only and ledger-only candidate claims remain non-blocking.
+
 ## Planned Git Boundary Lane
 
 The current public `git` surface governs identity, governed commit, and git

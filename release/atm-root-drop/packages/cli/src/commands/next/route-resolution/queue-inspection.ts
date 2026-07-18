@@ -181,6 +181,14 @@ export function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | n
           activeClaimActorId: claimRecord.state === 'active' && typeof claimRecord.actorId === 'string'
             ? claimRecord.actorId
             : null,
+          activeClaimLaneSessionId: claimRecord.state === 'active'
+            ? (() => {
+              const lane = claimRecord.laneSession;
+              if (!lane || typeof lane !== 'object' || Array.isArray(lane)) return null;
+              const laneSessionId = (lane as Record<string, unknown>).laneSessionId;
+              return typeof laneSessionId === 'string' && laneSessionId.trim() ? laneSessionId.trim() : null;
+            })()
+            : null,
           activeClaimIntent: claimRecord.state === 'active' && typeof claimRecord.intent === 'string'
             ? claimRecord.intent
             : (claimRecord.state === 'active' ? 'write' : null)
@@ -255,6 +263,7 @@ export function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | n
         allowPlanningMirror: allowsPlanningMirror(parsed),
         closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
         activeClaimActorId: null,
+        activeClaimLaneSessionId: null,
         activeClaimIntent: null
       }, cwd);
     })
@@ -380,6 +389,7 @@ export function buildMinimalImportedJsonTaskSummary(input: {
     allowPlanningMirror: false,
     closureAuthority: null,
     activeClaimActorId: null,
+    activeClaimLaneSessionId: null,
     activeClaimIntent: null,
     planningReadOnlyPaths: [],
     planningMirrorPaths: [],

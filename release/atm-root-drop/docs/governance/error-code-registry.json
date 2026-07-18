@@ -3,6 +3,63 @@
   "specVersion": "0.1.0",
   "entries": [
     {
+      "code": "ATM_CLAIM_FOREIGN_UNSTAGED_WIP",
+      "category": "claim-admission",
+      "shortDescription": "A candidate claim intersects foreign or unowned dirty WIP in the shared worktree.",
+      "commonCauses": [
+        "Another lane has uncommitted changes in the task's code scope.",
+        "A previous agent or editor left unstaged or staged changes without an active task owner.",
+        "The candidate task scope includes a code file already dirty in the shared worktree."
+      ],
+      "remediation": [
+        "Ask the owning lane to commit, close, release, or hand off before claiming the overlapping code scope.",
+        "If ownership is unowned, inspect the dirty file and either bind it to the right task or clear it through a governed cleanup.",
+        "Docs-only or ledger-only claims can proceed because this gate applies only to candidate code scope."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json",
+        "node atm.mjs lane status --json",
+        "node atm.mjs broker status --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts"
+    },
+    {
+      "code": "ATM_LANE_ADOPT_ACTOR_REQUIRED",
+      "category": "lane-session",
+      "shortDescription": "lane adopt requires an explicit actor id.",
+      "commonCauses": [
+        "lane adopt was invoked without --actor and ATM_ACTOR_ID was unset."
+      ],
+      "remediation": [
+        "Rerun with --actor <actor-id> or export ATM_ACTOR_ID before adopting."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane adopt <lane-id> --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
+      "code": "ATM_LANE_ADOPT_TOKEN_MISMATCH",
+      "category": "lane-session",
+      "shortDescription": "The provided handoff token does not match the lane session token hash.",
+      "commonCauses": [
+        "The handoff token was mistyped or copied from a different lane."
+      ],
+      "remediation": [
+        "Confirm the handoff token with the lane owner, or wait for TTL expiry / use --confirm for same-handle recovery."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane adopt <lane-id> --actor <actor> --handoff-token <token> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
       "code": "ATM_LANE_SESSION_ADOPTABLE",
       "category": "lane-session",
       "shortDescription": "Other usable lane sessions exist for the actor and may be exported or adopted.",
@@ -22,6 +79,24 @@
         "node atm.mjs lane adopt <lane-id> --actor <actor> --json"
       ],
       "sourceOwner": "packages/cli/src/commands/lane-session/resolve.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_ADOPTED",
+      "category": "lane-session",
+      "shortDescription": "A lane session was successfully adopted and lifecycle records were rebound.",
+      "commonCauses": [
+        "An operator or agent adopted an expired, handoff, confirmed, or token-authorized lane."
+      ],
+      "remediation": [
+        "Export the reported ATM_LANE_SESSION_ID and continue work on the adopted lane.",
+        "Inspect reboundTaskIds and preservedLeaseIds to confirm claim lease continuity."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane adopt <lane-id> --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
     },
     {
       "code": "ATM_LANE_SESSION_HEARTBEAT_CLOSED",
@@ -160,6 +235,26 @@
       "sourceOwner": "packages/cli/src/commands/lane.ts"
     },
     {
+      "code": "ATM_LANE_SESSION_NOT_STALE",
+      "category": "lane-session",
+      "shortDescription": "The requested lane is still within TTL and cannot be adopted without confirmation or a handoff token.",
+      "commonCauses": [
+        "lane adopt targeted an active lane that has not expired.",
+        "A second shell attempted to take over a live lane without --confirm or a handoff token."
+      ],
+      "remediation": [
+        "Wait for TTL expiry, or rerun with --confirm for same-handle recovery.",
+        "Provide --handoff-token when adopting a live handoff-authorized lane."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane adopt <lane-id> --actor <actor> --confirm --json",
+        "node atm.mjs lane adopt <lane-id> --actor <actor> --handoff-token <token> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
+    },
+    {
       "code": "ATM_LANE_SESSION_STALE_ENV",
       "category": "lane-session",
       "shortDescription": "The requested lane environment id is missing, closed, or expired, so ATM minted a new lane.",
@@ -178,6 +273,24 @@
         "node atm.mjs lane sweep --json"
       ],
       "sourceOwner": "packages/cli/src/commands/lane-session/resolve.ts"
+    },
+    {
+      "code": "ATM_LANE_SESSION_STATUS",
+      "category": "lane-session",
+      "shortDescription": "Lane status resolved the current lane session envelope for the caller.",
+      "commonCauses": [
+        "An operator inspected the active lane with lane status."
+      ],
+      "remediation": [
+        "Export the reported ATM_LANE_SESSION_ID when subsequent commands should stay on the same lane."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs lane status --json",
+        "node atm.mjs lane status --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/lane.ts"
     },
     {
       "code": "ATM_LANE_SESSION_SWEEP_APPLIED",

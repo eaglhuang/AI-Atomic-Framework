@@ -37,12 +37,41 @@ export function adoptLaneSession(input) {
     const cwd = path.resolve(input.cwd);
     const previousSession = readLaneSession(cwd, input.laneId);
     if (!previousSession) {
-        return { ok: false, reason: 'not-found', session: null };
+        return { ok: false, reason: 'not-found', session: null, ttlPhaseBefore: null };
     }
-    if (!isLaneSessionAdoptable(previousSession)) {
-        return { ok: false, reason: 'closed', session: previousSession };
+    if (previousSession.status === 'released' || previousSession.status === 'expired') {
+        return { ok: false, reason: 'closed', session: previousSession, ttlPhaseBefore: null };
     }
     const nowIso = normalizeIsoString(input.timestamp) ?? new Date().toISOString();
+    const graceMs = normalizePositiveInteger(input.graceMs, 0);
+    const ttlPhaseBefore = classifyLaneSessionTtl({
+        now: nowIso,
+        expiresAt: previousSession.expiresAt,
+        graceMs
+    });
+    const providedToken = normalizeOptionalString(input.handoffToken);
+    const tokenMatches = Boolean(providedToken
+        && previousSession.handoffTokenHash
+        && hashHandoffToken(providedToken) === previousSession.handoffTokenHash);
+    if (providedToken && previousSession.handoffTokenHash && !tokenMatches) {
+        return { ok: false, reason: 'token-mismatch', session: previousSession, ttlPhaseBefore };
+    }
+    let authorization = null;
+    if (tokenMatches) {
+        authorization = 'handoff-token';
+    }
+    else if (previousSession.status === 'handoff') {
+        authorization = 'handoff-status';
+    }
+    else if (ttlPhaseBefore === 'expired') {
+        authorization = 'stale-ttl';
+    }
+    else if (input.confirm === true) {
+        authorization = 'confirm';
+    }
+    else {
+        return { ok: false, reason: 'not-stale', session: previousSession, ttlPhaseBefore };
+    }
     const ttlMs = normalizePositiveInteger(previousSession.ttlMs, 0);
     const session = {
         ...previousSession,
@@ -66,7 +95,9 @@ export function adoptLaneSession(input) {
         ok: true,
         session,
         previousSession,
-        sessionPath: relativePathFrom(cwd, absolutePath)
+        sessionPath: relativePathFrom(cwd, absolutePath),
+        ttlPhaseBefore,
+        authorization
     };
 }
 export function recordLaneSessionHeartbeat(input) {

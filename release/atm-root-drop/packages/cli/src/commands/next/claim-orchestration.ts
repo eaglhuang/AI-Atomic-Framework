@@ -3,9 +3,8 @@ import { buildFirstUseUserNotice } from '../first-use-notice.ts';
 import { type BrokerQueueAdmission } from './broker-queue-admission.ts';
 import { runBroker } from '../broker.ts';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, selectPostClaimChannel } from './channel-strategy.ts';
-import { ensureDecisionTrail, type NextActionLike } from './next-action-assembly.ts';
-import { buildPromptScopedQueueClaimCommand } from './prompt-scope-resolution.ts';
-import { describeActorResolution, resolveActorId } from '../actor-registry.ts';
+import { type NextActionLike } from './next-action-assembly.ts';
+import { describeActorResolution } from '../actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from '../actor-session.ts';
 import { tryBuildQuickfixClaimResult, buildNoClaimableTaskResult } from './claim-early-results.ts';
 import { cleanupPreviousBatchQueueLocks } from './claim-cleanup.ts';
@@ -31,7 +30,7 @@ import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueF
 import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.ts';
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
-export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
+import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts'; import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
 export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
   const claimStartedAt = Date.now();
@@ -66,13 +65,17 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       } catch {}
     }
   }
-  const reusesOwnActiveClaim = Boolean(
-    selectedTask
-    && isTaskAlreadyActivelyClaimed(selectedTask)
-    && typeof input.actor === 'string'
-    && input.actor.trim().length > 0
-    && selectedTask.activeClaimActorId === input.actor.trim()
-  );
+  const requestedLaneSessionIdForReuse = selectedTask
+    ? resolveCurrentLaneSessionIdForFreshReservation(input.cwd, input.actor?.trim() ?? '')
+    : null;
+  const reusesOwnActiveClaim = Boolean(selectedTask && isTaskAlreadyActivelyClaimed(selectedTask)
+    && typeof input.actor === 'string' && input.actor.trim().length > 0
+    && evaluateSameTaskClaimOwnership({
+      currentActorId: selectedTask.activeClaimActorId ?? '',
+      currentLaneSessionId: selectedTask.activeClaimLaneSessionId,
+      requestedActorId: input.actor.trim(),
+      requestedLaneSessionId: requestedLaneSessionIdForReuse
+    }).sameOwner);
   if (selectedTaskDependencyBlockers.length > 0 && !reusesOwnActiveClaim) {
     const firstBlocker = selectedTaskDependencyBlockers[0];
     const requiredCmd = firstBlocker.requiredCommand
@@ -221,20 +224,16 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     };
   }
   const existingClaimActorId = claimableTask.activeClaimActorId;
-  if (existingClaimActorId && existingClaimActorId !== resolvedActor.actorId) {
-    throw new CliError('ATM_LOCK_CONFLICT', `Task ${claimableTask.workItemId} is already claimed by ${existingClaimActorId}.`, {
-      exitCode: 1,
-      details: {
-        taskId: claimableTask.workItemId,
-        actorId: existingClaimActorId,
-        requestedActorId: resolvedActor.actorId,
-        actorResolution,
-        recoveryHint: existingClaimActorId === actorResolution.repoDefaultActorId
-          ? `Continue with the existing claim owner ${existingClaimActorId}, or rerun with --actor ${existingClaimActorId}.`
-          : `Continue with the existing claim owner ${existingClaimActorId}, or release/take over the task before claiming as ${resolvedActor.actorId}.`
-      }
-    });
-  }
+  const existingClaimLaneSessionId = claimableTask.activeClaimLaneSessionId ?? null;
+  const requestedLaneSessionId = currentLaneSessionId;
+  const alreadyOwnsActiveClaim = throwIfNextClaimForeignActiveOwner({
+    taskId: claimableTask.workItemId,
+    existingClaimActorId,
+    existingClaimLaneSessionId,
+    requestedActorId: resolvedActor.actorId,
+    requestedLaneSessionId,
+    actorResolution
+  });
   let parallelAdvisory: Record<string, unknown> | undefined = undefined;
   let brokerQueueAdmission: BrokerQueueAdmission | undefined = undefined;
   let claimAllowedFiles = (input.claimFiles && input.claimFiles.length > 0)
@@ -251,8 +250,9 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   parallelAdvisory = parallelPreflight.parallelAdvisory;
   brokerQueueAdmission = parallelPreflight.brokerQueueAdmission;
   claimAllowedFiles = parallelPreflight.claimAllowedFiles;
+  const dirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: input.cwd, task: claimableTask, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, claimFiles: claimAllowedFiles });
   const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
-  if (!lineBudgetReport.ok) throw new CliError('ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED', `Claim blocked: touched files exceed the physical line budget for ${claimableTask.workItemId}.`, { exitCode: 1, details: lineBudgetReport });
+  const oversizedExtractionAdmission = assertClaimLineBudgetOrExtractionAdmission({ cwd: input.cwd, taskId: claimableTask.workItemId, taskPath: taskPathFor(input.cwd, claimableTask.workItemId), report: lineBudgetReport });
   claimLatencyPhases.push({ phase: 'parallel-preflight', durationMs: Date.now() - parallelStartedAt });
   const claimDeliveryClassification = classifyTaskDelivery({
     cwd: input.cwd,
@@ -293,8 +293,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     taskId: claimableTask.workItemId,
     actorId: resolvedActor.actorId
   });
-  if (!brokerClaimCheck.ok) {
-    throw new CliError('ATM_BROKER_LIFECYCLE_BLOCKED', brokerClaimCheck.reason ?? `Task ${claimableTask.workItemId} cannot claim because broker runtime state is blocked.`, {
+  if (!brokerClaimCheck.ok) { throw new CliError('ATM_BROKER_LIFECYCLE_BLOCKED', brokerClaimCheck.reason ?? `Task ${claimableTask.workItemId} cannot claim because broker runtime state is blocked.`, {
       exitCode: 1,
       details: {
         taskId: claimableTask.workItemId,
@@ -304,7 +303,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       }
     });
   }
-  const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
+  const alreadyClaimedByActor = alreadyOwnsActiveClaim;
   const activeClaimIntent = claimableTask.activeClaimIntent ?? 'write';
   const shouldReuseActiveClaim = alreadyClaimedByActor
     && (autoIntent || activeClaimIntent === claimIntent);
@@ -589,11 +588,13 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       importedTaskQueue: input.importedTaskQueue,
       integrationBootstrap: input.integrationBootstrap,
       runtimeAdapterReadiness: input.runtimeAdapterReadiness,
-      claimLatency: {
-        schemaId: 'atm.claimLatencyTelemetry.v1',
-        totalMs: Date.now() - claimStartedAt,
-        phases: claimLatencyPhases
-      }
-    }
+    claimLatency: {
+      schemaId: 'atm.claimLatencyTelemetry.v1',
+      totalMs: Date.now() - claimStartedAt,
+      phases: claimLatencyPhases
+    },
+    dirtyWipAdmission,
+    ...(oversizedExtractionAdmission ? { oversizedExtractionAdmission } : {})
+  }
   });
 }

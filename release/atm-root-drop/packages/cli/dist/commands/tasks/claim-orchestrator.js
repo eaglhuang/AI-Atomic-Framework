@@ -17,6 +17,7 @@ import { resolveTaskClaimIntent } from './claim-intent.js';
 import { writeTakeoverEvidence } from './takeover-evidence.js';
 import { assertPlanningSourceSealValid } from './import-task.js';
 import { resolveLaneSession } from '../lane-session/resolve.js';
+import { readClaimLaneSessionId, throwIfForeignSameTaskClaim, assertCurrentClaimOwnerForAction } from './claim-ownership.js';
 function normalizeTaskStatus(value) {
     return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
 }
@@ -55,10 +56,20 @@ export async function runTasksClaimLifecycle(action, argv) {
             taskDocument,
             surface: 'claim'
         });
-        if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId !== actorId) {
-            throw new CliError('ATM_LOCK_CONFLICT', `Task ${options.taskId} is already claimed by ${currentClaim.actorId}.`, {
-                exitCode: 1,
-                details: { taskId: options.taskId, actorId: currentClaim.actorId, leaseId: currentClaim.leaseId }
+        const laneSession = resolveLaneSession({
+            cwd: options.cwd,
+            actorId,
+            taskId: options.taskId,
+            command: `node atm.mjs tasks claim --task ${options.taskId} --actor ${actorId} --json`
+        });
+        if (currentClaim && currentClaim.state === 'active') {
+            throwIfForeignSameTaskClaim({
+                taskId: options.taskId,
+                currentActorId: currentClaim.actorId,
+                currentLaneSessionId: readClaimLaneSessionId(currentClaim),
+                requestedActorId: actorId,
+                requestedLaneSessionId: laneSession.session.laneId,
+                leaseId: currentClaim.leaseId
             });
         }
         const claimIntentResolution = resolveTaskClaimIntent({
@@ -123,12 +134,6 @@ export async function runTasksClaimLifecycle(action, argv) {
                 }
             });
         }
-        const laneSession = resolveLaneSession({
-            cwd: options.cwd,
-            actorId,
-            taskId: options.taskId,
-            command: `node atm.mjs tasks claim --task ${options.taskId} --actor ${actorId} --json`
-        });
         // TASK-CID-0024: persist the declared claim intent so downstream gates
         // (next --claim parallel preflight, hook pre-commit ownership checks) can
         // distinguish mutating write claims from non-mutating closeout-only claims.
@@ -289,12 +294,13 @@ export async function runTasksClaimLifecycle(action, argv) {
         });
     }
     if (action === 'renew') {
-        if (currentClaim.actorId !== actorId) {
-            throw new CliError('ATM_TASK_CLAIM_OWNER_MISMATCH', `Task ${options.taskId} is claimed by ${currentClaim.actorId}, not ${actorId}.`, {
-                exitCode: 1,
-                details: { taskId: options.taskId, currentActor: currentClaim.actorId, actorId }
-            });
-        }
+        assertCurrentClaimOwnerForAction({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            action: 'renew',
+            currentClaim
+        });
         const renewed = {
             ...currentClaim,
             heartbeatAt: nowIso,
@@ -344,12 +350,13 @@ export async function runTasksClaimLifecycle(action, argv) {
         });
     }
     if (action === 'release') {
-        if (currentClaim.actorId !== actorId) {
-            throw new CliError('ATM_TASK_CLAIM_OWNER_MISMATCH', `Task ${options.taskId} is claimed by ${currentClaim.actorId}, not ${actorId}.`, {
-                exitCode: 1,
-                details: { taskId: options.taskId, currentActor: currentClaim.actorId, actorId }
-            });
-        }
+        assertCurrentClaimOwnerForAction({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            action: 'release',
+            currentClaim
+        });
         const releasedClaim = {
             ...currentClaim,
             heartbeatAt: nowIso,
@@ -406,12 +413,13 @@ export async function runTasksClaimLifecycle(action, argv) {
         if (!options.handoffTo) {
             throw new CliError('ATM_CLI_USAGE', 'tasks handoff requires --to <actor-id>.', { exitCode: 2 });
         }
-        if (currentClaim.actorId !== actorId) {
-            throw new CliError('ATM_TASK_CLAIM_OWNER_MISMATCH', `Task ${options.taskId} is claimed by ${currentClaim.actorId}, not ${actorId}.`, {
-                exitCode: 1,
-                details: { taskId: options.taskId, currentActor: currentClaim.actorId, actorId }
-            });
-        }
+        assertCurrentClaimOwnerForAction({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            action: 'handoff',
+            currentClaim
+        });
         await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
         const handedOff = {
             ...currentClaim,

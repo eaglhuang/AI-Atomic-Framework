@@ -64,14 +64,25 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
         ...foreignSessions.map((claim) => claim.actorId)
     ]);
     const foreignSessionIds = uniqueSorted(foreignSessions.map((claim) => claim.sessionId).filter((entry) => Boolean(entry)));
-    const foreignDirtyFiles = readForeignDirtyFiles(cwd, {
+    const dirtyFiles = readDirtyWorktreeFiles(cwd);
+    const foreignDirtyFiles = readForeignDirtyFiles(cwd, dirtyFiles, {
         activeClaims,
         activeLocks,
         freshReservations,
         foreignActorIds,
         foreignSessionIds
     });
-    const hasForeignActiveWork = foreignActors.length > 0 || foreignSessionIds.length > 0 || stagedFiles.length > 0;
+    const ownedDirtySet = new Set(foreignDirtyFiles);
+    for (const claim of activeClaims)
+        for (const file of claim.files)
+            if (dirtyFiles.includes(file))
+                ownedDirtySet.add(file);
+    for (const lock of activeLocks)
+        for (const file of lock.files)
+            if (dirtyFiles.includes(file))
+                ownedDirtySet.add(file);
+    const unownedDirtyFiles = dirtyFiles.filter((file) => !ownedDirtySet.has(file));
+    const hasForeignActiveWork = foreignActors.length > 0 || foreignSessionIds.length > 0 || stagedFiles.length > 0 || unownedDirtyFiles.length > 0;
     const teamLevelRecommendation = buildTeamLevelRecommendation({
         ownFiles: normalizedOwnFiles,
         activeClaims,
@@ -79,6 +90,7 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
         freshReservations,
         stagedFiles,
         foreignDirtyFiles,
+        unownedDirtyFiles,
         foreignActorIds,
         foreignSessionIds
     });
@@ -87,6 +99,7 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
         ...(foreignSessionIds.length > 0 ? [`${foreignSessionIds.length} other active session(s) for current actor: ${foreignSessionIds.join(', ')}`] : []),
         ...(freshReservations.length > 0 ? [`${freshReservations.length} fresh task reservation(s) visible`] : []),
         ...(foreignDirtyFiles.length > 0 ? [`${foreignDirtyFiles.length} foreign dirty WIP file(s) overlap active task ownership`] : []),
+        ...(unownedDirtyFiles.length > 0 ? [`${unownedDirtyFiles.length} unowned dirty WIP file(s) visible`] : []),
         ...(stagedFiles.length > 0 ? [`${stagedFiles.length} staged file(s) present in the shared index`] : [])
     ];
     return {
@@ -99,6 +112,8 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
         freshReservationCount: freshReservations.length,
         freshReservations,
         stagedFiles,
+        dirtyFiles,
+        unownedDirtyFiles,
         foreignDirtyFiles,
         hasForeignActiveWork,
         teamLevelRecommendation,
@@ -121,20 +136,17 @@ function buildTeamLevelRecommendation(input) {
     const overlappingFiles = input.ownFiles.length > 0
         ? foreignFiles.filter((file) => ownSet.has(file))
         : [];
-    const stagedOverlap = input.ownFiles.length > 0
-        ? input.stagedFiles.filter((file) => ownSet.has(file))
-        : [];
-    const foreignDirtyOverlap = input.ownFiles.length > 0
-        ? input.foreignDirtyFiles.filter((file) => ownSet.has(file))
-        : [];
+    const stagedOverlap = input.ownFiles.length > 0 ? input.stagedFiles.filter((file) => ownSet.has(file)) : [];
+    const foreignDirtyOverlap = input.ownFiles.length > 0 ? input.foreignDirtyFiles.filter((file) => ownSet.has(file)) : [];
+    const unownedDirtyOverlap = input.ownFiles.length > 0 ? input.unownedDirtyFiles.filter((file) => ownSet.has(file)) : [];
     const foreignActorCount = new Set(input.foreignActorIds).size;
     const foreignSessionCount = new Set(input.foreignSessionIds).size;
     const freshForeignReservationCount = input.freshReservations.filter((reservation) => input.foreignActorIds.includes(reservation.actorId)).length;
     const sharedIndexActive = input.stagedFiles.length > 0;
-    const foreignDirtyActive = input.foreignDirtyFiles.length > 0;
-    const overlapCount = uniqueSorted([...overlappingFiles, ...stagedOverlap, ...foreignDirtyOverlap]).length;
+    const foreignDirtyActive = input.foreignDirtyFiles.length > 0 || input.unownedDirtyFiles.length > 0;
+    const overlapCount = uniqueSorted([...overlappingFiles, ...stagedOverlap, ...foreignDirtyOverlap, ...unownedDirtyOverlap]).length;
     const foreignWorkCount = foreignActorCount + foreignSessionCount;
-    const allOverlaps = uniqueSorted([...overlappingFiles, ...stagedOverlap, ...foreignDirtyOverlap]);
+    const allOverlaps = uniqueSorted([...overlappingFiles, ...stagedOverlap, ...foreignDirtyOverlap, ...unownedDirtyOverlap]);
     const frameworkFoundationRisk = input.ownFiles.some(isFrameworkFoundationPath);
     if (frameworkFoundationRisk && (foreignWorkCount > 0 || sharedIndexActive || foreignDirtyActive || overlapCount > 0)) {
         return {
@@ -225,8 +237,8 @@ function buildTeamLevelRecommendation(input) {
         foreignSessions: []
     };
 }
-function readForeignDirtyFiles(cwd, input) {
-    const dirtyFiles = new Set(readDirtyWorktreeFiles(cwd));
+function readForeignDirtyFiles(cwd, dirtyFilesInput, input) {
+    const dirtyFiles = new Set(dirtyFilesInput);
     if (dirtyFiles.size === 0)
         return [];
     const foreignOwnedFiles = uniqueSorted([

@@ -30,6 +30,7 @@ interface ImportedTaskSummary {
     readonly targetAllowedFiles: readonly string[];
     readonly closureAuthority: string | null;
     readonly activeClaimActorId: string | null;
+    readonly activeClaimLaneSessionId: string | null;
     readonly activeClaimIntent: string | null;
     readonly matchScore?: number;
     readonly matchReasons?: readonly string[];

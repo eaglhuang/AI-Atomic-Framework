@@ -49,6 +49,8 @@ export interface ActiveWorkSummary {
         readonly files: readonly string[];
     }[];
     readonly stagedFiles: readonly string[];
+    readonly dirtyFiles: readonly string[];
+    readonly unownedDirtyFiles: readonly string[];
     readonly foreignDirtyFiles: readonly string[];
     readonly hasForeignActiveWork: boolean;
     readonly teamLevelRecommendation: {

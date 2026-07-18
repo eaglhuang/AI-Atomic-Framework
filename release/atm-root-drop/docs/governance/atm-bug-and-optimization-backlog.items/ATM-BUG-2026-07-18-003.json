@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-18-003",
+  "date": "2026-07-18",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Claim admission / atomization line budget",
+  "finding": "The touched-file physical-line gate can block a claim before a task can split or extract the oversized files it is intended to repair. ATM-GOV-0169 could not be claimed because `packages/cli/src/commands/next/claim-orchestration.ts` has 636 physical lines and `packages/cli/src/commands/next/playbook-projection/active-work-summary.ts` is already a 590-line soft warning.",
+  "expectedBehavior": "Line-budget admission should still prevent ordinary work on oversized files, but it needs a governed extraction/refactor lane or bounded-region escape hatch for tasks whose explicit purpose is to reduce the oversized surface. The exception must be narrow, auditable, and must not lower the global 600-line cap.",
+  "evidenceOrRepro": "`node atm.mjs next --claim --task ATM-GOV-0169 --actor codex-gpt-5-captain --auto-intent --json` failed with `ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED`; reproduce command reported by ATM: `node --strip-types scripts/validate-physical-line-budget.ts --json --touched packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts,packages/cli/src/commands/next/__tests__/claim-readiness.test.ts,packages/cli/src/commands/next/claim-orchestration.ts,packages/cli/src/commands/next/playbook-projection/active-work-summary.ts --task ATM-GOV-0169 --actor codex-gpt-5-captain --gate claim`.",
+  "followUp": "Open a GOV/RFT prerequisite card for a governed extraction-claim pathway: either split `claim-orchestration.ts` below budget first, or add a task-declared `proposalAdmission`/bounded-region route that allows extraction-only edits with validator proof that the touched oversized file shrinks or delegates behavior into <=600-line modules."
+}

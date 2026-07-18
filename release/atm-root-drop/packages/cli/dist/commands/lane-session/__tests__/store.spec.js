@@ -79,6 +79,7 @@ try {
     assert.equal(adopted.ok, true);
     assert.equal(adopted.session.status, 'adopted');
     assert.equal(adopted.session.actorId, 'agent-b');
+    assert.equal(adopted.authorization, 'handoff-status');
     assert.equal(adopted.session.identity.gitEmail, 'codex-b@example.invalid');
     assert.equal(adopted.session.adoptionSource.kind, 'adoption');
     assert.equal(adopted.session.adoptionSource.sourceLaneId, 'lane-adoptable');
@@ -86,13 +87,55 @@ try {
     assert.equal(adopted.session.adoptionSource.reason, 'handoff accepted');
     assert.equal(adopted.previousSession.status, 'handoff');
     assert.equal(readLaneSession(repo, 'lane-adoptable')?.status, 'adopted');
+    const freshActive = mintLaneSession({
+        cwd: repo,
+        actorId: 'agent-a',
+        laneId: 'lane-fresh-active',
+        ttlMs: 60_000,
+        status: 'active',
+        timestamp: '2026-07-16T00:03:30.000Z'
+    });
+    const blockedFresh = adoptLaneSession({
+        cwd: repo,
+        laneId: freshActive.session.laneId,
+        actorId: 'agent-b',
+        timestamp: '2026-07-16T00:03:40.000Z'
+    });
+    assert.equal(blockedFresh.ok, false);
+    assert.equal(blockedFresh.reason, 'not-stale');
+    const confirmedFresh = adoptLaneSession({
+        cwd: repo,
+        laneId: freshActive.session.laneId,
+        actorId: 'agent-b',
+        confirm: true,
+        timestamp: '2026-07-16T00:03:45.000Z'
+    });
+    assert.equal(confirmedFresh.ok, true);
+    assert.equal(confirmedFresh.authorization, 'confirm');
+    const staleActive = mintLaneSession({
+        cwd: repo,
+        actorId: 'agent-a',
+        laneId: 'lane-stale-active',
+        ttlMs: 1_000,
+        status: 'active',
+        timestamp: '2026-07-16T00:04:00.000Z'
+    });
+    const adoptedStale = adoptLaneSession({
+        cwd: repo,
+        laneId: staleActive.session.laneId,
+        actorId: 'agent-b',
+        timestamp: '2026-07-16T00:04:02.000Z'
+    });
+    assert.equal(adoptedStale.ok, true);
+    assert.equal(adoptedStale.authorization, 'stale-ttl');
+    assert.equal(adoptedStale.ttlPhaseBefore, 'expired');
     mintLaneSession({
         cwd: repo,
         actorId: 'agent-a',
         laneId: 'lane-closed',
         ttlMs: 60_000,
         status: 'released',
-        timestamp: '2026-07-16T00:04:00.000Z'
+        timestamp: '2026-07-16T00:04:10.000Z'
     });
     const closedAdoption = adoptLaneSession({
         cwd: repo,

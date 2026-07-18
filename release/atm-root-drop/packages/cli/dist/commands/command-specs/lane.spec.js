@@ -12,6 +12,8 @@ export default defineCommandSpec({
         { flag: '--lane-session', value: 'id', summary: 'Alias for --lane-session-id.' },
         { flag: '--actor', value: 'id', summary: 'Actor id used when a missing or stale lane must be lazily minted, or when adopting a lane.' },
         { flag: '--reason', value: 'text', summary: 'Optional reason recorded when adopting a lane.' },
+        { flag: '--confirm', summary: 'Confirm adoption of a still-live lane owned by the same actor.' },
+        { flag: '--handoff-token', value: 'token', summary: 'Authorize adoption of a still-live lane with its handoff token.' },
         { flag: '--grace-ms', value: 'ms', summary: 'Grace period used by lane sweep before a TTL-expired lane becomes sweepable.' },
         { flag: '--write', summary: 'For lane sweep, expire sweepable lanes and write sweep events. Without --write, sweep is report-only.' },
         commonJsonOption,
@@ -25,6 +27,6 @@ export default defineCommandSpec({
         'node atm.mjs lane heartbeat lane-20260716000000-codex-main-abc123 --actor codex-main --json',
         'node atm.mjs lane sweep --json',
         'node atm.mjs lane sweep --grace-ms 60000 --write --json',
-        'node atm.mjs lane adopt lane-20260716000000-codex-main-abc123 --actor codex-main --json'
+        'node atm.mjs lane adopt lane-20260716000000-codex-main-abc123 --actor codex-main --confirm --json'
     ]
 });

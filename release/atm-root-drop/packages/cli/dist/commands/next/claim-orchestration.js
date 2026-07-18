@@ -25,6 +25,9 @@ import { quoteCliValue, uniqueSorted } from './view-projections.js';
 import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueForIntent, assertPromptBatchDoesNotConflict, reconcilePromptScopeRuntimeForClaim, inspectImportedTaskQueue, createDeterministicTaskIntent, checkPendingTaskArtifactScopeExpansion } from './route-resolution.js';
 import { buildActiveWorkSummary, buildChannelPlaybook, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.js';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.js';
+import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.js';
+import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.js';
+import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.js';
 export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag } from './claim-readiness.js';
 export async function claimNextImportedTask(input) {
     assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
@@ -62,11 +65,17 @@ export async function claimNextImportedTask(input) {
             catch { }
         }
     }
-    const reusesOwnActiveClaim = Boolean(selectedTask
-        && isTaskAlreadyActivelyClaimed(selectedTask)
-        && typeof input.actor === 'string'
-        && input.actor.trim().length > 0
-        && selectedTask.activeClaimActorId === input.actor.trim());
+    const requestedLaneSessionIdForReuse = selectedTask
+        ? resolveCurrentLaneSessionIdForFreshReservation(input.cwd, input.actor?.trim() ?? '')
+        : null;
+    const reusesOwnActiveClaim = Boolean(selectedTask && isTaskAlreadyActivelyClaimed(selectedTask)
+        && typeof input.actor === 'string' && input.actor.trim().length > 0
+        && evaluateSameTaskClaimOwnership({
+            currentActorId: selectedTask.activeClaimActorId ?? '',
+            currentLaneSessionId: selectedTask.activeClaimLaneSessionId,
+            requestedActorId: input.actor.trim(),
+            requestedLaneSessionId: requestedLaneSessionIdForReuse
+        }).sameOwner);
     if (selectedTaskDependencyBlockers.length > 0 && !reusesOwnActiveClaim) {
         const firstBlocker = selectedTaskDependencyBlockers[0];
         const requiredCmd = firstBlocker.requiredCommand
@@ -215,20 +224,16 @@ export async function claimNextImportedTask(input) {
         };
     }
     const existingClaimActorId = claimableTask.activeClaimActorId;
-    if (existingClaimActorId && existingClaimActorId !== resolvedActor.actorId) {
-        throw new CliError('ATM_LOCK_CONFLICT', `Task ${claimableTask.workItemId} is already claimed by ${existingClaimActorId}.`, {
-            exitCode: 1,
-            details: {
-                taskId: claimableTask.workItemId,
-                actorId: existingClaimActorId,
-                requestedActorId: resolvedActor.actorId,
-                actorResolution,
-                recoveryHint: existingClaimActorId === actorResolution.repoDefaultActorId
-                    ? `Continue with the existing claim owner ${existingClaimActorId}, or rerun with --actor ${existingClaimActorId}.`
-                    : `Continue with the existing claim owner ${existingClaimActorId}, or release/take over the task before claiming as ${resolvedActor.actorId}.`
-            }
-        });
-    }
+    const existingClaimLaneSessionId = claimableTask.activeClaimLaneSessionId ?? null;
+    const requestedLaneSessionId = currentLaneSessionId;
+    const alreadyOwnsActiveClaim = throwIfNextClaimForeignActiveOwner({
+        taskId: claimableTask.workItemId,
+        existingClaimActorId,
+        existingClaimLaneSessionId,
+        requestedActorId: resolvedActor.actorId,
+        requestedLaneSessionId,
+        actorResolution
+    });
     let parallelAdvisory = undefined;
     let brokerQueueAdmission = undefined;
     let claimAllowedFiles = (input.claimFiles && input.claimFiles.length > 0)
@@ -245,9 +250,9 @@ export async function claimNextImportedTask(input) {
     parallelAdvisory = parallelPreflight.parallelAdvisory;
     brokerQueueAdmission = parallelPreflight.brokerQueueAdmission;
     claimAllowedFiles = parallelPreflight.claimAllowedFiles;
+    const dirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: input.cwd, task: claimableTask, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, claimFiles: claimAllowedFiles });
     const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
-    if (!lineBudgetReport.ok)
-        throw new CliError('ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED', `Claim blocked: touched files exceed the physical line budget for ${claimableTask.workItemId}.`, { exitCode: 1, details: lineBudgetReport });
+    const oversizedExtractionAdmission = assertClaimLineBudgetOrExtractionAdmission({ cwd: input.cwd, taskId: claimableTask.workItemId, taskPath: taskPathFor(input.cwd, claimableTask.workItemId), report: lineBudgetReport });
     claimLatencyPhases.push({ phase: 'parallel-preflight', durationMs: Date.now() - parallelStartedAt });
     const claimDeliveryClassification = classifyTaskDelivery({
         cwd: input.cwd,
@@ -299,7 +304,7 @@ export async function claimNextImportedTask(input) {
             }
         });
     }
-    const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
+    const alreadyClaimedByActor = alreadyOwnsActiveClaim;
     const activeClaimIntent = claimableTask.activeClaimIntent ?? 'write';
     const shouldReuseActiveClaim = alreadyClaimedByActor
         && (autoIntent || activeClaimIntent === claimIntent);
@@ -585,7 +590,9 @@ export async function claimNextImportedTask(input) {
                 schemaId: 'atm.claimLatencyTelemetry.v1',
                 totalMs: Date.now() - claimStartedAt,
                 phases: claimLatencyPhases
-            }
+            },
+            dirtyWipAdmission,
+            ...(oversizedExtractionAdmission ? { oversizedExtractionAdmission } : {})
         }
     });
 }

@@ -56,6 +56,9 @@ export interface AdoptLaneSessionInput {
     readonly reason?: string | null;
     readonly timestamp?: string;
     readonly lastCommand?: LaneSessionLastCommand | null;
+    readonly confirm?: boolean;
+    readonly handoffToken?: string | null;
+    readonly graceMs?: number;
 }
 export interface RecordLaneSessionHeartbeatInput {
     readonly cwd: string;
@@ -105,16 +108,19 @@ export interface LaneSessionSweepResult {
     readonly sweptCount: number;
     readonly sweptSessions: readonly LaneSessionDocument[];
 }
-export type LaneSessionAdoptionFailureReason = 'not-found' | 'closed';
+export type LaneSessionAdoptionFailureReason = 'not-found' | 'closed' | 'not-stale' | 'token-mismatch';
 export type LaneSessionAdoptionResult = {
     readonly ok: true;
     readonly session: LaneSessionDocument;
     readonly previousSession: LaneSessionDocument;
     readonly sessionPath: string;
+    readonly ttlPhaseBefore: LaneSessionTtlPhase;
+    readonly authorization: 'stale-ttl' | 'handoff-status' | 'confirm' | 'handoff-token';
 } | {
     readonly ok: false;
     readonly reason: LaneSessionAdoptionFailureReason;
     readonly session: LaneSessionDocument | null;
+    readonly ttlPhaseBefore?: LaneSessionTtlPhase | null;
 };
 export declare function mintLaneSession(input: MintLaneSessionInput): {
     readonly session: LaneSessionDocument;
