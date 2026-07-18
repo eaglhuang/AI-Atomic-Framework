@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0176",
   "title": "Shared Delivery Commit Executor",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0172",
@@ -91,8 +91,8 @@
     }
   },
   "importedAt": "2026-07-18T18:17:07.709Z",
-  "lastTransitionId": "2026-07-18T18-25-28-810Z-scope-amendment-b0195036f041",
-  "lastTransitionAt": "2026-07-18T18:25:28.810Z",
+  "lastTransitionId": "2026-07-18T18-30-41-657Z-close-8eb89a788ec9",
+  "lastTransitionAt": "2026-07-18T18:30:41.657Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gov-auto-batch",
   "reservedAt": "2026-07-18T18:17:24.802Z",
@@ -101,7 +101,7 @@
     "actorId": "codex-gov-auto-batch",
     "leaseId": "lease-a42abbddc6be",
     "claimedAt": "2026-07-18T18:17:24.808Z",
-    "heartbeatAt": "2026-07-18T18:17:24.808Z",
+    "heartbeatAt": "2026-07-18T18:30:41.654Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0176.*",
@@ -121,14 +121,14 @@
       "tests/cli-fixtures/help-snapshots/broker.json",
       "tests/cli/shared-delivery-commit-executor.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718181724-codex-gov-auto-batch-02140fca4f",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718181724-codex-gov-auto-batch-02140fca4f\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T18:17:24.808Z",
   "startedByActor": "codex-gov-auto-batch",
@@ -180,5 +180,9 @@
     },
     "createdAt": "2026-07-18T18:17:31.849Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T18:30:41.654Z",
+  "closedByActor": "codex-gov-auto-batch",
+  "closedBySessionId": "session-20260718181724-codex-gov-auto-batch-ATM-GOV-0176-5ab12b89f4",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0176.closure-packet.json"
 }
