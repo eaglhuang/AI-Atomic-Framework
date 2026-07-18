@@ -18,5 +18,6 @@ export * from './conflict-key-overlap.ts';
 export * from './global-resource-projection.ts';
 export * from './runner-sync-steward-queue.ts';
 export * from './generated-projection-steward.ts';
+export * from './wave-manifest.ts';
 export * from './adapters/index.ts';
 export * from './cross-task-mutation-guard.ts';

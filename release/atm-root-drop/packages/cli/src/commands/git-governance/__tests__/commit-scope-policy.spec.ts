@@ -29,6 +29,20 @@ assert.equal(extractGovernanceTaskIdFromPath('packages/cli/src/commands/git-gove
 assert.equal(pathMatchesTaskScope('packages/cli/src/commands/git-governance/policy.ts', 'packages/cli/src/commands/git-governance/**'), true);
 assert.equal(pathMatchesTaskScope('packages/cli/src/commands/git-governance.ts', 'packages/cli/src/commands/git-governance.ts'), true);
 assert.equal(pathMatchesTaskScope('packages/cli/src/commands/next.ts', 'packages/cli/src/commands/git-governance/**'), false);
+// ATM-GOV-0180: `**/*.ts` must match files directly under the directory (zero intermediate segments).
+assert.equal(
+  pathMatchesTaskScope('packages/cli/src/commands/next/playbook-projection/foo.ts', 'packages/cli/src/commands/next/playbook-projection/**/*.ts'),
+  true
+);
+assert.equal(
+  pathMatchesTaskScope('packages/cli/src/commands/next/playbook-projection/nested/bar.ts', 'packages/cli/src/commands/next/playbook-projection/**/*.ts'),
+  true
+);
+assert.equal(
+  pathMatchesTaskScope('packages/cli/src/commands/next/playbook-projection/foo.js', 'packages/cli/src/commands/next/playbook-projection/**/*.ts'),
+  false
+);
+assert.equal(pathMatchesTaskScope('scripts/validate-cli/shard-a.ts', 'scripts/validate-cli/**/*.ts'), true);
 
 assert.deepEqual(uniqueSorted(['b', 'a', 'b', '.\\c']), ['a', 'b', 'c']);
 assert.equal(normalizeTaskClaimIntent('no-more-mutation'), 'closeout-only');
@@ -70,4 +84,4 @@ assert.equal(resolveCommitLaneSessionId({ env: { ATM_LANE_SESSION_ID: 'lane-runt
 assert.equal(resolveCommitLaneSessionId({ env: {}, claim: { laneSession: { laneSessionId: 'lane-claim' } } }), 'lane-claim');
 assert.equal(resolveCommitLaneSessionId({ env: {}, session: { guidanceSessionId: 'lane-session' } }), 'lane-session');
 
-console.log(JSON.stringify({ ok: true, assertions: 27 }, null, 2));
+console.log(JSON.stringify({ ok: true, assertions: 31 }, null, 2));

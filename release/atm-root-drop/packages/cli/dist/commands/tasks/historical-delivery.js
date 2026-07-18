@@ -303,10 +303,14 @@ export function pathMatchesTaskScope(filePath, scope) {
     if (!candidate)
         return false;
     if (candidate.includes('*')) {
+        // `dir/**/*.ts` must match `dir/foo.ts` (zero intermediate directories).
+        // Treat `**/` as an optional path prefix before single-segment wildcards.
         const escaped = candidate
             .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+            .replace(/\*\*\//g, '__ATM_GLOBSTAR_SLASH__')
             .replace(/\*\*/g, '__ATM_DOUBLE_STAR__')
             .replace(/\*/g, '[^/]*')
+            .replace(/__ATM_GLOBSTAR_SLASH__/g, '(?:.*/)?')
             .replace(/__ATM_DOUBLE_STAR__/g, '.*');
         return new RegExp(`^${escaped}$`).test(file);
     }

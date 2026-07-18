@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Fixed in ATM-GOV-0180 / d66c3b2de",
   "area": "Taskflow / Scope",
   "finding": "During TASK-RFT-0048, taskflow pre-close treated newly created files under an allowed glob (`packages/cli/src/commands/next/playbook-projection/**/*.ts`) as excluded dirty files until each file was added explicitly with `tasks scope add`.",
   "expectedBehavior": "Taskflow close/pre-close should expand task-scope globs for newly created files when classifying deliverables and close bundles, or should surface a precise one-command scope amendment without labeling valid glob-covered files as outside scope.",
   "evidenceOrRepro": "TASK-RFT-0048 pre-close after extracting six modules reported `excludedDirtyFiles` for the new playbook-projection modules despite the imported task containing `packages/cli/src/commands/next/playbook-projection/**/*.ts`; resolved by `node atm.mjs tasks scope add --task TASK-RFT-0048 --actor codex-task-rft-0048 --add ... --json` before delivery commit 0cc68138.",
-  "followUp": "Add a taskflow regression test covering new-file glob scope expansion, then either include matching files in the governed bundle automatically or emit a focused scope-amendment command with correctly parsed path entries."
+  "followUp": "Regression coverage: tests/cli/taskflow-scope-untracked-glob.test.ts"
 }

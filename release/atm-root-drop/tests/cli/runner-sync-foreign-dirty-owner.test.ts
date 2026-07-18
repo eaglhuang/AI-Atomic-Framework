@@ -146,13 +146,14 @@ const ownedByAnother = inspectRunnerSyncAdmission({
     stewardWorkId: 'runner-sync-other',
     queuePosition: 1,
     suggestedNextAction: 'run runner sync',
-    requests: [{ actorId: 'other-steward' }]
+    requests: [{ taskId: 'TASK-A', actorId: 'other-steward' }]
   } as any,
   dirtyFiles: [],
-  foreignClaims: []
+  foreignClaims: [],
+  landedFiles: []
 });
 assert.equal(ownedByAnother.ok, false);
-assert.match(ownedByAnother.requiredCommand ?? '', /other-steward/);
+assert.match(ownedByAnother.requiredCommand ?? '', /orphaned|other-steward/);
 
 const tempRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-admission-'));
 try {
@@ -199,10 +200,11 @@ try {
     cwd: tempRepo,
     stewardActorId: 'release-steward',
     sealedSourceSha: 'sha-from-queue',
-    dirtyFiles: [],
+    dirtyFiles: ['.atm/runtime/runner-sync-steward-queue.json'],
     foreignClaims: []
   });
   assert.equal(fileBacked.ok, true);
+  assert.deepEqual(fileBacked.foreignNonReleaseWip, []);
   assert.equal(fileBacked.queueHeadOwnership.stewardWorkId, 'runner-sync-file-backed');
   assert.deepEqual(fileBacked.queueHeadOwnership.ownerActorIds, ['release-steward']);
 } finally {

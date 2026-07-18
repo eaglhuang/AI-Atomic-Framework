@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in ATM-GOV-0158 / 14f1a2f46 (building on f0b8bbe99)",
   "area": "Runner Sync / Governance",
   "finding": "Runner-sync admission can self-block because broker runner-sync enqueue creates .atm/runtime/runner-sync-steward-queue.json, but assert-runner-sync-admission classifies that required queue-head file as foreign non-release WIP.",
   "expectedBehavior": "A queue-head runner-sync reservation should be admitted without treating its own runtime queue file as foreign WIP; ordinary unrelated non-release WIP should still block release publication.",
-  "evidenceOrRepro": "During TASK-RFT-0077 closeback, `node atm.mjs broker runner-sync enqueue --task TASK-RFT-0077 --actor codex-task-rft-0077 --sealed-source-sha 69612b61534cecfc1c861721e81013d4c2968bf0 --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json` succeeded, then `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` failed with `ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED` for `.atm/runtime/runner-sync-steward-queue.json`.",
-  "followUp": "Open a governed fix card to teach runner-sync admission to exempt the matching queue-head runtime queue file, add a regression test for enqueue-then-build admission, and document the closeback order for delivery commit plus runner sync."
+  "evidenceOrRepro": "During TASK-RFT-0077 closeback, `node atm.mjs broker runner-sync enqueue --task TASK-RFT-0077 --actor codex-task-rft-0077 --sealed-source-sha 69612b61534cecfc1c861721e81013d4c2968bf0 --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json` succeeded, then `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` failed with `ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED` for `.atm/runtime/runner-sync-steward-queue.json`.\n\nVerification 2026-07-18: current runner-sync admission only raises ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED from foreign claim files intersecting runner build inputs (package*.json, tsconfig*.json, packages/**, scripts/**). .atm/runtime/runner-sync-steward-queue.json is outside isRunnerBuildInputPath, and tests/cli/runner-sync-foreign-dirty-owner.test.ts covers a dirty file-backed queue-head admission with empty foreignNonReleaseWip.",
+  "followUp": "Closed after verification; keep the runner-sync dirty queue regression in tests/cli/runner-sync-foreign-dirty-owner.test.ts."
 }

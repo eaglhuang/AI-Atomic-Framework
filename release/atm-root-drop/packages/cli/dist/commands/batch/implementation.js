@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { createWaveManifest, evaluateWaveEligibility } from '../../../../core/dist/broker/wave-manifest.js';
 import { CliError, makeResult, message, parseOptions } from '../shared.js';
 import { resolveActorId } from '../actor-registry.js';
 import { runNext } from '../next.js';
@@ -413,15 +415,93 @@ function buildCompactBatchStatus(cwd, batchRun, taskQueue, consistency, activeBa
     const currentTaskId = batchRun?.currentTaskId ?? taskQueue?.taskIds?.[taskQueue?.currentIndex ?? 0] ?? null;
     const commitInstructionTaskId = pendingCommitWindow?.taskId ?? batchRun?.pendingCommitTaskId ?? currentTaskId;
     const held = Boolean(batchRun?.hold);
+    const currentWave = buildCurrentWaveSelection(cwd, batchRun, taskQueue);
     const resumeCommand = batchRun?.hold?.resumeCommand ?? (batchId ? `node atm.mjs batch resume --actor <id> --batch ${batchId} --json` : null);
     return { schemaId: 'atm.batchCurrent.v1', ok: consistency.ok, active: Boolean(batchRun), activeBatchCount, batchId, scopeKey: batchRun?.scopeKey ?? null, queueId: taskQueue?.queueId ?? batchRun?.queueId ?? null,
         currentIndex: batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null, totalTasks: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0, progress: buildCompactProgress(batchRun, taskQueue), held, hold: batchRun?.hold ?? null, skippedTasks: batchRun?.skippedTasks ?? [], auditSummary: buildBatchAuditSummary(batchRun), currentTaskId, currentTask: queueHead ? { workItemId: queueHead.workItemId,
             title: queueHead.title, taskPath: queueHead.taskPath, sourcePlanPath: queueHead.sourcePlanPath, targetRepo: queueHead.targetRepo }
-            : null, allowedFiles: scope?.targetWork.allowedFiles ?? [], planningReadOnlyPaths: scope?.planningContext.readOnlyPaths ?? [], validators, pendingCommitWindow, checkpointCommand: batchId ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json` : null, commands: { checkpoint: batchId ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json` : null, checkpointHold: batchId
+            : null, allowedFiles: scope?.targetWork.allowedFiles ?? [], planningReadOnlyPaths: scope?.planningContext.readOnlyPaths ?? [], validators, currentWave, deferredReasons: currentWave.deferredReasons, dispatchCommand: currentWave.dispatchCommand, pendingCommitWindow, checkpointCommand: batchId ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json` : null, commands: { checkpoint: batchId ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json` : null, checkpointHold: batchId
                 ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --hold --json` : null, resume: batchId ? `node atm.mjs batch resume --actor <id> --batch ${batchId} --json` : null, repair: batchId ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json` : 'node atm.mjs batch repair --actor <id> --json', status: batchId ? `node atm.mjs batch current --batch ${batchId} --compact --json`
-                : 'node atm.mjs batch current --compact --json' }, commitInstruction: commitInstructionTaskId ? { timing: 'after-checkpoint', files: pendingCommitWindow?.commitFiles ?? ['<deliverables>', `.atm/history/tasks/${commitInstructionTaskId}.json`, `.atm/history/evidence/${commitInstructionTaskId}.json`, `.atm/history/task-events/${commitInstructionTaskId}/`] }
+                : 'node atm.mjs batch current --compact --json', dispatchWave: currentWave.dispatchCommand }, commitInstruction: commitInstructionTaskId ? { timing: 'after-checkpoint', files: pendingCommitWindow?.commitFiles ?? ['<deliverables>', `.atm/history/tasks/${commitInstructionTaskId}.json`, `.atm/history/evidence/${commitInstructionTaskId}.json`, `.atm/history/task-events/${commitInstructionTaskId}/`] }
             : null, nextCommand: batchRun?.sourcePrompt ? `node atm.mjs next --claim --actor <id> --prompt "${batchRun.sourcePrompt}" --json` : null, resumeCommand, repairCommand: batchId ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json` : 'node atm.mjs batch repair --actor <id> --json', omitted: { taskIds: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0, fullTaskQueue: true, fullBatchRun: true,
             useVerboseCommand: batchId ? `node atm.mjs batch status --batch ${batchId} --json` : 'node atm.mjs batch status --json' }, consistency };
+}
+function buildCurrentWaveSelection(cwd, batchRun, taskQueue) {
+    const batchId = batchRun?.batchId ?? null;
+    const tasks = taskQueue?.tasks ?? [];
+    const startIndex = batchRun?.currentIndex ?? taskQueue?.currentIndex ?? 0;
+    const maxWaveSize = 4;
+    const selected = [];
+    const deferredReasons = [];
+    const seed = buildTaskWaveSeed(batchRun, taskQueue);
+    const waveId = buildDeterministicWaveId(batchId, seed, tasks.slice(startIndex).map((task) => task.workItemId));
+    for (let index = Math.max(0, startIndex); index < tasks.length; index += 1) {
+        const task = tasks[index];
+        if (selected.length >= maxWaveSize) {
+            deferredReasons.push({ taskId: task.workItemId, reasonCode: 'max-wave-size', detail: `wave selector admits at most ${maxWaveSize} tasks` });
+            continue;
+        }
+        const validators = readTaskValidators(cwd, task.taskPath);
+        if (validators.length === 0) {
+            deferredReasons.push({ taskId: task.workItemId, reasonCode: 'validators-missing', detail: 'task record has no validators' });
+            continue;
+        }
+        if (!areTaskDependenciesReady(cwd, task)) {
+            deferredReasons.push({ taskId: task.workItemId, reasonCode: 'dependency-not-ready', detail: 'one or more dependencies are not done' });
+            continue;
+        }
+        const candidate = buildWaveCandidate(task, waveId, validators);
+        const decision = evaluateWaveEligibility([...selected, candidate]);
+        if (!decision.ok) {
+            deferredReasons.push({ taskId: task.workItemId, reasonCode: 'wave-incompatible', detail: decision.reasons.join('; ') });
+            continue;
+        }
+        selected.push(candidate);
+    }
+    const targetRepo = selected[0]?.targetRepo ?? null;
+    const status = selected.length > 1 ? 'wave-ready' : selected.length === 1 ? 'serial-fallback' : 'empty';
+    const currentWave = selected.length > 0 && batchId && targetRepo ? createWaveManifest({ waveId, batchRunId: batchId, coordinatorActorId: batchRun?.createdByActor ?? 'unknown', targetRepo, executor: 'local-lanes', tasks: selected, sealedBaseSha: readGitHead(cwd), now: new Date(0).toISOString() }) : null;
+    const dispatchCommand = status === 'wave-ready' && batchId ? `node atm.mjs team wave dispatch --batch ${batchId} --wave ${waveId} --executor local-lanes --json` : null;
+    return { schemaId: 'atm.batchWaveSelection.v1', status, serialFallback: status === 'serial-fallback', maxWaveSize, selectedTaskIds: selected.map((task) => task.taskId), currentWave, deferredReasons, dispatchCommand };
+}
+function buildWaveCandidate(task, waveId, validators) {
+    return { taskId: task.workItemId, waveId, targetRepo: task.targetRepo ?? 'unknown', surfaceFamily: inferSurfaceFamily(task.scopePaths), scopePaths: task.scopePaths, validators, dependencyReady: true };
+}
+function areTaskDependenciesReady(cwd, task) {
+    const record = readJsonRecord(cwd, task.taskPath);
+    const recordDependencies = Array.isArray(record?.dependencies) ? record.dependencies.filter((entry) => typeof entry === 'string') : [];
+    const dependencies = recordDependencies.length > 0 ? recordDependencies : task.dependencies;
+    if (dependencies.length === 0)
+        return true;
+    return dependencies.every((dependency) => {
+        const record = readJsonRecord(cwd, `.atm/history/tasks/${dependency}.json`);
+        return record?.status === 'done';
+    });
+}
+function inferSurfaceFamily(scopePaths) {
+    const lower = scopePaths.map((entry) => normalizeRelativePath(entry).toLowerCase());
+    if (lower.some((entry) => entry.startsWith('packages/core/')))
+        return 'core';
+    if (lower.some((entry) => entry.startsWith('packages/cli/')))
+        return 'cli';
+    if (lower.some((entry) => entry.startsWith('release/')))
+        return 'release';
+    if (lower.some((entry) => entry.startsWith('scripts/')))
+        return 'scripts';
+    if (lower.some((entry) => entry.startsWith('docs/') || entry.endsWith('.md')))
+        return 'docs';
+    if (lower.some((entry) => entry.startsWith('.atm/')))
+        return 'ledger';
+    return 'mixed';
+}
+function buildTaskWaveSeed(batchRun, taskQueue) {
+    return `${batchRun?.scopeKey ?? taskQueue?.scopeKey ?? 'batch'}:${batchRun?.currentIndex ?? taskQueue?.currentIndex ?? 0}`;
+}
+function buildDeterministicWaveId(batchId, seed, taskIds) {
+    return `wave-${hashShort([batchId ?? 'no-batch', seed, ...taskIds].join('\n'))}`;
+}
+function hashShort(value) {
+    return createHash('sha256').update(value).digest('hex').slice(0, 12);
 }
 export function buildPendingCheckpointCommitWindow(cwd, batchRun, taskQueue) {
     if (!batchRun?.batchId || !Array.isArray(batchRun.taskIds))

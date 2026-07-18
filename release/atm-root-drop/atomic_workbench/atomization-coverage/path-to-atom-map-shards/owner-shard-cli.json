@@ -936,6 +936,41 @@
       "capability": "ATM-GOV-0171 regression for runner-sync receipt publication and broker release validation, including digest mismatch refusal.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0171"
+    },
+    {
+      "path_pattern": "tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "atom_id": "atm.taskflow.scope-glob-untracked",
+      "capability": "ATM-GOV-0180 regression: untracked files under declared **/ globs are matched for pre-close / commit-bundle classification.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0180"
+    },
+    {
+      "path_pattern": "tests/cli/tasks-scope-add-multi-flag.test.ts",
+      "atom_id": "atm.tasks.scope-add-multi-flag",
+      "capability": "ATM-GOV-0180 regression: repeated tasks scope add --add flags accumulate every path.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0180"
+    },
+    {
+      "path_pattern": "tests/cli/abandon-residue-governed-disposition.test.ts",
+      "atom_id": "atm.taskflow.abandon-residue-disposition",
+      "capability": "ATM-GOV-0181 / ATM-BUG-2026-07-12-147: abandon produces governed residue disposition; next-task commit does not inherit orphan bundle-manifest blockers while audit trail remains admissible.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0181"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch/implementation.ts",
+      "atom_id": "atm.batch-wave-selector",
+      "capability": "ATM-GOV-0173 compact batch current selector that turns eligible queue-head tasks into a deterministic read-only wave manifest candidate with deferred reasons and dispatch guidance.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0173"
+    },
+    {
+      "path_pattern": "tests/cli/batch-wave-selector.test.ts",
+      "atom_id": "atm.batch-wave-selector",
+      "capability": "ATM-GOV-0173 regression coverage for deterministic wave selection, dependency and validator deferrals, incompatible surface deferrals, max wave size, and serial fallback.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0173"
     }
   ]
 }

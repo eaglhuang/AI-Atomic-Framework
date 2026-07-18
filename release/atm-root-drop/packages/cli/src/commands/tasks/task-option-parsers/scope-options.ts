@@ -44,7 +44,8 @@ export function parseScopeAddOptions(argv: string[]) {
     }
     if (arg === '--add' || arg === '--paths') {
       const raw = requireValue(argv, index, arg);
-      options.addPaths = parseCsvPathList(raw);
+      // Accumulate repeated --add/--paths flags; last-wins silently dropped prior paths (ATM-BUG-2026-07-16-010).
+      options.addPaths = [...options.addPaths, ...parseCsvPathList(raw)];
       index += 1;
       continue;
     }
@@ -119,7 +120,8 @@ export function parseScopeRepairOptions(argv: string[]) {
     }
     if (arg === '--add') {
       const raw = requireValue(argv, index, '--add');
-      options.addPaths = parseCsvPathList(raw);
+      // Accumulate repeated --add flags (same semantics as tasks scope add).
+      options.addPaths = [...options.addPaths, ...parseCsvPathList(raw)];
       index += 1;
       continue;
     }

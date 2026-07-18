@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Fixed in ATM-GOV-0180 / d66c3b2de",
   "area": "Governance / Git commit bundle",
   "finding": "During TASK-RFT-0052, the task scope and deliverables included scripts/validate-cli/**/*.ts, but node atm.mjs git commit --auto-stage committed only tracked delivery files and left newly created validate-cli shard files untracked. Later, taskflow close dry-run accepted two historical delivery refs, but close --write rejected the second ref because the same glob-matched shard files were classified as out-of-scope source files.",
   "expectedBehavior": "The governed commit bundle and historical-delivery close gate should share the same glob expansion semantics for allowed untracked files. Newly created in-scope shard files should be included and accepted, or the dry-run should fail closed with the same blocker that --write will enforce.",
   "evidenceOrRepro": "TASK-RFT-0052: commit 957917cee315295f6e0232a01bd6aea2fa032d26 omitted scripts/validate-cli/*.ts even though .atm/history/tasks/TASK-RFT-0052.json contained scripts/validate-cli/**/*.ts. Follow-up governed commit 57d10cc3e1140f16224c48f775acc2d44e898462 was required after manual explicit staging. taskflow close dry-run with both refs reported ready, while taskflow close --write rejected 57d10cc as no-scoped-deliverable-files and bucketed scripts/validate-cli/*.ts as outOfScopeSourceFiles.",
-  "followUp": "Add regression coverage for auto-stage untracked glob expansion and for dry-run/write parity in taskflow historical delivery validation. Make pre-close/commit preview classify omitted in-scope untracked shards as blockers rather than excluded dirty files."
+  "followUp": "Regression coverage: tests/cli/taskflow-scope-untracked-glob.test.ts"
 }
