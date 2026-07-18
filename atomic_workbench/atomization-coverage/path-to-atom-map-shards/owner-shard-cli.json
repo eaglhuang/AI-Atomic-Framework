@@ -971,6 +971,27 @@
       "capability": "ATM-GOV-0173 regression coverage for deterministic wave selection, dependency and validator deferrals, incompatible surface deferrals, max wave size, and serial fallback.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0173"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-wave.ts",
+      "atom_id": "atm.team-wave-runtime",
+      "capability": "ATM-GOV-0174 executor-neutral team wave runtime surface for batch/wave manifest consumption, deterministic lane binding, worker report reconciliation, needs-review, and serial fallback.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0174"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "atom_id": "atm.team-wave-runtime",
+      "capability": "ATM-GOV-0174 team wave router preserves raw wave option tail so manifest runtime flags reach the wave handler.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0174"
+    },
+    {
+      "path_pattern": "tests/cli/team-wave-runtime-manifest.test.ts",
+      "atom_id": "atm.team-wave-runtime",
+      "capability": "ATM-GOV-0174 regression coverage for manifest runtime dispatch, out-of-scope needs-review, partial serial fallback, and no git write side effects.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0174"
     }
   ]
 }

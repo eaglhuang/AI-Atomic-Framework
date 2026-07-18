@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0174",
+  "updatedAt": "2026-07-18T17:28:56.212Z",
+  "updatedBy": "codex-gov-auto-batch",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/team-wave-runtime-manifest.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-wave-runtime-manifest.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:03779d5d027aad33d7b7fbbf3df5cbe612981abe87a3d5b24916691e8a38d12c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-wave-runtime-manifest.test.ts"
+      ],
+      "generatedAt": "2026-07-18T17:28:32.900Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0d983e359346ead7f0dd05daf8879d2bc007b3f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-18T17:28:43.690Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0d983e359346ead7f0dd05daf8879d2bc007b3f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:d9b488cb4275df1425003fa439372511f24afc7d612f9385bb3731f8e147184d",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-18T17:28:56.406Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0d983e359346ead7f0dd05daf8879d2bc007b3f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

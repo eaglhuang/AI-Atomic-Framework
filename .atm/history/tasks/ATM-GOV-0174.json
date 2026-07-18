@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0174",
+  "title": "Executor-Neutral Team Wave Runtime",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0172",
+    "ATM-GOV-0173"
+  ],
+  "acceptance": [
+    "A fixture manifest with two eligible members produces deterministic lane assignments and an executor-neutral dispatch envelope.",
+    "Out-of-scope reported files cause a `needs-review` result with the offending task and files listed.",
+    "A partial member can be deferred while preserving the rest of the manifest, and a one-member remainder reports serial fallback.",
+    "`team wave` does not stage, commit, build, project, or close tasks."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team-wave.ts",
+    "packages/cli/src/commands/team/**",
+    "tests/cli/team-wave-runtime-manifest.test.ts",
+    "docs/governance/command-surface.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team-wave.ts",
+    "packages/cli/src/commands/team/**",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "packages/core/src/broker/wave-manifest.ts",
+    "packages/core/src/broker/team-wave-envelope.ts",
+    "packages/core/src/broker/team-worker-report.ts",
+    "tests/cli/team-wave-runtime-manifest.test.ts",
+    "docs/governance/command-surface.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    ".atm/history/evidence/ATM-GOV-0174.*",
+    ".atm/history/task-events/ATM-GOV-0174/**",
+    ".atm/history/tasks/ATM-GOV-0174.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-wave-runtime-manifest.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-wave-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-wave-runtime",
+        "pattern": "Executor Adapter plus Result Contract",
+        "source": "packages/cli/src/commands/team-wave.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0174-executor-neutral-team-wave-runtime.task.md",
+    "sectionTitle": "ATM-GOV-0174",
+    "headingLine": 63,
+    "hash": "d45ee48b6a05191d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0174-executor-neutral-team-wave-runtime.task.md",
+      "planningCommitSha": "88c09e0e1285393697846babc2985c5307b5b85e",
+      "contentDigest": "sha256:d45ee48b6a05191d297032fe1c04c54f586622bb4fcea74c97588ae36d7b25cc",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T17:22:30.418Z"
+    }
+  },
+  "importedAt": "2026-07-18T17:22:30.418Z",
+  "lastTransitionId": "2026-07-18T17-28-17-551Z-scope-amendment-73414c9d7160",
+  "lastTransitionAt": "2026-07-18T17:28:17.551Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-auto-batch",
+  "reservedAt": "2026-07-18T17:22:37.652Z",
+  "promotedAt": "2026-07-18T17:22:37.655Z",
+  "claim": {
+    "actorId": "codex-gov-auto-batch",
+    "leaseId": "lease-f3f390c9e65f",
+    "claimedAt": "2026-07-18T17:22:37.658Z",
+    "heartbeatAt": "2026-07-18T17:22:37.658Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0174.*",
+      ".atm/history/task-events/ATM-GOV-0174/**",
+      ".atm/history/tasks/ATM-GOV-0174.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/**",
+      "packages/core/src/broker/team-wave-envelope.ts",
+      "packages/core/src/broker/team-worker-report.ts",
+      "packages/core/src/broker/wave-manifest.ts",
+      "tests/cli/team-wave-runtime-manifest.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718172237-codex-gov-auto-batch-95c4bb5e28",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718172237-codex-gov-auto-batch-95c4bb5e28\""
+    }
+  },
+  "startedAt": "2026-07-18T17:22:37.658Z",
+  "startedByActor": "codex-gov-auto-batch",
+  "startedBySessionId": "session-20260718172237-codex-gov-auto-batch-ATM-GOV-0174-5260c2e3a5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0174",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0174.*",
+      ".atm/history/task-events/ATM-GOV-0174/**",
+      ".atm/history/tasks/ATM-GOV-0174.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/**",
+      "packages/core/src/broker/team-wave-envelope.ts",
+      "packages/core/src/broker/team-worker-report.ts",
+      "packages/core/src/broker/wave-manifest.ts",
+      "tests/cli/team-wave-runtime-manifest.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0174-executor-neutral-team-wave-runtime.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0174-executor-neutral-team-wave-runtime.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "c7f5ce43058aabd857da392f6e4bd77d086e24945458cbdbc948028c4cc093b9",
+    "actorId": "codex-gov-auto-batch",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260718172237-codex-gov-auto-batch-95c4bb5e28",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718172237-codex-gov-auto-batch-95c4bb5e28\""
+    },
+    "createdAt": "2026-07-18T17:22:45.135Z",
+    "status": "active"
+  }
+}
