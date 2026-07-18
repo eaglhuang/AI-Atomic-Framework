@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0175",
+  "updatedAt": "2026-07-18T17:45:18.134Z",
+  "updatedBy": "codex-gov-auto-batch",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/durable-broker-scheduler.test.ts",
+    "typecheck",
+    "validate:atomization-coverage",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/durable-broker-scheduler.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a947967397db1ed63885fbfea6c6e70c001d60dd278b58908d6e7e66f6c29bb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/durable-broker-scheduler.test.ts"
+      ],
+      "generatedAt": "2026-07-18T17:44:26.709Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dad5e0d36245a0bd24ec0e6f9bffa44c188436df",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-18T17:44:43.169Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dad5e0d36245a0bd24ec0e6f9bffa44c188436df",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:46c8c5709026dc6b577a1628897e8ad5d779722e9d41f196177a2a811851757b",
+      "stderrSha256": "sha256:954d8f6ae5bc042cf9e3346777e38532e7af3600ac7857c7f76cb6e88d7b497e",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-18T17:45:14.054Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dad5e0d36245a0bd24ec0e6f9bffa44c188436df",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:atomization-coverage",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:33d924d560de199eba479481888196f0248b13c422aa3bce99b934654ef4e99e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:atomization-coverage"
+      ],
+      "generatedAt": "2026-07-18T17:45:18.502Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dad5e0d36245a0bd24ec0e6f9bffa44c188436df",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

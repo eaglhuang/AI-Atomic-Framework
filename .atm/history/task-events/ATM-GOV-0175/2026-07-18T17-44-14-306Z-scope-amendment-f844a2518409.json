@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T17-44-14-306Z-scope-amendment-f844a2518409",
+  "taskId": "ATM-GOV-0175",
+  "action": "scope-amendment",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0175.json",
+  "taskSha256": "sha256:44aee22950448f36fe6a8c3f59847bd5136a668fbcbb5d490cdb4331eaf003bc",
+  "createdAt": "2026-07-18T17:44:14.306Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0175 --actor codex-gov-auto-batch --add \"packages/core/src/broker/index.ts,tests/cli-fixtures/help-snapshots/broker.json,atomic_workbench/atomization-coverage/path-to-atom-map.json\" --reason \"Support files required for exported scheduler API, CLI help snapshot validation, and generated atomization projection\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Support files required for exported scheduler API, CLI help snapshot validation, and generated atomization projection"
+  }
+}

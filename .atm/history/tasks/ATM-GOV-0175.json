@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0175",
+  "title": "Durable Broker Scheduler",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0172",
+    "ATM-GOV-0174"
+  ],
+  "acceptance": [
+    "Command-backed test covers deterministic idempotency, state transitions, compatible same-wave batching, cross-wave separation, and collection timeout fallback.",
+    "Typecheck and CLI validation pass.",
+    "No branch workflow is introduced; all commits remain on `main`.",
+    "The card closes with target ledger/evidence and planning-source updates."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/wave-broker-scheduler.ts",
+    "packages/cli/src/commands/broker/**",
+    "tests/cli/durable-broker-scheduler.test.ts",
+    "docs/governance/command-surface.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/broker.ts",
+    "packages/cli/src/commands/command-specs/broker.spec.ts",
+    "packages/cli/src/commands/tasks/**",
+    "packages/cli/src/commands/taskflow/**",
+    "packages/core/src/broker/wave-manifest.ts",
+    "packages/core/src/broker/wave-broker-scheduler.ts",
+    "tests/cli/durable-broker-scheduler.test.ts",
+    "docs/governance/command-surface.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    ".atm/history/evidence/ATM-GOV-0175.*",
+    ".atm/history/task-events/ATM-GOV-0175/**",
+    ".atm/history/tasks/ATM-GOV-0175.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/durable-broker-scheduler.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.wave-broker-scheduler",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.wave-broker-scheduler",
+        "pattern": "Scheduler Policy Object",
+        "source": "packages/core/src/broker/wave-broker-scheduler.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0175-durable-broker-scheduler.task.md",
+    "sectionTitle": "ATM-GOV-0175",
+    "headingLine": 63,
+    "hash": "fa57a0e8f0f299a6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0175-durable-broker-scheduler.task.md",
+      "planningCommitSha": "10581c5b3922b850a5c0d120f79c074794d7cba5",
+      "contentDigest": "sha256:fa57a0e8f0f299a6b584706bf5ea176da4a40b2012b017f2d8b7b5fa6b538398",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T17:38:35.818Z"
+    }
+  },
+  "importedAt": "2026-07-18T17:38:35.818Z",
+  "lastTransitionId": "2026-07-18T17-44-14-306Z-scope-amendment-f844a2518409",
+  "lastTransitionAt": "2026-07-18T17:44:14.306Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-auto-batch",
+  "reservedAt": "2026-07-18T17:38:39.540Z",
+  "promotedAt": "2026-07-18T17:38:39.545Z",
+  "claim": {
+    "actorId": "codex-gov-auto-batch",
+    "leaseId": "lease-d41602f6ba68",
+    "claimedAt": "2026-07-18T17:38:39.549Z",
+    "heartbeatAt": "2026-07-18T17:38:39.549Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0175.*",
+      ".atm/history/task-events/ATM-GOV-0175/**",
+      ".atm/history/tasks/ATM-GOV-0175.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/tasks/**",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/wave-broker-scheduler.ts",
+      "packages/core/src/broker/wave-manifest.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/durable-broker-scheduler.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718173839-codex-gov-auto-batch-371173a821",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718173839-codex-gov-auto-batch-371173a821\""
+    }
+  },
+  "startedAt": "2026-07-18T17:38:39.549Z",
+  "startedByActor": "codex-gov-auto-batch",
+  "startedBySessionId": "session-20260718173839-codex-gov-auto-batch-ATM-GOV-0175-eb50a3cca7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0175",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0175.*",
+      ".atm/history/task-events/ATM-GOV-0175/**",
+      ".atm/history/tasks/ATM-GOV-0175.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/tasks/**",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/wave-broker-scheduler.ts",
+      "packages/core/src/broker/wave-manifest.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/durable-broker-scheduler.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0175-durable-broker-scheduler.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0175-durable-broker-scheduler.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "add75bb273eb36052624aefefdb936946d314f7242ba9c9749b7b93673fc2b60",
+    "actorId": "codex-gov-auto-batch",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260718173839-codex-gov-auto-batch-371173a821",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718173839-codex-gov-auto-batch-371173a821\""
+    },
+    "createdAt": "2026-07-18T17:38:46.342Z",
+    "status": "active"
+  }
+}
