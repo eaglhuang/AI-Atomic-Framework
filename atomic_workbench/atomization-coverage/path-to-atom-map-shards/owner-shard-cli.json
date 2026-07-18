@@ -877,9 +877,9 @@
     {
       "path_pattern": "scripts/analyze-captain-parallel-ledger.ts",
       "atom_id": "atm.captain-parallel-ledger.lane-session-concurrency",
-      "capability": "ATM-GOV-0168 lane-session event overlap concurrency metric for dual-lane acceptance.",
+      "capability": "ATM-GOV-0168 lane-session event overlap concurrency metric for dual-lane acceptance; ATM-GOV-0178 auto-batch pipeline evidence matrix for broker tickets, waitedMs, batchRate, generated-write counts, lane interventions, and observability gaps.",
       "coverage_status": "active",
-      "source_task": "ATM-GOV-0168"
+      "source_task": "ATM-GOV-0168; ATM-GOV-0178"
     },
     {
       "path_pattern": "tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
@@ -887,6 +887,13 @@
       "capability": "ATM-GOV-0168 analyzer lane-session concurrency metric regression.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0168"
+    },
+    {
+      "path_pattern": "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
+      "atom_id": "atm.captain-parallel-ledger.lane-session-concurrency",
+      "capability": "ATM-GOV-0178 analyzer v2 regression for auto-batch broker-ticket metrics, failure matrix, generated-write counts, and lane intervention evidence.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0178"
     },
     {
       "path_pattern": "tests/cli/git-commit-task-scoped-staging.test.ts",
