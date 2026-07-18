@@ -38,7 +38,8 @@ const handlers = {
     newTask: handler('new'),
     importTask: handler('import'),
     verify: handler('verify'),
-    scope: handler('scope')
+    scope: handler('scope'),
+    realignPlanSource: handler('realign-plan-source')
 };
 assert(JSON.stringify(normalizeTasksArgv(['status', '--output-json', 'ignored', '--task', 'TASK-1'])) === JSON.stringify(['status', '--task', 'TASK-1']), '--output-json pair must be stripped');
 await dispatchTasksAction(['status', '--task', 'TASK-1'], handlers);

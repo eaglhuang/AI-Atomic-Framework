@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-005",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Taskflow / Commit Bundle",
+  "finding": "During TASK-RFT-0047, the task scope contained packages/cli/src/commands/next/route-resolution/**/*.ts, but taskflow pre-close excluded the newly created child modules from the governed delivery bundle until each file was explicitly scope-added.",
+  "expectedBehavior": "Taskflow commit-bundle projection should expand supported glob scope paths for new in-scope files, or emit an early deterministic warning that explicit child paths are required before implementation/commit.",
+  "evidenceOrRepro": "TASK-RFT-0047 pre-close reported the new route-resolution child modules as outside task scope despite the route-resolution/**/*.ts scope entry; explicit tasks scope add for seven child modules resolved the projection gap.",
+  "followUp": "Open a governance task to make taskflow bundle assembly and pre-close scope projection consistently expand **/*.ts scope paths, with a regression covering newly created child files."
+}

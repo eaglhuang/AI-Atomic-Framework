@@ -15,6 +15,7 @@ export interface RunnerBuildScopeManifest {
     readonly nonCorePlanningUtilities: readonly string[];
 }
 export type AtmCoreScopeKind = 'atm-core' | 'generated-artifact' | 'non-core-planning' | 'outside-atm-core';
+export type AtmFileScopeClass = 'code' | 'docs' | 'ledger';
 export interface AtmCoreScopeClassification {
     readonly path: string;
     readonly kind: AtmCoreScopeKind;
@@ -33,6 +34,22 @@ export interface AtmCoreScopeReport {
     readonly diagnostics: readonly AtmCoreScopeDiagnostic[];
     readonly runnerSyncNeeded: boolean;
 }
+export interface AtmFileScopeClassification {
+    readonly path: string;
+    readonly scopeClass: readonly AtmFileScopeClass[];
+    readonly matchedPatterns: readonly string[];
+}
+export interface AtmFileScopeReport {
+    readonly schemaId: 'atm.fileScopeReport.v1';
+    readonly classifications: readonly AtmFileScopeClassification[];
+    readonly scopeClass: readonly AtmFileScopeClass[];
+    readonly hasCode: boolean;
+    readonly hasDocs: boolean;
+    readonly hasLedger: boolean;
+}
 export declare function runnerAffectingPatterns(manifest: RunnerBuildScopeManifest): readonly string[];
 export declare function classifyAtmCorePath(manifest: RunnerBuildScopeManifest, filePath: string): AtmCoreScopeClassification;
 export declare function analyzeAtmCoreScope(manifest: RunnerBuildScopeManifest, filePaths: readonly string[]): AtmCoreScopeReport;
+export declare function classifyAtmFileScope(filePath: string): AtmFileScopeClassification;
+export declare function deriveAtmScopeClass(filePaths: readonly string[]): AtmFileScopeReport;
+export declare function applyAtmScopeClassOverride(filePaths: readonly string[], overrideScopeClass: readonly AtmFileScopeClass[]): AtmFileScopeReport;

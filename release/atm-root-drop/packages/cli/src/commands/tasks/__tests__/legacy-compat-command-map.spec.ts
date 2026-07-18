@@ -55,7 +55,8 @@ const handlers: LegacyTasksCompatCommandHandlers = {
   newTask: handler('new'),
   importTask: handler('import'),
   verify: handler('verify'),
-  scope: handler('scope')
+  scope: handler('scope'),
+  realignPlanSource: handler('realign-plan-source')
 };
 
 await runTasksCompatCommandMap(['reconcile', '--task', 'TASK-1'], handlers);

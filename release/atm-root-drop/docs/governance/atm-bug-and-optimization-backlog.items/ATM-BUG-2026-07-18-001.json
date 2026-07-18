@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-18-001",
+  "date": "2026-07-18",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Task Routing",
+  "finding": "A requested GOV sequence start at ATM-GOV-0122 could be routed and imported, but claim was blocked because prerequisite tasks ATM-GOV-0116, ATM-GOV-0118, and ATM-GOV-0120 were absent or source-done/governance-incomplete in the target ledger. After importing those three with canonical scope, their closeback was still blocked by earlier legacy prerequisites ATM-GOV-0112, ATM-GOV-0114, ATM-GOV-0115, ATM-GOV-0117, and ATM-GOV-0119 that are done in planning source but not fully governed in the target ledger.",
+  "expectedBehavior": "When a planning-source task depends on older planning cards that are absent or source-done/governance-incomplete in the target ledger, ATM should provide an explicit dependency-chain backfill and historical-closeback plan before attempting claim, instead of leaving the operator to discover prerequisite ledger gaps one layer at a time.",
+  "evidenceOrRepro": "On 2026-07-18, `node atm.mjs next --claim --actor codex-gov-sequence --task ATM-GOV-0122 --auto-intent --json` returned ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED for ATM-GOV-0116, ATM-GOV-0118, and ATM-GOV-0120. After importing those cards with `tasks import --write --reset-open`, `node atm.mjs next --claim --actor codex-gov-sequence --task ATM-GOV-0116 --auto-intent --json` returned ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED for ATM-GOV-0114 and ATM-GOV-0115; the same chain also affects ATM-GOV-0118 via ATM-GOV-0112 and ATM-GOV-0120 via ATM-GOV-0117/0119.",
+  "followUp": "Open or attach to ATM-GOV-0164/0165-era ledger realignment work: add a governed dependency-chain import/reconcile assistant that can enumerate all source-done prerequisite cards, verify historical delivery commits, and produce a closeback batch without protected backend emergency commands or manual per-card discovery."
+}

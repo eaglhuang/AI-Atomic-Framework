@@ -1,10 +1,17 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 export function inspectRunnerSyncAdmission(input) {
     const dirtyFiles = normalizePaths(input.dirtyFiles ?? readGitDirtyFiles(input.cwd));
     const releaseWip = dirtyFiles.filter(isReleasePath);
-    const foreignNonReleaseWip = dirtyFiles.filter((file) => !isReleasePath(file) && isRunnerBuildInputPath(file));
+    const foreignClaims = input.foreignClaims ?? readActiveForeignClaims(input.cwd, input.stewardActorId);
+    const foreignBuildInputConflicts = inspectForeignBuildInputConflicts({
+        cwd: input.cwd,
+        dirtyFiles,
+        foreignClaims,
+        landedFiles: input.landedFiles ?? null
+    });
+    const foreignNonReleaseWip = uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
     const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input);
     return {
         schemaId: 'atm.runnerSyncAdmission.v1',
@@ -14,6 +21,7 @@ export function inspectRunnerSyncAdmission(input) {
         runnerSyncSteward: input.runnerSyncSteward ?? null,
         queueHeadOwnership,
         foreignNonReleaseWip,
+        foreignBuildInputConflicts,
         releaseWip,
         ordinaryTaskReleaseAutoStageAllowed: false,
         requiredCommand: foreignNonReleaseWip.length > 0
@@ -61,6 +69,10 @@ function readGitDirtyFiles(cwd) {
 function normalizePaths(paths) {
     return [...new Set(paths.map((entry) => entry.replace(/\\/g, '/').replace(/^\.\//, '').trim()).filter(Boolean))].sort();
 }
+function uniqueSorted(paths) {
+    return [...new Set(paths.map((entry) => entry.trim()).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+}
 function isReleasePath(file) {
     return file === 'release' || file.startsWith('release/');
 }
@@ -72,6 +84,78 @@ function isRunnerBuildInputPath(file) {
         || normalized === 'tsconfig.build.json'
         || normalized.startsWith('packages/')
         || normalized.startsWith('scripts/');
+}
+function inspectForeignBuildInputConflicts(input) {
+    const dirtySet = new Set(input.dirtyFiles);
+    const explicitLandedFiles = input.landedFiles === null ? null : new Set(normalizePaths(input.landedFiles));
+    const conflicts = [];
+    for (const claim of input.foreignClaims) {
+        const intersectingFiles = normalizePaths(claim.files).filter((file) => !isReleasePath(file) && isRunnerBuildInputPath(file));
+        if (intersectingFiles.length === 0)
+            continue;
+        const landedIntersectingFiles = explicitLandedFiles
+            ? intersectingFiles.filter((file) => explicitLandedFiles.has(file))
+            : intersectingFiles.filter((file) => hasLandedSinceClaim(input.cwd, file, claim.claimedAt ?? null));
+        if (landedIntersectingFiles.length === 0)
+            continue;
+        conflicts.push({
+            blockingTaskId: claim.taskId,
+            blockingActorId: claim.actorId ?? null,
+            blockingLaneSessionId: claim.laneSessionId ?? null,
+            heartbeatAt: claim.heartbeatAt ?? null,
+            intersectingFiles,
+            dirtyIntersectingFiles: intersectingFiles.filter((file) => dirtySet.has(file)),
+            landedIntersectingFiles,
+            reasonCode: 'landed-not-closed-build-input-risk'
+        });
+    }
+    return conflicts;
+}
+function readActiveForeignClaims(cwd, stewardActorId) {
+    const tasksDir = path.join(cwd, '.atm', 'history', 'tasks');
+    if (!existsSync(tasksDir))
+        return [];
+    const claims = [];
+    for (const entry of readdirSync(tasksDir)) {
+        if (!entry.endsWith('.json'))
+            continue;
+        try {
+            const task = JSON.parse(readFileSync(path.join(tasksDir, entry), 'utf8'));
+            const claim = task.claim && typeof task.claim === 'object' ? task.claim : null;
+            if (!claim || claim.state !== 'active')
+                continue;
+            const actorId = typeof claim.actorId === 'string' ? claim.actorId : null;
+            if (actorId === stewardActorId)
+                continue;
+            const files = Array.isArray(claim.files) ? claim.files.map((file) => String(file)) : [];
+            const laneSession = claim.laneSession && typeof claim.laneSession === 'object' ? claim.laneSession : null;
+            claims.push({
+                taskId: typeof task.workItemId === 'string' ? task.workItemId : entry.replace(/\.json$/, ''),
+                actorId,
+                laneSessionId: typeof laneSession?.laneSessionId === 'string' ? laneSession.laneSessionId : null,
+                heartbeatAt: typeof claim.heartbeatAt === 'string' ? claim.heartbeatAt : null,
+                claimedAt: typeof claim.claimedAt === 'string' ? claim.claimedAt : null,
+                files
+            });
+        }
+        catch {
+            continue;
+        }
+    }
+    return claims;
+}
+function hasLandedSinceClaim(cwd, file, claimedAt) {
+    const args = ['log', '--format=%H', '--', file];
+    if (claimedAt)
+        args.splice(1, 0, `--since=${claimedAt}`);
+    const result = spawnSync('git', args, {
+        cwd,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore']
+    });
+    if (result.status !== 0 || result.error)
+        return false;
+    return result.stdout.trim().length > 0;
 }
 function inspectRunnerSyncQueueHeadOwnership(input) {
     const steward = input.runnerSyncSteward ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);

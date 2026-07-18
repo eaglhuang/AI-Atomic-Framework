@@ -19,9 +19,20 @@ export type RunnerSyncAdmissionReport = {
         readonly cleanupCommand: string | null;
     };
     readonly foreignNonReleaseWip: readonly string[];
+    readonly foreignBuildInputConflicts: readonly RunnerSyncForeignBuildInputConflict[];
     readonly releaseWip: readonly string[];
     readonly ordinaryTaskReleaseAutoStageAllowed: false;
     readonly requiredCommand: string | null;
+};
+export type RunnerSyncForeignBuildInputConflict = {
+    readonly blockingTaskId: string;
+    readonly blockingActorId: string | null;
+    readonly blockingLaneSessionId: string | null;
+    readonly heartbeatAt: string | null;
+    readonly intersectingFiles: readonly string[];
+    readonly dirtyIntersectingFiles: readonly string[];
+    readonly landedIntersectingFiles: readonly string[];
+    readonly reasonCode: 'landed-not-closed-build-input-risk';
 };
 export declare function inspectRunnerSyncAdmission(input: {
     readonly cwd: string;
@@ -33,7 +44,17 @@ export declare function inspectRunnerSyncAdmission(input: {
         readonly suggestedNextAction: string;
     } | null;
     readonly dirtyFiles?: readonly string[] | null;
+    readonly foreignClaims?: readonly RunnerSyncForeignClaimInput[] | null;
+    readonly landedFiles?: readonly string[] | null;
 }): RunnerSyncAdmissionReport;
+export type RunnerSyncForeignClaimInput = {
+    readonly taskId: string;
+    readonly actorId?: string | null;
+    readonly laneSessionId?: string | null;
+    readonly heartbeatAt?: string | null;
+    readonly claimedAt?: string | null;
+    readonly files: readonly string[];
+};
 export declare function assertRunnerSyncAdmission(report: RunnerSyncAdmissionReport): void;
 export declare function ordinaryTaskCanAutoStageRelease(input: {
     readonly taskId: string;

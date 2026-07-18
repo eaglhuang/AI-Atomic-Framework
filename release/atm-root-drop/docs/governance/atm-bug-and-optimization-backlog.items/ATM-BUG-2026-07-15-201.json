@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-15-201",
+  "date": "2026-07-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in codex/bug-201",
+  "area": "Governance / Multi-editor session identity",
+  "finding": "Two agent sessions from Codex or another editor integration can operate through the same actor id and claim surface, making active-work warnings look like self-continuation instead of a distinct concurrent operator.",
+  "expectedBehavior": "ATM should surface a distinct session, ticket, and editor identity for each operator instance and warn when another live session touches the same task or shared Git/index lane, even if actor id and task id match.",
+  "evidenceOrRepro": "During TASK-RFT-0037, ATM surfaced active work and branch queue signals, but the shared codex-task-rft-0037 actor/claim made the other session indistinguishable until commit-status showed a separate in-flight owner PID and the user flagged the collision. During TASK-RFT-0038 closeout, Broker reported TASK-RFT-0038 and ATM-GOV-0146 as parallel-safe by file scope while pre-close still blocked on foreign staged governance and the branch commit queue owned by codex-gpt-5-5-captain, showing that cross-editor session identity must also cover shared index and queue resources.",
+  "followUp": "Keep task work sessions as the editor-agnostic ticket identity. Active-work summaries already report same-actor foreign sessions; codex/bug-201 persists sessionId into task direction locks, Git index ownership/index-lane diagnostics, branch commit queue lock/evidence records, and the task claim lease model so shared index and branch queue collisions identify distinct operator instances even when actor id is reused."
+}

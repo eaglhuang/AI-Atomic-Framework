@@ -1,5 +1,5 @@
 import { CliError } from '../shared.js';
-export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).';
+export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new | realign-plan-source).';
 export function normalizeTasksArgv(argv) {
     const cleanArgv = [];
     for (let i = 0; i < argv.length; i++) {
@@ -68,6 +68,8 @@ export async function dispatchTasksAction(argv, handlers) {
             return await handlers.verify(rest);
         case 'scope':
             return await handlers.scope(rest);
+        case 'realign-plan-source':
+            return await handlers.realignPlanSource(rest);
         case '':
             throw new CliError('ATM_CLI_USAGE', TASKS_ACTION_USAGE, { exitCode: 2 });
         default:

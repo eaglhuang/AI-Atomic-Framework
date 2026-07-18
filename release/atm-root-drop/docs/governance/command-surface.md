@@ -152,6 +152,22 @@ It must still stop or escalate for same-task active claims, closed
 target-authority history overwrites, unresolved planning authority, or any import
 path that would mutate outside `.atm/history/**`.
 
+## Closed-Ledger Planning Source Realign
+
+`node atm.mjs tasks realign-plan-source --map <from-to.json> [--dry-run|--write]`
+is the metadata-only repair lane for closed (`done` / `abandoned`) ledger records
+whose planning cards moved after closure (ATM-GOV-0166 / ATM-BUG-2026-07-17-004).
+
+It re-parses `source.planPath` and `planningSourceSeal.taskCardPath`, admits a
+change only when the planning-card `contentDigest` is unchanged (pure move), and
+must not mutate `status`, `closedAt`, `closurePacket`, `owner`, `claim`, or
+`taskDirectionLock`. `--write` commits through a temporary git index so the shared
+index is not contaminated. Do not use `tasks import --force` for this repair.
+
+`git record-commit` now asserts after commit that every explicitly staged
+`.atm/history` record file is present in the created commit
+(ATM-BUG-2026-07-17-002). A success that silently drops ledger payloads is refused.
+
 ## RFT Continuation Card Authoring Aid
 
 `node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json`

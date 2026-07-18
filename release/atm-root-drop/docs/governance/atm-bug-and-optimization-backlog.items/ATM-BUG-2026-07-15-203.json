@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-15-203",
+  "date": "2026-07-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Governance",
+  "finding": "During TASK-RFT-0042, the task direction lock allowed `packages/cli/src/commands/team/legacy/**/*.ts`, but the pre-commit hook still flagged newly staged files under that path as `ATM_TASK_DIRECTION_SCOPE_DRIFT` until each file was added explicitly with `tasks scope add`.",
+  "expectedBehavior": "Direction-lock scope matching should apply the same glob semantics across task claim, scope amendment, taskflow pre-close, and pre-commit staging checks so new files under an allowed recursive path do not require redundant explicit amendments.",
+  "evidenceOrRepro": "TASK-RFT-0042 governed commit attempt failed on `packages/cli/src/commands/team/legacy/crew-decision-policy.ts` and `packages/cli/src/commands/team/legacy/implementer-selector-policy.ts`; explicit `node atm.mjs tasks scope add ... --add <file>` for each path allowed commit `10aba7558106de9ed1d9cd580876a85479c007b5` to pass.",
+  "followUp": "Add a regression for direction-lock glob parity across pre-commit and taskflow scope checks, then remove the need for explicit per-file scope additions when a recursive allowed path already covers the file."
+}

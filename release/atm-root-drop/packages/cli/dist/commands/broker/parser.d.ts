@@ -1,0 +1,38 @@
+import type { PatchProposal } from '../../../../core/src/broker/types.ts';
+export interface ParsedBrokerOptions {
+    readonly cwd: string;
+    readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | null;
+    readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
+    readonly stewardAction: 'plan' | 'apply' | null;
+    readonly runtimeAction: 'activate' | null;
+    readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | 'release' | null;
+    readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;
+    readonly task: string | null;
+    readonly actorId: string | null;
+    readonly sealedSourceSha: string | null;
+    readonly stewardWorkId: string | null;
+    readonly receiptRef: string | null;
+    readonly receiptDigest: string | null;
+    readonly projectionKey: string | null;
+    readonly intentFile: string | null;
+    readonly freezeId: string | null;
+    readonly ttlSeconds: number;
+    readonly surfaces: readonly string[];
+    readonly sourceItems: readonly string[];
+    readonly proposalFiles: readonly string[];
+    readonly proposalIds: readonly string[];
+    readonly proposalStorePath: string | null;
+    readonly mergePlanFile: string | null;
+    readonly scopeFiles: readonly string[];
+    readonly stewardId: string | null;
+    readonly evidenceOutPath: string | null;
+    readonly requestFiles: readonly string[];
+    readonly requestsDir: string | null;
+    readonly runEvidenceDir: string | null;
+    readonly apply: boolean;
+}
+export declare function parseBrokerArgs(argv: string[]): ParsedBrokerOptions;
+export declare function resolveBrokerRunEvidenceDir(options: ParsedBrokerOptions): string;
+export declare function normalizeEvidencePath(cwd: string, filePath: string): string;
+export declare function loadComposeProposals(options: ParsedBrokerOptions): PatchProposal[];
+export declare function relativeStorePath(cwd: string, storePath: string): string;

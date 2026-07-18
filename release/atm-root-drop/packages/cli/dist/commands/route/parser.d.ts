@@ -1,0 +1,25 @@
+import type { RouteClaimIntent } from '../../../../core/src/routing/index.ts';
+import { type RouteAction } from './types.ts';
+export declare function parseRouteArgs(argv: string[]): {
+    cwd: string;
+    action: RouteAction;
+    routeId: string | null;
+    taskId: string | null;
+    actorId: string | null;
+    claimIntent: RouteClaimIntent;
+    leaseId: string | null;
+    ttlSeconds: number;
+    maxSeconds: number;
+    readSet: string[];
+    writeSet: string[];
+    targetAtomCids: string[];
+    targetVirtualAtomCids: string[];
+    patchEnvelopeRef: string | null;
+    reason: string | null;
+    admissionRechecked: boolean;
+    mergePlanFile: string | null;
+    proposalFile: string | null;
+    stewardId: string | null;
+    evidenceOutPath: string | null;
+    scopeFiles: string[];
+};

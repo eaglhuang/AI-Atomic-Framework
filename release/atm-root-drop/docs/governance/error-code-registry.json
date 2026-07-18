@@ -614,6 +614,63 @@
         "node atm.mjs next --prompt \"<current goal>\" --json"
       ],
       "sourceOwner": "packages/cli/src/commands/team-legacy.ts"
+    },
+    {
+      "code": "ATM_TASKS_REALIGN_DIGEST_MISMATCH",
+      "category": "task-ledger",
+      "shortDescription": "Closed-ledger planning source realign refused because contentDigest changed.",
+      "commonCauses": [
+        "Planning card content changed after closure",
+        "Map points at the wrong replacement card"
+      ],
+      "remediation": [
+        "Confirm the move is content-preserving",
+        "Do not use tasks import --force to rewrite closed history",
+        "Fix the map or restore the original card body"
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks realign-plan-source --map <file> --dry-run --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/realign-plan-source.ts"
+    },
+    {
+      "code": "ATM_TASKS_REALIGN_PROTECTED_FIELD_MUTATION",
+      "category": "task-ledger",
+      "shortDescription": "Realign attempted to mutate a protected closure/lifecycle field.",
+      "commonCauses": [
+        "Implementation bug writing outside the source block"
+      ],
+      "remediation": [
+        "Keep status/closedAt/closurePacket/owner/claim/taskDirectionLock bit-for-bit unchanged"
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks realign-plan-source --map <file> --dry-run --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/realign-plan-source.ts"
+    },
+    {
+      "code": "ATM_GIT_RECORD_COMMIT_PAYLOAD_DROPPED",
+      "category": "git-governance",
+      "shortDescription": "git record-commit created a commit that omitted explicitly staged record files.",
+      "commonCauses": [
+        "Concurrent index reset by another captain",
+        "Shared index contamination between stage and commit"
+      ],
+      "remediation": [
+        "Treat the commit as failed governance delivery",
+        "Re-stage missing record files",
+        "Prefer temporary-index commit paths for metadata repairs"
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs git record-commit --actor <id> --message \"...\" --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts"
     }
   ],
   "prefixRules": [

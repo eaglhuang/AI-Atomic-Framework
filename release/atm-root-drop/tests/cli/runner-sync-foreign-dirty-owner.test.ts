@@ -19,14 +19,52 @@ const blocked = inspectRunnerSyncAdmission({
   dirtyFiles: [
     'packages/cli/src/commands/internal-release.ts',
     'release/atm-onefile/atm.mjs'
+  ],
+  foreignClaims: [{
+    taskId: 'ATM-GOV-BLOCKED',
+    actorId: 'other-agent',
+    laneSessionId: 'lane-other',
+    heartbeatAt: '2026-07-18T00:00:00.000Z',
+    claimedAt: '2026-07-18T00:00:00.000Z',
+    files: ['packages/cli/src/commands/internal-release.ts']
+  }],
+  landedFiles: [
+    'packages/cli/src/commands/internal-release.ts'
   ]
 });
 assert.equal(blocked.ok, false);
 assert.deepEqual(blocked.foreignNonReleaseWip, ['packages/cli/src/commands/internal-release.ts']);
+assert.equal(blocked.foreignBuildInputConflicts[0]?.blockingTaskId, 'ATM-GOV-BLOCKED');
+assert.equal(blocked.foreignBuildInputConflicts[0]?.blockingActorId, 'other-agent');
+assert.deepEqual(blocked.foreignBuildInputConflicts[0]?.intersectingFiles, ['packages/cli/src/commands/internal-release.ts']);
+assert.deepEqual(blocked.foreignBuildInputConflicts[0]?.dirtyIntersectingFiles, ['packages/cli/src/commands/internal-release.ts']);
+assert.deepEqual(blocked.foreignBuildInputConflicts[0]?.landedIntersectingFiles, ['packages/cli/src/commands/internal-release.ts']);
 assert.deepEqual(blocked.releaseWip, ['release/atm-onefile/atm.mjs']);
 assert.equal(blocked.stewardActorId, 'release-steward');
 assert.equal(blocked.sealedSourceSha, 'abc123');
 assert.equal(blocked.ordinaryTaskReleaseAutoStageAllowed, false);
+
+const dirtyButUnlanded = inspectRunnerSyncAdmission({
+  cwd: process.cwd(),
+  stewardActorId: 'release-steward',
+  sealedSourceSha: 'dirty-unlanded',
+  runnerSyncSteward: {
+    stewardWorkId: 'runner-sync-dirty-unlanded',
+    queuePosition: 1,
+    suggestedNextAction: 'run runner sync'
+  },
+  dirtyFiles: ['packages/cli/src/commands/internal-release.ts'],
+  foreignClaims: [{
+    taskId: 'ATM-GOV-DIRTY',
+    actorId: 'other-agent',
+    heartbeatAt: '2026-07-18T00:00:00.000Z',
+    files: ['packages/cli/src/commands/internal-release.ts']
+  }],
+  landedFiles: []
+});
+assert.equal(dirtyButUnlanded.ok, true);
+assert.deepEqual(dirtyButUnlanded.foreignNonReleaseWip, []);
+assert.deepEqual(dirtyButUnlanded.foreignBuildInputConflicts, []);
 
 const nonBuildDirty = inspectRunnerSyncAdmission({
   cwd: process.cwd(),
@@ -42,10 +80,21 @@ const nonBuildDirty = inspectRunnerSyncAdmission({
     '.claude/skills/atm-memory-consolidate/SKILL.md',
     'templates/skills/atm-task-card-authoring.skill.md',
     'docs/governance/parallel-governance-charter.md'
-  ]
+  ],
+  foreignClaims: [{
+    taskId: 'ATM-GOV-DOCS',
+    actorId: 'docs-agent',
+    heartbeatAt: '2026-07-18T00:00:00.000Z',
+    files: [
+      '.atm/history/evidence/TASK-LANE-0019.json',
+      'docs/governance/parallel-governance-charter.md'
+    ]
+  }],
+  landedFiles: ['docs/governance/parallel-governance-charter.md']
 });
 assert.equal(nonBuildDirty.ok, true);
 assert.deepEqual(nonBuildDirty.foreignNonReleaseWip, []);
+assert.deepEqual(nonBuildDirty.foreignBuildInputConflicts, []);
 
 const releaseOnly = inspectRunnerSyncAdmission({
   cwd: process.cwd(),
@@ -56,7 +105,8 @@ const releaseOnly = inspectRunnerSyncAdmission({
     queuePosition: 1,
     suggestedNextAction: 'run runner sync'
   },
-  dirtyFiles: ['release/atm-root-drop/release-manifest.json']
+  dirtyFiles: ['release/atm-root-drop/release-manifest.json'],
+  foreignClaims: []
 });
 assert.equal(releaseOnly.ok, true);
 assert.equal(releaseOnly.queueHeadOwnership.ok, true);
@@ -66,7 +116,8 @@ const missingReservation = inspectRunnerSyncAdmission({
   cwd: process.cwd(),
   stewardActorId: 'release-steward',
   sealedSourceSha: 'missing-reservation',
-  dirtyFiles: []
+  dirtyFiles: [],
+  foreignClaims: []
 });
 assert.equal(missingReservation.ok, false);
 assert.equal(missingReservation.queueHeadOwnership.ok, false);
@@ -81,7 +132,8 @@ const waiting = inspectRunnerSyncAdmission({
     queuePosition: 2,
     suggestedNextAction: 'wait'
   },
-  dirtyFiles: []
+  dirtyFiles: [],
+  foreignClaims: []
 });
 assert.equal(waiting.ok, false);
 assert.match(waiting.requiredCommand ?? '', /queued at position 2/);
@@ -96,7 +148,8 @@ const ownedByAnother = inspectRunnerSyncAdmission({
     suggestedNextAction: 'run runner sync',
     requests: [{ actorId: 'other-steward' }]
   } as any,
-  dirtyFiles: []
+  dirtyFiles: [],
+  foreignClaims: []
 });
 assert.equal(ownedByAnother.ok, false);
 assert.match(ownedByAnother.requiredCommand ?? '', /other-steward/);
@@ -146,7 +199,8 @@ try {
     cwd: tempRepo,
     stewardActorId: 'release-steward',
     sealedSourceSha: 'sha-from-queue',
-    dirtyFiles: []
+    dirtyFiles: [],
+    foreignClaims: []
   });
   assert.equal(fileBacked.ok, true);
   assert.equal(fileBacked.queueHeadOwnership.stewardWorkId, 'runner-sync-file-backed');

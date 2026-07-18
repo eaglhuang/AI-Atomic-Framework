@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-004",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "P0",
+  "status": "Resolved - paired sample collected; promotion remains disabled by policy",
+  "area": "Team Agents promotion evidence",
+  "finding": "ATM-GOV-0153 requires at least one real paired single-Agent versus Team Agents dogfood sample with provider billable usage, model identities, pricing catalog version, wall-clock time, and quality outcome. On 2026-07-16, a live OpenAI Responses paired sample was collected and the artifact moved to measurementStatus complete.",
+  "expectedBehavior": "Team Agents promotion must stay disabled until a real paired sample records provider billable usage, model identities, pricing catalog version, wall-clock metrics, and quality outcome. Fixture or simulated numbers may remain diagnostic only and must keep promotionEligible false.",
+  "evidenceOrRepro": "artifacts/generated/team-dogfood/real-paired-sample.json records sampleKind live-paired-run, measurementStatus complete, providerBillableUsage true, pricingEvidenceKind provider-bill, wall-clock values, model identities, redacted secret refs, baseline/team token usage, and missingEvidence [].",
+  "followUp": "Keep promotionEligible false until a separate rollout decision approves Team as the default. Continue running node --strip-types tests/cli/team-agents-dogfood.test.ts and node --strip-types tests/cli/governance-cost-bench.test.ts when the paired sample contract changes."
+}

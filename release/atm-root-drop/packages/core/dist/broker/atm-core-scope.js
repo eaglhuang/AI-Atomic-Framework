@@ -70,3 +70,70 @@ export function analyzeAtmCoreScope(manifest, filePaths) {
         runnerSyncNeeded: classifications.some((classification) => classification.kind === 'atm-core')
     };
 }
+const codeScopePatterns = [
+    'packages/',
+    'scripts/',
+    'templates/',
+    'schemas/',
+    'atomic_workbench/',
+    'release/',
+    'integrations/',
+    'package.json',
+    'package-lock.json',
+    'tsconfig.json',
+    'tsconfig.build.json',
+    'atm.mjs',
+    'atm.dev.mjs'
+];
+const docsScopePatterns = [
+    'docs/',
+    '*.md'
+];
+const ledgerScopePatterns = [
+    '.atm/'
+];
+export function classifyAtmFileScope(filePath) {
+    const path = normalizePath(filePath);
+    const scopeClass = [];
+    const matchedPatterns = [];
+    const addMatches = (kind, patterns) => {
+        const match = firstMatch(path, patterns);
+        if (!match)
+            return;
+        scopeClass.push(kind);
+        matchedPatterns.push(match);
+    };
+    addMatches('ledger', ledgerScopePatterns);
+    addMatches('code', codeScopePatterns);
+    addMatches('docs', docsScopePatterns);
+    return { path, scopeClass, matchedPatterns };
+}
+export function deriveAtmScopeClass(filePaths) {
+    const classifications = filePaths.map((filePath) => classifyAtmFileScope(filePath));
+    const scopeClass = uniqueScopeClasses(classifications.flatMap((classification) => classification.scopeClass));
+    return {
+        schemaId: 'atm.fileScopeReport.v1',
+        classifications,
+        scopeClass,
+        hasCode: scopeClass.includes('code'),
+        hasDocs: scopeClass.includes('docs'),
+        hasLedger: scopeClass.includes('ledger')
+    };
+}
+export function applyAtmScopeClassOverride(filePaths, overrideScopeClass) {
+    const derived = deriveAtmScopeClass(filePaths);
+    const override = uniqueScopeClasses(overrideScopeClass);
+    if (derived.hasCode && !override.includes('code')) {
+        return derived;
+    }
+    return {
+        ...derived,
+        scopeClass: override,
+        hasCode: override.includes('code'),
+        hasDocs: override.includes('docs'),
+        hasLedger: override.includes('ledger')
+    };
+}
+function uniqueScopeClasses(values) {
+    return ['code', 'docs', 'ledger'].filter((value) => values.includes(value));
+}
