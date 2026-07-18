@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T03-10-56-664Z-close-1ebbad19e867",
+  "taskId": "ATM-GOV-0164",
+  "action": "close",
+  "actorId": "cursor-gov-0164",
+  "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0164.json",
+  "taskSha256": "sha256:4e48810f1c5a06a282347f2a48fa5536f6fc6a5c0022556ac48af00081b65bcb",
+  "createdAt": "2026-07-18T03:10:56.664Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0164 --actor cursor-gov-0164 --status done --historical-delivery c6112af1b316a8feaa92e51c8a1032524445ea42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0164.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T03:10:56.652Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0164.*",
+        ".atm/history/task-events/ATM-GOV-0164/**",
+        ".atm/history/tasks/ATM-GOV-0164.json",
+        "scripts/run-sealed-runner-build.ts",
+        "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/run-sealed-runner-build.ts",
+        "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

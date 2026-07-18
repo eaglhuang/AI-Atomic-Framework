@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0164",
-  "updatedAt": "2026-07-18T03:00:36.205Z",
+  "updatedAt": "2026-07-18T03:10:30.674Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -149,6 +149,209 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:015012b71e85a2c7d13f239e4e482893b02d39406766196b4796d8ce5bb8efe6",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gov-0164",
+      "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+      "createdAt": "2026-07-18T03:07:51.594Z",
+      "details": {
+        "actorId": "cursor-gov-0164",
+        "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.sealed-runner-build",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:46c8c5709026dc6b577a1628897e8ad5d779722e9d41f196177a2a811851757b",
+            "stderrSha256": "sha256:9a721f2673d07aa69337fb55e230df21d70a7d841da39eaf24d4d00d4ee31108",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6184ad741eca317bacfe148332eb77c2294d97751c2e855ad86e591e5c7a3ed1",
+            "cached": false,
+            "generatedAt": "2026-07-18T03:07:51.800Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c74dbc1f7a875aa664d102baaee4744595095ddbb239fa2ebfe5a1fa5a3e95cc",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gov-0164",
+      "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+      "createdAt": "2026-07-18T03:08:35.894Z",
+      "details": {
+        "actorId": "cursor-gov-0164",
+        "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.sealed-runner-build",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ba7195e6e9574bc6b3cab85a28dc05da13d86522e0077a77c3823abbcf1663cd",
+            "stderrSha256": "sha256:015de16f71d6b1afd64dd862eb832118986e2d44767633c487f9f12eaeed30df",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "b39ea6c38e9486700077f7d5ac80e8473a7fcbbd",
+            "cacheKey": "sha256:f71b59119e091ac395411d2eb5ca0590b8fadb8226d0b9b5ca0ba1cf4c96670c",
+            "cached": false,
+            "generatedAt": "2026-07-18T03:08:36.188Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1525e6ff35d7684275fc808d2161ee3fd7f01ba2212f7b9ec6278af429c48ec4",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gov-0164",
+      "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+      "createdAt": "2026-07-18T03:10:23.459Z",
+      "details": {
+        "actorId": "cursor-gov-0164",
+        "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.sealed-runner-build",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "b39ea6c38e9486700077f7d5ac80e8473a7fcbbd",
+            "cacheKey": "sha256:b267c7f9320910c0c63a89ca6f35af4ac238639f605d5d1d2a0be1fc8ac2e605",
+            "cached": false,
+            "generatedAt": "2026-07-18T03:10:23.563Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d94db049ed2f3ccaaa903e4867872e5175297db58f4236aa0a3e425874218bec",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gov-0164",
+      "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+      "createdAt": "2026-07-18T03:10:30.674Z",
+      "details": {
+        "actorId": "cursor-gov-0164",
+        "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.sealed-runner-build",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "b39ea6c38e9486700077f7d5ac80e8473a7fcbbd",
+            "cacheKey": "sha256:b267c7f9320910c0c63a89ca6f35af4ac238639f605d5d1d2a0be1fc8ac2e605",
+            "cached": false,
+            "generatedAt": "2026-07-18T03:10:30.827Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d94db049ed2f3ccaaa903e4867872e5175297db58f4236aa0a3e425874218bec",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
