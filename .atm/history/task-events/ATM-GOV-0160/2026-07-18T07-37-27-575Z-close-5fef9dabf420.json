@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T07-37-27-575Z-close-5fef9dabf420",
+  "taskId": "ATM-GOV-0160",
+  "action": "close",
+  "actorId": "atm-core",
+  "sessionId": "session-20260718071933-atm-core-ATM-GOV-0160-cb70068969",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0160.json",
+  "taskSha256": "sha256:075a51c0cc69af9d893b8d84630c5e8b617937fcb337c16c37937945f7cf69cc",
+  "createdAt": "2026-07-18T07:37:27.575Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0160 --actor atm-core --status done --historical-delivery 92934bc1f6a9cbd03a19311d130d5e25be6794f7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718071933-atm-core-ATM-GOV-0160-cb70068969",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0160.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "node --strip-types tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T07:37:27.559Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0160.*",
+        ".atm/history/task-events/ATM-GOV-0160/**",
+        ".atm/history/tasks/ATM-GOV-0160.json",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/claim-readiness.ts",
+        "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+        "packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+        "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/claim-readiness.ts",
+        "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+        "packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+        "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
