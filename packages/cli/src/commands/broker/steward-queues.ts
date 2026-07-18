@@ -31,6 +31,7 @@ import { readSharedSurfaceFreezeRecords, writeSharedSurfaceFreezeRecords, readSh
 import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleasedSharedSurfaceFreezes, shouldQueueSharedSurface, resolveSharedSurfaceQueueAdmission, replaceIntentLane, assertBrokerRegisterCliParity, syncTeamRunRearbitrationSnapshots } from './shared-surface.ts';
 import { loadComposeProposals, relativeStorePath, resolveBrokerRunEvidenceDir, normalizeEvidencePath } from './parser.ts';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
+import { appendLaneSessionEvent } from '../lane-session/events.ts';
 
 
 export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context: BrokerCommandContext) {
@@ -65,6 +66,7 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
         throw toRunnerSyncQueueCliError(error);
       }
       writeRunnerSyncStewardQueue(runnerSyncQueuePath, result.queue);
+      const laneEvent = appendBrokerTicketLaneEvent(options.cwd, options.actorId, result.brokerTicket);
       return makeResult({
         ok: true,
         command: 'broker',
@@ -76,12 +78,15 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
             queueHeadHealth: result.queueHeadHealth,
             stewardWorkId: result.stewardWorkId,
             waitingTasks: result.waitingTasks,
+            brokerTicket: result.brokerTicket,
             suggestedNextAction: result.suggestedNextAction
           })
         ],
         evidence: {
           runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
-          runnerSync: result
+          runnerSync: result,
+          brokerTicket: result.brokerTicket,
+          laneSessionEvent: laneEvent
         }
       });
     }
@@ -195,6 +200,7 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
         ttlSeconds: options.ttlSeconds
       });
       writeGeneratedProjectionSteward(projectionStewardPath, result.queue);
+      const laneEvent = appendBrokerTicketLaneEvent(options.cwd, options.actorId, result.brokerTicket);
       return makeResult({
         ok: true,
         command: 'broker',
@@ -204,12 +210,15 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
             projectionKey: result.projectionKey,
             ownerTaskId: result.ownerTaskId,
             queuePosition: result.queuePosition,
+            brokerTicket: result.brokerTicket,
             suggestedNextAction: result.suggestedNextAction
           })
         ],
         evidence: {
           generatedProjectionStewardPath: '.atm/runtime/generated-projection-steward.json',
-          projection: result
+          projection: result,
+          brokerTicket: result.brokerTicket,
+          laneSessionEvent: laneEvent
         }
       });
     }
@@ -253,6 +262,22 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
   }
 
   return null;
+}
+
+function appendBrokerTicketLaneEvent(cwd: string, actorId: string | null | undefined, brokerTicket: Record<string, unknown>) {
+  const laneId = process.env.ATM_LANE_SESSION_ID?.trim();
+  if (!laneId) return null;
+  try {
+    return appendLaneSessionEvent({
+      cwd,
+      laneId,
+      action: 'broker-ticket-enqueued',
+      actorId: actorId ?? null,
+      details: { brokerTicket }
+    });
+  } catch {
+    return null;
+  }
 }
 
 function resolveRunnerSyncTaskHealth(cwd: string, request: RunnerSyncStewardRequest): RunnerSyncTaskHealth {

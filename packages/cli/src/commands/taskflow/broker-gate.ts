@@ -17,6 +17,20 @@ export interface TaskflowBrokerConflictGate {
   readonly decisionReason: string | null;
   readonly violationStatus: 'broker-conflict-blocked' | null;
   readonly statusCode: 'broker-conflict-blocked' | null;
+  readonly brokerTicket?: TaskflowBrokerTicket | null;
+}
+
+export interface TaskflowBrokerTicket {
+  readonly schemaId: 'atm.brokerTicket.v1';
+  readonly ticketId: string;
+  readonly position: number;
+  readonly headOwner: string | null;
+  readonly headHealth: 'task-active';
+  readonly batchEligible: boolean;
+  readonly enqueuedAt: string;
+  readonly waitedMs: number;
+  readonly sharedSurface: string;
+  readonly scopeClass: readonly string[];
 }
 
 function uniqueTaskIds(values: readonly string[]): readonly string[] {
@@ -165,7 +179,8 @@ export function evaluateTaskflowBrokerConflictGate(input: {
       decisionClass: 'blocked',
       decisionReason: 'broker-conflict-blocked because active task overlap lacks a registered mutation intent or resolution artifact.',
       violationStatus: 'broker-conflict-blocked',
-      statusCode: 'broker-conflict-blocked'
+      statusCode: 'broker-conflict-blocked',
+      brokerTicket: buildTaskflowBrokerTicket(input.taskId, overlapping)
     };
   }
 
@@ -182,7 +197,8 @@ export function evaluateTaskflowBrokerConflictGate(input: {
       decisionClass: 'blocked',
       decisionReason: 'broker-conflict-blocked because active task overlap lacks atom-level mutation intent or resolution artifact.',
       violationStatus: 'broker-conflict-blocked',
-      statusCode: 'broker-conflict-blocked'
+      statusCode: 'broker-conflict-blocked',
+      brokerTicket: buildTaskflowBrokerTicket(input.taskId, overlapping)
     };
   }
 
@@ -203,7 +219,8 @@ export function evaluateTaskflowBrokerConflictGate(input: {
       decisionClass: 'serial-release',
       decisionReason: 'broker-conflict-blocked because Broker reports a confirmed CID/read-set conflict with another active write intent.',
       violationStatus: 'broker-conflict-blocked',
-      statusCode: 'broker-conflict-blocked'
+      statusCode: 'broker-conflict-blocked',
+      brokerTicket: buildTaskflowBrokerTicket(input.taskId, overlapping, true)
     };
   }
 
@@ -246,12 +263,35 @@ export function evaluateTaskflowBrokerConflictGate(input: {
       decisionClass: 'blocked',
       decisionReason: 'broker-conflict-blocked because active write surfaces overlap without a resolution artifact.',
       violationStatus: 'broker-conflict-blocked',
-      statusCode: 'broker-conflict-blocked'
+      statusCode: 'broker-conflict-blocked',
+      brokerTicket: buildTaskflowBrokerTicket(input.taskId, overlapping, decision.verdict === 'blocked-shared-surface')
     };
   }
 
   return {
     ...noConflictGate('Broker re-check found no confirmed CID conflict for this close.', decision.verdict),
     overlappingTaskIds: overlapping.map((entry) => entry.taskId)
+  };
+}
+
+function buildTaskflowBrokerTicket(
+  taskId: string,
+  overlapping: readonly ActiveWriteIntent[],
+  batchEligible = false
+): TaskflowBrokerTicket {
+  const head = [...overlapping].sort((left, right) => left.heartbeatAt.localeCompare(right.heartbeatAt))[0] ?? null;
+  const enqueuedAt = head?.heartbeatAt ?? new Date().toISOString();
+  const waitedMs = Math.max(0, Date.now() - Date.parse(enqueuedAt));
+  return {
+    schemaId: 'atm.brokerTicket.v1',
+    ticketId: `shared-surface:${taskId}:${head?.taskId ?? 'unknown'}`,
+    position: 2,
+    headOwner: head?.taskId ?? null,
+    headHealth: 'task-active',
+    batchEligible,
+    enqueuedAt,
+    waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
+    sharedSurface: 'broker-shared-surface',
+    scopeClass: ['code']
   };
 }

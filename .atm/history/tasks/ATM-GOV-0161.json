@@ -1,0 +1,194 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0161",
+  "title": "Convert Tier 2 shared-surface refusals into broker tickets",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0165",
+    "ATM-GOV-0158",
+    "ATM-GOV-0159",
+    "ATM-GOV-0160"
+  ],
+  "acceptance": [
+    "Runner-sync queue contention returns a broker ticket envelope instead of a bare refusal.",
+    "Build/release/projection shared-surface gates use the same envelope shape.",
+    "Ticket events are visible in lane session event history.",
+    "R1 same-card conflict still hard-refuses with `ATM_LOCK_CONFLICT`.",
+    "Analyzer fixtures can compute total queued time from `waitedMs`."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/cli/src/commands/taskflow/broker-gate.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "tests/cli/tier2-broker-ticket-exit.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "packages/cli/src/commands/taskflow/broker-gate.ts",
+    "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/lane-session/events.ts",
+    "tests/cli/tier2-broker-ticket-exit.test.ts",
+    "docs/governance/error-code-registry.json"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "node --strip-types tests/cli/tier2-broker-ticket-exit.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tier2-broker-ticket-unified-exit",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.tier2-broker-ticket-result-envelope",
+        "pattern": "Result Envelope",
+        "source": "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "tests/cli/tier2-broker-ticket-exit.test.ts",
+        "docs/governance/error-code-registry.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0161-tier2-broker-ticket-unified-exit.task.md",
+    "sectionTitle": "ATM-GOV-0161",
+    "headingLine": 52,
+    "hash": "172fd754b1b550d1",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0161-tier2-broker-ticket-unified-exit.task.md",
+      "planningCommitSha": "873b8827ef2fd62480e5b3737ee67e4ecfe82f33",
+      "contentDigest": "sha256:172fd754b1b550d15d8316d9f9b4cb9cd69a314fb9b7a2646a90d8bc758c8e04",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T08:02:56.078Z"
+    }
+  },
+  "importedAt": "2026-07-18T08:02:56.078Z",
+  "lastTransitionId": "2026-07-18T08-09-19-995Z-scope-amendment-806a1da8d47a",
+  "lastTransitionAt": "2026-07-18T08:09:19.995Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "atm-core",
+  "reservedAt": "2026-07-18T08:03:19.144Z",
+  "promotedAt": "2026-07-18T08:03:19.149Z",
+  "claim": {
+    "actorId": "atm-core",
+    "leaseId": "lease-3cec6b83160d",
+    "claimedAt": "2026-07-18T08:03:19.155Z",
+    "heartbeatAt": "2026-07-18T08:03:19.155Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0161.*",
+      ".atm/history/task-events/ATM-GOV-0161/**",
+      ".atm/history/tasks/ATM-GOV-0161.json",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/tier2-broker-ticket-exit.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718080327-atm-core-dfb2150e49",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718080327-atm-core-dfb2150e49\""
+    }
+  },
+  "startedAt": "2026-07-18T08:03:19.155Z",
+  "startedByActor": "atm-core",
+  "startedBySessionId": "session-20260718080319-atm-core-ATM-GOV-0161-781a19bd57",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0161",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0161.*",
+      ".atm/history/task-events/ATM-GOV-0161/**",
+      ".atm/history/tasks/ATM-GOV-0161.json",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/tier2-broker-ticket-exit.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0161-tier2-broker-ticket-unified-exit.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0161-tier2-broker-ticket-unified-exit.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "1cdd7dc11287a2c145ab5bcef853bb030c4418627e51470f0d014b6cbe1fb84d",
+    "actorId": "atm-core",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260718080327-atm-core-dfb2150e49",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718080327-atm-core-dfb2150e49\""
+    },
+    "createdAt": "2026-07-18T08:03:27.774Z",
+    "status": "active"
+  }
+}

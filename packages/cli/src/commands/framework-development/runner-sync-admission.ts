@@ -26,7 +26,21 @@ export type RunnerSyncAdmissionReport = {
   readonly foreignBuildInputConflicts: readonly RunnerSyncForeignBuildInputConflict[];
   readonly releaseWip: readonly string[];
   readonly ordinaryTaskReleaseAutoStageAllowed: false;
+  readonly brokerTicket: RunnerSyncAdmissionBrokerTicket | null;
   readonly requiredCommand: string | null;
+};
+
+export type RunnerSyncAdmissionBrokerTicket = {
+  readonly schemaId: 'atm.brokerTicket.v1';
+  readonly ticketId: string;
+  readonly position: number;
+  readonly headOwner: string | null;
+  readonly headHealth: 'task-active' | 'task-missing' | 'task-terminal';
+  readonly batchEligible: boolean;
+  readonly enqueuedAt: string;
+  readonly waitedMs: number;
+  readonly sharedSurface: string;
+  readonly scopeClass: readonly string[];
 };
 
 export type RunnerSyncForeignBuildInputConflict = {
@@ -64,6 +78,7 @@ export function inspectRunnerSyncAdmission(input: {
   });
   const foreignNonReleaseWip = uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
   const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input);
+  const brokerTicket = buildAdmissionBrokerTicket(input, queueHeadOwnership);
   return {
     schemaId: 'atm.runnerSyncAdmission.v1',
     ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok,
@@ -75,11 +90,34 @@ export function inspectRunnerSyncAdmission(input: {
     foreignBuildInputConflicts,
     releaseWip,
     ordinaryTaskReleaseAutoStageAllowed: false,
+    brokerTicket,
     requiredCommand: foreignNonReleaseWip.length > 0
       ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
       : queueHeadOwnership.ok
         ? null
         : queueHeadOwnership.reason
+  };
+}
+
+function buildAdmissionBrokerTicket(
+  input: Parameters<typeof inspectRunnerSyncAdmission>[0],
+  ownership: RunnerSyncAdmissionReport['queueHeadOwnership']
+): RunnerSyncAdmissionBrokerTicket | null {
+  if (!ownership.stewardWorkId && !input.sealedSourceSha) return null;
+  const now = new Date().toISOString();
+  return {
+    schemaId: 'atm.brokerTicket.v1',
+    ticketId: ownership.stewardWorkId
+      ? `${ownership.stewardWorkId}:${input.sealedSourceSha ?? 'unknown'}`
+      : `runner-sync:${input.sealedSourceSha}`,
+    position: ownership.queuePosition ?? 0,
+    headOwner: ownership.waitingTasks[0] ?? null,
+    headHealth: ownership.queueHeadHealth,
+    batchEligible: false,
+    enqueuedAt: now,
+    waitedMs: 0,
+    sharedSurface: 'runner-sync',
+    scopeClass: ['code']
   };
 }
 

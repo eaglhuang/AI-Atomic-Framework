@@ -43,7 +43,21 @@ export type GeneratedProjectionEnqueueResult = {
   readonly queuePosition: number;
   readonly sourceItemPaths: readonly string[];
   readonly suggestedNextAction: string;
+  readonly brokerTicket: GeneratedProjectionBrokerTicket;
   readonly queue: GeneratedProjectionStewardDocument;
+};
+
+export type GeneratedProjectionBrokerTicket = {
+  readonly schemaId: 'atm.brokerTicket.v1';
+  readonly ticketId: string;
+  readonly position: number;
+  readonly headOwner: string | null;
+  readonly headHealth: 'task-active';
+  readonly batchEligible: boolean;
+  readonly enqueuedAt: string;
+  readonly waitedMs: number;
+  readonly sharedSurface: string;
+  readonly scopeClass: readonly string[];
 };
 
 export type GeneratedProjectionCleanupResult = {
@@ -123,6 +137,7 @@ export function enqueueGeneratedProjectionRebuild(
     suggestedNextAction: position === 1
       ? `Rebuild generated projection ${normalized.projectionKey} from sealed source item shards, then release the projection steward entry.`
       : `Wait for projection steward owner ${ownerTaskId}; retry ${buildRetryCommand(materialized.entries[position - 1])}.`,
+    brokerTicket: buildProjectionBrokerTicket(materialized, normalized.taskId, normalized.heartbeatAt, position),
     queue: nextDocument
   };
 }
@@ -244,6 +259,29 @@ function compareEntries(left: GeneratedProjectionRequest, right: GeneratedProjec
 function buildRetryCommand(entry: GeneratedProjectionRequest): string {
   const items = entry.sourceItemPaths.map((itemPath) => ` --source-item ${quoteArg(itemPath)}`).join('');
   return `node atm.mjs broker projection enqueue --task ${quoteArg(entry.taskId)} --actor ${quoteArg(entry.actorId)} --projection-key ${quoteArg(entry.projectionKey)}${items} --json`;
+}
+
+function buildProjectionBrokerTicket(
+  queue: GeneratedProjectionQueue,
+  taskId: string,
+  now: string,
+  position: number
+): GeneratedProjectionBrokerTicket {
+  const entry = queue.entries.find((candidate) => candidate.taskId === taskId) ?? queue.entries[0];
+  const enqueuedAt = entry?.createdAt ?? now;
+  const waitedMs = Math.max(0, Date.parse(now) - Date.parse(enqueuedAt));
+  return {
+    schemaId: 'atm.brokerTicket.v1',
+    ticketId: `projection:${queue.projectionKey}:${taskId}`,
+    position,
+    headOwner: queue.entries[0]?.taskId ?? null,
+    headHealth: 'task-active',
+    batchEligible: position > 1,
+    enqueuedAt,
+    waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
+    sharedSurface: queue.projectionKey,
+    scopeClass: ['code']
+  };
 }
 
 function isGovernanceBacklogItemShard(path: string): boolean {

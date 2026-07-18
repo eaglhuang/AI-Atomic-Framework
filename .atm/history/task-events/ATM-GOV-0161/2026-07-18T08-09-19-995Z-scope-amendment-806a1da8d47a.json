@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T08-09-19-995Z-scope-amendment-806a1da8d47a",
+  "taskId": "ATM-GOV-0161",
+  "action": "scope-amendment",
+  "actorId": "atm-core",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0161.json",
+  "taskSha256": "sha256:59d58f88960aee9eb6fce6b8dd874b21e42174db589b3dbfef98eb53e704bde3",
+  "createdAt": "2026-07-18T08:09:19.995Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0161 --actor atm-core --add \"packages/cli/src/commands/broker/steward-queues.ts,packages/core/src/broker/generated-projection-steward.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

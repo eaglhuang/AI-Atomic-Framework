@@ -57,7 +57,21 @@ export type RunnerSyncStewardQueueResult = {
   readonly waitingTasks: readonly string[];
   readonly requestedSurfaces: readonly string[];
   readonly suggestedNextAction: string;
+  readonly brokerTicket: BrokerTicketEnvelope;
   readonly queue: RunnerSyncStewardQueueDocument;
+};
+
+export type BrokerTicketEnvelope = {
+  readonly schemaId: 'atm.brokerTicket.v1';
+  readonly ticketId: string;
+  readonly position: number;
+  readonly headOwner: string | null;
+  readonly headHealth: RunnerSyncTaskHealth;
+  readonly batchEligible: boolean;
+  readonly enqueuedAt: string;
+  readonly waitedMs: number;
+  readonly sharedSurface: string;
+  readonly scopeClass: readonly string[];
 };
 
 export type RunnerSyncStewardStaleRelease = {
@@ -181,6 +195,7 @@ export function enqueueRunnerSyncStewardRequest(
     waitingTasks: group.waitingTasks,
     requestedSurfaces: group.requestedSurfaces,
     suggestedNextAction: group.suggestedNextAction,
+    brokerTicket: buildBrokerTicket(group, normalized.taskId, normalized.heartbeatAt, status === 'coalesced-waiter'),
     queue: materialized
   };
 }
@@ -307,7 +322,31 @@ function groupToResult(queue: RunnerSyncStewardQueueDocument, group: RunnerSyncS
     waitingTasks: group.waitingTasks,
     requestedSurfaces: group.requestedSurfaces,
     suggestedNextAction: group.suggestedNextAction,
+    brokerTicket: buildBrokerTicket(group, group.waitingTasks[0] ?? group.stewardWorkId, queue.updatedAt, status === 'coalesced-waiter'),
     queue
+  };
+}
+
+function buildBrokerTicket(
+  group: RunnerSyncStewardGroup,
+  taskId: string,
+  now: string,
+  batchEligible: boolean
+): BrokerTicketEnvelope {
+  const request = group.requests.find((entry) => entry.taskId === taskId) ?? group.requests[0];
+  const enqueuedAt = request?.createdAt ?? group.createdAt;
+  const waitedMs = Math.max(0, Date.parse(now) - Date.parse(enqueuedAt));
+  return {
+    schemaId: 'atm.brokerTicket.v1',
+    ticketId: `${group.stewardWorkId}:${taskId}`,
+    position: group.queuePosition,
+    headOwner: group.waitingTasks[0] ?? null,
+    headHealth: group.queueHeadHealth ?? 'task-active',
+    batchEligible,
+    enqueuedAt,
+    waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
+    sharedSurface: 'runner-sync',
+    scopeClass: ['code']
   };
 }
 
