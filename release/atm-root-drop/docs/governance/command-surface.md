@@ -151,3 +151,17 @@ ledger records from the same planning authority without a human emergency lease.
 It must still stop or escalate for same-task active claims, closed
 target-authority history overwrites, unresolved planning authority, or any import
 path that would mutate outside `.atm/history/**`.
+
+## RFT Continuation Card Authoring Aid
+
+`node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json`
+is a contributor script, not a public top-level ATM command. It reads the
+current physical line-budget report and RFT semantic atomization metrics, then
+proposes candidate `TASK-RFT` continuation cards with scope, deliverables,
+validators, rollback notes, and atomization impact.
+
+The generator is dry-run first. It may help author reviewable card text, but it
+does not import, claim, close, or ledger successor work. Writing candidate card
+files requires explicit `--planning-root <path>` and `--target-root <path>`
+arguments, and the resulting cards still require human review plus the normal
+ATM task import route before they become governed work.
