@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0159",
+  "title": "Add shared code docs ledger scope classification and lane event foundation",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0010",
+    "TASK-LANE-0011"
+  ],
+  "acceptance": [
+    "Classification tests cover code, docs, ledger, mixed scopes, release mirror paths, Markdown cards, and governance JSON projection edge cases.",
+    "A task claim or dry-run can expose the derived `scopeClass`.",
+    "Lane event helper tests prove append-only event creation under `.atm/history/session-events/<laneId>/`.",
+    "No existing runner-affecting path loses code classification."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/atm-core-scope.ts",
+    "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+    "packages/cli/src/commands/lane-session/events.ts",
+    "packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/atm-core-scope.ts",
+    "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+    "packages/cli/src/commands/lane-session/events.ts",
+    "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+    "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.parallel-scope-classification",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.parallel-scope-classifier",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/atm-core-scope.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/atm-core-scope.ts",
+        "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0159-scope-classification-lane-events-foundation.task.md",
+    "sectionTitle": "ATM-GOV-0159",
+    "headingLine": 46,
+    "hash": "c3feb9f90cce9605",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0159-scope-classification-lane-events-foundation.task.md",
+      "planningCommitSha": "873b8827ef2fd62480e5b3737ee67e4ecfe82f33",
+      "contentDigest": "sha256:c3feb9f90cce96055d0f10ce7e3c1c9bd9f76ae19aaa2073f39feb874cfa61b8",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T05:23:34.351Z"
+    }
+  },
+  "importedAt": "2026-07-18T05:23:34.351Z",
+  "claim": {
+    "actorId": "codex-gov-sequence",
+    "leaseId": "lease-56d96e64009e",
+    "claimedAt": "2026-07-18T05:15:36.629Z",
+    "heartbeatAt": "2026-07-18T05:30:30.789Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0159.json",
+      "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "packages/core/src/broker/atm-core-scope.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260718051544-codex-gov-sequence-9492f4452e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718051544-codex-gov-sequence-9492f4452e\""
+    },
+    "reason": "closed"
+  },
+  "owner": "codex-gov-sequence",
+  "startedAt": "2026-07-18T05:15:36.629Z",
+  "startedBySessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0159",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0159.*",
+      ".atm/history/task-events/ATM-GOV-0159/**",
+      ".atm/history/tasks/ATM-GOV-0159.json",
+      "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "packages/core/src/broker/atm-core-scope.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a9d03f8c54ce3a36a7cf778593ff13d50eb9b1d03b60459bfd913737c8496143",
+    "actorId": "codex-gov-sequence",
+    "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+    "laneSession": {
+      "laneSessionId": "lane-20260718051544-codex-gov-sequence-9492f4452e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718051544-codex-gov-sequence-9492f4452e\""
+    },
+    "createdAt": "2026-07-18T05:15:44.725Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-07-18T05-30-30-794Z-close-d25bbd39d066",
+  "lastTransitionAt": "2026-07-18T05:30:30.794Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-07-18T05:30:30.789Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0159.closure-packet.json"
+}

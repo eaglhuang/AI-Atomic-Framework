@@ -1,0 +1,505 @@
+{
+  "taskId": "ATM-GOV-0159",
+  "updatedAt": "2026-07-18T05:28:42.666Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-sequence",
+      "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+      "createdAt": "2026-07-18T05:18:21.919Z",
+      "details": {
+        "actorId": "codex-gov-sequence",
+        "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.parallel-scope-classification",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5abc41daa94458c9967f6ff89be8dba2b5b2946ab53481a9a923689d3652b340",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "34ff2a504807b147b8960d3173270fc43fa8e1c3",
+            "cacheKey": "sha256:0ca09ae7e564c1e3cd5f704f7a0d68b32a743f0930be041302119fd358d740ff",
+            "cached": false,
+            "generatedAt": "2026-07-18T05:18:22.034Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:de2ef670d3b48981f10ee0cd344b6c71ae5835aed60c5f8caa87b2a14507dfdb",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-sequence",
+      "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+      "createdAt": "2026-07-18T05:18:33.530Z",
+      "details": {
+        "actorId": "codex-gov-sequence",
+        "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.parallel-scope-classification",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:9ecccd68e916e1526b7c4004d2fb1f0b596a3994219b80f78418a4826253576c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "34ff2a504807b147b8960d3173270fc43fa8e1c3",
+            "cacheKey": "sha256:f5b3c3c274301cd86cf0ae3fce0bb96a9c29ffd90792cec359ca2277603e09ae",
+            "cached": false,
+            "generatedAt": "2026-07-18T05:18:33.621Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:3ee162392b7039933fb68a465bee72a2b834ef6dc6fd4ffa2c28f792029963b5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-sequence",
+      "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+      "createdAt": "2026-07-18T05:18:56.628Z",
+      "details": {
+        "actorId": "codex-gov-sequence",
+        "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.parallel-scope-classification",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "34ff2a504807b147b8960d3173270fc43fa8e1c3",
+            "cacheKey": "sha256:7569d05788d5037fbe61fbfa03ee6a2a2784d5cd080248ff46dcd4acbecef39e",
+            "cached": false,
+            "generatedAt": "2026-07-18T05:18:56.725Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:8e23c0d97737d75dddd5c12fea049ff2eee2ffdda3436eac922adc47f92f08f0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-sequence",
+      "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+      "createdAt": "2026-07-18T05:25:35.632Z",
+      "details": {
+        "actorId": "codex-gov-sequence",
+        "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.parallel-scope-classification",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5abc41daa94458c9967f6ff89be8dba2b5b2946ab53481a9a923689d3652b340",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:d277c968f828e5c7e9d8fdf085fdb19189138b1f37ebc52d3b7c452beb499240",
+            "cached": false,
+            "generatedAt": "2026-07-18T05:25:35.719Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:8923548852ad2772f17e906cd9b6e1e7be1a794eeef2d140c7632e98e57071b1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-sequence",
+      "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+      "createdAt": "2026-07-18T05:25:45.758Z",
+      "details": {
+        "actorId": "codex-gov-sequence",
+        "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.parallel-scope-classification",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:9ecccd68e916e1526b7c4004d2fb1f0b596a3994219b80f78418a4826253576c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:2de758b2d30a4ec8bb30cdfbed0bf690eee0de7b5634dd374b4f7749f390fc9a",
+            "cached": false,
+            "generatedAt": "2026-07-18T05:25:45.952Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e38b86140d5f0dfddacedae2c3cc87c3f9ed1d30521aae3e41031cc901e9e473",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-sequence",
+      "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+      "createdAt": "2026-07-18T05:26:09.351Z",
+      "details": {
+        "actorId": "codex-gov-sequence",
+        "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.parallel-scope-classification",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-07-18T05:26:09.550Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:60e3ecb554b4334253c789e1b5f077df7fec27c6bd030b054e662174a6a741e0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-sequence",
+      "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+      "createdAt": "2026-07-18T05:26:46.700Z",
+      "details": {
+        "actorId": "codex-gov-sequence",
+        "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.parallel-scope-classification",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ba7195e6e9574bc6b3cab85a28dc05da13d86522e0077a77c3823abbcf1663cd",
+            "stderrSha256": "sha256:c22fbd1caf58b6dd8684cb3bb1e696e50b6c0d1ad835a878775cbed6db44e732",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:15ce5f08187c7ca859df13bd3f6704d6631595508a259a30369408034d2fb31d",
+            "cached": false,
+            "generatedAt": "2026-07-18T05:26:46.843Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c9c6359ff147a52b07f6f75b8201f8930df81f3289b3a81e4f91092b2a0a5377",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gov-sequence",
+      "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+      "createdAt": "2026-07-18T05:28:42.666Z",
+      "details": {
+        "actorId": "codex-gov-sequence",
+        "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.parallel-scope-classification",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-18T05:28:42.868Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:70fbbb0ab08e5fa5044b17439994508fb2abceea71f0791bb39d3da9d313cd0e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

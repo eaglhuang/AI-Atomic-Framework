@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T05-30-30-794Z-close-d25bbd39d066",
+  "taskId": "ATM-GOV-0159",
+  "action": "close",
+  "actorId": "codex-gov-sequence",
+  "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0159.json",
+  "taskSha256": "sha256:6d392de404fe1eb24db9811c43701b1a55fbdba8093493ddf7c2e684047befbe",
+  "createdAt": "2026-07-18T05:30:30.794Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0159 --actor codex-gov-sequence --status done --historical-delivery 0b4940f415eaef4a7a73dce422217fa49191702f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718051536-codex-gov-sequence-ATM-GOV-0159-02e8186992",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0159.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T05:30:30.779Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0159.*",
+        ".atm/history/task-events/ATM-GOV-0159/**",
+        ".atm/history/tasks/ATM-GOV-0159.json",
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+        "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+        "packages/core/src/broker/atm-core-scope.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+        "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+        "packages/core/src/broker/atm-core-scope.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
