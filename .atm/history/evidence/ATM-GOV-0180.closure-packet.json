@@ -1,0 +1,210 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0180",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d66c3b2de6758449e353c9489f74ae7f0428e615",
+  "governedTreeSha": "ad8eb4f4a047d351e643ab9c7a2708bcd0784cf2",
+  "targetCommitDelta": {
+    "currentCommitSha": "d66c3b2de6758449e353c9489f74ae7f0428e615",
+    "parentCommitShas": [
+      "d66c3b2de6758449e353c9489f74ae7f0428e615"
+    ],
+    "governedTreeSha": "ad8eb4f4a047d351e643ab9c7a2708bcd0784cf2",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0180.json",
+      ".atm/history/evidence/ATM-GOV-0180.runner-sync-receipt.json",
+      ".atm/history/tasks/ATM-GOV-0180.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/cli/src/commands/work-channels.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/__tests__/commit-scope-policy.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers/scope-options.js",
+      "release/atm-root-drop/packages/cli/dist/commands/work-channels.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/historical-delivery.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "release/atm-root-drop/packages/cli/src/commands/work-channels.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "tests/cli/tasks-scope-add-multi-flag.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "\"",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:0c3c2f3cac282c60f82fc88b23af1f10f47fc2331dba40a57146ab165ccb3ece",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:79af600c2a7f1f44b9dd90b78a994b226805e6a145ed53342fc4232af6073b6f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/tasks-scope-add-multi-flag.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:45d7c8c08c6ee16b5fe823db06b87d669e41f1bb70181f38d1c7a2fccf77aa1d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:139557ec24c24c19030794134ad913ada3a500b23d7cb3ab0ffe832bae6f3285",
+      "stderrSha256": "sha256:6809798e97b78e1d3b397c38079f2b5745f0fdd5d61776fc6ed1b25aebce3405",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/taskflow-scope-untracked-glob.test.ts",
+    "node --strip-types tests/cli/tasks-scope-add-multi-flag.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T14:24:29.447Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0180.*",
+      ".atm/history/evidence/ATM-GOV-0180.json",
+      ".atm/history/task-events/ATM-GOV-0180/**",
+      ".atm/history/tasks/ATM-GOV-0180.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-006.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-008.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-009.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-010.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/**",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/cli/src/commands/work-channels.ts",
+      "tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "tests/cli/tasks-scope-add-multi-flag.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/**",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/cli/src/commands/work-channels.ts",
+      "tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "tests/cli/tasks-scope-add-multi-flag.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0180.json",
+  "closedAt": "2026-07-18T14:24:29.448Z",
+  "closedByActor": "cursor-gov-0180",
+  "sessionId": "session-20260718140325-cursor-gov-0180-ATM-GOV-0180-2ce4dc18c6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d66c3b2de6758449e353c9489f74ae7f0428e615",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/cli/src/commands/work-channels.ts",
+      "tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "tests/cli/tasks-scope-add-multi-flag.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0180.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0180/2026-07-18T13-57-30-410Z-import-a3c0ac73abd7.json",
+      ".atm/history/task-events/ATM-GOV-0180/2026-07-18T14-03-25-426Z-reserve-5f9b062bd0fe.json",
+      ".atm/history/task-events/ATM-GOV-0180/2026-07-18T14-03-25-430Z-promote-cecceee0cb0f.json",
+      ".atm/history/task-events/ATM-GOV-0180/2026-07-18T14-03-35-907Z-claim-8d33d462688f.json",
+      ".atm/history/task-events/ATM-GOV-0180/2026-07-18T14-16-06-500Z-scope-amendment-b3c8f6a6cff1.json",
+      ".atm/history/tasks/ATM-GOV-0180.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

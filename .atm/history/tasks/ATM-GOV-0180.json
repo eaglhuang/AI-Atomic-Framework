@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0180",
   "title": "taskflow scope glob recognition for new files + tasks scope add multi-flag fix",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [],
@@ -94,8 +94,8 @@
     }
   },
   "importedAt": "2026-07-18T13:57:30.073Z",
-  "lastTransitionId": "2026-07-18T14-03-35-907Z-claim-8d33d462688f",
-  "lastTransitionAt": "2026-07-18T14:03:35.907Z",
+  "lastTransitionId": "2026-07-18T14-24-29-459Z-close-b7e3ecb2aaf6",
+  "lastTransitionAt": "2026-07-18T14:24:29.459Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-gov-0180",
   "reservedAt": "2026-07-18T14:03:25.426Z",
@@ -104,12 +104,15 @@
     "actorId": "cursor-gov-0180",
     "leaseId": "lease-c6ea21065169",
     "claimedAt": "2026-07-18T14:03:25.435Z",
-    "heartbeatAt": "2026-07-18T14:03:25.435Z",
+    "heartbeatAt": "2026-07-18T14:24:29.456Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/ATM-GOV-0180.json",
+      ".atm/history/evidence/ATM-GOV-0180.*",
       ".atm/history/evidence/ATM-GOV-0180.json",
+      ".atm/history/task-events/ATM-GOV-0180/**",
+      ".atm/history/tasks/ATM-GOV-0180.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
       "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
       "packages/cli/src/commands/git-governance/implementation.ts",
       "packages/cli/src/commands/task-direction.ts",
@@ -121,14 +124,14 @@
       "tests/cli/taskflow-scope-untracked-glob.test.ts",
       "tests/cli/tasks-scope-add-multi-flag.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718140325-cursor-gov-0180-1da7e98b4f",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718140325-cursor-gov-0180-1da7e98b4f\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T14:03:25.435Z",
   "startedByActor": "cursor-gov-0180",
@@ -147,6 +150,7 @@
       ".atm/history/task-events/ATM-GOV-0180/**",
       ".atm/history/tasks/ATM-GOV-0180.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
       "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
       "packages/cli/src/commands/git-governance/implementation.ts",
       "packages/cli/src/commands/task-direction.ts",
@@ -158,19 +162,30 @@
       "tests/cli/taskflow-scope-untracked-glob.test.ts",
       "tests/cli/tasks-scope-add-multi-flag.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0180-taskflow-scope-glob-and-multi-add.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0180-taskflow-scope-glob-and-multi-add.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "885348f2c0725beb34e5560bdbc3f331cd86b24fd364aba8277efb985125a66b",
     "actorId": "cursor-gov-0180",
-    "sessionId": "session-20260718140325-cursor-gov-0180-ATM-GOV-0180-2ce4dc18c6",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260718140325-cursor-gov-0180-1da7e98b4f",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718140325-cursor-gov-0180-1da7e98b4f\""
     },
-    "createdAt": "2026-07-18T14:03:35.905Z",
+    "createdAt": "2026-07-18T14:03:35.938Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T14:24:29.456Z",
+  "closedByActor": "cursor-gov-0180",
+  "closedBySessionId": "session-20260718140325-cursor-gov-0180-ATM-GOV-0180-2ce4dc18c6",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0180.closure-packet.json"
 }

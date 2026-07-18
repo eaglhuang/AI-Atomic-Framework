@@ -1,0 +1,92 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T14-24-29-459Z-close-b7e3ecb2aaf6",
+  "taskId": "ATM-GOV-0180",
+  "action": "close",
+  "actorId": "cursor-gov-0180",
+  "sessionId": "session-20260718140325-cursor-gov-0180-ATM-GOV-0180-2ce4dc18c6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0180.json",
+  "taskSha256": "sha256:ea92fbc3fdba6729b885772c357e0983e1db9f3ebba789c8656f1e0cb06fc586",
+  "createdAt": "2026-07-18T14:24:29.459Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0180 --actor cursor-gov-0180 --status done --historical-delivery d66c3b2de6758449e353c9489f74ae7f0428e615",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718140325-cursor-gov-0180-ATM-GOV-0180-2ce4dc18c6",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0180.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "node --strip-types tests/cli/tasks-scope-add-multi-flag.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T14:24:29.447Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0180.*",
+        ".atm/history/evidence/ATM-GOV-0180.json",
+        ".atm/history/task-events/ATM-GOV-0180/**",
+        ".atm/history/tasks/ATM-GOV-0180.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-006.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-008.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-009.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-010.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+        "packages/cli/src/commands/tasks/historical-delivery.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "tests/cli/taskflow-scope-untracked-glob.test.ts",
+        "tests/cli/tasks-scope-add-multi-flag.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+        "packages/cli/src/commands/tasks/historical-delivery.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "tests/cli/taskflow-scope-untracked-glob.test.ts",
+        "tests/cli/tasks-scope-add-multi-flag.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
