@@ -1,0 +1,191 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0177",
+  "title": "Shared Build/Projection Executor and Atomic Wave Checkpoint",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0172",
+    "ATM-GOV-0173",
+    "ATM-GOV-0174",
+    "ATM-GOV-0175",
+    "ATM-GOV-0176"
+  ],
+  "acceptance": [
+    "Command-backed test covers compatible build/projection coalescing, content addressed skip, receipt fan-out, missing member receipt rejection, checkpoint readiness, serial fallback, and reconcile-required planning closeback.",
+    "Typecheck and CLI validation pass.",
+    "No branch workflow is introduced; all commits remain on `main`.",
+    "The card closes with target ledger/evidence and planning-source updates."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/wave-generated-executor.ts",
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/batch/**",
+    "tests/cli/shared-build-projection-checkpoint.test.ts",
+    "docs/governance/command-surface.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/batch/**",
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/command-specs/broker.spec.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "packages/core/src/broker/wave-generated-executor.ts",
+    "packages/core/src/broker/wave-broker-scheduler.ts",
+    "packages/core/src/broker/shared-delivery-commit.ts",
+    "packages/core/src/broker/index.ts",
+    "tests/cli/shared-build-projection-checkpoint.test.ts",
+    "tests/cli-fixtures/help-snapshots/broker.json",
+    "tests/cli-fixtures/help-snapshots/batch.json",
+    "docs/governance/command-surface.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    ".atm/history/evidence/ATM-GOV-0177.*",
+    ".atm/history/task-events/ATM-GOV-0177/**",
+    ".atm/history/tasks/ATM-GOV-0177.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/shared-build-projection-checkpoint.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.shared-build-projection-checkpoint",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.shared-build-projection-checkpoint",
+        "pattern": "Shared Generated Write Executor Policy Object",
+        "source": "packages/core/src/broker/wave-generated-executor.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0177-shared-build-projection-checkpoint.task.md",
+    "sectionTitle": "ATM-GOV-0177",
+    "headingLine": 71,
+    "hash": "1e6d4d8f912d901c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0177-shared-build-projection-checkpoint.task.md",
+      "planningCommitSha": "f76f35b721f74d29da2bef45e56fd651e508921d",
+      "contentDigest": "sha256:1e6d4d8f912d901c795a8b6d0c7faa254fa630cd02372070befadf6e067cb2b0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T18:34:28.559Z"
+    }
+  },
+  "importedAt": "2026-07-18T18:34:28.559Z",
+  "lastTransitionId": "2026-07-18T18-34-42-206Z-claim-e066be23bcaa",
+  "lastTransitionAt": "2026-07-18T18:34:42.206Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-auto-batch",
+  "reservedAt": "2026-07-18T18:34:33.778Z",
+  "promotedAt": "2026-07-18T18:34:33.781Z",
+  "claim": {
+    "actorId": "codex-gov-auto-batch",
+    "leaseId": "lease-050293dfc6b1",
+    "claimedAt": "2026-07-18T18:34:33.786Z",
+    "heartbeatAt": "2026-07-18T18:34:33.786Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0177.json",
+      ".atm/history/evidence/ATM-GOV-0177.*",
+      ".atm/history/task-events/ATM-GOV-0177/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/wave-broker-scheduler.ts",
+      "packages/core/src/broker/wave-generated-executor.ts",
+      "tests/cli-fixtures/help-snapshots/batch.json",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/shared-build-projection-checkpoint.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718183434-codex-gov-auto-batch-5cbcbcd11c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718183434-codex-gov-auto-batch-5cbcbcd11c\""
+    }
+  },
+  "startedAt": "2026-07-18T18:34:33.786Z",
+  "startedByActor": "codex-gov-auto-batch",
+  "startedBySessionId": "session-20260718183433-codex-gov-auto-batch-ATM-GOV-0177-edec90ee5b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0177",
+    "batchId": null,
+    "scopeKey": "TASK-SYNC",
+    "queueId": "queue-0a5651c7ab89906a",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0177.*",
+      ".atm/history/task-events/ATM-GOV-0177/**",
+      ".atm/history/tasks/ATM-GOV-0177.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/wave-broker-scheduler.ts",
+      "packages/core/src/broker/wave-generated-executor.ts",
+      "tests/cli-fixtures/help-snapshots/batch.json",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/shared-build-projection-checkpoint.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "576978b03f64198732b82fc22eaf5e25ba4ae19061472df35a72b98b2b00cb43",
+    "actorId": "codex-gov-auto-batch",
+    "sessionId": "session-20260718183433-codex-gov-auto-batch-ATM-GOV-0177-edec90ee5b",
+    "laneSession": {
+      "laneSessionId": "lane-20260718183434-codex-gov-auto-batch-5cbcbcd11c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718183434-codex-gov-auto-batch-5cbcbcd11c\""
+    },
+    "createdAt": "2026-07-18T18:34:42.204Z",
+    "status": "active"
+  }
+}

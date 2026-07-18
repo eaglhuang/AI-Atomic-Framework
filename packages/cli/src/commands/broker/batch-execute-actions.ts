@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { CliError, makeResult, message } from '../shared.ts';
 import { planWaveBrokerBatch } from '../../../../core/src/broker/wave-broker-scheduler.ts';
 import { planSharedDeliveryCommit } from '../../../../core/src/broker/shared-delivery-commit.ts';
+import { planWaveGeneratedWrite, type WaveGeneratedSurfaceKind } from '../../../../core/src/broker/wave-generated-executor.ts';
 import type { ParsedBrokerOptions } from './parser.ts';
 import type { BrokerCommandContext } from './types.ts';
 
@@ -59,14 +60,64 @@ export function handleBrokerBatchExecute(options: ParsedBrokerOptions, context: 
   if (options.batchAction !== 'execute') {
     throw new CliError('ATM_CLI_USAGE', 'broker batch supports execute.', { exitCode: 2 });
   }
-  if (!options.surfaces.includes('commit')) {
-    throw new CliError('ATM_CLI_USAGE', 'broker batch execute currently requires --surface commit.', { exitCode: 2 });
+  const selectedSurface = options.surfaces.find((surface) => ['commit', 'build', 'projection'].includes(surface));
+  if (!selectedSurface) {
+    throw new CliError('ATM_CLI_USAGE', 'broker batch execute requires --surface commit, --surface build, or --surface projection.', { exitCode: 2 });
   }
   if (!options.actorId || !options.waveId || !options.surfaceFamily || !options.manifestDigest || !options.sealedSourceSha) {
-    throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface commit requires --actor, --wave, --surface-family, --manifest-digest, and --sealed-source-sha.', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'broker batch execute requires --actor, --wave, --surface-family, --manifest-digest, and --sealed-source-sha.', { exitCode: 2 });
   }
 
   const scheduler = readJson(context.waveSchedulerPath);
+  if (selectedSurface === 'build' || selectedSurface === 'projection') {
+    if (!options.payloadDigest || !options.receiptDigest) {
+      throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection requires --payload-digest <source-digest> and --receipt-digest <output-digest>.', { exitCode: 2 });
+    }
+    const surfaceKind = selectedSurface as WaveGeneratedSurfaceKind;
+    const decision = planWaveBrokerBatch({
+      document: scheduler,
+      waveId: options.waveId,
+      surfaceKind,
+      surfaceFamily: options.surfaceFamily,
+      expectedTaskIds: options.expectedTasks,
+      collectionTimeoutMs: options.collectionTimeoutMs
+    });
+    const plan = planWaveGeneratedWrite({
+      decision,
+      scheduler,
+      actorId: options.actorId,
+      surfaceKind,
+      surfaceFamily: options.surfaceFamily,
+      manifestDigest: options.manifestDigest,
+      sealedSourceSha: options.sealedSourceSha,
+      sourceDigest: options.payloadDigest,
+      outputDigest: options.receiptDigest,
+      expectedTaskIds: options.expectedTasks
+    });
+    const receiptPath = options.evidenceOutPath && plan.receipt
+      ? writeReceipt(options.cwd, options.evidenceOutPath, plan.receipt)
+      : null;
+    return makeResult({
+      ok: plan.ok,
+      command: 'broker',
+      cwd: options.cwd,
+      messages: [
+        message(plan.ok ? 'info' : 'error', plan.ok ? 'ATM_BROKER_BATCH_GENERATED_RECEIPT_READY' : 'ATM_BROKER_BATCH_GENERATED_BLOCKED', plan.reason, {
+          receiptPath,
+          blockers: plan.blockers
+        })
+      ],
+      evidence: {
+        action: 'broker-batch-execute',
+        surface: surfaceKind,
+        schedulerPath: '.atm/runtime/wave-broker-scheduler.json',
+        decision,
+        plan,
+        receiptPath
+      }
+    });
+  }
+
   const decision = planWaveBrokerBatch({
     document: scheduler,
     waveId: options.waveId,

@@ -21,5 +21,6 @@ export * from './generated-projection-steward.ts';
 export * from './wave-manifest.ts';
 export * from './wave-broker-scheduler.ts';
 export * from './shared-delivery-commit.ts';
+export * from './wave-generated-executor.ts';
 export * from './adapters/index.ts';
 export * from './cross-task-mutation-guard.ts';

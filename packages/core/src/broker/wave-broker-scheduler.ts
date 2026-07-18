@@ -9,7 +9,7 @@ export type WaveBrokerTicketState =
   | 'failed'
   | 'cancelled';
 
-export type WaveBrokerSurfaceKind = 'commit' | 'runner-sync' | 'projection' | 'checkpoint';
+export type WaveBrokerSurfaceKind = 'commit' | 'build' | 'runner-sync' | 'projection' | 'checkpoint';
 
 export interface WaveBrokerTicketInput {
   readonly waveId: string;
