@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0178",
   "title": "Parallel Analyzer v2 and End-to-End Failure Matrix",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0172",
@@ -89,8 +89,8 @@
     }
   },
   "importedAt": "2026-07-18T18:53:45.779Z",
-  "lastTransitionId": "2026-07-18T18-53-58-551Z-claim-eb4721d1399f",
-  "lastTransitionAt": "2026-07-18T18:53:58.551Z",
+  "lastTransitionId": "2026-07-18T19-03-19-828Z-close-7a0d17e46d06",
+  "lastTransitionAt": "2026-07-18T19:03:19.828Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gov-auto-batch",
   "reservedAt": "2026-07-18T18:53:49.581Z",
@@ -99,7 +99,7 @@
     "actorId": "codex-gov-auto-batch",
     "leaseId": "lease-07a64ec4a5a9",
     "claimedAt": "2026-07-18T18:53:49.591Z",
-    "heartbeatAt": "2026-07-18T18:53:49.591Z",
+    "heartbeatAt": "2026-07-18T19:03:19.823Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0178.json",
@@ -114,14 +114,14 @@
       "tests/cli/captain-parallel-ledger-analysis.test.ts",
       "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718185349-codex-gov-auto-batch-90ab277b8b",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718185349-codex-gov-auto-batch-90ab277b8b\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T18:53:49.591Z",
   "startedByActor": "codex-gov-auto-batch",
@@ -161,5 +161,9 @@
     },
     "createdAt": "2026-07-18T18:53:58.550Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T19:03:19.823Z",
+  "closedByActor": "codex-gov-auto-batch",
+  "closedBySessionId": "session-20260718185349-codex-gov-auto-batch-ATM-GOV-0178-9eb8dc913c",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0178.closure-packet.json"
 }

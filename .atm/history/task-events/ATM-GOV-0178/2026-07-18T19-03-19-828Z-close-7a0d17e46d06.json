@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T19-03-19-828Z-close-7a0d17e46d06",
+  "taskId": "ATM-GOV-0178",
+  "action": "close",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": "session-20260718185349-codex-gov-auto-batch-ATM-GOV-0178-9eb8dc913c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0178.json",
+  "taskSha256": "sha256:e6c69a12e68b93afacca144714ced3402c624e8ada3e4b29aaa6cab5a09dd9ef",
+  "createdAt": "2026-07-18T19:03:19.828Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0178 --actor codex-gov-auto-batch --status done --historical-delivery 6e95382ac34060047a0628285c1fb44f8c5bb67e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718185349-codex-gov-auto-batch-ATM-GOV-0178-9eb8dc913c",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0178.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
+      "typecheck",
+      "validate:atomization-coverage",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T19:03:19.811Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0178.*",
+        ".atm/history/task-events/ATM-GOV-0178/**",
+        ".atm/history/tasks/ATM-GOV-0178.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/reports/captain-parallel-ledger-analysis.md",
+        "scripts/analyze-captain-parallel-ledger.ts",
+        "scripts/fixtures/auto-batch-analyzer/**",
+        "tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
+        "tests/cli/captain-parallel-ledger-analysis.test.ts",
+        "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/analyze-captain-parallel-ledger.ts",
+        "scripts/fixtures/auto-batch-analyzer/**",
+        "tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
+        "tests/cli/captain-parallel-ledger-analysis.test.ts",
+        "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0178",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6e95382ac34060047a0628285c1fb44f8c5bb67e",
+  "governedTreeSha": "a3d15e6057447b957a3ccdaf1c7b03978abb63bc",
+  "targetCommitDelta": {
+    "currentCommitSha": "6e95382ac34060047a0628285c1fb44f8c5bb67e",
+    "parentCommitShas": [
+      "6e95382ac34060047a0628285c1fb44f8c5bb67e"
+    ],
+    "governedTreeSha": "a3d15e6057447b957a3ccdaf1c7b03978abb63bc",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0178.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0178.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:25000f7176a6fa15f8ce3cebf7d2cd958936bb7b99f89d65ed67b075e98370f3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:atomization-coverage",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:62bd8c7e8796a1280d0cf6b67c4943bbaadb39e3361c75d0e9bee99632c57e0c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:46c8c5709026dc6b577a1628897e8ad5d779722e9d41f196177a2a811851757b",
+      "stderrSha256": "sha256:dc610ef387b8b8f657f6abde960c5e41fc461b1ecd9ca748ad0c100fe9d587d3",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
+    "typecheck",
+    "validate:atomization-coverage",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T19:03:19.811Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0178.*",
+      ".atm/history/task-events/ATM-GOV-0178/**",
+      ".atm/history/tasks/ATM-GOV-0178.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
+      "tests/cli/captain-parallel-ledger-analysis.test.ts",
+      "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
+      "tests/cli/captain-parallel-ledger-analysis.test.ts",
+      "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0178.json",
+  "closedAt": "2026-07-18T19:03:19.812Z",
+  "closedByActor": "codex-gov-auto-batch",
+  "sessionId": "session-20260718185349-codex-gov-auto-batch-ATM-GOV-0178-9eb8dc913c",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6e95382ac34060047a0628285c1fb44f8c5bb67e",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0178.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0178/2026-07-18T18-53-45-897Z-import-694f725e97a3.json",
+      ".atm/history/task-events/ATM-GOV-0178/2026-07-18T18-53-49-582Z-reserve-dd0e85345599.json",
+      ".atm/history/task-events/ATM-GOV-0178/2026-07-18T18-53-49-585Z-promote-39a188538730.json",
+      ".atm/history/task-events/ATM-GOV-0178/2026-07-18T18-53-58-551Z-claim-eb4721d1399f.json",
+      ".atm/history/tasks/ATM-GOV-0178.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

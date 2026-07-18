@@ -1,13 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0178",
-  "updatedAt": "2026-07-18T18:59:48.045Z",
+  "updatedAt": "2026-07-18T19:02:49.236Z",
   "updatedBy": "codex-gov-auto-batch",
   "freshValidationPasses": [
     "node --strip-types tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
     "typecheck",
     "validate:atomization-coverage",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -61,6 +62,19 @@
       "generatedAt": "2026-07-18T18:59:48.235Z",
       "runnerKind": "dev-source",
       "sourceCommit": "3675f749091078899768652fb6637d10d461d056",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-18T19:02:49.416Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
