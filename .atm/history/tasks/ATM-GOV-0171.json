@@ -1,0 +1,196 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0171",
+  "title": "Governed runner-sync receipt and clean-close pathway",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0169"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "scripts/run-sealed-runner-build.ts",
+    "packages/cli/src/commands/broker.ts",
+    "packages/cli/src/commands/taskflow-close.ts",
+    "tests/cli/runner-sync-clean-close-pathway.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/run-sealed-runner-build.ts",
+    "packages/cli/src/commands/broker.ts",
+    "packages/cli/src/commands/taskflow-close.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "tests/cli/runner-sync-clean-close-pathway.test.ts",
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "docs/governance/command-surface.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-005.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    ".atm/history/evidence/ATM-GOV-0171.*",
+    ".atm/history/task-events/ATM-GOV-0171/**",
+    ".atm/history/tasks/ATM-GOV-0171.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-sync-clean-close-pathway.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync.clean-close",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-sync.receipt-publication",
+        "pattern": "Receipt Writer",
+        "source": "scripts/run-sealed-runner-build.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.taskflow.runner-sync-closeback",
+        "pattern": "Close Integration",
+        "source": "packages/cli/src/commands/taskflow-close.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0171-runner-sync-receipt-clean-close.task.md",
+    "sectionTitle": "ATM-GOV-0171",
+    "headingLine": 63,
+    "hash": "50aa0c7e6aab1c42",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0171-runner-sync-receipt-clean-close.task.md",
+      "planningCommitSha": "dd7d22f9ca7f0cca056e9646e25ae0f58c5cf8e7",
+      "contentDigest": "sha256:50aa0c7e6aab1c424400bc68ce69918333853d90cef6d4bc153ade07ae165584",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T13:41:32.622Z"
+    }
+  },
+  "importedAt": "2026-07-18T13:41:32.622Z",
+  "lastTransitionId": "2026-07-18T13-53-35-792Z-scope-amendment-709220e7c40d",
+  "lastTransitionAt": "2026-07-18T13:53:35.792Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-captain",
+  "reservedAt": "2026-07-18T13:41:42.003Z",
+  "promotedAt": "2026-07-18T13:41:42.007Z",
+  "claim": {
+    "actorId": "codex-gpt-5-captain",
+    "leaseId": "lease-93df989f39e8",
+    "claimedAt": "2026-07-18T13:41:42.012Z",
+    "heartbeatAt": "2026-07-18T13:41:42.012Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0171.*",
+      ".atm/history/task-events/ATM-GOV-0171/**",
+      ".atm/history/tasks/ATM-GOV-0171.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "core/src/broker/runner-sync-steward-queue.ts",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-005.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow-close.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/runner-sync-clean-close-pathway.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718134142-codex-gpt-5-captain-0df41fa0df",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718134142-codex-gpt-5-captain-0df41fa0df\""
+    }
+  },
+  "startedAt": "2026-07-18T13:41:42.012Z",
+  "startedByActor": "codex-gpt-5-captain",
+  "startedBySessionId": "session-20260718134142-codex-gpt-5-captain-ATM-GOV-0171-10a1d98ee9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0171",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0171.*",
+      ".atm/history/task-events/ATM-GOV-0171/**",
+      ".atm/history/tasks/ATM-GOV-0171.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "core/src/broker/runner-sync-steward-queue.ts",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-005.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow-close.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/runner-sync-clean-close-pathway.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0171-runner-sync-receipt-clean-close.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0171-runner-sync-receipt-clean-close.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "8757bf79de1e0a621a2258b729dcf38351d975d64903b51f88a90f4dfa75f26e",
+    "actorId": "codex-gpt-5-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260718134142-codex-gpt-5-captain-0df41fa0df",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718134142-codex-gpt-5-captain-0df41fa0df\""
+    },
+    "createdAt": "2026-07-18T13:41:50.261Z",
+    "status": "active"
+  }
+}

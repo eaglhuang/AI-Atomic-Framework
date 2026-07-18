@@ -105,6 +105,24 @@ The diagnostic includes `taskId`, `intersectingFiles`, ownership
 (`foreign` / `unowned`), and any known owner actor, task, session, or lane.
 Docs-only and ledger-only candidate claims remain non-blocking.
 
+## Runner-Sync Broker Release
+
+`node atm.mjs broker runner-sync enqueue --task <task-id> --actor <actor-id>
+--sealed-source-sha <sha> --surface <path> --json` reserves the shared
+runner-sync build lane. Only the queue head may run the sealed runner build.
+
+The build script writes `.atm/history/evidence/<task-id>.runner-sync-receipt.json`
+with schema `atm.runnerSyncReceipt.v1`. `broker runner-sync release` must validate
+that receipt before clearing the queue:
+
+```bash
+node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref .atm/history/evidence/<task-id>.runner-sync-receipt.json --json
+```
+
+The receipt has to match the queued task id, actor id, steward work id, sealed
+source SHA, and requested surface set. A digest may be supplied with
+`--receipt-digest sha256:<hex>` for byte-level assertion.
+
 ## Planned Git Boundary Lane
 
 The current public `git` surface governs identity, governed commit, and git

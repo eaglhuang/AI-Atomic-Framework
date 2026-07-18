@@ -687,6 +687,46 @@
       "shortDescription": "Runner-sync steward release requires a build/publication receipt reference or digest before the queue head can be cleared."
     },
     {
+      "category": "team-broker",
+      "commonCauses": [
+        "The referenced runner-sync receipt is missing, outside the repository, malformed, or does not match the queued steward work.",
+        "The receipt was generated for a different task, actor, sealed source SHA, steward work id, or surface set."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker runner-sync status --task <task-id> --json and compare the queue head against the receipt fields.",
+        "Regenerate the receipt by rerunning the governed sealed runner build as the queue-head owner.",
+        "Retry release with node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref .atm/history/evidence/<task-id>.runner-sync-receipt.json --json."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker runner-sync status --task <task-id> --json",
+        "node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/broker/steward-queues.ts",
+      "code": "ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID",
+      "shortDescription": "Runner-sync steward release receipt does not prove the queued build publication."
+    },
+    {
+      "category": "team-broker",
+      "commonCauses": [
+        "The --receipt-digest argument does not match the bytes of the referenced receipt file.",
+        "The receipt file changed after another command computed or copied its digest."
+      ],
+      "remediation": [
+        "Recompute the digest from the current receipt file or omit --receipt-digest when local file validation is enough.",
+        "Regenerate the receipt by rerunning the governed sealed runner build if the file content is stale."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --receipt-digest <sha256:digest> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/broker/steward-queues.ts",
+      "code": "ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_DIGEST_MISMATCH",
+      "shortDescription": "Runner-sync steward release receipt digest does not match the referenced receipt file."
+    },
+    {
       "code": "ATM_TASKS_AUDIT_WARNINGS",
       "category": "task-ledger",
       "shortDescription": "Task audit passed but found active warnings that should be reviewed before claiming a clean ledger.",
