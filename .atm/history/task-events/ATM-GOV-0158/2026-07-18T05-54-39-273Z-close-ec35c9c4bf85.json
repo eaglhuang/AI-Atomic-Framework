@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T05-54-39-273Z-close-ec35c9c4bf85",
+  "taskId": "ATM-GOV-0158",
+  "action": "close",
+  "actorId": "atm-core",
+  "sessionId": "session-20260718053732-atm-core-ATM-GOV-0158-f936121e9d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0158.json",
+  "taskSha256": "sha256:99e930d227f92c0d4a811a90c025c0a0a71aad19e1f81712502b6b21c31fbe34",
+  "createdAt": "2026-07-18T05:54:39.273Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0158 --actor atm-core --status done --historical-delivery 2e476d4c794a342d68d3946a3fd6e957b574fcdb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718053732-atm-core-ATM-GOV-0158-f936121e9d",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0158.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/runner-sync-build-script-admission.test.ts",
+      "node --strip-types tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T05:54:39.257Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0158.*",
+        ".atm/history/task-events/ATM-GOV-0158/**",
+        ".atm/history/tasks/ATM-GOV-0158.json",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "tests/cli/runner-sync-build-script-admission.test.ts",
+        "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "tests/cli/runner-sync-build-script-admission.test.ts",
+        "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

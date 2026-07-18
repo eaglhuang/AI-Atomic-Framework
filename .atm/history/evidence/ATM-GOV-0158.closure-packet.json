@@ -1,0 +1,157 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0158",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AppData\\Local\\Temp\\atm-gov-0159-push",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2e476d4c794a342d68d3946a3fd6e957b574fcdb",
+  "governedTreeSha": "79425dba73d92ac153611b9aeeed66c98b12ca7a",
+  "targetCommitDelta": {
+    "currentCommitSha": "2e476d4c794a342d68d3946a3fd6e957b574fcdb",
+    "parentCommitShas": [
+      "2e476d4c794a342d68d3946a3fd6e957b574fcdb"
+    ],
+    "governedTreeSha": "79425dba73d92ac153611b9aeeed66c98b12ca7a",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0158.json",
+      ".atm/history/task-events/ATM-GOV-0158/2026-07-18T05-35-07-735Z-import-bc7441c320c0.json",
+      ".atm/history/task-events/ATM-GOV-0158/2026-07-18T05-37-32-758Z-reserve-5ed058cf31f2.json",
+      ".atm/history/task-events/ATM-GOV-0158/2026-07-18T05-37-32-762Z-promote-e92cb3098e25.json",
+      ".atm/history/task-events/ATM-GOV-0158/2026-07-18T05-37-40-944Z-claim-2d65a85af045.json",
+      ".atm/history/tasks/ATM-GOV-0158.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b93fa68d4a9cace32d2ff5a7f10567805c1147e674f979e29731c4044ca52aad",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-build-script-admission.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:102d21cf87d796ba958e65f135b0df9b80122cb7269e7d173a473fce7778f37d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:46c8c5709026dc6b577a1628897e8ad5d779722e9d41f196177a2a811851757b",
+      "stderrSha256": "sha256:d9ff3d685cdb7b7a443cad2d4d681895104bff7bb9c47a92cc4b5f3661c0298f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ada84b041df961b4b223801798be1580f5be74b9876565dd2904497168c97257",
+      "stderrSha256": "sha256:3e11d5ffa719b77122eb849e4db51abfc6029b0e083212c3a707d4aa2a4b4af0",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:46c8c5709026dc6b577a1628897e8ad5d779722e9d41f196177a2a811851757b",
+      "stderrSha256": "sha256:afe4bc0dbeee5e79afed79828c3995339f759dccb0ac0da4f10403e6a3a09b8d",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/runner-sync-build-script-admission.test.ts",
+    "node --strip-types tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T05:54:39.257Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0158.*",
+      ".atm/history/task-events/ATM-GOV-0158/**",
+      ".atm/history/tasks/ATM-GOV-0158.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/runner-sync-build-script-admission.test.ts",
+      "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/runner-sync-build-script-admission.test.ts",
+      "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0158.json",
+  "closedAt": "2026-07-18T05:54:39.258Z",
+  "closedByActor": "atm-core",
+  "sessionId": "session-20260718053732-atm-core-ATM-GOV-0158-f936121e9d",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "2e476d4c794a342d68d3946a3fd6e957b574fcdb",
+    "taskMatchedFiles": [
+      "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
