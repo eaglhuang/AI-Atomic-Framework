@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0163",
   "title": "Prevent sealed runner build from wiping host node_modules via junction cleanup",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -76,8 +76,8 @@
     }
   },
   "importedAt": "2026-07-18T02:42:11.276Z",
-  "lastTransitionId": "2026-07-18T02-42-48-059Z-claim-2b1750329e0f",
-  "lastTransitionAt": "2026-07-18T02:42:48.059Z",
+  "lastTransitionId": "2026-07-18T02-54-04-306Z-close-59c35123ab62",
+  "lastTransitionAt": "2026-07-18T02:54:04.306Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-gov-0163",
   "reservedAt": "2026-07-18T02:42:40.937Z",
@@ -86,7 +86,7 @@
     "actorId": "cursor-gov-0163",
     "leaseId": "lease-7548d3ac48a5",
     "claimedAt": "2026-07-18T02:42:40.943Z",
-    "heartbeatAt": "2026-07-18T02:42:40.943Z",
+    "heartbeatAt": "2026-07-18T02:54:04.301Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0163.json",
@@ -97,14 +97,14 @@
       "scripts/run-sealed-runner-build.ts",
       "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718024247-cursor-gov-0163-c8946c41b1",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718024247-cursor-gov-0163-c8946c41b1\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T02:42:40.943Z",
   "startedByActor": "cursor-gov-0163",
@@ -140,5 +140,9 @@
     },
     "createdAt": "2026-07-18T02:42:48.058Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T02:54:04.301Z",
+  "closedByActor": "cursor-gov-0163",
+  "closedBySessionId": "session-20260718024240-cursor-gov-0163-ATM-GOV-0163-51dcd63ea8",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0163.closure-packet.json"
 }
