@@ -15,7 +15,7 @@ function writeJson(filePath: string, value: unknown): void {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
-function writeTask(taskId: string, status = 'running'): void {
+function writeTask(taskId: string, status = 'running', files: readonly string[] = ['packages/cli/src/commands/taskflow/implementation.ts']): void {
   const cardPath = `docs/tasks/${taskId}.task.md`;
   mkdirSync(path.join(repo, 'docs/tasks'), { recursive: true });
   writeFileSync(path.join(repo, cardPath), [
@@ -42,7 +42,7 @@ function writeTask(taskId: string, status = 'running'): void {
       leaseId: 'lease-1',
       claimedAt: '2026-07-16T00:00:00.000Z',
       state: 'active',
-      files: ['packages/cli/src/commands/taskflow/implementation.ts']
+      files
     }
   });
 }
@@ -119,9 +119,17 @@ try {
   const notEnqueued = staleRunnerBlocker('TASK-LANE-TEST-0001');
   assert.equal(notEnqueued.queuePosition, null);
   assert.equal(notEnqueued.queueHeadHealth, 'task-active');
+  assert.equal(notEnqueued.runnerGateDecision, 'required');
+  assert.deepEqual(notEnqueued.runnerGateIntersectingFiles, ['packages/cli/src/commands/taskflow/implementation.ts']);
   assert.match(notEnqueued.requiredCommand, /broker runner-sync enqueue/);
   assert.match(notEnqueued.runnerSyncActionChain[0], /broker runner-sync enqueue/);
   assert.match(notEnqueued.runnerSyncActionChain.join('\n'), /ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build/);
+
+  writeTask('TASK-LANE-DOCS-0001', 'running', ['docs/tasks/TASK-LANE-DOCS-0001.task.md', '.atm/history/tasks/TASK-LANE-DOCS-0001.json']);
+  const docsOnly = runAtm(['taskflow', 'pre-close', '--task', 'TASK-LANE-DOCS-0001', '--actor', 'lane-captain'], 1);
+  assert.equal(docsOnly.evidence.runnerGateDecision, 'skipped-non-code');
+  assert.deepEqual(docsOnly.evidence.runnerGateIntersectingFiles, []);
+  assert.equal((docsOnly.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER'), false);
 
   runAtm([
     'broker',
