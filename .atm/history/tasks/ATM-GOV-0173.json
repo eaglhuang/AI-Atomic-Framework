@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0173",
   "title": "Batch Wave Selector",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0172"
@@ -84,8 +84,8 @@
     }
   },
   "importedAt": "2026-07-18T16:49:42.062Z",
-  "lastTransitionId": "2026-07-18T17-06-45-914Z-scope-amendment-b7397d8eb052",
-  "lastTransitionAt": "2026-07-18T17:06:45.914Z",
+  "lastTransitionId": "2026-07-18T17-15-30-052Z-close-d87f34421214",
+  "lastTransitionAt": "2026-07-18T17:15:30.052Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gov-auto-batch",
   "reservedAt": "2026-07-18T16:50:24.837Z",
@@ -94,7 +94,7 @@
     "actorId": "codex-gov-auto-batch",
     "leaseId": "lease-5a5c12912651",
     "claimedAt": "2026-07-18T16:50:24.843Z",
-    "heartbeatAt": "2026-07-18T16:50:24.843Z",
+    "heartbeatAt": "2026-07-18T17:15:30.049Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0173.*",
@@ -110,14 +110,14 @@
       "packages/core/src/broker/wave-manifest.ts",
       "tests/cli/batch-wave-selector.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718165025-codex-gov-auto-batch-47c577db29",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718165025-codex-gov-auto-batch-47c577db29\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T16:50:24.843Z",
   "startedByActor": "codex-gov-auto-batch",
@@ -165,5 +165,9 @@
     },
     "createdAt": "2026-07-18T16:50:33.855Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T17:15:30.049Z",
+  "closedByActor": "codex-gov-auto-batch",
+  "closedBySessionId": "session-20260718165024-codex-gov-auto-batch-ATM-GOV-0173-7aa4b1f987",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0173.closure-packet.json"
 }

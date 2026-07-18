@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T17-15-30-052Z-close-d87f34421214",
+  "taskId": "ATM-GOV-0173",
+  "action": "close",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": "session-20260718165024-codex-gov-auto-batch-ATM-GOV-0173-7aa4b1f987",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0173.json",
+  "taskSha256": "sha256:c23fc35ed83dab8dfe973394ed1b8b5ae383982fa54c3604cd5295ecfc351278",
+  "createdAt": "2026-07-18T17:15:30.052Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0173 --actor codex-gov-auto-batch --status done --historical-delivery 14ca49168670824a3814ec16ea6b2e32b73a7975",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718165024-codex-gov-auto-batch-ATM-GOV-0173-7aa4b1f987",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0173.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/batch-wave-selector.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T17:15:30.036Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0173.*",
+        ".atm/history/task-events/ATM-GOV-0173/**",
+        ".atm/history/tasks/ATM-GOV-0173.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/command-surface.md",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/core/src/broker/wave-manifest.ts",
+        "tests/cli/batch-wave-selector.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/core/src/broker/wave-manifest.ts",
+        "tests/cli/batch-wave-selector.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
