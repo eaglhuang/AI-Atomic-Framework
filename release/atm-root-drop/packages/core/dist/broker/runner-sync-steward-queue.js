@@ -47,6 +47,7 @@ export function enqueueRunnerSyncStewardRequest(queue, request, options = {}) {
         waitingTasks: group.waitingTasks,
         requestedSurfaces: group.requestedSurfaces,
         suggestedNextAction: group.suggestedNextAction,
+        brokerTicket: buildBrokerTicket(group, normalized.taskId, normalized.heartbeatAt, status === 'coalesced-waiter'),
         queue: materialized
     };
 }
@@ -156,7 +157,25 @@ function groupToResult(queue, group) {
         waitingTasks: group.waitingTasks,
         requestedSurfaces: group.requestedSurfaces,
         suggestedNextAction: group.suggestedNextAction,
+        brokerTicket: buildBrokerTicket(group, group.waitingTasks[0] ?? group.stewardWorkId, queue.updatedAt, status === 'coalesced-waiter'),
         queue
+    };
+}
+function buildBrokerTicket(group, taskId, now, batchEligible) {
+    const request = group.requests.find((entry) => entry.taskId === taskId) ?? group.requests[0];
+    const enqueuedAt = request?.createdAt ?? group.createdAt;
+    const waitedMs = Math.max(0, Date.parse(now) - Date.parse(enqueuedAt));
+    return {
+        schemaId: 'atm.brokerTicket.v1',
+        ticketId: `${group.stewardWorkId}:${taskId}`,
+        position: group.queuePosition,
+        headOwner: group.waitingTasks[0] ?? null,
+        headHealth: group.queueHeadHealth ?? 'task-active',
+        batchEligible,
+        enqueuedAt,
+        waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
+        sharedSurface: 'runner-sync',
+        scopeClass: ['code']
     };
 }
 function normalizeQueue(queue, now) {

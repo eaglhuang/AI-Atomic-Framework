@@ -37,7 +37,20 @@ export type GeneratedProjectionEnqueueResult = {
     readonly queuePosition: number;
     readonly sourceItemPaths: readonly string[];
     readonly suggestedNextAction: string;
+    readonly brokerTicket: GeneratedProjectionBrokerTicket;
     readonly queue: GeneratedProjectionStewardDocument;
+};
+export type GeneratedProjectionBrokerTicket = {
+    readonly schemaId: 'atm.brokerTicket.v1';
+    readonly ticketId: string;
+    readonly position: number;
+    readonly headOwner: string | null;
+    readonly headHealth: 'task-active';
+    readonly batchEligible: boolean;
+    readonly enqueuedAt: string;
+    readonly waitedMs: number;
+    readonly sharedSurface: string;
+    readonly scopeClass: readonly string[];
 };
 export type GeneratedProjectionCleanupResult = {
     readonly schemaId: 'atm.generatedProjectionStewardCleanupResult.v1';

@@ -13,6 +13,7 @@ export function inspectRunnerSyncAdmission(input) {
     });
     const foreignNonReleaseWip = uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
     const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input);
+    const brokerTicket = buildAdmissionBrokerTicket(input, queueHeadOwnership);
     return {
         schemaId: 'atm.runnerSyncAdmission.v1',
         ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok,
@@ -24,11 +25,31 @@ export function inspectRunnerSyncAdmission(input) {
         foreignBuildInputConflicts,
         releaseWip,
         ordinaryTaskReleaseAutoStageAllowed: false,
+        brokerTicket,
         requiredCommand: foreignNonReleaseWip.length > 0
             ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
             : queueHeadOwnership.ok
                 ? null
                 : queueHeadOwnership.reason
+    };
+}
+function buildAdmissionBrokerTicket(input, ownership) {
+    if (!ownership.stewardWorkId && !input.sealedSourceSha)
+        return null;
+    const now = new Date().toISOString();
+    return {
+        schemaId: 'atm.brokerTicket.v1',
+        ticketId: ownership.stewardWorkId
+            ? `${ownership.stewardWorkId}:${input.sealedSourceSha ?? 'unknown'}`
+            : `runner-sync:${input.sealedSourceSha}`,
+        position: ownership.queuePosition ?? 0,
+        headOwner: ownership.waitingTasks[0] ?? null,
+        headHealth: ownership.queueHeadHealth,
+        batchEligible: false,
+        enqueuedAt: now,
+        waitedMs: 0,
+        sharedSurface: 'runner-sync',
+        scopeClass: ['code']
     };
 }
 export function assertRunnerSyncAdmission(report) {

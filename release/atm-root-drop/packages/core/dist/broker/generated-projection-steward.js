@@ -49,6 +49,7 @@ export function enqueueGeneratedProjectionRebuild(document, request) {
         suggestedNextAction: position === 1
             ? `Rebuild generated projection ${normalized.projectionKey} from sealed source item shards, then release the projection steward entry.`
             : `Wait for projection steward owner ${ownerTaskId}; retry ${buildRetryCommand(materialized.entries[position - 1])}.`,
+        brokerTicket: buildProjectionBrokerTicket(materialized, normalized.taskId, normalized.heartbeatAt, position),
         queue: nextDocument
     };
 }
@@ -154,6 +155,23 @@ function compareEntries(left, right) {
 function buildRetryCommand(entry) {
     const items = entry.sourceItemPaths.map((itemPath) => ` --source-item ${quoteArg(itemPath)}`).join('');
     return `node atm.mjs broker projection enqueue --task ${quoteArg(entry.taskId)} --actor ${quoteArg(entry.actorId)} --projection-key ${quoteArg(entry.projectionKey)}${items} --json`;
+}
+function buildProjectionBrokerTicket(queue, taskId, now, position) {
+    const entry = queue.entries.find((candidate) => candidate.taskId === taskId) ?? queue.entries[0];
+    const enqueuedAt = entry?.createdAt ?? now;
+    const waitedMs = Math.max(0, Date.parse(now) - Date.parse(enqueuedAt));
+    return {
+        schemaId: 'atm.brokerTicket.v1',
+        ticketId: `projection:${queue.projectionKey}:${taskId}`,
+        position,
+        headOwner: queue.entries[0]?.taskId ?? null,
+        headHealth: 'task-active',
+        batchEligible: position > 1,
+        enqueuedAt,
+        waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
+        sharedSurface: queue.projectionKey,
+        scopeClass: ['code']
+    };
 }
 function isGovernanceBacklogItemShard(path) {
     return path.startsWith('docs/governance/atm-bug-and-optimization-backlog.items/')

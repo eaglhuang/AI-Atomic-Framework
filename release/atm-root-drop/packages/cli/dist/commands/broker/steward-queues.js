@@ -5,6 +5,7 @@ import { CliError, makeResult, message } from '../shared.js';
 import { cleanupRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue } from '../../../../core/dist/broker/runner-sync-steward-queue.js';
 import { cleanupGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../../core/dist/broker/generated-projection-steward.js';
 import { readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward } from './persistence.js';
+import { appendLaneSessionEvent } from '../lane-session/events.js';
 export function handleBrokerStewardQueues(options, context) {
     const runnerSyncQueuePath = context.runnerSyncQueuePath;
     const projectionStewardPath = context.projectionStewardPath;
@@ -38,6 +39,7 @@ export function handleBrokerStewardQueues(options, context) {
                 throw toRunnerSyncQueueCliError(error);
             }
             writeRunnerSyncStewardQueue(runnerSyncQueuePath, result.queue);
+            const laneEvent = appendBrokerTicketLaneEvent(options.cwd, options.actorId, result.brokerTicket);
             return makeResult({
                 ok: true,
                 command: 'broker',
@@ -49,12 +51,15 @@ export function handleBrokerStewardQueues(options, context) {
                         queueHeadHealth: result.queueHeadHealth,
                         stewardWorkId: result.stewardWorkId,
                         waitingTasks: result.waitingTasks,
+                        brokerTicket: result.brokerTicket,
                         suggestedNextAction: result.suggestedNextAction
                     })
                 ],
                 evidence: {
                     runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
-                    runnerSync: result
+                    runnerSync: result,
+                    brokerTicket: result.brokerTicket,
+                    laneSessionEvent: laneEvent
                 }
             });
         }
@@ -160,6 +165,7 @@ export function handleBrokerStewardQueues(options, context) {
                 ttlSeconds: options.ttlSeconds
             });
             writeGeneratedProjectionSteward(projectionStewardPath, result.queue);
+            const laneEvent = appendBrokerTicketLaneEvent(options.cwd, options.actorId, result.brokerTicket);
             return makeResult({
                 ok: true,
                 command: 'broker',
@@ -169,12 +175,15 @@ export function handleBrokerStewardQueues(options, context) {
                         projectionKey: result.projectionKey,
                         ownerTaskId: result.ownerTaskId,
                         queuePosition: result.queuePosition,
+                        brokerTicket: result.brokerTicket,
                         suggestedNextAction: result.suggestedNextAction
                     })
                 ],
                 evidence: {
                     generatedProjectionStewardPath: '.atm/runtime/generated-projection-steward.json',
-                    projection: result
+                    projection: result,
+                    brokerTicket: result.brokerTicket,
+                    laneSessionEvent: laneEvent
                 }
             });
         }
@@ -214,6 +223,23 @@ export function handleBrokerStewardQueues(options, context) {
         throw new CliError('ATM_CLI_USAGE', 'broker projection supports: enqueue, status, cleanup', { exitCode: 2 });
     }
     return null;
+}
+function appendBrokerTicketLaneEvent(cwd, actorId, brokerTicket) {
+    const laneId = process.env.ATM_LANE_SESSION_ID?.trim();
+    if (!laneId)
+        return null;
+    try {
+        return appendLaneSessionEvent({
+            cwd,
+            laneId,
+            action: 'broker-ticket-enqueued',
+            actorId: actorId ?? null,
+            details: { brokerTicket }
+        });
+    }
+    catch {
+        return null;
+    }
 }
 function resolveRunnerSyncTaskHealth(cwd, request) {
     return resolveRunnerSyncTaskIdHealth(cwd, request.taskId);

@@ -52,7 +52,20 @@ export type RunnerSyncStewardQueueResult = {
     readonly waitingTasks: readonly string[];
     readonly requestedSurfaces: readonly string[];
     readonly suggestedNextAction: string;
+    readonly brokerTicket: BrokerTicketEnvelope;
     readonly queue: RunnerSyncStewardQueueDocument;
+};
+export type BrokerTicketEnvelope = {
+    readonly schemaId: 'atm.brokerTicket.v1';
+    readonly ticketId: string;
+    readonly position: number;
+    readonly headOwner: string | null;
+    readonly headHealth: RunnerSyncTaskHealth;
+    readonly batchEligible: boolean;
+    readonly enqueuedAt: string;
+    readonly waitedMs: number;
+    readonly sharedSurface: string;
+    readonly scopeClass: readonly string[];
 };
 export type RunnerSyncStewardStaleRelease = {
     readonly taskId: string;

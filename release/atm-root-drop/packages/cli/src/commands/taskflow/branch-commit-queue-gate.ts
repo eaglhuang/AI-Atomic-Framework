@@ -12,6 +12,20 @@ export interface TaskflowBranchCommitQueueGate {
   readonly actorId: string | null;
   readonly summary: string;
   readonly requiredCommand: string | null;
+  readonly brokerTicket?: TaskflowBrokerTicket | null;
+}
+
+export interface TaskflowBrokerTicket {
+  readonly schemaId: 'atm.brokerTicket.v1';
+  readonly ticketId: string;
+  readonly position: number;
+  readonly headOwner: string | null;
+  readonly headHealth: 'task-active';
+  readonly batchEligible: boolean;
+  readonly enqueuedAt: string;
+  readonly waitedMs: number;
+  readonly sharedSurface: string;
+  readonly scopeClass: readonly string[];
 }
 
 function readTaskflowHeadBranchRef(cwd: string): string | null {
@@ -79,7 +93,8 @@ export function evaluateTaskflowBranchCommitQueueGate(input: {
       summary: queueActorId
         ? `Another governed writer (${queueActorId}) is finalizing branch ${branchName}. Wait for the branch commit queue to clear before taskflow close --write.`
         : `Another governed writer is finalizing branch ${branchName}. Wait for the branch commit queue to clear before taskflow close --write.`,
-      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId)} --write --json`
+      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId)} --write --json`,
+      brokerTicket: buildBranchCommitBrokerTicket({ taskId: input.taskId, branchName, queueActorId, record })
     };
   } catch {
     return {
@@ -90,7 +105,30 @@ export function evaluateTaskflowBranchCommitQueueGate(input: {
       lockPath: relativePathFrom(input.cwd, lockPath),
       actorId: null,
       summary: `Branch commit queue lock for ${branchName} exists but could not be parsed. Clear or wait for the active governed writer before taskflow close --write.`,
-      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId)} --write --json`
+      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId)} --write --json`,
+      brokerTicket: buildBranchCommitBrokerTicket({ taskId: input.taskId, branchName, queueActorId: null, record: null })
     };
   }
+}
+
+function buildBranchCommitBrokerTicket(input: {
+  readonly taskId: string;
+  readonly branchName: string;
+  readonly queueActorId: string | null;
+  readonly record: Record<string, unknown> | null;
+}): TaskflowBrokerTicket {
+  const enqueuedAt = typeof input.record?.acquiredAt === 'string' ? input.record.acquiredAt : new Date().toISOString();
+  const waitedMs = Math.max(0, Date.now() - Date.parse(enqueuedAt));
+  return {
+    schemaId: 'atm.brokerTicket.v1',
+    ticketId: `branch-commit:${input.branchName}:${input.taskId}`,
+    position: 2,
+    headOwner: input.queueActorId,
+    headHealth: 'task-active',
+    batchEligible: false,
+    enqueuedAt,
+    waitedMs: Number.isFinite(waitedMs) ? waitedMs : 0,
+    sharedSurface: `branch-commit:${input.branchName}`,
+    scopeClass: ['code']
+  };
 }

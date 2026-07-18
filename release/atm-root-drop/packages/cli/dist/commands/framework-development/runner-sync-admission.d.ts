@@ -22,7 +22,20 @@ export type RunnerSyncAdmissionReport = {
     readonly foreignBuildInputConflicts: readonly RunnerSyncForeignBuildInputConflict[];
     readonly releaseWip: readonly string[];
     readonly ordinaryTaskReleaseAutoStageAllowed: false;
+    readonly brokerTicket: RunnerSyncAdmissionBrokerTicket | null;
     readonly requiredCommand: string | null;
+};
+export type RunnerSyncAdmissionBrokerTicket = {
+    readonly schemaId: 'atm.brokerTicket.v1';
+    readonly ticketId: string;
+    readonly position: number;
+    readonly headOwner: string | null;
+    readonly headHealth: 'task-active' | 'task-missing' | 'task-terminal';
+    readonly batchEligible: boolean;
+    readonly enqueuedAt: string;
+    readonly waitedMs: number;
+    readonly sharedSurface: string;
+    readonly scopeClass: readonly string[];
 };
 export type RunnerSyncForeignBuildInputConflict = {
     readonly blockingTaskId: string;
