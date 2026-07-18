@@ -1,4 +1,4 @@
-﻿// @ts-nocheck
+// @ts-nocheck
 import { inspectTouchedPhysicalLineBudget } from '../../../../../scripts/validate-physical-line-budget.ts';
 function assertGovernedCommitPhysicalLineBudget(cwd, files, actorId, taskId) {
   const report = inspectTouchedPhysicalLineBudget(cwd, files, { taskId, actorId, gate: 'git-commit' });
