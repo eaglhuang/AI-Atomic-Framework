@@ -1,7 +1,17 @@
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, symlinkSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  rmSync,
+  rmdirSync,
+  symlinkSync,
+  unlinkSync
+} from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   assertRunnerSyncAdmission,
   inspectRunnerSyncAdmission
@@ -10,12 +20,62 @@ import {
 type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const target = parseTarget(process.argv.slice(2));
+const invokedAsCli = process.argv[1] !== undefined
+  && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
 
-if (process.argv.includes('--inner')) {
-  runInnerBuild(target);
-} else {
-  runSealedBuild(target);
+/**
+ * Remove a path without following directory junctions/symlinks.
+ * Windows sealed builds link worktree/node_modules -> host node_modules via
+ * junction; recursive rmSync would traverse into the host tree and wipe it.
+ */
+export function removeTreeWithoutFollowingLinks(targetPath: string): void {
+  if (!existsSync(targetPath)) return;
+
+  let stats;
+  try {
+    stats = lstatSync(targetPath);
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException | undefined)?.code;
+    if (code === 'ENOENT') return;
+    throw error;
+  }
+
+  if (stats.isSymbolicLink()) {
+    unlinkSync(targetPath);
+    return;
+  }
+
+  if (stats.isDirectory()) {
+    for (const entry of readdirSync(targetPath)) {
+      removeTreeWithoutFollowingLinks(path.join(targetPath, entry));
+    }
+    try {
+      rmdirSync(targetPath);
+    } catch {
+      // Fall back for non-empty races; still never follow links.
+      rmSync(targetPath, { recursive: false, force: true });
+    }
+    return;
+  }
+
+  unlinkSync(targetPath);
+}
+
+export function isReparsePointOrSymlink(targetPath: string): boolean {
+  try {
+    return lstatSync(targetPath).isSymbolicLink();
+  } catch {
+    return false;
+  }
+}
+
+if (invokedAsCli) {
+  const target = parseTarget(process.argv.slice(2));
+  if (process.argv.includes('--inner')) {
+    runInnerBuild(target);
+  } else {
+    runSealedBuild(target);
+  }
 }
 
 function runSealedBuild(buildTarget: BuildTarget): void {
@@ -32,7 +92,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   }));
 
   const worktreeRoot = path.join(repoRoot, '.atm-temp', 'sealed-runner-build', `${process.pid}-${sealedSourceSha.slice(0, 12)}`);
-  rmSync(worktreeRoot, { recursive: true, force: true });
+  removeTreeWithoutFollowingLinks(worktreeRoot);
   mkdirSync(path.dirname(worktreeRoot), { recursive: true });
   try {
     runGit(repoRoot, ['worktree', 'add', '--detach', worktreeRoot, sealedSourceSha]);
@@ -46,7 +106,13 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe']
     });
-    if ((remove.status ?? 1) !== 0) rmSync(worktreeRoot, { recursive: true, force: true });
+    if ((remove.status ?? 1) !== 0) removeTreeWithoutFollowingLinks(worktreeRoot);
+    else {
+      // git worktree remove may leave a junction behind on Windows; unlink safely.
+      const linkedModules = path.join(worktreeRoot, 'node_modules');
+      if (isReparsePointOrSymlink(linkedModules)) unlinkSync(linkedModules);
+      if (existsSync(worktreeRoot)) removeTreeWithoutFollowingLinks(worktreeRoot);
+    }
   }
 }
 
@@ -83,7 +149,7 @@ function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTar
 
 function copyDirectory(source: string, target: string): void {
   if (!existsSync(source)) return;
-  rmSync(target, { recursive: true, force: true });
+  removeTreeWithoutFollowingLinks(target);
   mkdirSync(path.dirname(target), { recursive: true });
   cpSync(source, target, { recursive: true });
 }

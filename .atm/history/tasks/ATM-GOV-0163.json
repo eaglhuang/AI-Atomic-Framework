@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0163",
+  "title": "Prevent sealed runner build from wiping host node_modules via junction cleanup",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Junction/symlink 情境下，清理 sealed worktree 後主 repo `node_modules` marker 檔仍存在。",
+    "普通目錄（非 link）仍可被完整移除。",
+    "Focused test 全綠；`npm run typecheck` 全綠。",
+    "在 0163 驗證通過前，任何真實 sealed build 後仍建議 `npm ci` 自保；通過後才可宣稱 runner-sync rebuild 安全。"
+  ],
+  "deliverables": [
+    "scripts/run-sealed-runner-build.ts",
+    "tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+  ],
+  "scopePaths": [
+    "scripts/run-sealed-runner-build.ts",
+    "tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+    ".atm/history/evidence/ATM-GOV-0163.*",
+    ".atm/history/task-events/ATM-GOV-0163/**",
+    ".atm/history/tasks/ATM-GOV-0163.json",
+    ".atm/history/tasks/TASK-SYNC-0001.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.sealed-runner-build",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.sealed-runner-build.junction-safe-cleanup",
+        "pattern": "Adapter",
+        "source": "scripts/run-sealed-runner-build.ts",
+        "disposition": "inline",
+        "inlineReason": "Helper stays under 600 lines in the sealed-build script; extract only if a second caller appears."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0163-sealed-build-node-modules-wipe.task.md",
+    "sectionTitle": "ATM-GOV-0163",
+    "headingLine": 53,
+    "hash": "dc48b8a81e924d31",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0163-sealed-build-node-modules-wipe.task.md",
+      "planningCommitSha": "107214839ccaf75903ec4fe59217b112a6e03d0c",
+      "contentDigest": "sha256:dc48b8a81e924d311b45d9fb17dde50587dfe51cd841e85f16bebd688b6c728f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T02:42:11.276Z"
+    }
+  },
+  "importedAt": "2026-07-18T02:42:11.276Z",
+  "lastTransitionId": "2026-07-18T02-42-48-059Z-claim-2b1750329e0f",
+  "lastTransitionAt": "2026-07-18T02:42:48.059Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gov-0163",
+  "reservedAt": "2026-07-18T02:42:40.937Z",
+  "promotedAt": "2026-07-18T02:42:40.940Z",
+  "claim": {
+    "actorId": "cursor-gov-0163",
+    "leaseId": "lease-7548d3ac48a5",
+    "claimedAt": "2026-07-18T02:42:40.943Z",
+    "heartbeatAt": "2026-07-18T02:42:40.943Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0163.json",
+      ".atm/history/evidence/ATM-GOV-0163.*",
+      ".atm/history/task-events/ATM-GOV-0163/**",
+      ".atm/history/tasks/TASK-SYNC-0001.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718024247-cursor-gov-0163-c8946c41b1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718024247-cursor-gov-0163-c8946c41b1\""
+    }
+  },
+  "startedAt": "2026-07-18T02:42:40.943Z",
+  "startedByActor": "cursor-gov-0163",
+  "startedBySessionId": "session-20260718024240-cursor-gov-0163-ATM-GOV-0163-51dcd63ea8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0163",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0163.*",
+      ".atm/history/task-events/ATM-GOV-0163/**",
+      ".atm/history/tasks/ATM-GOV-0163.json",
+      ".atm/history/tasks/TASK-SYNC-0001.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "397efff61375760b7176e4256ed75e17193c6d183b417bf364a4c64852b63692",
+    "actorId": "cursor-gov-0163",
+    "sessionId": "session-20260718024240-cursor-gov-0163-ATM-GOV-0163-51dcd63ea8",
+    "laneSession": {
+      "laneSessionId": "lane-20260718024247-cursor-gov-0163-c8946c41b1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718024247-cursor-gov-0163-c8946c41b1\""
+    },
+    "createdAt": "2026-07-18T02:42:48.058Z",
+    "status": "active"
+  }
+}

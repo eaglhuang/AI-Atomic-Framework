@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0163",
+  "updatedAt": "2026-07-18T02:44:06.888Z",
+  "updatedBy": "cursor-gov-0163",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b044c4d409c7fa47e33a1907901d31c1a22e691af0a35ddf9603133e1f75ac83",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+      ],
+      "generatedAt": "2026-07-18T02:43:25.957Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "beba951a40eaa309772c495029b2a4323996b3c4",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-18T02:43:42.145Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "beba951a40eaa309772c495029b2a4323996b3c4",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b044c4d409c7fa47e33a1907901d31c1a22e691af0a35ddf9603133e1f75ac83",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+      ],
+      "generatedAt": "2026-07-18T02:44:06.949Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "beba951a40eaa309772c495029b2a4323996b3c4",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
