@@ -11,7 +11,8 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   isReparsePointOrSymlink,
-  removeTreeWithoutFollowingLinks
+  removeTreeWithoutFollowingLinks,
+  unlinkWorktreeNodeModulesLink
 } from '../../scripts/run-sealed-runner-build.ts';
 
 const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-junction-'));
@@ -40,6 +41,11 @@ assert.equal(
   'junction must resolve into host node_modules before cleanup'
 );
 
+// Simulate the sealed-build finally order: unlink junction FIRST, then remove tree.
+unlinkWorktreeNodeModulesLink(worktreeRoot);
+assert.equal(existsSync(worktreeNodeModules), false, 'junction must be unlinked before tree remove');
+assert.equal(existsSync(markerPath), true, 'host node_modules must survive unlink of junction');
+
 removeTreeWithoutFollowingLinks(worktreeRoot);
 
 assert.equal(existsSync(worktreeRoot), false, 'worktree root must be removed');
@@ -63,5 +69,6 @@ console.log(JSON.stringify({
   case: 'sealed-runner-build-junction-cleanup',
   platform: process.platform,
   hostMarkerSurvived: true,
-  plainTreeRemoved: true
+  plainTreeRemoved: true,
+  unlinkBeforeRemove: true
 }, null, 2));

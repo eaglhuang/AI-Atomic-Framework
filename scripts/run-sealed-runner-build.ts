@@ -101,18 +101,31 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget);
     console.log(`[sealed-runner-build] built ${buildTarget} from ${sealedSourceSha}`);
   } finally {
+    // CRITICAL: unlink the node_modules junction BEFORE git worktree remove.
+    // On Windows, `git worktree remove --force` can traverse the junction and
+    // wipe the host repo node_modules that the junction points at.
+    unlinkWorktreeNodeModulesLink(worktreeRoot);
     const remove = spawnSync('git', ['worktree', 'remove', '--force', worktreeRoot], {
       cwd: repoRoot,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe']
     });
-    if ((remove.status ?? 1) !== 0) removeTreeWithoutFollowingLinks(worktreeRoot);
-    else {
-      // git worktree remove may leave a junction behind on Windows; unlink safely.
-      const linkedModules = path.join(worktreeRoot, 'node_modules');
-      if (isReparsePointOrSymlink(linkedModules)) unlinkSync(linkedModules);
-      if (existsSync(worktreeRoot)) removeTreeWithoutFollowingLinks(worktreeRoot);
+    if ((remove.status ?? 1) !== 0 || existsSync(worktreeRoot)) {
+      unlinkWorktreeNodeModulesLink(worktreeRoot);
+      removeTreeWithoutFollowingLinks(worktreeRoot);
     }
+  }
+}
+
+export function unlinkWorktreeNodeModulesLink(worktreeRoot: string): void {
+  const linkedModules = path.join(worktreeRoot, 'node_modules');
+  try {
+    if (lstatSync(linkedModules).isSymbolicLink()) {
+      unlinkSync(linkedModules);
+    }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException | undefined)?.code === 'ENOENT') return;
+    throw error;
   }
 }
 

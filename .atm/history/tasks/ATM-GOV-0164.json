@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0164",
+  "title": "Unlink sealed worktree node_modules junction before git worktree remove",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0163"
+  ],
+  "acceptance": [
+    "Focused junction test passes with `unlinkBeforeRemove: true`.",
+    "`npm run typecheck` passes.",
+    "Live sealed build (when runner-sync admits) leaves host `node_modules` intact."
+  ],
+  "deliverables": [
+    "scripts/run-sealed-runner-build.ts",
+    "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/run-sealed-runner-build.ts",
+    "tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+    ".atm/history/evidence/ATM-GOV-0164.*",
+    ".atm/history/task-events/ATM-GOV-0164/**",
+    ".atm/history/tasks/ATM-GOV-0164.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.sealed-runner-build",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0164-unlink-before-worktree-remove.task.md",
+    "sectionTitle": "ATM-GOV-0164",
+    "headingLine": 38,
+    "hash": "b887857049a90f99",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0164-unlink-before-worktree-remove.task.md",
+      "planningCommitSha": "ec37610b96b2b494d629ae279407bb5688a9ea4e",
+      "contentDigest": "sha256:b887857049a90f99322e32c8d0bf05644abb10e734d46d04f5e6a1010f4455c5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T02:57:35.425Z"
+    }
+  },
+  "importedAt": "2026-07-18T02:57:35.425Z",
+  "lastTransitionId": "2026-07-18T02-59-49-321Z-claim-242015783d4a",
+  "lastTransitionAt": "2026-07-18T02:59:49.321Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gov-0164",
+  "reservedAt": "2026-07-18T02:59:41.045Z",
+  "promotedAt": "2026-07-18T02:59:41.050Z",
+  "claim": {
+    "actorId": "cursor-gov-0164",
+    "leaseId": "lease-2283fb3dc514",
+    "claimedAt": "2026-07-18T02:59:41.057Z",
+    "heartbeatAt": "2026-07-18T02:59:41.057Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0164.json",
+      ".atm/history/evidence/ATM-GOV-0164.*",
+      ".atm/history/task-events/ATM-GOV-0164/**",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718025949-cursor-gov-0164-c3fb429144",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718025949-cursor-gov-0164-c3fb429144\""
+    }
+  },
+  "startedAt": "2026-07-18T02:59:41.057Z",
+  "startedByActor": "cursor-gov-0164",
+  "startedBySessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0164",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0164.*",
+      ".atm/history/task-events/ATM-GOV-0164/**",
+      ".atm/history/tasks/ATM-GOV-0164.json",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3ab9800a27747092e6e7fc49b379a2d51ef14d63a09f3302e22b75387cd65841",
+    "actorId": "cursor-gov-0164",
+    "sessionId": "session-20260718025941-cursor-gov-0164-ATM-GOV-0164-e5107282b6",
+    "laneSession": {
+      "laneSessionId": "lane-20260718025949-cursor-gov-0164-c3fb429144",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718025949-cursor-gov-0164-c3fb429144\""
+    },
+    "createdAt": "2026-07-18T02:59:49.320Z",
+    "status": "active"
+  }
+}
