@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { appendLaneSessionEvent } from './lane-session/events.ts';
+import { rebindLifecycleAfterLaneAdopt } from './lane-session/adopt-rebind.ts';
 import { resolveLaneSession } from './lane-session/resolve.ts';
 import {
   adoptLaneSession,
@@ -65,6 +66,9 @@ function runLaneAdopt(options: ParsedLaneOptions) {
     laneId: options.targetLaneId,
     actorId,
     reason: options.reason,
+    confirm: options.confirm,
+    handoffToken: options.handoffToken,
+    graceMs: options.graceMs,
     lastCommand: {
       command: `node atm.mjs lane adopt ${options.targetLaneId} --json`,
       executedAt: new Date().toISOString(),
@@ -72,18 +76,39 @@ function runLaneAdopt(options: ParsedLaneOptions) {
     }
   });
   if (!adopted.ok) {
-    const code = adopted.reason === 'not-found' ? 'ATM_LANE_SESSION_NOT_FOUND' : 'ATM_LANE_SESSION_NOT_ADOPTABLE';
+    const code = adopted.reason === 'not-found'
+      ? 'ATM_LANE_SESSION_NOT_FOUND'
+      : adopted.reason === 'not-stale'
+        ? 'ATM_LANE_SESSION_NOT_STALE'
+        : adopted.reason === 'token-mismatch'
+          ? 'ATM_LANE_ADOPT_TOKEN_MISMATCH'
+          : 'ATM_LANE_SESSION_NOT_ADOPTABLE';
     const summary = adopted.reason === 'not-found'
       ? `Lane session ${options.targetLaneId} was not found.`
-      : `Lane session ${options.targetLaneId} is closed and cannot be adopted.`;
+      : adopted.reason === 'not-stale'
+        ? `Lane session ${options.targetLaneId} is still within TTL; adopt requires --confirm or a matching handoff token.`
+        : adopted.reason === 'token-mismatch'
+          ? `Lane session ${options.targetLaneId} handoff token did not match.`
+          : `Lane session ${options.targetLaneId} is closed and cannot be adopted.`;
     throw new CliError(code, summary, {
       exitCode: 1,
       details: {
         laneSessionId: options.targetLaneId,
-        status: adopted.session?.status ?? null
+        status: adopted.session?.status ?? null,
+        ttlPhase: adopted.ttlPhaseBefore ?? null,
+        requiredCommand: adopted.reason === 'not-stale'
+          ? `node atm.mjs lane adopt ${options.targetLaneId} --actor ${actorId} --confirm --json`
+          : null
       }
     });
   }
+
+  const rebind = rebindLifecycleAfterLaneAdopt({
+    cwd: options.cwd,
+    laneId: adopted.session.laneId,
+    actorId,
+    session: adopted.session
+  });
 
   const event = appendLaneSessionEvent({
     cwd: options.cwd,
@@ -93,7 +118,12 @@ function runLaneAdopt(options: ParsedLaneOptions) {
     details: {
       previousActorId: adopted.previousSession.actorId,
       previousStatus: adopted.previousSession.status,
-      reason: options.reason
+      reason: options.reason,
+      authorization: adopted.authorization,
+      ttlPhaseBefore: adopted.ttlPhaseBefore,
+      reboundSessionIds: rebind.reboundSessionIds,
+      reboundTaskIds: rebind.reboundTaskIds,
+      preservedLeaseIds: rebind.preservedLeaseIds
     }
   });
   const exportHint = buildExportHint(adopted.session.laneId);
@@ -113,6 +143,10 @@ function runLaneAdopt(options: ParsedLaneOptions) {
         laneSessionId: adopted.session.laneId,
         actorId,
         previousActorId: adopted.previousSession.actorId,
+        authorization: adopted.authorization,
+        reboundSessionIds: rebind.reboundSessionIds,
+        reboundTaskIds: rebind.reboundTaskIds,
+        preservedLeaseIds: rebind.preservedLeaseIds,
         eventPath: event.eventPath,
         exportHint
       })
@@ -122,6 +156,9 @@ function runLaneAdopt(options: ParsedLaneOptions) {
       laneSession: envelope,
       session: adopted.session,
       previousSession: adopted.previousSession,
+      authorization: adopted.authorization,
+      ttlPhaseBefore: adopted.ttlPhaseBefore,
+      rebind,
       event: event.event,
       eventPath: event.eventPath
     }
@@ -268,6 +305,8 @@ interface ParsedLaneOptions {
   readonly laneSessionId: string | null;
   readonly actorId: string | null;
   readonly reason: string | null;
+  readonly confirm: boolean;
+  readonly handoffToken: string | null;
   readonly graceMs: number;
   readonly write: boolean;
 }
@@ -280,6 +319,8 @@ function parseLaneOptions(argv: string[]): ParsedLaneOptions {
     laneSessionId: null as string | null,
     actorId: null as string | null,
     reason: null as string | null,
+    confirm: false,
+    handoffToken: null as string | null,
     graceMs: 0,
     write: false
   };
@@ -303,6 +344,15 @@ function parseLaneOptions(argv: string[]): ParsedLaneOptions {
     }
     if (arg === '--reason') {
       state.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--confirm') {
+      state.confirm = true;
+      continue;
+    }
+    if (arg === '--handoff-token') {
+      state.handoffToken = requireValue(argv, index, arg);
       index += 1;
       continue;
     }
@@ -338,6 +388,8 @@ function parseLaneOptions(argv: string[]): ParsedLaneOptions {
     laneSessionId: state.laneSessionId,
     actorId: state.actorId,
     reason: state.reason,
+    confirm: state.confirm,
+    handoffToken: state.handoffToken,
     graceMs: state.graceMs,
     write: state.write
   };

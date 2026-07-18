@@ -191,6 +191,34 @@ export function updateActorWorkSessionState(input: {
   });
 }
 
+/** Transfer active work-session authority after its lane is adopted. */
+export function rebindActiveWorkSessionsForLane(input: {
+  readonly cwd: string;
+  readonly laneSessionId: string;
+  readonly actorId: string;
+  readonly timestamp?: string;
+}): readonly ActorWorkSessionDocument[] {
+  return listActorWorkSessions(input.cwd)
+    .filter((session) => session.status === 'active' && session.guidanceSessionId === input.laneSessionId)
+    .map((session) => upsertActorWorkSession({
+      cwd: input.cwd,
+      sessionId: session.sessionId,
+      actorId: input.actorId,
+      taskId: session.taskId,
+      claimLeaseId: session.claimLeaseId,
+      status: 'active',
+      taskPath: session.taskPath,
+      sourcePrompt: session.sourcePrompt,
+      batchId: session.batchId,
+      guidanceSessionId: input.laneSessionId,
+      editor: session.editor,
+      gitName: session.gitName,
+      gitEmail: session.gitEmail,
+      reason: 'lane-adopted',
+      timestamp: input.timestamp
+    }).session);
+}
+
 function sessionPathFor(cwd: string, sessionId: string) {
   return path.join(cwd, runtimeSessionsRootRelativePath, `${safeFileId(sessionId)}.json`);
 }

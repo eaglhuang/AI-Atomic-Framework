@@ -31,6 +31,7 @@ import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueF
 import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.ts';
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
+import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts';
 export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
 export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
@@ -66,13 +67,17 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       } catch {}
     }
   }
-  const reusesOwnActiveClaim = Boolean(
-    selectedTask
-    && isTaskAlreadyActivelyClaimed(selectedTask)
-    && typeof input.actor === 'string'
-    && input.actor.trim().length > 0
-    && selectedTask.activeClaimActorId === input.actor.trim()
-  );
+  const requestedLaneSessionIdForReuse = selectedTask
+    ? resolveCurrentLaneSessionIdForFreshReservation(input.cwd, input.actor?.trim() ?? '')
+    : null;
+  const reusesOwnActiveClaim = Boolean(selectedTask && isTaskAlreadyActivelyClaimed(selectedTask)
+    && typeof input.actor === 'string' && input.actor.trim().length > 0
+    && evaluateSameTaskClaimOwnership({
+      currentActorId: selectedTask.activeClaimActorId ?? '',
+      currentLaneSessionId: selectedTask.activeClaimLaneSessionId,
+      requestedActorId: input.actor.trim(),
+      requestedLaneSessionId: requestedLaneSessionIdForReuse
+    }).sameOwner);
   if (selectedTaskDependencyBlockers.length > 0 && !reusesOwnActiveClaim) {
     const firstBlocker = selectedTaskDependencyBlockers[0];
     const requiredCmd = firstBlocker.requiredCommand
@@ -221,20 +226,16 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     };
   }
   const existingClaimActorId = claimableTask.activeClaimActorId;
-  if (existingClaimActorId && existingClaimActorId !== resolvedActor.actorId) {
-    throw new CliError('ATM_LOCK_CONFLICT', `Task ${claimableTask.workItemId} is already claimed by ${existingClaimActorId}.`, {
-      exitCode: 1,
-      details: {
-        taskId: claimableTask.workItemId,
-        actorId: existingClaimActorId,
-        requestedActorId: resolvedActor.actorId,
-        actorResolution,
-        recoveryHint: existingClaimActorId === actorResolution.repoDefaultActorId
-          ? `Continue with the existing claim owner ${existingClaimActorId}, or rerun with --actor ${existingClaimActorId}.`
-          : `Continue with the existing claim owner ${existingClaimActorId}, or release/take over the task before claiming as ${resolvedActor.actorId}.`
-      }
-    });
-  }
+  const existingClaimLaneSessionId = claimableTask.activeClaimLaneSessionId ?? null;
+  const requestedLaneSessionId = currentLaneSessionId;
+  const alreadyOwnsActiveClaim = throwIfNextClaimForeignActiveOwner({
+    taskId: claimableTask.workItemId,
+    existingClaimActorId,
+    existingClaimLaneSessionId,
+    requestedActorId: resolvedActor.actorId,
+    requestedLaneSessionId,
+    actorResolution
+  });
   let parallelAdvisory: Record<string, unknown> | undefined = undefined;
   let brokerQueueAdmission: BrokerQueueAdmission | undefined = undefined;
   let claimAllowedFiles = (input.claimFiles && input.claimFiles.length > 0)
@@ -304,7 +305,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       }
     });
   }
-  const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
+  const alreadyClaimedByActor = alreadyOwnsActiveClaim;
   const activeClaimIntent = claimableTask.activeClaimIntent ?? 'write';
   const shouldReuseActiveClaim = alreadyClaimedByActor
     && (autoIntent || activeClaimIntent === claimIntent);

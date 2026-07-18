@@ -48,6 +48,10 @@ type LaneEvidenceSummary = {
   readonly lastEventAt: string | null;
   readonly maxEventsPerLane: number;
   readonly hasAppendOnlyHistory: boolean;
+  readonly maxConcurrency: number;
+  readonly overlapMs: number;
+  readonly activeWindowMs: number;
+  readonly concurrentLaneIds: readonly string[];
 };
 
 type WaveSummary = {
@@ -247,6 +251,7 @@ function summarizeLaneEvidence(root: string, events: readonly LaneSessionEvent[]
     if (taskId) tasks.add(taskId);
   }
   const createdAts = events.map((event) => event.createdAt).filter((value): value is string => Boolean(value));
+  const concurrency = summarizeLaneSessionConcurrency(events);
   return {
     eventRoot: root,
     eventCount: events.length,
@@ -257,7 +262,50 @@ function summarizeLaneEvidence(root: string, events: readonly LaneSessionEvent[]
     firstEventAt: minIso(createdAts),
     lastEventAt: maxIso(createdAts),
     maxEventsPerLane: perLane.size ? Math.max(...perLane.values()) : 0,
-    hasAppendOnlyHistory: events.length > 0
+    hasAppendOnlyHistory: events.length > 0,
+    maxConcurrency: concurrency.maxConcurrency,
+    overlapMs: concurrency.overlapMs,
+    activeWindowMs: concurrency.activeWindowMs,
+    concurrentLaneIds: concurrency.concurrentLaneIds
+  };
+}
+
+/** Light overlap metric over lane-session event windows (first→last event per lane). */
+function summarizeLaneSessionConcurrency(events: readonly LaneSessionEvent[]): {
+  readonly maxConcurrency: number;
+  readonly overlapMs: number;
+  readonly activeWindowMs: number;
+  readonly concurrentLaneIds: readonly string[];
+} {
+  const byLane = new Map<string, { startAt: string; endAt: string; actorId: string }>();
+  for (const event of events) {
+    if (!event.laneId || !event.createdAt) continue;
+    const existing = byLane.get(event.laneId);
+    if (!existing) {
+      byLane.set(event.laneId, {
+        startAt: event.createdAt,
+        endAt: event.createdAt,
+        actorId: event.actorId ?? 'unknown'
+      });
+      continue;
+    }
+    if (Date.parse(event.createdAt) < Date.parse(existing.startAt)) existing.startAt = event.createdAt;
+    if (Date.parse(event.createdAt) > Date.parse(existing.endAt)) existing.endAt = event.createdAt;
+  }
+  const intervals: ActivityInterval[] = [...byLane.entries()]
+    .filter(([, window]) => Date.parse(window.endAt) > Date.parse(window.startAt))
+    .map(([laneId, window]) => ({
+      id: laneId,
+      actorId: window.actorId,
+      startAt: window.startAt,
+      endAt: window.endAt
+    }));
+  const stats = intervalConcurrencyStats(intervals);
+  return {
+    maxConcurrency: stats.maxConcurrency,
+    overlapMs: stats.overlapMs,
+    activeWindowMs: stats.activeWindowMs,
+    concurrentLaneIds: intervals.map((interval) => interval.id).sort()
   };
 }
 
@@ -501,6 +549,7 @@ function renderMarkdown(result: CaptainParallelLedgerAnalysis): string {
     '',
     `- Session event root: \`${result.laneEvidence.eventRoot}\``,
     `- Lane events: ${result.laneEvidence.eventCount}; lanes: ${result.laneEvidence.laneCount}; actors: ${result.laneEvidence.actorCount}; task-linked events: ${result.laneEvidence.taskCount}.`,
+    `- Lane-session event overlap concurrency: max ${result.laneEvidence.maxConcurrency}, overlap ${formatMs(result.laneEvidence.overlapMs)}, active window ${formatMs(result.laneEvidence.activeWindowMs)}.`,
     `- Event actions: ${Object.entries(result.laneEvidence.actions).map(([action, count]) => `${action}=${count}`).join(', ') || 'none'}.`,
     laneDogfood
       ? `- Dogfood overlap sample \`TASK-CODEX-0204\` + \`TASK-LANE-0001/0002/0003/0010\`: max concurrency ${laneDogfood.maxConcurrency}, overlap ${formatMs(laneDogfood.overlapMs)}.`
