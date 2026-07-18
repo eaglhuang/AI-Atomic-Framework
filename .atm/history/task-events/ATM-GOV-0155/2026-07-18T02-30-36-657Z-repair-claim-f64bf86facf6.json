@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T02-30-36-657Z-repair-claim-f64bf86facf6",
+  "taskId": "ATM-GOV-0155",
+  "action": "repair-claim",
+  "actorId": "codex-main",
+  "sessionId": "session-20260717085154-codex-atm-gov-0155-cleanup-ATM-GOV-0155-573d90b37e",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:b1bf6ce4b3f4f401d11004148d4beaffe0f3425cce4303bf2f1170d356be82ef",
+  "createdAt": "2026-07-18T02:30:36.657Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0155 --actor codex-main --write --reason \"Clear expired ATM-GOV-0155 claim and dangling governance lock so TASK-RFT-0099 runner-sync release artifacts can commit through governed hooks.\" --json"
+}
