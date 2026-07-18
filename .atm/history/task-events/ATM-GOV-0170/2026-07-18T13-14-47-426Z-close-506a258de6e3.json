@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T13-14-47-426Z-close-506a258de6e3",
+  "taskId": "ATM-GOV-0170",
+  "action": "close",
+  "actorId": "codex-gpt-5-captain",
+  "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0170.json",
+  "taskSha256": "sha256:e6a9bff5ed60a5649f7192824d274a2af8c5b1745bd538ee5fd51128898931b1",
+  "createdAt": "2026-07-18T13:14:47.426Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0170 --actor codex-gpt-5-captain --status done --historical-delivery a27dccd60679b9ac2d308c9e39001a1cd2450bda",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0170.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/oversized-extraction-claim-pathway.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:physical-line-budget"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T13:14:47.417Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0170.*",
+        ".atm/history/task-events/ATM-GOV-0170/**",
+        ".atm/history/tasks/ATM-GOV-0170.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-002.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-003.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/oversized-extraction-admission.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "scripts/validate-physical-line-budget.ts",
+        "tests/cli/oversized-extraction-claim-pathway.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/oversized-extraction-admission.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "scripts/validate-physical-line-budget.ts",
+        "tests/cli/oversized-extraction-claim-pathway.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

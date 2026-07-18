@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0170",
   "title": "Governed extraction claim pathway for oversized touched files",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [],
@@ -75,8 +75,8 @@
     }
   },
   "importedAt": "2026-07-18T10:55:55.352Z",
-  "lastTransitionId": "2026-07-18T13-02-19-878Z-scope-amendment-66d0484764d7",
-  "lastTransitionAt": "2026-07-18T13:02:19.878Z",
+  "lastTransitionId": "2026-07-18T13-14-47-426Z-close-506a258de6e3",
+  "lastTransitionAt": "2026-07-18T13:14:47.426Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5-captain",
   "reservedAt": "2026-07-18T13:01:31.439Z",
@@ -85,7 +85,7 @@
     "actorId": "codex-gpt-5-captain",
     "leaseId": "lease-8d19762b7cb5",
     "claimedAt": "2026-07-18T13:01:31.446Z",
-    "heartbeatAt": "2026-07-18T13:01:31.446Z",
+    "heartbeatAt": "2026-07-18T13:14:47.423Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0170.*",
@@ -104,14 +104,14 @@
       "scripts/validate-physical-line-budget.ts",
       "tests/cli/oversized-extraction-claim-pathway.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718130131-codex-gpt-5-captain-2b9e7186d8",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718130131-codex-gpt-5-captain-2b9e7186d8\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T13:01:31.446Z",
   "startedByActor": "codex-gpt-5-captain",
@@ -155,5 +155,9 @@
     },
     "createdAt": "2026-07-18T13:01:38.069Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T13:14:47.423Z",
+  "closedByActor": "codex-gpt-5-captain",
+  "closedBySessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0170.closure-packet.json"
 }
