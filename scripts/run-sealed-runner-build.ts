@@ -145,6 +145,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     linkNodeModules(worktreeRoot);
     runTimedInnerBuild(worktreeRoot, buildTarget, timings);
     timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget));
+    timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeBuildMetadataToReleaseManifests({
       cwd: repoRoot,
       sealedSourceSha,
