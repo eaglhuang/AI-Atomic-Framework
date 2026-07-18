@@ -1,0 +1,40 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0122",
+  "updatedAt": "2026-07-18T04:46:34.224Z",
+  "updatedBy": "codex-gov-sequence",
+  "freshValidationPasses": [
+    "typecheck",
+    "validate:registry-diff"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run validate:registry-diff",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e06908a0948ef4343096a9748d801e0a7e14e4f85e3bd1a81652982312e4dea8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:registry-diff"
+      ],
+      "generatedAt": "2026-07-18T04:46:22.562Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "57f10084b3a175fb6eb149646df4526ab7b6edda",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-18T04:46:34.343Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "57f10084b3a175fb6eb149646df4526ab7b6edda",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

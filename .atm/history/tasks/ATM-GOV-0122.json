@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0122",
+  "title": "Adopter Atom Version Lineage for Evolve Proof",
+  "status": "running",
+  "milestone": "M5",
+  "dependencies": [
+    "ATM-GOV-0116",
+    "ATM-GOV-0118",
+    "ATM-GOV-0120"
+  ],
+  "acceptance": [
+    "An adopter atom with lineage can produce a machine-generated `registry-diff` / hash-diff artifact instead of `ATM_DIFF_ATOM_NOT_FOUND`.",
+    "Atomize / infect / evolve flows define when and where adopter atom version lineage is born, updated, and validated.",
+    "Missing-lineage cases return an explicit advisory contract rather than a silent dead end.",
+    "Source-tree and onefile validation cover the evolve-proof path on a non-JS adopter fixture."
+  ],
+  "deliverables": [
+    "packages/core/src/registry/**",
+    "packages/core/src/upgrade/**",
+    "packages/cli/src/commands/registry-diff.ts",
+    "packages/cli/src/commands/replacement-lane.ts",
+    "scripts/validate-registry-diff.ts",
+    "docs/MAP_REPLACEMENT_PROTOCOL.md",
+    "docs/ADAPTER_GUIDE.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-002.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-003.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-004.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-001.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/core/src/registry/**",
+    "packages/core/src/upgrade/**",
+    "packages/cli/src/commands/registry-diff.ts",
+    "packages/cli/src/commands/replacement-lane.ts",
+    "scripts/validate-registry-diff.ts",
+    "docs/MAP_REPLACEMENT_PROTOCOL.md",
+    "docs/ADAPTER_GUIDE.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-002.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-003.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-004.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-001.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run build",
+    "node --experimental-strip-types scripts/validate-registry-diff.ts"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.adopter-atom-version-lineage",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.registry.adopter-version-lineage",
+        "pattern": "Contract",
+        "source": "packages/core/src/registry",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "`3klife-npc-brain` reached a real evolve blocker while validating `TASK-ATS-0007`. The ATM `registry-diff` route returned `ATM_DIFF_ATOM_NOT_FOUND` for `ATM-NPCBRAIN-0002`, even though the adopter already has governed map evidence and approved dry-run proposals. This shows that map-level evolve proof still lacks a machine-readable atom-level version lineage contract for adopter-managed atoms.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0122-adopter-atom-version-lineage.task.md",
+    "sectionTitle": "ATM-GOV-0122",
+    "headingLine": 68,
+    "hash": "e2eaf573ff5f0505",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0122-adopter-atom-version-lineage.task.md",
+      "planningCommitSha": "e8f6908b8a26d6301f50866c060d1e68c9c83e20",
+      "contentDigest": "sha256:e2eaf573ff5f0505d45ab75d4276fa6f06a40d9341b8d7c55ea5d06cea51fd1c",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T04:44:27.840Z"
+    }
+  },
+  "importedAt": "2026-07-18T04:44:27.840Z",
+  "lastTransitionId": "2026-07-18T04-44-43-271Z-claim-3423617cea09",
+  "lastTransitionAt": "2026-07-18T04:44:43.271Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-sequence",
+  "reservedAt": "2026-07-18T04:44:37.859Z",
+  "promotedAt": "2026-07-18T04:44:37.864Z",
+  "claim": {
+    "actorId": "codex-gov-sequence",
+    "leaseId": "lease-44d588f40fd1",
+    "claimedAt": "2026-07-18T04:44:37.871Z",
+    "heartbeatAt": "2026-07-18T04:44:37.871Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0122.json",
+      "docs/ADAPTER_GUIDE.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-002.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-004.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-001.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/MAP_REPLACEMENT_PROTOCOL.md",
+      "packages/cli/src/commands/registry-diff.ts",
+      "packages/cli/src/commands/replacement-lane.ts",
+      "packages/core/src/registry/**",
+      "packages/core/src/upgrade/**",
+      "scripts/validate-registry-diff.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718044443-codex-gov-sequence-52d59a7026",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718044443-codex-gov-sequence-52d59a7026\""
+    }
+  },
+  "startedAt": "2026-07-18T04:44:37.871Z",
+  "startedByActor": "codex-gov-sequence",
+  "startedBySessionId": "session-20260718044437-codex-gov-sequence-ATM-GOV-0122-07252c2920",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0122",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0122.*",
+      ".atm/history/task-events/ATM-GOV-0122/**",
+      ".atm/history/tasks/ATM-GOV-0122.json",
+      "docs/ADAPTER_GUIDE.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-002.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-004.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-001.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/MAP_REPLACEMENT_PROTOCOL.md",
+      "packages/cli/src/commands/registry-diff.ts",
+      "packages/cli/src/commands/replacement-lane.ts",
+      "packages/core/src/registry/**",
+      "packages/core/src/upgrade/**",
+      "scripts/validate-registry-diff.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9524fa6bcadd05ec97336dd308d73f9279a0feb74eb39b0999a7bd038c4c1ec9",
+    "actorId": "codex-gov-sequence",
+    "sessionId": "session-20260718044437-codex-gov-sequence-ATM-GOV-0122-07252c2920",
+    "laneSession": {
+      "laneSessionId": "lane-20260718044443-codex-gov-sequence-52d59a7026",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718044443-codex-gov-sequence-52d59a7026\""
+    },
+    "createdAt": "2026-07-18T04:44:43.270Z",
+    "status": "active"
+  }
+}
