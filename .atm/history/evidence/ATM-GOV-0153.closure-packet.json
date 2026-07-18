@@ -1,0 +1,160 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0153",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AppData\\Local\\Temp\\atm-gov-0159-push",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "97cf6748daf9b3f6f0eb3040e718b55e51a9a85a",
+  "governedTreeSha": "1e22eeea2c4989cd8a9665fcdc409ae31fde8c59",
+  "targetCommitDelta": {
+    "currentCommitSha": "97cf6748daf9b3f6f0eb3040e718b55e51a9a85a",
+    "parentCommitShas": [
+      "97cf6748daf9b3f6f0eb3040e718b55e51a9a85a"
+    ],
+    "governedTreeSha": "1e22eeea2c4989cd8a9665fcdc409ae31fde8c59",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0153.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0153.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-18T05-59-14-711Z-reserve-628c8cb3137c.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-18T05-59-14-715Z-promote-b10415477dfc.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-18T06-00-31-912Z-import-d832e75063c3.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-18T06-01-42-337Z-reserve-d772da9b0c8f.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-18T06-01-42-341Z-promote-35bacb113622.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-18T06-01-52-364Z-claim-56d17b73c4b1.json",
+      ".atm/history/tasks/ATM-GOV-0153.json",
+      "artifacts/generated/team-dogfood/real-paired-sample.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-004.json",
+      "tests/cli/team-agents-dogfood.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aa90f7cc0de63fed293b3e17440bb4758b49868fb07bf1bdda78003f455f3fd7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/governance-cost-bench.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4dc761bab6c143c738a6b35e5e316e5dad490442832a142bb4ddfdf0214716a3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8a590d48be9e1f06c3448c31621a6dea687cf8a0f5ae43985e10408331ec6a64",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+      "stderrSha256": "sha256:67be64dbc7494080d639c5ce93f9c27ada1ca38992de1702312f2b3addea10b1",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/governance-cost-bench.test.ts",
+    "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T06:04:56.010Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0153.*",
+      ".atm/history/task-events/ATM-GOV-0153/**",
+      ".atm/history/tasks/ATM-GOV-0153.json",
+      "artifacts/generated/team-dogfood/**",
+      "artifacts/generated/team-dogfood/real-paired-sample.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "tests/cli/governance-cost-bench.test.ts",
+      "tests/cli/team-agents-dogfood.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "tests/cli/governance-cost-bench.test.ts",
+      "tests/cli/team-agents-dogfood.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0153.json",
+  "closedAt": "2026-07-18T06:04:56.011Z",
+  "closedByActor": "atm-core",
+  "sessionId": "session-20260718060142-atm-core-ATM-GOV-0153-c2711f6800",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "fbd5499967a3d40dbc6144ca601909b96adcb31d",
+    "taskMatchedFiles": [
+      "artifacts/generated/team-dogfood/real-paired-sample.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-004.json",
+      "tests/cli/team-agents-dogfood.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0153.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-15T17-01-38-456Z-import-68ed3fcba202.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-15T17-01-45-580Z-reserve-967ddb8f8a50.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-15T17-01-45-583Z-promote-bdcf847b83dc.json",
+      ".atm/history/task-events/ATM-GOV-0153/2026-07-15T17-01-51-256Z-claim-e3a877c4d006.json",
+      ".atm/history/tasks/ATM-GOV-0153.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

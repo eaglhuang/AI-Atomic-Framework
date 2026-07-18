@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0153",
   "title": "Collect real Team dogfood promotion evidence",
-  "status": "open",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0140",
@@ -62,7 +62,7 @@
   "tags": [],
   "notes": "- This card closes the residual gap from TASK-RFT-0028, ATM-GOV-0126, and ATM-GOV-0140: fake or fixture cost data must never be treated as production Team promotion evidence.",
   "source": {
-    "planPath": "governance-optimization/tasks/ATM-GOV-0153-real-team-dogfood-promotion-evidence.task.md",
+    "planPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0153-real-team-dogfood-promotion-evidence.task.md",
     "sectionTitle": "ATM-GOV-0153",
     "headingLine": 39,
     "hash": "bf1d85eb0131f314",
@@ -70,25 +70,25 @@
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
-      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0153-real-team-dogfood-promotion-evidence.task.md",
+      "taskCardPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0153-real-team-dogfood-promotion-evidence.task.md",
       "planningCommitSha": null,
       "contentDigest": "sha256:bf1d85eb0131f314a5683ca95129232b0837f9234d10e069d4a0b618a0824104",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-15T17:01:38.123Z"
+      "sealedAt": "2026-07-18T06:00:28.902Z"
     }
   },
-  "importedAt": "2026-07-15T17:01:38.123Z",
-  "lastTransitionId": "2026-07-15T17-07-23-331Z-release-91e5abab22bc",
-  "lastTransitionAt": "2026-07-15T17:07:23.331Z",
+  "importedAt": "2026-07-18T06:00:28.902Z",
+  "lastTransitionId": "2026-07-18T06-04-56-026Z-close-40516be31625",
+  "lastTransitionAt": "2026-07-18T06:04:56.026Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5-5-captain",
-  "reservedAt": "2026-07-15T17:01:45.580Z",
-  "promotedAt": "2026-07-15T17:01:45.583Z",
+  "owner": "atm-core",
+  "reservedAt": "2026-07-18T06:01:42.337Z",
+  "promotedAt": "2026-07-18T06:01:42.341Z",
   "claim": {
-    "actorId": "codex-gpt-5-5-captain",
-    "leaseId": "lease-73d4a2b3f662",
-    "claimedAt": "2026-07-15T17:01:45.589Z",
-    "heartbeatAt": "2026-07-15T17:07:23.234Z",
+    "actorId": "atm-core",
+    "leaseId": "lease-ef515eee570e",
+    "claimedAt": "2026-07-18T06:01:42.348Z",
+    "heartbeatAt": "2026-07-18T06:04:56.023Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0153.json",
@@ -98,11 +98,17 @@
       "tests/cli/team-agents-dogfood.test.ts"
     ],
     "state": "released",
-    "reason": "Committed measurement-incomplete guard and blocker; leaving ATM-GOV-0153 open until real provider paired dogfood evidence exists."
+    "laneSession": {
+      "laneSessionId": "lane-20260718060152-atm-core-0ad42db4a0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718060152-atm-core-0ad42db4a0\""
+    },
+    "reason": "closed"
   },
-  "startedAt": "2026-07-15T17:01:45.589Z",
-  "startedByActor": "codex-gpt-5-5-captain",
-  "startedBySessionId": "session-20260715170145-codex-gpt-5-5-captain-ATM-GOV-0153-6938475a48",
+  "startedAt": "2026-07-18T06:01:42.348Z",
+  "startedByActor": "atm-core",
+  "startedBySessionId": "session-20260718060142-atm-core-ATM-GOV-0153-c2711f6800",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -124,8 +130,19 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "2df873dccea6ed494603c674077e88568e051f249c6bb08ac8caba7e0411fb48",
-    "actorId": "codex-gpt-5-5-captain",
-    "createdAt": "2026-07-15T17:01:51.255Z",
+    "actorId": "atm-core",
+    "sessionId": "session-20260718060142-atm-core-ATM-GOV-0153-c2711f6800",
+    "laneSession": {
+      "laneSessionId": "lane-20260718060152-atm-core-0ad42db4a0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718060152-atm-core-0ad42db4a0\""
+    },
+    "createdAt": "2026-07-18T06:01:52.363Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T06:04:56.023Z",
+  "closedByActor": "atm-core",
+  "closedBySessionId": "session-20260718060142-atm-core-ATM-GOV-0153-c2711f6800",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0153.closure-packet.json"
 }
