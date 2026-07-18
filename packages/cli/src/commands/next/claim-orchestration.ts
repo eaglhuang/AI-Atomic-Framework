@@ -19,7 +19,7 @@ import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfi
 import { buildTeamKnowledgeSummary } from '../team-knowledge.ts';
 import { decideActiveBatchClaimTask } from '../next-active-batch.ts';
 import { runClaimParallelPreflight } from './claim-parallel-preflight.ts';
-import { inspectTouchedPhysicalLineBudget } from '../../../../../scripts/validate-physical-line-budget.ts';
+import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.ts';
 import { CliError, makeResult, message, parseJsonText } from '../shared.ts';
 import { prepareImportedTaskForClaim, registerPreClaimBrokerTransaction } from './claim-helpers.ts';
 import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from '../tasks/public-surface.ts';

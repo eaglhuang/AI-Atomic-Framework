@@ -8,7 +8,7 @@ import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { resolveTaskflowDeclaredFiles } from './task-scope.ts';
 import { quoteCliValue } from '../shared.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
-import { inspectTouchedPhysicalLineBudget } from '../../../../../scripts/validate-physical-line-budget.ts';
+import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.ts';
 
 export type { HistoricalClosePreflightSummary };
 
