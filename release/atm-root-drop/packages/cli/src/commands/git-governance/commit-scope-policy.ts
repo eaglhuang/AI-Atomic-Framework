@@ -1,4 +1,106 @@
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+
 export type TaskClaimIntent = 'write' | 'closeout-only';
+
+export type PhysicalLineBudgetContext = {
+  readonly taskId?: string | null;
+  readonly actorId?: string | null;
+  readonly gate?: string | null;
+};
+
+export type PhysicalLineBudgetReport = {
+  readonly ok: boolean;
+  readonly mode: 'touched';
+  readonly scannedFiles: number;
+  readonly maxLines: number;
+  readonly softLines: number;
+  readonly hardViolationCount: number;
+  readonly softWarningCount: number;
+  readonly topFile: { readonly file: string; readonly lines: number } | null;
+  readonly hardViolations: readonly { readonly file: string; readonly lines: number }[];
+  readonly softWarnings: readonly { readonly file: string; readonly lines: number }[];
+  readonly context: PhysicalLineBudgetContext;
+  readonly reproduceCommand: string;
+};
+
+const DEFAULT_PHYSICAL_LINE_BUDGET_MAX = 600;
+const DEFAULT_PHYSICAL_LINE_BUDGET_SOFT = 500;
+const sourceExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs']);
+const excludedSegments = new Set(['node_modules', '.git', 'dist', 'build', 'coverage', '.turbo', '.next']);
+const excludedPrefixes = ['release/atm-root-drop/', 'release/atm-onefile/'];
+
+export function inspectTouchedPhysicalLineBudget(
+  cwd: string,
+  touchedFiles: readonly string[],
+  context: PhysicalLineBudgetContext = {}
+): PhysicalLineBudgetReport {
+  const files = uniqueSorted(touchedFiles)
+    .filter((file) => isPhysicalLineBudgetSourceFile(file))
+    .filter((file) => !shouldSkipPhysicalLineBudgetPath(file))
+    .filter((file) => existsSync(path.join(cwd, file)));
+  const maxLines = readConfiguredPhysicalLineBudget(cwd, 'maxLines', DEFAULT_PHYSICAL_LINE_BUDGET_MAX);
+  const softLines = readConfiguredPhysicalLineBudget(cwd, 'softLines', DEFAULT_PHYSICAL_LINE_BUDGET_SOFT);
+  const rows = files.map((file) => ({ file, lines: countPhysicalLines(path.join(cwd, file)) }))
+    .sort((left, right) => right.lines - left.lines || left.file.localeCompare(right.file));
+  const hardViolations = rows.filter((entry) => entry.lines > maxLines);
+  const softWarnings = rows.filter((entry) => entry.lines > softLines && entry.lines <= maxLines);
+  return {
+    ok: hardViolations.length === 0,
+    mode: 'touched',
+    scannedFiles: rows.length,
+    maxLines,
+    softLines,
+    hardViolationCount: hardViolations.length,
+    softWarningCount: softWarnings.length,
+    topFile: rows[0] ?? null,
+    hardViolations,
+    softWarnings,
+    context: {
+      taskId: context.taskId ?? null,
+      actorId: context.actorId ?? null,
+      gate: context.gate ?? null
+    },
+    reproduceCommand: buildTouchedPhysicalLineBudgetReproduceCommand(files, context)
+  };
+}
+
+function isPhysicalLineBudgetSourceFile(filePath: string): boolean {
+  return sourceExtensions.has(path.extname(filePath).toLowerCase());
+}
+
+function shouldSkipPhysicalLineBudgetPath(filePath: string): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  if (excludedPrefixes.some((prefix) => normalized.startsWith(prefix))) return true;
+  return normalized.split('/').some((segment) => excludedSegments.has(segment));
+}
+
+function readConfiguredPhysicalLineBudget(cwd: string, key: 'maxLines' | 'softLines', fallback: number): number {
+  const configPath = path.join(cwd, '.atm', 'config.json');
+  if (!existsSync(configPath)) return fallback;
+  try {
+    const parsed = JSON.parse(readFileSync(configPath, 'utf8')) as { governance?: { physicalLineBudget?: Record<string, unknown> } };
+    const value = Number(parsed.governance?.physicalLineBudget?.[key]);
+    return Number.isFinite(value) && value > 0 ? value : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function countPhysicalLines(filePath: string): number {
+  const content = readFileSync(filePath, 'utf8');
+  if (content.length === 0) return 0;
+  return content.split(/\r?\n/).length - (content.endsWith('\n') ? 1 : 0);
+}
+
+function buildTouchedPhysicalLineBudgetReproduceCommand(files: readonly string[], context: PhysicalLineBudgetContext): string {
+  const parts = ['node --strip-types scripts/validate-physical-line-budget.ts', '--json'];
+  if (files.length > 0) parts.push('--touched', files.join(','));
+  if (context.taskId) parts.push('--task', context.taskId);
+  if (context.actorId) parts.push('--actor', context.actorId);
+  if (context.gate) parts.push('--gate', context.gate);
+  return parts.map((part) => (/\s/.test(part) ? JSON.stringify(part) : part)).join(' ');
+}
 
 export function normalizeRelativePath(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+/g, '/');

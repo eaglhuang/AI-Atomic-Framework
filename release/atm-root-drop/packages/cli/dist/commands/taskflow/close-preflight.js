@@ -5,6 +5,7 @@ import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { resolveTaskflowDeclaredFiles } from './task-scope.js';
 import { quoteCliValue } from '../shared.js';
 import { isPathAllowedByScope } from '../work-channels.js';
+import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.js';
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
@@ -153,7 +154,55 @@ export function buildTaskflowClosePreflight(input) {
             ]
         };
     }
+    const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, readTouchedFiles(input.cwd), {
+        taskId: input.taskId,
+        actorId: input.actorId,
+        gate: 'pre-close'
+    });
+    if (!lineBudgetReport.ok) {
+        return {
+            ...summary,
+            ok: false,
+            blockers: [
+                {
+                    id: 'staleEvidence',
+                    code: 'ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED',
+                    summary: `Touched files exceed the physical line budget (${lineBudgetReport.maxLines}).`,
+                    files: lineBudgetReport.hardViolations.map((entry) => entry.file),
+                    taskIds: [input.taskId],
+                    remediationChoices: [],
+                    requiredCommand: lineBudgetReport.reproduceCommand
+                },
+                ...summary.blockers
+            ],
+            operationalBlockers: [
+                {
+                    id: 'staleEvidence',
+                    code: 'ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED',
+                    summary: `Touched files exceed the physical line budget (${lineBudgetReport.maxLines}).`,
+                    files: lineBudgetReport.hardViolations.map((entry) => entry.file),
+                    taskIds: [input.taskId],
+                    remediationChoices: [],
+                    requiredCommand: lineBudgetReport.reproduceCommand
+                },
+                ...summary.operationalBlockers
+            ]
+        };
+    }
     return summary;
+}
+function readTouchedFiles(cwd) {
+    const output = execFileSync('git', ['status', '--porcelain', '-uall'], {
+        cwd,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+    return output
+        .split(/\r?\n/)
+        .map((line) => line.slice(2).trim())
+        .filter(Boolean)
+        .map((file) => file.includes(' -> ') ? file.split(' -> ').pop() ?? file : file)
+        .map((file) => file.replace(/\\/g, '/'));
 }
 export function buildPlanningDeliveryRequiredCommand(taskId, actorId) {
     return `node atm.mjs taskflow close --task ${taskId} --actor ${quoteCliValue(actorId || '<actor>')} --historical-delivery <commit> --write --json`;

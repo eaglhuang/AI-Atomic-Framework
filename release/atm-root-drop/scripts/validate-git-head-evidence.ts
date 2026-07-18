@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const atmRunnerPath = resolveAtmRunnerPath();
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
@@ -37,7 +38,7 @@ function runGit(cwd: any, args: any) {
 }
 
 function runAtmDoctor(cwd: any) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'doctor', '--cwd', cwd, '--json'], {
+  const result = spawnSync(process.execPath, [atmRunnerPath, 'doctor', '--cwd', cwd, '--json'], {
     cwd,
     encoding: 'utf8',
     env: createSanitizedGitEnv()
@@ -61,6 +62,13 @@ function extractJsonPayload(payload: string) {
   return start >= 0 ? payload.slice(start) : payload;
 }
 
+function resolveAtmRunnerPath() {
+  const sourceEntrypoint = path.join(root, 'packages', 'cli', 'src', 'atm.ts');
+  const devRunner = path.join(root, 'atm.dev.mjs');
+  if (existsSync(devRunner) && existsSync(sourceEntrypoint)) return devRunner;
+  return path.join(root, 'atm.mjs');
+}
+
 function gitCheck(result: any) {
   return result.parsed.evidence?.checks?.find((entry: any) => entry.name === 'git-head-evidence') ?? null;
 }
@@ -73,7 +81,7 @@ function initGitRepo(repo: any) {
 }
 
 function bootstrap(repo: any) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'bootstrap', '--cwd', repo, '--json'], {
+  const result = spawnSync(process.execPath, [atmRunnerPath, 'bootstrap', '--cwd', repo, '--json'], {
     cwd: repo,
     encoding: 'utf8'
   });
@@ -82,7 +90,7 @@ function bootstrap(repo: any) {
   assert(result.status === 0, 'bootstrap must exit 0');
   assert(parsed.ok === true, 'bootstrap must report ok=true');
 
-  const atmChart = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'atm-chart', 'render', '--cwd', repo, '--json'], {
+  const atmChart = spawnSync(process.execPath, [atmRunnerPath, 'atm-chart', 'render', '--cwd', repo, '--json'], {
     cwd: repo,
     encoding: 'utf8'
   });
@@ -91,7 +99,7 @@ function bootstrap(repo: any) {
   assert(atmChart.status === 0, 'atm-chart render must exit 0');
   assert(atmChartParsed.ok === true, 'atm-chart render must report ok=true');
 
-  const welcome = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'welcome', '--cwd', repo, '--json'], {
+  const welcome = spawnSync(process.execPath, [atmRunnerPath, 'welcome', '--cwd', repo, '--json'], {
     cwd: repo,
     encoding: 'utf8'
   });

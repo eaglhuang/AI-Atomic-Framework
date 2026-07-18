@@ -19,6 +19,7 @@ import { CliError, quoteCliValue } from '../shared.js';
 import { isPathAllowedByScope } from '../work-channels.js';
 import { normalizeMarkdownPathDeclaration } from './markdown-paths.js';
 import { buildGitIndexLeaseParkPlan, inspectGitIndexOwnership, parkGitIndexLease, restoreGitIndexLease } from '../git-index-ownership.js';
+import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.js';
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
@@ -381,6 +382,11 @@ export function buildTaskflowCommitBundle(input) {
     }
     const scopeAmendment = buildScopeAmendmentProposal({ taskId: input.taskId, actorId: input.actorId, taskDocument, candidateFiles: scopeAmendmentCandidateFiles, reason: failClosedReason });
     const finalDeliveryFiles = targetDeliveryFiles.filter((file) => !historicalCommitted.some((h) => taskflowPathMatches(file, h)));
+    const lineBudgetReport = inspectTouchedPhysicalLineBudget(targetRepoRoot, finalDeliveryFiles, { taskId: input.taskId, actorId: input.actorId, gate: 'taskflow-close' });
+    if (!lineBudgetReport.ok) {
+        metadataFailClosed = true;
+        failClosedReason = `Touched-file physical line budget failed: ${lineBudgetReport.hardViolations.map((entry) => `${entry.file}:${entry.lines}`).join(', ')}. Reproduce: ${lineBudgetReport.reproduceCommand}`;
+    }
     const targetStageFiles = uniqueSorted([...finalDeliveryFiles, ...targetGovernanceFiles]);
     const planning = resolvePlanningPath(targetRepoRoot, input.planningMirrorPath);
     const planningStageFiles = planning.repoRoot && planning.relativePath ? uniqueSorted([planning.relativePath,
