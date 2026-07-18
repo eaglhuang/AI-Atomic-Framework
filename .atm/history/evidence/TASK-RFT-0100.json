@@ -1,0 +1,261 @@
+{
+  "taskId": "TASK-RFT-0100",
+  "updatedAt": "2026-07-18T02:39:48.532Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+      "createdAt": "2026-07-18T02:38:46.949Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.rft-continuation-card-generator",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5b8c116b56a494181850e88eca24a01722af6d071f69d1ecdc589263bacaa3c7",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6be40527c1347d452bc4e7745b17b1a47e3260d2",
+            "cacheKey": "sha256:c13290ea614cf1b18c5bfd391e552ea0520aac6794de859b87cba640d7c3bdee",
+            "cached": false,
+            "generatedAt": "2026-07-18T02:38:47.034Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:8d14d11365b4347a87b618eeea0114dbeabdc024bf8947840f0bc572f49e4746",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/rft-continuation-card-generation.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+      "createdAt": "2026-07-18T02:38:53.318Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/rft-continuation-card-generation.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.rft-continuation-card-generator",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/rft-continuation-card-generation.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3f68a9608df8ca8c8faea5156b52494733adf1c37974213b2b298cdfd1e04ac6",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/rft-continuation-card-generation.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6be40527c1347d452bc4e7745b17b1a47e3260d2",
+            "cacheKey": "sha256:8e6b6f34a568dc5105f28bdf067876223608a8812c2b76b3291bc1e5bdfafa17",
+            "cached": false,
+            "generatedAt": "2026-07-18T02:38:53.384Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e287311142f5c173d9009b92a46e7da9a60efb2d961e1768cff542852efaf4ac",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-physical-line-budget.ts --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+      "createdAt": "2026-07-18T02:39:00.076Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:physical-line-budget"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.rft-continuation-card-generator",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-physical-line-budget.ts --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:63ecb7e25decfc60bdda3d654e83ef5931cb9a9e48634994d8b52af4a08957bd",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:physical-line-budget"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6be40527c1347d452bc4e7745b17b1a47e3260d2",
+            "cacheKey": "sha256:f69b851ad7f39161e8265210861f291f550474f7bb2a5c25ed575e6696f36752",
+            "cached": false,
+            "generatedAt": "2026-07-18T02:39:00.148Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a8251614c09081c881e98f2a2a6fd1e99ab5029bea3aeee202ca3b983eb18fff",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+      "createdAt": "2026-07-18T02:39:23.626Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.rft-continuation-card-generator",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6be40527c1347d452bc4e7745b17b1a47e3260d2",
+            "cacheKey": "sha256:86248e32f87d9418bdd0244d7b75b5f8745e3503dba0805c73895d95683cea65",
+            "cached": false,
+            "generatedAt": "2026-07-18T02:39:23.709Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0a2cf6225697c1958487bf206691946e3c359ea7ff449c88e3e8276db84d36a0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+      "createdAt": "2026-07-18T02:39:48.532Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.rft-continuation-card-generator",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+            "stderrSha256": "sha256:e935c7da57653f092580bc64cd494b8ff7d056721abc81462fccdc501995bb13",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6be40527c1347d452bc4e7745b17b1a47e3260d2",
+            "cacheKey": "sha256:820437f0213123b6f920f7989e610204abe0790f91e391172a5c4d6ba4cf633a",
+            "cached": false,
+            "generatedAt": "2026-07-18T02:39:48.597Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:dbe0ba765355c30e2e113e1e6c9f30c6051d410979fe6505ac48c2cf1dfe26dd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
