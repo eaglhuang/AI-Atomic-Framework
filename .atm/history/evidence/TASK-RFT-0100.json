@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-RFT-0100",
-  "updatedAt": "2026-07-18T02:39:48.532Z",
+  "updatedAt": "2026-07-18T02:42:35.873Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -251,6 +251,57 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:dbe0ba765355c30e2e113e1e6c9f30c6051d410979fe6505ac48c2cf1dfe26dd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+      "createdAt": "2026-07-18T02:42:35.873Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.rft-continuation-card-generator",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "beba951a40eaa309772c495029b2a4323996b3c4",
+            "cacheKey": "sha256:007d9388291e1f0f2920944003c7e44cc9538b14ae94c9568fa402684b684c36",
+            "cached": false,
+            "generatedAt": "2026-07-18T02:42:35.933Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f27d52c55b32778ce40982691cc96bc1daf510773bf9bd529fe28e8bf7f606e0",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

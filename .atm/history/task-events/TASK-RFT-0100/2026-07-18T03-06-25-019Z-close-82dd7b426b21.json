@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T03-06-25-019Z-close-82dd7b426b21",
+  "taskId": "TASK-RFT-0100",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0100.json",
+  "taskSha256": "sha256:3909c41451359daf2f011660b64d4e3ff71ea65462d5068cd3d76ce71d41d2cd",
+  "createdAt": "2026-07-18T03:06:25.019Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0100 --actor codex-main --status done --historical-delivery beba951a40eaa309772c495029b2a4323996b3c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0100.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json",
+      "node --strip-types tests/cli/rft-continuation-card-generation.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:physical-line-budget"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T03:06:25.007Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0100.*",
+        ".atm/history/task-events/TASK-RFT-0100/**",
+        ".atm/history/tasks/TASK-RFT-0100.json",
+        "docs/governance/command-surface.md",
+        "package.json",
+        "scripts/generate-rft-continuation-cards.ts",
+        "scripts/validate-physical-line-budget.ts",
+        "tests/cli/rft-continuation-card-generation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/generate-rft-continuation-cards.ts",
+        "scripts/validate-physical-line-budget.ts",
+        "tests/cli/rft-continuation-card-generation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

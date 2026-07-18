@@ -1,13 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0100",
-  "updatedAt": "2026-07-18T02:39:48.532Z",
+  "updatedAt": "2026-07-18T02:42:35.873Z",
   "updatedBy": "codex-main",
   "freshValidationPasses": [
     "node --strip-types scripts/generate-rft-continuation-cards.ts --dry-run --json",
     "node --strip-types tests/cli/rft-continuation-card-generation.test.ts",
     "typecheck",
     "validate:cli",
+    "validate:git-head-evidence",
     "validate:physical-line-budget"
   ],
   "staleValidationPasses": [],
@@ -75,6 +76,19 @@
       "generatedAt": "2026-07-18T02:39:48.597Z",
       "runnerKind": "dev-source",
       "sourceCommit": "6be40527c1347d452bc4e7745b17b1a47e3260d2",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-18T02:42:35.933Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "beba951a40eaa309772c495029b2a4323996b3c4",
       "cached": false
     }
   ],

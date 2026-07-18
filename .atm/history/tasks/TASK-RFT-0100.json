@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0100",
   "title": "Automatic RFT continuation-card generation",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-RFT-0099"
@@ -96,8 +96,8 @@
     }
   },
   "importedAt": "2026-07-17T13:20:15.143Z",
-  "lastTransitionId": "2026-07-18T02-33-08-366Z-claim-1d9a67047a2c",
-  "lastTransitionAt": "2026-07-18T02:33:08.366Z",
+  "lastTransitionId": "2026-07-18T03-06-25-019Z-close-82dd7b426b21",
+  "lastTransitionAt": "2026-07-18T03:06:25.019Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-main",
   "reservedAt": "2026-07-18T02:33:03.775Z",
@@ -106,7 +106,7 @@
     "actorId": "codex-main",
     "leaseId": "lease-da8097837d8d",
     "claimedAt": "2026-07-18T02:33:03.780Z",
-    "heartbeatAt": "2026-07-18T02:33:03.780Z",
+    "heartbeatAt": "2026-07-18T03:06:25.015Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-RFT-0100.json",
@@ -116,14 +116,14 @@
       "scripts/validate-physical-line-budget.ts",
       "tests/cli/rft-continuation-card-generation.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718023308-codex-main-efa0f71777",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718023308-codex-main-efa0f71777\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T02:33:03.780Z",
   "startedByActor": "codex-main",
@@ -160,5 +160,9 @@
     },
     "createdAt": "2026-07-18T02:33:08.365Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T03:06:25.015Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260718023303-codex-main-TASK-RFT-0100-dfa4eb316f",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0100.closure-packet.json"
 }
