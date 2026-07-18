@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T18-00-11-762Z-scope-amendment-91fcd288bc43",
+  "taskId": "ATM-GOV-0175",
+  "action": "scope-amendment",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0175.json",
+  "taskSha256": "sha256:3344b0b50a733a283cd224a81f42eca002aea09e06400eea2ca5b5cbd2a11d15",
+  "createdAt": "2026-07-18T18:00:11.762Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0175 --actor codex-gov-auto-batch --add scripts/validate-root-drop-release.ts --reason \"Root-drop release validator runAtm doctor output exceeds default spawn buffer after large release bundle; required to validate runner-sync release artifacts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Root-drop release validator runAtm doctor output exceeds default spawn buffer after large release bundle; required to validate runner-sync release artifacts"
+  }
+}

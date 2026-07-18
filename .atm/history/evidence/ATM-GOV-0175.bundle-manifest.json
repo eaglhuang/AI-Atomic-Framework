@@ -1,14 +1,16 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0175",
-  "updatedAt": "2026-07-18T17:51:06.729Z",
+  "updatedAt": "2026-07-18T18:06:56.573Z",
   "updatedBy": "codex-gov-auto-batch",
   "freshValidationPasses": [
     "node --strip-types tests/cli/durable-broker-scheduler.test.ts",
     "typecheck",
     "validate:atomization-coverage",
     "validate:cli",
-    "validate:git-head-evidence"
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -114,6 +116,45 @@
       "generatedAt": "2026-07-18T17:51:06.996Z",
       "runnerKind": "dev-source",
       "sourceCommit": "4a0f4f820c5b1186df26f33930efdefabeec7f04",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-07-18T17:56:52.474Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "23be4213da9e998c45493cbb3c718aaa4545074c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:root-drop-release"
+      ],
+      "generatedAt": "2026-07-18T18:06:40.276Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "23be4213da9e998c45493cbb3c718aaa4545074c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-18T18:06:56.984Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "23be4213da9e998c45493cbb3c718aaa4545074c",
       "cached": false
     }
   ],

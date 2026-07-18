@@ -1,0 +1,18 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0175",
+  "actorId": "codex-gov-auto-batch",
+  "stewardWorkId": "runner-sync-f0446906",
+  "sealedSourceSha": "4a0f4f820c5b1186df26f33930efdefabeec7f04",
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildDecision": "failed-retryable",
+  "supersededBySourceSha": "23be4213da9e998c45493cbb3c718aaa4545074c",
+  "failureSummary": "Root-drop release git ls-files exceeded the default Node spawnSync buffer before ATM-GOV-0175 added an explicit maxBuffer.",
+  "publishedAt": "2026-07-18T17:53:33.326Z"
+}

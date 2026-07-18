@@ -26,7 +26,8 @@ function assert(condition: any, message: any) {
 function runAtm(cwd: any, args: any) {
   const result = spawnSync(process.execPath, [path.join(cwd, 'atm.mjs'), ...args], {
     cwd,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {
@@ -36,7 +37,7 @@ function runAtm(cwd: any, args: any) {
 }
 
 function runGit(cwd: any, args: any) {
-  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   assert(result.status === 0, `git ${args.join(' ')} must exit 0`);
   return result.stdout.trim();
 }
