@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T06-58-44-529Z-repair-claim-0aa4ee6dbc9f",
+  "taskId": "ATM-GOV-0156",
+  "action": "repair-claim",
+  "actorId": "atm-core",
+  "sessionId": "session-20260718061436-atm-core-ATM-GOV-0156-cfbf837c01",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0156.json",
+  "taskSha256": "sha256:58e1bea05e368f3adf6c40d65d0df3d93f733338ec936dfaf025ab7d8c1b359d",
+  "createdAt": "2026-07-18T06:58:44.529Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0156 --actor atm-core --write --reason \"continue ATM-GOV-0156 closeout after long sealed release artifact commit\" --json"
+}
