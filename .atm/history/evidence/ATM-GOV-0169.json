@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0169",
-  "updatedAt": "2026-07-18T13:24:19.481Z",
+  "updatedAt": "2026-07-18T13:32:44.801Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -395,6 +395,62 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:b776b68190289b73c25042a41344183242cd771881636310d8469b2295c1ad36",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-captain",
+      "sessionId": "session-20260718131550-codex-gpt-5-captain-ATM-GOV-0169-beec0e6a74",
+      "createdAt": "2026-07-18T13:32:44.801Z",
+      "details": {
+        "actorId": "codex-gpt-5-captain",
+        "sessionId": "session-20260718131550-codex-gpt-5-captain-ATM-GOV-0169-beec0e6a74",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.next.active-work-summary",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-18T13:32:44.980Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7c340a7b431e46e6f0ca078dff0f7a3c5469b860b634d7586b3e6546a677c259",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T13-33-18-322Z-close-009aff42163f",
+  "taskId": "ATM-GOV-0169",
+  "action": "close",
+  "actorId": "codex-gpt-5-captain",
+  "sessionId": "session-20260718131550-codex-gpt-5-captain-ATM-GOV-0169-beec0e6a74",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0169.json",
+  "taskSha256": "sha256:c28c51f059bff767c82394824370903705be603954a59ab5844ce98656d41172",
+  "createdAt": "2026-07-18T13:33:18.322Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0169 --actor codex-gpt-5-captain --status done --historical-delivery 471b321f763223d9fd5ac97db889530d9e7ebcc5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718131550-codex-gpt-5-captain-ATM-GOV-0169-beec0e6a74",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0169.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+      "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections",
+      "validate:physical-line-budget"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T13:33:18.310Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0169.*",
+        ".atm/history/task-events/ATM-GOV-0169/**",
+        ".atm/history/tasks/ATM-GOV-0169.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "atomic_workbench/atomization-coverage/receipts/ATM-GOV-0169/2026-07-18T13-19-46-006Z-foreign-dirty-wip-admission.ts-registration.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-004.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+        "tests/cli/claim-foreign-unstaged-wip.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+        "tests/cli/claim-foreign-unstaged-wip.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
