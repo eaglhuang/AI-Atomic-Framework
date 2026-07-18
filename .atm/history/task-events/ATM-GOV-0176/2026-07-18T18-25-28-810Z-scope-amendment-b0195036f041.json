@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T18-25-28-810Z-scope-amendment-b0195036f041",
+  "taskId": "ATM-GOV-0176",
+  "action": "scope-amendment",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0176.json",
+  "taskSha256": "sha256:1918c0c8ce5a48b310d6bfc5e4c023c1b15af8bceb5cf2ba4b0e0bbe7e4dfad0",
+  "createdAt": "2026-07-18T18:25:28.810Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0176 --actor codex-gov-auto-batch --add \"packages/core/src/broker/index.ts,atomic_workbench/atomization-coverage/path-to-atom-map.json,tests/cli-fixtures/help-snapshots/broker.json\" --reason \"ATM-GOV-0176 shared delivery commit executor needs core export, rebuilt atomization projection, and regenerated broker help snapshot for validate:cli.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0176 shared delivery commit executor needs core export, rebuilt atomization projection, and regenerated broker help snapshot for validate:cli."
+  }
+}

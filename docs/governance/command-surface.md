@@ -24,6 +24,8 @@ the command-spec help surface returned by `node atm.mjs <command> --help`.
 
 `node atm.mjs broker schedule plan --wave <id> --surface-kind <kind> --surface-family <family> --expected-task <id>` returns an `atm.waveBrokerBatchDecision.v1` verdict. Same-wave compatible tickets can become `batch-ready`; missing expected tickets wait until the collection timeout and then return `reseal-or-serial-fallback`; cross-wave or incompatible surfaces degrade to serial fallback.
 
+`node atm.mjs broker batch execute --surface commit --wave <id> --surface-family <family> --manifest-digest <digest> --sealed-source-sha <sha>` consumes the durable scheduler decision for commit-surface tickets and emits an `atm.sharedWriteReceipt.v1` receipt. The first version validates same-wave compatibility, claim/validator evidence, stale HEAD, task-owned file slices, and temporary-index isolation before a coordinator-owned shared delivery commit can be accepted. Unrelated task slices and scheduler serial fallback are rejected instead of being absorbed into the shared branch window.
+
 ## Batch Wave Selector
 
 `node atm.mjs batch current --compact --json` now includes a read-only `currentWave` selection envelope for the active batch queue. The selector emits `atm.batchWaveSelection.v1`, a deterministic `atm.waveManifest.v1` candidate, deferred reasons, and a `team wave dispatch` command when two or more queue-head-compatible tasks can run together. It does not claim tasks, write broker tickets, commit, build, project, or close tasks; those write actions remain owned by later Team Wave, Broker, and Checkpoint commands.

@@ -39,13 +39,14 @@ const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
 
 export interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
   readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | 'release' | null;
   readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;
   readonly scheduleAction: 'enqueue' | 'plan' | 'status' | null;
+  readonly batchAction: 'execute' | null;
   readonly task: string | null;
   readonly actorId: string | null;
   readonly sealedSourceSha: string | null;
@@ -57,6 +58,9 @@ export interface ParsedBrokerOptions {
   readonly surfaceKind: 'commit' | 'runner-sync' | 'projection' | 'checkpoint' | null;
   readonly surfaceFamily: string | null;
   readonly payloadDigest: string | null;
+  readonly manifestDigest: string | null;
+  readonly currentHeadSha: string | null;
+  readonly expectedHeadSha: string | null;
   readonly expectedTasks: readonly string[];
   readonly collectionTimeoutMs: number;
   readonly intentFile: string | null;
@@ -69,6 +73,9 @@ export interface ParsedBrokerOptions {
   readonly proposalStorePath: string | null;
   readonly mergePlanFile: string | null;
   readonly scopeFiles: readonly string[];
+  readonly claimedTasks: readonly string[];
+  readonly validatorTasks: readonly string[];
+  readonly fileSlices: readonly string[];
   readonly stewardId: string | null;
   readonly evidenceOutPath: string | null;
   readonly requestFiles: readonly string[];
@@ -87,6 +94,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     runnerSyncAction: null as ParsedBrokerOptions['runnerSyncAction'],
     projectionAction: null as ParsedBrokerOptions['projectionAction'],
     scheduleAction: null as ParsedBrokerOptions['scheduleAction'],
+    batchAction: null as ParsedBrokerOptions['batchAction'],
     task: null as string | null,
     actorId: null as string | null,
     sealedSourceSha: null as string | null,
@@ -98,6 +106,9 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     surfaceKind: null as ParsedBrokerOptions['surfaceKind'],
     surfaceFamily: null as string | null,
     payloadDigest: null as string | null,
+    manifestDigest: null as string | null,
+    currentHeadSha: null as string | null,
+    expectedHeadSha: null as string | null,
     expectedTasks: [] as string[],
     collectionTimeoutMs: 120000,
     intentFile: null as string | null,
@@ -111,6 +122,9 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     proposalStorePath: null as string | null,
     mergePlanFile: null as string | null,
     scopeFiles: [] as string[],
+    claimedTasks: [] as string[],
+    validatorTasks: [] as string[],
+    fileSlices: [] as string[],
     stewardId: null as string | null,
     evidenceOutPath: null as string | null,
     requestFiles: [] as string[],
@@ -185,6 +199,21 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--manifest-digest') {
+      state.manifestDigest = requireValue(argv, index, '--manifest-digest');
+      index += 1;
+      continue;
+    }
+    if (arg === '--current-head') {
+      state.currentHeadSha = requireValue(argv, index, '--current-head');
+      index += 1;
+      continue;
+    }
+    if (arg === '--expected-head') {
+      state.expectedHeadSha = requireValue(argv, index, '--expected-head');
+      index += 1;
+      continue;
+    }
     if (arg === '--expected-task') {
       state.expectedTasks.push(requireValue(argv, index, '--expected-task'));
       index += 1;
@@ -248,6 +277,21 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--claimed-task') {
+      state.claimedTasks.push(requireValue(argv, index, '--claimed-task'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--validator-task') {
+      state.validatorTasks.push(requireValue(argv, index, '--validator-task'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--file-slice') {
+      state.fileSlices.push(requireValue(argv, index, '--file-slice'));
+      index += 1;
+      continue;
+    }
     if (arg === '--steward-id') {
       state.stewardId = requireValue(argv, index, '--steward-id');
       index += 1;
@@ -296,6 +340,10 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       state.projectionAction = arg as ParsedBrokerOptions['projectionAction'];
     } else if (state.action === 'schedule' && !state.scheduleAction) {
       state.scheduleAction = arg as ParsedBrokerOptions['scheduleAction'];
+    } else if (state.action === 'batch' && !state.batchAction) {
+      state.batchAction = arg as ParsedBrokerOptions['batchAction'];
+    } else if (state.action === 'batch' && state.batchAction === 'execute' && arg === 'commit') {
+      state.surfaces.push(arg);
     } else {
       throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
     }
@@ -316,6 +364,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     runnerSyncAction: state.runnerSyncAction,
     projectionAction: state.projectionAction,
     scheduleAction: state.scheduleAction,
+    batchAction: state.batchAction,
     task: state.task,
     actorId: state.actorId,
     sealedSourceSha: state.sealedSourceSha,
@@ -327,6 +376,9 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     surfaceKind: state.surfaceKind,
     surfaceFamily: state.surfaceFamily,
     payloadDigest: state.payloadDigest,
+    manifestDigest: state.manifestDigest,
+    currentHeadSha: state.currentHeadSha,
+    expectedHeadSha: state.expectedHeadSha,
     expectedTasks: state.expectedTasks,
     collectionTimeoutMs: state.collectionTimeoutMs,
     intentFile: state.intentFile,
@@ -339,6 +391,9 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     proposalStorePath: state.proposalStorePath,
     mergePlanFile: state.mergePlanFile,
     scopeFiles: state.scopeFiles,
+    claimedTasks: state.claimedTasks,
+    validatorTasks: state.validatorTasks,
+    fileSlices: state.fileSlices,
     stewardId: state.stewardId,
     evidenceOutPath: state.evidenceOutPath,
     requestFiles: state.requestFiles,
