@@ -1,0 +1,261 @@
+{
+  "taskId": "ATM-GOV-0170",
+  "updatedAt": "2026-07-18T13:10:30.247Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-physical-line-budget.ts --json --touched packages/cli/src/commands/next/claim-orchestration.ts,packages/cli/src/commands/next/oversized-extraction-admission.ts,tests/cli/oversized-extraction-claim-pathway.test.ts --task ATM-GOV-0170 --actor codex-gpt-5-captain --gate claim",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-captain",
+      "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+      "createdAt": "2026-07-18T13:06:28.049Z",
+      "details": {
+        "actorId": "codex-gpt-5-captain",
+        "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:physical-line-budget"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-physical-line-budget.ts --json --touched packages/cli/src/commands/next/claim-orchestration.ts,packages/cli/src/commands/next/oversized-extraction-admission.ts,tests/cli/oversized-extraction-claim-pathway.test.ts --task ATM-GOV-0170 --actor codex-gpt-5-captain --gate claim",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3616c61cecb9662399961f3359f62093a3ff0fe6febc13e55651c1925786b459",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:physical-line-budget"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4893c83bb3aadac1175d6e1b8f28d2b10cdb44fc",
+            "cacheKey": "sha256:5b1663a0d0dab980be4ff627e1dc6d2f358e0431531eff34e5b0d82ad5e69830",
+            "cached": false,
+            "generatedAt": "2026-07-18T13:06:28.225Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:16eff1a3ad0e1d7222aceba4e10929b22e3f5d159fd885229d86f3c1c637a334",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/oversized-extraction-claim-pathway.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-captain",
+      "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+      "createdAt": "2026-07-18T13:06:28.056Z",
+      "details": {
+        "actorId": "codex-gpt-5-captain",
+        "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/oversized-extraction-claim-pathway.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/oversized-extraction-claim-pathway.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:8ca8d0eea3cb807749790ee2050fb0467f05333daeb40aac3f5ddef796d06c49",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/oversized-extraction-claim-pathway.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4893c83bb3aadac1175d6e1b8f28d2b10cdb44fc",
+            "cacheKey": "sha256:2f0796c3605d9249898d326347e3cb296f0acab78a9f2a12e798b2b7d0bd2573",
+            "cached": false,
+            "generatedAt": "2026-07-18T13:06:28.229Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:804d72bd9f24dc4ae26aa2413f089e49fcec18c1931e095a3ff7c9250128bd11",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-captain",
+      "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+      "createdAt": "2026-07-18T13:06:50.875Z",
+      "details": {
+        "actorId": "codex-gpt-5-captain",
+        "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+            "stderrSha256": "sha256:a0188499680fe97bddd4798c292c2c1231f61ff2a0100b656acb74dcdf89dbd4",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4893c83bb3aadac1175d6e1b8f28d2b10cdb44fc",
+            "cacheKey": "sha256:764753eb2e11d4a7f38e59478e29e71ff787e24d5db36e43382006a961e09e45",
+            "cached": false,
+            "generatedAt": "2026-07-18T13:06:51.095Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:3afbb64792c4b67d4672c001e1fadec5a6851ef6006434da6d27c3a016e3627b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-captain",
+      "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+      "createdAt": "2026-07-18T13:09:41.066Z",
+      "details": {
+        "actorId": "codex-gpt-5-captain",
+        "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4893c83bb3aadac1175d6e1b8f28d2b10cdb44fc",
+            "cacheKey": "sha256:f257db3f25e586ab6e677e0a2325510f1dbe4623a94c36fc87dcfc11cc7e1b45",
+            "cached": false,
+            "generatedAt": "2026-07-18T13:09:41.219Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:aee577d00cbe2f6747e62ccb68d4a8d869447e4b9d58ab0c9d486ea8c6669f85",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-captain",
+      "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+      "createdAt": "2026-07-18T13:10:30.247Z",
+      "details": {
+        "actorId": "codex-gpt-5-captain",
+        "sessionId": "session-20260718130131-codex-gpt-5-captain-ATM-GOV-0170-15e6c6c35f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4893c83bb3aadac1175d6e1b8f28d2b10cdb44fc",
+            "cacheKey": "sha256:221636d15c93b1db2dab7c1dfa2623a8cd9900f6c7cf8310fc79dfe886283403",
+            "cached": false,
+            "generatedAt": "2026-07-18T13:10:30.530Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6e9b4c27e81da9193a873cf222b9a89988b50b0007a6daad31ddb79b2abbe9a6",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

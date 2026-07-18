@@ -3,9 +3,8 @@ import { buildFirstUseUserNotice } from '../first-use-notice.ts';
 import { type BrokerQueueAdmission } from './broker-queue-admission.ts';
 import { runBroker } from '../broker.ts';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, selectPostClaimChannel } from './channel-strategy.ts';
-import { ensureDecisionTrail, type NextActionLike } from './next-action-assembly.ts';
-import { buildPromptScopedQueueClaimCommand } from './prompt-scope-resolution.ts';
-import { describeActorResolution, resolveActorId } from '../actor-registry.ts';
+import { type NextActionLike } from './next-action-assembly.ts';
+import { describeActorResolution } from '../actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from '../actor-session.ts';
 import { tryBuildQuickfixClaimResult, buildNoClaimableTaskResult } from './claim-early-results.ts';
 import { cleanupPreviousBatchQueueLocks } from './claim-cleanup.ts';
@@ -32,7 +31,7 @@ import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessH
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
 import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts';
-export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
+import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
 export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
   const claimStartedAt = Date.now();
@@ -253,7 +252,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   brokerQueueAdmission = parallelPreflight.brokerQueueAdmission;
   claimAllowedFiles = parallelPreflight.claimAllowedFiles;
   const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
-  if (!lineBudgetReport.ok) throw new CliError('ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED', `Claim blocked: touched files exceed the physical line budget for ${claimableTask.workItemId}.`, { exitCode: 1, details: lineBudgetReport });
+  const oversizedExtractionAdmission = assertClaimLineBudgetOrExtractionAdmission({ cwd: input.cwd, taskId: claimableTask.workItemId, taskPath: taskPathFor(input.cwd, claimableTask.workItemId), report: lineBudgetReport });
   claimLatencyPhases.push({ phase: 'parallel-preflight', durationMs: Date.now() - parallelStartedAt });
   const claimDeliveryClassification = classifyTaskDelivery({
     cwd: input.cwd,
@@ -590,11 +589,12 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       importedTaskQueue: input.importedTaskQueue,
       integrationBootstrap: input.integrationBootstrap,
       runtimeAdapterReadiness: input.runtimeAdapterReadiness,
-      claimLatency: {
-        schemaId: 'atm.claimLatencyTelemetry.v1',
-        totalMs: Date.now() - claimStartedAt,
-        phases: claimLatencyPhases
-      }
-    }
+    claimLatency: {
+      schemaId: 'atm.claimLatencyTelemetry.v1',
+      totalMs: Date.now() - claimStartedAt,
+      phases: claimLatencyPhases
+    },
+    ...(oversizedExtractionAdmission ? { oversizedExtractionAdmission } : {})
+  }
   });
 }

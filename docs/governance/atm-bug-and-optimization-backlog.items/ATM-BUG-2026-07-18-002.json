@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-18-002",
+  "date": "2026-07-18",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Claim admission / multi-editor observability",
+  "finding": "`next --claim` reported zero active claims and no foreign work for ATM-GOV-0168, then admitted a second captain lane. The shared worktree already contained uncommitted ATM-GOV-0168 changes from a Cursor agent. ATM currently derives active-work safety from ledger claims, locks, reservations, staged files, and coarse dirty summaries, but cannot attribute unstaged task-scoped edits to an editor/session or treat them as a claim-admission conflict.",
+  "expectedBehavior": "Before admitting a claim, ATM should correlate declared task scope with unstaged and staged changed files, active editor/session identity, worktree ownership, and lane metadata. A matching foreign or unowned task-scoped change must return a precise observe/coordinate route instead of claiming the card; genuinely unrelated dirty files must remain non-blocking.",
+  "evidenceOrRepro": "2026-07-18, `node atm.mjs next --prompt ... --json` returned `activeClaimCount: 0`, `foreignDirtyFiles: []`, and selected planned ATM-GOV-0168. After import, `next --claim --actor codex-gpt-5-captain ...` succeeded. Subsequent `git status --short` showed uncommitted 0168 code changes in `claim-orchestrator.ts`, `claim-ownership.ts`, and next-route files; the user confirmed Cursor was already executing ATM-GOV-0168. The captain released its new claim with reason `Cursor owns ATM-GOV-0168`.",
+  "followUp": "Open a GOV governance-optimization card after the Wave Manifest foundation: add task-scope dirty-work attribution, session/editor ownership probes, a distinct `ATM_CLAIM_FOREIGN_UNSTAGED_WIP` diagnostic with task/lane/file details, and regression fixtures for same-worktree Cursor/Codex overlap plus unrelated dirty files."
+}
