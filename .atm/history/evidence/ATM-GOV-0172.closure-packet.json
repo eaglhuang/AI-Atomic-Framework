@@ -1,0 +1,142 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0172",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e6a41ad1a9277a317b869656aa6494cc74d7077b",
+  "governedTreeSha": "1989529e7851a7ead0202e4e26deca1354a4562f",
+  "targetCommitDelta": {
+    "currentCommitSha": "e6a41ad1a9277a317b869656aa6494cc74d7077b",
+    "parentCommitShas": [
+      "e6a41ad1a9277a317b869656aa6494cc74d7077b"
+    ],
+    "governedTreeSha": "1989529e7851a7ead0202e4e26deca1354a4562f",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/wave-manifest.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/wave-manifest.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/wave-manifest.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ef1a3244a70fb1af3e8c77183a94f240beb61250367564501e6279c257fb749e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:atomization-coverage",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aeab9d1f28f898e7db3f2dd30d38b3bd313b97e7bb2160832536dd68febd3642",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ada1ce547f0010fe8c58acc6416da75f034d90bc693d6d81970433209b9d7bb5",
+      "stderrSha256": "sha256:b9ba7ad0bd8950449453302fbe585935e3a860dc5c3553e8ac7df53cac8f82f6",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/core/src/broker/__tests__/wave-manifest.test.ts",
+    "typecheck",
+    "validate:atomization-coverage",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T16:04:25.887Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0172.*",
+      ".atm/history/task-events/ATM-GOV-0172/**",
+      ".atm/history/tasks/ATM-GOV-0172.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/wave-manifest.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/wave-manifest.ts",
+      "packages/core/src/index.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/__tests__/wave-manifest.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/wave-manifest.ts",
+      "packages/core/src/index.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0172.json",
+  "closedAt": "2026-07-18T16:04:25.887Z",
+  "closedByActor": "codex-gpt-5-captain",
+  "sessionId": "session-20260718155316-codex-gpt-5-captain-ATM-GOV-0172-437a1c7e9c",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e6a41ad1a9277a317b869656aa6494cc74d7077b",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/index.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0172/2026-07-18T16-01-54-672Z-scope-amendment-d22ac2f9ca74.json",
+      ".atm/history/tasks/ATM-GOV-0172.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
