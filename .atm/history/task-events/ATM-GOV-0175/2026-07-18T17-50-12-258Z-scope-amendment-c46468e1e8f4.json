@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T17-50-12-258Z-scope-amendment-c46468e1e8f4",
+  "taskId": "ATM-GOV-0175",
+  "action": "scope-amendment",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0175.json",
+  "taskSha256": "sha256:938194b1bf133a214893121fae236ea46386b57cde023db54ac7ab8b40b49e9d",
+  "createdAt": "2026-07-18T17:50:12.258Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0175 --actor codex-gov-auto-batch --add \"scripts/build-root-drop-release.ts,atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json\" --reason \"Runner-sync close path exposed root-drop release git ls-files maxBuffer failure; scheduler card cannot close without runner build\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Runner-sync close path exposed root-drop release git ls-files maxBuffer failure; scheduler card cannot close without runner build"
+  }
+}
