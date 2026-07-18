@@ -4,7 +4,7 @@
   "positional": [
     {
       "name": "action",
-      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch",
+      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule",
       "required": true
     },
     {
@@ -85,6 +85,36 @@
       "summary": "Generated projection key for broker projection enqueue."
     },
     {
+      "flag": "--wave",
+      "value": "id",
+      "summary": "Wave id for broker schedule enqueue or plan."
+    },
+    {
+      "flag": "--surface-kind",
+      "value": "kind",
+      "summary": "Broker schedule surface kind: commit, runner-sync, projection, or checkpoint."
+    },
+    {
+      "flag": "--surface-family",
+      "value": "family",
+      "summary": "Broker schedule compatible surface family."
+    },
+    {
+      "flag": "--payload-digest",
+      "value": "digest",
+      "summary": "Broker schedule payload digest used in idempotency keys."
+    },
+    {
+      "flag": "--expected-task",
+      "value": "id",
+      "summary": "Expected task id for broker schedule plan. Repeatable."
+    },
+    {
+      "flag": "--collection-timeout-ms",
+      "value": "ms",
+      "summary": "Broker schedule collection timeout before reseal or serial fallback."
+    },
+    {
       "flag": "--source-item",
       "value": "path",
       "summary": "Source item shard for broker projection enqueue. Repeatable."
@@ -152,6 +182,8 @@
     "node atm.mjs broker runner-sync enqueue --task TASK-GOV-0100 --actor worker-1 --sealed-source-sha <sha> --surface release/atm-onefile/atm.mjs --json",
     "node atm.mjs broker runner-sync release --task TASK-GOV-0100 --steward-work-id runner-sync-1234abcd --receipt-ref .atm/history/evidence/TASK-GOV-0100.runner-sync-receipt.json --json",
     "node atm.mjs broker projection enqueue --task TASK-GOV-0100 --actor worker-1 --projection-key atm.generated-projection.governance-backlog --source-item docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-YYYY-MM-DD-NNN.json --json",
+    "node atm.mjs broker schedule enqueue --task TASK-GOV-0100 --wave wave-123 --surface-kind commit --surface-family cli --payload-digest sha256:abc --json",
+    "node atm.mjs broker schedule plan --wave wave-123 --surface-kind commit --surface-family cli --expected-task TASK-GOV-0100 --expected-task TASK-GOV-0101 --json",
     "node atm.mjs broker proposal create --proposal-file proposal.json --json",
     "node atm.mjs broker proposal list --json",
     "node atm.mjs broker proposal show proposal-123 --json",

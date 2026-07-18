@@ -18,6 +18,12 @@ the command-spec help surface returned by `node atm.mjs <command> --help`.
 
 `node atm.mjs team wave plan|dispatch --batch <id> --wave <id> --executor <mode>` consumes a selected `atm.waveManifest.v1` batch wave and emits an executor-neutral `atm.teamWaveRuntime.v1` envelope. The runtime binds deterministic lanes and shadow workspace plans, accepts only patch-envelope and worker-report return contracts, records out-of-scope worker files as `needs-review`, and degrades to serial fallback when fewer than two members remain. It does not stage, commit, build, project, or close tasks.
 
+## Broker Wave Scheduler
+
+`node atm.mjs broker schedule enqueue --task <id> --wave <id> --surface-kind <kind> --surface-family <family> --payload-digest <digest>` writes durable `atm.waveBrokerTicket.v1` records into `.atm/runtime/wave-broker-scheduler.json`. Ticket idempotency is keyed by wave, task, surface kind, surface family, and payload digest.
+
+`node atm.mjs broker schedule plan --wave <id> --surface-kind <kind> --surface-family <family> --expected-task <id>` returns an `atm.waveBrokerBatchDecision.v1` verdict. Same-wave compatible tickets can become `batch-ready`; missing expected tickets wait until the collection timeout and then return `reseal-or-serial-fallback`; cross-wave or incompatible surfaces degrade to serial fallback.
+
 ## Batch Wave Selector
 
 `node atm.mjs batch current --compact --json` now includes a read-only `currentWave` selection envelope for the active batch queue. The selector emits `atm.batchWaveSelection.v1`, a deterministic `atm.waveManifest.v1` candidate, deferred reasons, and a `team wave dispatch` command when two or more queue-head-compatible tasks can run together. It does not claim tasks, write broker tickets, commit, build, project, or close tasks; those write actions remain owned by later Team Wave, Broker, and Checkpoint commands.

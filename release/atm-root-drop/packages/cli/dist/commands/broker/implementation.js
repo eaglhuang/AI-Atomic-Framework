@@ -7,6 +7,7 @@ import { handleBrokerRegistryActions } from './registry-actions.js';
 import { handleBrokerProposalActions } from './proposal-actions.js';
 import { handleBrokerStewardRuntimeActions } from './steward-runtime-actions.js';
 import { handleBrokerPlanBatch } from './plan-batch-action.js';
+import { handleBrokerWaveScheduler } from './wave-scheduler-actions.js';
 export async function runBroker(argv) {
     const options = parseBrokerArgs(argv);
     const context = {
@@ -14,7 +15,8 @@ export async function runBroker(argv) {
         sharedQueuePath: path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json'),
         sharedFreezePath: path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-freezes.json'),
         runnerSyncQueuePath: path.join(options.cwd, '.atm', 'runtime', 'runner-sync-steward-queue.json'),
-        projectionStewardPath: path.join(options.cwd, '.atm', 'runtime', 'generated-projection-steward.json')
+        projectionStewardPath: path.join(options.cwd, '.atm', 'runtime', 'generated-projection-steward.json'),
+        waveSchedulerPath: path.join(options.cwd, '.atm', 'runtime', 'wave-broker-scheduler.json')
     };
     const stewardQueueResult = handleBrokerStewardQueues(options, context);
     if (stewardQueueResult)
@@ -31,5 +33,8 @@ export async function runBroker(argv) {
     const planBatchResult = handleBrokerPlanBatch(options);
     if (planBatchResult)
         return planBatchResult;
-    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch', { exitCode: 2 });
+    const waveSchedulerResult = handleBrokerWaveScheduler(options, context);
+    if (waveSchedulerResult)
+        return waveSchedulerResult;
+    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule', { exitCode: 2 });
 }

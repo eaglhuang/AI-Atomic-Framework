@@ -7,6 +7,7 @@ import { handleBrokerRegistryActions } from './registry-actions.ts';
 import { handleBrokerProposalActions } from './proposal-actions.ts';
 import { handleBrokerStewardRuntimeActions } from './steward-runtime-actions.ts';
 import { handleBrokerPlanBatch } from './plan-batch-action.ts';
+import { handleBrokerWaveScheduler } from './wave-scheduler-actions.ts';
 
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);
@@ -15,7 +16,8 @@ export async function runBroker(argv: string[]) {
     sharedQueuePath: path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json'),
     sharedFreezePath: path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-freezes.json'),
     runnerSyncQueuePath: path.join(options.cwd, '.atm', 'runtime', 'runner-sync-steward-queue.json'),
-    projectionStewardPath: path.join(options.cwd, '.atm', 'runtime', 'generated-projection-steward.json')
+    projectionStewardPath: path.join(options.cwd, '.atm', 'runtime', 'generated-projection-steward.json'),
+    waveSchedulerPath: path.join(options.cwd, '.atm', 'runtime', 'wave-broker-scheduler.json')
   };
 
   const stewardQueueResult = handleBrokerStewardQueues(options, context);
@@ -28,6 +30,8 @@ export async function runBroker(argv: string[]) {
   if (stewardRuntimeResult) return stewardRuntimeResult;
   const planBatchResult = handleBrokerPlanBatch(options);
   if (planBatchResult) return planBatchResult;
+  const waveSchedulerResult = handleBrokerWaveScheduler(options, context);
+  if (waveSchedulerResult) return waveSchedulerResult;
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule', { exitCode: 2 });
 }

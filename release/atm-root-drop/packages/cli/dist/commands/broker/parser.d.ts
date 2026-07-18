@@ -1,12 +1,13 @@
 import type { PatchProposal } from '../../../../core/src/broker/types.ts';
 export interface ParsedBrokerOptions {
     readonly cwd: string;
-    readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | null;
+    readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | null;
     readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
     readonly stewardAction: 'plan' | 'apply' | null;
     readonly runtimeAction: 'activate' | null;
     readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | 'release' | null;
     readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;
+    readonly scheduleAction: 'enqueue' | 'plan' | 'status' | null;
     readonly task: string | null;
     readonly actorId: string | null;
     readonly sealedSourceSha: string | null;
@@ -14,6 +15,12 @@ export interface ParsedBrokerOptions {
     readonly receiptRef: string | null;
     readonly receiptDigest: string | null;
     readonly projectionKey: string | null;
+    readonly waveId: string | null;
+    readonly surfaceKind: 'commit' | 'runner-sync' | 'projection' | 'checkpoint' | null;
+    readonly surfaceFamily: string | null;
+    readonly payloadDigest: string | null;
+    readonly expectedTasks: readonly string[];
+    readonly collectionTimeoutMs: number;
     readonly intentFile: string | null;
     readonly freezeId: string | null;
     readonly ttlSeconds: number;

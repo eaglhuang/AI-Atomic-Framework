@@ -13,6 +13,7 @@ export function parseBrokerArgs(argv) {
         runtimeAction: null,
         runnerSyncAction: null,
         projectionAction: null,
+        scheduleAction: null,
         task: null,
         actorId: null,
         sealedSourceSha: null,
@@ -20,6 +21,12 @@ export function parseBrokerArgs(argv) {
         receiptRef: null,
         receiptDigest: null,
         projectionKey: null,
+        waveId: null,
+        surfaceKind: null,
+        surfaceFamily: null,
+        payloadDigest: null,
+        expectedTasks: [],
+        collectionTimeoutMs: 120000,
         intentFile: null,
         freezeId: null,
         ttlSeconds: 1800,
@@ -77,6 +84,41 @@ export function parseBrokerArgs(argv) {
         }
         if (arg === '--projection-key') {
             state.projectionKey = requireValue(argv, index, '--projection-key');
+            index += 1;
+            continue;
+        }
+        if (arg === '--wave') {
+            state.waveId = requireValue(argv, index, '--wave');
+            index += 1;
+            continue;
+        }
+        if (arg === '--surface-kind') {
+            const surfaceKind = requireValue(argv, index, '--surface-kind');
+            if (!['commit', 'runner-sync', 'projection', 'checkpoint'].includes(surfaceKind)) {
+                throw new CliError('ATM_CLI_USAGE', `unsupported --surface-kind ${surfaceKind}`, { exitCode: 2 });
+            }
+            state.surfaceKind = surfaceKind;
+            index += 1;
+            continue;
+        }
+        if (arg === '--surface-family') {
+            state.surfaceFamily = requireValue(argv, index, '--surface-family');
+            index += 1;
+            continue;
+        }
+        if (arg === '--payload-digest') {
+            state.payloadDigest = requireValue(argv, index, '--payload-digest');
+            index += 1;
+            continue;
+        }
+        if (arg === '--expected-task') {
+            state.expectedTasks.push(requireValue(argv, index, '--expected-task'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--collection-timeout-ms') {
+            const parsed = Number.parseInt(requireValue(argv, index, '--collection-timeout-ms'), 10);
+            state.collectionTimeoutMs = Number.isFinite(parsed) && parsed >= 0 ? parsed : 120000;
             index += 1;
             continue;
         }
@@ -185,6 +227,9 @@ export function parseBrokerArgs(argv) {
         else if (state.action === 'projection' && !state.projectionAction) {
             state.projectionAction = arg;
         }
+        else if (state.action === 'schedule' && !state.scheduleAction) {
+            state.scheduleAction = arg;
+        }
         else {
             throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
         }
@@ -202,6 +247,7 @@ export function parseBrokerArgs(argv) {
         runtimeAction: state.runtimeAction,
         runnerSyncAction: state.runnerSyncAction,
         projectionAction: state.projectionAction,
+        scheduleAction: state.scheduleAction,
         task: state.task,
         actorId: state.actorId,
         sealedSourceSha: state.sealedSourceSha,
@@ -209,6 +255,12 @@ export function parseBrokerArgs(argv) {
         receiptRef: state.receiptRef,
         receiptDigest: state.receiptDigest,
         projectionKey: state.projectionKey,
+        waveId: state.waveId,
+        surfaceKind: state.surfaceKind,
+        surfaceFamily: state.surfaceFamily,
+        payloadDigest: state.payloadDigest,
+        expectedTasks: state.expectedTasks,
+        collectionTimeoutMs: state.collectionTimeoutMs,
         intentFile: state.intentFile,
         freezeId: state.freezeId,
         ttlSeconds: state.ttlSeconds,

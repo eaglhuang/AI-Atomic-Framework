@@ -113,7 +113,8 @@ export function buildRootDropRelease(options: any = {}) {
 function listReleaseSourceFiles(repositoryRoot: string) {
   const result = spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], {
     cwd: repositoryRoot,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024
   });
   if ((result.status ?? 1) !== 0) {
     throw new Error(`git ls-files failed while building root-drop release: ${result.stderr || result.stdout}`);

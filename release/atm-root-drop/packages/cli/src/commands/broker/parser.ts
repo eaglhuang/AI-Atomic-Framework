@@ -39,12 +39,13 @@ const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
 
 export interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
   readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | 'release' | null;
   readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;
+  readonly scheduleAction: 'enqueue' | 'plan' | 'status' | null;
   readonly task: string | null;
   readonly actorId: string | null;
   readonly sealedSourceSha: string | null;
@@ -52,6 +53,12 @@ export interface ParsedBrokerOptions {
   readonly receiptRef: string | null;
   readonly receiptDigest: string | null;
   readonly projectionKey: string | null;
+  readonly waveId: string | null;
+  readonly surfaceKind: 'commit' | 'runner-sync' | 'projection' | 'checkpoint' | null;
+  readonly surfaceFamily: string | null;
+  readonly payloadDigest: string | null;
+  readonly expectedTasks: readonly string[];
+  readonly collectionTimeoutMs: number;
   readonly intentFile: string | null;
   readonly freezeId: string | null;
   readonly ttlSeconds: number;
@@ -79,6 +86,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     runtimeAction: null as ParsedBrokerOptions['runtimeAction'],
     runnerSyncAction: null as ParsedBrokerOptions['runnerSyncAction'],
     projectionAction: null as ParsedBrokerOptions['projectionAction'],
+    scheduleAction: null as ParsedBrokerOptions['scheduleAction'],
     task: null as string | null,
     actorId: null as string | null,
     sealedSourceSha: null as string | null,
@@ -86,6 +94,12 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     receiptRef: null as string | null,
     receiptDigest: null as string | null,
     projectionKey: null as string | null,
+    waveId: null as string | null,
+    surfaceKind: null as ParsedBrokerOptions['surfaceKind'],
+    surfaceFamily: null as string | null,
+    payloadDigest: null as string | null,
+    expectedTasks: [] as string[],
+    collectionTimeoutMs: 120000,
     intentFile: null as string | null,
     freezeId: null as string | null,
     ttlSeconds: 1800,
@@ -144,6 +158,41 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     }
     if (arg === '--projection-key') {
       state.projectionKey = requireValue(argv, index, '--projection-key');
+      index += 1;
+      continue;
+    }
+    if (arg === '--wave') {
+      state.waveId = requireValue(argv, index, '--wave');
+      index += 1;
+      continue;
+    }
+    if (arg === '--surface-kind') {
+      const surfaceKind = requireValue(argv, index, '--surface-kind');
+      if (!['commit', 'runner-sync', 'projection', 'checkpoint'].includes(surfaceKind)) {
+        throw new CliError('ATM_CLI_USAGE', `unsupported --surface-kind ${surfaceKind}`, { exitCode: 2 });
+      }
+      state.surfaceKind = surfaceKind as ParsedBrokerOptions['surfaceKind'];
+      index += 1;
+      continue;
+    }
+    if (arg === '--surface-family') {
+      state.surfaceFamily = requireValue(argv, index, '--surface-family');
+      index += 1;
+      continue;
+    }
+    if (arg === '--payload-digest') {
+      state.payloadDigest = requireValue(argv, index, '--payload-digest');
+      index += 1;
+      continue;
+    }
+    if (arg === '--expected-task') {
+      state.expectedTasks.push(requireValue(argv, index, '--expected-task'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--collection-timeout-ms') {
+      const parsed = Number.parseInt(requireValue(argv, index, '--collection-timeout-ms'), 10);
+      state.collectionTimeoutMs = Number.isFinite(parsed) && parsed >= 0 ? parsed : 120000;
       index += 1;
       continue;
     }
@@ -245,6 +294,8 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       state.runnerSyncAction = arg as ParsedBrokerOptions['runnerSyncAction'];
     } else if (state.action === 'projection' && !state.projectionAction) {
       state.projectionAction = arg as ParsedBrokerOptions['projectionAction'];
+    } else if (state.action === 'schedule' && !state.scheduleAction) {
+      state.scheduleAction = arg as ParsedBrokerOptions['scheduleAction'];
     } else {
       throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
     }
@@ -264,6 +315,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     runtimeAction: state.runtimeAction,
     runnerSyncAction: state.runnerSyncAction,
     projectionAction: state.projectionAction,
+    scheduleAction: state.scheduleAction,
     task: state.task,
     actorId: state.actorId,
     sealedSourceSha: state.sealedSourceSha,
@@ -271,6 +323,12 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     receiptRef: state.receiptRef,
     receiptDigest: state.receiptDigest,
     projectionKey: state.projectionKey,
+    waveId: state.waveId,
+    surfaceKind: state.surfaceKind,
+    surfaceFamily: state.surfaceFamily,
+    payloadDigest: state.payloadDigest,
+    expectedTasks: state.expectedTasks,
+    collectionTimeoutMs: state.collectionTimeoutMs,
     intentFile: state.intentFile,
     freezeId: state.freezeId,
     ttlSeconds: state.ttlSeconds,

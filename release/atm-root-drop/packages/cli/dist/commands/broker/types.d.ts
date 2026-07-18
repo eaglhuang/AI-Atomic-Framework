@@ -4,6 +4,7 @@ export interface BrokerCommandContext {
     readonly sharedFreezePath: string;
     readonly runnerSyncQueuePath: string;
     readonly projectionStewardPath: string;
+    readonly waveSchedulerPath: string;
 }
 export type SharedSurfaceFreezeRecord = {
     readonly schemaId: 'atm.brokerSharedSurfaceFreeze.v1';
