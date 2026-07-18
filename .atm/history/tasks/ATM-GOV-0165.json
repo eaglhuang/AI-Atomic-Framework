@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0165",
   "title": "Scope runner staleness close gate to non-code tasks",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0150",
@@ -93,8 +93,8 @@
     }
   },
   "importedAt": "2026-07-18T07:42:59.759Z",
-  "lastTransitionId": "2026-07-18T07-43-19-798Z-claim-6fcedff93966",
-  "lastTransitionAt": "2026-07-18T07:43:19.798Z",
+  "lastTransitionId": "2026-07-18T08-00-04-575Z-close-12f4f5d373a3",
+  "lastTransitionAt": "2026-07-18T08:00:04.575Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "atm-core",
   "reservedAt": "2026-07-18T07:43:14.528Z",
@@ -103,23 +103,31 @@
     "actorId": "atm-core",
     "leaseId": "lease-2f62fd8fa67a",
     "claimedAt": "2026-07-18T07:43:14.536Z",
-    "heartbeatAt": "2026-07-18T07:43:14.536Z",
+    "heartbeatAt": "2026-07-18T08:00:04.573Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0165.*",
+      ".atm/history/task-events/ATM-GOV-0165/**",
       ".atm/history/tasks/ATM-GOV-0165.json",
       "docs/governance/command-surface.md",
       "docs/governance/error-code-registry.json",
       "packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/taskflow-stale-runner-lane.test.ts",
       "tests/cli/taskflow-stale-runner-lane.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718074319-atm-core-ccafa71de6",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718074319-atm-core-ccafa71de6\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T07:43:14.536Z",
   "startedByActor": "atm-core",
@@ -139,21 +147,38 @@
       "docs/governance/command-surface.md",
       "docs/governance/error-code-registry.json",
       "packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/taskflow-stale-runner-lane.test.ts",
       "tests/cli/taskflow-stale-runner-lane.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0165-taskflow-runner-staleness-scope-gate.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0165-taskflow-runner-staleness-scope-gate.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "ddd0dc026fe2b538555c75c3f2df9bb0608d71495368e8228a55d2a1f47c8c48",
     "actorId": "atm-core",
-    "sessionId": "session-20260718074314-atm-core-ATM-GOV-0165-ec5b6706c9",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260718074319-atm-core-ccafa71de6",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718074319-atm-core-ccafa71de6\""
     },
-    "createdAt": "2026-07-18T07:43:19.797Z",
+    "createdAt": "2026-07-18T07:43:19.800Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T08:00:04.573Z",
+  "closedByActor": "atm-core",
+  "closedBySessionId": "session-20260718074314-atm-core-ATM-GOV-0165-ec5b6706c9",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0165.closure-packet.json"
 }
