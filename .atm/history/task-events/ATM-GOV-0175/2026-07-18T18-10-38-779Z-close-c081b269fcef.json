@@ -1,0 +1,89 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T18-10-38-779Z-close-c081b269fcef",
+  "taskId": "ATM-GOV-0175",
+  "action": "close",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": "session-20260718173839-codex-gov-auto-batch-ATM-GOV-0175-eb50a3cca7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0175.json",
+  "taskSha256": "sha256:4a8d0fb84b329980468c498ab7c00a57c3582d4e4f147c706297224a33ae360c",
+  "createdAt": "2026-07-18T18:10:38.779Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0175 --actor codex-gov-auto-batch --status done --historical-delivery 23be4213da9e998c45493cbb3c718aaa4545074c --historical-delivery 359040288ef8edc9e8e29e779e6c0a992eabcf84 --historical-delivery 4a0f4f820c5b1186df26f33930efdefabeec7f04",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718173839-codex-gov-auto-batch-ATM-GOV-0175-eb50a3cca7",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0175.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/durable-broker-scheduler.test.ts",
+      "typecheck",
+      "validate:atomization-coverage",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T18:10:38.761Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0175.*",
+        ".atm/history/task-events/ATM-GOV-0175/**",
+        ".atm/history/tasks/ATM-GOV-0175.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/command-surface.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/tasks/**",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/wave-broker-scheduler.ts",
+        "packages/core/src/broker/wave-manifest.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-root-drop-release.ts",
+        "tests/cli-fixtures/help-snapshots/broker.json",
+        "tests/cli/durable-broker-scheduler.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/tasks/**",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/wave-broker-scheduler.ts",
+        "packages/core/src/broker/wave-manifest.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-root-drop-release.ts",
+        "tests/cli-fixtures/help-snapshots/broker.json",
+        "tests/cli/durable-broker-scheduler.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
