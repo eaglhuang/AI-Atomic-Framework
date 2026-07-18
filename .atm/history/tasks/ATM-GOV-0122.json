@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0122",
   "title": "Adopter Atom Version Lineage for Evolve Proof",
-  "status": "running",
+  "status": "done",
   "milestone": "M5",
   "dependencies": [
     "ATM-GOV-0116",
@@ -98,8 +98,8 @@
     }
   },
   "importedAt": "2026-07-18T04:44:27.840Z",
-  "lastTransitionId": "2026-07-18T04-44-43-271Z-claim-3423617cea09",
-  "lastTransitionAt": "2026-07-18T04:44:43.271Z",
+  "lastTransitionId": "2026-07-18T04-55-36-764Z-close-ec119adffaed",
+  "lastTransitionAt": "2026-07-18T04:55:36.764Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gov-sequence",
   "reservedAt": "2026-07-18T04:44:37.859Z",
@@ -108,7 +108,7 @@
     "actorId": "codex-gov-sequence",
     "leaseId": "lease-44d588f40fd1",
     "claimedAt": "2026-07-18T04:44:37.871Z",
-    "heartbeatAt": "2026-07-18T04:44:37.871Z",
+    "heartbeatAt": "2026-07-18T04:55:36.760Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0122.json",
@@ -125,14 +125,14 @@
       "packages/core/src/upgrade/**",
       "scripts/validate-registry-diff.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718044443-codex-gov-sequence-52d59a7026",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718044443-codex-gov-sequence-52d59a7026\""
-    }
+    },
+    "reason": "Legacy ATM-GOV-0122 delivery commit predates current task-scoped closeback and includes adjacent source files; user approved fastest necessary path to complete ATM-GOV-0122."
   },
   "startedAt": "2026-07-18T04:44:37.871Z",
   "startedByActor": "codex-gov-sequence",
@@ -176,5 +176,10 @@
     },
     "createdAt": "2026-07-18T04:44:43.270Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T04:55:36.760Z",
+  "closedByActor": "codex-gov-sequence",
+  "closedBySessionId": "session-20260718044437-codex-gov-sequence-ATM-GOV-0122-07252c2920",
+  "closeReason": "Legacy ATM-GOV-0122 delivery commit predates current task-scoped closeback and includes adjacent source files; user approved fastest necessary path to complete ATM-GOV-0122.",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0122.closure-packet.json"
 }
