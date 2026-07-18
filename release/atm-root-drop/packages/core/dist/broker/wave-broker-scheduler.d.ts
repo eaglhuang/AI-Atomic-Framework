@@ -1,5 +1,5 @@
 export type WaveBrokerTicketState = 'queued' | 'head' | 'batched' | 'executing' | 'released' | 'failed' | 'cancelled';
-export type WaveBrokerSurfaceKind = 'commit' | 'runner-sync' | 'projection' | 'checkpoint';
+export type WaveBrokerSurfaceKind = 'commit' | 'build' | 'runner-sync' | 'projection' | 'checkpoint';
 export interface WaveBrokerTicketInput {
     readonly waveId: string;
     readonly taskId: string;

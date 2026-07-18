@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createWaveManifest, evaluateWaveEligibility } from '../../../../core/dist/broker/wave-manifest.js';
+import { evaluateAtomicWaveCheckpoint } from '../../../../core/dist/broker/wave-generated-executor.js';
 import { CliError, makeResult, message, parseOptions } from '../shared.js';
 import { resolveActorId } from '../actor-registry.js';
 import { runNext } from '../next.js';
@@ -15,7 +16,8 @@ export async function runBatch(argv) {
     const batchHistoricalDeliveryRefs = action === 'checkpoint' ? parseBatchHistoricalDeliveryRefs(argv) : [];
     const batchHistoricalBatchRefs = action === 'checkpoint' ? parseBatchHistoricalBatchRefs(argv) : [];
     const batchDeliverAndCloseExtras = action === 'deliver-and-close' ? parseBatchDeliverAndCloseExtras(argv) : null;
-    const { options } = parseOptions(action === 'checkpoint' ? stripBatchCheckpointCloseArgs(argv) : action === 'deliver-and-close' ? stripBatchDeliverAndCloseExtras(argv) : argv, 'batch');
+    const checkpointReadinessInput = action === 'checkpoint-readiness' ? parseBatchCheckpointReadinessArgs(argv) : null;
+    const { options } = parseOptions(action === 'checkpoint' ? stripBatchCheckpointCloseArgs(argv) : action === 'deliver-and-close' ? stripBatchDeliverAndCloseExtras(argv) : action === 'checkpoint-readiness' ? stripBatchCheckpointReadinessArgs(argv) : argv, 'batch');
     if (action === 'status' || action === 'current') {
         const selector = buildBatchSelector(options);
         const compact = options.compact === true || action === 'current';
@@ -48,6 +50,16 @@ export async function runBatch(argv) {
                     : message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'Active batch runtime is inconsistent and must be repaired before continuing.', { active: Boolean(batchRun), batchHeadTaskId: consistency.batchHeadTaskId, queueHeadTaskId: consistency.queueHeadTaskId, reason: consistency.reason, requiredCommand: 'node atm.mjs batch repair --actor <id> --json' })], evidence: { action: 'status', batchRun,
                 activeBatches: allActiveBatches, taskQueue, pendingCommitWindow, consistency, dirtyFileSummary: readGitDirtyFileSummary(options.cwd) }
         });
+    }
+    if (action === 'checkpoint-readiness') {
+        if (!checkpointReadinessInput?.waveId || !checkpointReadinessInput.manifestDigest || checkpointReadinessInput.taskIds.length === 0) {
+            throw new CliError('ATM_CLI_USAGE', 'batch checkpoint-readiness requires --wave <id>, --manifest-digest <digest>, and at least one --task <id>.', { exitCode: 2 });
+        }
+        const deliveryReceipts = checkpointReadinessInput.deliveryReceipts.map((filePath) => JSON.parse(readFileSync(path.resolve(options.cwd, filePath), 'utf8')));
+        const buildReceipts = checkpointReadinessInput.buildReceipts.map((filePath) => JSON.parse(readFileSync(path.resolve(options.cwd, filePath), 'utf8')));
+        const projectionReceipts = checkpointReadinessInput.projectionReceipts.map((filePath) => JSON.parse(readFileSync(path.resolve(options.cwd, filePath), 'utf8')));
+        const readiness = evaluateAtomicWaveCheckpoint({ waveId: checkpointReadinessInput.waveId, taskIds: checkpointReadinessInput.taskIds, manifestDigest: checkpointReadinessInput.manifestDigest, deliveryReceipts, buildReceipts, projectionReceipts, planningClosebackOk: checkpointReadinessInput.planningClosebackOk });
+        return makeResult({ ok: readiness.ready, command: 'batch', cwd: options.cwd, messages: [message(readiness.ready ? 'info' : 'error', readiness.ready ? 'ATM_BATCH_WAVE_CHECKPOINT_READY' : 'ATM_BATCH_WAVE_CHECKPOINT_BLOCKED', readiness.ready ? 'Atomic wave checkpoint has all required commit/build/projection receipts.' : 'Atomic wave checkpoint is missing required receipts or planning closeback.', { waveId: readiness.waveId, missingByTask: readiness.missingByTask, planningCloseback: readiness.planningCloseback })], evidence: { action: 'checkpoint-readiness', readiness } });
     }
     const resolvedActor = resolveActorId(options.agent ?? undefined);
     if (!resolvedActor) {
@@ -345,6 +357,66 @@ function parseBatchDeliverAndCloseExtras(argv) {
         }
     }
     return { deliveryCommit, deliveryMessage, reason };
+}
+function parseBatchCheckpointReadinessArgs(argv) {
+    let waveId = null;
+    let manifestDigest = null;
+    const taskIds = [];
+    const deliveryReceipts = [];
+    const buildReceipts = [];
+    const projectionReceipts = [];
+    let planningClosebackOk = true;
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg === '--wave' && index + 1 < argv.length) {
+            waveId = argv[++index];
+            continue;
+        }
+        if (arg === '--manifest-digest' && index + 1 < argv.length) {
+            manifestDigest = argv[++index];
+            continue;
+        }
+        if (arg === '--task' && index + 1 < argv.length) {
+            taskIds.push(argv[++index]);
+            continue;
+        }
+        if (arg === '--delivery-receipt' && index + 1 < argv.length) {
+            deliveryReceipts.push(argv[++index]);
+            continue;
+        }
+        if (arg === '--build-receipt' && index + 1 < argv.length) {
+            buildReceipts.push(argv[++index]);
+            continue;
+        }
+        if (arg === '--projection-receipt' && index + 1 < argv.length) {
+            projectionReceipts.push(argv[++index]);
+            continue;
+        }
+        if (arg === '--planning-closeback-ok') {
+            planningClosebackOk = true;
+            continue;
+        }
+        if (arg === '--planning-closeback-blocked') {
+            planningClosebackOk = false;
+            continue;
+        }
+    }
+    return { waveId, manifestDigest, taskIds, deliveryReceipts, buildReceipts, projectionReceipts, planningClosebackOk };
+}
+function stripBatchCheckpointReadinessArgs(argv) {
+    const stripped = [];
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (['--wave', '--manifest-digest', '--task', '--delivery-receipt', '--build-receipt', '--projection-receipt'].includes(arg) && index + 1 < argv.length) {
+            index += 1;
+            continue;
+        }
+        if (arg === '--planning-closeback-ok' || arg === '--planning-closeback-blocked') {
+            continue;
+        }
+        stripped.push(arg);
+    }
+    return stripped;
 }
 function stripBatchDeliverAndCloseExtras(argv) {
     const stripped = [];

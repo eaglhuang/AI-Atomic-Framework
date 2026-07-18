@@ -17,7 +17,7 @@ export interface ParsedBrokerOptions {
     readonly receiptDigest: string | null;
     readonly projectionKey: string | null;
     readonly waveId: string | null;
-    readonly surfaceKind: 'commit' | 'runner-sync' | 'projection' | 'checkpoint' | null;
+    readonly surfaceKind: 'commit' | 'build' | 'runner-sync' | 'projection' | 'checkpoint' | null;
     readonly surfaceFamily: string | null;
     readonly payloadDigest: string | null;
     readonly manifestDigest: string | null;

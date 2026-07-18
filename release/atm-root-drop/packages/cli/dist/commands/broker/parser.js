@@ -101,7 +101,7 @@ export function parseBrokerArgs(argv) {
         }
         if (arg === '--surface-kind') {
             const surfaceKind = requireValue(argv, index, '--surface-kind');
-            if (!['commit', 'runner-sync', 'projection', 'checkpoint'].includes(surfaceKind)) {
+            if (!['commit', 'build', 'runner-sync', 'projection', 'checkpoint'].includes(surfaceKind)) {
                 throw new CliError('ATM_CLI_USAGE', `unsupported --surface-kind ${surfaceKind}`, { exitCode: 2 });
             }
             state.surfaceKind = surfaceKind;

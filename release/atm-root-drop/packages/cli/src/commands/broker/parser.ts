@@ -55,7 +55,7 @@ export interface ParsedBrokerOptions {
   readonly receiptDigest: string | null;
   readonly projectionKey: string | null;
   readonly waveId: string | null;
-  readonly surfaceKind: 'commit' | 'runner-sync' | 'projection' | 'checkpoint' | null;
+  readonly surfaceKind: 'commit' | 'build' | 'runner-sync' | 'projection' | 'checkpoint' | null;
   readonly surfaceFamily: string | null;
   readonly payloadDigest: string | null;
   readonly manifestDigest: string | null;
@@ -182,7 +182,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     }
     if (arg === '--surface-kind') {
       const surfaceKind = requireValue(argv, index, '--surface-kind');
-      if (!['commit', 'runner-sync', 'projection', 'checkpoint'].includes(surfaceKind)) {
+      if (!['commit', 'build', 'runner-sync', 'projection', 'checkpoint'].includes(surfaceKind)) {
         throw new CliError('ATM_CLI_USAGE', `unsupported --surface-kind ${surfaceKind}`, { exitCode: 2 });
       }
       state.surfaceKind = surfaceKind as ParsedBrokerOptions['surfaceKind'];
