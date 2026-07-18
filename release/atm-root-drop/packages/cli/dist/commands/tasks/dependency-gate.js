@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import { deriveAtmScopeClass } from '../../../../core/dist/broker/atm-core-scope.js';
 import { taskPathFor } from './task-file-io-helpers.js';
 import { parseYamlList } from './task-import-validators.js';
 import { normalizeWorkItemStatus } from './task-transition-helpers.js';
@@ -21,33 +22,48 @@ function isDependencyStatusClosed(status) {
     const normalized = normalizeWorkItemStatus(status);
     return normalized === 'done' || normalized === 'verified';
 }
-export function findTaskClaimDependencyBlockers(cwd, taskId, taskDocument) {
+export function findTaskClaimDependencyBlockers(cwd, taskId, taskDocument, options = {}) {
     const declaredDependencies = declaredDependenciesFor(taskDocument);
     if (declaredDependencies.length === 0) {
         return [];
     }
+    const scopeClass = deriveAtmScopeClass(options.claimFiles ?? []);
+    if (options.claimFiles && options.claimFiles.length > 0 && !scopeClass.hasCode) {
+        return [];
+    }
+    const codeFilesBlocked = scopeClass.classifications
+        .filter((classification) => classification.scopeClass.includes('code'))
+        .map((classification) => classification.path);
     const blockers = [];
+    const enrichBlocker = (blocker) => ({
+        ...blocker,
+        blockedByDependency: true,
+        dependencyTaskIds: declaredDependencies,
+        scopeClass,
+        codeFilesBlocked,
+        allowedDependencyBlockedRoute: 'docs-ledger-planning'
+    });
     for (const dependencyTaskId of declaredDependencies) {
         if (dependencyTaskId === taskId) {
             continue;
         }
         const dependencyPath = taskPathFor(cwd, dependencyTaskId);
         if (!existsSync(dependencyPath)) {
-            blockers.push({ taskId: dependencyTaskId, status: 'missing', taskPath: dependencyPath });
+            blockers.push(enrichBlocker({ taskId: dependencyTaskId, status: 'missing', taskPath: dependencyPath }));
             continue;
         }
         const dependencyDocument = readTaskDocument(dependencyPath);
         if (!dependencyDocument) {
-            blockers.push({ taskId: dependencyTaskId, status: 'unreadable', taskPath: dependencyPath });
+            blockers.push(enrichBlocker({ taskId: dependencyTaskId, status: 'unreadable', taskPath: dependencyPath }));
             continue;
         }
         const dependencyStatus = normalizeWorkItemStatus(dependencyDocument.status);
         if (!isDependencyStatusClosed(dependencyStatus)) {
-            blockers.push({ taskId: dependencyTaskId, status: dependencyStatus, taskPath: dependencyPath });
+            blockers.push(enrichBlocker({ taskId: dependencyTaskId, status: dependencyStatus, taskPath: dependencyPath }));
             continue;
         }
         if (!verifyCloseoutProvenance(cwd, dependencyTaskId, dependencyDocument)) {
-            blockers.push(buildDependencyCloseoutBlocker(cwd, dependencyTaskId, dependencyPath, dependencyDocument));
+            blockers.push(enrichBlocker(buildDependencyCloseoutBlocker(cwd, dependencyTaskId, dependencyPath, dependencyDocument)));
         }
     }
     return blockers;

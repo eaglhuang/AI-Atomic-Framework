@@ -56,7 +56,8 @@ export async function claimNextImportedTask(input) {
         if (existsSync(taskPath)) {
             try {
                 const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
-                selectedTaskDependencyBlockers = findTaskClaimDependencyBlockers(input.cwd, selectedTask.workItemId, taskDocument);
+                const dependencyClaimFiles = input.claimFiles?.length ? input.claimFiles : buildAllowedFilesForTask(selectedTask);
+                selectedTaskDependencyBlockers = findTaskClaimDependencyBlockers(input.cwd, selectedTask.workItemId, taskDocument, { claimFiles: dependencyClaimFiles });
             }
             catch { }
         }

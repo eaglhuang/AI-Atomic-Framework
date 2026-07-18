@@ -66,6 +66,7 @@ export interface TaskImportRecord {
   readonly closureAuthority?: string | null;
   readonly planningReadOnlyPaths?: readonly string[];
   readonly planningMirrorPaths?: readonly string[];
+  readonly planningArtifacts?: readonly string[];
   readonly outOfScope?: readonly string[];
   readonly nonGoals?: readonly string[];
   readonly evidenceRequired?: string | null;

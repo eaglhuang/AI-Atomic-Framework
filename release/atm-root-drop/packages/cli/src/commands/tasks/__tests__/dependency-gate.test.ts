@@ -35,14 +35,31 @@ writeTask(repo, 'TASK-DEP-PLANNED', { status: 'planned' });
 let blockers = findTaskClaimDependencyBlockers(repo, 'TASK-CONSUMER', {
   status: 'ready',
   dependencies: ['TASK-DEP-PLANNED']
+}, {
+  claimFiles: ['packages/cli/src/commands/tasks/dependency-gate.ts']
 });
 assert(blockers.length === 1, 'planned dependency must block claim');
 assert(blockers[0]?.status === 'planned', 'planned dependency blocker must preserve normalized status');
+assert(blockers[0]?.blockedByDependency === true, 'dependency blocker must expose blockedByDependency');
+assert(blockers[0]?.dependencyTaskIds?.includes('TASK-DEP-PLANNED'), 'dependency blocker must expose dependencyTaskIds');
+assert(blockers[0]?.scopeClass?.hasCode === true, 'code claim blocker must expose scopeClass');
+assert(blockers[0]?.codeFilesBlocked?.includes('packages/cli/src/commands/tasks/dependency-gate.ts'), 'code claim blocker must identify code files');
+assert(blockers[0]?.allowedDependencyBlockedRoute === 'docs-ledger-planning', 'blocker must identify the still-allowed planning route');
+
+blockers = findTaskClaimDependencyBlockers(repo, 'TASK-CONSUMER', {
+  status: 'ready',
+  dependencies: ['TASK-DEP-PLANNED']
+}, {
+  claimFiles: ['docs/governance/plan.md', '.atm/history/tasks/TASK-CONSUMER.json']
+});
+assert(blockers.length === 0, 'docs and ledger only claim must bypass unresolved dependency gate');
 
 writeTask(repo, 'TASK-DEP-MANUAL-DONE', { status: 'done' });
 blockers = findTaskClaimDependencyBlockers(repo, 'TASK-CONSUMER', {
   status: 'ready',
   dependencies: ['TASK-DEP-MANUAL-DONE']
+}, {
+  claimFiles: ['scripts/validate-task.ts']
 });
 assert(blockers.length === 1, 'source-done dependency without closeout provenance must block claim');
 assert(blockers[0]?.status === 'source-done-governance-incomplete', 'manual done blocker must use governed closeout bucket');
@@ -59,6 +76,8 @@ writeTask(repo, 'TASK-DEP-CLOSED', {
 blockers = findTaskClaimDependencyBlockers(repo, 'TASK-CONSUMER', {
   status: 'ready',
   dependencies: ['TASK-DEP-CLOSED']
+}, {
+  claimFiles: ['packages/core/src/index.ts']
 });
 assert(blockers.length === 0, 'dependency with governed closeout provenance must not block claim');
 

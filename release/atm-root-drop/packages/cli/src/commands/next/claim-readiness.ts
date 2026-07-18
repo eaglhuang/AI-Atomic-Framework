@@ -18,6 +18,8 @@ export interface ClaimReadinessTaskSummary {
   readonly status: string;
   readonly format: 'json' | 'markdown';
   readonly sourcePlanPath: string | null;
+  readonly scopePaths?: readonly string[];
+  readonly targetAllowedFiles?: readonly string[];
 }
 
 export interface ClaimReadinessDiagnostic {
@@ -113,7 +115,9 @@ export function diagnoseClaimReadinessForTasks(
       ? (() => {
         try {
           const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
-          return findTaskClaimDependencyBlockers(cwd, task.workItemId, taskDocument);
+          return findTaskClaimDependencyBlockers(cwd, task.workItemId, taskDocument, {
+            claimFiles: task.targetAllowedFiles ?? task.scopePaths ?? []
+          });
         } catch {
           return [];
         }

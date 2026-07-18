@@ -76,7 +76,9 @@ export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent) {
             ? (() => {
                 try {
                     const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
-                    return findTaskClaimDependencyBlockers(cwd, task.workItemId, taskDocument);
+                    return findTaskClaimDependencyBlockers(cwd, task.workItemId, taskDocument, {
+                        claimFiles: task.targetAllowedFiles ?? task.scopePaths ?? []
+                    });
                 }
                 catch {
                     return [];

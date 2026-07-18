@@ -34,7 +34,15 @@ try {
             workItemId: 'TASK-BLOCKED-BY-DEP',
             status: 'ready',
             format: 'json',
-            sourcePlanPath: null
+            sourcePlanPath: null,
+            scopePaths: ['packages/cli/src/commands/tasks/dependency-gate.ts']
+        },
+        {
+            workItemId: 'TASK-DOCS-BY-DEP',
+            status: 'ready',
+            format: 'json',
+            sourcePlanPath: null,
+            scopePaths: ['docs/planning.md', '.atm/history/tasks/TASK-DOCS-BY-DEP.json']
         },
         {
             workItemId: 'TASK-READY',
@@ -46,6 +54,12 @@ try {
     writeJson(path.join(repo, '.atm', 'history', 'tasks', 'TASK-BLOCKED-BY-DEP.json'), {
         schemaVersion: 'atm.workItem.v0.2',
         workItemId: 'TASK-BLOCKED-BY-DEP',
+        status: 'ready',
+        dependencies: ['TASK-UPSTREAM']
+    });
+    writeJson(path.join(repo, '.atm', 'history', 'tasks', 'TASK-DOCS-BY-DEP.json'), {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: 'TASK-DOCS-BY-DEP',
         status: 'ready',
         dependencies: ['TASK-UPSTREAM']
     });
@@ -63,7 +77,10 @@ try {
     const dependencyLane = diagnoseClaimReadinessForTasks(repo, [taskSummaries[2]], 'write');
     assert(dependencyLane.primaryBlocker?.blockerCode === 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', 'dependency gaps must surface as claim blockers');
     assert(dependencyLane.primaryBlocker?.dependencyBlockers[0]?.taskId === 'TASK-UPSTREAM', 'dependency blocker must identify the upstream task');
-    const readyLane = diagnoseClaimReadinessForTasks(repo, [taskSummaries[3]], 'write');
+    assert(dependencyLane.primaryBlocker?.dependencyBlockers[0]?.codeFilesBlocked?.includes('packages/cli/src/commands/tasks/dependency-gate.ts'), 'dependency blocker must identify blocking code files');
+    const docsLane = diagnoseClaimReadinessForTasks(repo, [taskSummaries[3]], 'write');
+    assert(docsLane.primaryBlocker === null, 'docs-only task must not be dependency-blocked while upstream closeout is incomplete');
+    const readyLane = diagnoseClaimReadinessForTasks(repo, [taskSummaries[4]], 'write');
     assert(readyLane.primaryBlocker === null, 'ready task must not report a blocking readiness issue');
     assert(readyLane.diagnostics[0]?.claimable === true, 'ready task must be marked claimable');
 }

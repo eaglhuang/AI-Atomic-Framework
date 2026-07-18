@@ -13,6 +13,8 @@ deliverables:
   - packages/cli/src/commands/tasks.ts
 validators:
   - npm run typecheck
+planningArtifacts:
+  - docs/blueprints/TASK-RFT-0019.md
 ---
 
 ## Acceptance
@@ -24,4 +26,5 @@ assert.equal(parsed.tasks.length, 1);
 assert.equal(parsed.tasks[0].workItemId, 'TASK-RFT-0019');
 assert.deepEqual(parsed.tasks[0].scopePaths, ['packages/cli/src/commands/tasks.ts']);
 assert.deepEqual(parsed.tasks[0].deliverables, ['packages/cli/src/commands/tasks.ts']);
+assert.deepEqual(parsed.tasks[0].planningArtifacts, ['docs/blueprints/TASK-RFT-0019.md']);
 console.log('task-card-parser.spec passed');

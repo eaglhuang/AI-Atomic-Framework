@@ -4479,6 +4479,7 @@
     "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+    "release/atm-root-drop/tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
     "release/atm-root-drop/tests/cli/protected-override-audit-direction-lock.test.ts",
     "release/atm-root-drop/tests/cli/protected-override-audit-staging.test.ts",
     "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
@@ -9247,6 +9248,7 @@
       "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+      "release/atm-root-drop/tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
       "release/atm-root-drop/tests/cli/protected-override-audit-direction-lock.test.ts",
       "release/atm-root-drop/tests/cli/protected-override-audit-staging.test.ts",
       "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
@@ -9569,18 +9571,18 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:5f2f5c4147551105bd515547b8008d8104d63de9281cff50949c86733343f630",
-  "sealedSourceCommit": "b26ca22eed11d5d9022ca70c5e8f9184caa97eb1",
-  "buildDecision": "cache-hit-skip",
+  "buildInputsTreeHash": "sha256:cdc30f0af262883dcb0b7a98c817d3989a1f5d7cc8542f558160814a09a1418e",
+  "sealedSourceCommit": "92934bc1f6a9cbd03a19311d130d5e25be6794f7",
+  "buildDecision": "cache-miss-build",
   "phaseTimingsMs": {
-    "inputHashCalculation": 56,
-    "skipDecision": 60,
-    "worktreeSetup": 0,
-    "typescriptBuild": 0,
-    "rootDropReleaseAssembly": 0,
-    "onefileReleaseAssembly": 0,
-    "artifactSync": 8,
+    "inputHashCalculation": 64,
+    "skipDecision": 3,
+    "worktreeSetup": 9439,
+    "typescriptBuild": 14653,
+    "rootDropReleaseAssembly": 4420,
+    "onefileReleaseAssembly": 1279,
+    "artifactSync": 5784,
     "cleanup": 0,
-    "totalElapsed": 956
+    "totalElapsed": 35986
   }
 }

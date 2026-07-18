@@ -53,9 +53,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     runtimeAdapterReadiness: input.runtimeAdapterReadiness
   });
   if (quickfixResult) return quickfixResult;
-  const claimDependencyStatusById = new Map(
-    importedTaskQueue.tasks.map((task) => [task.workItemId, task.status] as const)
-  );
+  const claimDependencyStatusById = new Map(importedTaskQueue.tasks.map((task) => [task.workItemId, task.status] as const));
   const selectedTask = importedTaskQueue.claimableTask || importedTaskQueue.selectedTask;
   let selectedTaskDependencyBlockers: TaskClaimDependencyBlocker[] = [];
   if (selectedTask) {
@@ -63,7 +61,8 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     if (existsSync(taskPath)) {
       try {
         const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
-        selectedTaskDependencyBlockers = findTaskClaimDependencyBlockers(input.cwd, selectedTask.workItemId, taskDocument);
+        const dependencyClaimFiles = input.claimFiles?.length ? input.claimFiles : buildAllowedFilesForTask(selectedTask);
+        selectedTaskDependencyBlockers = findTaskClaimDependencyBlockers(input.cwd, selectedTask.workItemId, taskDocument, { claimFiles: dependencyClaimFiles });
       } catch {}
     }
   }
