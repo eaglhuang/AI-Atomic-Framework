@@ -4,13 +4,16 @@ import {
   existsSync,
   lstatSync,
   mkdirSync,
+  readFileSync,
   readdirSync,
   rmSync,
   rmdirSync,
   symlinkSync,
-  unlinkSync
+  unlinkSync,
+  writeFileSync
 } from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   assertRunnerSyncAdmission,
@@ -18,10 +21,26 @@ import {
 } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 
 type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
+type BuildDecision = 'built' | 'cache-hit-skip' | 'cache-miss-build';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const invokedAsCli = process.argv[1] !== undefined
   && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
+const releaseManifestPaths = [
+  path.join('release', 'atm-root-drop', 'release-manifest.json'),
+  path.join('release', 'atm-onefile', 'release-manifest.json')
+] as const;
+const buildInputPaths = [
+  'packages',
+  'scripts',
+  'templates',
+  'schemas',
+  'atomic_workbench',
+  'package.json',
+  'package-lock.json',
+  'tsconfig.json',
+  'tsconfig.build.json'
+] as const;
 
 /**
  * Remove a path without following directory junctions/symlinks.
@@ -79,6 +98,7 @@ if (invokedAsCli) {
 }
 
 function runSealedBuild(buildTarget: BuildTarget): void {
+  const timings = createPhaseTimings();
   const actorId = process.env.ATM_ACTOR_ID?.trim()
     || process.env.AGENT_IDENTITY?.trim()
     || 'release-steward';
@@ -91,30 +111,196 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     sealedSourceSha
   }));
 
+  const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
+  const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({
+    cwd: repoRoot,
+    buildTarget,
+    buildInputsTreeHash
+  }));
+  if (cacheDecision.decision === 'cache-hit-skip') {
+    timePhase(timings, 'artifactSyncMs', () => writeBuildMetadataToReleaseManifests({
+      cwd: repoRoot,
+      sealedSourceSha,
+      buildInputsTreeHash,
+      buildDecision: cacheDecision.decision,
+      timings
+    }));
+    timings.totalElapsedMs = elapsedSince(timings.startedAt);
+    writeBuildMetadataToReleaseManifests({
+      cwd: repoRoot,
+      sealedSourceSha,
+      buildInputsTreeHash,
+      buildDecision: cacheDecision.decision,
+      timings
+    });
+    console.log(`[sealed-runner-build] cache-hit-skip ${buildTarget} from ${sealedSourceSha}`);
+    return;
+  }
+
   const worktreeRoot = path.join(repoRoot, '.atm-temp', 'sealed-runner-build', `${process.pid}-${sealedSourceSha.slice(0, 12)}`);
   removeTreeWithoutFollowingLinks(worktreeRoot);
   mkdirSync(path.dirname(worktreeRoot), { recursive: true });
   try {
-    runGit(repoRoot, ['worktree', 'add', '--detach', worktreeRoot, sealedSourceSha]);
+    timePhase(timings, 'worktreeSetupMs', () => runGit(repoRoot, ['worktree', 'add', '--detach', worktreeRoot, sealedSourceSha]));
     linkNodeModules(worktreeRoot);
-    runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', buildTarget]);
-    syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget);
-    console.log(`[sealed-runner-build] built ${buildTarget} from ${sealedSourceSha}`);
+    runTimedInnerBuild(worktreeRoot, buildTarget, timings);
+    timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget));
+    writeBuildMetadataToReleaseManifests({
+      cwd: repoRoot,
+      sealedSourceSha,
+      buildInputsTreeHash,
+      buildDecision: cacheDecision.decision,
+      timings
+    });
+    console.log(`[sealed-runner-build] ${cacheDecision.decision} ${buildTarget} from ${sealedSourceSha}`);
   } finally {
     // CRITICAL: unlink the node_modules junction BEFORE git worktree remove.
     // On Windows, `git worktree remove --force` can traverse the junction and
     // wipe the host repo node_modules that the junction points at.
     unlinkWorktreeNodeModulesLink(worktreeRoot);
-    const remove = spawnSync('git', ['worktree', 'remove', '--force', worktreeRoot], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe']
+    timePhase(timings, 'cleanupMs', () => {
+      const remove = spawnSync('git', ['worktree', 'remove', '--force', worktreeRoot], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
+      if ((remove.status ?? 1) !== 0 || existsSync(worktreeRoot)) {
+        unlinkWorktreeNodeModulesLink(worktreeRoot);
+        removeTreeWithoutFollowingLinks(worktreeRoot);
+      }
     });
-    if ((remove.status ?? 1) !== 0 || existsSync(worktreeRoot)) {
-      unlinkWorktreeNodeModulesLink(worktreeRoot);
-      removeTreeWithoutFollowingLinks(worktreeRoot);
+    timings.totalElapsedMs = elapsedSince(timings.startedAt);
+  }
+}
+
+function runTimedInnerBuild(worktreeRoot: string, buildTarget: BuildTarget, timings: SealedBuildTimings): void {
+  if (buildTarget === 'full') {
+    timePhase(timings, 'typescriptBuildMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'packages']));
+    timePhase(timings, 'rootDropAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'root-drop']));
+    timePhase(timings, 'onefileAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'onefile']));
+    return;
+  }
+  const phase = buildTarget === 'packages'
+    ? 'typescriptBuildMs'
+    : buildTarget === 'root-drop'
+      ? 'rootDropAssemblyMs'
+      : 'onefileAssemblyMs';
+  timePhase(timings, phase, () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', buildTarget]));
+}
+
+export interface SealedBuildTimings {
+  readonly startedAt: number;
+  inputHashCalculationMs: number;
+  skipDecisionMs: number;
+  worktreeSetupMs: number;
+  typescriptBuildMs: number;
+  rootDropAssemblyMs: number;
+  onefileAssemblyMs: number;
+  artifactSyncMs: number;
+  cleanupMs: number;
+  totalElapsedMs: number;
+}
+
+function createPhaseTimings(): SealedBuildTimings {
+  return {
+    startedAt: Date.now(),
+    inputHashCalculationMs: 0,
+    skipDecisionMs: 0,
+    worktreeSetupMs: 0,
+    typescriptBuildMs: 0,
+    rootDropAssemblyMs: 0,
+    onefileAssemblyMs: 0,
+    artifactSyncMs: 0,
+    cleanupMs: 0,
+    totalElapsedMs: 0
+  };
+}
+
+function timePhase<T>(timings: SealedBuildTimings, phase: keyof Omit<SealedBuildTimings, 'startedAt' | 'totalElapsedMs'>, callback: () => T): T {
+  const started = Date.now();
+  try {
+    return callback();
+  } finally {
+    timings[phase] += elapsedSince(started);
+  }
+}
+
+function elapsedSince(startedAt: number): number {
+  return Math.max(0, Date.now() - startedAt);
+}
+
+export function computeBuildInputsTreeHash(cwd: string, commitSha = 'HEAD'): string {
+  const result = spawnSync('git', ['ls-tree', '-r', '-z', commitSha, '--', ...buildInputPaths], {
+    cwd,
+    encoding: 'buffer',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if ((result.status ?? 1) !== 0 || result.error) {
+    fail(`Unable to compute sealed build input tree hash: ${String(result.stderr || result.error || '')}`, result.status ?? 1);
+  }
+  return `sha256:${createHash('sha256').update(result.stdout).digest('hex')}`;
+}
+
+export function inspectBuildCache(input: {
+  readonly cwd: string;
+  readonly buildTarget: BuildTarget;
+  readonly buildInputsTreeHash: string;
+}): { readonly decision: BuildDecision; readonly reason: string } {
+  if (input.buildTarget !== 'full') {
+    return { decision: 'built', reason: 'partial build targets do not use cache skip' };
+  }
+  for (const relative of releaseManifestPaths) {
+    const absolute = path.join(input.cwd, relative);
+    if (!existsSync(absolute)) {
+      return { decision: 'cache-miss-build', reason: `${relative} is missing` };
+    }
+    const parsed = readJsonRecord(absolute);
+    if (parsed.buildInputsTreeHash !== input.buildInputsTreeHash) {
+      return { decision: 'cache-miss-build', reason: `${relative} buildInputsTreeHash mismatch` };
     }
   }
+  const dirty = spawnSync('git', ['diff', '--quiet', '--', ...releaseManifestPaths, 'release/atm-root-drop/atm.mjs', 'release/atm-onefile/atm.mjs'], {
+    cwd: input.cwd,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if ((dirty.status ?? 1) !== 0) {
+    return { decision: 'cache-miss-build', reason: 'release artifacts are dirty or missing' };
+  }
+  return { decision: 'cache-hit-skip', reason: 'build input tree hash matches release manifests' };
+}
+
+export function writeBuildMetadataToReleaseManifests(input: {
+  readonly cwd: string;
+  readonly sealedSourceSha: string;
+  readonly buildInputsTreeHash: string;
+  readonly buildDecision: BuildDecision;
+  readonly timings: SealedBuildTimings;
+}): void {
+  for (const relative of releaseManifestPaths) {
+    const absolute = path.join(input.cwd, relative);
+    if (!existsSync(absolute)) continue;
+    const manifest = readJsonRecord(absolute);
+    manifest.buildInputsTreeHash = input.buildInputsTreeHash;
+    manifest.sealedSourceCommit = input.sealedSourceSha;
+    manifest.buildDecision = input.buildDecision;
+    manifest.phaseTimingsMs = {
+      inputHashCalculation: input.timings.inputHashCalculationMs,
+      skipDecision: input.timings.skipDecisionMs,
+      worktreeSetup: input.timings.worktreeSetupMs,
+      typescriptBuild: input.timings.typescriptBuildMs,
+      rootDropReleaseAssembly: input.timings.rootDropAssemblyMs,
+      onefileReleaseAssembly: input.timings.onefileAssemblyMs,
+      artifactSync: input.timings.artifactSyncMs,
+      cleanup: input.timings.cleanupMs,
+      totalElapsed: input.timings.totalElapsedMs
+    };
+    writeFileSync(absolute, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  }
+}
+
+function readJsonRecord(filePath: string): Record<string, unknown> {
+  return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
 }
 
 export function unlinkWorktreeNodeModulesLink(worktreeRoot: string): void {
