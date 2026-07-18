@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0165",
+  "title": "Scope runner staleness close gate to non-code tasks",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0150",
+    "ATM-GOV-0154",
+    "ATM-GOV-0159"
+  ],
+  "acceptance": [
+    "A task whose scope is only `.atm/history/**`, evidence, docs, or planning mirror paths can run taskflow pre-close without receiving `ATM_TASKFLOW_PRECLOSE_STALE_RUNNER` solely because the frozen runner is stale.",
+    "A task whose scope includes `packages/**`, `scripts/**`, or other build-input paths still receives the existing runner-sync blocker when the runner is stale.",
+    "Taskflow evidence includes `runnerGateDecision` and, for required gates, `runnerGateIntersectingFiles`.",
+    "Any required runner gate identifies the Tier 2 shared surface that requires serialization.",
+    "The change does not mutate release artifacts or enqueue runner-sync work."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "tests/cli/taskflow-stale-runner-lane.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "tests/cli/taskflow-stale-runner-lane.test.ts",
+    "docs/governance/command-surface.md",
+    "docs/governance/error-code-registry.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/taskflow-stale-runner-lane.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-close-runner-staleness-gate",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.taskflow-runner-staleness-scope-classifier",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/taskflow/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "tests/cli/taskflow-stale-runner-lane.test.ts",
+        "docs/governance/command-surface.md",
+        "docs/governance/error-code-registry.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0165-taskflow-runner-staleness-scope-gate.task.md",
+    "sectionTitle": "ATM-GOV-0165",
+    "headingLine": 43,
+    "hash": "2096e874a64f3e94",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "../../../../3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0165-taskflow-runner-staleness-scope-gate.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:2096e874a64f3e946d8a657354f020fe0db5b7823ddc7c824791191ce134fcb2",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T07:42:59.759Z"
+    }
+  },
+  "importedAt": "2026-07-18T07:42:59.759Z",
+  "lastTransitionId": "2026-07-18T07-43-19-798Z-claim-6fcedff93966",
+  "lastTransitionAt": "2026-07-18T07:43:19.798Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "atm-core",
+  "reservedAt": "2026-07-18T07:43:14.528Z",
+  "promotedAt": "2026-07-18T07:43:14.530Z",
+  "claim": {
+    "actorId": "atm-core",
+    "leaseId": "lease-2f62fd8fa67a",
+    "claimedAt": "2026-07-18T07:43:14.536Z",
+    "heartbeatAt": "2026-07-18T07:43:14.536Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0165.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "tests/cli/taskflow-stale-runner-lane.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718074319-atm-core-ccafa71de6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718074319-atm-core-ccafa71de6\""
+    }
+  },
+  "startedAt": "2026-07-18T07:43:14.536Z",
+  "startedByActor": "atm-core",
+  "startedBySessionId": "session-20260718074314-atm-core-ATM-GOV-0165-ec5b6706c9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0165",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0165.*",
+      ".atm/history/task-events/ATM-GOV-0165/**",
+      ".atm/history/tasks/ATM-GOV-0165.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "tests/cli/taskflow-stale-runner-lane.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ddd0dc026fe2b538555c75c3f2df9bb0608d71495368e8228a55d2a1f47c8c48",
+    "actorId": "atm-core",
+    "sessionId": "session-20260718074314-atm-core-ATM-GOV-0165-ec5b6706c9",
+    "laneSession": {
+      "laneSessionId": "lane-20260718074319-atm-core-ccafa71de6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718074319-atm-core-ccafa71de6\""
+    },
+    "createdAt": "2026-07-18T07:43:19.797Z",
+    "status": "active"
+  }
+}
