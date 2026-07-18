@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0166",
+  "title": "Add closed-ledger planning source realign verb",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "A before/after fixture for the recent 79-card move reproduces the original planning-source drift.",
+    "`realign-plan-source --dry-run` reports every proposed source-path update and every protected field that must remain unchanged.",
+    "Pure moves pass only when the content digest is unchanged.",
+    "Digest mismatch refuses the realignment with actionable diagnostics.",
+    "After realignment, the pre-push task audit passes.",
+    "Closure metadata is bit-for-bit unchanged for every realigned closed task.",
+    "The implementation includes regression coverage for pure-move allow, digest-mismatch refusal, and closure-field immutability.",
+    "The commit payload assertion fails if the staged set differs from the commit content diff."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/realign-plan-source.ts",
+    "tests/cli/ledger-realign.test.ts",
+    "docs/governance/command-surface.md",
+    "docs/governance/error-code-registry.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/realign-plan-source.ts",
+    "packages/cli/src/commands/tasks/realign-plan-source/**",
+    "packages/cli/src/commands/tasks/index.ts",
+    "packages/cli/src/commands/tasks/command-dispatch.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "packages/cli/src/commands/git-governance/record-commit.ts",
+    "packages/cli/src/commands/git-governance/**",
+    "packages/cli/src/commands/tasks/**",
+    "tests/cli/ledger-realign.test.ts",
+    "docs/governance/command-surface.md",
+    "docs/governance/error-code-registry.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    ".atm/history/evidence/ATM-GOV-0166.*",
+    ".atm/history/task-events/ATM-GOV-0166/**",
+    ".atm/history/tasks/ATM-GOV-0166.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/ledger-realign.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger-source-realignment",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.tasks.realign-plan-source",
+        "pattern": "Command Module",
+        "source": "packages/cli/src/commands/tasks/realign-plan-source.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.git-governance.record-commit-payload-assertion",
+        "pattern": "Guard",
+        "source": "packages/cli/src/commands/git-governance/record-commit.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0166-ledger-plan-source-realign-verb.task.md",
+    "sectionTitle": "ATM-GOV-0166",
+    "headingLine": 67,
+    "hash": "f3932a0f5b62baa7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0166-ledger-plan-source-realign-verb.task.md",
+      "planningCommitSha": "6c5cf2d0913e687c9cb348adfba60823eb3b26da",
+      "contentDigest": "sha256:f3932a0f5b62baa7c141cbe108b24bb72f05f8a9f35d8afcf3f74110f0ea88da",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T05:19:04.814Z"
+    }
+  },
+  "importedAt": "2026-07-18T05:19:04.814Z",
+  "lastTransitionId": "2026-07-18T05-21-33-927Z-claim-dfaff49a3d7b",
+  "lastTransitionAt": "2026-07-18T05:21:33.927Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gov-0166",
+  "reservedAt": "2026-07-18T05:20:27.147Z",
+  "promotedAt": "2026-07-18T05:20:27.151Z",
+  "claim": {
+    "actorId": "cursor-gov-0166",
+    "leaseId": "lease-2068c8da688a",
+    "claimedAt": "2026-07-18T05:21:24.876Z",
+    "heartbeatAt": "2026-07-18T05:21:24.876Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0166.json",
+      ".atm/history/evidence/ATM-GOV-0166.*",
+      ".atm/history/task-events/ATM-GOV-0166/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/git-governance/record-commit.ts",
+      "packages/cli/src/commands/tasks/**",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/index.ts",
+      "packages/cli/src/commands/tasks/realign-plan-source.ts",
+      "packages/cli/src/commands/tasks/realign-plan-source/**",
+      "tests/cli/ledger-realign.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718052133-cursor-gov-0166-48b2f38909",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718052133-cursor-gov-0166-48b2f38909\""
+    }
+  },
+  "startedAt": "2026-07-18T05:21:24.876Z",
+  "startedByActor": "cursor-gov-0166",
+  "startedBySessionId": "session-20260718052124-cursor-gov-0166-ATM-GOV-0166-ac7062f43f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0166",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0166.*",
+      ".atm/history/task-events/ATM-GOV-0166/**",
+      ".atm/history/tasks/ATM-GOV-0166.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/git-governance/record-commit.ts",
+      "packages/cli/src/commands/tasks/**",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/index.ts",
+      "packages/cli/src/commands/tasks/realign-plan-source.ts",
+      "packages/cli/src/commands/tasks/realign-plan-source/**",
+      "tests/cli/ledger-realign.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7764dd0ff6cfdec70fe0b9004c9a55d12ebc736b740dbacc63369f88ab44d006",
+    "actorId": "cursor-gov-0166",
+    "sessionId": "session-20260718052124-cursor-gov-0166-ATM-GOV-0166-ac7062f43f",
+    "laneSession": {
+      "laneSessionId": "lane-20260718052133-cursor-gov-0166-48b2f38909",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718052133-cursor-gov-0166-48b2f38909\""
+    },
+    "createdAt": "2026-07-18T05:21:33.925Z",
+    "status": "active"
+  }
+}

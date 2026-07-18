@@ -11,13 +11,15 @@ export default defineCommandSpec({
   name: 'tasks',
   summary: 'Backend and generator surfaces for task plans, runtime ledger, queues, and claim lifecycle. taskflow open/close is the official operator lane and the normal entry for governed work; the tasks subcommands below are backend/generator surfaces that should be invoked through taskflow when possible. taskflow close --write owns the exclusive close-window staged-index lock during governed staging; do not stage competing governance bundles while that lock is active. tasks new is the low-level template generator (no governed lifecycle, no runtime import). tasks import is the runtime synchronization surface that loads a planning markdown into the target ledger (taskflow open --write calls this internally). tasks close, tasks reconcile, tasks repair-closure, tasks repair-claim, tasks import --write --force, tasks reset, and tasks lock cleanup are protected backend surfaces and emergency mutations when used directly; prefer taskflow close for normal closeback. tasks repair-claim is diagnose-first: default mode reports stale, dangling, expired, or conflicting claim drift without mutation; pass --write --reason only when no valid active lease or session blocks repair. When historical delivery needs to be reconstructed across multiple commits, evidence historical-batch authors the close-ready task slice and tasks close consumes that slice as a backend surface. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, compact dispatchPattern / conditionReview / mailboxAssignee dispatch metadata, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
   positional: [
-    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | parallel | lock | migrate-legacy-ledger | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | roster | new', required: true }
+    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | parallel | lock | migrate-legacy-ledger | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | roster | new | realign-plan-source', required: true }
   ],
   options: [
     commonCwdOption,
     { flag: '--from', value: 'path', summary: 'Markdown plan path for tasks import.' },
-    { flag: '--dry-run', summary: 'Parse the plan and emit a manifest without writing task files.' },
-    { flag: '--write', summary: 'Write canonical task JSON files to .atm/history/tasks/ and persist import evidence.' },
+    { flag: '--dry-run', summary: 'Parse the plan and emit a manifest without writing task files. For tasks realign-plan-source, report proposed source-path updates without mutating ledger files or HEAD.' },
+    { flag: '--write', summary: 'Write canonical task JSON files to .atm/history/tasks/ and persist import evidence. For tasks realign-plan-source, apply pure-move source realignments and commit through a temporary index.' },
+    { flag: '--map', value: 'path', summary: 'JSON path map for tasks realign-plan-source (object of from->to paths, or { mappings: [{ from, to }] }).' },
+    { flag: '--planning-repo', value: 'path', summary: 'Optional planning repository root for tasks realign-plan-source path resolution (defaults to ATM_PLANNING_REPO_ROOT or cwd).' },
     { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs. Active claims are still preserved unless --force-overwrite-claims is set.' },
     { flag: '--force-overwrite-claims', summary: 'Allow tasks import --write to overwrite tasks with active or handoff claims and emit claim-displaced-by-import transition events.' },
     { flag: '--waive-planning-root', summary: 'For framework-repo AAO/TEAM imports from .atm/task-plans: explicitly waive the canonical planning-root authorship preflight; requires --reason.' },
@@ -76,6 +78,8 @@ export default defineCommandSpec({
   examples: [
     'node atm.mjs tasks import --from docs/plan.md --dry-run --json',
     'node atm.mjs tasks import --from docs/plan.md --write --json',
+    'node atm.mjs tasks realign-plan-source --map .atm/runtime/plan-path-realign-map.json --dry-run --json',
+    'node atm.mjs tasks realign-plan-source --map .atm/runtime/plan-path-realign-map.json --write --actor codex-main --json',
     'node atm.mjs tasks create --task ATM-GOV-0100 --actor codex-main --title "Governance task" --json',
     'node atm.mjs tasks mirror --provider github --origin-task 123 --origin-url https://github.com/org/repo/issues/123 --actor codex-main --json',
     'node atm.mjs tasks verify --json',
