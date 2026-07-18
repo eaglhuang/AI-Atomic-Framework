@@ -292,6 +292,11 @@ function readActiveClaimedTasks(cwd: string): ImportedTaskSummary[] {
           allowPlanningMirror: allowsPlanningMirror(parsed),
           closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
           activeClaimActorId: normalizeOptionalString(claimRecord.actorId),
+          activeClaimLaneSessionId: (() => {
+            const lane = claimRecord.laneSession;
+            if (!lane || typeof lane !== 'object' || Array.isArray(lane)) return null;
+            return normalizeOptionalString((lane as Record<string, unknown>).laneSessionId);
+          })(),
           activeClaimIntent: normalizeOptionalString(claimRecord.intent) ?? 'write'
         }, cwd)];
       } catch {
