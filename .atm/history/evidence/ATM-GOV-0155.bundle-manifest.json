@@ -1,10 +1,11 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0155",
-  "updatedAt": "2026-07-17T09:11:38.644Z",
-  "updatedBy": "codex-atm-gov-0155-cleanup",
+  "updatedAt": "2026-07-18T05:01:31.629Z",
+  "updatedBy": "codex-gov-sequence",
   "freshValidationPasses": [
     "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "doctor",
     "typecheck",
     "validate:cli",
     "validate:git-head-evidence"
@@ -85,6 +86,19 @@
       "generatedAt": "2026-07-17T09:11:38.718Z",
       "runnerKind": "dev-source",
       "sourceCommit": "f0de9a493e5bd18dc455272137a1a2c077f9e161",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2ed6daa11a786ebb6ef6eaf48d618f8ed736b0b0d82e4a6b123f9ce67466d98f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-18T05:01:31.828Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e67f03fe4fda91ada1782ef92716baff196df3d4",
       "cached": false
     }
   ],

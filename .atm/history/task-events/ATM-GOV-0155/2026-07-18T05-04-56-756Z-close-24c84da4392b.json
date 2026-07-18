@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T05-04-56-756Z-close-24c84da4392b",
+  "taskId": "ATM-GOV-0155",
+  "action": "close",
+  "actorId": "codex-gov-sequence",
+  "sessionId": "session-20260718050043-codex-gov-sequence-ATM-GOV-0155-546a2be48b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0155.json",
+  "taskSha256": "sha256:524f7afea6de910af2929f342a016529f39eb68a6df480f6d5c2e9c5e8ce10b6",
+  "createdAt": "2026-07-18T05:04:56.756Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0155 --actor codex-gov-sequence --status done --historical-delivery 129c23653fd3ad479cdb1471fb24e3829b5c4639",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718050043-codex-gov-sequence-ATM-GOV-0155-546a2be48b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0155.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+      "doctor",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T05:04:56.745Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0155.*",
+        ".atm/history/evidence/ATM-GOV-0155.runner-sync-receipt-9c24c05.json",
+        ".atm/history/evidence/ATM-GOV-0155.runner-sync-receipt-fe3b05ab.json",
+        ".atm/history/evidence/ATM-GOV-0155.runner-sync-receipt.json",
+        ".atm/history/task-events/ATM-GOV-0155/**",
+        ".atm/history/tasks/ATM-GOV-0155.json",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
