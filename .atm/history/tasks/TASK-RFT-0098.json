@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0098",
   "title": "Touched-file physical-line admission gate",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-RFT-0097"
@@ -112,8 +112,8 @@
     }
   },
   "importedAt": "2026-07-17T13:20:15.004Z",
-  "lastTransitionId": "2026-07-18T02-10-55-771Z-scope-amendment-b38600d5c52e",
-  "lastTransitionAt": "2026-07-18T02:10:55.771Z",
+  "lastTransitionId": "2026-07-18T02-16-03-781Z-close-b89a5ec14ffb",
+  "lastTransitionAt": "2026-07-18T02:16:03.781Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-main",
   "reservedAt": "2026-07-18T01:36:53.813Z",
@@ -122,7 +122,7 @@
     "actorId": "codex-main",
     "leaseId": "lease-1ed6e452a9f2",
     "claimedAt": "2026-07-18T01:36:53.819Z",
-    "heartbeatAt": "2026-07-18T01:36:53.819Z",
+    "heartbeatAt": "2026-07-18T02:16:03.778Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-RFT-0098.*",
@@ -142,14 +142,14 @@
       "tests/cli/physical-line-budget-gate.test.ts",
       "tests/cli/touched-physical-line-admission.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718013659-codex-main-8b2d3e1ff9",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718013659-codex-main-8b2d3e1ff9\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T01:36:53.819Z",
   "startedByActor": "codex-main",
@@ -201,5 +201,9 @@
     },
     "createdAt": "2026-07-18T01:36:59.630Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T02:16:03.778Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0098.closure-packet.json"
 }

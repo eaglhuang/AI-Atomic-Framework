@@ -1,0 +1,212 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0098",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "7c3104873b18613558ef25c44a4c7926d4f31c24",
+  "governedTreeSha": "64cec566325e28dd0b3b6e7b1da82493c9eeb23a",
+  "targetCommitDelta": {
+    "currentCommitSha": "7c3104873b18613558ef25c44a4c7926d4f31c24",
+    "parentCommitShas": [
+      "7c3104873b18613558ef25c44a4c7926d4f31c24"
+    ],
+    "governedTreeSha": "64cec566325e28dd0b3b6e7b1da82493c9eeb23a",
+    "changedFiles": [
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/touched-physical-line-admission.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:222f138ec9a2240f4d7cfba53b4cb84d5b5422824f9cf276c3e8bfd748c23d69",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-physical-line-budget.ts --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:004449bfdf00c899ba523cdc9e0dbc1a2d56e1a2fa49c03a5f58c1c660acd735",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2448a156453a5398c3a287e8523254de2dd676613b3ea434de763aac5a2954e5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+      "stderrSha256": "sha256:9463bb22295de5ea507ea839b5c61f599b3d333d459a6a48ec3b613bb2e74889",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-physical-line-budget.ts --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c205502c02779b2b03ad865e061b737bc1be1d7ec7f5783519f8cbc43f5dda3f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f320d2d889fd75b1d015db4be8cf4fe67a94047bc51204d17df677b691dad22c",
+      "stderrSha256": "sha256:a71a96431d871f72b0ee40fcb69f68d99daa957946dedac935ccb0607c85f0f0",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:physical-line-budget"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T02:16:03.769Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0098.*",
+      ".atm/history/task-events/TASK-RFT-0098/**",
+      ".atm/history/tasks/TASK-RFT-0098.json",
+      "package.json",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-onefile/",
+      "release/atm-root-drop/",
+      "release/atm-root-drop/scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/touched-physical-line-admission.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-physical-line-budget.ts",
+      "tests/cli/physical-line-budget-gate.test.ts",
+      "tests/cli/touched-physical-line-admission.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0098.json",
+  "closedAt": "2026-07-18T02:16:03.769Z",
+  "closedByActor": "codex-main",
+  "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "27a3b978dba10346d88fd9a394afc242c27ac78a",
+    "taskMatchedFiles": [],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0098/2026-07-18T02-10-41-656Z-scope-amendment-24ad4242ce72.json",
+      ".atm/history/task-events/TASK-RFT-0098/2026-07-18T02-10-49-507Z-scope-amendment-61900c8d1a73.json",
+      ".atm/history/task-events/TASK-RFT-0098/2026-07-18T02-10-55-771Z-scope-amendment-b38600d5c52e.json",
+      ".atm/history/tasks/TASK-RFT-0098.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-git-head-evidence.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

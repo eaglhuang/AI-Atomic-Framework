@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T02-16-03-781Z-close-b89a5ec14ffb",
+  "taskId": "TASK-RFT-0098",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0098.json",
+  "taskSha256": "sha256:5dec669c9223efac04b88e5e1bbb7ebb4d7b6ed5ea80ecdbf21574d9f949732c",
+  "createdAt": "2026-07-18T02:16:03.781Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0098 --actor codex-main --status done --historical-delivery 27a3b978dba10346d88fd9a394afc242c27ac78a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0098.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:physical-line-budget"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T02:16:03.769Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0098.*",
+        ".atm/history/task-events/TASK-RFT-0098/**",
+        ".atm/history/tasks/TASK-RFT-0098.json",
+        "package.json",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "release/atm-onefile/",
+        "release/atm-root-drop/",
+        "release/atm-root-drop/scripts/validate-git-head-evidence.ts",
+        "scripts/validate-git-head-evidence.ts",
+        "scripts/validate-physical-line-budget.ts",
+        "tests/cli/physical-line-budget-gate.test.ts",
+        "tests/cli/touched-physical-line-admission.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "scripts/validate-git-head-evidence.ts",
+        "scripts/validate-physical-line-budget.ts",
+        "tests/cli/physical-line-budget-gate.test.ts",
+        "tests/cli/touched-physical-line-admission.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
