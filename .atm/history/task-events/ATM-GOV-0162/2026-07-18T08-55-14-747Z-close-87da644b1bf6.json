@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T08-55-14-747Z-close-87da644b1bf6",
+  "taskId": "ATM-GOV-0162",
+  "action": "close",
+  "actorId": "atm-core",
+  "sessionId": "session-20260718083046-atm-core-ATM-GOV-0162-3db7b907b5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0162.json",
+  "taskSha256": "sha256:0e483ad5632988bca9c5fd2e3b52593d2d1fe3ea5a0be2fa0a54a696b0b2af7f",
+  "createdAt": "2026-07-18T08:55:14.747Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0162 --actor atm-core --status done --historical-delivery 3d698e9d7357ed04095dc636c0b7811d9ec017c6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260718083046-atm-core-ATM-GOV-0162-3db7b907b5",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0162.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "node --strip-types tests/cli/related-task-batching-wave-surface.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-18T08:55:14.730Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0162.*",
+        ".atm/history/evidence/ATM-GOV-0162.runner-sync-receipt.json",
+        ".atm/history/task-events/ATM-GOV-0162/**",
+        ".atm/history/tasks/ATM-GOV-0162.json",
+        "docs/governance/command-surface.md",
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-task.ts",
+        "packages/cli/src/commands/tasks/import.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/core/src/broker/generated-projection-steward.ts",
+        "packages/core/src/broker/related-task-batching.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**",
+        "tests/cli/related-task-batching-wave-surface.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-task.ts",
+        "packages/cli/src/commands/tasks/import.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/core/src/broker/generated-projection-steward.ts",
+        "packages/core/src/broker/related-task-batching.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "tests/cli/related-task-batching-wave-surface.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

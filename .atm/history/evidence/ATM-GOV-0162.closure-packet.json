@@ -1,0 +1,212 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0162",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AppData\\Local\\Temp\\atm-gov-next-20260718162938",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "3d698e9d7357ed04095dc636c0b7811d9ec017c6",
+  "governedTreeSha": "4e5ab4d9a6578e5dc6e51b034c4293d4d1ff3c1b",
+  "targetCommitDelta": {
+    "currentCommitSha": "3d698e9d7357ed04095dc636c0b7811d9ec017c6",
+    "parentCommitShas": [
+      "3d698e9d7357ed04095dc636c0b7811d9ec017c6"
+    ],
+    "governedTreeSha": "4e5ab4d9a6578e5dc6e51b034c4293d4d1ff3c1b",
+    "changedFiles": [
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/related-task-batching.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-002.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-003.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-004.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/branch-commit-queue-gate.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/branch-commit-queue-gate.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/result-contracts.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-markdown-helpers.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-markdown-helpers.js",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/result-contracts.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "release/atm-root-drop/packages/core/dist/broker/generated-projection-steward.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/generated-projection-steward.js",
+      "release/atm-root-drop/packages/core/dist/broker/runner-sync-steward-queue.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/runner-sync-steward-queue.js",
+      "release/atm-root-drop/packages/core/src/broker/generated-projection-steward.ts",
+      "release/atm-root-drop/packages/core/src/broker/runner-sync-steward-queue.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/related-task-batching-wave-surface.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:45abd4c29986fbc6aeb32b3ce8be7e2c6ad44ed8bab215f312db16a4b7cbb09a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/related-task-batching-wave-surface.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8c479a84f343718986ba97cc73353b885744435b52f160bbeb748015ee83e665",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:03e4362fba8491078da914be75a9ec06d858e7aa424ec23fc7bb4b24bf3feff9",
+      "stderrSha256": "sha256:265c3baf5be57c0cb3647b9bae94afa3db3ebaa8312a34d96dd7c9f801e0c7d2",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "node --strip-types tests/cli/related-task-batching-wave-surface.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-18T08:55:14.730Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0162.*",
+      ".atm/history/evidence/ATM-GOV-0162.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0162/**",
+      ".atm/history/tasks/ATM-GOV-0162.json",
+      "docs/governance/command-surface.md",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/import.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/related-task-batching.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "tests/cli/related-task-batching-wave-surface.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/import.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/related-task-batching.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/related-task-batching-wave-surface.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0162.json",
+  "closedAt": "2026-07-18T08:55:14.731Z",
+  "closedByActor": "atm-core",
+  "sessionId": "session-20260718083046-atm-core-ATM-GOV-0162-3db7b907b5",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "3d698e9d7357ed04095dc636c0b7811d9ec017c6",
+    "taskMatchedFiles": [],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0162.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0162/2026-07-18T08-52-13-499Z-scope-amendment-7f37e5b35a82.json",
+      ".atm/history/tasks/ATM-GOV-0162.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-002.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-003.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-004.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/branch-commit-queue-gate.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/branch-commit-queue-gate.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/result-contracts.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-markdown-helpers.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-markdown-helpers.js",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/result-contracts.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "release/atm-root-drop/packages/core/dist/broker/generated-projection-steward.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/generated-projection-steward.js",
+      "release/atm-root-drop/packages/core/dist/broker/runner-sync-steward-queue.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/runner-sync-steward-queue.js",
+      "release/atm-root-drop/packages/core/src/broker/generated-projection-steward.ts",
+      "release/atm-root-drop/packages/core/src/broker/runner-sync-steward-queue.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

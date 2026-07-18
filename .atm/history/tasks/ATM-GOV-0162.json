@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0162",
   "title": "Add related-task batching for commit build and projection windows",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0161"
@@ -101,8 +101,8 @@
     }
   },
   "importedAt": "2026-07-18T08:30:17.714Z",
-  "lastTransitionId": "2026-07-18T08-52-13-499Z-scope-amendment-7f37e5b35a82",
-  "lastTransitionAt": "2026-07-18T08:52:13.499Z",
+  "lastTransitionId": "2026-07-18T08-55-14-747Z-close-87da644b1bf6",
+  "lastTransitionAt": "2026-07-18T08:55:14.747Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "atm-core",
   "reservedAt": "2026-07-18T08:30:46.341Z",
@@ -111,7 +111,7 @@
     "actorId": "atm-core",
     "leaseId": "lease-01520dae2d00",
     "claimedAt": "2026-07-18T08:30:46.350Z",
-    "heartbeatAt": "2026-07-18T08:30:46.350Z",
+    "heartbeatAt": "2026-07-18T08:55:14.744Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0162.*",
@@ -135,14 +135,14 @@
       "release/atm-root-drop/**",
       "tests/cli/related-task-batching-wave-surface.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260718083056-atm-core-df368ccb8c",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718083056-atm-core-df368ccb8c\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-18T08:30:46.350Z",
   "startedByActor": "atm-core",
@@ -198,5 +198,9 @@
     },
     "createdAt": "2026-07-18T08:30:56.519Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-18T08:55:14.744Z",
+  "closedByActor": "atm-core",
+  "closedBySessionId": "session-20260718083046-atm-core-ATM-GOV-0162-3db7b907b5",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0162.closure-packet.json"
 }
