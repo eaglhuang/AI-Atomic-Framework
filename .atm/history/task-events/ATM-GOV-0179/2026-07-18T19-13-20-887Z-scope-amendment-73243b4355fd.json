@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-18T19-13-20-887Z-scope-amendment-73243b4355fd",
+  "taskId": "ATM-GOV-0179",
+  "action": "scope-amendment",
+  "actorId": "codex-gov-auto-batch",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0179.json",
+  "taskSha256": "sha256:5a33d3a0fa2b6ca0aedcc1b44e37432c4a99a483c232c801ae1ac4a60b0d6c18",
+  "createdAt": "2026-07-18T19:13:20.887Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0179 --actor codex-gov-auto-batch --add packages/cli/src/commands/command-specs/batch.spec.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

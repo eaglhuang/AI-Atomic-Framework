@@ -1,0 +1,198 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0179",
+  "title": "Strict Paired A/B Dogfood and Default-On Circuit Breaker",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0178"
+  ],
+  "acceptance": [
+    "Median makespan improves by at least 25 percent.",
+    "Active throughput improves by at least 25 percent.",
+    "Eligible treatment `batchRate >= 0.70`.",
+    "`buildsPerWave <= 1` and `projectionsPerWave <= 1`.",
+    "Validators and close audit pass at 100 percent.",
+    "Out-of-scope and R1 violations are zero.",
+    "Tests and command-backed evidence are recorded before close."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch/**",
+    "packages/core/src/batch/**",
+    "packages/core/src/broker/**",
+    "scripts/analyze-captain-parallel-ledger.ts",
+    "scripts/fixtures/auto-batch-analyzer/**",
+    "docs/reports/captain-parallel-ledger-analysis.md",
+    "docs/governance/command-surface.md",
+    "tests/cli/strict-paired-ab-dogfood.test.ts",
+    "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    ".atm/history/evidence/ATM-GOV-0179.*",
+    ".atm/history/task-events/ATM-GOV-0179/**",
+    ".atm/history/tasks/ATM-GOV-0179.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch/**",
+    "packages/core/src/batch/**",
+    "packages/core/src/broker/**",
+    "scripts/analyze-captain-parallel-ledger.ts",
+    "scripts/fixtures/auto-batch-analyzer/**",
+    "docs/reports/captain-parallel-ledger-analysis.md",
+    "docs/governance/command-surface.md",
+    "tests/cli/strict-paired-ab-dogfood.test.ts",
+    "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    ".atm/history/evidence/ATM-GOV-0179.*",
+    ".atm/history/task-events/ATM-GOV-0179/**",
+    ".atm/history/tasks/ATM-GOV-0179.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/strict-paired-ab-dogfood.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "disable via ATM_AUTO_BATCH=0 or ATM_AUTO_BATCH_CIRCUIT_OPEN, then revert commit if needed",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.auto-batch-ab-proof",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json (1061 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0179-strict-paired-ab-dogfood-circuit-breaker.task.md",
+    "sectionTitle": "ATM-GOV-0179",
+    "headingLine": 52,
+    "hash": "d0aa9cc8791f8de6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0179-strict-paired-ab-dogfood-circuit-breaker.task.md",
+      "planningCommitSha": "7317276b0ed00426f930acbeafc08f7e70b57571",
+      "contentDigest": "sha256:d0aa9cc8791f8de63b25cca65ec8dca71298eeb2ff6a1ed9d78f28b94760d39f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-18T19:06:31.325Z"
+    }
+  },
+  "importedAt": "2026-07-18T19:06:31.325Z",
+  "lastTransitionId": "2026-07-18T19-13-20-887Z-scope-amendment-73243b4355fd",
+  "lastTransitionAt": "2026-07-18T19:13:20.887Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gov-auto-batch",
+  "reservedAt": "2026-07-18T19:06:37.843Z",
+  "promotedAt": "2026-07-18T19:06:37.846Z",
+  "claim": {
+    "actorId": "codex-gov-auto-batch",
+    "leaseId": "lease-a1e323579b53",
+    "claimedAt": "2026-07-18T19:06:37.848Z",
+    "heartbeatAt": "2026-07-18T19:06:37.848Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0179.*",
+      ".atm/history/task-events/ATM-GOV-0179/**",
+      ".atm/history/tasks/ATM-GOV-0179.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/core/src/batch/**",
+      "packages/core/src/broker/**",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
+      "tests/cli/strict-paired-ab-dogfood.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260718190638-codex-gov-auto-batch-502f719a31",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718190638-codex-gov-auto-batch-502f719a31\""
+    }
+  },
+  "startedAt": "2026-07-18T19:06:37.848Z",
+  "startedByActor": "codex-gov-auto-batch",
+  "startedBySessionId": "session-20260718190637-codex-gov-auto-batch-ATM-GOV-0179-219280ca33",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0179",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0179.*",
+      ".atm/history/task-events/ATM-GOV-0179/**",
+      ".atm/history/tasks/ATM-GOV-0179.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/command-surface.md",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/core/src/batch/**",
+      "packages/core/src/broker/**",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "tests/cli/parallel-analyzer-v2-failure-matrix.test.ts",
+      "tests/cli/strict-paired-ab-dogfood.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0179-strict-paired-ab-dogfood-circuit-breaker.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0179-strict-paired-ab-dogfood-circuit-breaker.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "79b0b02d852a5da3e7635b8b80479a143b9b3d405ba7e233b6b5b831e0562ad0",
+    "actorId": "codex-gov-auto-batch",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260718190638-codex-gov-auto-batch-502f719a31",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260718190638-codex-gov-auto-batch-502f719a31\""
+    },
+    "createdAt": "2026-07-18T19:06:39.568Z",
+    "status": "active"
+  }
+}

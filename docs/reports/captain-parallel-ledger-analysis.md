@@ -1,6 +1,6 @@
 # Captain Parallel Ledger Analysis
 
-Generated: 2026-07-18T18:58:24.511Z
+Generated: 2026-07-18T19:11:16.491Z
 
 This report mines `.atm/history/task-events` as a read-only ledger to measure task-level captain parallelism. It deliberately measures inter-task concurrency, not intra-task Team worker fan-out.
 
@@ -36,7 +36,7 @@ Serial baseline repair closures: 6; RFT parallel-era repair closures: 0.
 
 ## Auto-Batch Pipeline
 
-- Broker tickets: 0; wave tickets: 0; waitedMs p50/p95: n/a / n/a; batchRate: n/a; build/projection/commit signals: 0/0/0.
+- Broker tickets: 0; wave tickets: 0; waitedMs p50/p95: n/a / n/a; batchRate: n/a; build/projection/commit signals: 0/0/0; rollout verdict: inconclusive (missing broker ticket evidence).
 - Failure matrix: happy-path-wave=observability-gap, conflict=observability-gap, docs-only-runner-skip=observability-gap, worker-partial-failure=observability-gap, head-moved=observability-gap, build-retry=observability-gap, projection-retry=observability-gap, checkpoint-retry=observability-gap, lane-conflict=observability-gap, kill-switch=observability-gap, serial-fallback=observability-gap.
 
 - Framework temp claims: 33 retained runtime lock files observed; 0 fresh, 33 stale. This is a runtime snapshot over retained lock files, not an append-only framework claim history; it must not be merged into task-event throughput.

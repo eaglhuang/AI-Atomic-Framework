@@ -877,9 +877,9 @@
     {
       "path_pattern": "scripts/analyze-captain-parallel-ledger.ts",
       "atom_id": "atm.captain-parallel-ledger.lane-session-concurrency",
-      "capability": "ATM-GOV-0168 lane-session event overlap concurrency metric for dual-lane acceptance; ATM-GOV-0178 auto-batch pipeline evidence matrix for broker tickets, waitedMs, batchRate, generated-write counts, lane interventions, and observability gaps.",
+      "capability": "ATM-GOV-0168 lane-session event overlap concurrency metric for dual-lane acceptance; ATM-GOV-0178 auto-batch pipeline evidence matrix for broker tickets, waitedMs, batchRate, generated-write counts, lane interventions, and observability gaps; ATM-GOV-0179 rollout verdict for improved/inconclusive/regressed auto-batch evidence.",
       "coverage_status": "active",
-      "source_task": "ATM-GOV-0168; ATM-GOV-0178"
+      "source_task": "ATM-GOV-0168; ATM-GOV-0178; ATM-GOV-0179"
     },
     {
       "path_pattern": "tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
@@ -968,9 +968,9 @@
     {
       "path_pattern": "packages/cli/src/commands/batch/implementation.ts",
       "atom_id": "atm.batch-wave-selector",
-      "capability": "ATM-GOV-0173 compact batch current selector that turns eligible queue-head tasks into a deterministic read-only wave manifest candidate with deferred reasons and dispatch guidance.",
+      "capability": "ATM-GOV-0173 compact batch current selector that turns eligible queue-head tasks into a deterministic read-only wave manifest candidate with deferred reasons and dispatch guidance; ATM-GOV-0179 auto-batch rollout controls and circuit-breaker admission.",
       "coverage_status": "active",
-      "source_task": "ATM-GOV-0173"
+      "source_task": "ATM-GOV-0173; ATM-GOV-0179"
     },
     {
       "path_pattern": "tests/cli/batch-wave-selector.test.ts",
@@ -978,6 +978,13 @@
       "capability": "ATM-GOV-0173 regression coverage for deterministic wave selection, dependency and validator deferrals, incompatible surface deferrals, max wave size, and serial fallback.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0173"
+    },
+    {
+      "path_pattern": "tests/cli/strict-paired-ab-dogfood.test.ts",
+      "atom_id": "atm.batch-wave-selector",
+      "capability": "ATM-GOV-0179 regression coverage for auto-batch CLI/env circuit breaker controls and analyzer rollout verdict evidence.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0179"
     },
     {
       "path_pattern": "packages/cli/src/commands/team-wave.ts",
@@ -1048,6 +1055,13 @@
       "capability": "ATM-GOV-0177 public help surface for atomic wave checkpoint readiness.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0177"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/batch.spec.ts#auto-batch-controls",
+      "atom_id": "atm.batch-wave-selector",
+      "capability": "ATM-GOV-0179 public help surface for auto-batch rollout controls and circuit breaker options.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0179"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs/broker.spec.ts#generated-surfaces",
