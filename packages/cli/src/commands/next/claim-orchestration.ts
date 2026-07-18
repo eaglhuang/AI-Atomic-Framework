@@ -3,7 +3,6 @@ import { buildFirstUseUserNotice } from '../first-use-notice.ts';
 import { type BrokerQueueAdmission } from './broker-queue-admission.ts';
 import { runBroker } from '../broker.ts';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, selectPostClaimChannel } from './channel-strategy.ts';
-import { buildTaskScopedClaimCommand } from './task-scoped-claim-command.ts';
 import { ensureDecisionTrail, type NextActionLike } from './next-action-assembly.ts';
 import { buildPromptScopedQueueClaimCommand } from './prompt-scope-resolution.ts';
 import { describeActorResolution, resolveActorId } from '../actor-registry.ts';
@@ -20,6 +19,7 @@ import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfi
 import { buildTeamKnowledgeSummary } from '../team-knowledge.ts';
 import { decideActiveBatchClaimTask } from '../next-active-batch.ts';
 import { runClaimParallelPreflight } from './claim-parallel-preflight.ts';
+import { inspectTouchedPhysicalLineBudget } from '../../../../../scripts/validate-physical-line-budget.ts';
 import { CliError, makeResult, message, parseJsonText } from '../shared.ts';
 import { prepareImportedTaskForClaim, registerPreClaimBrokerTransaction } from './claim-helpers.ts';
 import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from '../tasks/public-surface.ts';
@@ -252,6 +252,8 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   parallelAdvisory = parallelPreflight.parallelAdvisory;
   brokerQueueAdmission = parallelPreflight.brokerQueueAdmission;
   claimAllowedFiles = parallelPreflight.claimAllowedFiles;
+  const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
+  if (!lineBudgetReport.ok) throw new CliError('ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED', `Claim blocked: touched files exceed the physical line budget for ${claimableTask.workItemId}.`, { exitCode: 1, details: lineBudgetReport });
   claimLatencyPhases.push({ phase: 'parallel-preflight', durationMs: Date.now() - parallelStartedAt });
   const claimDeliveryClassification = classifyTaskDelivery({
     cwd: input.cwd,

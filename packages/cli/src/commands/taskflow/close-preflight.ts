@@ -8,6 +8,7 @@ import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { resolveTaskflowDeclaredFiles } from './task-scope.ts';
 import { quoteCliValue } from '../shared.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
+import { inspectTouchedPhysicalLineBudget } from '../../../../../scripts/validate-physical-line-budget.ts';
 
 export type { HistoricalClosePreflightSummary };
 
@@ -187,7 +188,56 @@ export function buildTaskflowClosePreflight(input: {
       ]
     };
   }
+  const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, readTouchedFiles(input.cwd), {
+    taskId: input.taskId,
+    actorId: input.actorId,
+    gate: 'pre-close'
+  });
+  if (!lineBudgetReport.ok) {
+    return {
+      ...summary,
+      ok: false,
+      blockers: [
+        {
+          id: 'staleEvidence',
+          code: 'ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED',
+          summary: `Touched files exceed the physical line budget (${lineBudgetReport.maxLines}).`,
+          files: lineBudgetReport.hardViolations.map((entry) => entry.file),
+          taskIds: [input.taskId],
+          remediationChoices: [],
+          requiredCommand: lineBudgetReport.reproduceCommand
+        },
+        ...summary.blockers
+      ],
+      operationalBlockers: [
+        {
+          id: 'staleEvidence',
+          code: 'ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED',
+          summary: `Touched files exceed the physical line budget (${lineBudgetReport.maxLines}).`,
+          files: lineBudgetReport.hardViolations.map((entry) => entry.file),
+          taskIds: [input.taskId],
+          remediationChoices: [],
+          requiredCommand: lineBudgetReport.reproduceCommand
+        },
+        ...summary.operationalBlockers
+      ]
+    };
+  }
   return summary;
+}
+
+function readTouchedFiles(cwd: string): string[] {
+  const output = execFileSync('git', ['status', '--porcelain', '-uall'], {
+    cwd,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  return output
+    .split(/\r?\n/)
+    .map((line) => line.slice(2).trim())
+    .filter(Boolean)
+    .map((file) => file.includes(' -> ') ? file.split(' -> ').pop() ?? file : file)
+    .map((file) => file.replace(/\\/g, '/'));
 }
 
 export function buildPlanningDeliveryRequiredCommand(taskId: string, actorId: string): string {

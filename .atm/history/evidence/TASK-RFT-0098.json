@@ -1,0 +1,720 @@
+{
+  "taskId": "TASK-RFT-0098",
+  "updatedAt": "2026-07-18T01:52:23.248Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:48:42.560Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/touched-physical-line-admission.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:222f138ec9a2240f4d7cfba53b4cb84d5b5422824f9cf276c3e8bfd748c23d69",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/touched-physical-line-admission.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:b91d013b1a450055ba6a69ad4417cb1c69c9056721503fea6e15e62065abd745",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:48:42.629Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f6a7af70af70fabf2fd93be1d577f3062c34bcd8c844fef5c23c13b8200b1f47",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-physical-line-budget.ts --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:48:42.735Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:physical-line-budget"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-physical-line-budget.ts --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:004449bfdf00c899ba523cdc9e0dbc1a2d56e1a2fa49c03a5f58c1c660acd735",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:physical-line-budget"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:149a01e06cf4af2b0f2d2b491b5405f510a7629104bdc46dfeb9d037050895d8",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:48:42.802Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:931e64b09bedd365b7a7a5d2c369ece24aec31e2666bbe089f01dcd081021148",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:48:42.886Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2448a156453a5398c3a287e8523254de2dd676613b3ea434de763aac5a2954e5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:9406b003ec2ba2c95e6a3264d320d713588260a0059ffd102265dfabb2400a8c",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:48:42.957Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:93f98522ceba3bc4d03669bd3cf73330a4c46a06527f3db52ffddab463b5ab4e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-physical-line-budget.ts --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:48:53.828Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:physical-line-budget"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-physical-line-budget.ts --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:004449bfdf00c899ba523cdc9e0dbc1a2d56e1a2fa49c03a5f58c1c660acd735",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:physical-line-budget"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:149a01e06cf4af2b0f2d2b491b5405f510a7629104bdc46dfeb9d037050895d8",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:48:53.886Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:931e64b09bedd365b7a7a5d2c369ece24aec31e2666bbe089f01dcd081021148",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:48:56.262Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2448a156453a5398c3a287e8523254de2dd676613b3ea434de763aac5a2954e5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:9406b003ec2ba2c95e6a3264d320d713588260a0059ffd102265dfabb2400a8c",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:48:56.354Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:93f98522ceba3bc4d03669bd3cf73330a4c46a06527f3db52ffddab463b5ab4e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:48:59.232Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/touched-physical-line-admission.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:222f138ec9a2240f4d7cfba53b4cb84d5b5422824f9cf276c3e8bfd748c23d69",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/touched-physical-line-admission.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:b91d013b1a450055ba6a69ad4417cb1c69c9056721503fea6e15e62065abd745",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:48:59.306Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f6a7af70af70fabf2fd93be1d577f3062c34bcd8c844fef5c23c13b8200b1f47",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:49:12.992Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:bceb50ac970153d696e6418ccd6cd9b263c3e8be5fb786c39a217c16aa656cbd",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:49:13.049Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0f94a07f7dfc77fbd4ee77d4aea212244e66f69d55dd4670a4ab0a174ed295fe",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:49:34.051Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+            "stderrSha256": "sha256:9463bb22295de5ea507ea839b5c61f599b3d333d459a6a48ec3b613bb2e74889",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:a1392eb4d711f28a5a2a8110e8f35bb56b9c6a76dc52f59232a9bb894f9fdbdb",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:49:34.110Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:cd616b63a5c28638dbf2d43773f273414a0e69947b7204c6e310a01f819f3226",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:51:40.988Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:16694b7885d7ea825f907de2b641ac090265cdd9408a3609997df824fafdce9d",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:51:41.051Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:08827dd3ae8b34ede05ea260cf7275f41614a7f376b4ac224ee813e1f0539333",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-physical-line-budget.ts --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:51:43.274Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:physical-line-budget"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-physical-line-budget.ts --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c205502c02779b2b03ad865e061b737bc1be1d7ec7f5783519f8cbc43f5dda3f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:physical-line-budget"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:18c615a6d5423176da43512bbd66d7fc43dd5d11d6a7038f2568b141d8247aaf",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:51:43.344Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7984618386cd65e7ac13f40d450202f59d60f08ef0cfc3305b8edabc97c2dd9b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:51:46.302Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2448a156453a5398c3a287e8523254de2dd676613b3ea434de763aac5a2954e5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:9406b003ec2ba2c95e6a3264d320d713588260a0059ffd102265dfabb2400a8c",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:51:46.392Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:93f98522ceba3bc4d03669bd3cf73330a4c46a06527f3db52ffddab463b5ab4e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:51:49.293Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/touched-physical-line-admission.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/touched-physical-line-admission.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:222f138ec9a2240f4d7cfba53b4cb84d5b5422824f9cf276c3e8bfd748c23d69",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/touched-physical-line-admission.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:b91d013b1a450055ba6a69ad4417cb1c69c9056721503fea6e15e62065abd745",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:51:49.376Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f6a7af70af70fabf2fd93be1d577f3062c34bcd8c844fef5c23c13b8200b1f47",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:52:02.351Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:bceb50ac970153d696e6418ccd6cd9b263c3e8be5fb786c39a217c16aa656cbd",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:52:02.419Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0f94a07f7dfc77fbd4ee77d4aea212244e66f69d55dd4670a4ab0a174ed295fe",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+      "createdAt": "2026-07-18T01:52:23.248Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260718013653-codex-main-TASK-RFT-0098-660a80d442",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.touched-physical-line-admission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f320d2d889fd75b1d015db4be8cf4fe67a94047bc51204d17df677b691dad22c",
+            "stderrSha256": "sha256:a71a96431d871f72b0ee40fcb69f68d99daa957946dedac935ccb0607c85f0f0",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4b6f0b209401c0c452b27dd1cd6e1bf5fb4ea557",
+            "cacheKey": "sha256:8d30c9cdde5fd28d98cd5ae805b7b96293a618710bf1ea689f4c022309934ab4",
+            "cached": false,
+            "generatedAt": "2026-07-18T01:52:23.304Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ec7c292b234513f3486e8018c8659cb483a2e575e80d93434f75500ffba13cd0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
