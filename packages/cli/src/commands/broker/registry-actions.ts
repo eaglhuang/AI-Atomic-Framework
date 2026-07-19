@@ -21,7 +21,7 @@ import { defaultAdapterRegistry, resolveAdapter } from '../../../../core/src/bro
 import { planMutationBatch } from '../../../../core/src/broker/adapters/batch-planner.ts';
 import { computeCasResult, hashContent } from '../../../../core/src/broker/adapters/cas.ts';
 import { enqueueSharedSurface, planSharedSurfaceAcquisition, removeSharedSurfaceEntry, type SharedSurfaceQueue } from '../../../../core/src/broker/shared-surface-queue.ts';
-import { cleanupRunnerSyncStewardQueue, emptyRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue, type RunnerSyncStewardQueueDocument } from '../../../../core/src/broker/runner-sync-steward-queue.ts';
+import { cleanupRunnerSyncStewardQueue, emptyRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue, releaseRunnerSyncStewardTaskRequests, type RunnerSyncStewardQueueDocument } from '../../../../core/src/broker/runner-sync-steward-queue.ts';
 import { cleanupGeneratedProjectionSteward, emptyGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild, type GeneratedProjectionStewardDocument } from '../../../../core/src/broker/generated-projection-steward.ts';
 import { acknowledgeFreeze, createFreezeSignal, resolveFreezeDecision, type FreezeAck, type FreezeResolution, type FreezeSignal } from '../../../../core/src/broker/freeze.ts';
 import type { ActiveWriteIntent, WriteBrokerRegistryDocument, BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent, ConflictKey, BrokerOperationRunRecord, ExplicitMutationIntentInputSummary, ExplicitMutationIntentKind, MutationIntentMissingInput } from '../../../../core/src/broker/types.ts';
@@ -248,6 +248,11 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       return released.entries.length === 0 ? [] : [released];
     });
     writeSharedSurfaceQueues(sharedQueuePath, updatedQueues);
+    const runnerSyncRelease = releaseRunnerSyncStewardTaskRequests(
+      readRunnerSyncStewardQueue(context.runnerSyncQueuePath),
+      releaseTaskId
+    );
+    writeRunnerSyncStewardQueue(context.runnerSyncQueuePath, runnerSyncRelease.queue);
     const freezes = markReleasedSharedSurfaceFreezes({
       records: readSharedSurfaceFreezeRecords(sharedFreezePath),
       releasedTaskId: releaseTaskId,
@@ -271,6 +276,7 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
         registryPath: '.atm/runtime/write-broker.registry.json',
         releasedTask: releaseTaskId,
         sharedSurfaceQueues: updatedQueues,
+        runnerSyncStewardRelease: runnerSyncRelease,
         sharedSurfaceFreezes: freezes,
         runtimeCleanup
       }

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -56,7 +57,7 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
         result = enqueueRunnerSyncStewardRequest(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
           taskId: options.task,
           actorId: options.actorId,
-          sealedSourceSha: options.sealedSourceSha,
+          sealedSourceSha: resolveFullGitCommitSha(options.cwd, options.sealedSourceSha),
           requestedSurfaces: options.surfaces,
           ttlSeconds: options.ttlSeconds
         }, {
@@ -306,6 +307,19 @@ function resolveRunnerSyncTaskIdHealth(cwd: string, taskId: string): RunnerSyncT
       : 'task-active';
   } catch {
     return 'task-active';
+  }
+}
+
+function resolveFullGitCommitSha(cwd: string, value: string): string {
+  const raw = String(value ?? '').trim();
+  try {
+    return execFileSync('git', ['rev-parse', '--verify', raw], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+  } catch {
+    return raw;
   }
 }
 

@@ -1,0 +1,133 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0191",
+  "updatedAt": "2026-07-19T13:31:14.733Z",
+  "updatedBy": "codex-governance-optimizer",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/runner-sync-incremental-build.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:internal-release-sync",
+    "validate:physical-line-budget",
+    "validate:runner-build-scope"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/runner-sync-incremental-build.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9e936e34997e6e856f0d0cb79e0f952ff1ff7c7885371397063a3424eb92a100",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/runner-sync-incremental-build.test.ts"
+      ],
+      "generatedAt": "2026-07-19T13:22:51.472Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "da95b853ab59684943664a5d04972e8d737e525c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-19T13:23:07.314Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "da95b853ab59684943664a5d04972e8d737e525c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:runner-build-scope",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:88c1867a435fe528a4a7a59966903ce2e308df6eacf0f0c7e36148615fe3be4c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:runner-build-scope"
+      ],
+      "generatedAt": "2026-07-19T13:23:16.368Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "da95b853ab59684943664a5d04972e8d737e525c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:internal-release-sync",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f4386b6f1aa9906c0a31445af4447e005cc5f9369f7c1de5595cb741f61110d8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:internal-release-sync"
+      ],
+      "generatedAt": "2026-07-19T13:23:26.551Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "da95b853ab59684943664a5d04972e8d737e525c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:3094a66bf587f7a9a2992de311ba0d784ba03c6e1d0d14f502a7cb2900311efd",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-19T13:23:55.117Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "da95b853ab59684943664a5d04972e8d737e525c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-physical-line-budget.ts --json --touched scripts/run-sealed-runner-build.ts,scripts/runner-sync-incremental-build.ts,scripts/build-package-dist.ts,scripts/build-root-drop-release.ts,scripts/build-onefile-release.ts,scripts/AtmCore/runner-build-scope.json,tests/cli/runner-sync-incremental-build.test.ts,tests/cli/runner-build-scope.test.ts --task ATM-GOV-0191 --actor codex-governance-optimizer --gate pre-close",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d4b6e3d85d44dfe5f370b3e53c25d658993aeae5d8ce5a2924f1f0259eeb3f6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:physical-line-budget"
+      ],
+      "generatedAt": "2026-07-19T13:24:05.092Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "da95b853ab59684943664a5d04972e8d737e525c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1d1d7a9fbb09bd6aca59834ca58e712d21b4e96f3ea9bd73a804fd708e6d1b19",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-19T13:30:02.418Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-physical-line-budget.ts --json --touched scripts/run-sealed-runner-build.ts,scripts/runner-sync-incremental-build.ts,scripts/build-package-dist.ts,scripts/build-root-drop-release.ts,scripts/build-onefile-release.ts,scripts/AtmCore/runner-build-scope.json,packages/core/src/broker/runner-sync-steward-queue.ts,packages/cli/src/commands/broker/steward-queues.ts,packages/cli/src/commands/broker/registry-actions.ts,tests/cli/runner-sync-incremental-build.test.ts,tests/cli/runner-build-scope.test.ts,tests/cli/runner-sync-steward-release.test.ts --task ATM-GOV-0191 --actor codex-governance-optimizer --gate pre-close",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bb81bc2eff2c4fd73906d5abe4d70181aa1218b1d5d7afd6197c75701c0f2da4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:physical-line-budget"
+      ],
+      "generatedAt": "2026-07-19T13:31:05.985Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-19T13:31:14.984Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

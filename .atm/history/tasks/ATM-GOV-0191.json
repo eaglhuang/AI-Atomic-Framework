@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0191",
+  "title": "Runner-sync cache-miss 增量 Build Executor",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0187"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/build-package-dist.ts",
+    "scripts/build-root-drop-release.ts",
+    "scripts/build-onefile-release.ts",
+    "tests/cli/runner-sync-incremental-build.test.ts",
+    "tests/cli/runner-build-scope.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/build-package-dist.ts",
+    "scripts/build-root-drop-release.ts",
+    "scripts/build-onefile-release.ts",
+    "tests/cli/runner-sync-incremental-build.test.ts",
+    "tests/cli/runner-build-scope.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-sync-incremental-build.test.ts",
+    "npm run typecheck",
+    "npm run validate:runner-build-scope",
+    "npm run validate:internal-release-sync"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "disable incremental planner and fall back to full sealed rebuild",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync-build-executor",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-incremental-build-planner",
+        "pattern": "Diff-aware Build Planner",
+        "source": "scripts/run-sealed-runner-build.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.package-dist-incremental-builder",
+        "pattern": "Package-level Builder",
+        "source": "scripts/build-package-dist.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0191-runner-sync-incremental-build.task.md",
+    "sectionTitle": "ATM-GOV-0191",
+    "headingLine": 59,
+    "hash": "30ca25746efa98df",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0191-runner-sync-incremental-build.task.md",
+      "planningCommitSha": "968c5cd874edd7118809151182a2e31f4ba3f4f4",
+      "contentDigest": "sha256:30ca25746efa98dfcec2c8a6d00cc419ac372e892cef0801cfb607d1e6e116e3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T13:17:07.849Z"
+    }
+  },
+  "importedAt": "2026-07-19T13:17:07.849Z",
+  "lastTransitionId": "2026-07-19T13-26-22-542Z-scope-amendment-afa6b8325622",
+  "lastTransitionAt": "2026-07-19T13:26:22.542Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-governance-optimizer",
+  "reservedAt": "2026-07-19T13:17:18.270Z",
+  "promotedAt": "2026-07-19T13:17:18.272Z",
+  "claim": {
+    "actorId": "codex-governance-optimizer",
+    "leaseId": "lease-3e26fe95a1f6",
+    "claimedAt": "2026-07-19T13:17:18.276Z",
+    "heartbeatAt": "2026-07-19T13:17:18.276Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0191.*",
+      ".atm/history/task-events/ATM-GOV-0191/**",
+      ".atm/history/tasks/ATM-GOV-0191.json",
+      ".gitignore",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/AtmCore/runner-build-scope.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "tests/cli/runner-build-scope.test.ts",
+      "tests/cli/runner-sync-incremental-build.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260719131718-codex-governance-optimizer-09b04cb04d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719131718-codex-governance-optimizer-09b04cb04d\""
+    }
+  },
+  "startedAt": "2026-07-19T13:17:18.276Z",
+  "startedByActor": "codex-governance-optimizer",
+  "startedBySessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0191",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0191.*",
+      ".atm/history/task-events/ATM-GOV-0191/**",
+      ".atm/history/tasks/ATM-GOV-0191.json",
+      ".gitignore",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/AtmCore/runner-build-scope.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "tests/cli/runner-build-scope.test.ts",
+      "tests/cli/runner-sync-incremental-build.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0191-runner-sync-incremental-build.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0191-runner-sync-incremental-build.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "d71157c9714395d3d9908323ec115a00a238383d1837c22e6e60bafb973c153f",
+    "actorId": "codex-governance-optimizer",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260719131718-codex-governance-optimizer-09b04cb04d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719131718-codex-governance-optimizer-09b04cb04d\""
+    },
+    "createdAt": "2026-07-19T13:17:24.730Z",
+    "status": "active"
+  }
+}

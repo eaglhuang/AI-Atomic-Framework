@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T13-17-52-111Z-scope-amendment-4ec0f98bbdad",
+  "taskId": "ATM-GOV-0191",
+  "action": "scope-amendment",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0191.json",
+  "taskSha256": "sha256:b5b181dbaec7d1002cab3958a16cdbd20f2d23c679e57ea102c9684c8007a372",
+  "createdAt": "2026-07-19T13:17:52.111Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0191 --actor codex-governance-optimizer --add \"scripts/runner-sync-incremental-build.ts,.gitignore\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T13-26-22-542Z-scope-amendment-afa6b8325622",
+  "taskId": "ATM-GOV-0191",
+  "action": "scope-amendment",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0191.json",
+  "taskSha256": "sha256:0f75869d34fe275e76085fee7c2a7e386c0beb3cf8e01ba5cde25b3b7a0ffe68",
+  "createdAt": "2026-07-19T13:26:22.542Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0191 --actor codex-governance-optimizer --add \"packages/core/src/broker/runner-sync-steward-queue.ts,packages/cli/src/commands/broker/steward-queues.ts,tests/cli/runner-sync-steward-release.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

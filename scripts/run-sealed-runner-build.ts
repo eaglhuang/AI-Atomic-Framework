@@ -1,17 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import {
-  cpSync,
-  existsSync,
-  lstatSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  rmdirSync,
-  symlinkSync,
-  unlinkSync,
-  writeFileSync
-} from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, rmdirSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -24,13 +12,17 @@ import {
   digestJson,
   phaseTimingsRecord,
   planRunnerIncrementalBuild,
+  prepareTsBuildCache,
+  persistTsBuildCache,
   syncDirectoryHashChanged,
   writeRunnerBuildRuntimeTelemetry,
-  type RunnerIncrementalBuildPlan
+  type RunnerIncrementalBuildPlan,
+  type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 export type BuildDecision = 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
+type RunnerSyncPhaseTimings = ReturnType<typeof phaseTimingsRecord>;
 export { planRunnerIncrementalBuild, type RunnerIncrementalBuildPlan } from './runner-sync-incremental-build.ts';
 
 export type RunnerSyncReceipt = {
@@ -47,17 +39,8 @@ export type RunnerSyncReceipt = {
   readonly decisionReason: string;
   readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef: string | null;
-  readonly phaseTimingsMs: {
-    readonly inputHashCalculation: number;
-    readonly skipDecision: number;
-    readonly worktreeSetup: number;
-    readonly typescriptBuild: number;
-    readonly rootDropReleaseAssembly: number;
-    readonly onefileReleaseAssembly: number;
-    readonly artifactSync: number;
-    readonly cleanup: number;
-    readonly totalElapsed: number;
-  };
+  readonly tsBuildCache: TsBuildCacheSummary | null;
+  readonly phaseTimingsMs: RunnerSyncPhaseTimings;
   readonly treatmentTelemetry: {
     readonly schemaId: 'atm.generatedWriteTreatmentTelemetry.v1';
     readonly executionMode: 'cache-hit-skip' | 'command-executed';
@@ -65,8 +48,9 @@ export type RunnerSyncReceipt = {
     readonly outputObserved: boolean;
     readonly receiptValidity: 'valid';
     readonly buildDecision: BuildDecision;
-    readonly phaseTimingsMs: Readonly<Record<string, number>>;
+    readonly phaseTimingsMs: RunnerSyncPhaseTimings;
     readonly rawTelemetryPolicy: 'gitignored-runtime-only';
+    readonly tsBuildCacheDigest: string | null;
   };
   readonly publishedAt: string;
 };
@@ -74,21 +58,8 @@ export type RunnerSyncReceipt = {
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const invokedAsCli = process.argv[1] !== undefined
   && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
-const releaseManifestPaths = [
-  path.join('release', 'atm-root-drop', 'release-manifest.json'),
-  path.join('release', 'atm-onefile', 'release-manifest.json')
-] as const;
-const buildInputPaths = [
-  'packages',
-  'scripts',
-  'templates',
-  'schemas',
-  'atomic_workbench',
-  'package.json',
-  'package-lock.json',
-  'tsconfig.json',
-  'tsconfig.build.json'
-] as const;
+const releaseManifestPaths = [path.join('release', 'atm-root-drop', 'release-manifest.json'), path.join('release', 'atm-onefile', 'release-manifest.json')] as const;
+const buildInputPaths = ['packages', 'scripts', 'templates', 'schemas', 'atomic_workbench', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json'] as const;
 
 /**
  * Remove a path without following directory junctions/symlinks.
@@ -175,6 +146,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       decisionReason: cacheDecision.reason,
       incrementalPlan: null,
       runtimeTelemetryRef: null,
+      tsBuildCache: null,
       timings
     }));
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
@@ -186,6 +158,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       decisionReason: cacheDecision.reason,
       incrementalPlan: null,
       runtimeTelemetryRef: null,
+      tsBuildCache: null,
       timings
     });
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
@@ -197,6 +170,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       buildDecision: cacheDecision.decision,
       decisionReason: cacheDecision.reason,
       incrementalPlan: null,
+      tsBuildCache: null,
       timings
     });
     writeRunnerSyncReceipt({
@@ -210,6 +184,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       decisionReason: cacheDecision.reason,
       incrementalPlan: null,
       runtimeTelemetryRef,
+      tsBuildCache: null,
       timings
     });
     console.log(`[sealed-runner-build] cacheHitSkip ${buildTarget} from ${sealedSourceSha}`);
@@ -230,10 +205,15 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   const worktreeRoot = path.join(repoRoot, '.atm-temp', 'sealed-runner-build', `${process.pid}-${sealedSourceSha.slice(0, 12)}`);
   removeTreeWithoutFollowingLinks(worktreeRoot);
   mkdirSync(path.dirname(worktreeRoot), { recursive: true });
+  let tsBuildCache: TsBuildCacheSummary | null = null;
   try {
     timePhase(timings, 'worktreeSetupMs', () => runGit(repoRoot, ['worktree', 'add', '--detach', worktreeRoot, sealedSourceSha]));
     linkNodeModules(worktreeRoot);
+    if (buildTarget === 'full' || buildTarget === 'packages') {
+      tsBuildCache = prepareTsBuildCache({ cwd: repoRoot, worktreeRoot });
+    }
     runTimedInnerBuild(worktreeRoot, buildTarget, timings, buildDecision === 'incrementalBuild' ? incrementalPlan : null);
+    tsBuildCache = persistTsBuildCache({ cwd: repoRoot, worktreeRoot, summary: tsBuildCache });
     timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget));
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeBuildMetadataToReleaseManifests({
@@ -244,6 +224,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       decisionReason,
       incrementalPlan,
       runtimeTelemetryRef: null,
+      tsBuildCache,
       timings
     });
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
@@ -255,6 +236,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       buildDecision,
       decisionReason,
       incrementalPlan,
+      tsBuildCache,
       timings
     });
     writeRunnerSyncReceipt({
@@ -268,6 +250,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       decisionReason,
       incrementalPlan,
       runtimeTelemetryRef,
+      tsBuildCache,
       timings
     });
     console.log(`[sealed-runner-build] ${buildDecision} ${buildTarget} from ${sealedSourceSha}`);
@@ -402,6 +385,7 @@ export function writeBuildMetadataToReleaseManifests(input: {
   readonly decisionReason?: string;
   readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef?: string | null;
+  readonly tsBuildCache?: TsBuildCacheSummary | null;
   readonly timings: SealedBuildTimings;
 }): void {
   for (const relative of releaseManifestPaths) {
@@ -413,6 +397,7 @@ export function writeBuildMetadataToReleaseManifests(input: {
     manifest.buildDecision = input.buildDecision;
     manifest.buildDecisionReason = input.decisionReason ?? null;
     manifest.incrementalPlanDigest = input.incrementalPlan ? digestJson(input.incrementalPlan) : null;
+    manifest.tsBuildCacheDigest = input.tsBuildCache ? digestJson(input.tsBuildCache) : null;
     manifest.rawTelemetryPolicy = 'gitignored-runtime-only';
     manifest.phaseTimingsMs = {
       inputHashCalculation: input.timings.inputHashCalculationMs,
@@ -439,6 +424,7 @@ export function buildRunnerSyncReceipt(input: {
   readonly decisionReason?: string;
   readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef?: string | null;
+  readonly tsBuildCache?: TsBuildCacheSummary | null;
   readonly timings: SealedBuildTimings;
   readonly publishedAt?: string;
 }): RunnerSyncReceipt {
@@ -461,6 +447,7 @@ export function buildRunnerSyncReceipt(input: {
     decisionReason: input.decisionReason ?? '',
     incrementalPlan: input.incrementalPlan ?? null,
     runtimeTelemetryRef: input.runtimeTelemetryRef ?? null,
+    tsBuildCache: input.tsBuildCache ?? null,
     phaseTimingsMs: phaseTimingsRecord(input.timings),
     treatmentTelemetry: {
       schemaId: 'atm.generatedWriteTreatmentTelemetry.v1',
@@ -470,7 +457,8 @@ export function buildRunnerSyncReceipt(input: {
       receiptValidity: 'valid',
       buildDecision: input.buildDecision,
       phaseTimingsMs: phaseTimingsRecord(input.timings),
-      rawTelemetryPolicy: 'gitignored-runtime-only'
+      rawTelemetryPolicy: 'gitignored-runtime-only',
+      tsBuildCacheDigest: input.tsBuildCache ? digestJson(input.tsBuildCache) : null
     },
     publishedAt: input.publishedAt ?? new Date().toISOString()
   };
@@ -487,6 +475,7 @@ export function writeRunnerSyncReceipt(input: {
   readonly decisionReason?: string;
   readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef?: string | null;
+  readonly tsBuildCache?: TsBuildCacheSummary | null;
   readonly timings: SealedBuildTimings;
 }): string {
   const receipt = buildRunnerSyncReceipt(input);
@@ -519,7 +508,14 @@ function runInnerBuild(buildTarget: BuildTarget): void {
     if (!existsSync(path.join(process.cwd(), tscPath))) {
       fail('Local TypeScript dependency is missing; run npm install/npm ci before sealed runner build.', 1);
     }
-    runNode(process.cwd(), [tscPath, '-p', 'tsconfig.build.json']);
+    runNode(process.cwd(), [
+      tscPath,
+      '-p',
+      'tsconfig.build.json',
+      '--incremental',
+      '--tsBuildInfoFile',
+      path.join('.atm-runtime-cache', 'tsconfig.build.tsbuildinfo')
+    ]);
     const packagesIndex = process.argv.indexOf('--packages');
     const packageArgs = packagesIndex >= 0 && process.argv[packagesIndex + 1] ? ['--packages', process.argv[packagesIndex + 1]] : [];
     runNode(process.cwd(), ['--strip-types', 'scripts/build-package-dist.ts', ...packageArgs]);

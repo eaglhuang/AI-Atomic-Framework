@@ -41,6 +41,22 @@ export type RunnerIncrementalBuildPlan = {
   readonly unsafeReasons: readonly string[];
 };
 
+export type TsBuildCacheSummary = {
+  readonly schemaId: 'atm.runnerTsBuildCacheSummary.v1';
+  readonly cacheRoot: string;
+  readonly tsBuildInfoPath: string;
+  readonly existedBefore: boolean;
+  readonly existsAfter: boolean;
+  readonly digestBefore: string | null;
+  readonly digestAfter: string | null;
+  readonly restoredBeforeBuild: boolean;
+  readonly persistedAfterBuild: boolean;
+  readonly gitPolicy: {
+    readonly rawCacheCommitted: false;
+    readonly storage: '.atm/runtime/runner-sync-build-cache/typescript/**';
+  };
+};
+
 export function planRunnerIncrementalBuild(input: {
   readonly cwd: string;
   readonly currentSealedSourceSha: string;
@@ -116,6 +132,7 @@ export function writeRunnerBuildRuntimeTelemetry(input: {
   readonly buildDecision: BuildDecision;
   readonly decisionReason: string;
   readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
+  readonly tsBuildCache?: TsBuildCacheSummary | null;
   readonly timings: SealedBuildTimings;
 }): string {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -136,6 +153,7 @@ export function writeRunnerBuildRuntimeTelemetry(input: {
     affectedPackageCount: input.incrementalPlan?.affectedPackages.length ?? 0,
     affectedGroups: input.incrementalPlan?.affectedGroups ?? null,
     unsafeReasons: input.incrementalPlan?.unsafeReasons ?? [],
+    tsBuildCache: input.tsBuildCache ?? null,
     phaseTimingsMs: phaseTimingsRecord(input.timings),
     gitPolicy: {
       rawLogsCommitted: false,
@@ -143,6 +161,58 @@ export function writeRunnerBuildRuntimeTelemetry(input: {
     }
   })}\n`, 'utf8');
   return relative.replace(/\\/g, '/');
+}
+
+export function prepareTsBuildCache(input: {
+  readonly cwd: string;
+  readonly worktreeRoot: string;
+}): TsBuildCacheSummary {
+  const cacheRoot = path.join(input.cwd, '.atm', 'runtime', 'runner-sync-build-cache', 'typescript');
+  const cacheFile = path.join(cacheRoot, 'tsconfig.build.tsbuildinfo');
+  const worktreeCacheFile = path.join(input.worktreeRoot, '.atm-runtime-cache', 'tsconfig.build.tsbuildinfo');
+  mkdirSync(path.dirname(worktreeCacheFile), { recursive: true });
+  const existedBefore = existsSync(cacheFile);
+  const digestBefore = existedBefore ? fileDigest(cacheFile) : null;
+  let restoredBeforeBuild = false;
+  if (existedBefore) {
+    cpSync(cacheFile, worktreeCacheFile);
+    restoredBeforeBuild = true;
+  }
+  return {
+    schemaId: 'atm.runnerTsBuildCacheSummary.v1',
+    cacheRoot: '.atm/runtime/runner-sync-build-cache/typescript',
+    tsBuildInfoPath: '.atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo',
+    existedBefore,
+    existsAfter: false,
+    digestBefore,
+    digestAfter: null,
+    restoredBeforeBuild,
+    persistedAfterBuild: false,
+    gitPolicy: {
+      rawCacheCommitted: false,
+      storage: '.atm/runtime/runner-sync-build-cache/typescript/**'
+    }
+  };
+}
+
+export function persistTsBuildCache(input: {
+  readonly cwd: string;
+  readonly worktreeRoot: string;
+  readonly summary: TsBuildCacheSummary | null;
+}): TsBuildCacheSummary | null {
+  if (!input.summary) return null;
+  const cacheRoot = path.join(input.cwd, '.atm', 'runtime', 'runner-sync-build-cache', 'typescript');
+  const cacheFile = path.join(cacheRoot, 'tsconfig.build.tsbuildinfo');
+  const worktreeCacheFile = path.join(input.worktreeRoot, '.atm-runtime-cache', 'tsconfig.build.tsbuildinfo');
+  const existsAfter = existsSync(worktreeCacheFile);
+  mkdirSync(cacheRoot, { recursive: true });
+  if (existsAfter) cpSync(worktreeCacheFile, cacheFile);
+  return {
+    ...input.summary,
+    existsAfter,
+    digestAfter: existsAfter ? fileDigest(worktreeCacheFile) : null,
+    persistedAfterBuild: existsAfter
+  };
 }
 
 export function syncDirectoryHashChanged(source: string, target: string): void {
