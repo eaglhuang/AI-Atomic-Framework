@@ -12,7 +12,7 @@ export declare function prepareImportedTaskForClaim(input: {
             action: "reserve" | "promote";
             taskId: string;
             actorId: string;
-            status: "ready" | "reserved";
+            status: "reserved" | "ready";
             transitionPath: string;
             importEvidencePath: string | null;
         };

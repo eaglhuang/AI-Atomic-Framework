@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-TMP-0003",
-  "updatedAt": "2026-07-19T17:51:22.885Z",
+  "updatedAt": "2026-07-19T17:54:45.347Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -281,6 +281,42 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:5dcb5205dbb9f368ce03958e16920a5a3c84964c6ebc479105af1ddf1ee2c93d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v2.md --dry-run --cwd . --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260719174907-codex-main-TASK-TMP-0003-1fbd7a16d9",
+      "createdAt": "2026-07-19T17:54:45.347Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260719174907-codex-main-TASK-TMP-0003-1fbd7a16d9",
+        "kind": "test",
+        "freshness": "fresh",
+        "commandRuns": [
+          {
+            "command": "node atm.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v2.md --dry-run --cwd . --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:840738e0d473b8708e6fa7180f4e450f0ff11dd7375de6e65da1eb9f6ef4c0a8",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:54e1f8662b080a294ecc0cb2af7f47dc63b037b7af54de42d46c1e25c7b18b37",
+            "cached": false,
+            "generatedAt": "2026-07-19T17:54:45.510Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b7ca13a95081ac7e2807b669de0181182559bb15bcea3d23c6001593596dbbeb",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

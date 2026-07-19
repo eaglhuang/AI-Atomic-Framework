@@ -2,7 +2,7 @@ import type { GovernedVendorConfigSurface } from './types.ts';
 export declare function discoverGovernedVendorConfigSurface(repositoryRoot: string): GovernedVendorConfigSurface;
 export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
     repoBootstrapped: boolean;
-    currentEditorId: "codex" | "copilot" | "gemini" | "cursor" | "claude-code" | "antigravity" | null;
+    currentEditorId: "claude-code" | "gemini" | "codex" | "copilot" | "cursor" | "antigravity" | null;
     currentEditorDetectedFrom: import("./adapters.ts").EditorDetectionSource | null;
     currentEditorRawValue: string | null;
     currentEditorAdapter: {
@@ -10,7 +10,7 @@ export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
         primaryEntryPresent: boolean;
         installCommand: string;
         verifyCommand: string;
-        status: "missing" | "installed" | "manifest-only" | "entry-only";
+        status: "installed" | "missing" | "manifest-only" | "entry-only";
         id: import("@ai-atomic-framework/integrations-core").IntegrationAdapterId;
         displayName: string;
         adapterVersion: string;
@@ -30,7 +30,7 @@ export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
         primaryEntryPresent: boolean;
         installCommand: string;
         verifyCommand: string;
-        status: "missing" | "installed" | "manifest-only" | "entry-only";
+        status: "installed" | "missing" | "manifest-only" | "entry-only";
         id: import("@ai-atomic-framework/integrations-core").IntegrationAdapterId;
         displayName: string;
         adapterVersion: string;
@@ -46,14 +46,14 @@ export declare function describeIntegrationInstallHint(bootstrap: ReturnType<typ
     text: string;
     data: {
         reason: string | null;
-        currentEditorId: "codex" | "copilot" | "gemini" | "cursor" | "claude-code" | "antigravity" | null;
+        currentEditorId: "claude-code" | "gemini" | "codex" | "copilot" | "cursor" | "antigravity" | null;
         currentEditorDetectedFrom: import("./adapters.ts").EditorDetectionSource | null;
         currentEditorRawValue: string | null;
         suggestedAction: string | null;
         adapters: {
             id: import("@ai-atomic-framework/integrations-core").IntegrationAdapterId;
             displayName: string;
-            status: "missing" | "installed" | "manifest-only" | "entry-only";
+            status: "installed" | "missing" | "manifest-only" | "entry-only";
             primaryEntryPath: string;
             installCommand: string;
             verifyCommand: string;
