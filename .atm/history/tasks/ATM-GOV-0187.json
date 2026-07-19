@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0187",
+  "title": "Real Build、Projection 與 Runner-Sync Executor",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0184",
+    "ATM-GOV-0185"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/core/src/broker/**",
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/runner-mode/**",
+    "scripts/build-onefile-release.ts",
+    "tests/cli/real-build-projection-runner-sync-executor.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/**",
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/runner-mode/**",
+    "scripts/build-onefile-release.ts",
+    "tests/cli/real-build-projection-runner-sync-executor.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/real-build-projection-runner-sync-executor.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit and remove only run-owned generated residue",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.generated-write-executor",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.generated-write-executor",
+        "pattern": "Command Adapter",
+        "source": "packages/cli/src/commands/broker/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0187-real-build-projection-runner-sync-executor.task.md",
+    "sectionTitle": "ATM-GOV-0187",
+    "headingLine": 55,
+    "hash": "acec1fcf90cebfd2",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0187-real-build-projection-runner-sync-executor.task.md",
+      "planningCommitSha": "013eb0c0e9e676bb3932d258b6587eb870a860e2",
+      "contentDigest": "sha256:acec1fcf90cebfd2686db700806cf63e0198bcd754492af20f6e7b6af7a0581b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T11:47:20.180Z"
+    }
+  },
+  "importedAt": "2026-07-19T11:47:20.180Z",
+  "lastTransitionId": "2026-07-19T11-47-40-870Z-claim-9c9ebc9a60e6",
+  "lastTransitionAt": "2026-07-19T11:47:40.870Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-governance-optimizer",
+  "reservedAt": "2026-07-19T11:47:36.066Z",
+  "promotedAt": "2026-07-19T11:47:36.068Z",
+  "claim": {
+    "actorId": "codex-governance-optimizer",
+    "leaseId": "lease-17cba5353c16",
+    "claimedAt": "2026-07-19T11:47:36.071Z",
+    "heartbeatAt": "2026-07-19T11:47:36.071Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0187.json",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/runner-mode/**",
+      "packages/core/src/broker/**",
+      "scripts/build-onefile-release.ts",
+      "tests/cli/real-build-projection-runner-sync-executor.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260719114736-codex-governance-optimizer-238d16b0af",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719114736-codex-governance-optimizer-238d16b0af\""
+    }
+  },
+  "startedAt": "2026-07-19T11:47:36.071Z",
+  "startedByActor": "codex-governance-optimizer",
+  "startedBySessionId": "session-20260719114736-codex-governance-optimizer-ATM-GOV-0187-d1ba63cefc",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0187",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0187.*",
+      ".atm/history/task-events/ATM-GOV-0187/**",
+      ".atm/history/tasks/ATM-GOV-0187.json",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/runner-mode/**",
+      "packages/core/src/broker/**",
+      "scripts/build-onefile-release.ts",
+      "tests/cli/real-build-projection-runner-sync-executor.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4b564ed07f803498b3effb1c9a680df151d59f0ddf3fc60913e0da44948e2678",
+    "actorId": "codex-governance-optimizer",
+    "sessionId": "session-20260719114736-codex-governance-optimizer-ATM-GOV-0187-d1ba63cefc",
+    "laneSession": {
+      "laneSessionId": "lane-20260719114736-codex-governance-optimizer-238d16b0af",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719114736-codex-governance-optimizer-238d16b0af\""
+    },
+    "createdAt": "2026-07-19T11:47:40.869Z",
+    "status": "active"
+  }
+}

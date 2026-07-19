@@ -14,6 +14,12 @@ export interface WaveGeneratedWriteInput {
   readonly sealedSourceSha: string;
   readonly sourceDigest: string;
   readonly outputDigest: string;
+  readonly command?: string | null;
+  readonly commandExitCode?: number | null;
+  readonly commandDurationMs?: number | null;
+  readonly phaseTimingsMs?: Readonly<Record<string, number>> | null;
+  readonly observedOutputFiles?: readonly string[];
+  readonly treatmentTelemetry?: WaveGeneratedWriteTreatmentTelemetry | null;
   readonly expectedTaskIds?: readonly string[];
   readonly contentAddressedSkip?: boolean;
   readonly now?: string;
@@ -32,9 +38,31 @@ export interface WaveGeneratedWriteReceipt {
   readonly sourceDigest: string;
   readonly outputDigest: string;
   readonly contentAddressedSkip: boolean;
+  readonly command: string | null;
+  readonly commandExitCode: number | null;
+  readonly commandDurationMs: number | null;
+  readonly phaseTimingsMs: Readonly<Record<string, number>>;
+  readonly observedOutputFiles: readonly string[];
+  readonly telemetry: WaveGeneratedWriteTreatmentTelemetry;
   readonly executorActor: string;
   readonly payloadDigest: string;
   readonly createdAt: string;
+}
+
+export interface WaveGeneratedWriteTreatmentTelemetry {
+  readonly schemaId: 'atm.generatedWriteTreatmentTelemetry.v1';
+  readonly specVersion: '0.1.0';
+  readonly surfaceKind: WaveGeneratedSurfaceKind;
+  readonly executionMode: 'receipt-only' | 'command-executed' | 'content-addressed-skip';
+  readonly sideEffectAllowed: boolean;
+  readonly commandExecuted: boolean;
+  readonly outputObserved: boolean;
+  readonly receiptValidity: 'valid' | 'invalid' | 'pending';
+  readonly exactlyOnce: 'not-applicable' | 'observed';
+  readonly skipReason: string | null;
+  readonly durationMs: number | null;
+  readonly phaseTimingsMs: Readonly<Record<string, number>>;
+  readonly outputFileCount: number;
 }
 
 export interface WaveGeneratedWritePlan {
@@ -100,6 +128,7 @@ export function planWaveGeneratedWrite(input: WaveGeneratedWriteInput): WaveGene
   if (!input.sealedSourceSha.trim()) blockers.push('sealed source sha is required');
   if (!input.sourceDigest.trim()) blockers.push('source digest is required');
   if (!input.outputDigest.trim()) blockers.push('output digest is required');
+  if (input.commandExitCode !== null && input.commandExitCode !== undefined && input.commandExitCode !== 0) blockers.push(`generated write command failed with exit code ${input.commandExitCode}`);
 
   const tickets = selectedTickets(input.scheduler, decision);
   const taskIds = uniqueSorted(tickets.map((ticket) => ticket.taskId));
@@ -137,6 +166,26 @@ export function planWaveGeneratedWrite(input: WaveGeneratedWriteInput): WaveGene
     sourceDigest: input.sourceDigest,
     outputDigest: input.outputDigest,
     contentAddressedSkip: input.contentAddressedSkip === true,
+    command: input.command?.trim() || null,
+    commandExitCode: input.commandExitCode ?? null,
+    commandDurationMs: input.commandDurationMs ?? null,
+    phaseTimingsMs: input.phaseTimingsMs ?? (input.commandDurationMs !== null && input.commandDurationMs !== undefined ? { totalElapsed: input.commandDurationMs } : {}),
+    observedOutputFiles: uniqueSorted(input.observedOutputFiles ?? []),
+    telemetry: input.treatmentTelemetry ?? {
+      schemaId: 'atm.generatedWriteTreatmentTelemetry.v1' as const,
+      specVersion: '0.1.0' as const,
+      surfaceKind: input.surfaceKind,
+      executionMode: input.contentAddressedSkip === true ? 'content-addressed-skip' as const : input.command ? 'command-executed' as const : 'receipt-only' as const,
+      sideEffectAllowed: Boolean(input.command && input.commandExitCode === 0),
+      commandExecuted: Boolean(input.command),
+      outputObserved: (input.observedOutputFiles ?? []).length > 0,
+      receiptValidity: 'valid' as const,
+      exactlyOnce: input.command ? 'observed' as const : 'not-applicable' as const,
+      skipReason: input.contentAddressedSkip === true ? 'content-addressed input/output digest match' : null,
+      durationMs: input.commandDurationMs ?? null,
+      phaseTimingsMs: input.phaseTimingsMs ?? (input.commandDurationMs !== null && input.commandDurationMs !== undefined ? { totalElapsed: input.commandDurationMs } : {}),
+      outputFileCount: uniqueSorted(input.observedOutputFiles ?? []).length
+    },
     executorActor: input.actorId,
     createdAt: input.now ?? new Date().toISOString()
   };
