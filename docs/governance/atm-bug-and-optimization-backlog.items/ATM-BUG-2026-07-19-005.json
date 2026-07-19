@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-005",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Task scope amendment metadata",
+  "finding": "`tasks scope add --add <csv>` can still surface quote artifacts in closeback amendmentHistory even when the immediate scope-amendment command reports normalized addedPaths.",
+  "expectedBehavior": "Every consumer of scope-amendment history should see the same normalized path list without shell quote artifacts.",
+  "evidenceOrRepro": "During ATM-GOV-0183, `node atm.mjs tasks scope add --task ATM-GOV-0183 --actor codex-governance-optimizer --add packages/core/src/index.ts,atomic_workbench/atomization-coverage/path-to-atom-map.json ... --json` reported normalized addedPaths, but subsequent `taskflow close --write` showed amendmentHistory addedPaths as `\"packages/core/src/index.ts` and `atomic_workbench/atomization-coverage/path-to-atom-map.json\"`.",
+  "followUp": "Add a regression that checks the persisted transition event and taskflow closeback amendmentHistory projection after a CSV scope amendment, not only the immediate tasks scope add response."
+}
