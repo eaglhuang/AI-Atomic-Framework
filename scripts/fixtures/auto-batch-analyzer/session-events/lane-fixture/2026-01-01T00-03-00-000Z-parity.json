@@ -1,0 +1,31 @@
+{
+  "schemaId": "atm.laneSessionEvent.v1",
+  "eventId": "fixture-parity",
+  "laneId": "lane-fixture-treatment",
+  "sequence": 3,
+  "action": "gate-parity",
+  "actorId": "fixture-agent-b",
+  "createdAt": "2026-01-01T00:03:00.000Z",
+  "details": {
+    "taskId": "TASK-FIXTURE-0002",
+    "brokerTicket": {
+      "ticketId": "ticket-parity",
+      "waveId": "wave-fixture",
+      "baselineOrTreatmentRole": "treatment",
+      "sharedSurface": "commit",
+      "batchEligible": true,
+      "parallelAdmitted": true,
+      "decisionCorrect": true,
+      "outcomeRef": "fixture://parity-ok",
+      "decisionLatencyMs": 20,
+      "validationMethod": "canonicalParity",
+      "checkId": "fixture.parity-check",
+      "eligible": 100,
+      "uniqueBlocks": 0,
+      "truePositiveCount": 0,
+      "falsePositiveCount": 0,
+      "evidenceReadbacks": 1,
+      "parityMismatch": false
+    }
+  }
+}

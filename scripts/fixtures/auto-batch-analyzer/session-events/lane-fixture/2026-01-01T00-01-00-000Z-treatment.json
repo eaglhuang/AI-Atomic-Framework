@@ -1,0 +1,41 @@
+{
+  "schemaId": "atm.laneSessionEvent.v1",
+  "eventId": "fixture-treatment",
+  "laneId": "lane-fixture-treatment",
+  "sequence": 1,
+  "action": "broker-decision",
+  "actorId": "fixture-agent-b",
+  "createdAt": "2026-01-01T00:01:00.000Z",
+  "details": {
+    "taskId": "TASK-FIXTURE-0002",
+    "brokerTicket": {
+      "ticketId": "ticket-treatment",
+      "waveId": "wave-fixture",
+      "baselineOrTreatmentRole": "treatment",
+      "sharedSurface": "build",
+      "batchEligible": true,
+      "waitedMs": 100,
+      "waitedMsSaved": 1100,
+      "parallelAdmitted": true,
+      "conflictDetected": true,
+      "trueConflict": true,
+      "decisionCorrect": true,
+      "outcomeRef": "fixture://treatment-ok",
+      "decisionLatencyMs": 40,
+      "composeAttempted": true,
+      "composeAccepted": true,
+      "composeRollback": false,
+      "escapedConflict": false,
+      "manualOverride": false,
+      "validationMethod": "matchedBatchAb",
+      "checkId": "fixture.safety-check",
+      "eligible": 600,
+      "uniqueBlocks": 1,
+      "truePositiveCount": 1,
+      "falsePositiveCount": 0,
+      "evidenceReadbacks": 1,
+      "optimizationApplied": true,
+      "optimizationId": "fixture-compose-build"
+    }
+  }
+}
