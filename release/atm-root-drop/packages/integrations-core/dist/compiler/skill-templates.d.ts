@@ -65,6 +65,11 @@ export declare const minimumAtmEntrySkillDefinitions: readonly [{
     readonly summary: "Resolve ATM_* error codes from CLI JSON, logs, or user reports into canonical meaning, remediation, retryability, and approval guidance.";
     readonly command: "node atm.mjs next --prompt \"$ARGUMENTS\" --json";
 }, {
+    readonly id: "atm-plan-authoring";
+    readonly title: "ATM Plan Authoring";
+    readonly summary: "Create registered planning families, plan documents, and task cards through the tool-first plan CLI.";
+    readonly command: "node atm.mjs plan card create $ARGUMENTS --dry-run --json";
+}, {
     readonly id: "atm-upgrade-scan";
     readonly title: "ATM Upgrade Scan";
     readonly summary: "Scan evidence reports and draft governed upgrade proposals.";

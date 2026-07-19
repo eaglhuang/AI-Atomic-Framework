@@ -29,6 +29,7 @@ import { runLock } from './commands/lock.js';
 import { runNext } from './commands/next.js';
 import { runOrient } from './commands/orient.js';
 import { runPolice } from './commands/police.js';
+import { runPlan } from './commands/plan.js';
 import { runQuickfix } from './commands/quickfix.js';
 import { runResidue } from './commands/residue.js';
 import { runSelfHostAlphaAsync } from './commands/self-host-alpha.js';
@@ -99,6 +100,7 @@ export const cliCommandRunners = {
     lock: runLock,
     next: runNext,
     orient: runOrient,
+    plan: runPlan,
     police: runPolice,
     quickfix: runQuickfix,
     residue: runResidue,

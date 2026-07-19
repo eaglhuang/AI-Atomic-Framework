@@ -45,6 +45,7 @@ export declare const commandSpecs: Readonly<{
     migrate: import("./shared.ts").CommandSpec;
     next: import("./shared.ts").CommandSpec;
     orient: import("./shared.ts").CommandSpec;
+    plan: import("./shared.ts").CommandSpec;
     police: import("./shared.ts").CommandSpec;
     quickfix: import("./shared.ts").CommandSpec;
     residue: import("./shared.ts").CommandSpec;

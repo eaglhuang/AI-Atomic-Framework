@@ -18,6 +18,7 @@ import experienceSpec from './command-specs/experience.spec.js';
 import healthReportSpec from './command-specs/health-report.spec.js';
 import identitySpec from './command-specs/identity.spec.js';
 import orientSpec from './command-specs/orient.spec.js';
+import planSpec from './command-specs/plan.spec.js';
 import mapCapsuleSpec from './command-specs/map-capsule.spec.js';
 import policeSpec from './command-specs/police.spec.js';
 import quickfixSpec from './command-specs/quickfix.spec.js';
@@ -107,6 +108,7 @@ export const commandSpecs = Object.freeze({
     migrate: migrateSpec,
     next: nextSpec,
     orient: orientSpec,
+    plan: planSpec,
     police: policeSpec,
     quickfix: quickfixSpec,
     residue: residueSpec,
