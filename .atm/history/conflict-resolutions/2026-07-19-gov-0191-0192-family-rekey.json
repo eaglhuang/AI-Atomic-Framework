@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.brokerConflictResolution.v1",
+  "generatedAt": "2026-07-19T05:49:43.357Z",
+  "actorId": "codex-gov-series-repair",
+  "ownerInstruction": "Move misclassified ATM-GOV-0191 to ERR and ATM-GOV-0192 to TMP, then clear old GOV keys so future GOV may reuse 0191.",
+  "decision": "override-for-family-rekey-only",
+  "conflictTasks": [
+    "TASK-ERR-0001",
+    "TASK-TMP-0001"
+  ],
+  "legacyTaskIds": [
+    "ATM-GOV-0191",
+    "ATM-GOV-0192"
+  ],
+  "resolutionOrder": [
+    "3KLife planning source cards were moved to registered ERR/TMP families via atm plan card create, then old GOV source files were removed.",
+    "AAF task/evidence/event keys were copied to TASK-ERR-0001 and TASK-TMP-0001, source paths were realigned to the new planning family paths, then old ATM-GOV-0191/0192 keyed files were removed.",
+    "Copilot adapter projection was regenerated with atm integration add copilot --force because verify identified stale atm-plan-authoring adapter files."
+  ],
+  "scope": [
+    ".atm/history/tasks/{TASK-ERR-0001,TASK-TMP-0001}.json",
+    ".atm/history/evidence/{TASK-ERR-0001*,TASK-TMP-0001*}.json",
+    ".atm/history/task-events/{TASK-ERR-0001,TASK-TMP-0001}/**",
+    ".atm/history/session-events/lane-20260719035424-codex-error-code-governance-dba09bda71/**",
+    ".atm/integrations/copilot.manifest.json",
+    ".github/instructions/atm-plan-authoring.instructions.md",
+    ".github/prompts/{atm-dispatch,atm-error-code-resolver,atm-plan-authoring}.prompt.md"
+  ],
+  "nonGoals": [
+    "No code-source mutation under packages/** or scripts/**.",
+    "No branch development.",
+    "No mutation of foreign ATM-GOV-0168/ATM-GOV-0181 untracked receipts."
+  ],
+  "validators": [
+    {
+      "command": "node atm.mjs tasks audit --json",
+      "result": "pass with 3 pre-existing active ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE warnings"
+    },
+    {
+      "command": "node atm.mjs integration verify copilot --json",
+      "result": "pass after governed adapter reinstall"
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "result": "pass"
+    },
+    {
+      "command": "Node UTF-8 scan of .atm/history/tasks,evidence,task-events",
+      "result": "no ATM-GOV-0191/ATM-GOV-0192 keyed content or wrong GOV TASK-ERR/TMP source paths"
+    }
+  ],
+  "risk": "bounded metadata/key migration required to remove numbering ambiguity introduced by misclassified GOV cards",
+  "expiresAfterCommit": true,
+  "conflictTaskId": "TASK-ERR-0001",
+  "conflictFiles": [
+    ".atm/history/evidence/TASK-ERR-0001.bundle-manifest.json",
+    ".atm/history/evidence/TASK-ERR-0001.closure-packet.json",
+    ".atm/history/evidence/TASK-ERR-0001.json",
+    ".atm/history/evidence/TASK-ERR-0001.runner-sync-receipt.json",
+    ".atm/history/evidence/TASK-ERR-0001.seal-and-commit.json",
+    ".atm/history/evidence/TASK-TMP-0001.abandon-residue-disposition.json",
+    ".atm/history/evidence/TASK-TMP-0001.json",
+    ".atm/history/task-events/TASK-ERR-0001/2026-07-19T03-54-15-374Z-import-c8e8636af32f.json",
+    ".atm/history/task-events/TASK-ERR-0001/2026-07-19T03-54-24-071Z-reserve-dbe19bf25f0d.json",
+    ".atm/history/task-events/TASK-ERR-0001/2026-07-19T03-54-24-073Z-promote-c7e24df2c790.json",
+    ".atm/history/task-events/TASK-ERR-0001/2026-07-19T03-54-25-592Z-claim-071d64d2efea.json",
+    ".atm/history/task-events/TASK-ERR-0001/2026-07-19T04-04-56-002Z-close-1c3aa337733f.json",
+    ".atm/history/task-events/TASK-TMP-0001/2026-07-19T04-07-20-201Z-import-4a438e62195c.json",
+    ".atm/history/task-events/TASK-TMP-0001/2026-07-19T04-07-57-969Z-import-adb46f3b7a1c.json",
+    ".atm/history/task-events/TASK-TMP-0001/2026-07-19T04-09-07-031Z-reserve-8f2caac0af5d.json",
+    ".atm/history/task-events/TASK-TMP-0001/2026-07-19T04-09-07-033Z-promote-d58d05492b2d.json",
+    ".atm/history/task-events/TASK-TMP-0001/2026-07-19T04-09-16-376Z-claim-e13d7e37c7bd.json",
+    ".atm/history/task-events/TASK-TMP-0001/2026-07-19T04-09-28-381Z-scope-amendment-3a93253ce891.json",
+    ".atm/history/task-events/TASK-TMP-0001/2026-07-19T04-19-05-080Z-release-86bcd2cf15cf.json",
+    ".atm/history/task-events/TASK-TMP-0001/2026-07-19T04-35-31-442Z-abandon-84747fe022f9.json",
+    ".atm/history/tasks/TASK-ERR-0001.json",
+    ".atm/history/tasks/TASK-TMP-0001.json"
+  ],
+  "decisionClass": "human-signoff-required",
+  "decisionReason": "Owner-directed family rekey of two misclassified GOV records after migration to registered ERR/TMP planning families; this is not competing delivery work.",
+  "violationStatus": "resolved",
+  "validatorPlan": [
+    "node atm.mjs tasks audit --json => pass with only existing draft static evidence warnings",
+    "node atm.mjs integration verify copilot --json => pass after adapter reinstall",
+    "npm run check:encoding:touched => pass",
+    "Node UTF-8 old-key scan under .atm/history/tasks,evidence,task-events => no ATM-GOV-0191/ATM-GOV-0192 keyed content and no wrong GOV TASK-ERR/TMP source paths"
+  ]
+}

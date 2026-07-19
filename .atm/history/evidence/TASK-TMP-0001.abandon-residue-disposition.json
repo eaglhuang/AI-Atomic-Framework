@@ -1,0 +1,28 @@
+{
+  "schemaId": "atm.abandonResidueDisposition.v1",
+  "taskId": "TASK-TMP-0001",
+  "actorId": "codex-error-code-governance",
+  "reason": "Owner reclassified one-off post-close residue: do not consume GOV plan numbering; preserve reproducible product gap in ATM backlog.",
+  "disposition": "remove-evidence",
+  "classes": {
+    "keep-diagnostic": [
+      ".atm/history/tasks/TASK-TMP-0001.json",
+      ".atm/history/evidence/TASK-TMP-0001.json",
+      ".atm/history/task-events/TASK-TMP-0001/"
+    ],
+    "abandon": [],
+    "remove-evidence": [
+      ".atm/history/evidence/TASK-TMP-0001.bundle-manifest.json"
+    ]
+  },
+  "removed": [
+    ".atm/history/evidence/TASK-TMP-0001.bundle-manifest.json"
+  ],
+  "unstaged": [],
+  "keptAuditTrail": [
+    ".atm/history/tasks/TASK-TMP-0001.json",
+    ".atm/history/evidence/TASK-TMP-0001.json",
+    ".atm/history/task-events/TASK-TMP-0001/"
+  ],
+  "recordedAt": "2026-07-19T04:35:31.441Z"
+}
