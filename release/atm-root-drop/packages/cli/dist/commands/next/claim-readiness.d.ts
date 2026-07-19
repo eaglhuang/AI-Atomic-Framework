@@ -5,9 +5,6 @@ export interface ClaimReadinessTaskSummary {
     readonly status: string;
     readonly format: 'json' | 'markdown';
     readonly sourcePlanPath: string | null;
-    readonly scopePaths?: readonly string[];
-    readonly targetAllowedFiles?: readonly string[];
-    readonly activeClaimActorId?: string | null;
 }
 export interface ClaimReadinessDiagnostic {
     readonly taskId: string;

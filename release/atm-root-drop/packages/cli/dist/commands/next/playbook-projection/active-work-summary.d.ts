@@ -40,7 +40,6 @@ export interface ActiveWorkSummary {
         readonly taskId: string;
         readonly title: string;
         readonly actorId: string;
-        readonly laneSessionId: string | null;
         readonly createdAt: string | null;
         readonly importedAt: string | null;
         readonly ageSeconds: number;
@@ -49,9 +48,6 @@ export interface ActiveWorkSummary {
         readonly files: readonly string[];
     }[];
     readonly stagedFiles: readonly string[];
-    readonly dirtyFiles: readonly string[];
-    readonly unownedDirtyFiles: readonly string[];
-    readonly foreignDirtyFiles: readonly string[];
     readonly hasForeignActiveWork: boolean;
     readonly teamLevelRecommendation: {
         readonly level: 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
@@ -70,6 +66,6 @@ export interface ActiveWorkSummary {
     };
 }
 export declare function buildActiveWorkSummary(cwd: string, currentActorId?: string | null, ownFiles?: readonly string[]): ActiveWorkSummary;
-export declare function inspectFreshTaskReservationForTask(cwd: string, task: ImportedTaskSummary, currentActorId: string | null | undefined, now: number, currentLaneSessionId?: string | null | undefined): ActiveWorkSummary['freshReservations'][number] | null;
+export declare function inspectFreshTaskReservationForTask(cwd: string, task: ImportedTaskSummary, currentActorId: string | null | undefined, now: number): ActiveWorkSummary['freshReservations'][number] | null;
 export declare function normalizeWorkPath(value: string): string;
 export declare function mentionsNotCurrentTask(prompt: string): boolean;

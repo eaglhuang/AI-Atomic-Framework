@@ -10,7 +10,7 @@
  * schema and rendering live here so regressions can pin the shape.
  */
 import type { BrokerArbitrationVerdict } from '../../../../core/src/broker/conflict-matrix.ts';
-import type { ClaimAdmissionCidVerdict, ClaimAdmissionDecision, ClaimOwnerComparison } from './claim-admission.ts';
+import type { ClaimAdmissionCidVerdict, ClaimAdmissionDecision } from './claim-admission.ts';
 import type { BrokerQueueAdmission } from './broker-queue-admission.ts';
 export interface ClaimAdmissionGateOutcome {
     readonly gate: string;
@@ -34,7 +34,6 @@ export interface ClaimAdmissionDecisionLog {
             readonly position: number;
         }[];
     };
-    readonly ownerComparison: ClaimOwnerComparison | null;
     readonly privatePathAllowance: {
         readonly granted: boolean;
         readonly allowedFileCount: number;
@@ -44,7 +43,7 @@ export interface ClaimAdmissionDecisionLog {
     readonly admissionReason: string | null;
 }
 /** Stable top-level key order; the atomization regression pins this list. */
-export declare const CLAIM_ADMISSION_DECISION_LOG_KEYS: readonly ["schemaId", "taskId", "conflictTaskId", "gates", "sharedPathOrder", "queue", "ownerComparison", "privatePathAllowance", "admitted", "blockReason", "admissionReason"];
+export declare const CLAIM_ADMISSION_DECISION_LOG_KEYS: readonly ["schemaId", "taskId", "conflictTaskId", "gates", "sharedPathOrder", "queue", "privatePathAllowance", "admitted", "blockReason", "admissionReason"];
 /** The seven gate names, in fixed evaluation order; regressions pin this. */
 export declare const CLAIM_ADMISSION_GATE_NAMES: readonly ["claim-intent", "active-write-conflict", "broker-confirmation", "mutation-intent", "cid-verdict", "queue-admission", "broker-verdict"];
 export interface ClaimAdmissionDecisionLogInput {
@@ -59,7 +58,6 @@ export interface ClaimAdmissionDecisionLogInput {
     readonly queueAdmission: BrokerQueueAdmission | null;
     readonly overlappingFiles: readonly string[];
     readonly decision: ClaimAdmissionDecision;
-    readonly ownerComparison?: ClaimOwnerComparison | null;
     readonly admissionReason: string | null;
 }
 export declare function buildClaimAdmissionDecisionLog(input: ClaimAdmissionDecisionLogInput): ClaimAdmissionDecisionLog;

@@ -1,14 +1,5 @@
 import type { TaskClaimRecord } from '@ai-atomic-framework/core';
-export interface ClaimLaneSessionMetadata {
-    readonly laneSessionId: string;
-    readonly status: string;
-    readonly source: string;
-    readonly exportHint: string;
-}
-export type TaskClaimRecordWithLane = TaskClaimRecord & {
-    readonly laneSession?: ClaimLaneSessionMetadata;
-};
-export declare function parseClaimRecord(value: unknown): TaskClaimRecordWithLane | null;
+export declare function parseClaimRecord(value: unknown): TaskClaimRecord | null;
 export declare function createClaimRecord(input: {
     taskId: string;
     actorId: string;

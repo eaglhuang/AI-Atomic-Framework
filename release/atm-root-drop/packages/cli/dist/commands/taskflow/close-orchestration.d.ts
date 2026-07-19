@@ -3,7 +3,7 @@ import type { TaskResidueBucket, TaskResidueClassification } from '../tasks/publ
 import { type TaskflowCloseBackend, type TaskflowCloseMode } from '../tasks/surface-invariants.ts';
 import { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestPathForTask, evidenceBundleManifestRelativePath, readEvidenceBundleManifest, type EvidenceBundleManifest } from '../evidence.ts';
 import { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory, type DirectoryDeliverableExpansion, type DirectoryDeliverableManifestEntry } from '../tasks/historical-delivery.ts';
-export type ClosebackPlanningPathRoute = 'source-plan-path' | 'task-direction-fallback' | 'profile-root-fallback' | 'ledger-only-target' | 'missing' | 'ambiguous';
+export type ClosebackPlanningPathRoute = 'source-plan-path' | 'task-direction-fallback' | 'profile-root-fallback' | 'missing' | 'ambiguous';
 export interface ClosebackPlanningPathResolution {
     route: ClosebackPlanningPathRoute;
     planningMirrorPath: string | null;

@@ -5,7 +5,6 @@ export interface TaskflowCloseKnownBlocker {
     readonly code: string;
     readonly summary: string;
     readonly requiredCommand: string | null;
-    readonly files?: readonly string[];
     readonly multiTaskCloseRecipe?: string | null;
 }
 export declare function buildSharedDeliveryWaiverCommand(input: {

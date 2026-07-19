@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -7,6 +7,7 @@ import { CliError, makeResult, message } from '../shared.js';
 import { planWaveBrokerBatch } from '../../../../core/dist/broker/wave-broker-scheduler.js';
 import { planSharedDeliveryCommit } from '../../../../core/dist/broker/shared-delivery-commit.js';
 import { planWaveGeneratedWrite } from '../../../../core/dist/broker/wave-generated-executor.js';
+import { assertRecordCommitPayloadPresent } from '../git-governance/record-commit-payload-assertion.js';
 function readJson(pathName) {
     if (!existsSync(pathName)) {
         throw new CliError('ATM_BROKER_SCHEDULER_MISSING', `Wave broker scheduler document does not exist: ${pathName}`, { exitCode: 2 });
@@ -22,6 +23,68 @@ function currentHead(cwd) {
         });
     }
     return result.stdout.trim();
+}
+function runGit(cwd, args, env = {}) {
+    const result = spawnSync('git', args, {
+        cwd,
+        encoding: 'utf8',
+        env: { ...process.env, ...env },
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+    if (result.status !== 0) {
+        throw new CliError('ATM_BROKER_BATCH_COMMIT_BLOCKED', `git ${args.join(' ')} failed while executing shared delivery commit.`, {
+            exitCode: 1,
+            details: { args, stdout: result.stdout, stderr: result.stderr }
+        });
+    }
+    return result.stdout.trim();
+}
+function uniqueSorted(values) {
+    return [...new Set(values.map((value) => value.replace(/\\/g, '/').replace(/^\.\//, '').trim()).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+}
+function executeTemporaryIndexCommit(input) {
+    const files = uniqueSorted(input.files);
+    if (files.length === 0) {
+        throw new CliError('ATM_BROKER_BATCH_COMMIT_BLOCKED', 'Shared delivery commit apply requires at least one payload file.', {
+            exitCode: 1,
+            details: { taskIds: input.taskIds }
+        });
+    }
+    const env = { GIT_INDEX_FILE: input.temporaryIndexPath };
+    runGit(input.cwd, ['read-tree', input.expectedHeadSha], env);
+    runGit(input.cwd, ['add', '-A', '-f', '--', ...files], env);
+    const treeSha = runGit(input.cwd, ['write-tree'], env);
+    const headTreeSha = runGit(input.cwd, ['rev-parse', `${input.expectedHeadSha}^{tree}`]);
+    if (treeSha === headTreeSha) {
+        throw new CliError('ATM_BROKER_BATCH_COMMIT_BLOCKED', 'Shared delivery commit payload produced no tree changes.', {
+            exitCode: 1,
+            details: { taskIds: input.taskIds, files }
+        });
+    }
+    const commitSha = runGit(input.cwd, [
+        'commit-tree',
+        treeSha,
+        '-p',
+        input.expectedHeadSha,
+        '-m',
+        `shared-delivery: commit ${input.taskIds.join(', ')}`
+    ], {
+        ...env,
+        GIT_AUTHOR_NAME: input.actorId,
+        GIT_AUTHOR_EMAIL: `${input.actorId}@atm.local`,
+        GIT_COMMITTER_NAME: input.actorId,
+        GIT_COMMITTER_EMAIL: `${input.actorId}@atm.local`
+    });
+    runGit(input.cwd, ['update-ref', 'HEAD', commitSha, input.expectedHeadSha]);
+    return {
+        commitSha,
+        payloadAssertion: assertRecordCommitPayloadPresent({
+            cwd: input.cwd,
+            commitSha,
+            expectedStagedFiles: files
+        })
+    };
 }
 function parseFileSlices(entries, fallbackTasks, fallbackFiles) {
     const slices = {};
@@ -125,24 +188,38 @@ export function handleBrokerBatchExecute(options, context) {
     const tempIndexDir = mkdtempSync(path.join(tmpdir(), 'atm-shared-delivery-index-'));
     const temporaryIndexPath = path.join(tempIndexDir, 'index');
     const stagedFiles = options.scopeFiles.length > 0 ? options.scopeFiles : [];
+    const fileSlices = parseFileSlices(options.fileSlices, taskIds, stagedFiles);
+    const payloadFiles = uniqueSorted(Object.values(fileSlices).flat());
+    const expectedHead = options.expectedHeadSha ?? options.currentHeadSha ?? currentHead(options.cwd);
+    const applied = options.apply
+        ? executeTemporaryIndexCommit({
+            cwd: options.cwd,
+            actorId: options.actorId,
+            taskIds,
+            expectedHeadSha: expectedHead,
+            temporaryIndexPath,
+            files: payloadFiles
+        })
+        : null;
     const plan = planSharedDeliveryCommit({
         decision,
         scheduler,
         actorId: options.actorId,
         manifestDigest: options.manifestDigest,
         sealedBaseSha: options.sealedSourceSha,
-        currentHeadSha: options.currentHeadSha ?? currentHead(options.cwd),
-        expectedHeadSha: options.expectedHeadSha,
+        currentHeadSha: applied?.commitSha ?? options.currentHeadSha ?? currentHead(options.cwd),
+        expectedHeadSha: applied ? null : options.expectedHeadSha,
         claimedTaskIds: options.claimedTasks.length > 0 ? options.claimedTasks : taskIds,
         validatorTaskIds: options.validatorTasks,
         stagedFiles,
-        fileSlices: parseFileSlices(options.fileSlices, taskIds, stagedFiles),
+        fileSlices,
+        commitSha: applied?.commitSha ?? null,
         temporaryIndexPath
     });
     const receiptPath = options.evidenceOutPath && plan.receipt
         ? writeReceipt(options.cwd, options.evidenceOutPath, plan.receipt)
         : null;
-    return makeResult({
+    const result = makeResult({
         ok: plan.ok,
         command: 'broker',
         cwd: options.cwd,
@@ -159,7 +236,10 @@ export function handleBrokerBatchExecute(options, context) {
             decision,
             plan,
             receiptPath,
-            temporaryIndexPath
+            temporaryIndexPath,
+            payloadAssertion: applied?.payloadAssertion ?? null
         }
     });
+    rmSync(tempIndexDir, { recursive: true, force: true });
+    return result;
 }

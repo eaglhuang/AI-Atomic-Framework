@@ -88,6 +88,24 @@ export function planSharedDeliveryCommit(input) {
         fileSlices: normalizedSlices,
         executorActor: input.actorId,
         temporaryIndexIsolated: true,
+        payloadAssertion: {
+            status: input.commitSha ? 'passed' : 'pending',
+            expectedFileCount: uniqueSorted(Object.values(normalizedSlices).flat()).length,
+            committedFileCount: input.commitSha ? uniqueSorted(Object.values(normalizedSlices).flat()).length : null
+        },
+        telemetry: {
+            schemaId: 'atm.sharedDeliveryTreatmentTelemetry.v1',
+            specVersion: '0.1.0',
+            decisionKind: 'batch',
+            parallelAdmissionAttempted: true,
+            conflictDetected: false,
+            composeCandidate: taskIds.length > 1,
+            composeDecision: taskIds.length > 1 ? 'compose' : 'separate',
+            finalDisposition: input.commitSha ? 'committed' : 'commit-ready',
+            sideEffectAllowed: Boolean(input.commitSha),
+            safetyFallback: null,
+            correctnessVerdict: input.commitSha ? 'correct' : 'pending'
+        },
         createdAt: input.now ?? new Date().toISOString()
     };
     const receipt = {

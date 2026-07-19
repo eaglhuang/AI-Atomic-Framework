@@ -43,7 +43,6 @@ export interface ToolBridgeProjection {
     allowedCommands?: readonly string[];
     blockedCommands?: readonly string[];
     skillGrowth?: Record<string, unknown> | null;
-    laneSession?: Record<string, unknown> | null;
 }
 export type CliResultSeverity = 'success' | 'advisory' | 'blocked' | 'usage-error' | 'failure';
 export interface CliResultDiagnostics {

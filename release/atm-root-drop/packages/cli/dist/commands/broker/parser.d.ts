@@ -1,14 +1,12 @@
 import type { PatchProposal } from '../../../../core/src/broker/types.ts';
 export interface ParsedBrokerOptions {
     readonly cwd: string;
-    readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | null;
+    readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | null;
     readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
     readonly stewardAction: 'plan' | 'apply' | null;
     readonly runtimeAction: 'activate' | null;
     readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | 'release' | null;
     readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;
-    readonly scheduleAction: 'enqueue' | 'plan' | 'status' | null;
-    readonly batchAction: 'execute' | null;
     readonly task: string | null;
     readonly actorId: string | null;
     readonly sealedSourceSha: string | null;
@@ -16,15 +14,6 @@ export interface ParsedBrokerOptions {
     readonly receiptRef: string | null;
     readonly receiptDigest: string | null;
     readonly projectionKey: string | null;
-    readonly waveId: string | null;
-    readonly surfaceKind: 'commit' | 'build' | 'runner-sync' | 'projection' | 'checkpoint' | null;
-    readonly surfaceFamily: string | null;
-    readonly payloadDigest: string | null;
-    readonly manifestDigest: string | null;
-    readonly currentHeadSha: string | null;
-    readonly expectedHeadSha: string | null;
-    readonly expectedTasks: readonly string[];
-    readonly collectionTimeoutMs: number;
     readonly intentFile: string | null;
     readonly freezeId: string | null;
     readonly ttlSeconds: number;
@@ -35,9 +24,6 @@ export interface ParsedBrokerOptions {
     readonly proposalStorePath: string | null;
     readonly mergePlanFile: string | null;
     readonly scopeFiles: readonly string[];
-    readonly claimedTasks: readonly string[];
-    readonly validatorTasks: readonly string[];
-    readonly fileSlices: readonly string[];
     readonly stewardId: string | null;
     readonly evidenceOutPath: string | null;
     readonly requestFiles: readonly string[];

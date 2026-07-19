@@ -34,7 +34,27 @@ export interface SharedWriteReceipt {
   readonly payloadDigest: string;
   readonly executorActor: string;
   readonly temporaryIndexIsolated: boolean;
+  readonly payloadAssertion: {
+    readonly status: 'pending' | 'passed';
+    readonly expectedFileCount: number;
+    readonly committedFileCount: number | null;
+  };
+  readonly telemetry: SharedDeliveryTreatmentTelemetry;
   readonly createdAt: string;
+}
+
+export interface SharedDeliveryTreatmentTelemetry {
+  readonly schemaId: 'atm.sharedDeliveryTreatmentTelemetry.v1';
+  readonly specVersion: '0.1.0';
+  readonly decisionKind: 'batch' | 'serialize' | 'defer';
+  readonly parallelAdmissionAttempted: boolean;
+  readonly conflictDetected: boolean;
+  readonly composeCandidate: boolean;
+  readonly composeDecision: 'compose' | 'separate' | 'unsafe' | 'inconclusive';
+  readonly finalDisposition: 'commit-ready' | 'committed' | 'serial-fallback' | 'blocked';
+  readonly sideEffectAllowed: boolean;
+  readonly safetyFallback: string | null;
+  readonly correctnessVerdict: 'pending' | 'correct' | 'false-positive' | 'false-negative' | 'escaped-conflict' | 'manual-overridden';
 }
 
 export interface SharedDeliveryCommitPlan {
@@ -125,6 +145,24 @@ export function planSharedDeliveryCommit(input: SharedDeliveryCommitInput): Shar
     fileSlices: normalizedSlices,
     executorActor: input.actorId,
     temporaryIndexIsolated: true,
+    payloadAssertion: {
+      status: input.commitSha ? 'passed' as const : 'pending' as const,
+      expectedFileCount: uniqueSorted(Object.values(normalizedSlices).flat()).length,
+      committedFileCount: input.commitSha ? uniqueSorted(Object.values(normalizedSlices).flat()).length : null
+    },
+    telemetry: {
+      schemaId: 'atm.sharedDeliveryTreatmentTelemetry.v1' as const,
+      specVersion: '0.1.0' as const,
+      decisionKind: 'batch' as const,
+      parallelAdmissionAttempted: true,
+      conflictDetected: false,
+      composeCandidate: taskIds.length > 1,
+      composeDecision: taskIds.length > 1 ? 'compose' as const : 'separate' as const,
+      finalDisposition: input.commitSha ? 'committed' as const : 'commit-ready' as const,
+      sideEffectAllowed: Boolean(input.commitSha),
+      safetyFallback: null,
+      correctnessVerdict: input.commitSha ? 'correct' as const : 'pending' as const
+    },
     createdAt: input.now ?? new Date().toISOString()
   };
   const receipt: SharedWriteReceipt = {

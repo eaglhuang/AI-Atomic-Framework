@@ -1,12 +1,8 @@
-import { type BrokerBatchEvidence } from './related-task-batching.ts';
 export type GeneratedProjectionRequestInput = {
     readonly taskId: string;
     readonly actorId: string;
     readonly projectionKey: string;
     readonly sourceItemPaths: readonly string[];
-    readonly waveId?: string | null;
-    readonly surfaceFamily?: string | null;
-    readonly validators?: readonly string[];
     readonly createdAt?: string;
     readonly heartbeatAt?: string;
     readonly ttlSeconds?: number;
@@ -16,9 +12,6 @@ export type GeneratedProjectionRequest = {
     readonly actorId: string;
     readonly projectionKey: string;
     readonly sourceItemPaths: readonly string[];
-    readonly waveId: string | null;
-    readonly surfaceFamily: string;
-    readonly validators: readonly string[];
     readonly createdAt: string;
     readonly heartbeatAt: string;
     readonly expiresAt: string;
@@ -44,23 +37,7 @@ export type GeneratedProjectionEnqueueResult = {
     readonly queuePosition: number;
     readonly sourceItemPaths: readonly string[];
     readonly suggestedNextAction: string;
-    readonly brokerTicket: GeneratedProjectionBrokerTicket;
     readonly queue: GeneratedProjectionStewardDocument;
-};
-export type GeneratedProjectionBrokerTicket = {
-    readonly schemaId: 'atm.brokerTicket.v1';
-    readonly ticketId: string;
-    readonly position: number;
-    readonly headOwner: string | null;
-    readonly headHealth: 'task-active';
-    readonly batchEligible: boolean;
-    readonly waveId?: string | null;
-    readonly surfaceFamily?: string;
-    readonly batch?: BrokerBatchEvidence | null;
-    readonly enqueuedAt: string;
-    readonly waitedMs: number;
-    readonly sharedSurface: string;
-    readonly scopeClass: readonly string[];
 };
 export type GeneratedProjectionCleanupResult = {
     readonly schemaId: 'atm.generatedProjectionStewardCleanupResult.v1';
