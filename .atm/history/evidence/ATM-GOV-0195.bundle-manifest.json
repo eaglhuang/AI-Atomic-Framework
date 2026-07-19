@@ -1,0 +1,94 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0195",
+  "updatedAt": "2026-07-19T13:54:21.747Z",
+  "updatedBy": "codex-governance-optimizer",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:gate-telemetry-coverage"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1dcf3ebbe05c537258eb750b4bd0e12cd17b932b5c9ab9f6428eb9450b2aac9d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:gate-telemetry-coverage"
+      ],
+      "generatedAt": "2026-07-19T13:51:28.514Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:84ca8f95d1a4c15fdccb8b85d54446fef1c30faf25e7580f2b1a64dafea3e1c0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts"
+      ],
+      "generatedAt": "2026-07-19T13:51:33.156Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-19T13:51:55.155Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ec28dbdd63dac80be7dbcfab374dbbeab64865b131f3a777ceba90d42fe096a",
+      "stderrSha256": "sha256:526ca567e5a00bf7dfa6a2ff158e3653f4dfa1f7bbd7431a1c24868622739f73",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-19T13:52:06.964Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1dcf3ebbe05c537258eb750b4bd0e12cd17b932b5c9ab9f6428eb9450b2aac9d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:gate-telemetry-coverage"
+      ],
+      "generatedAt": "2026-07-19T13:54:13.721Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:84ca8f95d1a4c15fdccb8b85d54446fef1c30faf25e7580f2b1a64dafea3e1c0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts"
+      ],
+      "generatedAt": "2026-07-19T13:54:22.028Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

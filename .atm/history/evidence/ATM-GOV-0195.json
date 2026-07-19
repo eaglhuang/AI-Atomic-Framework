@@ -1,0 +1,312 @@
+{
+  "taskId": "ATM-GOV-0195",
+  "updatedAt": "2026-07-19T13:54:21.747Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+      "createdAt": "2026-07-19T13:51:28.360Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:gate-telemetry-coverage"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.gate-telemetry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:1dcf3ebbe05c537258eb750b4bd0e12cd17b932b5c9ab9f6428eb9450b2aac9d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:gate-telemetry-coverage"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+            "cacheKey": "sha256:2afec993a320ca59e37940d216b0b7aa353f93e719686b1b777e2de941213d9e",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:51:28.514Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b68b77cfec4a25dac6b0de74ac4f2c3b23e08aa27b3d30c244c0cd51794ef1bc",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+      "createdAt": "2026-07-19T13:51:32.825Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.gate-telemetry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:84ca8f95d1a4c15fdccb8b85d54446fef1c30faf25e7580f2b1a64dafea3e1c0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+            "cacheKey": "sha256:b922267f12733dfd724c494b89d97ca6275d197802014a0914635b6acdf51bc7",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:51:33.156Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f5043a8efaebdca0b720a3ee064535e3685604d85955e8e023306a6471894831",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+      "createdAt": "2026-07-19T13:51:54.925Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.gate-telemetry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+            "cacheKey": "sha256:d1390e171c56d011506f9986f856707e9170e6e0cd813c8de9a28d3ed0726001",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:51:55.155Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5eb5c438860db38aa73e7f0b2849ed5b2ab68a70073da31f294fb72b02166d30",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+      "createdAt": "2026-07-19T13:52:06.804Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.gate-telemetry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6ec28dbdd63dac80be7dbcfab374dbbeab64865b131f3a777ceba90d42fe096a",
+            "stderrSha256": "sha256:526ca567e5a00bf7dfa6a2ff158e3653f4dfa1f7bbd7431a1c24868622739f73",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+            "cacheKey": "sha256:f91e076653f2cf80a46d120d071136de9f6855c8a6eac711d860e923441802b3",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:52:06.964Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:9b419ae631eba9f51231106fcde5cd33de0154b731cfbaa70e6c35b28bcfa547",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+      "createdAt": "2026-07-19T13:54:13.562Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:gate-telemetry-coverage"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.gate-telemetry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:1dcf3ebbe05c537258eb750b4bd0e12cd17b932b5c9ab9f6428eb9450b2aac9d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:gate-telemetry-coverage"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+            "cacheKey": "sha256:2afec993a320ca59e37940d216b0b7aa353f93e719686b1b777e2de941213d9e",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:54:13.721Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b68b77cfec4a25dac6b0de74ac4f2c3b23e08aa27b3d30c244c0cd51794ef1bc",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+      "createdAt": "2026-07-19T13:54:21.747Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.gate-telemetry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:84ca8f95d1a4c15fdccb8b85d54446fef1c30faf25e7580f2b1a64dafea3e1c0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+            "cacheKey": "sha256:b922267f12733dfd724c494b89d97ca6275d197802014a0914635b6acdf51bc7",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:54:22.028Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f5043a8efaebdca0b720a3ee064535e3685604d85955e8e023306a6471894831",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

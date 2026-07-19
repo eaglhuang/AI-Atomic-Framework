@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0195",
+  "title": "Gate telemetry coverage repair and M2 preflight",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0193"
+  ],
+  "acceptance": [
+    "Coverage validator 能列出全部 required node families，並對每個 node 產生明確 coverage status。",
+    "Coverage report 能輸出 `m2PreflightVerdict`，0190 可直接消費。",
+    "缺事件與缺節點只標 `observability-missing` / `source: unavailable` / `not-yet-covered`，不被解讀成零成本或成功。",
+    "Runtime raw telemetry/log/stat/counter 不進 Git；tracked evidence 只保存 compact digest/report/decision receipt。",
+    "本卡 close 前 seal 自身 `atm.gateTelemetryTaskSummary.v1`，並附 history/config digest。",
+    "若 coverage 無法補齊，close report 必須明確說明 0190 應輸出 `inconclusive` 或等待 owner 裁決。"
+  ],
+  "deliverables": [
+    "packages/core/src/telemetry/**",
+    "packages/cli/src/commands/telemetry.ts",
+    "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+    "packages/cli/src/commands/taskflow/**",
+    "packages/cli/src/commands/batch/**",
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/team/**",
+    "scripts/validate-gate-telemetry-coverage.ts",
+    "tests/cli/gate-telemetry-coverage-repair.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/telemetry/**",
+    "packages/cli/src/commands/telemetry.ts",
+    "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+    "packages/cli/src/commands/taskflow/**",
+    "packages/cli/src/commands/batch/**",
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/team/**",
+    "scripts/validate-gate-telemetry-coverage.ts",
+    "tests/cli/gate-telemetry-coverage-repair.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+    "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.gate-telemetry",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.gate-telemetry-coverage",
+        "pattern": "Coverage Validator",
+        "source": "packages/core/src/telemetry/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0195-gate-telemetry-coverage-repair-and-m2-preflight.task.md",
+    "sectionTitle": "ATM-GOV-0195",
+    "headingLine": 56,
+    "hash": "656bf34737b03eb4",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0195-gate-telemetry-coverage-repair-and-m2-preflight.task.md",
+      "planningCommitSha": "eb5d3df4f50c08701f47e7bc2d920c52156c5130",
+      "contentDigest": "sha256:656bf34737b03eb4ea3dd0445032a5fbd422e545a5084c11668736306067e3af",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T13:48:40.447Z"
+    }
+  },
+  "importedAt": "2026-07-19T13:48:40.447Z",
+  "lastTransitionId": "2026-07-19T13-54-43-573Z-scope-amendment-8bcbc0eeb25e",
+  "lastTransitionAt": "2026-07-19T13:54:43.573Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-governance-optimizer",
+  "reservedAt": "2026-07-19T13:48:47.364Z",
+  "promotedAt": "2026-07-19T13:48:47.366Z",
+  "claim": {
+    "actorId": "codex-governance-optimizer",
+    "leaseId": "lease-5534769cf087",
+    "claimedAt": "2026-07-19T13:48:47.370Z",
+    "heartbeatAt": "2026-07-19T13:48:47.370Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0195.*",
+      ".atm/history/task-events/ATM-GOV-0195/**",
+      ".atm/history/tasks/ATM-GOV-0195.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/team/**",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "scripts/validate-gate-telemetry-coverage.ts",
+      "tests/cli/gate-telemetry-coverage-repair.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260719134847-codex-governance-optimizer-ef8a433602",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719134847-codex-governance-optimizer-ef8a433602\""
+    }
+  },
+  "startedAt": "2026-07-19T13:48:47.370Z",
+  "startedByActor": "codex-governance-optimizer",
+  "startedBySessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0195",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0195.*",
+      ".atm/history/task-events/ATM-GOV-0195/**",
+      ".atm/history/tasks/ATM-GOV-0195.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/team/**",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "scripts/validate-gate-telemetry-coverage.ts",
+      "tests/cli/gate-telemetry-coverage-repair.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0195-gate-telemetry-coverage-repair-and-m2-preflight.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0195-gate-telemetry-coverage-repair-and-m2-preflight.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "b5968477622bb3f2a4e3cbf76e2aafe65373775ff4dc40ce34cc288a835ee347",
+    "actorId": "codex-governance-optimizer",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260719134847-codex-governance-optimizer-ef8a433602",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719134847-codex-governance-optimizer-ef8a433602\""
+    },
+    "createdAt": "2026-07-19T13:48:51.853Z",
+    "status": "active"
+  }
+}
