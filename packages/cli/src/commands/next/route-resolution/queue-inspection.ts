@@ -273,9 +273,10 @@ export function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | n
   profile.mark('dedupe-tasks');
 
   const tasks = allTasks
-    .filter((task) => isTaskRoutable(task.status, taskIntent)
+    .filter((task) => !isTerminalImportedTask(task)
+      && (isTaskRoutable(task.status, taskIntent)
       || isTaskExplicitlyMentioned(task, taskIntent)
-      || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && isActiveClaimedTask(task)))
+      || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && isActiveClaimedTask(task))))
     .sort((left, right) => {
       const statusWeight = statusQueueWeight(left.status) - statusQueueWeight(right.status);
       return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
@@ -427,6 +428,14 @@ export function shouldSkipMarkdownTaskDiscovery(
   }
   const promptScopedJsonRoute = resolvePromptScopedTaskRoute(cwd, jsonTasks, taskIntent);
   return Boolean(promptScopedJsonRoute && promptScopedJsonRoute.selectedTasks.length > 0);
+}
+
+function isTerminalImportedTask(task: ImportedTaskSummary): boolean {
+  const status = normalizeTaskRouteStatus(task.status);
+  return status === 'done'
+    || status === 'abandoned'
+    || Boolean(task.closedAt)
+    || Boolean(task.closedByActor);
 }
 
 export function selectImportedTaskForPromptScope(
