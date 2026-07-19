@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T14-40-09-509Z-close-df4a5f5a3489",
+  "taskId": "ATM-GOV-0190",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719142345-codex-governance-optimizer-ATM-GOV-0190-b953f5d40f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0190.json",
+  "taskSha256": "sha256:6d68dbf73be020926df1c9aeb40d495cda5211e62898e1c91550c67d02405a9f",
+  "createdAt": "2026-07-19T14:40:09.509Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0190 --actor codex-governance-optimizer --status done --historical-delivery ffdbb13b8daee730095617fe03b75e63d854500a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719142345-codex-governance-optimizer-ATM-GOV-0190-b953f5d40f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0190.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/real-paired-ab-analyzer-v3.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T14:40:09.496Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0190.*",
+        ".atm/history/task-events/ATM-GOV-0190/**",
+        ".atm/history/tasks/ATM-GOV-0190.json",
+        "docs/reports/captain-parallel-ledger-analysis.md",
+        "packages/cli/src/commands/batch/**",
+        "scripts/analyze-captain-parallel-ledger.ts",
+        "scripts/captain-parallel-ledger-report.ts",
+        "scripts/fixtures/auto-batch-analyzer/**",
+        "scripts/plan-performance-report-v3.ts",
+        "tests/cli/real-paired-ab-analyzer-v3.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/**",
+        "scripts/analyze-captain-parallel-ledger.ts",
+        "scripts/captain-parallel-ledger-report.ts",
+        "scripts/fixtures/auto-batch-analyzer/**",
+        "scripts/plan-performance-report-v3.ts",
+        "tests/cli/real-paired-ab-analyzer-v3.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

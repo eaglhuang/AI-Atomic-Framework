@@ -1,0 +1,163 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0190",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "ffdbb13b8daee730095617fe03b75e63d854500a",
+  "governedTreeSha": "a3e20c00091d489718310968a5f3ba30d6ac444c",
+  "targetCommitDelta": {
+    "currentCommitSha": "ffdbb13b8daee730095617fe03b75e63d854500a",
+    "parentCommitShas": [
+      "ffdbb13b8daee730095617fe03b75e63d854500a"
+    ],
+    "governedTreeSha": "a3e20c00091d489718310968a5f3ba30d6ac444c",
+    "changedFiles": [
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/auto-batch-analyzer/coverage-ready.json",
+      "scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-00-00-000Z-control.json",
+      "scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-01-00-000Z-treatment.json",
+      "scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-02-00-000Z-shadow.json",
+      "scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-03-00-000Z-parity.json",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/real-paired-ab-analyzer-v3.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/real-paired-ab-analyzer-v3.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:4b1d277e8792a0e1e9662d734cd76f92b1676f740b146426199ef54201e8bdea",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:7d3e08d42e8a4933b0ffb6b49cc116871e8a76667eb6984f0a379778b71b7bce",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/real-paired-ab-analyzer-v3.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-19T14:40:09.496Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0190.*",
+      ".atm/history/task-events/ATM-GOV-0190/**",
+      ".atm/history/tasks/ATM-GOV-0190.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/**",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/real-paired-ab-analyzer-v3.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/**",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/real-paired-ab-analyzer-v3.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0190.json",
+  "closedAt": "2026-07-19T14:40:09.496Z",
+  "closedByActor": "codex-governance-optimizer",
+  "sessionId": "session-20260719142345-codex-governance-optimizer-ATM-GOV-0190-b953f5d40f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "ffdbb13b8daee730095617fe03b75e63d854500a",
+    "taskMatchedFiles": [
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/auto-batch-analyzer/coverage-ready.json",
+      "scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-00-00-000Z-control.json",
+      "scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-01-00-000Z-treatment.json",
+      "scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-02-00-000Z-shadow.json",
+      "scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-03-00-000Z-parity.json",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/real-paired-ab-analyzer-v3.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0190.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0190/2026-07-19T14-23-34-547Z-import-c6a866209f79.json",
+      ".atm/history/task-events/ATM-GOV-0190/2026-07-19T14-23-45-395Z-reserve-4aedb1945a00.json",
+      ".atm/history/task-events/ATM-GOV-0190/2026-07-19T14-23-45-397Z-promote-7615265b9155.json",
+      ".atm/history/task-events/ATM-GOV-0190/2026-07-19T14-23-51-999Z-claim-4c0435093a4f.json",
+      ".atm/history/task-events/ATM-GOV-0190/2026-07-19T14-34-51-798Z-scope-amendment-7521ad48b662.json",
+      ".atm/history/tasks/ATM-GOV-0190.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
