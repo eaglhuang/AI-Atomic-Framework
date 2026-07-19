@@ -2,9 +2,11 @@
   "schemaVersion": "atm.onefileRelease.v0.2",
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "entrypoint": "atm.mjs",
-  "payloadSha256": "432688c7f12d6dfab074ab5d572ea979932d73ecf6853276079a7e7d6eb0e114",
+  "payloadSha256": "8637f51ed8fe8aef8aa5da485c40c4e400eee21463d41796031637d14b8f9451",
+  "payloadInputManifestHash": "sha256:94d570589f7b100e6a9d717e2c8b2747abdcbfb8916e732b5aa41be27a1ce15a",
+  "payloadReuse": false,
   "sourceRoot": "release/atm-root-drop",
-  "fileCount": 2141,
+  "fileCount": 2142,
   "generatedFiles": [
     "release/atm-onefile/README.onefile.md",
     "release/atm-onefile/atm.mjs",
@@ -23,18 +25,21 @@
     "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
     "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
   },
-  "buildInputsTreeHash": "sha256:ac7e33d7cff6e2159fd614c9f9faa5df65fe31886bfa999199bb06751208e103",
-  "sealedSourceCommit": "3e60d035ccb5c8f71c6d6ee1f5c6001db5530405",
-  "buildDecision": "cache-miss-build",
+  "buildInputsTreeHash": "sha256:ad9cf40a4fa02d6caf317d0d4d79fcc5d7302710cddb6d347ba4479cdc2cb585",
+  "sealedSourceCommit": "ca21936e907e5a66bf2893762148862cdcb11036",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:12ee20b2bce49e5a71ae38268a219596432731e4305d8d783c5075dc9464ea6a",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 44,
-    "skipDecision": 3,
-    "worktreeSetup": 10028,
-    "typescriptBuild": 15478,
-    "rootDropReleaseAssembly": 7151,
-    "onefileReleaseAssembly": 1854,
-    "artifactSync": 7646,
+    "inputHashCalculation": 42,
+    "skipDecision": 37,
+    "worktreeSetup": 8954,
+    "typescriptBuild": 17601,
+    "rootDropReleaseAssembly": 6854,
+    "onefileReleaseAssembly": 1484,
+    "artifactSync": 7764,
     "cleanup": 0,
-    "totalElapsed": 42479
+    "totalElapsed": 43127
   }
 }

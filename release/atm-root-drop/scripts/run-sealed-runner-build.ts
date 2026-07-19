@@ -20,9 +20,18 @@ import {
   inspectRunnerSyncAdmission,
   type RunnerSyncAdmissionReport
 } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
+import {
+  digestJson,
+  phaseTimingsRecord,
+  planRunnerIncrementalBuild,
+  syncDirectoryHashChanged,
+  writeRunnerBuildRuntimeTelemetry,
+  type RunnerIncrementalBuildPlan
+} from './runner-sync-incremental-build.ts';
 
-type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
-type BuildDecision = 'built' | 'cache-hit-skip' | 'cache-miss-build';
+export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
+export type BuildDecision = 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
+export { planRunnerIncrementalBuild, type RunnerIncrementalBuildPlan } from './runner-sync-incremental-build.ts';
 
 export type RunnerSyncReceipt = {
   readonly schemaId: 'atm.runnerSyncReceipt.v1';
@@ -35,6 +44,9 @@ export type RunnerSyncReceipt = {
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
+  readonly decisionReason: string;
+  readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
+  readonly runtimeTelemetryRef: string | null;
   readonly phaseTimingsMs: {
     readonly inputHashCalculation: number;
     readonly skipDecision: number;
@@ -45,6 +57,16 @@ export type RunnerSyncReceipt = {
     readonly artifactSync: number;
     readonly cleanup: number;
     readonly totalElapsed: number;
+  };
+  readonly treatmentTelemetry: {
+    readonly schemaId: 'atm.generatedWriteTreatmentTelemetry.v1';
+    readonly executionMode: 'cache-hit-skip' | 'command-executed';
+    readonly commandExecuted: boolean;
+    readonly outputObserved: boolean;
+    readonly receiptValidity: 'valid';
+    readonly buildDecision: BuildDecision;
+    readonly phaseTimingsMs: Readonly<Record<string, number>>;
+    readonly rawTelemetryPolicy: 'gitignored-runtime-only';
   };
   readonly publishedAt: string;
 };
@@ -144,12 +166,15 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     buildTarget,
     buildInputsTreeHash
   }));
-  if (cacheDecision.decision === 'cache-hit-skip') {
+  if (cacheDecision.decision === 'cacheHitSkip') {
     timePhase(timings, 'artifactSyncMs', () => writeBuildMetadataToReleaseManifests({
       cwd: repoRoot,
       sealedSourceSha,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
+      decisionReason: cacheDecision.reason,
+      incrementalPlan: null,
+      runtimeTelemetryRef: null,
       timings
     }));
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
@@ -158,6 +183,20 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       sealedSourceSha,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
+      decisionReason: cacheDecision.reason,
+      incrementalPlan: null,
+      runtimeTelemetryRef: null,
+      timings
+    });
+    const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
+      cwd: repoRoot,
+      actorId,
+      sealedSourceSha,
+      buildTarget,
+      buildInputsTreeHash,
+      buildDecision: cacheDecision.decision,
+      decisionReason: cacheDecision.reason,
+      incrementalPlan: null,
       timings
     });
     writeRunnerSyncReceipt({
@@ -168,11 +207,25 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       buildTarget,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
+      decisionReason: cacheDecision.reason,
+      incrementalPlan: null,
+      runtimeTelemetryRef,
       timings
     });
-    console.log(`[sealed-runner-build] cache-hit-skip ${buildTarget} from ${sealedSourceSha}`);
+    console.log(`[sealed-runner-build] cacheHitSkip ${buildTarget} from ${sealedSourceSha}`);
     return;
   }
+
+  const incrementalPlan = timePhase(timings, 'skipDecisionMs', () => planRunnerIncrementalBuild({
+    cwd: repoRoot,
+    currentSealedSourceSha: sealedSourceSha
+  }));
+  const buildDecision: BuildDecision = buildTarget === 'full' && incrementalPlan.incrementalEligible
+    ? 'incrementalBuild'
+    : 'fullRebuild';
+  const decisionReason = buildDecision === 'incrementalBuild'
+    ? `diff planner selected ${incrementalPlan.affectedPackages.length} affected package(s)`
+    : (incrementalPlan.unsafeReasons[0] ?? cacheDecision.reason);
 
   const worktreeRoot = path.join(repoRoot, '.atm-temp', 'sealed-runner-build', `${process.pid}-${sealedSourceSha.slice(0, 12)}`);
   removeTreeWithoutFollowingLinks(worktreeRoot);
@@ -180,14 +233,28 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   try {
     timePhase(timings, 'worktreeSetupMs', () => runGit(repoRoot, ['worktree', 'add', '--detach', worktreeRoot, sealedSourceSha]));
     linkNodeModules(worktreeRoot);
-    runTimedInnerBuild(worktreeRoot, buildTarget, timings);
+    runTimedInnerBuild(worktreeRoot, buildTarget, timings, buildDecision === 'incrementalBuild' ? incrementalPlan : null);
     timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget));
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeBuildMetadataToReleaseManifests({
       cwd: repoRoot,
       sealedSourceSha,
       buildInputsTreeHash,
-      buildDecision: cacheDecision.decision,
+      buildDecision,
+      decisionReason,
+      incrementalPlan,
+      runtimeTelemetryRef: null,
+      timings
+    });
+    const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
+      cwd: repoRoot,
+      actorId,
+      sealedSourceSha,
+      buildTarget,
+      buildInputsTreeHash,
+      buildDecision,
+      decisionReason,
+      incrementalPlan,
       timings
     });
     writeRunnerSyncReceipt({
@@ -197,10 +264,13 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       sealedSourceSha,
       buildTarget,
       buildInputsTreeHash,
-      buildDecision: cacheDecision.decision,
+      buildDecision,
+      decisionReason,
+      incrementalPlan,
+      runtimeTelemetryRef,
       timings
     });
-    console.log(`[sealed-runner-build] ${cacheDecision.decision} ${buildTarget} from ${sealedSourceSha}`);
+    console.log(`[sealed-runner-build] ${buildDecision} ${buildTarget} from ${sealedSourceSha}`);
   } finally {
     // CRITICAL: unlink the node_modules junction BEFORE git worktree remove.
     // On Windows, `git worktree remove --force` can traverse the junction and
@@ -221,9 +291,15 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   }
 }
 
-function runTimedInnerBuild(worktreeRoot: string, buildTarget: BuildTarget, timings: SealedBuildTimings): void {
+function runTimedInnerBuild(
+  worktreeRoot: string,
+  buildTarget: BuildTarget,
+  timings: SealedBuildTimings,
+  incrementalPlan: RunnerIncrementalBuildPlan | null = null
+): void {
   if (buildTarget === 'full') {
-    timePhase(timings, 'typescriptBuildMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'packages']));
+    const packageArgs = incrementalPlan?.affectedPackages.length ? ['--packages', incrementalPlan.affectedPackages.join(',')] : [];
+    timePhase(timings, 'typescriptBuildMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'packages', ...packageArgs]));
     timePhase(timings, 'rootDropAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'root-drop']));
     timePhase(timings, 'onefileAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'onefile']));
     return;
@@ -300,11 +376,11 @@ export function inspectBuildCache(input: {
   for (const relative of releaseManifestPaths) {
     const absolute = path.join(input.cwd, relative);
     if (!existsSync(absolute)) {
-      return { decision: 'cache-miss-build', reason: `${relative} is missing` };
+      return { decision: 'fullRebuild', reason: `${relative} is missing` };
     }
     const parsed = readJsonRecord(absolute);
     if (parsed.buildInputsTreeHash !== input.buildInputsTreeHash) {
-      return { decision: 'cache-miss-build', reason: `${relative} buildInputsTreeHash mismatch` };
+      return { decision: 'fullRebuild', reason: `${relative} buildInputsTreeHash mismatch` };
     }
   }
   const dirty = spawnSync('git', ['diff', '--quiet', '--', ...releaseManifestPaths, 'release/atm-root-drop/atm.mjs', 'release/atm-onefile/atm.mjs'], {
@@ -313,9 +389,9 @@ export function inspectBuildCache(input: {
     stdio: ['ignore', 'pipe', 'pipe']
   });
   if ((dirty.status ?? 1) !== 0) {
-    return { decision: 'cache-miss-build', reason: 'release artifacts are dirty or missing' };
+    return { decision: 'fullRebuild', reason: 'release artifacts are dirty or missing' };
   }
-  return { decision: 'cache-hit-skip', reason: 'build input tree hash matches release manifests' };
+  return { decision: 'cacheHitSkip', reason: 'build input tree hash matches release manifests' };
 }
 
 export function writeBuildMetadataToReleaseManifests(input: {
@@ -323,6 +399,9 @@ export function writeBuildMetadataToReleaseManifests(input: {
   readonly sealedSourceSha: string;
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
+  readonly decisionReason?: string;
+  readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
+  readonly runtimeTelemetryRef?: string | null;
   readonly timings: SealedBuildTimings;
 }): void {
   for (const relative of releaseManifestPaths) {
@@ -332,6 +411,9 @@ export function writeBuildMetadataToReleaseManifests(input: {
     manifest.buildInputsTreeHash = input.buildInputsTreeHash;
     manifest.sealedSourceCommit = input.sealedSourceSha;
     manifest.buildDecision = input.buildDecision;
+    manifest.buildDecisionReason = input.decisionReason ?? null;
+    manifest.incrementalPlanDigest = input.incrementalPlan ? digestJson(input.incrementalPlan) : null;
+    manifest.rawTelemetryPolicy = 'gitignored-runtime-only';
     manifest.phaseTimingsMs = {
       inputHashCalculation: input.timings.inputHashCalculationMs,
       skipDecision: input.timings.skipDecisionMs,
@@ -354,6 +436,9 @@ export function buildRunnerSyncReceipt(input: {
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
+  readonly decisionReason?: string;
+  readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
+  readonly runtimeTelemetryRef?: string | null;
   readonly timings: SealedBuildTimings;
   readonly publishedAt?: string;
 }): RunnerSyncReceipt {
@@ -373,16 +458,19 @@ export function buildRunnerSyncReceipt(input: {
     buildTarget: input.buildTarget,
     buildInputsTreeHash: input.buildInputsTreeHash,
     buildDecision: input.buildDecision,
-    phaseTimingsMs: {
-      inputHashCalculation: input.timings.inputHashCalculationMs,
-      skipDecision: input.timings.skipDecisionMs,
-      worktreeSetup: input.timings.worktreeSetupMs,
-      typescriptBuild: input.timings.typescriptBuildMs,
-      rootDropReleaseAssembly: input.timings.rootDropAssemblyMs,
-      onefileReleaseAssembly: input.timings.onefileAssemblyMs,
-      artifactSync: input.timings.artifactSyncMs,
-      cleanup: input.timings.cleanupMs,
-      totalElapsed: input.timings.totalElapsedMs
+    decisionReason: input.decisionReason ?? '',
+    incrementalPlan: input.incrementalPlan ?? null,
+    runtimeTelemetryRef: input.runtimeTelemetryRef ?? null,
+    phaseTimingsMs: phaseTimingsRecord(input.timings),
+    treatmentTelemetry: {
+      schemaId: 'atm.generatedWriteTreatmentTelemetry.v1',
+      executionMode: input.buildDecision === 'cacheHitSkip' ? 'cache-hit-skip' : 'command-executed',
+      commandExecuted: input.buildDecision !== 'cacheHitSkip',
+      outputObserved: true,
+      receiptValidity: 'valid',
+      buildDecision: input.buildDecision,
+      phaseTimingsMs: phaseTimingsRecord(input.timings),
+      rawTelemetryPolicy: 'gitignored-runtime-only'
     },
     publishedAt: input.publishedAt ?? new Date().toISOString()
   };
@@ -396,6 +484,9 @@ export function writeRunnerSyncReceipt(input: {
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
+  readonly decisionReason?: string;
+  readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
+  readonly runtimeTelemetryRef?: string | null;
   readonly timings: SealedBuildTimings;
 }): string {
   const receipt = buildRunnerSyncReceipt(input);
@@ -429,7 +520,9 @@ function runInnerBuild(buildTarget: BuildTarget): void {
       fail('Local TypeScript dependency is missing; run npm install/npm ci before sealed runner build.', 1);
     }
     runNode(process.cwd(), [tscPath, '-p', 'tsconfig.build.json']);
-    runNode(process.cwd(), ['--strip-types', 'scripts/build-package-dist.ts']);
+    const packagesIndex = process.argv.indexOf('--packages');
+    const packageArgs = packagesIndex >= 0 && process.argv[packagesIndex + 1] ? ['--packages', process.argv[packagesIndex + 1]] : [];
+    runNode(process.cwd(), ['--strip-types', 'scripts/build-package-dist.ts', ...packageArgs]);
   }
   if (buildTarget === 'full' || buildTarget === 'root-drop') {
     runNode(process.cwd(), ['--strip-types', 'scripts/build-root-drop-release.ts']);
@@ -442,22 +535,15 @@ function runInnerBuild(buildTarget: BuildTarget): void {
 function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget): void {
   if (buildTarget === 'full' || buildTarget === 'packages') {
     for (const packageName of readDirectoryNames(path.join(sourceRoot, 'packages'))) {
-      copyDirectory(path.join(sourceRoot, 'packages', packageName, 'dist'), path.join(targetRoot, 'packages', packageName, 'dist'));
+      syncDirectoryHashChanged(path.join(sourceRoot, 'packages', packageName, 'dist'), path.join(targetRoot, 'packages', packageName, 'dist'));
     }
   }
   if (buildTarget === 'full' || buildTarget === 'root-drop') {
-    copyDirectory(path.join(sourceRoot, 'release', 'atm-root-drop'), path.join(targetRoot, 'release', 'atm-root-drop'));
+    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-root-drop'), path.join(targetRoot, 'release', 'atm-root-drop'));
   }
   if (buildTarget === 'full' || buildTarget === 'onefile') {
-    copyDirectory(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'));
+    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'));
   }
-}
-
-function copyDirectory(source: string, target: string): void {
-  if (!existsSync(source)) return;
-  removeTreeWithoutFollowingLinks(target);
-  mkdirSync(path.dirname(target), { recursive: true });
-  cpSync(source, target, { recursive: true });
 }
 
 function linkNodeModules(worktreeRoot: string): void {

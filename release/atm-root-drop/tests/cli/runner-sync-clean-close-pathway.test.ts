@@ -31,7 +31,7 @@ try {
     sealedSourceSha: 'sha256:source-a',
     buildTarget: 'full',
     buildInputsTreeHash: 'sha256:inputs',
-    buildDecision: 'cache-hit-skip',
+    buildDecision: 'cacheHitSkip',
     timings,
     publishedAt: '2026-07-18T00:00:00.000Z'
   });
@@ -50,7 +50,7 @@ try {
     sealedSourceSha: 'sha256:source-a',
     buildTarget: 'full',
     buildInputsTreeHash: 'sha256:inputs',
-    buildDecision: 'cache-hit-skip',
+    buildDecision: 'cacheHitSkip',
     timings
   });
   assert.equal(receiptRef, '.atm/history/evidence/TASK-A.runner-sync-receipt.json');

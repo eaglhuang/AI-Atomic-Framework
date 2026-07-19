@@ -436,6 +436,7 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-022.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-023.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-024.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-025.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
     "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
     "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -4126,6 +4127,7 @@
     "release/atm-root-drop/scripts/run-structured-artifact-admission-track.ts",
     "release/atm-root-drop/scripts/run-validators.ts",
     "release/atm-root-drop/scripts/run-validators/implementation.ts",
+    "release/atm-root-drop/scripts/runner-sync-incremental-build.ts",
     "release/atm-root-drop/scripts/scan-broker-runs.ts",
     "release/atm-root-drop/scripts/skew-matrix.config.json",
     "release/atm-root-drop/scripts/split-command-specs.ts",
@@ -4921,6 +4923,12 @@
     "release/atm-root-drop/tsconfig.json",
     "release/atm-root-drop/turbo.json"
   ],
+  "copyReport": {
+    "schemaId": "atm.rootDropHashCopyReport.v1",
+    "copied": 72,
+    "unchanged": 4818,
+    "removed": 0
+  },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
     "generatedFiles": [
@@ -5329,6 +5337,7 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-022.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-023.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-024.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-025.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
       "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
       "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -9019,6 +9028,7 @@
       "release/atm-root-drop/scripts/run-structured-artifact-admission-track.ts",
       "release/atm-root-drop/scripts/run-validators.ts",
       "release/atm-root-drop/scripts/run-validators/implementation.ts",
+      "release/atm-root-drop/scripts/runner-sync-incremental-build.ts",
       "release/atm-root-drop/scripts/scan-broker-runs.ts",
       "release/atm-root-drop/scripts/skew-matrix.config.json",
       "release/atm-root-drop/scripts/split-command-specs.ts",
@@ -9819,18 +9829,21 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:ac7e33d7cff6e2159fd614c9f9faa5df65fe31886bfa999199bb06751208e103",
-  "sealedSourceCommit": "3e60d035ccb5c8f71c6d6ee1f5c6001db5530405",
-  "buildDecision": "cache-miss-build",
+  "buildInputsTreeHash": "sha256:ad9cf40a4fa02d6caf317d0d4d79fcc5d7302710cddb6d347ba4479cdc2cb585",
+  "sealedSourceCommit": "ca21936e907e5a66bf2893762148862cdcb11036",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:12ee20b2bce49e5a71ae38268a219596432731e4305d8d783c5075dc9464ea6a",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 44,
-    "skipDecision": 3,
-    "worktreeSetup": 10028,
-    "typescriptBuild": 15478,
-    "rootDropReleaseAssembly": 7151,
-    "onefileReleaseAssembly": 1854,
-    "artifactSync": 7646,
+    "inputHashCalculation": 42,
+    "skipDecision": 37,
+    "worktreeSetup": 8954,
+    "typescriptBuild": 17601,
+    "rootDropReleaseAssembly": 6854,
+    "onefileReleaseAssembly": 1484,
+    "artifactSync": 7764,
     "cleanup": 0,
-    "totalElapsed": 42479
+    "totalElapsed": 43127
   }
 }

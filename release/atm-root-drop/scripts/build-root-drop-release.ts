@@ -1,6 +1,7 @@
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import {
   assertRootLauncherSafeForReleaseBuild,
@@ -43,10 +44,16 @@ export function buildRootDropRelease(options: any = {}) {
   const releaseRoot = path.resolve(options.releaseRoot ?? defaultReleaseRoot);
   assertStableLauncherTemplatePresent(repositoryRoot);
   assertRootLauncherSafeForReleaseBuild(repositoryRoot);
-  rmSync(releaseRoot, { recursive: true, force: true });
   mkdirSync(releaseRoot, { recursive: true });
 
   const sourceFiles = listReleaseSourceFiles(repositoryRoot);
+  const expectedTargets = new Set<string>();
+  const copyReport = {
+    schemaId: 'atm.rootDropHashCopyReport.v1',
+    copied: 0,
+    unchanged: 0,
+    removed: 0
+  };
   for (const releaseEntry of releaseEntries) {
     if (!sourceFiles.some((relativePath) => relativePath === releaseEntry || relativePath.startsWith(`${releaseEntry}/`))) {
       throw new Error(`release bundle source is missing: ${releaseEntry}`);
@@ -55,17 +62,27 @@ export function buildRootDropRelease(options: any = {}) {
   for (const relativePath of sourceFiles) {
     const sourcePath = path.join(repositoryRoot, relativePath);
     const targetPath = path.join(releaseRoot, relativePath);
+    expectedTargets.add(relativePath);
     mkdirSync(path.dirname(targetPath), { recursive: true });
-    copyFileSync(sourcePath, targetPath);
+    if (copyFileIfChanged(sourcePath, targetPath)) {
+      copyReport.copied += 1;
+    } else {
+      copyReport.unchanged += 1;
+    }
   }
   const stableLauncherTemplatePath = resolveStableLauncherTemplatePath(repositoryRoot);
-  writeFileSync(
+  expectedTargets.add('atm.mjs');
+  if (writeTextIfChanged(
     path.join(releaseRoot, 'atm.mjs'),
-    readFileSync(stableLauncherTemplatePath, 'utf8'),
-    'utf8'
-  );
+    readFileSync(stableLauncherTemplatePath, 'utf8')
+  )) {
+    copyReport.copied += 1;
+  } else {
+    copyReport.unchanged += 1;
+  }
 
   const bundleReadmePath = path.join(releaseRoot, 'README.root-drop.md');
+  expectedTargets.add('README.root-drop.md');
   const bundleReadme = [
     '# ATM Root-Drop Release Bundle',
     '',
@@ -79,8 +96,13 @@ export function buildRootDropRelease(options: any = {}) {
     '',
     '`node atm.mjs next --prompt "<current user prompt>" --json`'
   ].join('\n');
-  writeFileSync(bundleReadmePath, `${bundleReadme}\n`, 'utf8');
+  if (writeTextIfChanged(bundleReadmePath, `${bundleReadme}\n`)) {
+    copyReport.copied += 1;
+  } else {
+    copyReport.unchanged += 1;
+  }
   const manifestPath = path.join(releaseRoot, 'release-manifest.json');
+  expectedTargets.add('release-manifest.json');
   const generatedFiles = collectGeneratedArtifactPaths(releaseRoot, 'release/atm-root-drop', [
     'release-manifest.json'
   ]);
@@ -91,6 +113,7 @@ export function buildRootDropRelease(options: any = {}) {
     entrypoint: 'atm.mjs',
     entries: ['atm.mjs', ...releaseEntries],
     generatedFiles,
+    copyReport,
     stagingContract: {
       schemaId: 'atm.generatedArtifactStaging.v1',
       generatedFiles,
@@ -100,13 +123,15 @@ export function buildRootDropRelease(options: any = {}) {
       rationale: 'release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts.'
     }
   };
-  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  removeExtraneousFiles(releaseRoot, expectedTargets, copyReport);
+  writeTextIfChanged(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
   return {
     releaseRoot,
     manifestPath,
     entrypointPath: path.join(releaseRoot, 'atm.mjs'),
-    entryCount: releaseEntries.length
+    entryCount: releaseEntries.length,
+    copyReport
   };
 }
 
@@ -198,4 +223,30 @@ function walkFiles(directory: string): string[] {
     }
     return [absolutePath];
   });
+}
+
+function copyFileIfChanged(source: string, target: string): boolean {
+  if (existsSync(target) && fileDigest(source) === fileDigest(target)) return false;
+  copyFileSync(source, target);
+  return true;
+}
+
+function writeTextIfChanged(filePath: string, content: string): boolean {
+  if (existsSync(filePath) && readFileSync(filePath, 'utf8') === content) return false;
+  writeFileSync(filePath, content, 'utf8');
+  return true;
+}
+
+function removeExtraneousFiles(root: string, expected: ReadonlySet<string>, report: { removed: number }): void {
+  for (const absolutePath of walkFiles(root)) {
+    const relativePath = path.relative(root, absolutePath).replace(/\\/g, '/');
+    if (expected.has(relativePath)) continue;
+    unlinkSync(absolutePath);
+    report.removed += 1;
+  }
+}
+
+function fileDigest(filePath: string): string {
+  const stats = statSync(filePath);
+  return createHash('sha256').update(readFileSync(filePath)).update(String(stats.mode & 0o777)).digest('hex');
 }

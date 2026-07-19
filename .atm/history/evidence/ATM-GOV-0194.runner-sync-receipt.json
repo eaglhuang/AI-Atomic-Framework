@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0194",
+  "actorId": "codex-governance-optimizer",
+  "stewardWorkId": "runner-sync-603b5c4e",
+  "sealedSourceSha": "ca21936e907e5a66bf2893762148862cdcb11036",
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:ad9cf40a4fa02d6caf317d0d4d79fcc5d7302710cddb6d347ba4479cdc2cb585",
+  "buildDecision": "fullRebuild",
+  "decisionReason": "build-script-change",
+  "incrementalPlan": {
+    "schemaId": "atm.runnerIncrementalBuildPlan.v1",
+    "specVersion": "0.1.0",
+    "previousSealedSourceSha": "3e60d035ccb5c8f71c6d6ee1f5c6001db5530405",
+    "currentSealedSourceSha": "ca21936e907e5a66bf2893762148862cdcb11036",
+    "changedPaths": [
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts"
+    ],
+    "affectedPackages": [],
+    "affectedGroups": {
+      "packages": [],
+      "scripts": [
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts"
+      ],
+      "templates": [],
+      "schemas": [],
+      "atomicWorkbench": [],
+      "rootConfig": [],
+      "unknown": []
+    },
+    "incrementalEligible": false,
+    "unsafeReasons": [
+      "build-script-change"
+    ]
+  },
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-07-19T13-09-56-425Z-ATM-GOV-0194.jsonl",
+  "phaseTimingsMs": {
+    "inputHashCalculation": 42,
+    "skipDecision": 37,
+    "worktreeSetup": 8954,
+    "typescriptBuild": 17601,
+    "rootDropReleaseAssembly": 6854,
+    "onefileReleaseAssembly": 1484,
+    "artifactSync": 7764,
+    "cleanup": 0,
+    "totalElapsed": 43127
+  },
+  "treatmentTelemetry": {
+    "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
+    "executionMode": "command-executed",
+    "commandExecuted": true,
+    "outputObserved": true,
+    "receiptValidity": "valid",
+    "buildDecision": "fullRebuild",
+    "phaseTimingsMs": {
+      "inputHashCalculation": 42,
+      "skipDecision": 37,
+      "worktreeSetup": 8954,
+      "typescriptBuild": 17601,
+      "rootDropReleaseAssembly": 6854,
+      "onefileReleaseAssembly": 1484,
+      "artifactSync": 7764,
+      "cleanup": 0,
+      "totalElapsed": 43127
+    },
+    "rawTelemetryPolicy": "gitignored-runtime-only"
+  },
+  "publishedAt": "2026-07-19T13:09:56.426Z"
+}
