@@ -108,6 +108,8 @@ reuse it; report it to the owner and remap the work onto the correct family.
 Task ids are assigned from the planning repository state, never inferred from
 the local target-repo ledger.
 
+Reserved family routing: ErrorCode and error-governance work must use the registered ERR family (series ERR, prefix TASK-ERR). Temporary cleanup, quarantine, and one-off residue-disposition work must use the registered TMP family (series TMP, prefix TASK-TMP). Do not spend GOV numbers on these categories. If a draft or ledger record already used a GOV id for ERR/TMP work, stop and reclassify it through the registered planning family and, when needed, a ledger rekey/realign repair before implementation continues.
+
 ## Windows Text Document IO Rule
 
 On Windows, read, write, and compare Markdown, JSON, and text planning documents with Node.js UTF-8 helpers. Do not use PowerShell content commands such as `Get-Content`, `Set-Content`, or `Out-File` as the basis for document authoring or content comparison, because console encoding can make valid Traditional Chinese UTF-8 look corrupted.

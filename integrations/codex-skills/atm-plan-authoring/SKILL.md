@@ -54,6 +54,11 @@ Use `--series ERR --prefix TASK-ERR` for the error governance family and
 has explicit owner approval. TMP is not a junk drawer; every TMP card must say
 why it is temporary and how it will be removed, migrated, or abandoned.
 
+This ERR/TMP routing is mandatory. Do not spend GOV numbers on ErrorCode,
+error-governance, temporary cleanup, quarantine, or one-off residue-disposition
+work. If such work was already drafted under GOV, stop and reclassify it
+through the registered planning family before implementation continues.
+
 ## Error Governance Boundary
 
 The canonical ErrorCode registry currently remains:

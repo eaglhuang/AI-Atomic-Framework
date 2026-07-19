@@ -18,6 +18,8 @@ node atm.mjs next --prompt "$ARGUMENTS" --json
 If the task card does not exist yet and `next` returns scope-not-found, continue
 only as an authoring action. Do not claim unrelated open tasks.
 
+
+Reserved family routing: ErrorCode and error-governance work must use the registered ERR family (series ERR, prefix TASK-ERR). Temporary cleanup, quarantine, and one-off residue-disposition work must use the registered TMP family (series TMP, prefix TASK-TMP). Do not spend GOV numbers on these categories. If a draft or ledger record already used a GOV id for ERR/TMP work, stop and reclassify it through the registered planning family and, when needed, a ledger rekey/realign repair before implementation continues.
 ## Required Card Contract
 
 Every task card must include frontmatter or an equivalent machine-readable block:

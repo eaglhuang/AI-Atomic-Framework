@@ -1,10 +1,3 @@
----
-name: atm-plan-authoring
-description: Create registered planning families, plan documents, and task cards through the tool-first plan CLI.
-argument-hint: "<ATM context>"
-charter-invariants-injected: true
----
-
 
 # ATM Plan Authoring
 
@@ -120,3 +113,9 @@ unrelated task.
   history.
 - Do not move `docs/governance/error-code-registry.json` as part of routine
   family setup.
+
+## Rules
+
+- Use ATM as the only governance route for this action.
+- Do not create a second registry, task state, or approval workflow.
+- Preserve user-edited integration files; manifest hashes decide uninstall safety.
