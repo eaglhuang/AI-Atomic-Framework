@@ -62,6 +62,8 @@ The guard checks that:
 | `node atm.mjs atomize` | Inspect and improve atomization coverage. |
 | `node atm.mjs baseline` | Manage redteam baselines for framework work. |
 | `node atm.mjs batch` | Inspect, repair, resume, or checkpoint a batch run. |
+
+`node atm.mjs batch execute-plan --actor <id> --plan <path> --task <id>...` starts or resumes a durable plan-level executor loop. It writes raw plan journal events only under gitignored `.atm/runtime/batch-runs/**`, emits a digest-only `atm.planExecutorDecisionReceipt.v1`, and returns exactly one next/recovery command for the operator lane. `--pause`, `--cancel`, and circuit-open/serial fallback all become explicit executor decisions instead of hidden control flow.
 | `node atm.mjs bootstrap` | Create or refresh the default bootstrap pack. |
 | `node atm.mjs broker` | Broker daemon and steward surfaces for governed writes. |
 | `node atm.mjs budget` | Evaluate context budget policy for governed work. |

@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createWaveManifest, evaluateWaveEligibility, type WaveManifestTask } from '../../../../core/src/broker/wave-manifest.ts';
 import { createAtomicWaveCheckpointReceipt, evaluateAtomicWaveCheckpoint } from '../../../../core/src/broker/wave-generated-executor.ts';
 import { appendPlanBatchRunEvent, startPlanBatchRun } from '../../../../core/src/batch/plan-run-journal.ts';
+import { runBatchExecutePlan } from './plan-executor.ts';
 import { CliError, makeResult, message, parseOptions } from '../shared.ts';
 import { resolveActorId } from '../actor-registry.ts';
 import { runNext } from '../next.ts';
@@ -28,6 +29,7 @@ const ATM_BATCH_PLANNING_CLOSEBACK_CONFLICT = 'ATM_BATCH_PLANNING_CLOSEBACK_CONF
 const ATM_BATCH_PUSH_DIVERGED = 'ATM_BATCH_PUSH_DIVERGED';
 export async function runBatch(argv: string[]) {
 const action = String(argv[0] ?? 'status').toLowerCase();
+if (action === 'execute-plan') return runBatchExecutePlan(argv);
 if (action === 'plan-start') return runBatchPlanStart(argv);
 if (action === 'plan-journal') return runBatchPlanJournal(argv);
 const batchHistoricalDeliveryRefs = action === 'checkpoint' ? parseBatchHistoricalDeliveryRefs(argv) : [];
@@ -228,7 +230,7 @@ const abandonedQueue = activeQueue ? abandonTaskQueue({ cwd: options.cwd, queueI
 const abandoned = releaseBatchRun(options.cwd, active, 'abandoned'); return makeResult({ ok: true, command: 'batch', cwd: options.cwd, messages: [message('info', 'ATM_BATCH_ABANDONED', 'Batch run abandoned.', { batchId: abandoned.batchId, actorId: resolvedActor.actorId })], evidence: { action: 'abandon', actorId: resolvedActor.actorId, batchRun: abandoned, taskQueue: abandonedQueue }
 });
 }
-throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, skip, abandon', { exitCode: 2 }); }
+throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, execute-plan, plan-start, plan-journal, checkpoint, repair, resume, skip, abandon', { exitCode: 2 }); }
 function runBatchPlanStart(argv: string[]) {
 const { options } = parseOptions(stripPlanRunArgs(argv), 'batch');
 const resolvedActor = resolveActorId(options.agent ?? undefined); if (!resolvedActor) { throw new CliError('ATM_ACTOR_ID_MISSING', 'batch plan-start requires --actor or ATM_ACTOR_ID.', { exitCode: 2 }); }
