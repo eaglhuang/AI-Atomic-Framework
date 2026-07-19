@@ -1,9 +1,9 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createWaveManifest, evaluateWaveEligibility, type WaveManifestTask } from '../../../../core/src/broker/wave-manifest.ts';
-import { evaluateAtomicWaveCheckpoint } from '../../../../core/src/broker/wave-generated-executor.ts';
+import { createAtomicWaveCheckpointReceipt, evaluateAtomicWaveCheckpoint } from '../../../../core/src/broker/wave-generated-executor.ts';
 import { appendPlanBatchRunEvent, startPlanBatchRun } from '../../../../core/src/batch/plan-run-journal.ts';
 import { CliError, makeResult, message, parseOptions } from '../shared.ts';
 import { resolveActorId } from '../actor-registry.ts';
@@ -69,8 +69,11 @@ if (!checkpointReadinessInput?.waveId || !checkpointReadinessInput.manifestDiges
 const deliveryReceipts = checkpointReadinessInput.deliveryReceipts.map((filePath) => JSON.parse(readFileSync(path.resolve(options.cwd, filePath), 'utf8')));
 const buildReceipts = checkpointReadinessInput.buildReceipts.map((filePath) => JSON.parse(readFileSync(path.resolve(options.cwd, filePath), 'utf8')));
 const projectionReceipts = checkpointReadinessInput.projectionReceipts.map((filePath) => JSON.parse(readFileSync(path.resolve(options.cwd, filePath), 'utf8')));
-const readiness = evaluateAtomicWaveCheckpoint({ waveId: checkpointReadinessInput.waveId, taskIds: checkpointReadinessInput.taskIds, manifestDigest: checkpointReadinessInput.manifestDigest, deliveryReceipts, buildReceipts, projectionReceipts, planningClosebackOk: checkpointReadinessInput.planningClosebackOk });
-return makeResult({ ok: readiness.ready, command: 'batch', cwd: options.cwd, messages: [message(readiness.ready ? 'info' : 'error', readiness.ready ? 'ATM_BATCH_WAVE_CHECKPOINT_READY' : 'ATM_BATCH_WAVE_CHECKPOINT_BLOCKED', readiness.ready ? 'Atomic wave checkpoint has all required commit/build/projection receipts.' : 'Atomic wave checkpoint is missing required receipts or planning closeback.', { waveId: readiness.waveId, missingByTask: readiness.missingByTask, planningCloseback: readiness.planningCloseback })], evidence: { action: 'checkpoint-readiness', readiness } });
+const checkpointInput = { waveId: checkpointReadinessInput.waveId, taskIds: checkpointReadinessInput.taskIds, manifestDigest: checkpointReadinessInput.manifestDigest, deliveryReceipts, buildReceipts, projectionReceipts, planningClosebackOk: checkpointReadinessInput.planningClosebackOk };
+const readiness = evaluateAtomicWaveCheckpoint(checkpointInput);
+const receipt = createAtomicWaveCheckpointReceipt(checkpointInput);
+const receiptPath = checkpointReadinessInput.evidenceOutPath ? writeCheckpointReceipt(options.cwd, checkpointReadinessInput.evidenceOutPath, receipt) : null;
+return makeResult({ ok: readiness.ready, command: 'batch', cwd: options.cwd, messages: [message(readiness.ready ? 'info' : 'error', readiness.ready ? 'ATM_BATCH_WAVE_CHECKPOINT_READY' : 'ATM_BATCH_WAVE_CHECKPOINT_BLOCKED', readiness.ready ? 'Atomic wave checkpoint has all required commit/build/projection receipts.' : 'Atomic wave checkpoint is missing required receipts or planning closeback.', { waveId: readiness.waveId, missingByTask: readiness.missingByTask, planningCloseback: readiness.planningCloseback, checkpointWatermark: receipt.checkpointWatermark, receiptPath })], evidence: { action: 'checkpoint-readiness', readiness, receipt, receiptPath } });
 }
 const resolvedActor = resolveActorId(options.agent ?? undefined); if (!resolvedActor) { throw new CliError('ATM_ACTOR_ID_MISSING', `batch ${action} requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 }); }
 if (action === 'checkpoint') {
@@ -283,9 +286,10 @@ if (arg === '--message' && index + 1 < argv.length) { deliveryMessage = argv[ind
 if (arg === '--reason' && index + 1 < argv.length) { reason = argv[index + 1]; index += 1; continue; }
 }
 return { deliveryCommit, deliveryMessage, reason }; }
-function parseBatchCheckpointReadinessArgs(argv: readonly string[]): { waveId: string | null; manifestDigest: string | null; taskIds: readonly string[]; deliveryReceipts: readonly string[]; buildReceipts: readonly string[]; projectionReceipts: readonly string[]; planningClosebackOk: boolean } {
+function parseBatchCheckpointReadinessArgs(argv: readonly string[]): { waveId: string | null; manifestDigest: string | null; taskIds: readonly string[]; deliveryReceipts: readonly string[]; buildReceipts: readonly string[]; projectionReceipts: readonly string[]; planningClosebackOk: boolean; evidenceOutPath: string | null } {
 let waveId: string | null = null;
 let manifestDigest: string | null = null;
+let evidenceOutPath: string | null = null;
 const taskIds: string[] = [];
 const deliveryReceipts: string[] = [];
 const buildReceipts: string[] = [];
@@ -299,20 +303,27 @@ if (arg === '--task' && index + 1 < argv.length) { taskIds.push(argv[++index]); 
 if (arg === '--delivery-receipt' && index + 1 < argv.length) { deliveryReceipts.push(argv[++index]); continue; }
 if (arg === '--build-receipt' && index + 1 < argv.length) { buildReceipts.push(argv[++index]); continue; }
 if (arg === '--projection-receipt' && index + 1 < argv.length) { projectionReceipts.push(argv[++index]); continue; }
+if (arg === '--evidence-out' && index + 1 < argv.length) { evidenceOutPath = argv[++index]; continue; }
 if (arg === '--planning-closeback-ok') { planningClosebackOk = true; continue; }
 if (arg === '--planning-closeback-blocked') { planningClosebackOk = false; continue; }
 }
-return { waveId, manifestDigest, taskIds, deliveryReceipts, buildReceipts, projectionReceipts, planningClosebackOk };
+return { waveId, manifestDigest, taskIds, deliveryReceipts, buildReceipts, projectionReceipts, planningClosebackOk, evidenceOutPath };
 }
 function stripBatchCheckpointReadinessArgs(argv: readonly string[]): string[] {
 const stripped: string[] = [];
 for (let index = 0; index < argv.length; index += 1) {
 const arg = argv[index];
-if (['--wave', '--manifest-digest', '--task', '--delivery-receipt', '--build-receipt', '--projection-receipt'].includes(arg) && index + 1 < argv.length) { index += 1; continue; }
+if (['--wave', '--manifest-digest', '--task', '--delivery-receipt', '--build-receipt', '--projection-receipt', '--evidence-out'].includes(arg) && index + 1 < argv.length) { index += 1; continue; }
 if (arg === '--planning-closeback-ok' || arg === '--planning-closeback-blocked') { continue; }
 stripped.push(arg);
 }
 return stripped;
+}
+function writeCheckpointReceipt(cwd: string, outPath: string, value: unknown): string {
+const absolute = path.resolve(cwd, outPath);
+mkdirSync(path.dirname(absolute), { recursive: true });
+writeFileSync(absolute, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+return path.relative(cwd, absolute).replace(/\\/g, '/');
 }
 function stripBatchDeliverAndCloseExtras(argv: readonly string[]): string[] {
 const stripped: string[] = []; for (let index = 0; index < argv.length; index += 1) {

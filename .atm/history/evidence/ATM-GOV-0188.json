@@ -1,0 +1,159 @@
+{
+  "taskId": "ATM-GOV-0188",
+  "updatedAt": "2026-07-19T12:15:56.267Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+      "createdAt": "2026-07-19T12:15:15.152Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.atomic-wave-checkpoint",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:741b4381fabcafad9c115296971d8d5b9646d06072ccab9c2549ba0d02c4083f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "e51d54025d86d4267213a8dc6b07fd84a6362308",
+            "cacheKey": "sha256:34224f3094f2f64b499aab30a5d5e4c70744c907206caaf4e88f8550d3650cd3",
+            "cached": false,
+            "generatedAt": "2026-07-19T12:15:15.326Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:92067cc3b6096124efc8aed39ca2827118220ce1b816d563e22d0af3a13c87cd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+      "createdAt": "2026-07-19T12:15:27.620Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.atomic-wave-checkpoint",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "e51d54025d86d4267213a8dc6b07fd84a6362308",
+            "cacheKey": "sha256:0a535208f795267090f79bc7368d0001ad4f949de0b42dc356dffae1f3bec596",
+            "cached": false,
+            "generatedAt": "2026-07-19T12:15:27.812Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d3a1d9295b0ce7740a79d5b1854145130384a8f49ee10284213072a3fd89f3d9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+      "createdAt": "2026-07-19T12:15:56.267Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.atomic-wave-checkpoint",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f6b85b34caec4dd9c9141003810eba937b373d719a04e206ddb85d637b362bf3",
+            "stderrSha256": "sha256:234577749e4f1e9e66904d10a9e186b61cc1fba218dcb92623801bff02812d80",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "e51d54025d86d4267213a8dc6b07fd84a6362308",
+            "cacheKey": "sha256:9e2a05b1e7eb0e07c29b5bebd9a7fbd2a6a8fd5efa15adf1f13920ee9e0f93b2",
+            "cached": false,
+            "generatedAt": "2026-07-19T12:15:56.519Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a2a4d327986d32776f6a9a959885c8010a4d3f97d2d313984ad4e0bbbb9b0b20",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

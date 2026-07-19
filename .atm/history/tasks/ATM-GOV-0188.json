@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0188",
+  "title": "Atomic Wave Checkpoint 與 Cross-Repo Closeback Saga",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0186",
+    "ATM-GOV-0187"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/batch/**",
+    "packages/cli/src/commands/taskflow/**",
+    "packages/cli/src/commands/git-governance/**",
+    "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+    "scripts/validators/task-ledger/**"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch/**",
+    "packages/cli/src/commands/taskflow/**",
+    "packages/cli/src/commands/git-governance/**",
+    "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+    "scripts/validators/task-ledger/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "preserve pushed target closure; resume or repair planning side only",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.atomic-wave-checkpoint",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.atomic-wave-checkpoint",
+        "pattern": "Saga",
+        "source": "packages/cli/src/commands/batch/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0188-atomic-wave-checkpoint-closeback-saga.task.md",
+    "sectionTitle": "ATM-GOV-0188",
+    "headingLine": 59,
+    "hash": "41c88f73763c4fc9",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0188-atomic-wave-checkpoint-closeback-saga.task.md",
+      "planningCommitSha": "013eb0c0e9e676bb3932d258b6587eb870a860e2",
+      "contentDigest": "sha256:41c88f73763c4fc95dacfacdbf58bc73496f7b5799565f3808d3e4618a960efb",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T12:10:52.314Z"
+    }
+  },
+  "importedAt": "2026-07-19T12:10:52.314Z",
+  "lastTransitionId": "2026-07-19T12-16-30-385Z-scope-amendment-45112bf87499",
+  "lastTransitionAt": "2026-07-19T12:16:30.385Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-governance-optimizer",
+  "reservedAt": "2026-07-19T12:11:04.034Z",
+  "promotedAt": "2026-07-19T12:11:04.037Z",
+  "claim": {
+    "actorId": "codex-governance-optimizer",
+    "leaseId": "lease-f9fe2950a483",
+    "claimedAt": "2026-07-19T12:11:04.040Z",
+    "heartbeatAt": "2026-07-19T12:11:04.040Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0188.*",
+      ".atm/history/task-events/ATM-GOV-0188/**",
+      ".atm/history/tasks/ATM-GOV-0188.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/core/src/broker/wave-generated-executor.ts",
+      "scripts/validators/task-ledger/**",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260719121104-codex-governance-optimizer-3596747b69",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719121104-codex-governance-optimizer-3596747b69\""
+    }
+  },
+  "startedAt": "2026-07-19T12:11:04.040Z",
+  "startedByActor": "codex-governance-optimizer",
+  "startedBySessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0188",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0188.*",
+      ".atm/history/task-events/ATM-GOV-0188/**",
+      ".atm/history/tasks/ATM-GOV-0188.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/core/src/broker/wave-generated-executor.ts",
+      "scripts/validators/task-ledger/**",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0188-atomic-wave-checkpoint-closeback-saga.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0188-atomic-wave-checkpoint-closeback-saga.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7f551a9198afea2daee826f02cf03238b4d992713f141ba8a3d1f7161a901eeb",
+    "actorId": "codex-governance-optimizer",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260719121104-codex-governance-optimizer-3596747b69",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719121104-codex-governance-optimizer-3596747b69\""
+    },
+    "createdAt": "2026-07-19T12:11:08.633Z",
+    "status": "active"
+  }
+}
