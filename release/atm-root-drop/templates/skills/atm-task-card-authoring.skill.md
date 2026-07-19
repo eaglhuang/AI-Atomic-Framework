@@ -24,10 +24,11 @@ First command:
 If the task card does not exist yet and `next` returns scope-not-found, continue
 only as an authoring action. Do not claim unrelated open tasks.
 
-When a task card is opened because an `ATM_*` code is confusing, missing
-remediation, or repeatedly mishandled, route the code explanation through
-`atm-error-code-resolver`. The card should update the shared registry instead
-of adding private error-code prose to one skill.
+When a task card introduces, renames, retires, explains, or repairs an `ATM_*`
+code, route the code contract through `atm-error-code-resolver`. The source plan
+and owning card must declare the code contract, and the designated registry
+owner must update the shared registry instead of adding private error-code prose
+to one skill.
 
 ## Highest Parallel Governance Principle
 
@@ -162,6 +163,18 @@ atomizationImpact:
       source: packages/cli/src/commands/example.ts
       disposition: extract   # extract | follow-up-card | inline
       inlineReason: null     # required when disposition is inline
+errorCodes:
+  - code: ATM_EXAMPLE_GUARD_BLOCKED
+    disposition: register   # reuse | register | rename | retire
+    category: guard
+    trigger: Exact operator-actionable failure boundary
+    retryable: true
+    requiresHumanApproval: false
+    recovery: node atm.mjs example status --json
+    sourceOwner: packages/cli/src/commands/example.ts
+    registryOwnerTask: TASK-AREA-0001
+    tests:
+      - tests/cli/example-error-code.test.ts
 ```
 
 ## Authoring Rules
@@ -177,6 +190,17 @@ atomizationImpact:
   the task must say which validator must be created.
 - Include rollback instructions. For framework tasks, prefer revertable commits
   plus any generated artifact cleanup.
+- If the behavior can emit an `ATM_*` code, use `atm-error-code-resolver` in
+  authoring mode before import. List each code under `errorCodes`; distinguish
+  reused codes from new registrations, and include trigger, retryability,
+  approval, recovery, source owner, registry owner, and focused tests.
+- Do not turn normal states (`paused`, `deferred`, `inconclusive`, cache miss,
+  queue position) into ErrorCodes. Codes are for stable failed or guarded
+  boundaries that require operator action.
+- Keep the single registry from becoming a false parallelism blocker: a plan
+  with multiple implementation cards should designate one foundational card as
+  registry owner, while every emitting card retains its own code contract and
+  tests.
 - Include `atomizationImpact` for ATM framework work:
   - name the owner atom or map;
   - list map/spec/report files that must be updated;

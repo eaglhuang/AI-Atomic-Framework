@@ -82,9 +82,11 @@ After every `next --prompt` or `next --claim` response, read
 `evidence.nextAction.playbook` before drafting dispatch instructions, editing,
 closing, or committing. The playbook is the short channel-specific work order.
 
-If a route, validator, hook, or worker report includes an `ATM_*` error code,
-route interpretation through `atm-error-code-resolver` and its shared registry
-instead of keeping private recovery prose in the dispatch brief.
+If a route, validator, hook, worker report, plan, or task card includes an
+`ATM_*` error code, route interpretation and authoring through
+`atm-error-code-resolver` and its shared registry instead of keeping private
+recovery prose in the dispatch brief. New, renamed, or retired codes must be
+declared in both the source plan and owning task card before implementation.
 
 ## Task Series Governance
 

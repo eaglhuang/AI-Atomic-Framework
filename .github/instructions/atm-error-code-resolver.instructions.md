@@ -5,8 +5,9 @@ applyTo: "**"
 
 # ATM Error Code Resolver
 
-Use this skill when a user, CLI result, validator output, hook, or task report
-mentions an `ATM_*` code and needs interpretation or recovery guidance.
+Use this skill when a user, CLI result, validator output, hook, plan, or task
+card mentions an `ATM_*` code and needs interpretation, recovery guidance,
+registration, renaming, or retirement.
 
 First command:
 
@@ -48,6 +49,41 @@ npm run generate:error-codes
 
 Then open or update a governed task/backlog item to add the missing entry in
 `docs/governance/error-code-registry.json`.
+
+## Authoring And Registration Flow
+
+Use this flow before a plan, task card, or implementation introduces, renames,
+or retires an `ATM_*` code:
+
+1. Classify the condition. Normal states such as `paused`, `deferred`,
+   `inconclusive`, cache miss, or successful broker enqueue are not errors.
+   Create an ErrorCode only for a command failure or an operator-actionable
+   guarded boundary that needs stable retry, approval, or recovery semantics.
+2. Search the exact entries and `prefixRules[]` in
+   `docs/governance/error-code-registry.json`. Reuse an existing exact code only
+   when its trigger and recovery semantics match; a prefix rule documents a new
+   code but does not reserve its exact meaning.
+3. Record every planned code in the source plan and owning task card with:
+   `code`, `disposition` (`reuse`, `register`, `rename`, or `retire`), trigger,
+   category, retryability, human-approval requirement, recovery command, source
+   owner, registry-owner task, and required tests.
+4. When parallel cards would otherwise contend on the single registry file,
+   assign one foundational registry-owner task to register the plan-wide code
+   catalog. Other cards keep their own code contract but must not independently
+   edit the shared registry.
+5. The registry-owner delivery updates
+   `docs/governance/error-code-registry.json`, runs
+   `npm run generate:error-codes`, and commits the generated
+   `docs/ERROR_CODES.md`. Do not hand-edit the generated file.
+6. The implementation that emits a code must include structured details and a
+   focused test proving the exact trigger, exit behavior, retry/approval
+   contract, and recovery guidance. A planned code is not complete merely
+   because it appears in prose or the registry.
+7. Renames and retirements must preserve an explicit compatibility or migration
+   path. Never silently reuse an old code name for a different meaning.
+
+If a plan discovers a new ErrorCode after its catalog was sealed, amend the
+plan and owning card through this skill before implementing the emitter.
 
 ## Shared-Skill Rule
 
