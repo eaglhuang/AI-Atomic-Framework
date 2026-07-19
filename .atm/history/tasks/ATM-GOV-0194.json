@@ -1,0 +1,220 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0194",
+  "title": "Add runner-sync incremental build on cache miss",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0186"
+  ],
+  "acceptance": [
+    "A fixture proves unchanged sealed input produces `cacheHitSkip`.",
+    "A fixture proves a small TypeScript source change produces `incrementalBuild`, rebuilds only affected package outputs, and preserves unrelated package outputs.",
+    "A fixture proves a release mirror copy updates only hash-changed files.",
+    "A fixture proves onefile generation can reuse unchanged payload segments or records a justified `fullRebuild` fallback.",
+    "Receipt schema, test assertions, and CLI/broker output distinguish `cacheHitSkip`, `incrementalBuild`, and `fullRebuild`.",
+    "Runner build timing data is queryable from gitignored runtime telemetry/log files, not only visible in terminal output or one-off receipt prose.",
+    "All statistics, counters, raw event logs, debug logs, and per-run telemetry are excluded from Git by default and remain on local disk.",
+    "Git-tracked artifacts contain only digest/summary/baseline data needed for governance decisions; repeated raw telemetry does not grow the repository.",
+    "Package-level incremental build receipt schema/fields are versioned and documented in the test fixture expectations.",
+    "Focused tests prove changed-input incremental rebuild is distinct from unchanged-input cache skip.",
+    "A safety fallback test proves dependency graph or manifest uncertainty becomes `fullRebuild` with a machine-readable reason.",
+    "Validation evidence includes the focused sealed runner cache/incremental tests, `npm run typecheck`, `npm run validate:cli`, and `npm run validate:git-head-evidence`."
+  ],
+  "deliverables": [
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/build-package-dist.ts",
+    "scripts/build-root-drop-release.ts",
+    "scripts/build-onefile-release.ts",
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "tests/cli/sealed-runner-build-input-cache.test.ts",
+    "tests/cli/runner-sync-build-script-admission.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/build-package-dist.ts",
+    "scripts/build-root-drop-release.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/validate-root-drop-release.ts",
+    "scripts/validate-onefile-release.ts",
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "tests/cli/sealed-runner-build-input-cache.test.ts",
+    "tests/cli/runner-sync-build-script-admission.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+    "node --strip-types tests/cli/runner-sync-build-script-admission.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit; remove any generated sealed incremental cache artifacts created by this card",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync-build-surface-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/build-onefile-release.ts"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.sealed-source-diff-detector",
+        "pattern": "Policy Object",
+        "source": "scripts/run-sealed-runner-build.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.package-level-release-builder",
+        "pattern": "Builder Strategy",
+        "source": "scripts/build-package-dist.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/build-onefile-release.ts",
+        "scripts/validate-root-drop-release.ts",
+        "scripts/validate-onefile-release.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "tests/cli/sealed-runner-build-input-cache.test.ts",
+        "tests/cli/runner-sync-build-script-admission.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0194-add-runner-sync-incremental-build-on-cache-miss.task.md",
+    "sectionTitle": "ATM-GOV-0194",
+    "headingLine": 65,
+    "hash": "b5a62c909fca3c7d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0194-add-runner-sync-incremental-build-on-cache-miss.task.md",
+      "planningCommitSha": "27f9ddb92e08fec851f31a6998e825f5e388da8c",
+      "contentDigest": "sha256:b5a62c909fca3c7d5026e294a9a3f985ef32c5fbbac5be84ff0453e646c1c5f6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T12:48:04.566Z"
+    }
+  },
+  "importedAt": "2026-07-19T12:48:04.566Z",
+  "lastTransitionId": "2026-07-19T12-57-47-375Z-scope-amendment-20ce1207ffdd",
+  "lastTransitionAt": "2026-07-19T12:57:47.375Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-governance-optimizer",
+  "reservedAt": "2026-07-19T12:48:20.915Z",
+  "promotedAt": "2026-07-19T12:48:20.918Z",
+  "claim": {
+    "actorId": "codex-governance-optimizer",
+    "leaseId": "lease-fae16b78b842",
+    "claimedAt": "2026-07-19T12:48:20.921Z",
+    "heartbeatAt": "2026-07-19T12:48:20.921Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0194.*",
+      ".atm/history/task-events/ATM-GOV-0194/**",
+      ".atm/history/tasks/ATM-GOV-0194.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-root-drop-release.ts",
+      "tests/cli/runner-sync-build-script-admission.test.ts",
+      "tests/cli/runner-sync-clean-close-pathway.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts",
+      "tests/cli/sealed-runner-build-input-cache.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260719124821-codex-governance-optimizer-bc2e4a68d8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719124821-codex-governance-optimizer-bc2e4a68d8\""
+    }
+  },
+  "startedAt": "2026-07-19T12:48:20.921Z",
+  "startedByActor": "codex-governance-optimizer",
+  "startedBySessionId": "session-20260719124820-codex-governance-optimizer-ATM-GOV-0194-efc0b6e426",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0194",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0194.*",
+      ".atm/history/task-events/ATM-GOV-0194/**",
+      ".atm/history/tasks/ATM-GOV-0194.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-root-drop-release.ts",
+      "tests/cli/runner-sync-build-script-admission.test.ts",
+      "tests/cli/runner-sync-clean-close-pathway.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts",
+      "tests/cli/sealed-runner-build-input-cache.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0194-add-runner-sync-incremental-build-on-cache-miss.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0194-add-runner-sync-incremental-build-on-cache-miss.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "45a893d83ad709b7fa0868649344325ba6156324a371dacac5ea6f90bf6e7e44",
+    "actorId": "codex-governance-optimizer",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260719124821-codex-governance-optimizer-bc2e4a68d8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719124821-codex-governance-optimizer-bc2e4a68d8\""
+    },
+    "createdAt": "2026-07-19T12:48:27.318Z",
+    "status": "active"
+  }
+}

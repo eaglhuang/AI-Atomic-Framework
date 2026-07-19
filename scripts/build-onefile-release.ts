@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
@@ -26,6 +26,27 @@ export function buildOnefileRelease(options: any = {}) {
   assertPayloadLauncherIsNotNested(path.join(rootDropRoot, 'atm.mjs'));
 
   const payloadFiles = collectPayloadFiles(rootDropRoot);
+  const payloadInputManifestHash = digestJson(payloadFiles.map((file: any) => ({
+    path: file.path,
+    mode: file.mode,
+    dataDigest: createHash('sha256').update(file.dataBase64).digest('hex')
+  })));
+  const existingManifest = existsSync(path.join(outputRoot, 'release-manifest.json'))
+    ? JSON.parse(readFileSync(path.join(outputRoot, 'release-manifest.json'), 'utf8')) as Record<string, unknown>
+    : null;
+  const canReusePayload = existingManifest?.payloadInputManifestHash === payloadInputManifestHash
+    && existsSync(outputFilePath);
+  if (canReusePayload) {
+    return {
+      outputRoot,
+      outputFilePath,
+      manifestPath: path.join(outputRoot, 'release-manifest.json'),
+      payloadSha256: String(existingManifest?.payloadSha256 ?? ''),
+      fileCount: payloadFiles.length,
+      payloadReuse: true,
+      payloadInputManifestHash
+    };
+  }
   const payload = {
     schemaVersion: 'atm.onefilePayload.v0.1',
     generatedAt: resolveReleaseGeneratedAt(),
@@ -42,12 +63,12 @@ export function buildOnefileRelease(options: any = {}) {
     payloadSha256
   });
 
-  rmSync(outputRoot, { recursive: true, force: true });
   mkdirSync(outputRoot, { recursive: true });
-  writeFileSync(outputFilePath, runtimeSource, 'utf8');
+  const expectedTargets = new Set<string>(['atm.mjs', 'README.onefile.md', 'release-manifest.json']);
+  writeTextIfChanged(outputFilePath, runtimeSource);
 
   const readmePath = path.join(outputRoot, 'README.onefile.md');
-  writeFileSync(readmePath, `${[
+  writeTextIfChanged(readmePath, `${[
     '# ATM One-File Release',
     '',
     'This artifact is a single-file ATM launcher with embedded payload.',
@@ -59,16 +80,19 @@ export function buildOnefileRelease(options: any = {}) {
     '## Prompt',
     '',
     'Read README.md if present, then run "node atm.mjs next --prompt \\"<current user prompt>\\" --json" from the repository root before task work. Use "node atm.mjs next --json" only as read-only orientation when no user prompt is available. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action.'
-  ].join('\n')}\n`, 'utf8');
+  ].join('\n')}\n`);
   const manifestPath = path.join(outputRoot, 'release-manifest.json');
+  removeExtraneousFiles(outputRoot, expectedTargets);
   const generatedFiles = collectGeneratedArtifactPaths(outputRoot, 'release/atm-onefile', [
     'release-manifest.json'
   ]);
-  writeFileSync(manifestPath, `${JSON.stringify({
+  writeTextIfChanged(manifestPath, `${JSON.stringify({
     schemaVersion: 'atm.onefileRelease.v0.2',
     generatedAt: payload.generatedAt,
     entrypoint: 'atm.mjs',
     payloadSha256,
+    payloadInputManifestHash,
+    payloadReuse: false,
     sourceRoot: 'release/atm-root-drop',
     fileCount: payloadFiles.length,
     generatedFiles,
@@ -81,14 +105,16 @@ export function buildOnefileRelease(options: any = {}) {
       dependsOnRootDropManifest: 'release/atm-root-drop/release-manifest.json',
       rationale: 'release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list.'
     }
-  }, null, 2)}\n`, 'utf8');
+  }, null, 2)}\n`);
 
   return {
     outputRoot,
     outputFilePath,
     manifestPath,
     payloadSha256,
-    fileCount: payloadFiles.length
+    fileCount: payloadFiles.length,
+    payloadReuse: false,
+    payloadInputManifestHash
   };
 }
 
@@ -224,6 +250,25 @@ function walkFiles(directory: any): string[] {
     }
     return [absolutePath];
   });
+}
+
+function writeTextIfChanged(filePath: string, content: string): boolean {
+  if (existsSync(filePath) && readFileSync(filePath, 'utf8') === content) return false;
+  writeFileSync(filePath, content, 'utf8');
+  return true;
+}
+
+function removeExtraneousFiles(root: string, expected: ReadonlySet<string>): void {
+  if (!existsSync(root)) return;
+  for (const absolutePath of walkFiles(root)) {
+    const relativePath = path.relative(root, absolutePath).replace(/\\/g, '/');
+    if (expected.has(relativePath)) continue;
+    unlinkSync(absolutePath);
+  }
+}
+
+function digestJson(value: unknown): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 }
 
 function renderOnefileRuntime({ payloadBase64, payloadSha256 }: any) {

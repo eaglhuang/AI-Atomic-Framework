@@ -1,4 +1,5 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -6,6 +7,9 @@ import ts from 'typescript';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const onlyPackage = process.argv.includes('--package')
   ? process.argv[process.argv.indexOf('--package') + 1]
+  : null;
+const onlyPackages = process.argv.includes('--packages')
+  ? new Set(String(process.argv[process.argv.indexOf('--packages') + 1] ?? '').split(',').map((entry) => entry.trim()).filter(Boolean))
   : null;
 
 function listFiles(directory: string, results: string[] = []): string[] {
@@ -84,19 +88,22 @@ function copyDeclarations(packageDir: string): void {
 
 function writeCliEntrypointWrapper(distRoot: string): void {
   const wrapperPath = path.join(distRoot, 'atm.mjs');
-  writeFileSync(wrapperPath, `${[
+  writeTextIfChanged(wrapperPath, `${[
     '#!/usr/bin/env node',
     "import { runCli } from './atm.js';",
     '',
     'process.exitCode = await runCli(process.argv.slice(2));'
-  ].join('\n')}\n`, 'utf8');
+  ].join('\n')}\n`);
 }
 
-function buildPackage(packageDir: string): void {
+function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
   const srcRoot = path.join(root, packageDir, 'src');
   const distRoot = path.join(root, packageDir, 'dist');
-  rmSync(distRoot, { recursive: true, force: true });
+  if (mode === 'full') {
+    rmSync(distRoot, { recursive: true, force: true });
+  }
   mkdirSync(distRoot, { recursive: true });
+  const expectedOutputs = new Set<string>();
   for (const filePath of listFiles(srcRoot)) {
     const relativePath = path.relative(srcRoot, filePath);
     const targetBase = path.join(distRoot, relativePath);
@@ -112,26 +119,51 @@ function buildPackage(packageDir: string): void {
         fileName: filePath
       });
       const outputPath = targetBase.replace(/\.ts$/, '.js');
+      expectedOutputs.add(path.relative(distRoot, outputPath).replace(/\\/g, '/'));
       ensureDir(outputPath);
-      writeFileSync(outputPath, transpiled.outputText, 'utf8');
+      writeTextIfChanged(outputPath, transpiled.outputText);
       continue;
     }
     if (filePath.endsWith('.json')) {
+      expectedOutputs.add(path.relative(distRoot, targetBase).replace(/\\/g, '/'));
       ensureDir(targetBase);
-      copyFileSync(filePath, targetBase);
+      copyFileIfChanged(filePath, targetBase);
     }
   }
   if (packageDir === 'packages/cli' && existsSync(path.join(distRoot, 'atm.js'))) {
+    expectedOutputs.add('atm.mjs');
     writeCliEntrypointWrapper(distRoot);
   }
   copyDeclarations(packageDir);
+  for (const filePath of listFiles(distRoot)) {
+    const relative = path.relative(distRoot, filePath).replace(/\\/g, '/');
+    if (relative.endsWith('.d.ts')) continue;
+    if (!expectedOutputs.has(relative)) unlinkSync(filePath);
+  }
 }
 
 const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => `packages/${entry.name}`)
   .filter((packageDir) => existsSync(path.join(root, packageDir, 'package.json')))
-  .filter((packageDir) => !onlyPackage || packageDir === onlyPackage || packageDir.endsWith(`/${onlyPackage}`));
+  .filter((packageDir) => !onlyPackage || packageDir === onlyPackage || packageDir.endsWith(`/${onlyPackage}`))
+  .filter((packageDir) => !onlyPackages || onlyPackages.has(packageDir) || onlyPackages.has(packageDir.replace(/^packages\//, '')));
 
-for (const packageDir of packageDirs) buildPackage(packageDir);
-console.log(`[build-package-dist] built ${packageDirs.length} packages`);
+const mode = onlyPackage || onlyPackages ? 'incremental' : 'full';
+for (const packageDir of packageDirs) buildPackage(packageDir, mode);
+console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})`);
+
+function writeTextIfChanged(filePath: string, content: string): void {
+  if (existsSync(filePath) && readFileSync(filePath, 'utf8') === content) return;
+  writeFileSync(filePath, content, 'utf8');
+}
+
+function copyFileIfChanged(source: string, target: string): void {
+  if (existsSync(target) && fileDigest(source) === fileDigest(target)) return;
+  copyFileSync(source, target);
+}
+
+function fileDigest(filePath: string): string {
+  const stats = statSync(filePath);
+  return createHash('sha256').update(readFileSync(filePath)).update(String(stats.mode & 0o777)).digest('hex');
+}

@@ -194,7 +194,7 @@ function writeRunnerSyncReceiptFixture(
     requestedSurfaces,
     buildTarget: 'full',
     buildInputsTreeHash: 'sha256:fixture',
-    buildDecision: 'cache-hit-skip',
+    buildDecision: 'cacheHitSkip',
     phaseTimingsMs: {
       inputHashCalculation: 0,
       skipDecision: 0,

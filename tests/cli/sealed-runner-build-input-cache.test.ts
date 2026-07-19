@@ -6,6 +6,7 @@ import path from 'node:path';
 import {
   computeBuildInputsTreeHash,
   inspectBuildCache,
+  planRunnerIncrementalBuild,
   writeBuildMetadataToReleaseManifests
 } from '../../scripts/run-sealed-runner-build.ts';
 
@@ -49,7 +50,7 @@ writeBuildMetadataToReleaseManifests({
   cwd: repo,
   sealedSourceSha: 'abc123',
   buildInputsTreeHash: firstHash,
-  buildDecision: 'cache-miss-build',
+  buildDecision: 'fullRebuild',
   timings: {
     startedAt: Date.now(),
     inputHashCalculationMs: 1,
@@ -65,20 +66,34 @@ writeBuildMetadataToReleaseManifests({
 });
 execFileSync('git', ['add', 'release'], { cwd: repo, stdio: 'ignore' });
 execFileSync('git', ['commit', '-m', 'manifest metadata'], { cwd: repo, stdio: 'ignore' });
+const sealedBaselineSha = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
 
 assert.equal(inspectBuildCache({
   cwd: repo,
   buildTarget: 'full',
   buildInputsTreeHash: firstHash
-}).decision, 'cache-hit-skip');
+}).decision, 'cacheHitSkip');
 
 writeFileSync(path.join(repo, 'release/atm-onefile/atm.mjs'), '// dirty launcher\n');
 assert.equal(inspectBuildCache({
   cwd: repo,
   buildTarget: 'full',
   buildInputsTreeHash: firstHash
-}).decision, 'cache-miss-build');
+}).decision, 'fullRebuild');
 execFileSync('git', ['checkout', '--', 'release/atm-onefile/atm.mjs'], { cwd: repo, stdio: 'ignore' });
+
+writeFileSync(path.join(repo, 'packages/cli/src/index.ts'), 'export const cli = "changed";\n');
+execFileSync('git', ['add', 'packages/cli/src/index.ts'], { cwd: repo, stdio: 'ignore' });
+execFileSync('git', ['commit', '-m', 'package source change'], { cwd: repo, stdio: 'ignore' });
+const packageChangeSha = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+const packagePlan = planRunnerIncrementalBuild({
+  cwd: repo,
+  previousSealedSourceSha: sealedBaselineSha,
+  currentSealedSourceSha: packageChangeSha
+});
+assert.equal(packagePlan.incrementalEligible, true);
+assert.deepEqual(packagePlan.affectedPackages, ['packages/cli']);
+assert.deepEqual(packagePlan.unsafeReasons, []);
 
 writeFileSync(path.join(repo, 'scripts/build.ts'), 'console.log("changed");\n');
 execFileSync('git', ['add', 'scripts/build.ts'], { cwd: repo, stdio: 'ignore' });
@@ -89,13 +104,21 @@ assert.equal(inspectBuildCache({
   cwd: repo,
   buildTarget: 'full',
   buildInputsTreeHash: secondHash
-}).decision, 'cache-miss-build');
+}).decision, 'fullRebuild');
 
 const manifest = JSON.parse(readFileSync(path.join(repo, 'release/atm-root-drop/release-manifest.json'), 'utf8'));
 assert.equal(manifest.buildInputsTreeHash, firstHash);
 assert.equal(manifest.sealedSourceCommit, 'abc123');
-assert.equal(manifest.buildDecision, 'cache-miss-build');
+assert.equal(manifest.buildDecision, 'fullRebuild');
 assert.equal(manifest.phaseTimingsMs.rootDropReleaseAssembly, 5);
+
+const unsafePlan = planRunnerIncrementalBuild({
+  cwd: repo,
+  previousSealedSourceSha: packageChangeSha,
+  currentSealedSourceSha: execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim()
+});
+assert.equal(unsafePlan.incrementalEligible, false);
+assert.ok(unsafePlan.unsafeReasons.includes('build-script-change'));
 
 console.log('[sealed-runner-build-input-cache.test] ok');
 
