@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-040",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Runtime Residue / Session Events",
+  "finding": "A lane adoption event was written under `.atm/history/session-events/...` as an untracked file and pre-commit classified it as manual-review residue.",
+  "expectedBehavior": "Ephemeral lane/session events should either be written under ignored runtime storage or be lifecycle-managed into a compact tracked digest; they should not leave ambiguous untracked history files that block or distract later governed work.",
+  "evidenceOrRepro": "After ATM-GOV-0195 closeback, `git status --short` showed `?? .atm/history/session-events/lane-20260719134847-codex-governance-optimizer-ef8a433602/`; pre-commit residueReport classified the adopt JSON as `manual-review` with reason `path is not recognized as a known ATM auto-generated residue shape`.",
+  "followUp": "Decide whether lane session events are runtime logs or tracked evidence. If runtime, move them to `.atm/runtime/session-events` and gitignore them; if evidence, add deterministic seal/cleanup and pre-commit recognition."
+}
