@@ -182,6 +182,9 @@ function readTaskDocumentRelatedPlanPath(taskDocument) { const relatedPlan = tas
 function tryResolvePlanningCandidate(candidatePath, normalizedTaskId, cwd) { const absolutePath = resolveStoredPlanningPath(cwd, candidatePath).absolutePath; if (!existsSync(absolutePath))
     return null; const metadata = readPlanningCardMetadata(absolutePath); if (metadata.taskId && metadata.taskId !== normalizedTaskId)
     return null; return { absolutePath, metadata }; }
+function isFrameworkLedgerOnlyTemporaryTask(taskId, taskDocument) { if (!taskId.startsWith('ATM-FRAMEWORK-TEMP-'))
+    return false; const source = taskDocument.source; if (source && typeof source === 'object' && !Array.isArray(source) && typeof source.planPath === 'string')
+    return false; return readTaskDirectionPlanningCandidates(taskDocument).length === 0 && !readTaskDocumentRelatedPlanPath(taskDocument); }
 function slugifyPlanningTitle(title) { const slug = title.trim().toLowerCase().replace(/['"]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); return slug || 'task'; }
 function resolveCanonicalPlanningRelativePath(taskId, title, policy) {
     const pattern = policy.resolveCanonicalOutputPath.pattern;
@@ -235,6 +238,9 @@ export function resolveClosebackPlanningPath(input) {
         return { route: 'task-direction-fallback', planningMirrorPath: resolved.absolutePath.replace(/\\/g, '/'), profileRepoRoot: null, planningStatus: resolved.metadata.status, diagnostics: { codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_DIRECTION_FALLBACK'],
                 messages: [`Recovered planning path from task-direction runtime context: ${candidatePath}.`] } };
     }
+    if (isFrameworkLedgerOnlyTemporaryTask(normalizedTaskId, input.taskDocument)) {
+        return { route: 'ledger-only-target', planningMirrorPath: null, profileRepoRoot: null, planningStatus: null, diagnostics: { codes: ['ATM_TASKFLOW_CLOSE_LEDGER_ONLY_TARGET'], messages: [`Framework temporary task ${normalizedTaskId} has no planning mirror; taskflow close may proceed as a target-ledger-only closeback.`] } };
+    }
     if (!profileFallbackAvailable) {
         return { route: 'missing', planningMirrorPath: null, profileRepoRoot: null, planningStatus: null, diagnostics: { codes: [directPlanPathMissingMessage ? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING' : 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_UNAVAILABLE'],
                 messages: [directPlanPathMissingMessage ?? 'source.planPath is absent and no taskflow profile was supplied for governed fallback recovery.'] } };
@@ -273,7 +279,7 @@ export function assertClosebackPlanningPathReady(resolution, input) {
     if (!input.requirePlanningPath) {
         return;
     }
-    if (resolution.route === 'source-plan-path' || resolution.route === 'task-direction-fallback' || resolution.route === 'profile-root-fallback') {
+    if (resolution.route === 'source-plan-path' || resolution.route === 'task-direction-fallback' || resolution.route === 'profile-root-fallback' || resolution.route === 'ledger-only-target') {
         return;
     }
     const code = resolution.diagnostics.codes[0] ?? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING';

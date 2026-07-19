@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-002",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Auto-batch / Governance performance",
+  "finding": "ATM-GOV-0168 through ATM-GOV-0179 delivered the auto-batch pipeline primitives, but dogfood execution was still slow because the end-to-end operator path remained mostly manual: each card still required explicit card alignment, claim/close evidence, multiple validation passes, runner-sync/release artifact handling, separate 3KLife planning commits, and push verification. The final A/B rollout verdict also remained inconclusive because real broker ticket lane-event evidence was missing.",
+  "expectedBehavior": "A plan-level GOV wave should run through one guided command path that selects cards, executes Team Wave work, routes shared writes through Broker, checkpoints closure, records lane/session ticket evidence, and emits a performance report without repeated manual lifecycle decisions.",
+  "evidenceOrRepro": "Dogfood run for ATM-GOV-0168..ATM-GOV-0179 on 2026-07-18/2026-07-19. All tasks closed and pushed, but final goal usage was 2,846,530 tokens and about 3h 2m. ATM-GOV-0179 rollout verdict was recorded as inconclusive due to missing real broker-ticket evidence.",
+  "followUp": "Open a GOV performance card for a single plan-level executor command that collapses per-card boilerplate, caches repeated validators, records real broker ticket evidence by default, and reports per-wave elapsed time/token/test/build metrics against a baseline."
+}

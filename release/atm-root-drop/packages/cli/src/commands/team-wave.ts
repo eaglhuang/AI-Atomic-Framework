@@ -17,7 +17,8 @@ import {
 import { admitWave, type WaveAdmissionDecision } from '../../../core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, type TeamWaveEnvelope } from '../../../core/src/broker/team-wave-envelope.ts';
 import { createWaveManifest, evaluateWaveEligibility, type WaveManifest, type WaveManifestTask } from '../../../core/src/broker/wave-manifest.ts';
-import { effectiveExecutionState, validateWorkerReport, type TeamWorkerReport } from '../../../core/src/broker/team-worker-report.ts';
+import type { TeamWorkerReport } from '../../../core/src/broker/team-worker-report.ts';
+import { buildTeamWorkerExecutionRuntime, type TeamWorkerExecutionRuntime, type TeamWorkerExecutorResultState } from '../../../core/src/team-agents/worker-executor.ts';
 
 interface LedgerTask {
   readonly workItemId: string;
@@ -133,11 +134,14 @@ export interface TeamWaveRuntimeRecord {
   readonly taskIds: readonly string[];
   readonly manifest: WaveManifest;
   readonly lanes: readonly TeamWaveRuntimeLane[];
+  readonly workerExecution: TeamWorkerExecutionRuntime;
   readonly workerReports: readonly TeamWorkerReport[];
   readonly acceptedTaskIds: readonly string[];
   readonly deferredTaskIds: readonly string[];
+  readonly missingWorkerReports: readonly string[];
+  readonly invalidWorkerReports: readonly { readonly taskId: string; readonly reason: string }[];
   readonly outOfScopeFindings: readonly { readonly taskId: string; readonly files: readonly string[] }[];
-  readonly resultState: 'ready-for-write' | 'needs-review' | 'serial-fallback';
+  readonly resultState: TeamWorkerExecutorResultState;
   readonly writesPerformed: false;
   readonly createdAt: string;
 }
@@ -248,22 +252,7 @@ export function buildManifestRuntimeRecordFromBatch(input: {
     now: input.now
   });
   const reports = input.workerReports ?? [];
-  const outOfScopeFindings = buildOutOfScopeFindings(manifest, reports);
-  const invalidReports = reports.filter((report) => !validateWorkerReport(report).ok).map((report) => report.taskId);
-  const deferredTaskIds = reports
-    .filter((report) => {
-      const state = effectiveExecutionState(report);
-      return state === 'partial' || state === 'blocked' || state === 'not-started';
-    })
-    .map((report) => report.taskId);
-  const acceptedTaskIds = manifest.tasks
-    .map((task) => task.taskId)
-    .filter((taskId) => !deferredTaskIds.includes(taskId) && !invalidReports.includes(taskId));
-  const resultState = outOfScopeFindings.length > 0 || invalidReports.length > 0
-    ? 'needs-review'
-    : acceptedTaskIds.length < 2
-      ? 'serial-fallback'
-      : 'ready-for-write';
+  const workerExecution = buildTeamWorkerExecutionRuntime({ manifest, workerReports: reports, now: input.now });
   const runtime: TeamWaveRuntimeRecord = {
     schemaId: 'atm.teamWaveRuntime.v1',
     specVersion: '0.1.0',
@@ -272,23 +261,26 @@ export function buildManifestRuntimeRecordFromBatch(input: {
     executor: input.executor,
     coordinatorActorId: input.coordinatorActorId,
     taskIds: manifest.tasks.map((task) => task.taskId),
-    manifest: { ...manifest, state: resultState === 'ready-for-write' ? 'ready-for-write' : resultState === 'needs-review' ? 'needs-review' : 'planned' },
-    lanes: manifest.tasks.map((task, index) => ({
-      taskId: task.taskId,
-      laneSessionId: `lane-${input.waveId}-${String(index + 1).padStart(2, '0')}-${task.taskId.toLowerCase()}`,
+    manifest: { ...manifest, state: workerExecution.resultState === 'ready-for-write' ? 'ready-for-write' : workerExecution.resultState === 'needs-review' ? 'needs-review' : 'executing' },
+    lanes: workerExecution.lanes.map((lane) => ({
+      taskId: lane.taskId,
+      laneSessionId: lane.laneSessionId,
       workspace: createTeamShadowWorkspaceProviderPlan({ baseCommit: manifest.sealedBaseSha ?? 'HEAD' }),
       workerCanCommitOrClose: false,
       allowedReturnSchemas: ['atm.patchEnvelope.v1', 'atm.teamWorkerReport.v1']
     })),
+    workerExecution,
     workerReports: reports,
-    acceptedTaskIds,
-    deferredTaskIds,
-    outOfScopeFindings,
-    resultState,
+    acceptedTaskIds: workerExecution.acceptedTaskIds,
+    deferredTaskIds: workerExecution.deferredTaskIds,
+    missingWorkerReports: workerExecution.missingWorkerReports,
+    invalidWorkerReports: workerExecution.invalidWorkerReports,
+    outOfScopeFindings: workerExecution.outOfScopeFindings,
+    resultState: workerExecution.resultState,
     writesPerformed: false,
     createdAt: input.now ?? new Date().toISOString()
   };
-  return { ok: resultState !== 'needs-review', runtime, reason: null, batchRun };
+  return { ok: workerExecution.resultState !== 'needs-review', runtime, reason: null, batchRun };
 }
 
 function selectManifestTasksFromQueue(cwd: string, tasks: readonly TaskDirectionTask[], waveId: string): readonly WaveManifestTask[] {
@@ -311,26 +303,6 @@ function selectManifestTasksFromQueue(cwd: string, tasks: readonly TaskDirection
     if (selected.length >= 4) break;
   }
   return selected;
-}
-
-function buildOutOfScopeFindings(manifest: WaveManifest, reports: readonly TeamWorkerReport[]) {
-  const byTask = new Map(manifest.tasks.map((task) => [task.taskId, task]));
-  return reports
-    .map((report) => {
-      const task = byTask.get(report.taskId);
-      const files = task ? report.changedFiles.filter((file) => !pathAllowedByScope(file, task.scopePaths)) : report.changedFiles;
-      return { taskId: report.taskId, files };
-    })
-    .filter((entry) => entry.files.length > 0);
-}
-
-function pathAllowedByScope(filePath: string, scopePaths: readonly string[]): boolean {
-  const normalized = normalizeRepoPath(filePath);
-  return scopePaths.some((scope) => {
-    const allowed = normalizeRepoPath(scope);
-    if (allowed.endsWith('/**')) return normalized.startsWith(allowed.slice(0, -3));
-    return normalized === allowed || normalized.startsWith(`${allowed.replace(/\/$/, '')}/`);
-  });
 }
 
 function readTaskValidators(cwd: string, taskPath: string): readonly string[] {

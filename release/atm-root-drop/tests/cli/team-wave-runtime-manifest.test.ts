@@ -92,10 +92,44 @@ async function testManifestDispatch() {
     assert.equal(runtime.manifest.schemaId, 'atm.waveManifest.v1');
     assert.deepEqual(runtime.taskIds, ['TASK-WAVE-RUNTIME-A', 'TASK-WAVE-RUNTIME-B']);
     assert.deepEqual(runtime.lanes.map((lane: any) => lane.workerCanCommitOrClose), [false, false]);
-    assert.equal(runtime.resultState, 'ready-for-write');
+    assert.equal(runtime.resultState, 'executing');
+    assert.deepEqual(runtime.missingWorkerReports, ['TASK-WAVE-RUNTIME-A', 'TASK-WAVE-RUNTIME-B']);
     assert.equal(existsSync(path.join(repo, '.atm/runtime/team-waves/wave-runtime-fixture.json')), true);
     const dirty = execFileSync('git', ['ls-files', '--others', '--exclude-standard'], { cwd: repo, encoding: 'utf8' });
     assert.match(dirty, /\.atm\/runtime\/team-waves\/wave-runtime-fixture\.json/);
+
+    const reportA = path.join(repo, 'report-a.json');
+    const reportB = path.join(repo, 'report-b.json');
+    writeJson(reportA, {
+      schemaId: 'atm.teamWorkerReport.v1',
+      specVersion: '0.1.0',
+      migration: { strategy: 'none', fromVersion: null, notes: 'fixture' },
+      reportId: 'report-a',
+      taskId: 'TASK-WAVE-RUNTIME-A',
+      workerActorId: 'worker-a',
+      executionState: 'done',
+      changedFiles: ['packages/cli/src/commands/team/TASK-WAVE-RUNTIME-A.ts'],
+      validatorRuns: [{ command: 'npm run typecheck', passed: true }],
+      deviations: [],
+      metadata: { reportedAt: '2026-07-18T00:00:00.000Z', waveId: 'wave-runtime-fixture' }
+    });
+    writeJson(reportB, {
+      schemaId: 'atm.teamWorkerReport.v1',
+      specVersion: '0.1.0',
+      migration: { strategy: 'none', fromVersion: null, notes: 'fixture' },
+      reportId: 'report-b',
+      taskId: 'TASK-WAVE-RUNTIME-B',
+      workerActorId: 'worker-b',
+      executionState: 'done',
+      changedFiles: ['packages/cli/src/commands/team/TASK-WAVE-RUNTIME-B.ts'],
+      validatorRuns: [{ command: 'npm run typecheck', passed: true }],
+      deviations: [],
+      metadata: { reportedAt: '2026-07-18T00:01:00.000Z', waveId: 'wave-runtime-fixture' }
+    });
+    const ready = await runTeam(['wave', 'dispatch', '--cwd', repo, '--batch', batchRun.batchId, '--wave', 'wave-runtime-fixture', '--executor', 'local-lanes', '--actor', 'coordinator-a', '--worker-report', reportA, '--worker-report', reportB, '--json']);
+    assert.equal(ready.ok, true);
+    assert.equal((ready.evidence as any).waveRuntime.resultState, 'ready-for-write');
+    assert.deepEqual((ready.evidence as any).waveRuntime.acceptedTaskIds, ['TASK-WAVE-RUNTIME-A', 'TASK-WAVE-RUNTIME-B']);
   } finally {
     rmSync(repo, { recursive: true, force: true });
   }

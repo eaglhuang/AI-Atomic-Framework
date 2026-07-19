@@ -10,7 +10,7 @@ export function createOrRefreshTaskQueue(input) {
     const requestedTaskIds = input.taskIds && input.taskIds.length > 0
         ? uniqueInOrder(input.taskIds)
         : uniqueInOrder(input.tasks.map((task) => task.workItemId));
-    const taskIds = orderTaskIdsByDependencies(input.tasks, requestedTaskIds);
+    const taskIds = orderTaskIdsByDependencies(input.tasks, requestedTaskIds).filter((taskId) => !isLedgerTerminalQueueTask(input.cwd, taskId));
     const queueId = buildQueueId(sourcePrompt, taskIds);
     const now = new Date().toISOString();
     const existing = readTaskQueue(input.cwd, queueId);
@@ -31,7 +31,7 @@ export function createOrRefreshTaskQueue(input) {
         taskIds,
         tasks: taskIds.map((taskId) => input.tasks.find((task) => task.workItemId === taskId)).filter((task) => Boolean(task)),
         currentIndex,
-        status: 'active',
+        status: taskIds.length === 0 ? 'completed' : 'active',
         createdByActor: activeExisting?.createdByActor ?? input.actorId ?? null,
         createdAt: activeExisting?.createdAt ?? now,
         updatedAt: now
@@ -89,7 +89,10 @@ function orderTaskIdsByDependencies(tasks, requestedTaskIds) {
 }
 export function findActiveTaskQueue(cwd, sourcePrompt, selector = {}) {
     const promptHash = sourcePrompt?.trim() ? sha256(sourcePrompt.trim()) : null;
-    const queues = listTaskQueues(cwd).filter((queue) => queue.status === 'active');
+    const queues = listTaskQueues(cwd)
+        .filter((queue) => queue.status === 'active')
+        .map((queue) => normalizeTaskQueueForTerminalLedgerTasks(cwd, queue))
+        .filter((queue) => queue.status === 'active');
     if (selector.queueId)
         return queues.find((queue) => queue.queueId === selector.queueId) ?? null;
     if (selector.batchId)
@@ -134,7 +137,7 @@ export function advanceTaskQueueHead(cwd, taskId, selector = {}) {
     const currentTaskId = queue.taskIds[queue.currentIndex] ?? null;
     if (currentTaskId !== taskId)
         return queue;
-    const nextIndex = queue.currentIndex + 1;
+    const nextIndex = findNextOpenQueueIndex(cwd, queue, queue.currentIndex + 1);
     const now = new Date().toISOString();
     const updated = {
         ...queue,
@@ -144,6 +147,45 @@ export function advanceTaskQueueHead(cwd, taskId, selector = {}) {
     };
     writeTaskQueue(cwd, updated);
     return updated;
+}
+function findNextOpenQueueIndex(cwd, queue, startIndex) {
+    for (let index = startIndex; index < queue.taskIds.length; index += 1) {
+        const candidateTaskId = queue.taskIds[index];
+        if (!candidateTaskId || isLedgerTerminalQueueTask(cwd, candidateTaskId))
+            continue;
+        return index;
+    }
+    return queue.taskIds.length;
+}
+function normalizeTaskQueueForTerminalLedgerTasks(cwd, queue) {
+    const nextOpenIndex = findNextOpenQueueIndex(cwd, queue, queue.currentIndex);
+    if (nextOpenIndex === queue.currentIndex)
+        return queue;
+    const now = new Date().toISOString();
+    const updated = {
+        ...queue,
+        currentIndex: Math.min(nextOpenIndex, Math.max(0, queue.taskIds.length - 1)),
+        status: nextOpenIndex >= queue.taskIds.length ? 'completed' : 'active',
+        updatedAt: now
+    };
+    writeTaskQueue(cwd, updated);
+    return updated;
+}
+function isLedgerTerminalQueueTask(cwd, taskId) {
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (!existsSync(taskPath))
+        return false;
+    try {
+        const parsed = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const status = typeof parsed.status === 'string' ? parsed.status.toLowerCase() : '';
+        return status === 'done'
+            || status === 'abandoned'
+            || typeof parsed.closedAt === 'string'
+            || typeof parsed.closedByActor === 'string';
+    }
+    catch {
+        return false;
+    }
 }
 export function restoreTaskQueueHead(cwd, taskId, selector = {}) {
     const queue = findActiveTaskQueue(cwd, null, { ...selector, taskId });

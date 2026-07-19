@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-010",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Validation telemetry / validator lifecycle",
+  "finding": "ATM validation surfaces can grow monotonically and make common flows slower because validators do not yet emit enough per-validator usage, latency, trigger-rate, failure-rate, and defect-interception counters to justify their placement in fast, default, full, or archive tiers.",
+  "expectedBehavior": "Every validation unit should emit lightweight instrument-mode counters: validator id, mode tier, invocation count, skipped count, duration, failure count, blocking count, downstream defect/incident link when known, and task/surface context. Fast/default/full placement should be evidence-driven. Rarely used or expensive validators should move to full; never-used or no-impact validators should be archived or sampled.",
+  "evidenceOrRepro": "During 2026-07-19 dogfood, repeated source and governance commits required increasingly broad validation. The user observed that validation will keep getting slower unless each validator has counters that prove frequency and value. Existing validate:cli fast reports aggregate timing, but not enough per-validator lifecycle data to demote or retire specific checks.",
+  "followUp": "Add a validator telemetry schema and runtime journal that is fail-open and gitignored by default, with digest rollups in close/batch evidence. Integrate it into validate:cli, doctor, pre-commit, task audit, runner-sync, and batch checkpoint surfaces. Add policy thresholds: promote high-value frequent blockers to fast/default, demote low-frequency or high-cost checks to full, archive never-used/no-impact validators after a defined observation window, and require validation telemetry itself to prove it drove at least one optimization decision or be sampled."
+}

@@ -4,7 +4,8 @@ import { type WavePlan } from '../../../core/src/broker/team-wave-planner.ts';
 import { type WaveAdmissionDecision } from '../../../core/src/broker/team-wave-admission.ts';
 import { type TeamWaveEnvelope } from '../../../core/src/broker/team-wave-envelope.ts';
 import { type WaveManifest } from '../../../core/src/broker/wave-manifest.ts';
-import { type TeamWorkerReport } from '../../../core/src/broker/team-worker-report.ts';
+import type { TeamWorkerReport } from '../../../core/src/broker/team-worker-report.ts';
+import { type TeamWorkerExecutionRuntime, type TeamWorkerExecutorResultState } from '../../../core/src/team-agents/worker-executor.ts';
 /**
  * Build a wave plan for an explicit set of task ids, reading their declared
  * metadata from the ledger. Append-safe paths default to the coverage map,
@@ -32,14 +33,20 @@ export interface TeamWaveRuntimeRecord {
     readonly taskIds: readonly string[];
     readonly manifest: WaveManifest;
     readonly lanes: readonly TeamWaveRuntimeLane[];
+    readonly workerExecution: TeamWorkerExecutionRuntime;
     readonly workerReports: readonly TeamWorkerReport[];
     readonly acceptedTaskIds: readonly string[];
     readonly deferredTaskIds: readonly string[];
+    readonly missingWorkerReports: readonly string[];
+    readonly invalidWorkerReports: readonly {
+        readonly taskId: string;
+        readonly reason: string;
+    }[];
     readonly outOfScopeFindings: readonly {
         readonly taskId: string;
         readonly files: readonly string[];
     }[];
-    readonly resultState: 'ready-for-write' | 'needs-review' | 'serial-fallback';
+    readonly resultState: TeamWorkerExecutorResultState;
     readonly writesPerformed: false;
     readonly createdAt: string;
 }

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-004",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Auto-batch analyzer / Performance evidence",
+  "finding": "The current auto-batch rollout analyzer can classify a run as improved from synthetic broker-ticket events when batchRate is at least 0.70 and build/projection ticket counts are within limits, without requiring paired serial/treatment makespan, throughput, cost, or real lane evidence. ATM-GOV-0179's focused test exercises this synthetic path rather than a real paired A/B dogfood run.",
+  "expectedBehavior": "An improved verdict must require real plan-run control and treatment samples joined through durable task, wave, broker, checkpoint, and lane-session evidence. Missing makespan, throughput, cost, sample-size, or safety evidence must produce inconclusive, never improved.",
+  "evidenceOrRepro": "In scripts/analyze-captain-parallel-ledger.ts, summarizeAutoBatchPipeline derives improved from ticket batch eligibility and generated-write counts. tests/cli/strict-paired-ab-dogfood.test.ts supplies three synthetic broker-ticket lane events and expects improved without a serial/treatment timing comparison. ATM-GOV-0179 remains historically done, but its performance claim is unproven.",
+  "followUp": "ATM-GOV-0190 in doc_atm_gov_auto_batch_perf_plan_v2 must deliver Analyzer v3, real lane-session joins, deterministic replay, prospective paired GOV dogfood, sample thresholds, and a verdict that gates on speed, cost, safety, and batching evidence."
+}

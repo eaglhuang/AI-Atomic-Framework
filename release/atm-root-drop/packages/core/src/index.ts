@@ -450,4 +450,5 @@ export * from './police/family.ts';
 export * from './broker/index.ts';
 export * from './evidence/index.ts';
 export * from './telemetry/index.ts';
+export * from './team-agents/index.ts';
 export * from './batch/plan-run-journal.ts';

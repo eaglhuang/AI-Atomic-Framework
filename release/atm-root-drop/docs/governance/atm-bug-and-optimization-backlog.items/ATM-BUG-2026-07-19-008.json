@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-008",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Framework-mode skill / first-layer command guidance",
+  "finding": "framework-mode release usage is not exposed clearly enough in first-layer ATM skill/workflow guidance. During dogfood, the operator attempted `node atm.mjs framework-mode release --actor codex-governance-optimizer --task ATM-FRAMEWORK-TEMP-codex-governance-optimizer --json`, but the CLI rejected `--task`; the correct release surface is actor-only. The agent had to query CLI help mid-flow.",
+  "expectedBehavior": "First-layer ATM framework/development skills and command-surface guidance should show the exact claim/release command pair up front, including that framework-mode release is actor-scoped and does not accept --task. Agents should not need to discover basic lifecycle syntax by trial-and-error help queries during a governed closeout.",
+  "evidenceOrRepro": "2026-07-19 dogfood while closing/pushing the taskflow ledger-only TEMP fix: `node atm.mjs framework-mode release --actor codex-governance-optimizer --task ATM-FRAMEWORK-TEMP-codex-governance-optimizer --json` failed with ATM_CLI_USAGE: framework-mode does not support option --task. `node atm.mjs framework-mode --help` then revealed the correct example: `node atm.mjs framework-mode release --actor codex-main --json`.",
+  "followUp": "Open a GOV card to update the repo-local ATM skill entrypoints and command-surface docs so framework-mode claim/release appear in the first-layer workflow. Include exact examples, actor identity expectations, and a note that release is actor-scoped. Add a skill regression/snapshot check so future skill text does not omit this lifecycle syntax."
+}

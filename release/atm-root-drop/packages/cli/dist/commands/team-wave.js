@@ -13,7 +13,7 @@ import { planWaves } from '../../../core/dist/broker/team-wave-planner.js';
 import { admitWave } from '../../../core/dist/broker/team-wave-admission.js';
 import { createTeamWaveEnvelope } from '../../../core/dist/broker/team-wave-envelope.js';
 import { createWaveManifest, evaluateWaveEligibility } from '../../../core/dist/broker/wave-manifest.js';
-import { effectiveExecutionState, validateWorkerReport } from '../../../core/dist/broker/team-worker-report.js';
+import { buildTeamWorkerExecutionRuntime } from '../../../core/dist/team-agents/worker-executor.js';
 const TASKS_DIR = '.atm/history/tasks';
 function readLedgerTask(cwd, taskId) {
     const file = path.join(cwd, TASKS_DIR, `${taskId}.json`);
@@ -162,22 +162,7 @@ export function buildManifestRuntimeRecordFromBatch(input) {
         now: input.now
     });
     const reports = input.workerReports ?? [];
-    const outOfScopeFindings = buildOutOfScopeFindings(manifest, reports);
-    const invalidReports = reports.filter((report) => !validateWorkerReport(report).ok).map((report) => report.taskId);
-    const deferredTaskIds = reports
-        .filter((report) => {
-        const state = effectiveExecutionState(report);
-        return state === 'partial' || state === 'blocked' || state === 'not-started';
-    })
-        .map((report) => report.taskId);
-    const acceptedTaskIds = manifest.tasks
-        .map((task) => task.taskId)
-        .filter((taskId) => !deferredTaskIds.includes(taskId) && !invalidReports.includes(taskId));
-    const resultState = outOfScopeFindings.length > 0 || invalidReports.length > 0
-        ? 'needs-review'
-        : acceptedTaskIds.length < 2
-            ? 'serial-fallback'
-            : 'ready-for-write';
+    const workerExecution = buildTeamWorkerExecutionRuntime({ manifest, workerReports: reports, now: input.now });
     const runtime = {
         schemaId: 'atm.teamWaveRuntime.v1',
         specVersion: '0.1.0',
@@ -186,23 +171,26 @@ export function buildManifestRuntimeRecordFromBatch(input) {
         executor: input.executor,
         coordinatorActorId: input.coordinatorActorId,
         taskIds: manifest.tasks.map((task) => task.taskId),
-        manifest: { ...manifest, state: resultState === 'ready-for-write' ? 'ready-for-write' : resultState === 'needs-review' ? 'needs-review' : 'planned' },
-        lanes: manifest.tasks.map((task, index) => ({
-            taskId: task.taskId,
-            laneSessionId: `lane-${input.waveId}-${String(index + 1).padStart(2, '0')}-${task.taskId.toLowerCase()}`,
+        manifest: { ...manifest, state: workerExecution.resultState === 'ready-for-write' ? 'ready-for-write' : workerExecution.resultState === 'needs-review' ? 'needs-review' : 'executing' },
+        lanes: workerExecution.lanes.map((lane) => ({
+            taskId: lane.taskId,
+            laneSessionId: lane.laneSessionId,
             workspace: createTeamShadowWorkspaceProviderPlan({ baseCommit: manifest.sealedBaseSha ?? 'HEAD' }),
             workerCanCommitOrClose: false,
             allowedReturnSchemas: ['atm.patchEnvelope.v1', 'atm.teamWorkerReport.v1']
         })),
+        workerExecution,
         workerReports: reports,
-        acceptedTaskIds,
-        deferredTaskIds,
-        outOfScopeFindings,
-        resultState,
+        acceptedTaskIds: workerExecution.acceptedTaskIds,
+        deferredTaskIds: workerExecution.deferredTaskIds,
+        missingWorkerReports: workerExecution.missingWorkerReports,
+        invalidWorkerReports: workerExecution.invalidWorkerReports,
+        outOfScopeFindings: workerExecution.outOfScopeFindings,
+        resultState: workerExecution.resultState,
         writesPerformed: false,
         createdAt: input.now ?? new Date().toISOString()
     };
-    return { ok: resultState !== 'needs-review', runtime, reason: null, batchRun };
+    return { ok: workerExecution.resultState !== 'needs-review', runtime, reason: null, batchRun };
 }
 function selectManifestTasksFromQueue(cwd, tasks, waveId) {
     const selected = [];
@@ -228,25 +216,6 @@ function selectManifestTasksFromQueue(cwd, tasks, waveId) {
             break;
     }
     return selected;
-}
-function buildOutOfScopeFindings(manifest, reports) {
-    const byTask = new Map(manifest.tasks.map((task) => [task.taskId, task]));
-    return reports
-        .map((report) => {
-        const task = byTask.get(report.taskId);
-        const files = task ? report.changedFiles.filter((file) => !pathAllowedByScope(file, task.scopePaths)) : report.changedFiles;
-        return { taskId: report.taskId, files };
-    })
-        .filter((entry) => entry.files.length > 0);
-}
-function pathAllowedByScope(filePath, scopePaths) {
-    const normalized = normalizeRepoPath(filePath);
-    return scopePaths.some((scope) => {
-        const allowed = normalizeRepoPath(scope);
-        if (allowed.endsWith('/**'))
-            return normalized.startsWith(allowed.slice(0, -3));
-        return normalized === allowed || normalized.startsWith(`${allowed.replace(/\/$/, '')}/`);
-    });
 }
 function readTaskValidators(cwd, taskPath) {
     const file = path.join(cwd, taskPath);

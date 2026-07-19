@@ -215,9 +215,10 @@ export function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write')
     const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
     profile.mark('dedupe-tasks');
     const tasks = allTasks
-        .filter((task) => isTaskRoutable(task.status, taskIntent)
-        || isTaskExplicitlyMentioned(task, taskIntent)
-        || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && isActiveClaimedTask(task)))
+        .filter((task) => !isTerminalImportedTask(task)
+        && (isTaskRoutable(task.status, taskIntent)
+            || isTaskExplicitlyMentioned(task, taskIntent)
+            || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && isActiveClaimedTask(task))))
         .sort((left, right) => {
         const statusWeight = statusQueueWeight(left.status) - statusQueueWeight(right.status);
         return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
@@ -348,6 +349,13 @@ export function shouldSkipMarkdownTaskDiscovery(cwd, jsonTasks, taskIntent) {
     }
     const promptScopedJsonRoute = resolvePromptScopedTaskRoute(cwd, jsonTasks, taskIntent);
     return Boolean(promptScopedJsonRoute && promptScopedJsonRoute.selectedTasks.length > 0);
+}
+function isTerminalImportedTask(task) {
+    const status = normalizeTaskRouteStatus(task.status);
+    return status === 'done'
+        || status === 'abandoned'
+        || Boolean(task.closedAt)
+        || Boolean(task.closedByActor);
 }
 export function selectImportedTaskForPromptScope(selectedTaskPool, isActiveQueue, explicitSingleTaskRoute, statusById, cwd) {
     if (isActiveQueue || explicitSingleTaskRoute) {
