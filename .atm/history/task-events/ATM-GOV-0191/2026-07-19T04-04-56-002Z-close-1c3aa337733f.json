@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T04-04-56-002Z-close-1c3aa337733f",
+  "taskId": "ATM-GOV-0191",
+  "action": "close",
+  "actorId": "codex-error-code-governance",
+  "sessionId": "session-20260719035424-codex-error-code-governance-ATM-GOV-0191-a2752be69e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0191.json",
+  "taskSha256": "sha256:71ba71aad5369c073eb7c3048ec309fe01215466a99735f44af49a2ea6816082",
+  "createdAt": "2026-07-19T04:04:56.002Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0191 --actor codex-error-code-governance --status done --historical-delivery 056292af13ed57dc4d27f3f10263917b88797919 --historical-delivery 60cfbda0664339cbb48eac83b405bf8809120391",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719035424-codex-error-code-governance-ATM-GOV-0191-a2752be69e",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0191.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T04:04:55.988Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/**",
+        ".atm/history/evidence/ATM-GOV-0191.*",
+        ".atm/history/task-events/ATM-GOV-0191/**",
+        ".atm/history/tasks/ATM-GOV-0191.json",
+        ".atm/integrations/*.manifest.json",
+        ".claude/skills/**",
+        ".cursor/rules/skills/**",
+        ".gemini/commands/**",
+        ".github/instructions/**",
+        "GEMINI.md",
+        "integrations/codex-skills/**",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop/**",
+        "templates/skills/atm-dispatch.skill.md",
+        "templates/skills/atm-error-code-resolver.skill.md",
+        "templates/skills/atm-task-card-authoring.skill.md"
+      ],
+      "criticalChangedFiles": [
+        "integrations/codex-skills/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

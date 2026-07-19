@@ -1,0 +1,187 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0191",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "60cfbda0664339cbb48eac83b405bf8809120391",
+  "governedTreeSha": "d08fb36aa9a881e6dc84061c7f88ccf530ea0e32",
+  "targetCommitDelta": {
+    "currentCommitSha": "60cfbda0664339cbb48eac83b405bf8809120391",
+    "parentCommitShas": [
+      "60cfbda0664339cbb48eac83b405bf8809120391"
+    ],
+    "governedTreeSha": "d08fb36aa9a881e6dc84061c7f88ccf530ea0e32",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-error-code-resolver/SKILL.md",
+      ".atm/history/evidence/ATM-GOV-0191.runner-sync-receipt.json",
+      ".claude/skills/atm-dispatch/SKILL.md",
+      ".claude/skills/atm-error-code-resolver/SKILL.md",
+      ".cursor/rules/skills/atm-dispatch/SKILL.md",
+      ".cursor/rules/skills/atm-error-code-resolver/SKILL.md",
+      ".gemini/commands/atm-dispatch.toml",
+      ".gemini/commands/atm-error-code-resolver.toml",
+      ".github/instructions/atm-dispatch.instructions.md",
+      ".github/instructions/atm-error-code-resolver.instructions.md",
+      ".github/prompts/atm-dispatch.prompt.md",
+      ".github/prompts/atm-error-code-resolver.prompt.md",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "integrations/codex-skills/atm-error-code-resolver/SKILL.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-dispatch/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-error-code-resolver/SKILL.md",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+      "release/atm-root-drop/templates/skills/atm-error-code-resolver.skill.md",
+      "release/atm-root-drop/templates/skills/atm-task-card-authoring.skill.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-skill-templates.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cd9a3a39183f338c0eebb8fff718fa89c3a48386fd91d8b4a4d62b6b86823f4b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fa733ad7046eec7243ec9ea004ac479e6b4473afae5452ee630f09a5051b275d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:3d732df37208691212db689c7fa02229edad63feb038401704b4f2ad55062ebe",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "check:encoding:touched",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:skill-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-19T04:04:55.988Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".agents/skills/**",
+      ".atm/history/evidence/ATM-GOV-0191.*",
+      ".atm/history/task-events/ATM-GOV-0191/**",
+      ".atm/history/tasks/ATM-GOV-0191.json",
+      ".atm/integrations/*.manifest.json",
+      ".claude/skills/**",
+      ".cursor/rules/skills/**",
+      ".gemini/commands/**",
+      ".github/instructions/**",
+      "GEMINI.md",
+      "integrations/codex-skills/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop/**",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-error-code-resolver.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md"
+    ],
+    "criticalChangedFiles": [
+      "integrations/codex-skills/**"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0191.json",
+  "closedAt": "2026-07-19T04:04:55.989Z",
+  "closedByActor": "codex-error-code-governance",
+  "sessionId": "session-20260719035424-codex-error-code-governance-ATM-GOV-0191-a2752be69e",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "056292af13ed57dc4d27f3f10263917b88797919",
+    "taskMatchedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-error-code-resolver/SKILL.md",
+      ".claude/skills/atm-dispatch/SKILL.md",
+      ".claude/skills/atm-error-code-resolver/SKILL.md",
+      ".cursor/rules/skills/atm-dispatch/SKILL.md",
+      ".cursor/rules/skills/atm-error-code-resolver/SKILL.md",
+      ".gemini/commands/atm-dispatch.toml",
+      ".gemini/commands/atm-error-code-resolver.toml",
+      ".github/instructions/atm-dispatch.instructions.md",
+      ".github/instructions/atm-error-code-resolver.instructions.md",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "integrations/codex-skills/atm-error-code-resolver/SKILL.md"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0191.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0191/2026-07-19T03-54-15-374Z-import-c8e8636af32f.json",
+      ".atm/history/task-events/ATM-GOV-0191/2026-07-19T03-54-24-071Z-reserve-dbe19bf25f0d.json",
+      ".atm/history/task-events/ATM-GOV-0191/2026-07-19T03-54-24-073Z-promote-c7e24df2c790.json",
+      ".atm/history/task-events/ATM-GOV-0191/2026-07-19T03-54-25-592Z-claim-071d64d2efea.json",
+      ".atm/history/tasks/ATM-GOV-0191.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+      "release/atm-root-drop/templates/skills/atm-error-code-resolver.skill.md",
+      "release/atm-root-drop/templates/skills/atm-task-card-authoring.skill.md"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
