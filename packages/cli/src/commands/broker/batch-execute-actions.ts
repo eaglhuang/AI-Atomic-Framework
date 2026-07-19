@@ -149,6 +149,12 @@ function digestOutputFiles(cwd: string, files: readonly string[]): string {
   return `sha256:${hash.digest('hex')}`;
 }
 
+function timeOutputDigest(cwd: string, files: readonly string[]) {
+  const started = Date.now();
+  const digest = digestOutputFiles(cwd, files);
+  return { digest, durationMs: Date.now() - started };
+}
+
 function runGeneratedCommand(cwd: string, command: string) {
   const started = Date.now();
   const result = spawnSync(command, {
@@ -195,9 +201,10 @@ export function handleBrokerBatchExecute(options: ParsedBrokerOptions, context: 
     const commandRun = options.apply && options.runCommand
       ? runGeneratedCommand(options.cwd, options.runCommand)
       : null;
-    const observedOutputDigest = options.runCommand
-      ? digestOutputFiles(options.cwd, options.outputFiles)
-      : options.receiptDigest;
+    const outputDigestMeasurement = options.runCommand
+      ? timeOutputDigest(options.cwd, options.outputFiles)
+      : null;
+    const observedOutputDigest = outputDigestMeasurement?.digest ?? options.receiptDigest;
     if (!observedOutputDigest) {
       throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection requires --receipt-digest when no --run-command is provided.', { exitCode: 2 });
     }
@@ -222,7 +229,11 @@ export function handleBrokerBatchExecute(options: ParsedBrokerOptions, context: 
       command: commandRun ? options.runCommand : null,
       commandExitCode: commandRun?.exitCode ?? null,
       commandDurationMs: commandRun?.durationMs ?? null,
-      phaseTimingsMs: commandRun ? { command: commandRun.durationMs, outputDigestCalculation: 0, totalElapsed: commandRun.durationMs } : null,
+      phaseTimingsMs: commandRun ? {
+        command: commandRun.durationMs,
+        outputDigestCalculation: outputDigestMeasurement?.durationMs ?? 0,
+        totalElapsed: commandRun.durationMs + (outputDigestMeasurement?.durationMs ?? 0)
+      } : null,
       observedOutputFiles: options.runCommand ? options.outputFiles : [],
       expectedTaskIds: options.expectedTasks
     });
