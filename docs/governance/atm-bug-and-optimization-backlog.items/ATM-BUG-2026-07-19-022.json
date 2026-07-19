@@ -6,9 +6,9 @@
   "type": "Optimization",
   "severity": "High",
   "status": "Needs task card",
-  "area": "Runner Sync / Build Telemetry",
-  "finding": "runner-sync build timing currently appears as terminal output, ad hoc operator measurement, or git-tracked receipts, not as a first-class gitignored telemetry stream for trend analysis.",
-  "expectedBehavior": "Every runner-sync build should emit structured timing telemetry with cacheHitSkip, incrementalBuild, fullRebuild, phaseTimingsMs, output file count, input/output digest, sealed source SHA, steward work id, and exit status under .atm/runtime/telemetry or another gitignored log surface. Git history should keep only compact decision digests, close summaries, or deliberately selected baselines; repeated raw build telemetry must not be committed by default.",
-  "evidenceOrRepro": "During ATM-GOV-0187 closeout, npm run build produced a seed metric: totalElapsed=42004ms from .atm/history/evidence/ATM-GOV-0187.runner-sync-receipt.json, mode=cache-miss full, sealedSourceSha=313a8151abb4b09fe1fc55df53f8973f3899c7c6, stewardWorkId=runner-sync-19213019. The receipt also demonstrated why raw per-build telemetry should not accumulate in Git history.",
-  "followUp": "Fold this into ATM-GOV-0194 and/or a dedicated runner telemetry task so future task cards can consume cumulative build-speed data from gitignored runtime telemetry before deciding whether to optimize, defer, or rewrite scope."
+  "area": "Runtime Telemetry / Build Telemetry",
+  "finding": "ATM statistics and logs can appear as terminal output, ad hoc operator measurement, or git-tracked receipts instead of a first-class gitignored runtime telemetry stream.",
+  "expectedBehavior": "All raw statistics and logs should be written to local disk under .atm/runtime/telemetry or another gitignored log surface. This includes counters, per-run timing events, validation usage, debug logs, broker decision traces, runner-sync receipts, and other high-frequency telemetry. Git history should keep only compact decision digests, close summaries, or deliberately selected baselines; repeated raw telemetry/log/receipt streams must not be committed by default.",
+  "evidenceOrRepro": "During ATM-GOV-0187 closeout, npm run build produced a seed metric: totalElapsed=42004ms from .atm/history/evidence/ATM-GOV-0187.runner-sync-receipt.json, mode=cache-miss full, sealedSourceSha=313a8151abb4b09fe1fc55df53f8973f3899c7c6, stewardWorkId=runner-sync-19213019. The receipt also demonstrated why raw per-run telemetry should not accumulate in Git history.",
+  "followUp": "Fold this into ATM-GOV-0194 and/or a dedicated runtime telemetry task so future task cards can consume cumulative local telemetry before deciding whether to optimize, defer, or rewrite scope."
 }
