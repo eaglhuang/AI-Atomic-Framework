@@ -1,14 +1,17 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0191",
-  "updatedAt": "2026-07-19T13:31:14.733Z",
+  "updatedAt": "2026-07-19T13:37:13.302Z",
   "updatedBy": "codex-governance-optimizer",
   "freshValidationPasses": [
     "node --strip-types tests/cli/runner-sync-incremental-build.test.ts",
     "typecheck",
     "validate:cli",
+    "validate:git-head-evidence",
     "validate:internal-release-sync",
+    "validate:onefile-release",
     "validate:physical-line-budget",
+    "validate:root-drop-release",
     "validate:runner-build-scope"
   ],
   "staleValidationPasses": [],
@@ -124,6 +127,45 @@
         "typecheck"
       ],
       "generatedAt": "2026-07-19T13:31:14.984Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-19T13:35:05.514Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-07-19T13:37:02.172Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:root-drop-release"
+      ],
+      "generatedAt": "2026-07-19T13:37:13.573Z",
       "runnerKind": "unknown",
       "sourceCommit": null,
       "cached": false

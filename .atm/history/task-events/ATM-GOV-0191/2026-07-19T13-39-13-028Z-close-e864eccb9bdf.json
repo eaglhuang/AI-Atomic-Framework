@@ -1,0 +1,91 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T13-39-13-028Z-close-e864eccb9bdf",
+  "taskId": "ATM-GOV-0191",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0191.json",
+  "taskSha256": "sha256:e5837f6bde0432e074d8812f6e91730dcc1ed82748137fbd45e7c3a3497c4303",
+  "createdAt": "2026-07-19T13:39:13.028Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0191 --actor codex-governance-optimizer --status done --historical-delivery 14122b6af9cf4f2fe27cda68e39a454ebb47030e --historical-delivery f805f51edb4e1a0275c8227866fa6844d7241cab",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0191.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/runner-sync-incremental-build.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:internal-release-sync",
+      "validate:onefile-release",
+      "validate:physical-line-budget",
+      "validate:root-drop-release",
+      "validate:runner-build-scope"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T13:39:13.012Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0191.*",
+        ".atm/history/evidence/ATM-GOV-0191.runner-sync-receipt.json",
+        ".atm/history/task-events/ATM-GOV-0191/**",
+        ".atm/history/tasks/ATM-GOV-0191.json",
+        ".gitignore",
+        "packages/cli/src/commands/broker/registry-actions.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "scripts/AtmCore/runner-build-scope.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-build-scope.test.ts",
+        "tests/cli/runner-sync-incremental-build.test.ts",
+        "tests/cli/runner-sync-steward-release.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/registry-actions.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "scripts/AtmCore/runner-build-scope.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-build-scope.test.ts",
+        "tests/cli/runner-sync-incremental-build.test.ts",
+        "tests/cli/runner-sync-steward-release.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}

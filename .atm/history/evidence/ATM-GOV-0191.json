@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0191",
-  "updatedAt": "2026-07-19T13:31:14.733Z",
+  "updatedAt": "2026-07-19T13:37:13.302Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -446,6 +446,156 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:f55f0b4026a645faf56fdc50d62a4c737263c25253ddcdbaa88450b30a608241",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+      "createdAt": "2026-07-19T13:35:05.227Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-sync-build-executor",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:35:05.514Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e5ef6ca4982ed60ebc7bf5cd56703b01ddb3895043d61a94fbdbc88596203b2c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:onefile-release",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+      "createdAt": "2026-07-19T13:37:01.897Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:onefile-release"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-sync-build-executor",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:onefile-release",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:onefile-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7998693dda5dc8e71c292f9f18b9fbcf4031dd670b029e00e0e6a127ad109667",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:37:02.172Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5f6c2112df98732935ee98ee5a6e22f40a8c82fe4e37c2d60e22ba576ce6e853",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:root-drop-release",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+      "createdAt": "2026-07-19T13:37:13.302Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719131718-codex-governance-optimizer-ATM-GOV-0191-f9571b8fb1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:root-drop-release"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-sync-build-executor",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:root-drop-release",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:root-drop-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:5a5719d94d4f01b4bb7322f5d6add0c96e83a55de922eb88f506045f5e9f87b6",
+            "cached": false,
+            "generatedAt": "2026-07-19T13:37:13.573Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d232e80bd4a00a6ea84faa1dfd8203586641fc5cc2d493717339a787045907b3",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
