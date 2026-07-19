@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-007",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Taskflow close / framework temporary tasks",
+  "finding": "taskflow close cannot cleanly close a framework temporary task that exists only in the local ATM ledger and has no source.planPath or planning card. Supplying a normal profile fails with ATM_TASKFLOW_CLOSE_PLANNING_PATH_POLICY_MISSING; supplying a policy profile fails when the recovered docs/tasks card is missing; pointing the profile at .atm/history/tasks/<task>.json fails with ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH because the JSON ledger is parsed as a planning card with no frontmatter task id.",
+  "expectedBehavior": "Framework temporary ledger-only tasks should have a governed target-only close or repair path. The operator should be able to close or intentionally retire the task using historical delivery evidence without fabricating a planning markdown card or bypassing taskflow.",
+  "evidenceOrRepro": "Observed while trying to close ATM-FRAMEWORK-TEMP-codex-plan-series-skill on 2026-07-19. Commands: taskflow pre-close reported ATM_TASKFLOW_CLOSE_PLANNING_PATH_UNAVAILABLE and ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED; taskflow close --profile fixtures/taskflow-profile/valid.profile.json --historical-delivery 1a627e231 failed with ATM_TASKFLOW_CLOSE_PLANNING_PATH_POLICY_MISSING; governed-invocable profile failed with ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING; target-ledger fallback profile failed with ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH.",
+  "followUp": "Add an explicit taskflow close mode for framework ledger-only tasks, or teach taskflow profile recovery to recognize local ATM task JSON as a valid target-ledger closeback source. Add regression coverage for closing an ATM-FRAMEWORK-TEMP task with historical delivery and no planning mirror."
+}
