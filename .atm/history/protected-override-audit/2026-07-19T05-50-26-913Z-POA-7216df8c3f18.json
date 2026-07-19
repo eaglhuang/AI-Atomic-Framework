@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-7216df8c3f18",
+  "recordedAt": "2026-07-19T05:50:26.913Z",
+  "actorId": "codex-gov-series-repair",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gov-series-repair --message \"chore(atm): rekey GOV 0191 and 0192 out of GOV\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-4c20040716",
+  "reason": "Cross-family task-id rekey migration has no ordinary hook lane; owner requested clearing GOV 0191/0192 after ERR/TMP migration.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-19T05-50-26-912Z-EMG-GLOBAL-4c20040716.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
