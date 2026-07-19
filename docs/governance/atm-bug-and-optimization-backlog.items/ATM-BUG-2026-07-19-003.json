@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-003",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Governance UX / Dogfood friction",
+  "finding": "During the ATM-GOV-0168..0179 dogfood sequence, several governance steps were still easy to stall on: prompt-scoped next could route broad follow-up work to generic guidance instead of the intended plan/card set; unowned runtime receipts were reported as L3 active work even when unrelated; claim/steward/runner-sync actor identity mismatches caused reruns; and dirty WIP ownership was not obvious enough for agents to distinguish active Cursor work from stale generated residue.",
+  "expectedBehavior": "ATM should distinguish plan-scoped continuation work from unrelated global queue state, classify generated/runtime residue separately from actionable foreign WIP, surface the owning actor/session for each blocker, and offer a one-command recovery path for actor mismatch, stale receipt cleanup, and safe continuation after another agent closes.",
+  "evidenceOrRepro": "Observed in the 2026-07-18/2026-07-19 GOV auto-batch dogfood: Cursor-owned 0168/0180 work required manual avoidance; runner-sync first failed on actor mismatch before rerun with ATM_ACTOR_ID=codex-gov-auto-batch; later `atm next` reported unowned `.atm/history/evidence/*.runner-sync-receipt.json` as active L3 work even after the target plan was complete.",
+  "followUp": "Open a GOV usability card for plan-scoped continuation routing, WIP provenance display, stale runtime receipt classification, and automatic recovery hints for actor mismatch and unrelated dirty WIP."
+}
