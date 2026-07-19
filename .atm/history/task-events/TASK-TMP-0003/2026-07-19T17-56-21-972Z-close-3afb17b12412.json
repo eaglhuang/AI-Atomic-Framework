@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T17-56-21-972Z-close-3afb17b12412",
+  "taskId": "TASK-TMP-0003",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260719174907-codex-main-TASK-TMP-0003-1fbd7a16d9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0003.json",
+  "taskSha256": "sha256:4b57d5dc6b9b1f92023432146d8d5e5c54615c9012c26d4d8a55fa535f01fd62",
+  "createdAt": "2026-07-19T17:56:21.972Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0003 --actor codex-main --status done --historical-delivery 6894b24ca618039edb14304460239b6b8b1b22da",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719174907-codex-main-TASK-TMP-0003-1fbd7a16d9",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-import"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T17:56:21.962Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0003.*",
+        ".atm/history/evidence/TASK-TMP-0003.runner-sync-receipt.json",
+        ".atm/history/task-events/TASK-TMP-0003/**",
+        ".atm/history/tasks/TASK-TMP-0003.json",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/tasks/canonical-task-id-boundary.ts",
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-import/**",
+        "scripts/validate-task-import/dry-run-scenarios.ts",
+        "tests/cli/task-import-canonical-id-boundary.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/tasks/canonical-task-id-boundary.ts",
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-import/**",
+        "scripts/validate-task-import/dry-run-scenarios.ts",
+        "tests/cli/task-import-canonical-id-boundary.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
