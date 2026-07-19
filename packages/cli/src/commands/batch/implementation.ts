@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createWaveManifest, evaluateWaveEligibility, type WaveManifestTask } from '../../../../core/src/broker/wave-manifest.ts';
 import { evaluateAtomicWaveCheckpoint } from '../../../../core/src/broker/wave-generated-executor.ts';
+import { appendPlanBatchRunEvent, startPlanBatchRun } from '../../../../core/src/batch/plan-run-journal.ts';
 import { CliError, makeResult, message, parseOptions } from '../shared.ts';
 import { resolveActorId } from '../actor-registry.ts';
 import { runNext } from '../next.ts';
@@ -23,8 +24,12 @@ readonly latency: { readonly queueHeadLatencyMs: number; readonly batchMakespanM
 readonly stopLoss: { readonly triggered: boolean; readonly laterQueueHeadRoute: 'unchanged' | 'cheaper-qualified-model-mix' | 'single-agent'; readonly closeSemanticsChanged: false; };
 };
 type BatchTeamUsageAggregate = BatchTeamIntegrationReport['usage'];
+const ATM_BATCH_PLANNING_CLOSEBACK_CONFLICT = 'ATM_BATCH_PLANNING_CLOSEBACK_CONFLICT';
+const ATM_BATCH_PUSH_DIVERGED = 'ATM_BATCH_PUSH_DIVERGED';
 export async function runBatch(argv: string[]) {
 const action = String(argv[0] ?? 'status').toLowerCase();
+if (action === 'plan-start') return runBatchPlanStart(argv);
+if (action === 'plan-journal') return runBatchPlanJournal(argv);
 const batchHistoricalDeliveryRefs = action === 'checkpoint' ? parseBatchHistoricalDeliveryRefs(argv) : [];
 const batchHistoricalBatchRefs = action === 'checkpoint' ? parseBatchHistoricalBatchRefs(argv) : [];
 const batchDeliverAndCloseExtras = action === 'deliver-and-close' ? parseBatchDeliverAndCloseExtras(argv) : null;
@@ -221,6 +226,30 @@ const abandoned = releaseBatchRun(options.cwd, active, 'abandoned'); return make
 });
 }
 throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, skip, abandon', { exitCode: 2 }); }
+function runBatchPlanStart(argv: string[]) {
+const { options } = parseOptions(stripPlanRunArgs(argv), 'batch');
+const resolvedActor = resolveActorId(options.agent ?? undefined); if (!resolvedActor) { throw new CliError('ATM_ACTOR_ID_MISSING', 'batch plan-start requires --actor or ATM_ACTOR_ID.', { exitCode: 2 }); }
+const taskIds = collectRepeatedValues(argv, '--task');
+if (taskIds.length === 0) { throw new CliError('ATM_CLI_USAGE', 'batch plan-start requires at least one --task <id>.', { exitCode: 2 }); }
+const planPath = readFlagValue(argv, '--plan');
+const laneSessionId = readFlagValue(argv, '--lane') ?? process.env.ATM_LANE_SESSION_ID ?? null;
+const started = startPlanBatchRun({ cwd: options.cwd, actorId: resolvedActor.actorId, planPath, taskIds, laneSessionId });
+return makeResult({ ok: true, command: 'batch', cwd: options.cwd, messages: [message('info', 'ATM_BATCH_PLAN_RUN_STARTED', 'Durable plan batch run journal started.', { batchId: started.batchRun.batchId, planDigest: started.batchRun.planDigest, taskIds })], evidence: { action: 'plan-start', batchRun: started.batchRun, event: started.event,
+commands: { journal: `node atm.mjs batch plan-journal --actor ${resolvedActor.actorId} --batch ${started.batchRun.batchId} --kind <event> --json`, status: `node atm.mjs batch status --json` } } });
+}
+function runBatchPlanJournal(argv: string[]) {
+const { options } = parseOptions(stripPlanRunArgs(argv), 'batch');
+const resolvedActor = resolveActorId(options.agent ?? undefined); if (!resolvedActor) { throw new CliError('ATM_ACTOR_ID_MISSING', 'batch plan-journal requires --actor or ATM_ACTOR_ID.', { exitCode: 2 }); }
+const batchId = typeof options.batch === 'string' ? options.batch.trim() : '';
+const kind = readFlagValue(argv, '--kind') ?? '';
+if (!batchId || !kind) { throw new CliError('ATM_CLI_USAGE', 'batch plan-journal requires --batch <id> and --kind <event-kind>.', { exitCode: 2 }); }
+const taskId = typeof options.task === 'string' ? options.task.trim() : null;
+const laneSessionId = readFlagValue(argv, '--lane') ?? process.env.ATM_LANE_SESSION_ID ?? null;
+const idempotencyKey = readFlagValue(argv, '--idempotency-key') ?? `${batchId}:${kind}:${taskId ?? 'plan'}`;
+const appended = appendPlanBatchRunEvent(options.cwd, batchId, { kind, taskId, actorId: resolvedActor.actorId, laneSessionId, idempotencyKey,
+inputTokens: parseNullableNumber(readFlagValue(argv, '--input-tokens')), outputTokens: parseNullableNumber(readFlagValue(argv, '--output-tokens')), cacheReadTokens: parseNullableNumber(readFlagValue(argv, '--cache-read-tokens')), tokenSource: parseTokenSource(readFlagValue(argv, '--token-source')), waitedMs: parseNullableNumber(readFlagValue(argv, '--waited-ms')) ?? 0 });
+return makeResult({ ok: true, command: 'batch', cwd: options.cwd, messages: [message('info', appended.duplicate ? 'ATM_BATCH_PLAN_EVENT_DUPLICATE' : 'ATM_BATCH_PLAN_EVENT_APPENDED', appended.duplicate ? 'Durable plan batch journal event already existed for this idempotency key.' : 'Durable plan batch journal event appended.', { batchId, eventId: appended.event.eventId, kind })], evidence: { action: 'plan-journal', batchRun: appended.batchRun, event: appended.event, duplicate: appended.duplicate } });
+}
 export function buildBatchTeamIntegrationReport(input: { readonly taskId: string; readonly batchId: string; readonly currentQueueHeadTaskId: string | null | undefined; readonly structuralParallelism: boolean; readonly evidencePayloadDigest: string | null | undefined; readonly sealedPayloadDigest: string | null | undefined; readonly attempts?: readonly BatchTeamAttemptUsage[]; readonly queueHeadLatencyMs: number;
 readonly batchMakespanMs: number; readonly completedTaskCount: number; readonly stopLossTriggered?: boolean; readonly costTelemetryLoaded?: boolean; }): BatchTeamIntegrationReport {
 const attempts = input.attempts ?? [];
@@ -466,6 +495,33 @@ const files = String(result.stdout ?? '') .split(/\r?\n/) .map((line) => line.tr
 function readGitHead(cwd: string): string | null {
 const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd, encoding: 'utf8' });
 return result.status === 0 ? result.stdout.trim() || null : null; }
+function collectRepeatedValues(argv: readonly string[], flag: string) {
+const values: string[] = [];
+for (let index = 0; index < argv.length; index += 1) { if (argv[index] === flag && argv[index + 1] && !String(argv[index + 1]).startsWith('--')) { values.push(String(argv[index + 1])); index += 1; } }
+return values;
+}
+function readFlagValue(argv: readonly string[], flag: string) {
+const index = argv.indexOf(flag);
+return index >= 0 && argv[index + 1] && !String(argv[index + 1]).startsWith('--') ? String(argv[index + 1]) : null;
+}
+function stripPlanRunArgs(argv: readonly string[]) {
+const stripped: string[] = [];
+const customValueFlags = new Set(['--plan', '--lane', '--kind', '--idempotency-key', '--input-tokens', '--output-tokens', '--cache-read-tokens', '--token-source', '--waited-ms']);
+for (let index = 0; index < argv.length; index += 1) {
+const arg = argv[index];
+if (customValueFlags.has(arg)) { index += 1; continue; }
+stripped.push(arg);
+}
+return stripped;
+}
+function parseNullableNumber(value: unknown) {
+if (typeof value !== 'string' && typeof value !== 'number') return null;
+const parsed = Number(value);
+return Number.isFinite(parsed) ? parsed : null;
+}
+function parseTokenSource(value: unknown) {
+return value === 'provider' || value === 'manual' || value === 'unavailable' ? value : 'unavailable';
+}
 function readGitDirtyFileSummary(cwd: string) {
 const porcelain = spawnSync('git', ['status', '--porcelain=v1', '--untracked-files=all'], { cwd, encoding: 'utf8' });
 if (porcelain.status !== 0) { return { available: false, staged: 0, modifiedTracked: 0, untracked: 0, untrackedFiles: [] as string[], hint: 'git status unavailable' };

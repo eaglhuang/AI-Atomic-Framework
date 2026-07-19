@@ -3,6 +3,94 @@
   "specVersion": "0.1.0",
   "entries": [
     {
+      "code": "ATM_BATCH_PLAN_DIGEST_MISMATCH",
+      "category": "batch",
+      "shortDescription": "A durable plan batch run resume observed a plan digest that differs from the pinned run digest.",
+      "commonCauses": [
+        "The plan file or member task list changed after the batch run was started.",
+        "A coordinator attempted to resume an old batch id against a newer plan revision.",
+        "The operator intentionally amended the plan but did not acknowledge the new digest."
+      ],
+      "remediation": [
+        "Inspect the current batch run with node atm.mjs batch status --batch <id> --json.",
+        "If the plan change is intentional, rerun the plan execution command with an explicit accept-plan-change flag once implemented.",
+        "Otherwise restore the original plan/task set before resuming the batch run."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": true,
+      "relatedCommands": [
+        "node atm.mjs batch status --batch <id> --json",
+        "node atm.mjs batch plan-start --actor <actor> --plan <path> --task <id> --json"
+      ],
+      "sourceOwner": "packages/core/src/batch/plan-run-journal.ts"
+    },
+    {
+      "code": "ATM_BATCH_RUN_EVENT_JOURNAL_INVALID",
+      "category": "batch",
+      "shortDescription": "A durable plan batch run journal event could not be appended or read as a valid append-only event.",
+      "commonCauses": [
+        "The requested batch id does not have a runtime batch-run record.",
+        "The journal contains malformed JSONL or an event with a conflicting idempotency key.",
+        "Runtime batch-run files were manually edited instead of using the batch command surface."
+      ],
+      "remediation": [
+        "Run node atm.mjs batch status --batch <id> --json to inspect the active run.",
+        "Recreate the plan batch run if the runtime journal is corrupted.",
+        "Do not hand-edit .atm/runtime/batch-runs/*.journal.jsonl."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs batch plan-journal --actor <actor> --batch <id> --kind <event> --json",
+        "node atm.mjs batch status --batch <id> --json"
+      ],
+      "sourceOwner": "packages/core/src/batch/plan-run-journal.ts"
+    },
+    {
+      "code": "ATM_BATCH_PLANNING_CLOSEBACK_CONFLICT",
+      "category": "batch",
+      "shortDescription": "A plan-level batch closeback compare-and-swap seal conflicted with the planning mirror state.",
+      "commonCauses": [
+        "The external planning card changed after the batch run pinned its plan digest.",
+        "Another coordinator closed or amended a planning mirror card first.",
+        "The closeback seal references stale planning content."
+      ],
+      "remediation": [
+        "Refresh the planning mirror status and compare the seal digest.",
+        "Resume the batch only after resolving the planning-card amendment or closeback order.",
+        "Keep target-repo closure and planning mirror closeback in one governed saga."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs taskflow close --task <task-id> --json",
+        "node atm.mjs batch status --batch <id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/batch/implementation.ts"
+    },
+    {
+      "code": "ATM_BATCH_PUSH_DIVERGED",
+      "category": "git-governance",
+      "shortDescription": "A batch run cannot fast-forward its target branch because the remote branch diverged.",
+      "commonCauses": [
+        "Another lane pushed to the protected branch while the batch run was preparing commits.",
+        "The local branch is behind origin/main or origin/master.",
+        "A coordinator attempted to publish stale plan-run commits without revalidating the head."
+      ],
+      "remediation": [
+        "Fetch and inspect the divergence before retrying the push.",
+        "Use the governed git admission flow once available for batch-level divergence recovery.",
+        "Rerun required validators after reconciling the branch head."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": true,
+      "relatedCommands": [
+        "git fetch origin",
+        "node atm.mjs batch status --batch <id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/batch/implementation.ts"
+    },
+    {
       "code": "ATM_CLAIM_FOREIGN_UNSTAGED_WIP",
       "category": "claim-admission",
       "shortDescription": "A candidate claim intersects foreign or unowned dirty WIP in the shared worktree.",
