@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T09-13-36-388Z-close-4dbfc533c58a",
+  "taskId": "ATM-GOV-0184",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719090122-codex-governance-optimizer-ATM-GOV-0184-6b56121e6f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0184.json",
+  "taskSha256": "sha256:3c4c20ebe58665721337c8587b39e8abd624e683025217b9d04d78a4cf1b6412",
+  "createdAt": "2026-07-19T09:13:36.388Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0184 --actor codex-governance-optimizer --status done --historical-delivery d5bd615463fd791123ae88eee4da9132fb2bf384",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719090122-codex-governance-optimizer-ATM-GOV-0184-6b56121e6f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0184.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/real-team-wave-worker-executor.test.ts",
+      "typecheck",
+      "validate:atomization-coverage",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T09:13:36.375Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0184.*",
+        ".atm/history/task-events/ATM-GOV-0184/**",
+        ".atm/history/tasks/ATM-GOV-0184.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/team-wave.ts",
+        "packages/cli/src/commands/team/**",
+        "packages/core/src/index.ts",
+        "packages/core/src/team-agents/**",
+        "tests/cli/real-team-wave-worker-executor.test.ts",
+        "tests/cli/team-wave-runtime-manifest.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/team-wave.ts",
+        "packages/cli/src/commands/team/**",
+        "packages/core/src/index.ts",
+        "packages/core/src/team-agents/**",
+        "tests/cli/real-team-wave-worker-executor.test.ts",
+        "tests/cli/team-wave-runtime-manifest.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
