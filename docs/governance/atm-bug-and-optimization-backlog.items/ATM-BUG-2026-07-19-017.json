@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-017",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Agent Skills / Windows Text IO",
+  "finding": "Agents repeatedly use PowerShell text IO or range-slicing patterns despite repository instructions requiring Node.js UTF-8 helpers for Markdown, JSON, and text planning files.",
+  "expectedBehavior": "First-layer ATM skills and playbooks should expose copy-paste-safe Node.js UTF-8 read/compare snippets and warn against PowerShell Get-Content/Set-Content/Out-File/range slicing for document work.",
+  "evidenceOrRepro": "During ATM-GOV-0186/ATM-GOV-0194 dogfood, the operator used PowerShell content commands before noticing the Windows Text Document IO Rule in atm-dispatch/atm-plan-authoring.",
+  "followUp": "Update source-of-truth ATM skills and integration pack templates so Windows text IO guidance appears in the first visible workflow layer, then reinstall/regenerate derived skill copies."
+}
