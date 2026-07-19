@@ -1,0 +1,210 @@
+{
+  "taskId": "ATM-GOV-0185",
+  "updatedAt": "2026-07-19T11:06:47.614Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+      "createdAt": "2026-07-19T11:04:56.566Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/validator-dag-shared-cache.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.validator-dag-cache",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:a3df649e38383b17b58ba47f7d368de01f7499259869db3e6b3dc0492a56c663",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/validator-dag-shared-cache.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "875ef7ff97c9e58321dd3ce30c32b51dd70c97fe",
+            "cacheKey": "sha256:bc58f91a7c9cd74177acb0cbde88883f7c1c99108fc31edcf1663f6fcdf66885",
+            "cached": false,
+            "generatedAt": "2026-07-19T11:04:56.707Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ae09499f39d4ed2c4e9d875f2020215b69c0dc5245d314a1c98df3459ab876b8",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+      "createdAt": "2026-07-19T11:05:12.600Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.validator-dag-cache",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "875ef7ff97c9e58321dd3ce30c32b51dd70c97fe",
+            "cacheKey": "sha256:9a42b6c5357d43ad4206631b1756c15543201d1914d57884b0da65e4a860c05a",
+            "cached": false,
+            "generatedAt": "2026-07-19T11:05:12.750Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:2771e89409e90347c3c0bf059798f4bc6242f72b86e78633da6eccb5d5e35089",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+      "createdAt": "2026-07-19T11:05:41.067Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.validator-dag-cache",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+            "stderrSha256": "sha256:9c2ae1fd69d9757f06ee83d0a87a03e737b08d917897658bb6514cd8d1dec5e6",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "875ef7ff97c9e58321dd3ce30c32b51dd70c97fe",
+            "cacheKey": "sha256:19137ed1ef093c50730f6ba233edbeed0e0cc47bd0e2a37c11e77ea13634f726",
+            "cached": false,
+            "generatedAt": "2026-07-19T11:05:41.210Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:259842b6a78b46eef753668fbb569ea7e292f09e648876b6ebccf762de64128d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-governance-optimizer",
+      "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+      "createdAt": "2026-07-19T11:06:47.614Z",
+      "details": {
+        "actorId": "codex-governance-optimizer",
+        "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.validator-dag-cache",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "875ef7ff97c9e58321dd3ce30c32b51dd70c97fe",
+            "cacheKey": "sha256:a79644ada223f1d7e5871e501e32382792c617108cbb4d9d58e34ac33ba71f48",
+            "cached": false,
+            "generatedAt": "2026-07-19T11:06:47.905Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0eff8225cbdb182769ee2b37a6d806c3522bcb4338086e94fdfc15e4dd0e7715",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0185",
+  "title": "Validator DAG、共享結果與安全 Cache",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0183"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/core/src/evidence/**",
+    "packages/cli/src/commands/evidence/**",
+    "scripts/run-validators/**",
+    "tests/cli/validator-dag-shared-cache.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/**",
+    "packages/cli/src/commands/evidence/**",
+    "scripts/run-validators/**",
+    "tests/cli/validator-dag-shared-cache.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "disable cache and revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-dag-cache",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-dag-cache",
+        "pattern": "DAG Scheduler",
+        "source": "packages/core/src/evidence/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    },
+    {
+      "severity": "info",
+      "code": "ATM_TASK_IMPORT_PLANNING_IN_PROGRESS_CLAIMABLE",
+      "message": "Task ATM-GOV-0185 declared planning status in-progress; imported target ledger status as ready so an agent can claim it through next --claim."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0185-validator-dag-shared-cache.task.md",
+    "sectionTitle": "ATM-GOV-0185",
+    "headingLine": 50,
+    "hash": "cbd0ac0a3b3ebbdb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0185-validator-dag-shared-cache.task.md",
+      "planningCommitSha": "3b70cbb4b3613962f2c2ee0e9001071cb50b8089",
+      "contentDigest": "sha256:cbd0ac0a3b3ebbdbc2e665f5a05efb7c240edcbdc09a596ef4e90d558a029043",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T10:59:10.349Z"
+    }
+  },
+  "importedAt": "2026-07-19T10:59:10.349Z",
+  "lastTransitionId": "2026-07-19T10-59-25-673Z-claim-3806e59103b3",
+  "lastTransitionAt": "2026-07-19T10:59:25.673Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "codex-governance-optimizer",
+    "leaseId": "lease-c03e29fb5eaa",
+    "claimedAt": "2026-07-19T10:59:19.471Z",
+    "heartbeatAt": "2026-07-19T10:59:19.471Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0185.json",
+      "packages/cli/src/commands/evidence/**",
+      "packages/core/src/evidence/**",
+      "scripts/run-validators/**",
+      "tests/cli/validator-dag-shared-cache.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260719105919-codex-governance-optimizer-e39752fdc2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719105919-codex-governance-optimizer-e39752fdc2\""
+    }
+  },
+  "owner": "codex-governance-optimizer",
+  "startedAt": "2026-07-19T10:59:19.471Z",
+  "startedByActor": "codex-governance-optimizer",
+  "startedBySessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0185",
+    "batchId": null,
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-df53beb51a1f337e",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0185.*",
+      ".atm/history/task-events/ATM-GOV-0185/**",
+      ".atm/history/tasks/ATM-GOV-0185.json",
+      "packages/cli/src/commands/evidence/**",
+      "packages/core/src/evidence/**",
+      "scripts/run-validators/**",
+      "tests/cli/validator-dag-shared-cache.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9800271c915df293a2cfea7e94520b3b530b55d595b3d67195a812f3cb11cd2d",
+    "actorId": "codex-governance-optimizer",
+    "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+    "laneSession": {
+      "laneSessionId": "lane-20260719105919-codex-governance-optimizer-e39752fdc2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719105919-codex-governance-optimizer-e39752fdc2\""
+    },
+    "createdAt": "2026-07-19T10:59:25.672Z",
+    "status": "active"
+  }
+}
