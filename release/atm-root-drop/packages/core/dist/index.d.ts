@@ -383,3 +383,4 @@ export * from './upgrade/evolution-draft.ts';
 export * from './police/family.ts';
 export * from './broker/index.ts';
 export * from './evidence/index.ts';
+export * from './telemetry/index.ts';

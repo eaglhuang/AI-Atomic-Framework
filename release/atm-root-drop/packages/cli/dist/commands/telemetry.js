@@ -2,6 +2,7 @@ import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
 import { makeResult, message, parseArgsForCommand } from './shared.js';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.js';
+import { canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/dist/telemetry/index.js';
 export async function runTelemetry(argv) {
     const spec = getCommandSpec('telemetry');
     const parsed = parseArgsForCommand(spec, argv);
@@ -9,6 +10,67 @@ export async function runTelemetry(argv) {
     const endpoint = typeof parsed.options.endpoint === 'string' ? String(parsed.options.endpoint) : null;
     const requestedOn = parsed.options.on === true;
     const requestedOff = parsed.options.off === true;
+    const requestedGateRegistry = parsed.options.gateRegistry === true;
+    const requestedEmitFixture = parsed.options.emitFixture === true;
+    const requestedSeal = parsed.options.seal === true;
+    const requestedReport = parsed.options.report === true;
+    if (requestedGateRegistry) {
+        return makeResult({
+            ok: true,
+            command: 'telemetry',
+            cwd,
+            messages: [message('info', 'ATM_GATE_TELEMETRY_REGISTRY_READY', 'Gate telemetry check registry is ready.')],
+            evidence: {
+                schemaId: 'atm.gateTelemetryRegistryReport.v1',
+                checks: canonicalGateCheckRegistry
+            }
+        });
+    }
+    if (requestedEmitFixture) {
+        const emitted = emitGateTelemetryEvent(cwd, {
+            gate: String(parsed.options.gate ?? 'next'),
+            checkId: String(parsed.options.checkId ?? 'next.route-resolution'),
+            result: normalizeGateTelemetryResult(parsed.options.result),
+            reasonClass: String(parsed.options.reason ?? 'fixture'),
+            durationMs: Number(parsed.options.durationMs ?? 1),
+            actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? 'fixture'),
+            taskId: typeof parsed.options.task === 'string' ? String(parsed.options.task) : null,
+            command: 'telemetry --emit-fixture',
+            source: 'fixture'
+        });
+        return makeResult({
+            ok: true,
+            command: 'telemetry',
+            cwd,
+            messages: [message(emitted.ok ? 'info' : 'warn', emitted.ok ? 'ATM_GATE_TELEMETRY_EVENT_WRITTEN' : 'ATM_GATE_TELEMETRY_EVENT_DROPPED', emitted.ok ? 'Gate telemetry fixture event written.' : `Gate telemetry fixture event dropped: ${emitted.warning}`)],
+            evidence: emitted
+        });
+    }
+    if (requestedSeal) {
+        const taskId = typeof parsed.options.task === 'string' ? String(parsed.options.task) : 'UNKNOWN';
+        const digest = sealGateTelemetry(cwd, {
+            taskId,
+            windowId: typeof parsed.options.window === 'string' ? String(parsed.options.window) : undefined,
+            watermark: typeof parsed.options.watermark === 'string' ? String(parsed.options.watermark) : undefined
+        });
+        return makeResult({
+            ok: true,
+            command: 'telemetry',
+            cwd,
+            messages: [message('info', 'ATM_GATE_TELEMETRY_SEALED', 'Gate telemetry runtime events sealed to history.')],
+            evidence: digest
+        });
+    }
+    if (requestedReport) {
+        const report = reportGateTelemetry(cwd, parsed.options.includeRuntime === true);
+        return makeResult({
+            ok: true,
+            command: 'telemetry',
+            cwd,
+            messages: [message('info', 'ATM_GATE_TELEMETRY_REPORT_READY', 'Gate telemetry report is ready.')],
+            evidence: report
+        });
+    }
     let state = readTelemetryState(cwd);
     let code = 'ATM_TELEMETRY_STATUS';
     let text = state.enabled
@@ -37,4 +99,7 @@ export async function runTelemetry(argv) {
             docs: 'docs/TELEMETRY.md'
         }
     });
+}
+function normalizeGateTelemetryResult(value) {
+    return value === 'block' || value === 'warn' || value === 'skip' || value === 'error' ? value : 'pass';
 }

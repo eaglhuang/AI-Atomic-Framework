@@ -67,6 +67,8 @@ as one of:
 - adopter or project work
 - dogfood or backlog recording
 
+Reserved family routing: ErrorCode and error-governance work must use the registered ERR family (series ERR, prefix TASK-ERR). Temporary cleanup, quarantine, and one-off residue-disposition work must use the registered TMP family (series TMP, prefix TASK-TMP). Do not spend GOV numbers on these categories. If a draft or ledger record already used a GOV id for ERR/TMP work, stop and reclassify it through the registered planning family and, when needed, a ledger rekey/realign repair before implementation continues.
+
 Then resolve and state these three authorities:
 
 - `planning authority`: repository that owns the human-readable plan and source
@@ -127,6 +129,8 @@ planning-repo parent directory is itself an illegally invented series - do not
 reuse it; report it to the owner and remap the work onto the correct family.
 Task ids are assigned from the planning repository state, never inferred from
 the local target-repo ledger.
+
+Reserved family routing: ErrorCode and error-governance work must use the registered ERR family (series ERR, prefix TASK-ERR). Temporary cleanup, quarantine, and one-off residue-disposition work must use the registered TMP family (series TMP, prefix TASK-TMP). Do not spend GOV numbers on these categories. If a draft or ledger record already used a GOV id for ERR/TMP work, stop and reclassify it through the registered planning family and, when needed, a ledger rekey/realign repair before implementation continues.
 
 ## Required Card Contract
 
