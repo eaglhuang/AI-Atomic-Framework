@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0183",
   "title": "Durable Plan BatchRun、Lane Stamping 與 Shadow Journal",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0182"
@@ -94,8 +94,8 @@
     }
   },
   "importedAt": "2026-07-19T08:34:49.683Z",
-  "lastTransitionId": "2026-07-19T08-47-37-051Z-scope-amendment-2103a5f92cea",
-  "lastTransitionAt": "2026-07-19T08:47:37.051Z",
+  "lastTransitionId": "2026-07-19T08-52-22-059Z-close-8a5d10044001",
+  "lastTransitionAt": "2026-07-19T08:52:22.059Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-governance-optimizer",
   "reservedAt": "2026-07-19T08:34:59.033Z",
@@ -104,7 +104,7 @@
     "actorId": "codex-governance-optimizer",
     "leaseId": "lease-c9fbe6e1f551",
     "claimedAt": "2026-07-19T08:34:59.038Z",
-    "heartbeatAt": "2026-07-19T08:34:59.038Z",
+    "heartbeatAt": "2026-07-19T08:52:22.057Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0183.*",
@@ -123,14 +123,14 @@
       "packages/core/src/index.ts",
       "tests/cli/durable-plan-batchrun-shadow-journal.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260719083459-codex-governance-optimizer-3a8558c2c3",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719083459-codex-governance-optimizer-3a8558c2c3\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-19T08:34:59.038Z",
   "startedByActor": "codex-governance-optimizer",
@@ -181,5 +181,9 @@
     },
     "createdAt": "2026-07-19T08:35:04.042Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-19T08:52:22.057Z",
+  "closedByActor": "codex-governance-optimizer",
+  "closedBySessionId": "session-20260719083459-codex-governance-optimizer-ATM-GOV-0183-8159469900",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0183.closure-packet.json"
 }

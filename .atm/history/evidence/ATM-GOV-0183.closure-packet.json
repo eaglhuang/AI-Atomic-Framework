@@ -1,0 +1,183 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0183",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "09039fe624f2f8844b78a5e4aac61445bb1884fb",
+  "governedTreeSha": "115a217b5693f7a4d8571addbb78c7148566ed26",
+  "targetCommitDelta": {
+    "currentCommitSha": "09039fe624f2f8844b78a5e4aac61445bb1884fb",
+    "parentCommitShas": [
+      "09039fe624f2f8844b78a5e4aac61445bb1884fb"
+    ],
+    "governedTreeSha": "115a217b5693f7a4d8571addbb78c7148566ed26",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0183.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0183.json",
+      ".atm/history/evidence/ATM-GOV-0183.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0193.runner-sync-receipt.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/core/src/batch/plan-run-journal.ts",
+      "packages/core/src/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/packages/cli/dist/commands/batch/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/batch/implementation.ts",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/index.js",
+      "release/atm-root-drop/packages/core/src/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/durable-plan-batchrun-shadow-journal.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/durable-plan-batchrun-shadow-journal.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:49a4141c65e7a8bd16d38fddbed65090611e60b014f9d63878182be65cc15276",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run generate:error-codes",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:712fe8b5b175c7fd97d25c4056ca7cf9e1a13fffb56b44d39fb94143083befc2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:7e91398260afdd3d5df5e35e4b693ac21cb65ee6d8d79d82560557f951c96220",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:atomization-coverage",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2434286c3c6d3f00657c6d88809796694e56184cbbe47dd6fa91de99715fca5c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/durable-plan-batchrun-shadow-journal.test.ts",
+    "typecheck",
+    "validate:atomization-coverage",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-19T08:52:22.048Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0183.*",
+      ".atm/history/task-events/ATM-GOV-0183/**",
+      ".atm/history/tasks/ATM-GOV-0183.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/tasks/**",
+      "packages/core/src/batch/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/index.ts",
+      "tests/cli/durable-plan-batchrun-shadow-journal.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/tasks/**",
+      "packages/core/src/batch/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/index.ts",
+      "tests/cli/durable-plan-batchrun-shadow-journal.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0183.json",
+  "closedAt": "2026-07-19T08:52:22.048Z",
+  "closedByActor": "codex-governance-optimizer",
+  "sessionId": "session-20260719083459-codex-governance-optimizer-ATM-GOV-0183-8159469900",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "09039fe624f2f8844b78a5e4aac61445bb1884fb",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/index.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0183.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0183/2026-07-19T08-47-37-051Z-scope-amendment-2103a5f92cea.json",
+      ".atm/history/tasks/ATM-GOV-0183.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
