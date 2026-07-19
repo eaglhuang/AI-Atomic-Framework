@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-021",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Team Broker / Generated Write Executor",
+  "finding": "broker batch execute uses --run-command as a shell string for generated build/projection writes, which is fragile on Windows quoting and forces AI operators to debug shell syntax instead of declaring an executable command contract.",
+  "expectedBehavior": "Generated-write execution should accept an argv-array or JSON command manifest surface, preserve exact arguments cross-platform, and expose first-layer skill/CLI guidance so operators do not rediscover shell quoting rules.",
+  "evidenceOrRepro": "ATM-GOV-0187 implementation and test work required changing the test command to quote process.execPath for Windows; later runner build measurement also required switching between npm, npm.cmd, and shell:true surfaces before a valid run.",
+  "followUp": "Add a follow-up task to introduce --run-command-json or command manifest support, update help/skills, and keep --run-command as a compatibility shortcut with explicit Windows warnings."
+}

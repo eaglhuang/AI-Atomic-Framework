@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-022",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Runner Sync / Build Telemetry",
+  "finding": "runner-sync build timing currently appears as terminal output or ad hoc operator measurement, not as a first-class telemetry event/queryable receipt field for trend analysis.",
+  "expectedBehavior": "Every runner-sync build should emit structured timing telemetry with cacheHitSkip, incrementalBuild, fullRebuild, phaseTimingsMs, output file count, input/output digest, sealed source SHA, steward work id, and exit status.",
+  "evidenceOrRepro": "During ATM-GOV-0187 closeout, npm run build produced a manual seed metric: elapsedMs=48128, mode=cache-miss full, sealedSourceSha=313a8151abb4b09fe1fc55df53f8973f3899c7c6, stewardWorkId=runner-sync-19213019. The runner-sync release receipt was not cleanly committed by the closeback flow.",
+  "followUp": "Fold this into ATM-GOV-0194 and/or a dedicated runner telemetry task so future task cards can consume cumulative build-speed data before deciding whether to optimize, defer, or rewrite scope."
+}
