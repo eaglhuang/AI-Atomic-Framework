@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-014",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Task lifecycle / scope repair",
+  "finding": "An imported planning card with target ledger `status: in_progress` and `claim: null` could be selected by `next`, but `tasks claim`, `tasks scope add --claim-first`, and `tasks repair-claim` could not repair or adopt it. Scope expansion for the source fix also deadlocked because scope add depends on the same claim path.",
+  "expectedBehavior": "Orphaned `in_progress` target-ledger tasks with no active claim should be diagnosed as repairable and normalized to a claimable state without emergency reset. Scope amendment should either run through `next --claim` preparation or expose a repair command that can add the unblocker files safely.",
+  "evidenceOrRepro": "ATM-GOV-0185 import produced `.atm/history/tasks/ATM-GOV-0185.json` with `status: in_progress` and `claimState: null`. `node atm.mjs next --claim ...` first failed with `ATM_TASK_CLAIM_NOT_READY`; after source fix it reached `ATM_TASK_SCOPE_EXPANSION_REQUIRED`; `node atm.mjs tasks scope add --claim-first ...` still failed with `ATM_TASK_CLAIM_NOT_READY`; `node atm.mjs tasks repair-claim --task ATM-GOV-0185 --actor codex-governance-optimizer --json` reported `ATM_TASKS_REPAIR_CLAIM_CLEAN`.",
+  "followUp": "Extend repair-claim/scope-add diagnostics to treat orphaned `in_progress` as lifecycle drift, reuse next claim-preparation logic, and add an end-to-end regression covering import -> scope amendment -> claim."
+}

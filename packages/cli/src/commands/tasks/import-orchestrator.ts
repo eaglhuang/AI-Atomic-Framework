@@ -13,6 +13,7 @@ import { inspectPlanningRootAuthorship } from './planning-root-authorship.ts';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.ts';
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import { classifyForceImportAdmission } from './import-validation.ts';
+import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.ts';
 import {
   type TaskImportManifest,
   classifyResetOpenImportForOptions,
@@ -210,6 +211,10 @@ export async function runTasksImport(argv: string[]) {
         ? task
         : { ...task, importDiagnostics: [...(task.importDiagnostics ?? []), ...patrol] };
     })
+  };
+  parsed = {
+    ...parsed,
+    tasks: normalizeImportedTasksForTargetLedger(parsed.tasks)
   };
 
   if (parsed.diagnostics.some((entry) => entry.level === 'error') || parsed.tasks.length === 0) {
