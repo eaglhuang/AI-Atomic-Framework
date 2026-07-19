@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0185",
   "title": "Validator DAG、共享結果與安全 Cache",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0183"
@@ -83,14 +83,14 @@
     }
   },
   "importedAt": "2026-07-19T10:59:10.349Z",
-  "lastTransitionId": "2026-07-19T10-59-25-673Z-claim-3806e59103b3",
-  "lastTransitionAt": "2026-07-19T10:59:25.673Z",
+  "lastTransitionId": "2026-07-19T11-16-19-576Z-close-10ca5c236811",
+  "lastTransitionAt": "2026-07-19T11:16:19.576Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
     "actorId": "codex-governance-optimizer",
     "leaseId": "lease-c03e29fb5eaa",
     "claimedAt": "2026-07-19T10:59:19.471Z",
-    "heartbeatAt": "2026-07-19T10:59:19.471Z",
+    "heartbeatAt": "2026-07-19T11:16:19.572Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0185.json",
@@ -99,14 +99,14 @@
       "scripts/run-validators/**",
       "tests/cli/validator-dag-shared-cache.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260719105919-codex-governance-optimizer-e39752fdc2",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719105919-codex-governance-optimizer-e39752fdc2\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-governance-optimizer",
   "startedAt": "2026-07-19T10:59:19.471Z",
@@ -143,5 +143,9 @@
     },
     "createdAt": "2026-07-19T10:59:25.672Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-19T11:16:19.572Z",
+  "closedByActor": "codex-governance-optimizer",
+  "closedBySessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0185.closure-packet.json"
 }

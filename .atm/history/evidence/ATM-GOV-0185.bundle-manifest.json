@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0185",
-  "updatedAt": "2026-07-19T11:06:47.614Z",
+  "updatedAt": "2026-07-19T11:13:20.001Z",
   "updatedBy": "codex-governance-optimizer",
   "freshValidationPasses": [
     "node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
@@ -61,6 +61,45 @@
       "generatedAt": "2026-07-19T11:06:47.905Z",
       "runnerKind": "dev-source",
       "sourceCommit": "875ef7ff97c9e58321dd3ce30c32b51dd70c97fe",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5a9ca5553b35aada8bdf75eefa778cec5a9e3bef2bc3a3a020358a5c6f8a1806",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/validator-dag-shared-cache.test.ts"
+      ],
+      "generatedAt": "2026-07-19T11:12:42.984Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "875ef7ff97c9e58321dd3ce30c32b51dd70c97fe",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-19T11:12:57.961Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "875ef7ff97c9e58321dd3ce30c32b51dd70c97fe",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:dc24e0b74ed36ca8111a1c1f3398cc21409c10455f661a3884a0308c35cb8278",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-19T11:13:20.159Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e238836f09fc970331053a6af2e2e8d261296061",
       "cached": false
     }
   ],

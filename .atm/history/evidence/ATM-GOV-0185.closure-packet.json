@@ -1,0 +1,145 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0185",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a1d7fb9759aa1d2b684af71e907ef0df23195e3f",
+  "governedTreeSha": "8167f76b4ead764b236c554dd616310eeb130e2c",
+  "targetCommitDelta": {
+    "currentCommitSha": "a1d7fb9759aa1d2b684af71e907ef0df23195e3f",
+    "parentCommitShas": [
+      "a1d7fb9759aa1d2b684af71e907ef0df23195e3f"
+    ],
+    "governedTreeSha": "8167f76b4ead764b236c554dd616310eeb130e2c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0185.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0185.json",
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/validator-dag-shared-cache.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a3df649e38383b17b58ba47f7d368de01f7499259869db3e6b3dc0492a56c663",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:9c2ae1fd69d9757f06ee83d0a87a03e737b08d917897658bb6514cd8d1dec5e6",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5a9ca5553b35aada8bdf75eefa778cec5a9e3bef2bc3a3a020358a5c6f8a1806",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:dc24e0b74ed36ca8111a1c1f3398cc21409c10455f661a3884a0308c35cb8278",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-19T11:16:19.560Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0185.*",
+      ".atm/history/task-events/ATM-GOV-0185/**",
+      ".atm/history/tasks/ATM-GOV-0185.json",
+      "packages/cli/src/commands/evidence/**",
+      "packages/core/src/evidence/**",
+      "scripts/run-validators/**",
+      "tests/cli/validator-dag-shared-cache.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/evidence/**",
+      "packages/core/src/evidence/**",
+      "scripts/run-validators/**",
+      "tests/cli/validator-dag-shared-cache.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0185.json",
+  "closedAt": "2026-07-19T11:16:19.560Z",
+  "closedByActor": "codex-governance-optimizer",
+  "sessionId": "session-20260719105919-codex-governance-optimizer-ATM-GOV-0185-78bf60dc56",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a1d7fb9759aa1d2b684af71e907ef0df23195e3f",
+    "taskMatchedFiles": [
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/validator-dag-shared-cache.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
