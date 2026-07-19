@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -29,7 +30,7 @@ export function handleBrokerStewardQueues(options, context) {
                 result = enqueueRunnerSyncStewardRequest(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
                     taskId: options.task,
                     actorId: options.actorId,
-                    sealedSourceSha: options.sealedSourceSha,
+                    sealedSourceSha: resolveFullGitCommitSha(options.cwd, options.sealedSourceSha),
                     requestedSurfaces: options.surfaces,
                     ttlSeconds: options.ttlSeconds
                 }, {
@@ -268,6 +269,19 @@ function resolveRunnerSyncTaskIdHealth(cwd, taskId) {
     }
     catch {
         return 'task-active';
+    }
+}
+function resolveFullGitCommitSha(cwd, value) {
+    const raw = String(value ?? '').trim();
+    try {
+        return execFileSync('git', ['rev-parse', '--verify', raw], {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore']
+        }).trim();
+    }
+    catch {
+        return raw;
     }
 }
 export function validateRunnerSyncReleaseReceipt(input) {

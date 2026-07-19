@@ -59,7 +59,9 @@ export function cleanupRunnerSyncStewardQueue(queue, now = new Date().toISOStrin
         const live = group.requests.filter((request) => {
             const expired = isExpired(request, now);
             const health = expired ? 'task-active' : resolveTaskHealth(request, options);
-            const releaseReason = expired ? 'ttl-expired' : staleReleaseReasonFromHealth(health);
+            const releaseReason = isFullCommitSha(request.sealedSourceSha)
+                ? (expired ? 'ttl-expired' : staleReleaseReasonFromHealth(health))
+                : 'malformed-sealed-source';
             if (releaseReason) {
                 staleReleases.push({
                     taskId: request.taskId,
@@ -135,6 +137,27 @@ export function releaseRunnerSyncStewardQueue(queue, input) {
         suggestedNextAction: next
             ? `Runner-sync steward advanced to ${next.stewardWorkId} at queue position ${next.queuePosition}. ${next.suggestedNextAction}`
             : `Runner-sync steward queue is empty after releasing ${stewardWorkId}.`
+    };
+}
+export function releaseRunnerSyncStewardTaskRequests(queue, taskId, releasedAt = new Date().toISOString()) {
+    const normalizedTaskId = String(taskId ?? '').trim();
+    const base = normalizeQueue(queue, releasedAt);
+    let releasedCount = 0;
+    const groups = base.groups.flatMap((group) => {
+        const requests = group.requests.filter((request) => {
+            const keep = request.taskId !== normalizedTaskId;
+            if (!keep)
+                releasedCount += 1;
+            return keep;
+        });
+        return requests.length === 0 ? [] : [{ ...group, requests, updatedAt: releasedAt }];
+    });
+    return {
+        schemaId: 'atm.runnerSyncStewardTaskReleaseResult.v1',
+        ok: true,
+        releasedTaskId: normalizedTaskId,
+        releasedCount,
+        queue: materializeQueue({ ...base, updatedAt: releasedAt, groups })
     };
 }
 export function explainRunnerSyncStewardPosition(queue, taskId, now = new Date().toISOString(), options = {}) {
@@ -307,6 +330,9 @@ function isExpired(request, now) {
     const expiresAt = Date.parse(request.expiresAt);
     const nowMs = Date.parse(now);
     return Number.isFinite(expiresAt) && Number.isFinite(nowMs) && expiresAt <= nowMs;
+}
+function isFullCommitSha(value) {
+    return /^[a-f0-9]{40}$/i.test(value);
 }
 function resolveTaskHealth(request, options) {
     if (options.taskHealthResolver) {

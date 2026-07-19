@@ -7,8 +7,9 @@ import { cleanupBrokerRuntimeSnapshots } from '../../../../core/dist/broker/life
 import { calculateBrokerDecision } from '../../../../core/dist/broker/decision.js';
 import { projectTeamBrokerRearbitrationSnapshot } from '../../../../core/dist/broker/team-lane.js';
 import { planSharedSurfaceAcquisition, removeSharedSurfaceEntry } from '../../../../core/dist/broker/shared-surface-queue.js';
+import { releaseRunnerSyncStewardTaskRequests } from '../../../../core/dist/broker/runner-sync-steward-queue.js';
 import { acknowledgeFreeze, resolveFreezeDecision } from '../../../../core/dist/broker/freeze.js';
-import { readSharedSurfaceFreezeRecords, writeSharedSurfaceFreezeRecords, readSharedSurfaceQueues, writeSharedSurfaceQueues } from './persistence.js';
+import { readSharedSurfaceFreezeRecords, writeSharedSurfaceFreezeRecords, readSharedSurfaceQueues, writeSharedSurfaceQueues, readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue } from './persistence.js';
 import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleasedSharedSurfaceFreezes, shouldQueueSharedSurface, resolveSharedSurfaceQueueAdmission, replaceIntentLane, assertBrokerRegisterCliParity, syncTeamRunRearbitrationSnapshots } from './shared-surface.js';
 function readBrokerWriteIntent(intentFilePath, displayPath) {
     let parsed;
@@ -209,6 +210,8 @@ export function handleBrokerRegistryActions(options, context) {
             return released.entries.length === 0 ? [] : [released];
         });
         writeSharedSurfaceQueues(sharedQueuePath, updatedQueues);
+        const runnerSyncRelease = releaseRunnerSyncStewardTaskRequests(readRunnerSyncStewardQueue(context.runnerSyncQueuePath), releaseTaskId);
+        writeRunnerSyncStewardQueue(context.runnerSyncQueuePath, runnerSyncRelease.queue);
         const freezes = markReleasedSharedSurfaceFreezes({
             records: readSharedSurfaceFreezeRecords(sharedFreezePath),
             releasedTaskId: releaseTaskId,
@@ -231,6 +234,7 @@ export function handleBrokerRegistryActions(options, context) {
                 registryPath: '.atm/runtime/write-broker.registry.json',
                 releasedTask: releaseTaskId,
                 sharedSurfaceQueues: updatedQueues,
+                runnerSyncStewardRelease: runnerSyncRelease,
                 sharedSurfaceFreezes: freezes,
                 runtimeCleanup
             }

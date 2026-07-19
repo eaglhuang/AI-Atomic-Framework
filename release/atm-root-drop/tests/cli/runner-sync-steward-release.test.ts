@@ -7,6 +7,11 @@ import path from 'node:path';
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-release-'));
 const root = process.cwd();
 const atmCliEntrypoint = path.join(root, 'packages/cli/src/atm.ts');
+const sourceA = 'a'.repeat(40);
+const sourceC = 'c'.repeat(40);
+const sourceMissing = 'd'.repeat(40);
+const sourceDone = 'e'.repeat(40);
+const sourceRelease = 'f'.repeat(40);
 
 function runAtm(args: readonly string[], expectStatus = 0): Record<string, any> {
   const result = spawnSync(process.execPath, ['--strip-types', atmCliEntrypoint, ...args, '--cwd', repo, '--json'], {
@@ -43,7 +48,7 @@ try {
     'enqueue',
     '--task', 'TASK-A',
     '--actor', 'captain-a',
-    '--sealed-source-sha', 'sha256:source-a',
+    '--sealed-source-sha', sourceA,
     '--surface', 'release/atm-onefile/atm.mjs'
   ]);
   const stewardWorkId = first.evidence.runnerSync.stewardWorkId;
@@ -54,7 +59,7 @@ try {
     'enqueue',
     '--task', 'TASK-B',
     '--actor', 'captain-b',
-    '--sealed-source-sha', 'sha256:source-a',
+    '--sealed-source-sha', sourceA,
     '--surface', 'release/atm-root-drop/atm.mjs'
   ]);
   assert.equal(coalesced.evidence.runnerSync.stewardWorkId, stewardWorkId);
@@ -66,7 +71,7 @@ try {
     'enqueue',
     '--task', 'TASK-C',
     '--actor', 'captain-c',
-    '--sealed-source-sha', 'sha256:source-c',
+    '--sealed-source-sha', sourceC,
     '--surface', 'release/atm-root-drop/release-manifest.json'
   ]);
   assert.equal(waiting.evidence.runnerSync.queuePosition, 2);
@@ -80,7 +85,7 @@ try {
   ], 1);
   assert.equal(missingReceipt.messages[0].code, 'ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_REQUIRED');
 
-  writeRunnerSyncReceiptFixture('TASK-A', 'captain-a', stewardWorkId, 'sha256:source-a', [
+  writeRunnerSyncReceiptFixture('TASK-A', 'captain-a', stewardWorkId, sourceA, [
     'release/atm-onefile/atm.mjs',
     'release/atm-root-drop/atm.mjs'
   ]);
@@ -137,7 +142,7 @@ try {
     'enqueue',
     '--task', 'TASK-MISSING',
     '--actor', 'missing-captain',
-    '--sealed-source-sha', 'sha256:missing',
+    '--sealed-source-sha', sourceMissing,
     '--surface', 'release/atm-onefile/atm.mjs'
   ]);
   rmSync(path.join(repo, '.atm/history/tasks/TASK-MISSING.json'));
@@ -157,7 +162,7 @@ try {
     'enqueue',
     '--task', 'TASK-DONE',
     '--actor', 'done-captain',
-    '--sealed-source-sha', 'sha256:done',
+    '--sealed-source-sha', sourceDone,
     '--surface', 'release/atm-onefile/atm.mjs'
   ]);
   writeTask('TASK-DONE', 'done');
@@ -169,6 +174,43 @@ try {
   assert.equal(terminalCleanup.evidence.cleanup.staleReleases.length, 1);
   assert.equal(terminalCleanup.evidence.cleanup.staleReleases[0].taskId, 'TASK-DONE');
   assert.equal(terminalCleanup.evidence.cleanup.staleReleases[0].reason, 'orphan-task-terminal');
+
+  writeTask('TASK-MALFORMED');
+  runAtm([
+    'broker',
+    'runner-sync',
+    'enqueue',
+    '--task', 'TASK-MALFORMED',
+    '--actor', 'bad-captain',
+    '--sealed-source-sha', 'short-sha',
+    '--surface', 'release/atm-onefile/atm.mjs'
+  ]);
+  const malformedCleanup = runAtm([
+    'broker',
+    'runner-sync',
+    'cleanup'
+  ]);
+  assert.equal(malformedCleanup.evidence.cleanup.staleReleases.length, 1);
+  assert.equal(malformedCleanup.evidence.cleanup.staleReleases[0].taskId, 'TASK-MALFORMED');
+  assert.equal(malformedCleanup.evidence.cleanup.staleReleases[0].reason, 'malformed-sealed-source');
+
+  writeTask('TASK-RELEASE');
+  runAtm([
+    'broker',
+    'runner-sync',
+    'enqueue',
+    '--task', 'TASK-RELEASE',
+    '--actor', 'release-captain',
+    '--sealed-source-sha', sourceRelease,
+    '--surface', 'release/atm-onefile/atm.mjs'
+  ]);
+  const taskRelease = runAtm([
+    'broker',
+    'release',
+    '--task', 'TASK-RELEASE'
+  ]);
+  assert.equal(taskRelease.evidence.runnerSyncStewardRelease.releasedCount, 1);
+  assert.equal(taskRelease.evidence.runnerSyncStewardRelease.queue.groups.length, 0);
 
   console.log('[runner-sync-steward-release.test] ok');
 } finally {

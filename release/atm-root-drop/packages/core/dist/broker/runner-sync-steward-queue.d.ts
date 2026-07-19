@@ -86,7 +86,7 @@ export type RunnerSyncStewardStaleRelease = {
     readonly stewardWorkId: string;
     readonly queuePosition: number;
     readonly expiredAt: string;
-    readonly reason: 'ttl-expired' | 'orphan-task-missing' | 'orphan-task-terminal';
+    readonly reason: 'ttl-expired' | 'orphan-task-missing' | 'orphan-task-terminal' | 'malformed-sealed-source';
     readonly safeRetryCommand: string;
 };
 export type RunnerSyncStewardCleanupResult = {
@@ -136,8 +136,16 @@ export type RunnerSyncStewardReleaseResult = {
     readonly next: RunnerSyncStewardQueueResult | null;
     readonly suggestedNextAction: string;
 };
+export type RunnerSyncStewardTaskReleaseResult = {
+    readonly schemaId: 'atm.runnerSyncStewardTaskReleaseResult.v1';
+    readonly ok: boolean;
+    readonly releasedTaskId: string;
+    readonly releasedCount: number;
+    readonly queue: RunnerSyncStewardQueueDocument;
+};
 export declare function emptyRunnerSyncStewardQueue(now?: string): RunnerSyncStewardQueueDocument;
 export declare function enqueueRunnerSyncStewardRequest(queue: RunnerSyncStewardQueueDocument | null | undefined, request: RunnerSyncStewardRequestInput, options?: RunnerSyncStewardEnqueueOptions): RunnerSyncStewardQueueResult;
 export declare function cleanupRunnerSyncStewardQueue(queue: RunnerSyncStewardQueueDocument | null | undefined, now?: string, options?: RunnerSyncStewardCleanupOptions): RunnerSyncStewardCleanupResult;
 export declare function releaseRunnerSyncStewardQueue(queue: RunnerSyncStewardQueueDocument | null | undefined, input: RunnerSyncStewardReleaseInput): RunnerSyncStewardReleaseResult;
+export declare function releaseRunnerSyncStewardTaskRequests(queue: RunnerSyncStewardQueueDocument | null | undefined, taskId: string, releasedAt?: string): RunnerSyncStewardTaskReleaseResult;
 export declare function explainRunnerSyncStewardPosition(queue: RunnerSyncStewardQueueDocument | null | undefined, taskId: string, now?: string, options?: RunnerSyncStewardExplainOptions): RunnerSyncStewardQueueResult | null;
