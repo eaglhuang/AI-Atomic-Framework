@@ -1,14 +1,15 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0183",
-  "updatedAt": "2026-07-19T08:41:56.494Z",
+  "updatedAt": "2026-07-19T08:46:49.634Z",
   "updatedBy": "codex-governance-optimizer",
   "freshValidationPasses": [
     "generate:error-codes",
     "node --strip-types tests/cli/durable-plan-batchrun-shadow-journal.test.ts",
     "typecheck",
     "validate:atomization-coverage",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -75,6 +76,19 @@
       "generatedAt": "2026-07-19T08:41:56.556Z",
       "runnerKind": "dev-source",
       "sourceCommit": "7e52e165d79a456fbc2ae5da7e7fff9f7358c994",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-19T08:46:49.698Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
