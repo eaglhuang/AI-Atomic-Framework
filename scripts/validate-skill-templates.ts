@@ -20,6 +20,7 @@ const requiredTemplateIds = [
   'atm-lock',
   'atm-evidence',
   'atm-error-code-resolver',
+  'atm-plan-authoring',
   'atm-upgrade-scan',
   'atm-handoff',
   'mailbox-worker-execution',

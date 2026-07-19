@@ -94,6 +94,12 @@ export const minimumAtmEntrySkillDefinitions = [
     command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
   },
   {
+    id: 'atm-plan-authoring',
+    title: 'ATM Plan Authoring',
+    summary: 'Create registered planning families, plan documents, and task cards through the tool-first plan CLI.',
+    command: 'node atm.mjs plan card create $ARGUMENTS --dry-run --json'
+  },
+  {
     id: 'atm-upgrade-scan',
     title: 'ATM Upgrade Scan',
     summary: 'Scan evidence reports and draft governed upgrade proposals.',

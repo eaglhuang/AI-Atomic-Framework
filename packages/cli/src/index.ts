@@ -114,6 +114,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'plan',
+    summary: 'Manage registered planning families and create plan documents or task cards',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'start',
     summary: 'Start a goal-bound guidance session',
     implemented: true,
