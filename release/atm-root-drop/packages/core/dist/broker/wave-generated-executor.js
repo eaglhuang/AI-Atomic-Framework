@@ -147,3 +147,48 @@ export function evaluateAtomicWaveCheckpoint(input) {
     };
     return { ...withoutPayload, payloadDigest: digestJson(withoutPayload) };
 }
+export function createAtomicWaveCheckpointReceipt(input) {
+    const readiness = evaluateAtomicWaveCheckpoint(input);
+    const evidenceReadback = {};
+    for (const taskId of readiness.taskIds) {
+        evidenceReadback[taskId] = {
+            commit: readiness.missingByTask[taskId]?.includes('commit') ? 'missing' : 'present',
+            build: readiness.missingByTask[taskId]?.includes('build') ? 'missing' : 'present',
+            projection: readiness.missingByTask[taskId]?.includes('projection') ? 'missing' : 'present'
+        };
+    }
+    const missingSummary = Object.entries(readiness.missingByTask).flatMap(([taskId, missing]) => missing.map((surface) => `${taskId}:${surface}`)).sort((a, b) => a.localeCompare(b));
+    const withoutPayload = {
+        schemaId: 'atm.atomicWaveCheckpointReceipt.v1',
+        specVersion: '0.1.0',
+        waveId: readiness.waveId,
+        taskIds: readiness.taskIds,
+        manifestDigest: readiness.manifestDigest,
+        ready: readiness.ready,
+        checkpointWatermark: readiness.payloadDigest,
+        readinessDigest: readiness.payloadDigest,
+        evidenceConsumed: {
+            deliveryReceiptCount: input.deliveryReceipts.length,
+            buildReceiptCount: input.buildReceipts.length,
+            projectionReceiptCount: input.projectionReceipts.length,
+            totalReceiptCount: input.deliveryReceipts.length + input.buildReceipts.length + input.projectionReceipts.length
+        },
+        evidenceReadback,
+        planningCloseback: {
+            status: readiness.planningCloseback,
+            cas: readiness.planningCloseback === 'ready' ? 'matched' : 'conflict'
+        },
+        missingByTask: readiness.missingByTask,
+        treatment: {
+            schemaId: 'atm.atomicWaveCheckpointTreatment.v1',
+            specVersion: '0.1.0',
+            readiness: readiness.ready ? 'ready' : 'blocked',
+            evidenceConsumed: true,
+            evidenceReadback: true,
+            uniqueBlock: readiness.ready ? null : digestJson({ waveId: readiness.waveId, manifestDigest: readiness.manifestDigest, missingByTask: readiness.missingByTask, planningCloseback: readiness.planningCloseback }),
+            missingSummary
+        },
+        createdAt: readiness.createdAt
+    };
+    return { ...withoutPayload, payloadDigest: digestJson(withoutPayload) };
+}

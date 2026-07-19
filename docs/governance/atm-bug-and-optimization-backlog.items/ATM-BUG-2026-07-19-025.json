@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-025",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Runner Sync / CLI UX",
+  "finding": "ATM-GOV-0189 dogfood exposed two runner-sync lifecycle frictions: broker runner-sync release reports required arguments one at a time (`--task`, then `--steward-work-id`, then `--receipt-ref`) instead of surfacing the complete first-layer usage contract, and sealed runner build rewrites `.atm/history/evidence/<task>.runner-sync-receipt.json` after taskflow close so a follow-up release-sync commit is blocked by `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT`.",
+  "expectedBehavior": "Runner-sync release help/error output and first-layer skills should disclose the full required command shape up front. Runner-sync receipts should be either close-owned digest artifacts committed with the task transition, or local runtime/log artifacts with only a stable digest reference in Git; a post-close build should not leave a protected evidence file dirty with no legal commit path.",
+  "evidenceOrRepro": "During ATM-GOV-0189 on 2026-07-19: `node atm.mjs broker runner-sync release --actor codex-governance-optimizer --json` returned `release requires --task`; adding `--task ATM-GOV-0189` returned `release requires --steward-work-id`; adding steward id returned `ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_REQUIRED`. After taskflow close commit `6da05643`, `node atm.mjs git commit --actor codex-governance-optimizer --task ATM-GOV-0189 --message \"build(release): sync ATM-GOV-0189 artifacts\" --auto-stage --json` failed because `.atm/history/evidence/ATM-GOV-0189.runner-sync-receipt.json` lacked task context.",
+  "followUp": "Add a runner-sync release UX/task card: complete usage validation in one diagnostic, document the command in first-layer skills/help, and change runner-sync receipt persistence to runtime raw + Git digest/close-owned summary so release artifact commits can proceed without protected evidence residue."
+}

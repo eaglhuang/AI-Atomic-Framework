@@ -98,6 +98,44 @@ export interface AtomicWaveCheckpointReadiness {
   readonly createdAt: string;
 }
 
+export interface AtomicWaveCheckpointReceipt {
+  readonly schemaId: 'atm.atomicWaveCheckpointReceipt.v1';
+  readonly specVersion: '0.1.0';
+  readonly waveId: string;
+  readonly taskIds: readonly string[];
+  readonly manifestDigest: string;
+  readonly ready: boolean;
+  readonly checkpointWatermark: string;
+  readonly readinessDigest: string;
+  readonly evidenceConsumed: {
+    readonly deliveryReceiptCount: number;
+    readonly buildReceiptCount: number;
+    readonly projectionReceiptCount: number;
+    readonly totalReceiptCount: number;
+  };
+  readonly evidenceReadback: Readonly<Record<string, {
+    readonly commit: 'present' | 'missing';
+    readonly build: 'present' | 'missing';
+    readonly projection: 'present' | 'missing';
+  }>>;
+  readonly planningCloseback: {
+    readonly status: 'ready' | 'reconcile-required';
+    readonly cas: 'matched' | 'conflict';
+  };
+  readonly missingByTask: Readonly<Record<string, readonly string[]>>;
+  readonly treatment: {
+    readonly schemaId: 'atm.atomicWaveCheckpointTreatment.v1';
+    readonly specVersion: '0.1.0';
+    readonly readiness: 'ready' | 'blocked';
+    readonly evidenceConsumed: boolean;
+    readonly evidenceReadback: boolean;
+    readonly uniqueBlock: string | null;
+    readonly missingSummary: readonly string[];
+  };
+  readonly payloadDigest: string;
+  readonly createdAt: string;
+}
+
 function uniqueSorted(values: readonly string[]): readonly string[] {
   return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
@@ -232,6 +270,52 @@ export function evaluateAtomicWaveCheckpoint(input: AtomicWaveCheckpointInput): 
     missingByTask,
     planningCloseback: input.planningClosebackOk === false ? 'reconcile-required' as const : 'ready' as const,
     createdAt: input.now ?? new Date().toISOString()
+  };
+  return { ...withoutPayload, payloadDigest: digestJson(withoutPayload) };
+}
+
+export function createAtomicWaveCheckpointReceipt(input: AtomicWaveCheckpointInput): AtomicWaveCheckpointReceipt {
+  const readiness = evaluateAtomicWaveCheckpoint(input);
+  const evidenceReadback: Record<string, { commit: 'present' | 'missing'; build: 'present' | 'missing'; projection: 'present' | 'missing' }> = {};
+  for (const taskId of readiness.taskIds) {
+    evidenceReadback[taskId] = {
+      commit: readiness.missingByTask[taskId]?.includes('commit') ? 'missing' : 'present',
+      build: readiness.missingByTask[taskId]?.includes('build') ? 'missing' : 'present',
+      projection: readiness.missingByTask[taskId]?.includes('projection') ? 'missing' : 'present'
+    };
+  }
+  const missingSummary = Object.entries(readiness.missingByTask).flatMap(([taskId, missing]) => missing.map((surface) => `${taskId}:${surface}`)).sort((a, b) => a.localeCompare(b));
+  const withoutPayload = {
+    schemaId: 'atm.atomicWaveCheckpointReceipt.v1' as const,
+    specVersion: '0.1.0' as const,
+    waveId: readiness.waveId,
+    taskIds: readiness.taskIds,
+    manifestDigest: readiness.manifestDigest,
+    ready: readiness.ready,
+    checkpointWatermark: readiness.payloadDigest,
+    readinessDigest: readiness.payloadDigest,
+    evidenceConsumed: {
+      deliveryReceiptCount: input.deliveryReceipts.length,
+      buildReceiptCount: input.buildReceipts.length,
+      projectionReceiptCount: input.projectionReceipts.length,
+      totalReceiptCount: input.deliveryReceipts.length + input.buildReceipts.length + input.projectionReceipts.length
+    },
+    evidenceReadback,
+    planningCloseback: {
+      status: readiness.planningCloseback,
+      cas: readiness.planningCloseback === 'ready' ? 'matched' as const : 'conflict' as const
+    },
+    missingByTask: readiness.missingByTask,
+    treatment: {
+      schemaId: 'atm.atomicWaveCheckpointTreatment.v1' as const,
+      specVersion: '0.1.0' as const,
+      readiness: readiness.ready ? 'ready' as const : 'blocked' as const,
+      evidenceConsumed: true,
+      evidenceReadback: true,
+      uniqueBlock: readiness.ready ? null : digestJson({ waveId: readiness.waveId, manifestDigest: readiness.manifestDigest, missingByTask: readiness.missingByTask, planningCloseback: readiness.planningCloseback }),
+      missingSummary
+    },
+    createdAt: readiness.createdAt
   };
   return { ...withoutPayload, payloadDigest: digestJson(withoutPayload) };
 }
