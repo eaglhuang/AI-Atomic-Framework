@@ -18,6 +18,7 @@ import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfi
 import { buildTeamKnowledgeSummary } from '../team-knowledge.ts';
 import { decideActiveBatchClaimTask } from '../next-active-batch.ts';
 import { runClaimParallelPreflight } from './claim-parallel-preflight.ts';
+import { buildPlanScopedRoutingPreflight } from './plan-scoped-preflight.ts';
 import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.ts';
 import { CliError, makeResult, message, parseJsonText } from '../shared.ts';
 import { prepareImportedTaskForClaim, registerPreClaimBrokerTransaction } from './claim-helpers.ts';
@@ -251,6 +252,16 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   brokerQueueAdmission = parallelPreflight.brokerQueueAdmission;
   claimAllowedFiles = parallelPreflight.claimAllowedFiles;
   const dirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: input.cwd, task: claimableTask, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, claimFiles: claimAllowedFiles });
+  const planScopedPreflight = buildPlanScopedRoutingPreflight({
+    cwd: input.cwd,
+    task: claimableTask,
+    selectedTasks: importedTaskQueue.promptScope?.selectedTasks ?? [claimableTask],
+    taskIntent: input.taskIntent,
+    actorId: resolvedActor.actorId,
+    laneSessionId: currentLaneSessionId,
+    dirtyWipAdmission,
+    command: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --task ${claimableTask.workItemId} --auto-intent --json`
+  });
   const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
   const oversizedExtractionAdmission = assertClaimLineBudgetOrExtractionAdmission({ cwd: input.cwd, taskId: claimableTask.workItemId, taskPath: taskPathFor(input.cwd, claimableTask.workItemId), report: lineBudgetReport });
   claimLatencyPhases.push({ phase: 'parallel-preflight', durationMs: Date.now() - parallelStartedAt });
@@ -593,6 +604,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       totalMs: Date.now() - claimStartedAt,
       phases: claimLatencyPhases
     },
+    planScopedPreflight,
     dirtyWipAdmission,
     ...(oversizedExtractionAdmission ? { oversizedExtractionAdmission } : {})
   }
