@@ -35,6 +35,8 @@ export function planWaveGeneratedWrite(input) {
         blockers.push('source digest is required');
     if (!input.outputDigest.trim())
         blockers.push('output digest is required');
+    if (input.commandExitCode !== null && input.commandExitCode !== undefined && input.commandExitCode !== 0)
+        blockers.push(`generated write command failed with exit code ${input.commandExitCode}`);
     const tickets = selectedTickets(input.scheduler, decision);
     const taskIds = uniqueSorted(tickets.map((ticket) => ticket.taskId));
     if (taskIds.length === 0)
@@ -74,6 +76,26 @@ export function planWaveGeneratedWrite(input) {
         sourceDigest: input.sourceDigest,
         outputDigest: input.outputDigest,
         contentAddressedSkip: input.contentAddressedSkip === true,
+        command: input.command?.trim() || null,
+        commandExitCode: input.commandExitCode ?? null,
+        commandDurationMs: input.commandDurationMs ?? null,
+        phaseTimingsMs: input.phaseTimingsMs ?? (input.commandDurationMs !== null && input.commandDurationMs !== undefined ? { totalElapsed: input.commandDurationMs } : {}),
+        observedOutputFiles: uniqueSorted(input.observedOutputFiles ?? []),
+        telemetry: input.treatmentTelemetry ?? {
+            schemaId: 'atm.generatedWriteTreatmentTelemetry.v1',
+            specVersion: '0.1.0',
+            surfaceKind: input.surfaceKind,
+            executionMode: input.contentAddressedSkip === true ? 'content-addressed-skip' : input.command ? 'command-executed' : 'receipt-only',
+            sideEffectAllowed: Boolean(input.command && input.commandExitCode === 0),
+            commandExecuted: Boolean(input.command),
+            outputObserved: (input.observedOutputFiles ?? []).length > 0,
+            receiptValidity: 'valid',
+            exactlyOnce: input.command ? 'observed' : 'not-applicable',
+            skipReason: input.contentAddressedSkip === true ? 'content-addressed input/output digest match' : null,
+            durationMs: input.commandDurationMs ?? null,
+            phaseTimingsMs: input.phaseTimingsMs ?? (input.commandDurationMs !== null && input.commandDurationMs !== undefined ? { totalElapsed: input.commandDurationMs } : {}),
+            outputFileCount: uniqueSorted(input.observedOutputFiles ?? []).length
+        },
         executorActor: input.actorId,
         createdAt: input.now ?? new Date().toISOString()
     };

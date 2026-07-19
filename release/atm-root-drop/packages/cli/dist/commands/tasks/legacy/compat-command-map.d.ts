@@ -23,5 +23,6 @@ export interface LegacyTasksCompatCommandHandlers {
     readonly importTask: (argv: string[]) => Promise<CommandResult> | CommandResult;
     readonly verify: (argv: string[]) => Promise<CommandResult> | CommandResult;
     readonly scope: (argv: string[]) => Promise<CommandResult> | CommandResult;
+    readonly realignPlanSource: (argv: string[]) => Promise<CommandResult> | CommandResult;
 }
 export declare function runTasksCompatCommandMap(argv: string[], handlers: LegacyTasksCompatCommandHandlers): Promise<CommandResult>;

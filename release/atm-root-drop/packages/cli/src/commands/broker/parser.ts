@@ -76,6 +76,8 @@ export interface ParsedBrokerOptions {
   readonly claimedTasks: readonly string[];
   readonly validatorTasks: readonly string[];
   readonly fileSlices: readonly string[];
+  readonly runCommand: string | null;
+  readonly outputFiles: readonly string[];
   readonly stewardId: string | null;
   readonly evidenceOutPath: string | null;
   readonly requestFiles: readonly string[];
@@ -125,6 +127,8 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     claimedTasks: [] as string[],
     validatorTasks: [] as string[],
     fileSlices: [] as string[],
+    runCommand: null as string | null,
+    outputFiles: [] as string[],
     stewardId: null as string | null,
     evidenceOutPath: null as string | null,
     requestFiles: [] as string[],
@@ -292,6 +296,16 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--run-command') {
+      state.runCommand = requireValue(argv, index, '--run-command');
+      index += 1;
+      continue;
+    }
+    if (arg === '--output-file') {
+      state.outputFiles.push(requireValue(argv, index, '--output-file'));
+      index += 1;
+      continue;
+    }
     if (arg === '--steward-id') {
       state.stewardId = requireValue(argv, index, '--steward-id');
       index += 1;
@@ -394,6 +408,8 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     claimedTasks: state.claimedTasks,
     validatorTasks: state.validatorTasks,
     fileSlices: state.fileSlices,
+    runCommand: state.runCommand,
+    outputFiles: state.outputFiles,
     stewardId: state.stewardId,
     evidenceOutPath: state.evidenceOutPath,
     requestFiles: state.requestFiles,

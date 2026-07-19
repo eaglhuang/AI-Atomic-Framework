@@ -41,6 +41,7 @@ export interface ClaimAdmissionInput {
      * echoed back in the decision for diagnostic clarity.
      */
     readonly overlappingAtomIds?: readonly string[];
+    readonly ownerComparison?: ClaimOwnerComparison;
 }
 export interface ClaimAdmissionDecision {
     readonly admitted: boolean;
@@ -56,11 +57,40 @@ export interface ClaimAdmissionDecision {
         readonly kind: 'cid-overlap-advisory' | 'takeover-required';
         readonly detail: string;
     };
+    readonly ownerComparison?: ClaimOwnerComparison;
+}
+export type ClaimOwnerComparisonMode = 'lane-id' | 'actor-fallback';
+export interface ClaimLifecycleOwner {
+    readonly actorId?: string | null;
+    readonly laneSessionId?: string | null;
+}
+export interface ClaimOwnerComparison {
+    readonly schemaId: 'atm.claimOwnerComparison.v1';
+    readonly mode: ClaimOwnerComparisonMode;
+    readonly sameOwner: boolean;
+    readonly currentActorId: string | null;
+    readonly conflictingActorId: string | null;
+    readonly currentLaneSessionId: string | null;
+    readonly conflictingLaneSessionId: string | null;
+    readonly reason: string;
 }
 /**
  * Return true iff the broker verdict is admissible.
  */
 export declare function isBrokerVerdictAdmissible(verdict: BrokerArbitrationVerdict): boolean;
+/**
+ * Compare lifecycle ownership during the lane-session migration.
+ * If both sides have lane ids, lane identity is authoritative; otherwise the
+ * legacy actor-id comparison remains the fallback.
+ */
+export declare function compareClaimLifecycleOwners(input: {
+    readonly current: ClaimLifecycleOwner;
+    readonly conflicting: ClaimLifecycleOwner;
+}): ClaimOwnerComparison;
+export declare function deriveActiveWriteConflictFromOwnerComparison(input: {
+    readonly comparison: ClaimOwnerComparison;
+    readonly conflictIntent?: string | null;
+}): boolean;
 /**
  * Classify whether the broker verdict and the CID diagnostic agree. They
  * "agree" when both would admit or both would block; anything else is

@@ -1,6 +1,11 @@
+import { createTeamShadowWorkspaceProviderPlan } from './team/shadow-workspace.ts';
+import { type BatchRunRecord } from './work-channels.ts';
 import { type WavePlan } from '../../../core/src/broker/team-wave-planner.ts';
 import { type WaveAdmissionDecision } from '../../../core/src/broker/team-wave-admission.ts';
 import { type TeamWaveEnvelope } from '../../../core/src/broker/team-wave-envelope.ts';
+import { type WaveManifest } from '../../../core/src/broker/wave-manifest.ts';
+import type { TeamWorkerReport } from '../../../core/src/broker/team-worker-report.ts';
+import { type TeamWorkerExecutionRuntime, type TeamWorkerExecutorResultState } from '../../../core/src/team-agents/worker-executor.ts';
 /**
  * Build a wave plan for an explicit set of task ids, reading their declared
  * metadata from the ledger. Append-safe paths default to the coverage map,
@@ -10,6 +15,41 @@ export declare function buildWavePlanFromTaskIds(cwd: string, taskIds: readonly 
     readonly plan: WavePlan;
     readonly missing: readonly string[];
 };
+type WaveExecutor = 'auto' | 'local-lanes' | 'editor-subagents' | 'team-agents' | 'manual';
+export interface TeamWaveRuntimeLane {
+    readonly taskId: string;
+    readonly laneSessionId: string;
+    readonly workspace: ReturnType<typeof createTeamShadowWorkspaceProviderPlan>;
+    readonly workerCanCommitOrClose: false;
+    readonly allowedReturnSchemas: readonly ['atm.patchEnvelope.v1', 'atm.teamWorkerReport.v1'];
+}
+export interface TeamWaveRuntimeRecord {
+    readonly schemaId: 'atm.teamWaveRuntime.v1';
+    readonly specVersion: '0.1.0';
+    readonly waveId: string;
+    readonly batchId: string;
+    readonly executor: WaveExecutor;
+    readonly coordinatorActorId: string;
+    readonly taskIds: readonly string[];
+    readonly manifest: WaveManifest;
+    readonly lanes: readonly TeamWaveRuntimeLane[];
+    readonly workerExecution: TeamWorkerExecutionRuntime;
+    readonly workerReports: readonly TeamWorkerReport[];
+    readonly acceptedTaskIds: readonly string[];
+    readonly deferredTaskIds: readonly string[];
+    readonly missingWorkerReports: readonly string[];
+    readonly invalidWorkerReports: readonly {
+        readonly taskId: string;
+        readonly reason: string;
+    }[];
+    readonly outOfScopeFindings: readonly {
+        readonly taskId: string;
+        readonly files: readonly string[];
+    }[];
+    readonly resultState: TeamWorkerExecutorResultState;
+    readonly writesPerformed: false;
+    readonly createdAt: string;
+}
 export type WaveRole = 'coordinator' | 'worker' | 'validator' | 'reviewer';
 export type WavePrivilegedAction = 'git-write' | 'task-closeout' | 'checkpoint';
 export interface CoordinatorGuardResult {
@@ -29,8 +69,23 @@ export declare function buildWaveRuntimeRecord(cwd: string, taskIds: readonly st
     readonly envelope: TeamWaveEnvelope | null;
     readonly missing: readonly string[];
 };
+export declare function buildManifestRuntimeRecordFromBatch(input: {
+    readonly cwd: string;
+    readonly batchId: string;
+    readonly waveId: string;
+    readonly executor: WaveExecutor;
+    readonly coordinatorActorId: string;
+    readonly workerReports?: readonly TeamWorkerReport[];
+    readonly now?: string;
+}): {
+    readonly ok: boolean;
+    readonly runtime: TeamWaveRuntimeRecord | null;
+    readonly reason: string | null;
+    readonly batchRun: BatchRunRecord | null;
+};
 /**
  * Handle `team wave <plan|dispatch> <csv>`. Delegated to from the `team` command
  * so no new top-level command registration is required.
  */
 export declare function runTeamWave(argv: readonly string[], cwd: string): import("./shared.ts").CommandResult;
+export {};

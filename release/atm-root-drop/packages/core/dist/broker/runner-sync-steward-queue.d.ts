@@ -1,9 +1,13 @@
 import { RUNNER_SYNC_STEWARD_GENERATOR } from './global-resource-projection.ts';
+import { type BrokerBatchEvidence } from './related-task-batching.ts';
 export type RunnerSyncStewardRequestInput = {
     readonly taskId: string;
     readonly actorId: string;
     readonly sealedSourceSha: string;
     readonly requestedSurfaces: readonly string[];
+    readonly waveId?: string | null;
+    readonly surfaceFamily?: string | null;
+    readonly validators?: readonly string[];
     readonly createdAt?: string;
     readonly heartbeatAt?: string;
     readonly ttlSeconds?: number;
@@ -13,6 +17,9 @@ export type RunnerSyncStewardRequest = {
     readonly actorId: string;
     readonly sealedSourceSha: string;
     readonly requestedSurfaces: readonly string[];
+    readonly waveId: string | null;
+    readonly surfaceFamily: string;
+    readonly validators: readonly string[];
     readonly createdAt: string;
     readonly heartbeatAt: string;
     readonly expiresAt: string;
@@ -23,8 +30,11 @@ export type RunnerSyncStewardRequest = {
 export type RunnerSyncStewardGroup = {
     readonly stewardWorkId: string;
     readonly sealedSourceSha: string;
+    readonly waveId: string | null;
+    readonly surfaceFamily: string;
     readonly queuePosition: number;
     readonly status: 'queue-head' | 'waiting';
+    readonly queueHeadHealth?: RunnerSyncTaskHealth;
     readonly createdAt: string;
     readonly updatedAt: string;
     readonly requestedSurfaces: readonly string[];
@@ -47,10 +57,27 @@ export type RunnerSyncStewardQueueResult = {
     readonly stewardWorkId: string;
     readonly sealedSourceSha: string;
     readonly queuePosition: number;
+    readonly queueHeadHealth: RunnerSyncTaskHealth;
     readonly waitingTasks: readonly string[];
     readonly requestedSurfaces: readonly string[];
     readonly suggestedNextAction: string;
+    readonly brokerTicket: BrokerTicketEnvelope;
     readonly queue: RunnerSyncStewardQueueDocument;
+};
+export type BrokerTicketEnvelope = {
+    readonly schemaId: 'atm.brokerTicket.v1';
+    readonly ticketId: string;
+    readonly position: number;
+    readonly headOwner: string | null;
+    readonly headHealth: RunnerSyncTaskHealth;
+    readonly batchEligible: boolean;
+    readonly waveId?: string | null;
+    readonly surfaceFamily?: string;
+    readonly batch?: BrokerBatchEvidence | null;
+    readonly enqueuedAt: string;
+    readonly waitedMs: number;
+    readonly sharedSurface: string;
+    readonly scopeClass: readonly string[];
 };
 export type RunnerSyncStewardStaleRelease = {
     readonly taskId: string;
@@ -59,6 +86,7 @@ export type RunnerSyncStewardStaleRelease = {
     readonly stewardWorkId: string;
     readonly queuePosition: number;
     readonly expiredAt: string;
+    readonly reason: 'ttl-expired' | 'orphan-task-missing' | 'orphan-task-terminal';
     readonly safeRetryCommand: string;
 };
 export type RunnerSyncStewardCleanupResult = {
@@ -74,6 +102,18 @@ export type RunnerSyncStewardReleaseInput = {
     readonly receiptRef?: string | null;
     readonly receiptDigest?: string | null;
     readonly releasedAt?: string;
+};
+export type RunnerSyncTaskHealth = 'task-active' | 'task-missing' | 'task-terminal';
+export type TaskHealthResolver = (request: RunnerSyncStewardRequest) => RunnerSyncTaskHealth;
+export type RunnerSyncStewardCleanupOptions = {
+    readonly taskHealthResolver?: TaskHealthResolver;
+    readonly shouldReleaseRequest?: (request: RunnerSyncStewardRequest) => boolean;
+};
+export type RunnerSyncStewardEnqueueOptions = {
+    readonly taskHealthResolver?: (taskId: string) => RunnerSyncTaskHealth;
+};
+export type RunnerSyncStewardExplainOptions = {
+    readonly taskHealthResolver?: TaskHealthResolver;
 };
 export type RunnerSyncStewardReleaseRecord = {
     readonly taskId: string;
@@ -97,7 +137,7 @@ export type RunnerSyncStewardReleaseResult = {
     readonly suggestedNextAction: string;
 };
 export declare function emptyRunnerSyncStewardQueue(now?: string): RunnerSyncStewardQueueDocument;
-export declare function enqueueRunnerSyncStewardRequest(queue: RunnerSyncStewardQueueDocument | null | undefined, request: RunnerSyncStewardRequestInput): RunnerSyncStewardQueueResult;
-export declare function cleanupRunnerSyncStewardQueue(queue: RunnerSyncStewardQueueDocument | null | undefined, now?: string): RunnerSyncStewardCleanupResult;
+export declare function enqueueRunnerSyncStewardRequest(queue: RunnerSyncStewardQueueDocument | null | undefined, request: RunnerSyncStewardRequestInput, options?: RunnerSyncStewardEnqueueOptions): RunnerSyncStewardQueueResult;
+export declare function cleanupRunnerSyncStewardQueue(queue: RunnerSyncStewardQueueDocument | null | undefined, now?: string, options?: RunnerSyncStewardCleanupOptions): RunnerSyncStewardCleanupResult;
 export declare function releaseRunnerSyncStewardQueue(queue: RunnerSyncStewardQueueDocument | null | undefined, input: RunnerSyncStewardReleaseInput): RunnerSyncStewardReleaseResult;
-export declare function explainRunnerSyncStewardPosition(queue: RunnerSyncStewardQueueDocument | null | undefined, taskId: string, now?: string): RunnerSyncStewardQueueResult | null;
+export declare function explainRunnerSyncStewardPosition(queue: RunnerSyncStewardQueueDocument | null | undefined, taskId: string, now?: string, options?: RunnerSyncStewardExplainOptions): RunnerSyncStewardQueueResult | null;

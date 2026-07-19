@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -112,6 +113,42 @@ function writeReceipt(cwd, outPath, value) {
     writeFileSync(absolute, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
     return path.relative(cwd, absolute).replace(/\\/g, '/');
 }
+function digestOutputFiles(cwd, files) {
+    const normalized = uniqueSorted(files);
+    const hash = createHash('sha256');
+    for (const relative of normalized) {
+        const absolute = path.resolve(cwd, relative);
+        if (!existsSync(absolute)) {
+            throw new CliError('ATM_BROKER_BATCH_GENERATED_BLOCKED', `generated output file does not exist: ${relative}`, { exitCode: 1 });
+        }
+        const stat = statSync(absolute);
+        if (stat.isDirectory()) {
+            throw new CliError('ATM_BROKER_BATCH_GENERATED_BLOCKED', `generated output path is a directory; pass concrete --output-file entries: ${relative}`, { exitCode: 1 });
+        }
+        hash.update(relative);
+        hash.update('\0');
+        hash.update(readFileSync(absolute));
+        hash.update('\0');
+    }
+    return `sha256:${hash.digest('hex')}`;
+}
+function runGeneratedCommand(cwd, command) {
+    const started = Date.now();
+    const result = spawnSync(command, {
+        cwd,
+        shell: true,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+    const durationMs = Date.now() - started;
+    if ((result.status ?? 1) !== 0) {
+        throw new CliError('ATM_BROKER_BATCH_GENERATED_BLOCKED', `generated write command failed: ${command}`, {
+            exitCode: 1,
+            details: { command, exitCode: result.status ?? 1, stdout: result.stdout, stderr: result.stderr, durationMs }
+        });
+    }
+    return { exitCode: result.status ?? 0, stdout: result.stdout, stderr: result.stderr, durationMs };
+}
 export function handleBrokerBatchExecute(options, context) {
     if (options.action !== 'batch')
         return null;
@@ -127,10 +164,25 @@ export function handleBrokerBatchExecute(options, context) {
     }
     const scheduler = readJson(context.waveSchedulerPath);
     if (selectedSurface === 'build' || selectedSurface === 'projection') {
-        if (!options.payloadDigest || !options.receiptDigest) {
-            throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection requires --payload-digest <source-digest> and --receipt-digest <output-digest>.', { exitCode: 2 });
+        if (!options.payloadDigest) {
+            throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection requires --payload-digest <source-digest>.', { exitCode: 2 });
+        }
+        if (options.apply && !options.runCommand && !options.receiptDigest) {
+            throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection --apply requires --run-command or --receipt-digest.', { exitCode: 2 });
+        }
+        if (options.runCommand && options.outputFiles.length === 0) {
+            throw new CliError('ATM_CLI_USAGE', 'broker batch execute --run-command requires at least one --output-file so ATM can observe the output digest.', { exitCode: 2 });
         }
         const surfaceKind = selectedSurface;
+        const commandRun = options.apply && options.runCommand
+            ? runGeneratedCommand(options.cwd, options.runCommand)
+            : null;
+        const observedOutputDigest = options.runCommand
+            ? digestOutputFiles(options.cwd, options.outputFiles)
+            : options.receiptDigest;
+        if (!observedOutputDigest) {
+            throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection requires --receipt-digest when no --run-command is provided.', { exitCode: 2 });
+        }
         const decision = planWaveBrokerBatch({
             document: scheduler,
             waveId: options.waveId,
@@ -148,7 +200,12 @@ export function handleBrokerBatchExecute(options, context) {
             manifestDigest: options.manifestDigest,
             sealedSourceSha: options.sealedSourceSha,
             sourceDigest: options.payloadDigest,
-            outputDigest: options.receiptDigest,
+            outputDigest: observedOutputDigest,
+            command: commandRun ? options.runCommand : null,
+            commandExitCode: commandRun?.exitCode ?? null,
+            commandDurationMs: commandRun?.durationMs ?? null,
+            phaseTimingsMs: commandRun ? { command: commandRun.durationMs, outputDigestCalculation: 0, totalElapsed: commandRun.durationMs } : null,
+            observedOutputFiles: options.runCommand ? options.outputFiles : [],
             expectedTaskIds: options.expectedTasks
         });
         const receiptPath = options.evidenceOutPath && plan.receipt

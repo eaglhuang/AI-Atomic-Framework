@@ -23,7 +23,8 @@ export interface TaskCommandDispatchTable {
     readonly importTask: TaskCommandHandler;
     readonly verify: TaskCommandHandler;
     readonly scope: TaskCommandHandler;
+    readonly realignPlanSource: TaskCommandHandler;
 }
-export declare const TASKS_ACTION_USAGE = "tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).";
+export declare const TASKS_ACTION_USAGE = "tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new | realign-plan-source).";
 export declare function normalizeTasksArgv(argv: readonly string[]): string[];
 export declare function dispatchTasksAction(argv: readonly string[], handlers: TaskCommandDispatchTable): Promise<CommandResult>;

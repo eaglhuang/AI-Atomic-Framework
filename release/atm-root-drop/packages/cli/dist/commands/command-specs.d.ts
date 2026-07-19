@@ -37,6 +37,7 @@ export declare const commandSpecs: Readonly<{
     init: import("./shared.ts").CommandSpec;
     'internal-release': import("./shared.ts").CommandSpec;
     integration: import("./shared.ts").CommandSpec;
+    lane: import("./shared.ts").CommandSpec;
     lock: import("./shared.ts").CommandSpec;
     'map-capsule': Readonly<import("./shared.ts").CommandSpec & {
         visibility: "public" | "internal";
@@ -44,6 +45,7 @@ export declare const commandSpecs: Readonly<{
     migrate: import("./shared.ts").CommandSpec;
     next: import("./shared.ts").CommandSpec;
     orient: import("./shared.ts").CommandSpec;
+    plan: import("./shared.ts").CommandSpec;
     police: import("./shared.ts").CommandSpec;
     quickfix: import("./shared.ts").CommandSpec;
     residue: import("./shared.ts").CommandSpec;

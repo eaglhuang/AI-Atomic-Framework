@@ -58,6 +58,12 @@ export interface TaskDirectionLock {
     readonly promptHash: string | null;
     readonly actorId: string;
     readonly sessionId: string | null;
+    readonly laneSession?: {
+        readonly laneSessionId: string;
+        readonly status: string;
+        readonly source: string;
+        readonly exportHint: string;
+    };
     readonly createdAt: string;
     readonly status: 'active';
 }
@@ -111,6 +117,7 @@ export declare function writeTaskDirectionLock(input: {
     readonly allowPlanningMirror?: boolean;
     readonly prompt?: string | null;
     readonly sessionId?: string | null;
+    readonly laneSession?: TaskDirectionLock['laneSession'] | null;
 }): TaskDirectionLock;
 export declare function getCanonicalAllowedFilesForTask(cwd: string, taskId: string): readonly string[] | null;
 export interface TaskDirectionAllowedFilesDiagnosis {
