@@ -6,7 +6,7 @@ import path from 'node:path';
 import { runTasksImport } from '../../packages/cli/src/commands/tasks/import-orchestrator.ts';
 import { runTasksClaimLifecycle } from '../../packages/cli/src/commands/tasks/claim-orchestrator.ts';
 import { validatePlanningSourceSeal } from '../../packages/cli/src/commands/tasks/import-task.ts';
-import { resolveClosebackPlanningPath } from '../../packages/cli/src/commands/taskflow/close-orchestration.ts';
+import { assertClosebackPlanningPathReady, resolveClosebackPlanningPath } from '../../packages/cli/src/commands/taskflow/close-orchestration.ts';
 import { buildDelegationContract } from '../../packages/cli/src/commands/taskflow/profile-loader.ts';
 import { toStoredPlanningPath } from '../../packages/cli/src/commands/planning-repo-root.ts';
 
@@ -182,5 +182,28 @@ const amendedValidation = validatePlanningSourceSeal({ cwd: targetRepo, taskDocu
 assert.equal(amendedValidation.ok, true);
 assert.equal(amendedValidation.status, 'governed-amendment');
 assert.ok(amendedValidation.driftKinds.includes('amendment-epoch'));
+
+const ledgerOnlyTempTaskId = 'ATM-FRAMEWORK-TEMP-codex-ledger-only-close';
+const ledgerOnlyResolution = resolveClosebackPlanningPath({
+  cwd: targetRepo,
+  taskId: ledgerOnlyTempTaskId,
+  taskDocument: {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: ledgerOnlyTempTaskId,
+    title: 'Ledger-only framework temp close fixture',
+    status: 'running',
+    scopePaths: ['packages/cli/src/commands/taskflow/close-orchestration.ts'],
+    deliverables: ['packages/cli/src/commands/taskflow/close-orchestration.ts']
+  },
+  profile: null,
+  profileRepoRoot: null,
+  delegationContract: buildDelegationContract(null)
+});
+assert.equal(ledgerOnlyResolution.route, 'ledger-only-target');
+assert.equal(ledgerOnlyResolution.planningMirrorPath, null);
+assert.doesNotThrow(() => assertClosebackPlanningPathReady(ledgerOnlyResolution, {
+  profileSupplied: false,
+  requirePlanningPath: true
+}));
 
 console.log('[planning-source-seal:test] ok');
