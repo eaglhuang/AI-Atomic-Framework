@@ -1,0 +1,146 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0182",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f054b8b49c9013d781e170acca5e7b52dd019221",
+  "governedTreeSha": "d3cf876fd1360aeb8333ecf81997da0ec3b3b7a4",
+  "targetCommitDelta": {
+    "currentCommitSha": "f054b8b49c9013d781e170acca5e7b52dd019221",
+    "parentCommitShas": [
+      "f054b8b49c9013d781e170acca5e7b52dd019221"
+    ],
+    "governedTreeSha": "d3cf876fd1360aeb8333ecf81997da0ec3b3b7a4",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0182.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0182.json",
+      ".atm/history/evidence/ATM-GOV-0193.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0182/2026-07-19T08-28-19-870Z-renew-436c6eb8a022.json",
+      ".atm/history/tasks/ATM-GOV-0182.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/plan-scoped-preflight.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/packages/cli/dist/commands/next/claim-orchestration.js",
+      "release/atm-root-drop/packages/cli/src/commands/next/claim-orchestration.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/plan-scoped-routing-preflight.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan-scoped-routing-preflight.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:308de3aaebca6c8a8da18690bcd229dbbf728c0086af50a2694e00a499aa3518",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1ad3962e05a1cbf3df00da39cb065926c70ed6ff343565ad77347ab06a29c7db",
+      "stderrSha256": "sha256:b07843e2515ba016a480a233b003621dff1d1d937659d11426f9034788c9e821",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:4a82d0b0327c6175f043a770ff7c78b6e693bd5ba72646a2bedbf17e8f521e93",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan-scoped-routing-preflight.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-19T08:33:00.012Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0182.*",
+      ".atm/history/task-events/ATM-GOV-0182/**",
+      ".atm/history/tasks/ATM-GOV-0182.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/next/**",
+      "packages/cli/src/commands/tasks/**",
+      "tests/cli/plan-scoped-routing-preflight.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/next/**",
+      "packages/cli/src/commands/tasks/**",
+      "tests/cli/plan-scoped-routing-preflight.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0182.json",
+  "closedAt": "2026-07-19T08:33:00.013Z",
+  "closedByActor": "codex-governance-optimizer",
+  "sessionId": "session-20260719081457-codex-governance-optimizer-ATM-GOV-0182-0d818a85ea",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f054b8b49c9013d781e170acca5e7b52dd019221",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/next/claim-orchestration.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0182",
   "title": "Plan-Scoped Routing、Identity 與 WIP Provenance Preflight",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0193"
@@ -82,8 +82,8 @@
     }
   },
   "importedAt": "2026-07-19T08:14:36.634Z",
-  "lastTransitionId": "2026-07-19T08-15-00-876Z-claim-da1a998f69da",
-  "lastTransitionAt": "2026-07-19T08:15:00.876Z",
+  "lastTransitionId": "2026-07-19T08-33-00-021Z-close-437ac10a8323",
+  "lastTransitionAt": "2026-07-19T08:33:00.021Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-governance-optimizer",
   "reservedAt": "2026-07-19T08:14:57.562Z",
@@ -92,7 +92,7 @@
     "actorId": "codex-governance-optimizer",
     "leaseId": "lease-a53521876426",
     "claimedAt": "2026-07-19T08:14:57.567Z",
-    "heartbeatAt": "2026-07-19T08:14:57.567Z",
+    "heartbeatAt": "2026-07-19T08:33:00.019Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0182.json",
@@ -102,14 +102,14 @@
       "packages/cli/src/commands/tasks/**",
       "tests/cli/plan-scoped-routing-preflight.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260719081458-codex-governance-optimizer-c74aa6478e",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719081458-codex-governance-optimizer-c74aa6478e\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-19T08:14:57.567Z",
   "startedByActor": "codex-governance-optimizer",
@@ -146,5 +146,9 @@
     },
     "createdAt": "2026-07-19T08:15:00.875Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-19T08:33:00.019Z",
+  "closedByActor": "codex-governance-optimizer",
+  "closedBySessionId": "session-20260719081457-codex-governance-optimizer-ATM-GOV-0182-0d818a85ea",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0182.closure-packet.json"
 }

@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T08-33-00-021Z-close-437ac10a8323",
+  "taskId": "ATM-GOV-0182",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719081457-codex-governance-optimizer-ATM-GOV-0182-0d818a85ea",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0182.json",
+  "taskSha256": "sha256:e44ac9d710be65d5378304c510338ddb4293f0721954a9e7c69f684dd137ffe5",
+  "createdAt": "2026-07-19T08:33:00.021Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0182 --actor codex-governance-optimizer --status done --historical-delivery f054b8b49c9013d781e170acca5e7b52dd019221",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719081457-codex-governance-optimizer-ATM-GOV-0182-0d818a85ea",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0182.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan-scoped-routing-preflight.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T08:33:00.012Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0182.*",
+        ".atm/history/task-events/ATM-GOV-0182/**",
+        ".atm/history/tasks/ATM-GOV-0182.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/next/**",
+        "packages/cli/src/commands/tasks/**",
+        "tests/cli/plan-scoped-routing-preflight.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/next/**",
+        "packages/cli/src/commands/tasks/**",
+        "tests/cli/plan-scoped-routing-preflight.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
