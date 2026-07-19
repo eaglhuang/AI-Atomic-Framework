@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-012",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Task lifecycle / CLI UX",
+  "finding": "Importing a planning card whose frontmatter is already in-progress can create a target ledger task with status in_progress but no active claim owner. next --claim then refuses the task because it is already in_progress, tasks takeover refuses because there is no active claim, repair-claim reports no repairable drift, task-view loops back to tasks status, and the only reset path requires emergency approval.",
+  "expectedBehavior": "The normal operator lane should either import planning in-progress as an adoptable open/claimable state, preserve or derive a claim owner from planning lock metadata, or offer a first-class adopt/rebind command for in_progress tasks with null claimState. The first-layer skill/playbook should also expose the correct surface so agents do not need to discover it by trial CLI help.",
+  "evidenceOrRepro": "ATM-GOV-0185 imported from C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0185-validator-dag-shared-cache.task.md into C:/Users/User/AI-Atomic-Framework. node atm.mjs next --claim --actor codex-governance-optimizer --task ATM-GOV-0185 --auto-intent --json failed with ATM_NEXT_CLAIM_NO_TASK; tasks status showed status=in_progress and claimState=null; tasks takeover failed with ATM_TASK_CLAIM_MISSING; tasks reset required ATM_EMERGENCY_LANE_APPROVAL_REQUIRED.",
+  "followUp": "Add a lifecycle repair or adopt path for imported in-progress/null-claim tasks; add regression coverage for planning in-progress import plus next --claim; update ATM first-layer skills/playbooks to reveal release/takeover/adopt/reset surfaces and when human emergency approval is required."
+}

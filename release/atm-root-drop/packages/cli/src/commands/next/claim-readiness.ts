@@ -20,6 +20,7 @@ export interface ClaimReadinessTaskSummary {
   readonly sourcePlanPath: string | null;
   readonly scopePaths?: readonly string[];
   readonly targetAllowedFiles?: readonly string[];
+  readonly activeClaimActorId?: string | null;
 }
 
 export interface ClaimReadinessDiagnostic {
@@ -81,7 +82,8 @@ export function diagnoseClaimReadinessForTasks(
   const diagnostics: ClaimReadinessDiagnostic[] = [];
   for (const task of tasks) {
     const status = normalizeTaskRouteStatus(task.status);
-    const claimable = canTaskBePreparedForClaim(status) || (status === 'review' && claimIntent === 'closeout-only');
+    const orphanedInProgress = status === 'in_progress' && !task.activeClaimActorId;
+    const claimable = canTaskBePreparedForClaim(status) || orphanedInProgress || (status === 'review' && claimIntent === 'closeout-only');
     if (task.format === 'markdown') {
       diagnostics.push({
         taskId: task.workItemId,

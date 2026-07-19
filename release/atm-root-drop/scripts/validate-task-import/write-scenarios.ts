@@ -71,6 +71,38 @@ export async function runWriteScenarios(paths: FixturePaths, workspace: string):
       fail(`next --claim must prepare and claim the prompt-scoped imported task, got ${JSON.stringify(nextClaimResult)}.`);
     }
 
+    const planningInProgressCard = path.join(tempWorkspace, 'planning-in-progress.task.md');
+    writeFileSync(planningInProgressCard, [
+      '---',
+      'task_id: TASK-FIXTURE-INPROGRESS-0001',
+      'title: Planning in-progress should import claimable',
+      'status: in-progress',
+      'scopePaths:',
+      '  - packages/core/src/evidence/**',
+      'deliverables:',
+      '  - packages/core/src/evidence/**',
+      '---',
+      '',
+      '# TASK-FIXTURE-INPROGRESS-0001',
+      ''
+    ].join('\n'), 'utf8');
+    const planningInProgressImport = await expectOk('import', ['--from', planningInProgressCard, '--write', '--cwd', tempWorkspace]);
+    const planningInProgressTask = JSON.parse(readFileSync(path.join(tempWorkspace, '.atm', 'history', 'tasks', 'TASK-FIXTURE-INPROGRESS-0001.json'), 'utf8'));
+    if (planningInProgressTask.status !== 'ready') {
+      fail(`planning in-progress import must become target-ledger ready, got ${JSON.stringify(planningInProgressTask.status)}.`);
+    }
+    if (!planningInProgressTask.importDiagnostics?.some((entry: { code?: string }) => entry.code === 'ATM_TASK_IMPORT_PLANNING_IN_PROGRESS_CLAIMABLE')) {
+      fail(`planning in-progress import must record a claimable-status diagnostic, got ${JSON.stringify(planningInProgressTask.importDiagnostics)}.`);
+    }
+    const planningInProgressManifest = (planningInProgressImport.evidence as { manifest: { tasks: ReadonlyArray<{ status?: string }> } }).manifest;
+    if (planningInProgressManifest.tasks[0]?.status !== 'ready') {
+      fail(`planning in-progress import manifest must report ready, got ${JSON.stringify(planningInProgressManifest.tasks[0])}.`);
+    }
+    const planningInProgressClaim = await runNext(['--cwd', tempWorkspace, '--claim', '--actor', 'fixture-agent', '--prompt', 'TASK-FIXTURE-INPROGRESS-0001']);
+    if (planningInProgressClaim.ok !== true || !planningInProgressClaim.messages?.some((entry) => entry.code === 'ATM_NEXT_CLAIMED')) {
+      fail(`next --claim must claim an imported planning in-progress card, got ${JSON.stringify(planningInProgressClaim)}.`);
+    }
+
     // Re-importing without --force is idempotent (no errors emitted).
     const secondImport = await expectOk('import', ['--from', npcPlan, '--write', '--cwd', tempWorkspace]);
     const secondManifest = (secondImport.evidence as { manifest: { diagnostics: ReadonlyArray<{ code: string }> } }).manifest;

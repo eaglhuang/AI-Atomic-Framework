@@ -454,6 +454,7 @@ export function selectImportedTaskForPromptScope(
 export function isSelectedTaskClaimableForIntent(task: ImportedTaskSummary, claimIntent: NextClaimIntent) {
   const status = normalizeTaskRouteStatus(task.status);
   if (canTaskBePreparedForClaim(status)) return true;
+  if (status === 'in_progress' && !task.activeClaimActorId) return true;
   return status === 'review' && claimIntent === 'closeout-only';
 }
 

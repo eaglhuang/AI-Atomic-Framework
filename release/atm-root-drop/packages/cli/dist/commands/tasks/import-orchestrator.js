@@ -11,6 +11,7 @@ import { buildExtractionFirstPatrolDiagnostics, validateDeliverablesList } from 
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
 import { classifyForceImportAdmission } from './import-validation.js';
+import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.js';
 import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
 export async function runTasksImport(argv) {
     const options = parseImportOptions(argv);
@@ -184,6 +185,10 @@ export async function runTasksImport(argv) {
                 ? task
                 : { ...task, importDiagnostics: [...(task.importDiagnostics ?? []), ...patrol] };
         })
+    };
+    parsed = {
+        ...parsed,
+        tasks: normalizeImportedTasksForTargetLedger(parsed.tasks)
     };
     if (parsed.diagnostics.some((entry) => entry.level === 'error') || parsed.tasks.length === 0) {
         if (parsed.tasks.length === 0) {

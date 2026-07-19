@@ -60,8 +60,17 @@ export function prepareTaskForClaim(input: {
 
   const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
   const currentStatus = normalizeTaskStatus(taskDocument.status);
+  const claimRecord = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
+    ? taskDocument.claim as Record<string, unknown>
+    : null;
+  const hasActiveClaim = claimRecord?.state === 'active'
+    && typeof claimRecord.actorId === 'string'
+    && claimRecord.actorId.trim().length > 0;
+  const preparationStatus = currentStatus === 'in_progress' && !hasActiveClaim
+    ? 'open'
+    : currentStatus;
 
-  if (currentStatus === 'planned' || currentStatus === 'open') {
+  if (preparationStatus === 'planned' || preparationStatus === 'open') {
     const reserveAt = new Date().toISOString();
     const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'reserved';
@@ -89,7 +98,7 @@ export function prepareTaskForClaim(input: {
   }
 
   const owner = typeof taskDocument.owner === 'string' ? taskDocument.owner : null;
-  if ((currentStatus === 'planned' || currentStatus === 'open' || currentStatus === 'reserved')
+  if ((preparationStatus === 'planned' || preparationStatus === 'open' || preparationStatus === 'reserved')
     && owner
     && owner !== input.actorId) {
     throw new CliError('ATM_TASKS_PROMOTE_OWNER_MISMATCH', `Task ${input.taskId} is reserved by ${owner}, not ${input.actorId}.`, {
@@ -98,7 +107,7 @@ export function prepareTaskForClaim(input: {
     });
   }
 
-  if (currentStatus === 'planned' || currentStatus === 'open' || currentStatus === 'reserved') {
+  if (preparationStatus === 'planned' || preparationStatus === 'open' || preparationStatus === 'reserved') {
     const promotionAdmission = evaluateTaskPromotionAdmission({
       taskId: input.taskId,
       status: taskDocument.status
