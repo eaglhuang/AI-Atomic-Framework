@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-030",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Lane / Claim Ownership",
+  "finding": "next --claim reported an owner mismatch as 'Task ATM-GOV-0195 is claimed by codex-governance-optimizer, not codex-governance-optimizer', which is semantically contradictory. The true mismatch was lane-id ownership.",
+  "expectedBehavior": "Owner mismatch diagnostics should distinguish actor mismatch from lane-session mismatch and avoid saying the same actor is not itself.",
+  "evidenceOrRepro": "node atm.mjs next --claim --actor codex-governance-optimizer --prompt \"Claim batch queue head ATM-GOV-0195...\" --json failed with ATM_TASK_CLAIM_OWNER_MISMATCH. data.currentActor and data.actorId were both codex-governance-optimizer; holdingLaneSessionId and requestedLaneSessionId differed.",
+  "followUp": "Rename the diagnostic or message for ownershipMode=lane-id, include the currently required ATM_LANE_SESSION_ID/adopt command, and add a snapshot test for same-actor lane mismatch."
+}

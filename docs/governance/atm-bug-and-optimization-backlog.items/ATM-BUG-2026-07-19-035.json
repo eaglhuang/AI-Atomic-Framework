@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-035",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Runner Build / Release",
+  "finding": "The full release build for ATM-GOV-0195 took about 47 seconds and regenerated a large root-drop diff, including many .d.ts deletions, even though the source change was localized to telemetry CLI/core files.",
+  "expectedBehavior": "Runner release sync should support cache-miss incremental builds: affected package detection, persistent TypeScript build info, package-level dist updates, hash-based root-drop copy-if-changed, onefile payload reuse, and receipts distinguishing cacheHitSkip, incrementalBuild, and fullRebuild.",
+  "evidenceOrRepro": "ATM-GOV-0195 build output: [build-package-dist] built 27 packages (full), [build-root-drop-release] built 25 entries, [build-onefile-release] built 1662 files, [sealed-runner-build] fullRebuild full from 0f24213f..., wall about 47.7s.",
+  "followUp": "Open/implement the proposed runner-sync incremental build task in the CID/build family and wire runner build timings into telemetry summaries."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-033",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Git Governance / Hooks",
+  "finding": "When the ATM git wrapper hit ENAMETOOLONG, the fallback path required knowing that pre-commit reads ATM_COMMIT_TASK_ID and related ATM_COMMIT_* variables, not the more obvious ATM_TASK_ID variables.",
+  "expectedBehavior": "Fallback commands should be fully copyable and should set the exact hook-visible environment variables. First-layer skills should expose the commit env names when a governed git fallback is required.",
+  "evidenceOrRepro": "Direct git commit and a Node spawn with ATM_TASK_ID still showed hook data.taskId=null and ATM_CROSS_TASK_MUTATION_BLOCKED. The hook source uses process.env.ATM_COMMIT_TASK_ID; using ATM_COMMIT_TASK_ID moved the commit to the next protected-state check.",
+  "followUp": "Update ATM git wrapper failure guidance, Codex/Claude skills, and hook docs to document ATM_COMMIT_ACTOR_ID, ATM_COMMIT_TASK_ID, ATM_COMMIT_CLAIM_ID, ATM_COMMIT_SESSION_ID, and ATM_COMMIT_LANE_SESSION_ID."
+}

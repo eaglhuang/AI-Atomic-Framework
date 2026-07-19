@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-032",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Git Governance / Windows",
+  "finding": "ATM git commit wrapper failed with ENAMETOOLONG when committing the large release root-drop update for ATM-GOV-0195.",
+  "expectedBehavior": "Governed git commit should handle large staged file sets on Windows by avoiding long argv/pathspec lists, using stdin pathspecs where needed, or committing the staged index without expanding every file into the command line.",
+  "evidenceOrRepro": "node atm.mjs git commit --actor codex-governance-optimizer --task ATM-GOV-0195 --message \"build(release): sync telemetry coverage preflight artifacts\" --json failed. commit-status reported errorSummary: spawnSync C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe ENAMETOOLONG.",
+  "followUp": "Refactor the wrapper's git invocation and preflight pathspec handling for large release commits; add a Windows regression fixture with hundreds of staged files."
+}

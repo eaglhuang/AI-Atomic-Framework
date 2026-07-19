@@ -1,13 +1,15 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0195",
-  "updatedAt": "2026-07-19T14:05:04.975Z",
+  "updatedAt": "2026-07-19T14:15:55.177Z",
   "updatedBy": "codex-governance-optimizer",
   "freshValidationPasses": [
     "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
     "typecheck",
     "validate:cli",
     "validate:gate-telemetry-coverage",
+    "validate:git-head-evidence",
+    "validate:governance-projections",
     "validate:internal-release-sync",
     "validate:onefile-release",
     "validate:root-drop-release"
@@ -138,6 +140,32 @@
         "validate:internal-release-sync"
       ],
       "generatedAt": "2026-07-19T14:05:05.206Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-19T14:12:46.754Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9e0223035e3719a64f9b1536f3523d15998dd5c7b07a36dfee9a0d58b7adc829",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:governance-projections"
+      ],
+      "generatedAt": "2026-07-19T14:15:55.325Z",
       "runnerKind": "unknown",
       "sourceCommit": null,
       "cached": false

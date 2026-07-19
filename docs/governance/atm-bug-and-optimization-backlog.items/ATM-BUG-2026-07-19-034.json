@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-034",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Pre-commit / Protected State",
+  "finding": "Pre-commit blocked evidence files with evidence-file-missing-task-context but did not provide a requiredCommand, leaving the operator to infer that the related task ledger/event files must be staged.",
+  "expectedBehavior": "Protected-state findings should include a concrete repair command or an auto-stage hint when the missing context is the same task's ledger/event files.",
+  "evidenceOrRepro": "Fallback commit with ATM_COMMIT_TASK_ID for ATM-GOV-0195 failed with ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED. Findings: ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT for .atm/history/evidence/ATM-GOV-0195*. requiredCommand was null. Staging .atm/history/tasks/ATM-GOV-0195.json and .atm/history/task-events/ATM-GOV-0195 resolved it.",
+  "followUp": "Add same-task context repair hints and tests for evidence-only staged changes after evidence run / runner-sync receipt creation."
+}
