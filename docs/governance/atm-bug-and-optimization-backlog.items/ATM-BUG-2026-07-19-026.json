@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-026",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Governance instrumentation / agent skill routing",
+  "finding": "ATM dogfood still exposes raw telemetry and shell-usage habits at the wrong layer: pre-push diagnostics expect .atm/history/evidence/git-head.jsonl even when the operator intentionally keeps raw JSONL out of Git, and first-layer skills do not reliably prevent Windows PowerShell text-IO/range examples that repeatedly trip agents.",
+  "expectedBehavior": "Raw statistics, counters, logs, and detailed telemetry should remain on disk under gitignored runtime/log surfaces; Git should contain only compact digest or decision evidence. First-layer ATM skills should disclose the correct CLI surfaces and safe shell conventions early enough that agents do not need to rediscover them through trial-and-error.",
+  "evidenceOrRepro": "During ATM-GOV-0194 close/push on 2026-07-19, runtime build telemetry was correctly written under .atm/runtime/telemetry/runner-sync-build, but pre-push emitted ATM_HOOK_PRE_PUSH_GIT_HEAD_EVIDENCE_MISSING_DIAGNOSTIC for ca21936e907e5a66bf2893762148862cdcb11036 because .atm/history/evidence/git-head.jsonl was intentionally not committed. The same session also repeated Get-Content usage after the user had explicitly asked not to use PowerShell for document/text IO.",
+  "followUp": "Create a follow-up task to split git-head evidence into runtime-only raw journal plus tracked digest/receipt, update pre-push to accept the digest form, and revise first-layer ATM skills/agent-pack instructions to state safe shell conventions and common CLI surfaces without requiring agents to probe help output."
+}
