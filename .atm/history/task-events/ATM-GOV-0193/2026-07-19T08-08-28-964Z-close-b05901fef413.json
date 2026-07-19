@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T08-08-28-964Z-close-b05901fef413",
+  "taskId": "ATM-GOV-0193",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719075429-codex-governance-optimizer-ATM-GOV-0193-fe560d6acb",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0193.json",
+  "taskSha256": "sha256:45677ef1d66cfa952dae5f3e36de00f38d0510641d3951819af6675a5b1f57f1",
+  "createdAt": "2026-07-19T08:08:28.964Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0193 --actor codex-governance-optimizer --status done --historical-delivery 3b27cabf12a622dd7e907ea2ee9718e71f6e9359",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719075429-codex-governance-optimizer-ATM-GOV-0193-fe560d6acb",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0193.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/gate-telemetry-v1.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T08:08:28.956Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0193.*",
+        ".atm/history/task-events/ATM-GOV-0193/**",
+        ".atm/history/tasks/ATM-GOV-0193.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+        "packages/cli/src/commands/doctor/**",
+        "packages/cli/src/commands/guard/**",
+        "packages/cli/src/commands/next/**",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/cli/src/commands/telemetry/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/index.ts",
+        "packages/core/src/telemetry/**",
+        "tests/cli/gate-telemetry-v1.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+        "packages/cli/src/commands/doctor/**",
+        "packages/cli/src/commands/guard/**",
+        "packages/cli/src/commands/next/**",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/tasks/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/cli/src/commands/telemetry/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/index.ts",
+        "packages/core/src/telemetry/**",
+        "tests/cli/gate-telemetry-v1.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
