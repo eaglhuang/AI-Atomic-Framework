@@ -1,0 +1,104 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TMP-0003",
+  "updatedAt": "2026-07-19T17:51:22.885Z",
+  "updatedBy": "codex-main",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:task-import"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:52c1a420134fbe3f7dafa810713a1209caa1eb0f911ff86af4747689eac7a1b0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-19T17:40:17.337Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-19T17:40:39.399Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6b85b34caec4dd9c9141003810eba937b373d719a04e206ddb85d637b362bf3",
+      "stderrSha256": "sha256:09103e31c8b2f3f637f5d95dd5131d43f435a933112a4a59e100178be8b58e82",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-19T17:40:51.473Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-import.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5978a12bcfbed4dcaf96038554055174138e5b209731fc37dd0b772d23f28d6f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:task-import"
+      ],
+      "generatedAt": "2026-07-19T17:42:26.112Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.dev.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v2.md --dry-run --cwd . --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcd3a1d2ec8d53d643868e220cc0bf86ff4e811d69c607c24aa2b22ea50d49f2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-19T17:42:35.746Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "bf40afb4aaf081ecc8d47bfc84c6f906040d1343",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-19T17:50:59.904Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "bf40afb4aaf081ecc8d47bfc84c6f906040d1343",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:52c1a420134fbe3f7dafa810713a1209caa1eb0f911ff86af4747689eac7a1b0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts"
+      ],
+      "generatedAt": "2026-07-19T17:51:23.034Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "bf40afb4aaf081ecc8d47bfc84c6f906040d1343",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

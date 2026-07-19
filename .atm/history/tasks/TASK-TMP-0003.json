@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0003",
+  "title": "Temporary carrier for ATM-GOV-0204 canonical task import boundary repair",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Focused canonical-boundary regression passes.",
+    "`scripts/validate-task-import.ts` passes.",
+    "`npm run typecheck` passes.",
+    "`npm run validate:cli` passes.",
+    "2.0 plan dry-run parses real task ids and excludes fake `ATM-GOV-018`.",
+    "No tracked or dirty `TASK-CID-0121` artifact is introduced."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/**",
+    "scripts/validate-task-import/**",
+    "tests/cli/task-import-canonical-id-boundary.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/**",
+    "scripts/validate-task-import/**",
+    "scripts/validate-task-import.ts",
+    "tests/cli/task-import-canonical-id-boundary.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+    "node --strip-types scripts/validate-task-import.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the parser-boundary helper, wrapper, fixture, and focused regression; do not change CID family numbering.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-TMP-0003-task-import-canonical-id-boundary-temp-carrier.task.md",
+    "sectionTitle": "TASK-TMP-0003",
+    "headingLine": 34,
+    "hash": "f7cce8ddf5ea65e8",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-TMP-0003-task-import-canonical-id-boundary-temp-carrier.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f7cce8ddf5ea65e84c645a8f014cb78ae2501f3586166c9a4987e81e3d403e85",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T17:48:56.796Z"
+    }
+  },
+  "importedAt": "2026-07-19T17:48:56.796Z",
+  "lastTransitionId": "2026-07-19T17-49-17-214Z-claim-49f88d8c7801",
+  "lastTransitionAt": "2026-07-19T17:49:17.214Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-07-19T17:49:07.224Z",
+  "promotedAt": "2026-07-19T17:49:07.228Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-a4f04c116852",
+    "claimedAt": "2026-07-19T17:49:07.232Z",
+    "heartbeatAt": "2026-07-19T17:49:07.232Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TMP-0003.json",
+      "packages/cli/src/commands/tasks/canonical-task-id-boundary.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "scripts/validate-task-import/dry-run-scenarios.ts",
+      "tests/cli/task-import-canonical-id-boundary.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260719174908-codex-main-968a7b91d7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719174908-codex-main-968a7b91d7\""
+    }
+  },
+  "startedAt": "2026-07-19T17:49:07.232Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260719174907-codex-main-TASK-TMP-0003-1fbd7a16d9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0003",
+    "batchId": "batch-ef18ffd7092a",
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-c0a60da689a80c90",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0003.*",
+      ".atm/history/task-events/TASK-TMP-0003/**",
+      ".atm/history/tasks/TASK-TMP-0003.json",
+      "packages/cli/src/commands/tasks/canonical-task-id-boundary.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "scripts/validate-task-import/dry-run-scenarios.ts",
+      "tests/cli/task-import-canonical-id-boundary.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c888846e334bedab401310345728a07eba653175e2d8fb611422bb2fb70331c7",
+    "actorId": "codex-main",
+    "sessionId": "session-20260719174907-codex-main-TASK-TMP-0003-1fbd7a16d9",
+    "laneSession": {
+      "laneSessionId": "lane-20260719174908-codex-main-968a7b91d7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719174908-codex-main-968a7b91d7\""
+    },
+    "createdAt": "2026-07-19T17:49:17.213Z",
+    "status": "active"
+  }
+}

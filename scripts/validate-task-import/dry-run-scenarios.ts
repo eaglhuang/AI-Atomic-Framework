@@ -50,6 +50,49 @@ export async function runDryRunAndMetadataScenarios(paths: FixturePaths): Promis
     fail(`governance-table plan should preserve done status for ATM-GOV-0111: ${JSON.stringify(gov0111)}.`);
   }
 
+  const canonicalBoundaryPlan = path.join(tmpdir(), `atm-task-import-canonical-boundary-${process.pid}.md`);
+  writeFileSync(canonicalBoundaryPlan, [
+    '# Canonical task id boundary fixture',
+    '',
+    '## ATM-GOV-0182 Real complete heading',
+    '',
+    '- Deliverables: packages/cli/src/commands/tasks/plan-import-boundary.ts',
+    '',
+    '## TASK-ERR-0001 Error family still imports',
+    '',
+    '- Deliverables: scripts/validate-task-import.ts',
+    '',
+    '## TASK-TMP-0001 Tmp family still imports',
+    '',
+    '- Deliverables: tests/cli/task-import-canonical-id-boundary.test.ts',
+    '',
+    '### ATM-GOV-018x Reference template suffix must not become ATM-GOV-018',
+    '',
+    '### ATM-GOV-01820 Five digit family id still imports',
+    '',
+    '- Deliverables: docs/tasks/ATM-GOV-01820.task.md',
+    '',
+    '### ATM-GOV-018200 Six digits must not become ATM-GOV-01820'
+  ].join('\n'), 'utf8');
+  const canonicalBoundaryResult = await expectOk('import', ['--from', canonicalBoundaryPlan, '--dry-run', '--cwd', root]);
+  const canonicalBoundaryManifest = (canonicalBoundaryResult.evidence as {
+    manifest: {
+      tasks: ReadonlyArray<{ workItemId: string }>;
+      diagnostics?: ReadonlyArray<{ code: string; workItemId?: string }>;
+    };
+  }).manifest;
+  const canonicalBoundaryIds = canonicalBoundaryManifest.tasks.map((task) => task.workItemId);
+  if (canonicalBoundaryIds.join(',') !== 'ATM-GOV-0182,TASK-ERR-0001,TASK-TMP-0001,ATM-GOV-01820') {
+    fail(`canonical-boundary plan imported unexpected ids: ${canonicalBoundaryIds.join(',')}.`);
+  }
+  if (!canonicalBoundaryManifest.diagnostics?.some((entry) => entry.code === 'ATM_TASK_IMPORT_REFERENCE_ONLY_ID_FRAGMENT' && entry.workItemId === 'ATM-GOV-018')) {
+    fail(`canonical-boundary plan must diagnose the ignored ATM-GOV-018 fragment: ${JSON.stringify(canonicalBoundaryManifest.diagnostics)}.`);
+  }
+  if (!canonicalBoundaryManifest.diagnostics?.some((entry) => entry.code === 'ATM_TASK_IMPORT_REFERENCE_ONLY_ID_FRAGMENT' && entry.workItemId === 'ATM-GOV-018200')) {
+    fail(`canonical-boundary plan must diagnose the ignored six-digit fragment: ${JSON.stringify(canonicalBoundaryManifest.diagnostics)}.`);
+  }
+  rmSync(canonicalBoundaryPlan, { force: true });
+
   const chineseResult = await expectOk('import', ['--from', chineseBootstrapPlan, '--dry-run', '--cwd', root]);
   const chineseTasks = (chineseResult.evidence as {
     manifest: { tasks: ReadonlyArray<{ workItemId: string; deliverables: readonly string[] }> };
