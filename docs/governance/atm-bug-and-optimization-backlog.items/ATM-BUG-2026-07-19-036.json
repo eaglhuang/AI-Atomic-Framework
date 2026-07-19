@@ -9,6 +9,6 @@
   "area": "Telemetry / Broker",
   "finding": "Broker conflict decisions, compose-vs-serialize decisions, parallel-entry admission, and conflict-resolution correctness are not yet first-class telemetry observations in the coverage summary.",
   "expectedBehavior": "Telemetry should record broker decision inputs/outcomes, whether agents were allowed to enter parallel work before conflict analysis, whether writes could be composed, and whether the resolution later proved correct or caused rework.",
-  "evidenceOrRepro": "User explicitly requested broker decision telemetry during governance optimization. ATM-GOV-0195 coverage added broker/team node families but does not yet fully capture decision correctness, compose opportunity, or parallel-entry policy outcomes.",
-  "followUp": "Add broker decision telemetry fields and validators in a follow-up governance card; include decisionClass, conflictKeys, composePlan, serializedReason, downstream rework, and owner override."
+  "evidenceOrRepro": "The final `docs/reports/captain-parallel-ledger-analysis.md` reports broker tickets=1, correctness samples=0, parallel admission=0.00%, compose acceptance=n/a, and broker verdict=inconclusive because outcomeRef/decisionCorrect samples are absent. The synthetic fixture proves analyzer shape only, not live conflict-resolution correctness.",
+  "followUp": "Emit live broker decision/outcome pairs with decisionClass, conflict set/axis, parallel-admission attempt and reason, compose candidate/decision/group, wait time, downstream rework or escaped conflict, owner override, and delayed correctness verdict. Require analyzer joins against outcomeRef before claiming broker improvement."
 }

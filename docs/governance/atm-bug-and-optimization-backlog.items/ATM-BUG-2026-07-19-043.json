@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-043",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Guidance / Token efficiency",
+  "finding": "A simple backlog/audit request required a multi-hop `next -> guide -> orient -> start` sequence, and `orient --json` embedded the repository's full testEntrypoints list instead of a compact capability summary. This creates avoidable latency and large tool output before any useful work begins.",
+  "expectedBehavior": "Read-only orientation and simple governance-document workflows should default to compact output: language, package manager, governance state, blockers, and a small validator summary. Full validator inventory should be opt-in or referenced by digest/path.",
+  "evidenceOrRepro": "The 2026-07-19 `orient --json` response for this request emitted well over 100 declared test entrypoints, including nearly every `validate:*` script, although the requested work only needed backlog shards and plan evidence. The preceding guide route already knew README was read and no atom mutation was requested.",
+  "followUp": "Add `--compact` as the default AI-facing orientation projection, move full test inventory behind `--full`, and allow `next` to invoke the exact backlog/review playbook without requiring a guidance session start. Instrument route hop count, output bytes, and time-to-first-action."
+}
