@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0192",
+  "title": "ErrorCode Post-Close Projection Cleanup",
+  "status": "abandoned",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0191"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    ".github/prompts/atm-dispatch.prompt.md",
+    ".github/prompts/atm-error-code-resolver.prompt.md",
+    ".atm/history/evidence/ATM-GOV-0191.runner-sync-receipt.json",
+    ".atm/history/session-events/**",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/release-manifest.json"
+  ],
+  "scopePaths": [
+    ".github/prompts/atm-dispatch.prompt.md",
+    ".github/prompts/atm-error-code-resolver.prompt.md",
+    ".atm/history/evidence/ATM-GOV-0191.runner-sync-receipt.json",
+    ".atm/history/session-events/**",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/release-manifest.json"
+  ],
+  "validators": [
+    "node atm.mjs integration verify copilot --json",
+    "npm run validate:onefile-release",
+    "npm run validate:root-drop-release",
+    "npm run check:encoding:touched"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert the single generated projection delivery commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.skill-template-compiler",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.generated-root-drop-release-manifest",
+        "pattern": "Generated Projection",
+        "source": "release/atm-root-drop/release-manifest.json",
+        "disposition": "inline",
+        "inlineReason": "The manifest is generated output; this card only records the sealed build projection and must not split or hand-edit it."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0192-error-code-post-close-projection-cleanup.task.md",
+    "sectionTitle": "ATM-GOV-0192",
+    "headingLine": 49,
+    "hash": "fde2474102f4ad79",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0192-error-code-post-close-projection-cleanup.task.md",
+      "planningCommitSha": "da0fece8986726c6ba2662b04ce2986caf4ab924",
+      "contentDigest": "sha256:fde2474102f4ad79803ba2f72d301b95618fb79c37cdf5de9f94eeaaccc7da86",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T04:07:57.851Z"
+    }
+  },
+  "importedAt": "2026-07-19T04:07:57.851Z",
+  "lastTransitionId": "2026-07-19T04-35-31-442Z-abandon-84747fe022f9",
+  "lastTransitionAt": "2026-07-19T04:35:31.442Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-error-code-governance",
+  "reservedAt": "2026-07-19T04:09:07.031Z",
+  "promotedAt": "2026-07-19T04:09:07.033Z",
+  "claim": {
+    "actorId": "codex-error-code-governance",
+    "leaseId": "lease-36a8900fb6b2",
+    "claimedAt": "2026-07-19T04:09:07.035Z",
+    "heartbeatAt": "2026-07-19T04:19:05.027Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0191.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0192.*",
+      ".atm/history/session-events/**",
+      ".atm/history/task-events/ATM-GOV-0192/**",
+      ".atm/history/tasks/ATM-GOV-0192.json",
+      ".github/prompts/atm-dispatch.prompt.md",
+      ".github/prompts/atm-error-code-resolver.prompt.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260719040907-codex-error-code-governance-c368b33734",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719040907-codex-error-code-governance-c368b33734\""
+    },
+    "reason": "Owner review: auxiliary cleanup card was not an approved 2.0 plan card; stop work and return it for disposition."
+  },
+  "startedAt": "2026-07-19T04:09:07.035Z",
+  "startedByActor": "codex-error-code-governance",
+  "startedBySessionId": "session-20260719040907-codex-error-code-governance-ATM-GOV-0192-babb62e834",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0192",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0191.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0192.*",
+      ".atm/history/session-events/**",
+      ".atm/history/task-events/ATM-GOV-0192/**",
+      ".atm/history/tasks/ATM-GOV-0192.json",
+      ".github/prompts/atm-dispatch.prompt.md",
+      ".github/prompts/atm-error-code-resolver.prompt.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0192-error-code-post-close-projection-cleanup.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0192-error-code-post-close-projection-cleanup.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "52ad379eabd82bdb01d4a1fd1ddeb83496eba99bab18a571416c71cf690b91e4",
+    "actorId": "codex-error-code-governance",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260719040907-codex-error-code-governance-c368b33734",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719040907-codex-error-code-governance-c368b33734\""
+    },
+    "createdAt": "2026-07-19T04:09:16.389Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-19T04:35:31.334Z",
+  "closedByActor": "codex-error-code-governance",
+  "closedBySessionId": "session-20260719040907-codex-error-code-governance-ATM-GOV-0192-babb62e834",
+  "closeReason": "Owner reclassified one-off post-close residue: do not consume GOV plan numbering; preserve reproducible product gap in ATM backlog.",
+  "abandonResidueDisposition": ".atm/history/evidence/ATM-GOV-0192.abandon-residue-disposition.json"
+}
