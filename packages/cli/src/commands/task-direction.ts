@@ -113,7 +113,7 @@ export function createOrRefreshTaskQueue(input: {
   const requestedTaskIds = input.taskIds && input.taskIds.length > 0
     ? uniqueInOrder(input.taskIds)
     : uniqueInOrder(input.tasks.map((task) => task.workItemId));
-  const taskIds = orderTaskIdsByDependencies(input.tasks, requestedTaskIds);
+  const taskIds = orderTaskIdsByDependencies(input.tasks, requestedTaskIds).filter((taskId) => !isLedgerTerminalQueueTask(input.cwd, taskId));
   const queueId = buildQueueId(sourcePrompt, taskIds);
   const now = new Date().toISOString();
   const existing = readTaskQueue(input.cwd, queueId);
@@ -134,7 +134,7 @@ export function createOrRefreshTaskQueue(input: {
     taskIds,
     tasks: taskIds.map((taskId) => input.tasks.find((task) => task.workItemId === taskId)).filter((task): task is TaskDirectionTask => Boolean(task)),
     currentIndex,
-    status: 'active',
+    status: taskIds.length === 0 ? 'completed' : 'active',
     createdByActor: activeExisting?.createdByActor ?? input.actorId ?? null,
     createdAt: activeExisting?.createdAt ?? now,
     updatedAt: now
@@ -197,7 +197,10 @@ function orderTaskIdsByDependencies(tasks: readonly TaskDirectionTask[], request
 
 export function findActiveTaskQueue(cwd: string, sourcePrompt?: string | null, selector: { readonly queueId?: string | null; readonly batchId?: string | null; readonly scopeKey?: string | null; readonly taskId?: string | null } = {}): TaskQueueRecord | null {
   const promptHash = sourcePrompt?.trim() ? sha256(sourcePrompt.trim()) : null;
-  const queues = listTaskQueues(cwd).filter((queue) => queue.status === 'active');
+  const queues = listTaskQueues(cwd)
+    .filter((queue) => queue.status === 'active')
+    .map((queue) => normalizeTaskQueueForTerminalLedgerTasks(cwd, queue))
+    .filter((queue) => queue.status === 'active');
   if (selector.queueId) return queues.find((queue) => queue.queueId === selector.queueId) ?? null;
   if (selector.batchId) return queues.find((queue) => queue.batchId === selector.batchId) ?? null;
   if (selector.scopeKey) return queues.find((queue) => queue.scopeKey === selector.scopeKey) ?? null;
@@ -244,7 +247,7 @@ export function advanceTaskQueueHead(cwd: string, taskId: string, selector: { re
   if (!queue) return null;
   const currentTaskId = queue.taskIds[queue.currentIndex] ?? null;
   if (currentTaskId !== taskId) return queue;
-  const nextIndex = queue.currentIndex + 1;
+  const nextIndex = findNextOpenQueueIndex(cwd, queue, queue.currentIndex + 1);
   const now = new Date().toISOString();
   const updated: TaskQueueRecord = {
     ...queue,
@@ -254,6 +257,44 @@ export function advanceTaskQueueHead(cwd: string, taskId: string, selector: { re
   };
   writeTaskQueue(cwd, updated);
   return updated;
+}
+
+function findNextOpenQueueIndex(cwd: string, queue: TaskQueueRecord, startIndex: number): number {
+  for (let index = startIndex; index < queue.taskIds.length; index += 1) {
+    const candidateTaskId = queue.taskIds[index];
+    if (!candidateTaskId || isLedgerTerminalQueueTask(cwd, candidateTaskId)) continue;
+    return index;
+  }
+  return queue.taskIds.length;
+}
+
+function normalizeTaskQueueForTerminalLedgerTasks(cwd: string, queue: TaskQueueRecord): TaskQueueRecord {
+  const nextOpenIndex = findNextOpenQueueIndex(cwd, queue, queue.currentIndex);
+  if (nextOpenIndex === queue.currentIndex) return queue;
+  const now = new Date().toISOString();
+  const updated: TaskQueueRecord = {
+    ...queue,
+    currentIndex: Math.min(nextOpenIndex, Math.max(0, queue.taskIds.length - 1)),
+    status: nextOpenIndex >= queue.taskIds.length ? 'completed' : 'active',
+    updatedAt: now
+  };
+  writeTaskQueue(cwd, updated);
+  return updated;
+}
+
+function isLedgerTerminalQueueTask(cwd: string, taskId: string): boolean {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return false;
+  try {
+    const parsed = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    const status = typeof parsed.status === 'string' ? parsed.status.toLowerCase() : '';
+    return status === 'done'
+      || status === 'abandoned'
+      || typeof parsed.closedAt === 'string'
+      || typeof parsed.closedByActor === 'string';
+  } catch {
+    return false;
+  }
 }
 
 export function restoreTaskQueueHead(cwd: string, taskId: string, selector: { readonly batchId?: string | null; readonly queueId?: string | null } = {}): TaskQueueRecord | null {

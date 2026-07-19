@@ -137,7 +137,10 @@ export function listActiveBatchRuns(cwd: string): readonly BatchRunRecord[] {
   return dedupeBatchRuns([
     ...listBatchRuns(cwd),
     ...readLegacyBatchRun(cwd)
-  ]).filter((entry) => entry.status === 'active');
+  ])
+    .filter((entry) => entry.status === 'active')
+    .map((entry) => normalizeBatchRunForTerminalLedgerTasks(cwd, entry))
+    .filter((entry) => entry.status === 'active');
 }
 
 export function readBatchRunById(cwd: string, batchId: string): BatchRunRecord | null {
@@ -272,6 +275,44 @@ export function releaseBatchRun(cwd: string, current: BatchRunRecord, status: Ba
     currentTaskId: status === 'completed' ? null : current.currentTaskId,
     hold: null
   });
+}
+
+function normalizeBatchRunForTerminalLedgerTasks(cwd: string, batchRun: BatchRunRecord): BatchRunRecord {
+  if (batchRun.status !== 'active') return batchRun;
+  const nextOpenIndex = findNextOpenBatchTaskIndex(cwd, batchRun, batchRun.currentIndex);
+  if (nextOpenIndex === batchRun.currentIndex) return batchRun;
+  if (nextOpenIndex >= batchRun.taskIds.length) {
+    return releaseBatchRun(cwd, batchRun, 'completed');
+  }
+  return updateBatchRun(cwd, batchRun, {
+    currentIndex: nextOpenIndex,
+    currentTaskId: batchRun.taskIds[nextOpenIndex] ?? null,
+    hold: null
+  });
+}
+
+function findNextOpenBatchTaskIndex(cwd: string, batchRun: BatchRunRecord, startIndex: number): number {
+  for (let index = startIndex; index < batchRun.taskIds.length; index += 1) {
+    const taskId = batchRun.taskIds[index];
+    if (!taskId || isLedgerTerminalBatchTask(cwd, taskId)) continue;
+    return index;
+  }
+  return batchRun.taskIds.length;
+}
+
+function isLedgerTerminalBatchTask(cwd: string, taskId: string): boolean {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return false;
+  try {
+    const parsed = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    const status = typeof parsed.status === 'string' ? parsed.status.toLowerCase() : '';
+    return status === 'done'
+      || status === 'abandoned'
+      || typeof parsed.closedAt === 'string'
+      || typeof parsed.closedByActor === 'string';
+  } catch {
+    return false;
+  }
 }
 
 export function inspectBatchRunConsistency(batchRun: BatchRunRecord | null, taskQueue: TaskQueueRecord | null) {
