@@ -1,0 +1,91 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T14-17-32-636Z-close-6310463b18ac",
+  "taskId": "ATM-GOV-0195",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0195.json",
+  "taskSha256": "sha256:688f22c55775c5fa4bdd87220e0c0aebcc711e6c7d550e19765bddffe64cc4de",
+  "createdAt": "2026-07-19T14:17:32.636Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0195 --actor codex-governance-optimizer --status done --historical-delivery 4a2323a8ed7f8d26af51191b78b7ba1eaa032fc4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719134847-codex-governance-optimizer-ATM-GOV-0195-005e4eb760",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0195.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:gate-telemetry-coverage",
+      "validate:git-head-evidence",
+      "validate:governance-projections",
+      "validate:internal-release-sync",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T14:17:32.621Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0195.*",
+        ".atm/history/task-events/ATM-GOV-0195/**",
+        ".atm/history/tasks/ATM-GOV-0195.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-028.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-029.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-030.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-031.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-032.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-033.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-034.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-035.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-036.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-037.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-038.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/team/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/**",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/gate-telemetry-coverage-repair.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/team/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/**",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/gate-telemetry-coverage-repair.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
