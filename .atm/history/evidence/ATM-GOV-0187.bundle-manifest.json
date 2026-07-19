@@ -1,12 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0187",
-  "updatedAt": "2026-07-19T11:53:37.412Z",
+  "updatedAt": "2026-07-19T12:01:57.022Z",
   "updatedBy": "codex-governance-optimizer",
   "freshValidationPasses": [
     "node --strip-types tests/cli/real-build-projection-runner-sync-executor.test.ts",
     "typecheck",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -97,6 +98,45 @@
       "generatedAt": "2026-07-19T11:53:37.563Z",
       "runnerKind": "dev-source",
       "sourceCommit": "793dfa24676aad4db6e0a54b3dce6fbf4f4601ac",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/real-build-projection-runner-sync-executor.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9be9d2405e8a6046ca5aa1ff96d0815b03fc5664379258afba27ff6949fc6633",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/real-build-projection-runner-sync-executor.test.ts"
+      ],
+      "generatedAt": "2026-07-19T11:58:02.244Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "313a8151abb4b09fe1fc55df53f8973f3899c7c6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-19T11:58:43.888Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "313a8151abb4b09fe1fc55df53f8973f3899c7c6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-19T12:01:57.189Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a400361816841522dc868a684e64fd70016298ea",
       "cached": false
     }
   ],

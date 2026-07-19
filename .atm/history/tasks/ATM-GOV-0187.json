@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0187",
   "title": "Real Build、Projection 與 Runner-Sync Executor",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0184",
@@ -81,8 +81,8 @@
     }
   },
   "importedAt": "2026-07-19T11:47:20.180Z",
-  "lastTransitionId": "2026-07-19T11-47-40-870Z-claim-9c9ebc9a60e6",
-  "lastTransitionAt": "2026-07-19T11:47:40.870Z",
+  "lastTransitionId": "2026-07-19T12-01-58-782Z-close-0fad3ea16ef0",
+  "lastTransitionAt": "2026-07-19T12:01:58.782Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-governance-optimizer",
   "reservedAt": "2026-07-19T11:47:36.066Z",
@@ -91,7 +91,7 @@
     "actorId": "codex-governance-optimizer",
     "leaseId": "lease-17cba5353c16",
     "claimedAt": "2026-07-19T11:47:36.071Z",
-    "heartbeatAt": "2026-07-19T11:47:36.071Z",
+    "heartbeatAt": "2026-07-19T12:01:58.778Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0187.json",
@@ -101,14 +101,14 @@
       "scripts/build-onefile-release.ts",
       "tests/cli/real-build-projection-runner-sync-executor.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260719114736-codex-governance-optimizer-238d16b0af",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719114736-codex-governance-optimizer-238d16b0af\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-19T11:47:36.071Z",
   "startedByActor": "codex-governance-optimizer",
@@ -145,5 +145,9 @@
     },
     "createdAt": "2026-07-19T11:47:40.869Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-19T12:01:58.778Z",
+  "closedByActor": "codex-governance-optimizer",
+  "closedBySessionId": "session-20260719114736-codex-governance-optimizer-ATM-GOV-0187-d1ba63cefc",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0187.closure-packet.json"
 }

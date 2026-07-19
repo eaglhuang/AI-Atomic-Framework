@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T12-01-58-782Z-close-0fad3ea16ef0",
+  "taskId": "ATM-GOV-0187",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719114736-codex-governance-optimizer-ATM-GOV-0187-d1ba63cefc",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0187.json",
+  "taskSha256": "sha256:6ccbead26dc00d043ce4515583b46df54cf5ce625077075cf47bb23fdfec8504",
+  "createdAt": "2026-07-19T12:01:58.782Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0187 --actor codex-governance-optimizer --status done --historical-delivery 313a8151abb4b09fe1fc55df53f8973f3899c7c6 --historical-delivery a400361816841522dc868a684e64fd70016298ea",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719114736-codex-governance-optimizer-ATM-GOV-0187-d1ba63cefc",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0187.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/real-build-projection-runner-sync-executor.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T12:01:58.769Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0187.*",
+        ".atm/history/task-events/ATM-GOV-0187/**",
+        ".atm/history/tasks/ATM-GOV-0187.json",
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/runner-mode/**",
+        "packages/core/src/broker/**",
+        "scripts/build-onefile-release.ts",
+        "tests/cli/real-build-projection-runner-sync-executor.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/runner-mode/**",
+        "packages/core/src/broker/**",
+        "scripts/build-onefile-release.ts",
+        "tests/cli/real-build-projection-runner-sync-executor.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
