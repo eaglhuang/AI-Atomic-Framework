@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T10-15-00-436Z-close-e7234adfe530",
+  "taskId": "ATM-FRAMEWORK-TEMP-codex-plan-series-skill",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719101411-codex-governance-optimizer-ATM-FRAMEWORK-TEMP-codex-plan-series-skill-823cf45cd3",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-FRAMEWORK-TEMP-codex-plan-series-skill.json",
+  "taskSha256": "sha256:a2b347bb63fd2eb81b656d0ec38f96016ffa3b3a7520332760bd898cf37cce54",
+  "createdAt": "2026-07-19T10:15:00.436Z",
+  "command": "node atm.mjs tasks close --task ATM-FRAMEWORK-TEMP-codex-plan-series-skill --actor codex-governance-optimizer --status done --from-batch-checkpoint --batch batch-504722c30f49",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-504722c30f49",
+    "sessionId": "session-20260719101411-codex-governance-optimizer-ATM-FRAMEWORK-TEMP-codex-plan-series-skill-823cf45cd3",
+    "closurePacketPath": ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-plan-series-skill.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:cli:surface",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T10:15:00.429Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-plan-series-skill.*",
+        ".atm/history/task-events/ATM-FRAMEWORK-TEMP-codex-plan-series-skill/**",
+        ".atm/history/tasks/ATM-FRAMEWORK-TEMP-codex-plan-series-skill.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
