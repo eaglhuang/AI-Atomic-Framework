@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T09-08-51-691Z-scope-amendment-ddb7474c0935",
+  "taskId": "ATM-GOV-0184",
+  "action": "scope-amendment",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0184.json",
+  "taskSha256": "sha256:d1ce7272d5e222d2345b381f20f3437d504e3f38f9aebcb57e61600b05e44e12",
+  "createdAt": "2026-07-19T09:08:51.691Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0184 --actor codex-governance-optimizer --add \"packages/cli/src/commands/team-wave.ts,packages/core/src/index.ts,tests/cli/team-wave-runtime-manifest.test.ts,atomic_workbench/atomization-coverage/path-to-atom-map.json\" --reason \"ATM-GOV-0184 extracted the worker executor into core and had to wire the existing team wave dispatch bridge, export the new core package surface, update the existing wave runtime regression, and regenerate the atom map projection after the owner shard update.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0184 extracted the worker executor into core and had to wire the existing team wave dispatch bridge, export the new core package surface, update the existing wave runtime regression, and regenerate the atom map projection after the owner shard update."
+  }
+}

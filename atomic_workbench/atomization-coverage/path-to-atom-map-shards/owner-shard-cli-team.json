@@ -191,6 +191,20 @@
       "capability": "Team runtime contract selection, closure attestation, editor subagent bridge metadata, runtime normalization, and review signature governance extracted from the legacy command surface.",
       "coverage_status": "active",
       "source_task": "TASK-RFT-0044"
+    },
+    {
+      "path_pattern": "packages/core/src/team-agents/worker-executor.ts",
+      "atom_id": "atm.team-wave-worker-executor",
+      "capability": "Real Team Wave worker lifecycle executor runtime: report ingestion, heartbeat/defer/retry summary, out-of-scope review, and coordinator-only write authority.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0184"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-wave.ts#buildManifestRuntimeRecordFromBatch",
+      "atom_id": "atm.team-wave-worker-executor",
+      "capability": "CLI Team Wave dispatch ingestion bridge that consumes the core worker executor and writes runtime-only wave records.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0184"
     }
   ]
 }

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0184",
+  "title": "Real Team Wave Worker Executor",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0183"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/core/src/team-agents/**",
+    "packages/cli/src/commands/team/**",
+    "packages/cli/src/commands/batch/**",
+    "tests/cli/real-team-wave-worker-executor.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-agents/**",
+    "packages/cli/src/commands/team/**",
+    "packages/cli/src/commands/batch/**",
+    "tests/cli/real-team-wave-worker-executor.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/real-team-wave-worker-executor.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "governance-workbench",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "force serial fallback and revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-wave-worker-executor",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-wave-worker-executor",
+        "pattern": "Strategy",
+        "source": "packages/cli/src/commands/team/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0184-real-team-wave-worker-executor.task.md",
+    "sectionTitle": "ATM-GOV-0184",
+    "headingLine": 59,
+    "hash": "e80c0da422e2daa4",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0184-real-team-wave-worker-executor.task.md",
+      "planningCommitSha": "a249ae80c4b9d9474dea312826fd12adaccd096e",
+      "contentDigest": "sha256:e80c0da422e2daa48ee3f54b5b5e5838ad0d67d45748478806cdcf25bc37fefe",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-19T09:01:14.537Z"
+    }
+  },
+  "importedAt": "2026-07-19T09:01:14.537Z",
+  "lastTransitionId": "2026-07-19T09-08-51-691Z-scope-amendment-ddb7474c0935",
+  "lastTransitionAt": "2026-07-19T09:08:51.691Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-governance-optimizer",
+  "reservedAt": "2026-07-19T09:01:22.634Z",
+  "promotedAt": "2026-07-19T09:01:22.638Z",
+  "claim": {
+    "actorId": "codex-governance-optimizer",
+    "leaseId": "lease-3d2efae68333",
+    "claimedAt": "2026-07-19T09:01:22.643Z",
+    "heartbeatAt": "2026-07-19T09:01:22.643Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0184.*",
+      ".atm/history/task-events/ATM-GOV-0184/**",
+      ".atm/history/tasks/ATM-GOV-0184.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/**",
+      "packages/core/src/index.ts",
+      "packages/core/src/team-agents/**",
+      "tests/cli/real-team-wave-worker-executor.test.ts",
+      "tests/cli/team-wave-runtime-manifest.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260719090123-codex-governance-optimizer-c1eae94293",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719090123-codex-governance-optimizer-c1eae94293\""
+    }
+  },
+  "startedAt": "2026-07-19T09:01:22.643Z",
+  "startedByActor": "codex-governance-optimizer",
+  "startedBySessionId": "session-20260719090122-codex-governance-optimizer-ATM-GOV-0184-6b56121e6f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0184",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0184.*",
+      ".atm/history/task-events/ATM-GOV-0184/**",
+      ".atm/history/tasks/ATM-GOV-0184.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/**",
+      "packages/core/src/index.ts",
+      "packages/core/src/team-agents/**",
+      "tests/cli/real-team-wave-worker-executor.test.ts",
+      "tests/cli/team-wave-runtime-manifest.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0184-real-team-wave-worker-executor.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0184-real-team-wave-worker-executor.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "e02561fc821bd337e60e986acaf12caa5754214200e03e6fec58dfb607821070",
+    "actorId": "codex-governance-optimizer",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260719090123-codex-governance-optimizer-c1eae94293",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719090123-codex-governance-optimizer-c1eae94293\""
+    },
+    "createdAt": "2026-07-19T09:01:30.676Z",
+    "status": "active"
+  }
+}
