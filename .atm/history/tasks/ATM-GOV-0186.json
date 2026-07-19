@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0186",
   "title": "Real Shared Delivery Commit Executor",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0184",
@@ -86,8 +86,8 @@
     }
   },
   "importedAt": "2026-07-19T11:21:54.080Z",
-  "lastTransitionId": "2026-07-19T11-22-23-209Z-claim-5b646c09eed9",
-  "lastTransitionAt": "2026-07-19T11:22:23.209Z",
+  "lastTransitionId": "2026-07-19T11-39-13-521Z-close-7d3cd78d7769",
+  "lastTransitionAt": "2026-07-19T11:39:13.521Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-governance-optimizer",
   "reservedAt": "2026-07-19T11:22:18.894Z",
@@ -96,7 +96,7 @@
     "actorId": "codex-governance-optimizer",
     "leaseId": "lease-e2a654af8e93",
     "claimedAt": "2026-07-19T11:22:18.899Z",
-    "heartbeatAt": "2026-07-19T11:22:18.899Z",
+    "heartbeatAt": "2026-07-19T11:39:13.519Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0186.json",
@@ -107,14 +107,14 @@
       "packages/core/src/broker/**",
       "tests/cli/real-shared-delivery-commit-executor.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260719112218-codex-governance-optimizer-e58d3109c0",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719112218-codex-governance-optimizer-e58d3109c0\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-19T11:22:18.899Z",
   "startedByActor": "codex-governance-optimizer",
@@ -152,5 +152,9 @@
     },
     "createdAt": "2026-07-19T11:22:23.208Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-19T11:39:13.519Z",
+  "closedByActor": "codex-governance-optimizer",
+  "closedBySessionId": "session-20260719112218-codex-governance-optimizer-ATM-GOV-0186-746a4d054f",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0186.closure-packet.json"
 }

@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T11-39-13-521Z-close-7d3cd78d7769",
+  "taskId": "ATM-GOV-0186",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719112218-codex-governance-optimizer-ATM-GOV-0186-746a4d054f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0186.json",
+  "taskSha256": "sha256:b486264bf7ee30294f4123b8b198fcd52d2a5e56106561fe2d1e77ae24bbd795",
+  "createdAt": "2026-07-19T11:39:13.521Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0186 --actor codex-governance-optimizer --status done --historical-delivery 111cbdc01a57f3c34b53ddecaf99a92d5654bf0d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719112218-codex-governance-optimizer-ATM-GOV-0186-746a4d054f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0186.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T11:39:13.509Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0186.*",
+        ".atm/history/task-events/ATM-GOV-0186/**",
+        ".atm/history/tasks/ATM-GOV-0186.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/core/src/broker/**",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/**",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/core/src/broker/**",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
