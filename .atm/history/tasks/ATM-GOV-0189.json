@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0189",
   "title": "Plan-Level Executor 主迴圈、收單策略與復原 CLI",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0188"
@@ -78,8 +78,8 @@
     }
   },
   "importedAt": "2026-07-19T12:25:47.613Z",
-  "lastTransitionId": "2026-07-19T12-30-32-199Z-scope-amendment-8dfbfc2e0afd",
-  "lastTransitionAt": "2026-07-19T12:30:32.199Z",
+  "lastTransitionId": "2026-07-19T12-40-33-121Z-close-8b16b7347b8d",
+  "lastTransitionAt": "2026-07-19T12:40:33.121Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-governance-optimizer",
   "reservedAt": "2026-07-19T12:25:54.157Z",
@@ -88,7 +88,7 @@
     "actorId": "codex-governance-optimizer",
     "leaseId": "lease-205d17c2311b",
     "claimedAt": "2026-07-19T12:25:54.162Z",
-    "heartbeatAt": "2026-07-19T12:25:54.162Z",
+    "heartbeatAt": "2026-07-19T12:40:33.118Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0189.*",
@@ -100,14 +100,14 @@
       "packages/cli/src/commands/command-specs/batch.spec.ts",
       "tests/cli/plan-level-executor-recovery.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260719122554-codex-governance-optimizer-f8ab8136f1",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260719122554-codex-governance-optimizer-f8ab8136f1\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-19T12:25:54.162Z",
   "startedByActor": "codex-governance-optimizer",
@@ -151,5 +151,9 @@
     },
     "createdAt": "2026-07-19T12:25:58.503Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-19T12:40:33.118Z",
+  "closedByActor": "codex-governance-optimizer",
+  "closedBySessionId": "session-20260719122554-codex-governance-optimizer-ATM-GOV-0189-5343e40adf",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0189.closure-packet.json"
 }

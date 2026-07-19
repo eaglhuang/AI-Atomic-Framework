@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T12-40-33-121Z-close-8b16b7347b8d",
+  "taskId": "ATM-GOV-0189",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719122554-codex-governance-optimizer-ATM-GOV-0189-5343e40adf",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0189.json",
+  "taskSha256": "sha256:a4e10086509b1561ed6d974d1b83deab4c0a77c0029c627dc97bf43bf7b5b6ef",
+  "createdAt": "2026-07-19T12:40:33.121Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0189 --actor codex-governance-optimizer --status done --historical-delivery 3e60d035ccb5c8f71c6d6ee1f5c6001db5530405",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719122554-codex-governance-optimizer-ATM-GOV-0189-5343e40adf",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0189.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan-level-executor-recovery.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:physical-line-budget"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T12:40:33.105Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0189.*",
+        ".atm/history/task-events/ATM-GOV-0189/**",
+        ".atm/history/tasks/ATM-GOV-0189.json",
+        "docs/governance/command-surface.md",
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "tests/cli/plan-level-executor-recovery.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "tests/cli/plan-level-executor-recovery.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
