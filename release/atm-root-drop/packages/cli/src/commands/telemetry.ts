@@ -2,7 +2,7 @@ import path from 'node:path';
 import { getCommandSpec } from './command-specs.ts';
 import { type CommandSpec, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.ts';
-import { canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/src/telemetry/index.ts';
+import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/src/telemetry/index.ts';
 
 export async function runTelemetry(argv: string[]) {
   const spec = getCommandSpec('telemetry') as CommandSpec;
@@ -12,6 +12,8 @@ export async function runTelemetry(argv: string[]) {
   const requestedOn = parsed.options.on === true;
   const requestedOff = parsed.options.off === true;
   const requestedGateRegistry = parsed.options.gateRegistry === true;
+  const requestedCoverageReport = parsed.options.coverageReport === true || parsed.options.m2Preflight === true;
+  const requestedTaskSummary = parsed.options.taskSummary === true;
   const requestedEmitFixture = parsed.options.emitFixture === true;
   const requestedSeal = parsed.options.seal === true;
   const requestedReport = parsed.options.report === true;
@@ -26,6 +28,30 @@ export async function runTelemetry(argv: string[]) {
         schemaId: 'atm.gateTelemetryRegistryReport.v1',
         checks: canonicalGateCheckRegistry
       }
+    });
+  }
+
+  if (requestedCoverageReport) {
+    return makeResult({
+      ok: true,
+      command: 'telemetry',
+      cwd,
+      messages: [message('info', 'ATM_GATE_TELEMETRY_COVERAGE_READY', 'Gate telemetry registry coverage report is ready.')],
+      evidence: buildGateTelemetryRegistryCoverageReport(cwd)
+    });
+  }
+
+  if (requestedTaskSummary) {
+    const taskId = typeof parsed.options.task === 'string' ? String(parsed.options.task) : 'UNKNOWN';
+    return makeResult({
+      ok: true,
+      command: 'telemetry',
+      cwd,
+      messages: [message('info', 'ATM_GATE_TELEMETRY_TASK_SUMMARY_READY', 'Gate telemetry task summary is ready.')],
+      evidence: buildGateTelemetryTaskSummary(cwd, {
+        taskId,
+        role: normalizeTaskSummaryRole(parsed.options.role)
+      })
     });
   }
 
@@ -110,4 +136,8 @@ export async function runTelemetry(argv: string[]) {
 
 function normalizeGateTelemetryResult(value: unknown): 'pass' | 'block' | 'warn' | 'skip' | 'error' {
   return value === 'block' || value === 'warn' || value === 'skip' || value === 'error' ? value : 'pass';
+}
+
+function normalizeTaskSummaryRole(value: unknown): 'baseline' | 'treatment' | 'm2-preflight' | 'unknown' {
+  return value === 'baseline' || value === 'treatment' || value === 'm2-preflight' ? value : 'unknown';
 }

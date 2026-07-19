@@ -2,7 +2,7 @@ import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
 import { makeResult, message, parseArgsForCommand } from './shared.js';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.js';
-import { canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/dist/telemetry/index.js';
+import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/dist/telemetry/index.js';
 export async function runTelemetry(argv) {
     const spec = getCommandSpec('telemetry');
     const parsed = parseArgsForCommand(spec, argv);
@@ -11,6 +11,8 @@ export async function runTelemetry(argv) {
     const requestedOn = parsed.options.on === true;
     const requestedOff = parsed.options.off === true;
     const requestedGateRegistry = parsed.options.gateRegistry === true;
+    const requestedCoverageReport = parsed.options.coverageReport === true || parsed.options.m2Preflight === true;
+    const requestedTaskSummary = parsed.options.taskSummary === true;
     const requestedEmitFixture = parsed.options.emitFixture === true;
     const requestedSeal = parsed.options.seal === true;
     const requestedReport = parsed.options.report === true;
@@ -24,6 +26,28 @@ export async function runTelemetry(argv) {
                 schemaId: 'atm.gateTelemetryRegistryReport.v1',
                 checks: canonicalGateCheckRegistry
             }
+        });
+    }
+    if (requestedCoverageReport) {
+        return makeResult({
+            ok: true,
+            command: 'telemetry',
+            cwd,
+            messages: [message('info', 'ATM_GATE_TELEMETRY_COVERAGE_READY', 'Gate telemetry registry coverage report is ready.')],
+            evidence: buildGateTelemetryRegistryCoverageReport(cwd)
+        });
+    }
+    if (requestedTaskSummary) {
+        const taskId = typeof parsed.options.task === 'string' ? String(parsed.options.task) : 'UNKNOWN';
+        return makeResult({
+            ok: true,
+            command: 'telemetry',
+            cwd,
+            messages: [message('info', 'ATM_GATE_TELEMETRY_TASK_SUMMARY_READY', 'Gate telemetry task summary is ready.')],
+            evidence: buildGateTelemetryTaskSummary(cwd, {
+                taskId,
+                role: normalizeTaskSummaryRole(parsed.options.role)
+            })
         });
     }
     if (requestedEmitFixture) {
@@ -102,4 +126,7 @@ export async function runTelemetry(argv) {
 }
 function normalizeGateTelemetryResult(value) {
     return value === 'block' || value === 'warn' || value === 'skip' || value === 'error' ? value : 'pass';
+}
+function normalizeTaskSummaryRole(value) {
+    return value === 'baseline' || value === 'treatment' || value === 'm2-preflight' ? value : 'unknown';
 }

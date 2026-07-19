@@ -1,0 +1,101 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0195",
+  "actorId": "codex-governance-optimizer",
+  "stewardWorkId": "runner-sync-f67a268f",
+  "sealedSourceSha": "0f24213f698921c27f646edca8b24e5950215e55",
+  "requestedSurfaces": [
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:ecf40aee03fba722adb6787027bc748d9b1e8c2dbb7c421a72ee6583963ea5ba",
+  "buildDecision": "fullRebuild",
+  "decisionReason": "build-script-change",
+  "incrementalPlan": {
+    "schemaId": "atm.runnerIncrementalBuildPlan.v1",
+    "specVersion": "0.1.0",
+    "previousSealedSourceSha": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+    "currentSealedSourceSha": "0f24213f698921c27f646edca8b24e5950215e55",
+    "changedPaths": [
+      "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/index.ts",
+      "scripts/validate-gate-telemetry-coverage.ts"
+    ],
+    "affectedPackages": [
+      "packages/cli",
+      "packages/core"
+    ],
+    "affectedGroups": {
+      "packages": [
+        "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/index.ts"
+      ],
+      "scripts": [
+        "scripts/validate-gate-telemetry-coverage.ts"
+      ],
+      "templates": [],
+      "schemas": [],
+      "atomicWorkbench": [],
+      "rootConfig": [],
+      "unknown": []
+    },
+    "incrementalEligible": false,
+    "unsafeReasons": [
+      "build-script-change"
+    ]
+  },
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-07-19T13-58-36-206Z-ATM-GOV-0195.jsonl",
+  "tsBuildCache": {
+    "schemaId": "atm.runnerTsBuildCacheSummary.v1",
+    "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
+    "tsBuildInfoPath": ".atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo",
+    "existedBefore": true,
+    "existsAfter": true,
+    "digestBefore": "sha256:ab645be4c8f0b229b78911f16f942d93bd9b8eaa5f0e64a8921ac9fa54a32f7a",
+    "digestAfter": "sha256:4c7be17f79890b22eb533432ae214513eab1dd159aba449ba4f0a1616d969c69",
+    "restoredBeforeBuild": true,
+    "persistedAfterBuild": true,
+    "gitPolicy": {
+      "rawCacheCommitted": false,
+      "storage": ".atm/runtime/runner-sync-build-cache/typescript/**"
+    }
+  },
+  "phaseTimingsMs": {
+    "inputHashCalculation": 38,
+    "skipDecision": 38,
+    "worktreeSetup": 8884,
+    "typescriptBuild": 15368,
+    "rootDropReleaseAssembly": 7477,
+    "onefileReleaseAssembly": 1344,
+    "artifactSync": 7943,
+    "cleanup": 0,
+    "totalElapsed": 41377
+  },
+  "treatmentTelemetry": {
+    "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
+    "executionMode": "command-executed",
+    "commandExecuted": true,
+    "outputObserved": true,
+    "receiptValidity": "valid",
+    "buildDecision": "fullRebuild",
+    "phaseTimingsMs": {
+      "inputHashCalculation": 38,
+      "skipDecision": 38,
+      "worktreeSetup": 8884,
+      "typescriptBuild": 15368,
+      "rootDropReleaseAssembly": 7477,
+      "onefileReleaseAssembly": 1344,
+      "artifactSync": 7943,
+      "cleanup": 0,
+      "totalElapsed": 41377
+    },
+    "rawTelemetryPolicy": "gitignored-runtime-only",
+    "tsBuildCacheDigest": "sha256:be0b4f9e9a5ded5031b1c08a1a3f0afb86afdcfce7ad8da2143a2c343447b32e"
+  },
+  "publishedAt": "2026-07-19T13:58:36.208Z"
+}

@@ -1,13 +1,16 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0195",
-  "updatedAt": "2026-07-19T13:54:21.747Z",
+  "updatedAt": "2026-07-19T14:05:04.975Z",
   "updatedBy": "codex-governance-optimizer",
   "freshValidationPasses": [
     "node --strip-types tests/cli/gate-telemetry-coverage-repair.test.ts",
     "typecheck",
     "validate:cli",
-    "validate:gate-telemetry-coverage"
+    "validate:gate-telemetry-coverage",
+    "validate:internal-release-sync",
+    "validate:onefile-release",
+    "validate:root-drop-release"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -87,6 +90,56 @@
       "generatedAt": "2026-07-19T13:54:22.028Z",
       "runnerKind": "dev-source",
       "sourceCommit": "6e433d274a94f6f6cb46e94887553eb2512a9010",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs telemetry --task-summary --task ATM-GOV-0195 --role m2-preflight --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4607053292e788bfb9d6278938960e29bd0fbde717161e0122282cf25354eee3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-19T14:00:56.047Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-07-19T14:01:59.338Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:root-drop-release"
+      ],
+      "generatedAt": "2026-07-19T14:02:13.609Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:internal-release-sync",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f4386b6f1aa9906c0a31445af4447e005cc5f9369f7c1de5595cb741f61110d8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:internal-release-sync"
+      ],
+      "generatedAt": "2026-07-19T14:05:05.206Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

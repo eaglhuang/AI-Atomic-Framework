@@ -17,6 +17,68 @@ export interface GateCheckRegistryEntry {
   readonly summary: string;
 }
 
+export type GateTelemetryCoverageStatus = 'instrumented' | 'read-only-summary' | 'out-of-scope' | 'not-yet-covered';
+export type GateTelemetrySourceAvailability = 'available' | 'unavailable' | 'partial';
+export type GateTelemetryM2PreflightVerdict = 'ready' | 'inconclusive' | 'blocked';
+
+export interface GateTelemetryRequiredNodeCoverage {
+  readonly nodeId: string;
+  readonly nodeFamily: string;
+  readonly coverageStatus: GateTelemetryCoverageStatus;
+  readonly producerCheckIds: readonly string[];
+  readonly consumerIds: readonly string[];
+  readonly requiredCorrelationKeys: readonly string[];
+  readonly missingCorrelationKeys: readonly string[];
+  readonly sourceAvailability: GateTelemetrySourceAvailability;
+  readonly missingTelemetry: readonly string[];
+  readonly m2Comparable: boolean;
+}
+
+export interface GateTelemetryRegistryCoverageReport {
+  readonly schemaId: 'atm.gateTelemetryRegistryCoverageReport.v1';
+  readonly generatedAt: string;
+  readonly configDigest: string;
+  readonly historyDigest: string;
+  readonly requiredNodes: readonly GateTelemetryRequiredNodeCoverage[];
+  readonly droppedEvents: number;
+  readonly malformedEvents: number;
+  readonly m2Comparable: boolean;
+  readonly m2PreflightVerdict: GateTelemetryM2PreflightVerdict;
+  readonly rawDataPolicy: {
+    readonly runtimeStorage: '.atm/runtime/telemetry/**';
+    readonly trackedEvidence: 'compact-digest-only';
+    readonly rawTelemetryCommitted: false;
+  };
+}
+
+export interface GateTelemetryTaskSummary {
+  readonly schemaId: 'atm.gateTelemetryTaskSummary.v1';
+  readonly taskId: string;
+  readonly generatedAt: string;
+  readonly window: {
+    readonly start: string | null;
+    readonly end: string | null;
+    readonly watermark: string | null;
+  };
+  readonly correlation: {
+    readonly runIds: readonly string[];
+    readonly laneSessionIds: readonly string[];
+    readonly batchIds: readonly string[];
+    readonly waveIds: readonly string[];
+  };
+  readonly gateEvents: GateTelemetryReport['byCheckId'];
+  readonly uniqueBlocks: readonly string[];
+  readonly truePositiveStatus: 'unclassified' | 'classified';
+  readonly evidenceReadbacks: number;
+  readonly warnings: readonly string[];
+  readonly droppedEvents: number;
+  readonly missingTelemetry: readonly string[];
+  readonly baselineOrTreatmentRole: 'baseline' | 'treatment' | 'm2-preflight' | 'unknown';
+  readonly sourceAvailability: GateTelemetrySourceAvailability;
+  readonly historyDigest: string;
+  readonly configDigest: string;
+}
+
 export interface GateTelemetryEvent {
   readonly specVersion: typeof gateTelemetrySpecVersion;
   readonly eventId: string;
@@ -88,8 +150,92 @@ export const canonicalGateCheckRegistry: readonly GateCheckRegistryEntry[] = Obj
   { checkId: 'tasks.claim-admission', checkVersion: '1.0.0', gate: 'tasks', owner: 'atm-core', summary: 'Task claim admission and ownership check.' },
   { checkId: 'taskflow.close-readiness', checkVersion: '1.0.0', gate: 'taskflow', owner: 'atm-core', summary: 'Task close readiness check.' },
   { checkId: 'batch.checkpoint-readiness', checkVersion: '1.0.0', gate: 'batch', owner: 'atm-core', summary: 'Batch checkpoint readiness check.' },
-  { checkId: 'broker.shared-surface-admission', checkVersion: '1.0.0', gate: 'broker', owner: 'atm-core', summary: 'Shared surface broker admission check.' }
+  { checkId: 'broker.shared-surface-admission', checkVersion: '1.0.0', gate: 'broker', owner: 'atm-core', summary: 'Shared surface broker admission check.' },
+  { checkId: 'telemetry.registry-coverage', checkVersion: '1.0.0', gate: 'telemetry', owner: 'atm-core', summary: 'Gate telemetry registry coverage and M2 preflight report.' }
 ]);
+
+export const canonicalGateTelemetryRequiredNodes: readonly GateTelemetryRequiredNodeCoverage[] = Object.freeze([
+  coverageNode('claim-reservation-lane-presence', 'claim/reservation/lane presence', 'instrumented', ['tasks.claim-admission'], ['ATM-GOV-0190'], []),
+  coverageNode('next-preflight-guard-doctor', 'next/preflight/guard/doctor', 'instrumented', ['next.route-resolution', 'doctor.readiness', 'guard.framework-mode'], ['ATM-GOV-0190'], []),
+  coverageNode('validator-queue-execution-cache-fanout', 'validator queue/execution/cache/fan-out', 'not-yet-covered', [], ['ATM-GOV-0190'], ['validatorId', 'validatorVersion', 'durationMs', 'fanOutConsumerCount']),
+  coverageNode('task-import-close-taskflow-checkpoint', 'task import/task close/taskflow close/checkpoint', 'instrumented', ['taskflow.close-readiness', 'batch.checkpoint-readiness'], ['ATM-GOV-0190'], []),
+  coverageNode('evidence-seal-readback-handoff', 'evidence seal/readback/handoff', 'not-yet-covered', [], ['ATM-GOV-0190'], ['evidenceReadRef']),
+  coverageNode('git-governance-hooks-branch-queue', 'git governance/pre-commit/pre-push/branch queue', 'read-only-summary', [], ['ATM-GOV-0190'], ['commitSha', 'branchRef']),
+  coverageNode('runner-sync-release-projection', 'runner-sync/release mirror/generated projection', 'read-only-summary', [], ['ATM-GOV-0190'], ['runnerSyncReceiptRef']),
+  coverageNode('batch-broker-team-worker-lifecycle', 'batch/broker/team/worker lifecycle', 'instrumented', ['batch.checkpoint-readiness', 'broker.shared-surface-admission'], ['ATM-GOV-0190'], []),
+  coverageNode('telemetry-seal-report-self-health', 'telemetry seal/report/self-health', 'instrumented', ['telemetry.registry-coverage'], ['ATM-GOV-0190'], [])
+]);
+
+export function buildGateTelemetryRegistryCoverageReport(cwd: string): GateTelemetryRegistryCoverageReport {
+  const historyEvents = readHistoryEvents(path.join(cwd, gateTelemetryHistoryRelativePath));
+  const requiredNodes = canonicalGateTelemetryRequiredNodes;
+  const m2Comparable = requiredNodes.every((node) => node.m2Comparable);
+  return {
+    schemaId: 'atm.gateTelemetryRegistryCoverageReport.v1',
+    generatedAt: new Date().toISOString(),
+    configDigest: digestJson({
+      checks: canonicalGateCheckRegistry,
+      requiredNodes: requiredNodes.map((node) => ({
+        nodeId: node.nodeId,
+        coverageStatus: node.coverageStatus,
+        requiredCorrelationKeys: node.requiredCorrelationKeys
+      }))
+    }),
+    historyDigest: digestJson({
+      eventCount: historyEvents.valid.length,
+      checkIds: [...new Set(historyEvents.valid.map((event) => event.checkId))].sort()
+    }),
+    requiredNodes,
+    droppedEvents: 0,
+    malformedEvents: historyEvents.malformed,
+    m2Comparable,
+    m2PreflightVerdict: m2Comparable ? 'ready' : 'inconclusive',
+    rawDataPolicy: {
+      runtimeStorage: '.atm/runtime/telemetry/**',
+      trackedEvidence: 'compact-digest-only',
+      rawTelemetryCommitted: false
+    }
+  };
+}
+
+export function buildGateTelemetryTaskSummary(cwd: string, input: {
+  readonly taskId: string;
+  readonly role?: GateTelemetryTaskSummary['baselineOrTreatmentRole'];
+}): GateTelemetryTaskSummary {
+  const historyEvents = readHistoryEvents(path.join(cwd, gateTelemetryHistoryRelativePath));
+  const events = historyEvents.valid.filter((event) => event.taskId === input.taskId);
+  const coverage = buildGateTelemetryRegistryCoverageReport(cwd);
+  const report = reportEvents(events, historyEvents.malformed, historyEvents.warnings, 'sealed-history');
+  const observed = events.map((event) => event.observedAt).sort();
+  const missingTelemetry = coverage.requiredNodes.flatMap((node) => node.missingTelemetry);
+  return {
+    schemaId: 'atm.gateTelemetryTaskSummary.v1',
+    taskId: input.taskId,
+    generatedAt: new Date().toISOString(),
+    window: {
+      start: observed[0] ?? null,
+      end: observed[observed.length - 1] ?? null,
+      watermark: observed[observed.length - 1] ?? null
+    },
+    correlation: {
+      runIds: sortedUnique(events.map((event) => event.runId)),
+      laneSessionIds: sortedUnique(events.map((event) => event.laneSessionId ?? null)),
+      batchIds: sortedUnique(events.map((event) => event.batchId ?? null)),
+      waveIds: sortedUnique(events.map((event) => event.waveId ?? null))
+    },
+    gateEvents: report.byCheckId,
+    uniqueBlocks: report.uniqueBlocks,
+    truePositiveStatus: report.truePositiveStatus,
+    evidenceReadbacks: Object.values(report.byCheckId).reduce((sum, bucket) => sum + bucket.evidenceReadbacks, 0),
+    warnings: report.metaHealth.warnings,
+    droppedEvents: report.metaHealth.droppedEvents,
+    missingTelemetry,
+    baselineOrTreatmentRole: input.role ?? 'unknown',
+    sourceAvailability: missingTelemetry.length > 0 ? 'partial' : 'available',
+    historyDigest: coverage.historyDigest,
+    configDigest: coverage.configDigest
+  };
+}
 
 export function emitGateTelemetryEvent(cwd: string, input: Partial<GateTelemetryEvent> & {
   readonly gate: string;
@@ -181,6 +327,15 @@ export function reportGateTelemetry(cwd: string, includeRuntime = false): GateTe
   const historyEvents = readHistoryEvents(path.join(cwd, gateTelemetryHistoryRelativePath));
   const runtimeEvents = includeRuntime ? readRuntimeEvents(path.join(cwd, gateTelemetryRuntimeRelativePath, 'gate-events')).valid : [];
   const events = [...historyEvents.valid, ...runtimeEvents];
+  return reportEvents(events, historyEvents.malformed, historyEvents.warnings, includeRuntime ? 'sealed-history+runtime' : 'sealed-history');
+}
+
+function reportEvents(
+  events: readonly GateTelemetryEvent[],
+  malformedEvents: number,
+  warnings: readonly string[],
+  source: GateTelemetryReport['source']
+): GateTelemetryReport {
   const byCheckId: GateTelemetryReport['byCheckId'] = {};
   const uniqueBlocks = new Set<string>();
   for (const event of events) {
@@ -204,21 +359,44 @@ export function reportGateTelemetry(cwd: string, includeRuntime = false): GateTe
   return {
     schemaId: 'atm.gateTelemetryReport.v1',
     generatedAt: new Date().toISOString(),
-    source: includeRuntime ? 'sealed-history+runtime' : 'sealed-history',
+    source,
     eventCount: events.length,
     byCheckId,
     uniqueBlocks: [...uniqueBlocks].sort(),
     truePositiveStatus: 'unclassified',
     metaHealth: {
       droppedEvents: 0,
-      malformedEvents: historyEvents.malformed,
-      warnings: historyEvents.warnings
+      malformedEvents,
+      warnings
     }
   };
 }
 
 function registryEntryFor(checkId: string): GateCheckRegistryEntry | null {
   return canonicalGateCheckRegistry.find((entry) => entry.checkId === checkId) ?? null;
+}
+
+function coverageNode(
+  nodeId: string,
+  nodeFamily: string,
+  coverageStatus: GateTelemetryCoverageStatus,
+  producerCheckIds: readonly string[],
+  consumerIds: readonly string[],
+  missingTelemetry: readonly string[]
+): GateTelemetryRequiredNodeCoverage {
+  const requiredCorrelationKeys = ['runId', 'laneSessionId', 'taskId', 'configDigest'];
+  return {
+    nodeId,
+    nodeFamily,
+    coverageStatus,
+    producerCheckIds,
+    consumerIds,
+    requiredCorrelationKeys,
+    missingCorrelationKeys: missingTelemetry.length > 0 ? requiredCorrelationKeys : [],
+    sourceAvailability: coverageStatus === 'instrumented' ? 'available' : coverageStatus === 'out-of-scope' ? 'unavailable' : 'partial',
+    missingTelemetry,
+    m2Comparable: coverageStatus === 'instrumented' || coverageStatus === 'out-of-scope'
+  };
 }
 
 function readRuntimeEvents(root: string, watermark?: string): { valid: GateTelemetryEvent[]; malformed: number; warnings: string[] } {
@@ -285,4 +463,8 @@ function digestJson(value: unknown): string {
 
 function digestText(value: string): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function sortedUnique(values: readonly (string | null)[]): string[] {
+  return [...new Set(values.filter((value): value is string => typeof value === 'string' && value.length > 0))].sort();
 }
