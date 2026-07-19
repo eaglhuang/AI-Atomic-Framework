@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-19T12-19-39-723Z-close-f1a8a525f4f6",
+  "taskId": "ATM-GOV-0188",
+  "action": "close",
+  "actorId": "codex-governance-optimizer",
+  "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0188.json",
+  "taskSha256": "sha256:6fe476752abbc6b40a11eda082a869c31b4cca3a03c2d3c78daf0578890b09b8",
+  "createdAt": "2026-07-19T12:19:39.723Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0188 --actor codex-governance-optimizer --status done --historical-delivery 4083157505847f5a0b246c45fbb2574449c80d68",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0188.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-19T12:19:39.710Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0188.*",
+        ".atm/history/task-events/ATM-GOV-0188/**",
+        ".atm/history/tasks/ATM-GOV-0188.json",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/core/src/broker/wave-generated-executor.ts",
+        "scripts/validators/task-ledger/**",
+        "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/core/src/broker/wave-generated-executor.ts",
+        "scripts/validators/task-ledger/**",
+        "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

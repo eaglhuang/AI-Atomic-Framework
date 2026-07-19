@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0188",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4083157505847f5a0b246c45fbb2574449c80d68",
+  "governedTreeSha": "9ad64ae431f085f90af8da3489eeb3698ce9e3b4",
+  "targetCommitDelta": {
+    "currentCommitSha": "4083157505847f5a0b246c45fbb2574449c80d68",
+    "parentCommitShas": [
+      "4083157505847f5a0b246c45fbb2574449c80d68"
+    ],
+    "governedTreeSha": "9ad64ae431f085f90af8da3489eeb3698ce9e3b4",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0188.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0188.json",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/core/src/broker/wave-generated-executor.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/batch-execute-actions.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:741b4381fabcafad9c115296971d8d5b9646d06072ccab9c2549ba0d02c4083f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6b85b34caec4dd9c9141003810eba937b373d719a04e206ddb85d637b362bf3",
+      "stderrSha256": "sha256:234577749e4f1e9e66904d10a9e186b61cc1fba218dcb92623801bff02812d80",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-19T12:19:39.710Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0188.*",
+      ".atm/history/task-events/ATM-GOV-0188/**",
+      ".atm/history/tasks/ATM-GOV-0188.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/core/src/broker/wave-generated-executor.ts",
+      "scripts/validators/task-ledger/**",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/core/src/broker/wave-generated-executor.ts",
+      "scripts/validators/task-ledger/**",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0188.json",
+  "closedAt": "2026-07-19T12:19:39.710Z",
+  "closedByActor": "codex-governance-optimizer",
+  "sessionId": "session-20260719121104-codex-governance-optimizer-ATM-GOV-0188-9bd7e91a27",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "4083157505847f5a0b246c45fbb2574449c80d68",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/core/src/broker/wave-generated-executor.ts",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0188.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0188/2026-07-19T12-10-52-425Z-import-e08e483d66dd.json",
+      ".atm/history/task-events/ATM-GOV-0188/2026-07-19T12-11-04-034Z-reserve-a21ef0747b70.json",
+      ".atm/history/task-events/ATM-GOV-0188/2026-07-19T12-11-04-037Z-promote-8fd3cf1bf359.json",
+      ".atm/history/task-events/ATM-GOV-0188/2026-07-19T12-11-08-615Z-claim-e54229b6653f.json",
+      ".atm/history/task-events/ATM-GOV-0188/2026-07-19T12-16-30-258Z-scope-amendment-24eadc3a2028.json",
+      ".atm/history/task-events/ATM-GOV-0188/2026-07-19T12-16-30-385Z-scope-amendment-45112bf87499.json",
+      ".atm/history/tasks/ATM-GOV-0188.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
