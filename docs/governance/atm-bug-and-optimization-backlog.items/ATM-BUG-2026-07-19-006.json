@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-006",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Captain workflow / Windows UTF-8 document IO",
+  "finding": "Captain workflows can still use PowerShell content commands or PowerShell-wrapped one-liners for planning Markdown/JSON inspection even though atm-dispatch guidance says Windows planning documents must be read, compared, and authored through Node.js UTF-8 helpers. This causes repeated mojibake/range/quoting failures and can make valid Traditional Chinese UTF-8 look corrupted.",
+  "expectedBehavior": "When a task touches CJK planning Markdown/JSON/text, the active captain and sidecars should treat Node.js UTF-8 document IO as a hard preflight rule. PowerShell may launch node, git, or ATM CLI commands, but must not be the basis for document content IO or comparison.",
+  "evidenceOrRepro": "Observed during 2026-07-19 governance-optimization planning work: the captain used PowerShell Get-Content/Select-Object for line-range inspection and then PowerShell-wrapped node -e commands that were mangled by shell interpolation, despite repo-local guidance in integrations/codex-skills/atm-dispatch/SKILL.md lines 119-121.",
+  "followUp": "Add a deterministic captain/document-IO preflight or skill guard that blocks PowerShell content IO for CJK planning files, provides a canonical Node.js UTF-8 helper command, and makes sidecar briefs inherit the same rule. Add a regression dogfood check that detects Get-Content/Set-Content/Out-File usage in captain-authored planning workflows."
+}
