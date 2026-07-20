@@ -912,6 +912,227 @@
         "node atm.mjs git record-commit --actor <id> --message \"...\" --json"
       ],
       "sourceOwner": "packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts"
+    },
+    {
+      "code": "ATM_ATOMIC_WRITE_RETRY_EXHAUSTED",
+      "category": "runtime-write",
+      "shortDescription": "An atomic write helper exhausted its bounded retry budget before it could safely persist state.",
+      "commonCauses": [
+        "Concurrent writers repeatedly changed the same runtime or evidence file.",
+        "A filesystem rename or replace operation kept failing after retry.",
+        "The operator retried a shared side effect without reconciling the current file digest."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json to inspect the current shared-write owner.",
+        "Run node atm.mjs taskflow diagnose --task <task-id> --json before retrying the write.",
+        "Retry only after the status command shows the owning lane or recovery action."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs taskflow diagnose --task <task-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/broker/persistence.ts"
+    },
+    {
+      "code": "ATM_ORPHAN_CLAIM_ADOPTABLE",
+      "category": "claim-admission",
+      "shortDescription": "A task has orphaned claim state that can be adopted or repaired through the governed claim flow.",
+      "commonCauses": [
+        "A previous actor session expired or disappeared before release.",
+        "The task ledger still records claim ownership but no live lane can continue it.",
+        "A takeover was attempted without first diagnosing claim ownership."
+      ],
+      "remediation": [
+        "Run node atm.mjs tasks repair-claim --task <task-id> --actor <actor-id> --json to inspect the adoptable claim.",
+        "Run node atm.mjs tasks status --task <task-id> --json after repair or adoption.",
+        "Do not hand-edit .atm/history/tasks/<task-id>.json."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks repair-claim --task <task-id> --actor <actor-id> --json",
+        "node atm.mjs tasks status --task <task-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/next/claim-orchestration.ts"
+    },
+    {
+      "code": "ATM_RUNNER_RECEIPT_MISSING",
+      "category": "runner-mode",
+      "shortDescription": "A runner-sync or frozen-runner validation step expected a receipt but could not find one.",
+      "commonCauses": [
+        "The build completed outside the runner-sync receipt writer.",
+        "A cache-hit path skipped receipt creation.",
+        "A later close or release gate could not prove which runner artifacts were synced."
+      ],
+      "remediation": [
+        "Run ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build from the framework repository.",
+        "Run node atm.mjs broker runner-sync status --json when runner-sync broker state exists.",
+        "Rerun the frozen node atm.mjs command that required the receipt."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+        "node atm.mjs broker runner-sync status --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/next/runner-mode.ts"
+    },
+    {
+      "code": "ATM_RUNNER_SYNC_STALE_SHA",
+      "category": "runner-mode",
+      "shortDescription": "Runner-sync observed a stale source or artifact SHA and must reseal before frozen-runner validation can be trusted.",
+      "commonCauses": [
+        "HEAD moved after the runner-sync plan was prepared.",
+        "Release artifacts were generated from a different source tree.",
+        "A runner-sync retry reused an old reservation or receipt."
+      ],
+      "remediation": [
+        "Run git status --short --branch and confirm the intended source state.",
+        "Run ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build to reseal frozen artifacts.",
+        "Rerun node atm.mjs next --prompt \"<current goal>\" --json after the build."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "git status --short --branch",
+        "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+        "node atm.mjs next --prompt \"<current goal>\" --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/next/runner-mode.ts"
+    },
+    {
+      "code": "ATM_SIDE_EFFECT_RECONCILE_REQUIRED",
+      "category": "shared-delivery",
+      "shortDescription": "A shared side effect may have partially completed and must be reconciled before retry or close.",
+      "commonCauses": [
+        "A commit, closeback, generated write, push, or runner-sync phase crashed after starting.",
+        "The receipt exists but the expected file, commit, or queue transition does not match.",
+        "A retry would duplicate a side effect without checking the idempotency key."
+      ],
+      "remediation": [
+        "Run node atm.mjs taskflow diagnose --task <task-id> --json to inspect the side-effect state.",
+        "Run node atm.mjs broker status --json before retrying shared publication.",
+        "Retry only the command returned by the diagnose or broker status output."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs taskflow diagnose --task <task-id> --json",
+        "node atm.mjs broker status --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/broker/batch-execute-actions.ts"
+    },
+    {
+      "code": "ATM_TASK_ID_NORMALIZATION_MISMATCH",
+      "category": "task-ledger",
+      "shortDescription": "A command normalized or emitted a task id differently from the canonical target-ledger id.",
+      "commonCauses": [
+        "A generated recovery command used a prompt fragment instead of the canonical task id.",
+        "A planning card id and target ledger id differ by prefix, suffix width, or case.",
+        "A command mixed source-card path inference with target-ledger lookup."
+      ],
+      "remediation": [
+        "Run node atm.mjs tasks status --task <canonical-task-id> --json.",
+        "Rerun node atm.mjs next --prompt \"<canonical-task-id> <goal>\" --json.",
+        "Use the canonical task id in claim, close, and recovery commands."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <canonical-task-id> --json",
+        "node atm.mjs next --prompt \"<canonical-task-id> <goal>\" --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/canonical-task-id-boundary.ts"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_REFERENCE_ONLY_ID_FRAGMENT",
+      "category": "task-import",
+      "shortDescription": "Task import ignored a task-like id fragment because it was not a canonical task declaration.",
+      "commonCauses": [
+        "A task id appears inside a fenced code block or prose example.",
+        "A heading contains an incomplete or overlong numeric suffix.",
+        "The plan contains a range or placeholder instead of a concrete task card heading."
+      ],
+      "remediation": [
+        "Run node atm.mjs tasks import --from <planning-card-or-plan> --dry-run --json and inspect diagnostics[].sourceLine.",
+        "Move examples into fenced code blocks or add a real canonical task heading with a 4-5 digit suffix.",
+        "Retry import with --write only after dry-run diagnostics identify the intended declaration."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <planning-card-or-plan> --dry-run --json",
+        "node atm.mjs tasks import --from <planning-card-or-plan> --write --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/plan-import-boundary.ts"
+    },
+    {
+      "code": "ATM_TASKS_PLAN_EMPTY",
+      "category": "task-import",
+      "shortDescription": "Task import found no importable task declarations in the planning markdown.",
+      "commonCauses": [
+        "The file is a handoff, report, or reference document rather than a task card or task plan.",
+        "Only fenced examples, prose references, or non-canonical id fragments were present.",
+        "The requested --from path points to the wrong planning document."
+      ],
+      "remediation": [
+        "Run node atm.mjs tasks import --from <planning-card-or-plan> --dry-run --json and inspect diagnostics[].sourceLine.",
+        "Run node atm.mjs next --prompt \"<specific task id or imported task card>\" --json to route the intended work.",
+        "Use a concrete task card path when importing a single task."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <planning-card-or-plan> --dry-run --json",
+        "node atm.mjs next --prompt \"<specific task id or imported task card>\" --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    },
+    {
+      "code": "ATM_TICKET_ADOPT_REQUIRED",
+      "category": "broker-ticket",
+      "shortDescription": "A broker ticket or queue item has a lost owner and must be adopted before mutation continues.",
+      "commonCauses": [
+        "The ticket owner lane expired before publishing or canceling.",
+        "A queued shared-write window reached the head with no live owner.",
+        "A recovery attempt tried to mutate a ticket without explicit adoption."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json to identify the ticket and owner state.",
+        "Run node atm.mjs taskflow diagnose --task <task-id> --json to get the adoption command for the task.",
+        "Continue only after the broker status shows the ticket owner is current."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs taskflow diagnose --task <task-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/broker/registry-actions.ts"
+    },
+    {
+      "code": "ATM_TICKET_CANCEL_REQUIRED",
+      "category": "broker-ticket",
+      "shortDescription": "A broker ticket cannot continue and must be canceled through the broker recovery surface.",
+      "commonCauses": [
+        "The ticket references stale base state or invalidated proposal input.",
+        "The queued operation is no longer safe after revalidation.",
+        "An operator attempted to abandon a shared-write ticket by deleting runtime files."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json to inspect the ticket state.",
+        "Run node atm.mjs taskflow diagnose --task <task-id> --json to get the cancel or reconcile command.",
+        "Do not delete .atm/runtime broker files directly."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs taskflow diagnose --task <task-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/broker/registry-actions.ts"
     }
   ],
   "prefixRules": [

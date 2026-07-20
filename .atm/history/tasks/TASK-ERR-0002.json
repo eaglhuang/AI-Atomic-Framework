@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0002",
+  "title": "Error and recovery contract",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [],
+  "acceptance": [
+    "所有列名錯誤都有 exact 或 prefix-documented registry entry。",
+    "每個 code 都有 executable recovery command 且測試驗證可直接執行。",
+    "docs/ERROR_CODES.md 由 generator 更新且與 registry 一致。",
+    "相關 CLI failure JSON 含 code/retryability/approval/statusCommand/nextAction。",
+    "`ATM-BUG-2026-07-20-216` 的 parser fixture 產生正確診斷；不得把 fenced code block 內的 shell-style comment 誤判成任務 heading。"
+  ],
+  "deliverables": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "packages/cli/src/commands/next/**",
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/tasks/**",
+    "tests/cli/error-recovery-contract.test.ts",
+    "tests/cli/task-import-diagnostic-contract.test.ts"
+  ],
+  "scopePaths": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "packages/cli/src/commands/next/**",
+    "packages/cli/src/commands/broker/**",
+    "packages/cli/src/commands/tasks/**",
+    "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+    "tests/cli/error-recovery-contract.test.ts",
+    "tests/cli/task-import-diagnostic-contract.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/error-recovery-contract.test.ts",
+    "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+    "npm run generate:error-codes",
+    "npm run validate:cli",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No registry location migration.",
+    "No product implementation beyond emitter/tests needed to prove the codes."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and dispose generated artifacts through formal ATM commands; do not edit .atm runtime state directly.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 2 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "docs/governance/error-code-registry.json (1107 lines)",
+        "docs/ERROR_CODES.md (1533 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0002-error-and-recovery-contract.task.md",
+    "sectionTitle": "TASK-ERR-0002",
+    "headingLine": 81,
+    "hash": "986208d30cbbd8a9",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0002-error-and-recovery-contract.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:986208d30cbbd8a9d628f62a0b7ed11e9eadf603407c20bedc46e01def6b202f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T15:15:08.986Z"
+    }
+  },
+  "importedAt": "2026-07-20T15:15:08.986Z",
+  "lastTransitionId": "2026-07-20T15-15-25-795Z-claim-e9d8586d9d2f",
+  "lastTransitionAt": "2026-07-20T15:15:25.795Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T15:15:18.943Z",
+  "promotedAt": "2026-07-20T15:15:18.949Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-1656d191c89c",
+    "claimedAt": "2026-07-20T15:15:18.955Z",
+    "heartbeatAt": "2026-07-20T15:15:18.955Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-ERR-0002.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/next/**",
+      "packages/cli/src/commands/tasks/**",
+      "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "tests/cli/error-recovery-contract.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720151519-codex-gpt-5.4-mini-bc091ebe7b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720151519-codex-gpt-5.4-mini-bc091ebe7b\""
+    }
+  },
+  "startedAt": "2026-07-20T15:15:18.955Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720151518-codex-gpt-5.4-mini-TASK-ERR-0002-5d0c62dd97",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0002",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0002.*",
+      ".atm/history/task-events/TASK-ERR-0002/**",
+      ".atm/history/tasks/TASK-ERR-0002.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/**",
+      "packages/cli/src/commands/next/**",
+      "packages/cli/src/commands/tasks/**",
+      "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "tests/cli/error-recovery-contract.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a16dc56838ee7d9f8c853a486f1b8c9be9acec90f04486bcd5f900cb3293b0b7",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260720151518-codex-gpt-5.4-mini-TASK-ERR-0002-5d0c62dd97",
+    "laneSession": {
+      "laneSessionId": "lane-20260720151519-codex-gpt-5.4-mini-bc091ebe7b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720151519-codex-gpt-5.4-mini-bc091ebe7b\""
+    },
+    "createdAt": "2026-07-20T15:15:25.794Z",
+    "status": "active"
+  }
+}
