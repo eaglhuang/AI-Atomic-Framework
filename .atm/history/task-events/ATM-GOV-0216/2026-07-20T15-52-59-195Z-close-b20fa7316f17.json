@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T15-52-59-195Z-close-b20fa7316f17",
+  "taskId": "ATM-GOV-0216",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720153655-codex-gpt-5.4-mini-ATM-GOV-0216-04f7094685",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0216.json",
+  "taskSha256": "sha256:d2869018d797741062cff5015dcb0302a3e097a6db506670f6c404ccb59cf854",
+  "createdAt": "2026-07-20T15:52:59.195Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0216 --actor codex-gpt-5.4-mini --status done --historical-delivery d5fdb674af9c1856f741c5c547843e14cbd51f86",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720153655-codex-gpt-5.4-mini-ATM-GOV-0216-04f7094685",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0216.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/broker-parallel-admission-policy.test.ts",
+      "typecheck",
+      "validate:broker-registry",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T15:52:59.187Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0216.*",
+        ".atm/history/task-events/ATM-GOV-0216/**",
+        ".atm/history/tasks/ATM-GOV-0216.json",
+        "docs/governance/parallel-governance-charter.md",
+        "packages/cli/src/commands/broker/implementation.ts",
+        "packages/cli/src/commands/broker/parser.ts",
+        "packages/cli/src/commands/broker/policy-actions.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/parallel-admission-policy.ts",
+        "schemas/governance/parallel-admission-policy.schema.json",
+        "tests/cli-fixtures/help-snapshots/broker.json",
+        "tests/cli/broker-parallel-admission-policy.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/implementation.ts",
+        "packages/cli/src/commands/broker/parser.ts",
+        "packages/cli/src/commands/broker/policy-actions.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/parallel-admission-policy.ts",
+        "schemas/governance/parallel-admission-policy.schema.json",
+        "tests/cli-fixtures/help-snapshots/broker.json",
+        "tests/cli/broker-parallel-admission-policy.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

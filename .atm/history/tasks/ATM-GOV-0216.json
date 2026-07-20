@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0216",
   "title": "Unified parallel admission policy",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [
     "ATM-GOV-0215"
@@ -75,8 +75,8 @@
     }
   },
   "importedAt": "2026-07-20T15:36:46.466Z",
-  "lastTransitionId": "2026-07-20T15-46-39-975Z-scope-amendment-5fccca158d0f",
-  "lastTransitionAt": "2026-07-20T15:46:39.975Z",
+  "lastTransitionId": "2026-07-20T15-52-59-195Z-close-b20fa7316f17",
+  "lastTransitionAt": "2026-07-20T15:52:59.195Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-07-20T15:36:55.581Z",
@@ -85,7 +85,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-9ad3e182434f",
     "claimedAt": "2026-07-20T15:36:55.592Z",
-    "heartbeatAt": "2026-07-20T15:36:55.592Z",
+    "heartbeatAt": "2026-07-20T15:52:59.193Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0216.*",
@@ -102,14 +102,14 @@
       "tests/cli-fixtures/help-snapshots/broker.json",
       "tests/cli/broker-parallel-admission-policy.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720153655-codex-gpt-5.4-mini-34ad933aaa",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720153655-codex-gpt-5.4-mini-34ad933aaa\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T15:36:55.592Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -158,5 +158,9 @@
     },
     "createdAt": "2026-07-20T15:37:02.108Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T15:52:59.193Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260720153655-codex-gpt-5.4-mini-ATM-GOV-0216-04f7094685",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0216.closure-packet.json"
 }
