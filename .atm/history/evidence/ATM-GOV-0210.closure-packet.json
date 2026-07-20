@@ -1,0 +1,210 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0210",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "496544e448bbd2050f6402336e11c244978a485c",
+  "governedTreeSha": "4dccdca38cd4c0691746165d27ad7efd7218e6c0",
+  "targetCommitDelta": {
+    "currentCommitSha": "496544e448bbd2050f6402336e11c244978a485c",
+    "parentCommitShas": [
+      "496544e448bbd2050f6402336e11c244978a485c"
+    ],
+    "governedTreeSha": "4dccdca38cd4c0691746165d27ad7efd7218e6c0",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0210.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0210.json",
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/next/proposal-lane.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/proposal-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/registry-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/telemetry.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/claim-parallel-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/proposal-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/registry-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/shared-utils.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/dist/broker/decision.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/broker/registry.js",
+      "release/atm-root-drop/packages/core/dist/telemetry/index.js",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/broker/registry.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/packages/core/src/telemetry/index.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.js",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/index.ts",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/schemas/governance/patch-proposal.schema.json",
+      "release/atm-root-drop/schemas/governance/write-intent.schema.json",
+      "release/atm-root-drop/scripts/validate-schemas/context.ts",
+      "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
+      "schemas/governance/proposal-lane.schema.json",
+      "tests/cli/parallel-proposal-lane-admission.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/parallel-proposal-lane-admission.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b123ae5b4164a2906f2e26e1199dbffe6f3c360e9e85b1008c5b190afef55a4d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ba8373cf15dfb4bc1765c5fb613b372c1c8e679020bbb04f80f269a7c48a19e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:broker-proposal",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c08486df81f580f042f9ae1b5f51a3aa828c3664687f4b2eddfb67fad3476f3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:639b1e4361f32cae3eb441210e0a9f8e1c94cc4399e17752806c3a96432cd168",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+    "node --strip-types tests/cli/parallel-proposal-lane-admission.test.ts",
+    "typecheck",
+    "validate:broker-proposal",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T08:48:37.727Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0210.*",
+      ".atm/history/task-events/ATM-GOV-0210/**",
+      ".atm/history/tasks/ATM-GOV-0210.json",
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/next/broker-queue-admission.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/next/proposal-lane.ts",
+      "packages/core/src/broker/proposal.ts",
+      "schemas/governance/proposal-lane.schema.json",
+      "tests/cli/parallel-proposal-lane-admission.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/next/broker-queue-admission.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/next/proposal-lane.ts",
+      "packages/core/src/broker/proposal.ts",
+      "schemas/governance/proposal-lane.schema.json",
+      "tests/cli/parallel-proposal-lane-admission.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0210.json",
+  "closedAt": "2026-07-20T08:48:37.728Z",
+  "closedByActor": "codex-captain-0210",
+  "sessionId": "session-20260720083428-codex-captain-0210-ATM-GOV-0210-0525ecaa17",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "496544e448bbd2050f6402336e11c244978a485c",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/next/proposal-lane.ts",
+      "schemas/governance/proposal-lane.schema.json",
+      "tests/cli/parallel-proposal-lane-admission.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0210.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0210/2026-07-20T08-34-16-203Z-import-c05f720afc3c.json",
+      ".atm/history/task-events/ATM-GOV-0210/2026-07-20T08-34-28-035Z-reserve-a67c09e5ff6e.json",
+      ".atm/history/task-events/ATM-GOV-0210/2026-07-20T08-34-28-039Z-promote-31848ad0efff.json",
+      ".atm/history/task-events/ATM-GOV-0210/2026-07-20T08-34-32-633Z-claim-3a5d6c704f9f.json",
+      ".atm/history/tasks/ATM-GOV-0210.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

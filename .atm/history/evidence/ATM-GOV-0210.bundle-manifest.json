@@ -1,14 +1,15 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0210",
-  "updatedAt": "2026-07-20T08:43:41.600Z",
+  "updatedAt": "2026-07-20T08:46:52.206Z",
   "updatedBy": "codex-captain-0210",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
     "node --strip-types tests/cli/parallel-proposal-lane-admission.test.ts",
     "typecheck",
     "validate:broker-proposal",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -154,6 +155,22 @@
       "durationMs": 15379,
       "runnerKind": "dev-source",
       "sourceCommit": "2a410c4bdbfaf5b59b9c7c5c9ca3f1f707c63bc4",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-20T08:46:52.204Z",
+      "startedAt": "2026-07-20T08:46:02.500Z",
+      "finishedAt": "2026-07-20T08:46:52.204Z",
+      "durationMs": 49704,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0210",
   "title": "Parallel task start and isolated proposal lanes",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0207",
@@ -112,8 +112,8 @@
     }
   },
   "importedAt": "2026-07-20T08:34:16.102Z",
-  "lastTransitionId": "2026-07-20T08-34-32-633Z-claim-3a5d6c704f9f",
-  "lastTransitionAt": "2026-07-20T08:34:32.633Z",
+  "lastTransitionId": "2026-07-20T08-48-37-743Z-close-c107669ff63a",
+  "lastTransitionAt": "2026-07-20T08:48:37.743Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0210",
   "reservedAt": "2026-07-20T08:34:28.035Z",
@@ -122,7 +122,7 @@
     "actorId": "codex-captain-0210",
     "leaseId": "lease-9ee143d15bcd",
     "claimedAt": "2026-07-20T08:34:28.043Z",
-    "heartbeatAt": "2026-07-20T08:34:28.043Z",
+    "heartbeatAt": "2026-07-20T08:48:37.738Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0210.json",
@@ -137,14 +137,14 @@
       "schemas/governance/proposal-lane.schema.json",
       "tests/cli/parallel-proposal-lane-admission.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720083428-codex-captain-0210-1cf7d799e9",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720083428-codex-captain-0210-1cf7d799e9\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T08:34:28.043Z",
   "startedByActor": "codex-captain-0210",
@@ -186,5 +186,9 @@
     },
     "createdAt": "2026-07-20T08:34:32.632Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T08:48:37.739Z",
+  "closedByActor": "codex-captain-0210",
+  "closedBySessionId": "session-20260720083428-codex-captain-0210-ATM-GOV-0210-0525ecaa17",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0210.closure-packet.json"
 }

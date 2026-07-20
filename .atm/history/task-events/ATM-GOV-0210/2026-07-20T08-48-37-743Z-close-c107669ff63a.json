@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T08-48-37-743Z-close-c107669ff63a",
+  "taskId": "ATM-GOV-0210",
+  "action": "close",
+  "actorId": "codex-captain-0210",
+  "sessionId": "session-20260720083428-codex-captain-0210-ATM-GOV-0210-0525ecaa17",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0210.json",
+  "taskSha256": "sha256:f2e6e50f1d4ebc6964201c47dd9d8c7f94bda84503ddb5aa2f8c15115bae74dc",
+  "createdAt": "2026-07-20T08:48:37.743Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0210 --actor codex-captain-0210 --status done --historical-delivery 496544e448bbd2050f6402336e11c244978a485c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720083428-codex-captain-0210-ATM-GOV-0210-0525ecaa17",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0210.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "node --strip-types tests/cli/parallel-proposal-lane-admission.test.ts",
+      "typecheck",
+      "validate:broker-proposal",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T08:48:37.727Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0210.*",
+        ".atm/history/task-events/ATM-GOV-0210/**",
+        ".atm/history/tasks/ATM-GOV-0210.json",
+        "packages/cli/src/commands/broker/proposal-actions.ts",
+        "packages/cli/src/commands/next/broker-queue-admission.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/claim-helpers.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/cli/src/commands/next/proposal-lane.ts",
+        "packages/core/src/broker/proposal.ts",
+        "schemas/governance/proposal-lane.schema.json",
+        "tests/cli/parallel-proposal-lane-admission.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/proposal-actions.ts",
+        "packages/cli/src/commands/next/broker-queue-admission.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/claim-helpers.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/cli/src/commands/next/proposal-lane.ts",
+        "packages/core/src/broker/proposal.ts",
+        "schemas/governance/proposal-lane.schema.json",
+        "tests/cli/parallel-proposal-lane-admission.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
