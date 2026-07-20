@@ -43,8 +43,10 @@ counts are mandatory diagnostics, not a cross-model price proxy.
 | INV-ATM-003 | Schema-validated promotion only | gate |
 | INV-ATM-004 | No competing highest authority | doctor |
 | INV-ATM-005 | Host rule amendments require waiver flow | waiver-required |
-| INV-ATM-006 | Framework work tracking stays downstream | doctor |
+| INV-ATM-006 | Framework work tracking stays target-local | doctor |
 | INV-ATM-007 | Public framework docs remain English-only | doctor |
+| INV-ATM-008 | Broker tickets, not refusals | doctor |
+| INV-ATM-009 | Generalized repair and data-driven policy | doctor |
 
 ---
 
