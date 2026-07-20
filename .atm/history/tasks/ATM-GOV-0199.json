@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0199",
   "title": "Live broker decision outcome telemetry and correctness adjudication",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0196",
@@ -94,8 +94,8 @@
     }
   },
   "importedAt": "2026-07-20T10:32:09.881Z",
-  "lastTransitionId": "2026-07-20T10-32-44-809Z-claim-eaff733464d0",
-  "lastTransitionAt": "2026-07-20T10:32:44.809Z",
+  "lastTransitionId": "2026-07-20T10-47-15-307Z-close-033244375057",
+  "lastTransitionAt": "2026-07-20T10:47:15.307Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0199",
   "reservedAt": "2026-07-20T10:32:40.216Z",
@@ -104,7 +104,7 @@
     "actorId": "codex-captain-0199",
     "leaseId": "lease-e477cf6cc316",
     "claimedAt": "2026-07-20T10:32:40.221Z",
-    "heartbeatAt": "2026-07-20T10:32:40.221Z",
+    "heartbeatAt": "2026-07-20T10:47:15.304Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0199.json",
@@ -115,14 +115,14 @@
       "scripts/validate-broker-decision-outcome-telemetry.ts",
       "tests/cli/broker-decision-outcome-telemetry.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720103240-codex-captain-0199-b11e78c245",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720103240-codex-captain-0199-b11e78c245\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T10:32:40.221Z",
   "startedByActor": "codex-captain-0199",
@@ -160,5 +160,9 @@
     },
     "createdAt": "2026-07-20T10:32:44.808Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T10:47:15.304Z",
+  "closedByActor": "codex-captain-0199",
+  "closedBySessionId": "session-20260720103240-codex-captain-0199-ATM-GOV-0199-c061099397",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0199.closure-packet.json"
 }
