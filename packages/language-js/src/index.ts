@@ -85,6 +85,11 @@ export interface JavaScriptLanguageAdapter extends LanguageAdapter<JavaScriptPro
   getFastStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
   getDefaultStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
   getAllStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
+  findSymbolAnchors(sourceFile: JavaScriptSourceFile, symbolName: string): readonly {
+    readonly filePath: string;
+    readonly lineStart: number;
+    readonly lineEnd: number;
+  }[];
 }
 
 export const defaultJavaScriptImportPolicy: JavaScriptImportPolicy = {
@@ -110,5 +115,6 @@ export {
   createAllJavaScriptStaticCheck,
   createCommandRunnerContract,
   createDefaultJavaScriptStaticCheck,
-  createFastJavaScriptStaticCheck
+  createFastJavaScriptStaticCheck,
+  findJavaScriptSymbolAnchors
 } from './language-js-adapter.ts';

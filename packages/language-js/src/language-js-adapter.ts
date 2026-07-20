@@ -57,7 +57,8 @@ export function createJavaScriptLanguageAdapter(
       request: LanguageAdapterValidationRequest,
       profile = createUnknownProfile()
     ) => validateComputeAtom(request, profile, defaultPolicy),
-    createCommandRunnerContract
+    createCommandRunnerContract,
+    findSymbolAnchors: findJavaScriptSymbolAnchors
   };
 }
 
@@ -212,6 +213,27 @@ export function discoverJavaScriptAtomCandidates(
   }
 
   return applyJsCandidateFilters(candidates, request);
+}
+
+export function findJavaScriptSymbolAnchors(
+  sourceFile: JavaScriptSourceFile,
+  symbolName: string
+): readonly { readonly filePath: string; readonly lineStart: number; readonly lineEnd: number }[] {
+  const normalizedName = symbolName.trim();
+  if (!normalizedName) return [];
+  return discoverJavaScriptAtomCandidates({
+    sourceFiles: [{ ...sourceFile, languageId: sourceFile.filePath.endsWith('.ts') ? 'typescript' : 'javascript' }],
+    filters: { minConfidence: 'low' }
+  })
+    .filter((candidate): candidate is typeof candidate & { lineStart: number; lineEnd: number } =>
+      candidate.symbol === normalizedName
+      && typeof candidate.lineStart === 'number'
+      && typeof candidate.lineEnd === 'number')
+    .map((candidate) => ({
+      filePath: normalizePath(candidate.filePath),
+      lineStart: candidate.lineStart,
+      lineEnd: candidate.lineEnd
+    }));
 }
 
 /**

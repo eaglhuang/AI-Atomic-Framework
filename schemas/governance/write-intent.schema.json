@@ -91,6 +91,12 @@
         },
         "operation": {
           "enum": ["create", "modify", "delete"]
+        },
+        "contentAnchors": {
+          "type": "array",
+          "items": {
+            "$ref": "https://schemas.ai-atomic-framework.dev/governance/content-anchor.schema.json"
+          }
         }
       }
     },

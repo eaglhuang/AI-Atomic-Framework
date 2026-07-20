@@ -1,0 +1,193 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0208",
+  "title": "Content anchored code boundary and resolver substrate",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0207"
+  ],
+  "acceptance": [
+    "早期 proposal 插入行後，後續 disjoint anchor 仍定位到原目標；不再以舊 absolute line 套用。",
+    "rename/reorder/format/duplicate/same-name/base-mismatch fixtures 對 resolved/stale/ambiguous 結論可重現。",
+    "unsupported/ambiguous 不會被標 compose-safe，且 downstream 可轉成 re-arbitration/queue ticket。",
+    "write-intent 與 patch-proposal schemas 接受同一 content-anchor contract，無 additionalProperties 漂移。",
+    "focused validator、schema validation、typecheck 與 validate:cli 全數通過。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/boundaries/**",
+    "packages/language-js/src/**",
+    "schemas/governance/content-anchor.schema.json",
+    "schemas/governance/write-intent.schema.json",
+    "schemas/governance/patch-proposal.schema.json",
+    "scripts/validate-content-anchor.ts",
+    "tests/core/content-anchor-resolver.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/boundaries/**",
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/adapters/text-range.ts",
+    "packages/core/src/git/admission.ts",
+    "packages/language-js/src/**",
+    "schemas/governance/content-anchor.schema.json",
+    "schemas/governance/write-intent.schema.json",
+    "schemas/governance/patch-proposal.schema.json",
+    "scripts/validate-content-anchor.ts",
+    "tests/core/content-anchor-resolver.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/core/content-anchor-resolver.test.ts",
+    "node --strip-types scripts/validate-content-anchor.ts",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No overlap verdict, admission policy, ticket scheduling, semantic revalidation, patch application, commit, or push.",
+    "Do not claim that path-to-atom-map already contains line or symbol boundaries."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Disable anchor-based compose eligibility, retain anchors as shadow diagnostic evidence, keep legacy intent readers, and return to the existing safe broker path without absolute-line fallback. Durable queue routing is activated only after ATM-GOV-0211 is sealed.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-broker",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.content-anchor-contract",
+        "pattern": "Result Contract Object",
+        "source": "packages/core/src/broker/boundaries/content-anchor.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.content-boundary-resolver",
+        "pattern": "Adapter/Port",
+        "source": "packages/core/src/broker/boundaries/resolver.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0208-content-anchored-code-boundary-and-resolver-substrate.task.md",
+    "sectionTitle": "ATM-GOV-0208",
+    "headingLine": 82,
+    "hash": "a19516f99afe52c9",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0208-content-anchored-code-boundary-and-resolver-substrate.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:a19516f99afe52c97b2189a46d0a21d283519677e3924f77439fd3a70c44d96a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T07:54:56.610Z"
+    }
+  },
+  "importedAt": "2026-07-20T07:54:56.610Z",
+  "lastTransitionId": "2026-07-20T07-57-35-919Z-scope-amendment-85b35604789f",
+  "lastTransitionAt": "2026-07-20T07:57:35.919Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0208",
+  "reservedAt": "2026-07-20T07:55:05.717Z",
+  "promotedAt": "2026-07-20T07:55:05.720Z",
+  "claim": {
+    "actorId": "codex-captain-0208",
+    "leaseId": "lease-fb927d3ce007",
+    "claimedAt": "2026-07-20T07:55:05.725Z",
+    "heartbeatAt": "2026-07-20T07:55:05.725Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0208.*",
+      ".atm/history/task-events/ATM-GOV-0208/**",
+      ".atm/history/tasks/ATM-GOV-0208.json",
+      "packages/core/src/broker/adapters/text-range.ts",
+      "packages/core/src/broker/boundaries/**",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/types.ts",
+      "packages/core/src/git/admission.ts",
+      "packages/language-js/src/**",
+      "schemas/governance/content-anchor.schema.json",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "scripts/validate-content-anchor.ts",
+      "scripts/validate-schemas/context.ts",
+      "tests/core/content-anchor-resolver.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720075505-codex-captain-0208-5719d116aa",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720075505-codex-captain-0208-5719d116aa\""
+    }
+  },
+  "startedAt": "2026-07-20T07:55:05.725Z",
+  "startedByActor": "codex-captain-0208",
+  "startedBySessionId": "session-20260720075505-codex-captain-0208-ATM-GOV-0208-c937e06ff0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0208",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0208.*",
+      ".atm/history/task-events/ATM-GOV-0208/**",
+      ".atm/history/tasks/ATM-GOV-0208.json",
+      "packages/core/src/broker/adapters/text-range.ts",
+      "packages/core/src/broker/boundaries/**",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/types.ts",
+      "packages/core/src/git/admission.ts",
+      "packages/language-js/src/**",
+      "schemas/governance/content-anchor.schema.json",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "scripts/validate-content-anchor.ts",
+      "scripts/validate-schemas/context.ts",
+      "tests/core/content-anchor-resolver.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0208-content-anchored-code-boundary-and-resolver-substrate.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0208-content-anchored-code-boundary-and-resolver-substrate.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "df3c63d665d5d57562f750775cbacb98be59748d44de36a3e040219cf488b002",
+    "actorId": "codex-captain-0208",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260720075505-codex-captain-0208-5719d116aa",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720075505-codex-captain-0208-5719d116aa\""
+    },
+    "createdAt": "2026-07-20T07:55:10.142Z",
+    "status": "active"
+  }
+}

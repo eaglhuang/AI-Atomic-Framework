@@ -1,4 +1,5 @@
 import type { FreezeAck, FreezeResolution, FreezeSignal } from './freeze.ts';
+import type { ContentAnchor } from './boundaries/content-anchor.ts';
 
 export interface MigrationRecord {
   readonly strategy: 'none' | 'additive' | 'breaking';
@@ -10,6 +11,7 @@ export interface WriteIntentAtomRef {
   readonly atomId: string;
   readonly atomCid: string;
   readonly operation: 'create' | 'modify' | 'delete';
+  readonly contentAnchors?: readonly ContentAnchor[];
   readonly sourceRange?: {
     readonly filePath: string;
     readonly lineStart: number;
@@ -127,6 +129,7 @@ export interface ProposalAtomRef {
 export interface PatchAnchor {
   readonly kind: string;
   readonly hint: string;
+  readonly contentAnchor?: ContentAnchor;
 }
 
 export interface PatchProposal {

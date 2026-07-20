@@ -64,6 +64,7 @@ export const schemaEntries: Record<string, string> = {
   'agent-pack-manifest': 'schemas/agent-pack/manifest.schema.json',
   'write-intent': 'schemas/governance/write-intent.schema.json',
   'patch-proposal': 'schemas/governance/patch-proposal.schema.json',
+  'content-anchor': 'schemas/governance/content-anchor.schema.json',
   'broker-decision': 'schemas/governance/broker-decision.schema.json',
   'merge-plan': 'schemas/governance/merge-plan.schema.json',
   'break-glass-handoff': 'schemas/governance/break-glass-handoff.schema.json',
