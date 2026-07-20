@@ -86,6 +86,48 @@ Do not optimize for making many cards become `done`. Optimize for producing the
 requested non-.atm deliverables for the current task or current batch queue
 head.
 
+## Governance Flow Backwrite
+
+For Captain, dispatch, handoff, evidence, closeout, and first-layer governance
+work, promote only stable rules into reusable skills. Historical task status,
+dirty worktree residue, local commit shas, actor ids, queue ids, and
+date-bound incident instructions belong in task evidence, backlog, handoff, or
+learning references, not in this entry skill.
+
+Before implementation on a governed card, record an opening data-driven
+decision in the task evidence, close summary, or dispatch report:
+
+- consumed sealed summaries;
+- missing data;
+- assumption changes;
+- stop rule;
+- whether the card adds, removes, or touches a shared-write gate.
+
+For every shared-write gate touched by the route, apply the `INV-ATM-008`
+check before accepting a blocker as normal: did the workflow turn a
+coordinatable shared write into a bare refusal or terminal block, and is that
+refusal one of the owner-ruled exceptions? If not, route through a broker
+ticket, compose/steward path, queue ticket, or backlog item instead of
+normalizing the refusal.
+
+For repairs, follow `INV-ATM-009`: derive behavior from schemas, registries,
+configuration, observed counters, canonical ErrorCodes, capability payloads,
+or compact digest evidence. Do not hard-code task ids, actor ids, queue names,
+local absolute paths, dates, or one incident's error string unless the task
+records why the general rule is unsafe or infeasible.
+
+Before closeout, check that evidence and telemetry include a window,
+watermark, counters, duration/timing, source availability, compact digest, and
+explicit unavailable receipts where data is missing. Raw runtime logs should
+remain in runtime or gitignored storage; tracked history should carry compact
+evidence.
+
+If the route changes runner, release, broker shared-write behavior,
+first-layer entry behavior, skill template projection, or generated
+integration output, source tests alone are insufficient. Rebuild the frozen
+runner when ATM says it is stale and run a frozen-entry smoke or probe before
+claiming delivery.
+
 If the natural-language request mentions a task id, task card, plan document, or
 scoped task batch, invoke `atm-task-intent-resolver` first. It must write
 `.atm/runtime/task-intent.json` from semantic reading of the user prompt and then

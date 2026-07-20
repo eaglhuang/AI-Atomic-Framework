@@ -74,6 +74,29 @@ instruction sheet for the selected channel:
 - `batch`: many tasks, claim original prompt -> deliver queue head -> evidence
   -> batch checkpoint -> commit -> continue next queue head.
 
+## Governed Card Opening And Close Checks
+
+For an explicit task card, add an opening data-driven decision before editing:
+name the consumed sealed summaries, missing data, assumption changes, stop
+rule, and whether the card touches a shared-write gate. If it touches a
+shared-write gate, apply the `INV-ATM-008` check: broker tickets, compose or
+steward paths, and queue tickets are valid coordination states; a bare refusal
+is charter debt unless it is an owner-ruled exception.
+
+For repairs, prefer generalized and data-driven behavior from schemas,
+registries, configuration, observed counters, canonical ErrorCodes,
+capability payloads, or compact digest evidence. Do not hard-code task ids,
+actor ids, queue names, local paths, dates, or one incident's error string into
+reusable skill text or framework logic.
+
+Before closeout, verify evidence and telemetry include a window, watermark,
+counters, duration/timing, source availability, compact digest, and explicit
+unavailable receipts where data is missing. If the task touches runner,
+release, broker shared-write behavior, first-layer entry behavior, skill
+template projection, or generated integration output, source tests alone are
+not enough; rebuild the frozen runner when stale and run a frozen-entry smoke
+or probe.
+
 If `evidence.nextAction.governanceReadiness` is present, prepare those items
 before you reach commit or push. Treat framework claim, protected push
 evidence, `doctor`, and branch queue retry codes as early blockers, not as
