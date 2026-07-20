@@ -1,0 +1,84 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T18-04-36-659Z-close-e66d4070e14c",
+  "taskId": "ATM-GOV-0222",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720175213-codex-gpt-5.4-mini-ATM-GOV-0222-8ca33652c5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0222.json",
+  "taskSha256": "sha256:2b5c7aff9a3cf6ea7fc31f13513ee34987ae5d500c796fdd551354b9861ee582",
+  "createdAt": "2026-07-20T18:04:36.659Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0222 --actor codex-gpt-5.4-mini --status done --historical-delivery eb43c47ae08f810e277652bd76fc3ea98c21ea1e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720175213-codex-gpt-5.4-mini-ATM-GOV-0222-8ca33652c5",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0222.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/adopter-compose-first-default.test.ts",
+      "node --strip-types tests/cli/first-layer-ux-routing.test.ts",
+      "node --strip-types tests/cli/managed-plan-executor.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:guidance",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T18:04:36.649Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0222.*",
+        ".atm/history/task-events/ATM-GOV-0222/**",
+        ".atm/history/tasks/ATM-GOV-0222.json",
+        ".github/prompts/atm-dispatch.prompt.md",
+        ".github/prompts/atm-evidence.prompt.md",
+        ".github/prompts/atm-governance-router.prompt.md",
+        ".github/prompts/atm-handoff.prompt.md",
+        ".github/prompts/atm-next.prompt.md",
+        "packages/cli/src/commands/batch/plan-executor.ts",
+        "packages/cli/src/commands/guide.ts",
+        "packages/cli/src/commands/next/result-compaction.ts",
+        "packages/core/src/batch/plan-run-journal.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-governance-router.skill.md",
+        "templates/skills/atm-next.skill.md",
+        "tests/cli/adopter-compose-first-default.test.ts",
+        "tests/cli/first-layer-ux-routing.test.ts",
+        "tests/cli/managed-plan-executor.test.ts",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/plan-executor.ts",
+        "packages/cli/src/commands/guide.ts",
+        "packages/cli/src/commands/next/result-compaction.ts",
+        "packages/core/src/batch/plan-run-journal.ts",
+        "scripts/validate-skill-templates.ts",
+        "tests/cli/adopter-compose-first-default.test.ts",
+        "tests/cli/first-layer-ux-routing.test.ts",
+        "tests/cli/managed-plan-executor.test.ts",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

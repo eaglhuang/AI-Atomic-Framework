@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0222",
-  "updatedAt": "2026-07-20T18:01:08.559Z",
+  "updatedAt": "2026-07-20T18:04:02.082Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "git diff --check",
@@ -10,6 +10,7 @@
     "node --strip-types tests/cli/managed-plan-executor.test.ts",
     "typecheck",
     "validate:cli",
+    "validate:git-head-evidence",
     "validate:guidance",
     "validate:integration-adapter",
     "validate:skill-templates"
@@ -158,6 +159,22 @@
       "durationMs": 491,
       "runnerKind": "dev-source",
       "sourceCommit": "f9fbec2a297c446bb86d3439f353020fbd3fc817",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-20T18:04:02.081Z",
+      "startedAt": "2026-07-20T18:03:12.412Z",
+      "finishedAt": "2026-07-20T18:04:02.081Z",
+      "durationMs": 49669,
+      "runnerKind": "dev-source",
+      "sourceCommit": "eb43c47ae08f810e277652bd76fc3ea98c21ea1e",
       "cached": false
     }
   ],
