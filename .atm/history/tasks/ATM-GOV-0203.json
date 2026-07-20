@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0203",
   "title": "First layer routing compact orientation and Windows safe command contracts",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0196",
@@ -96,8 +96,8 @@
     }
   },
   "importedAt": "2026-07-20T11:33:38.419Z",
-  "lastTransitionId": "2026-07-20T12-44-22-806Z-claim-3beabc4853ca",
-  "lastTransitionAt": "2026-07-20T12:44:22.806Z",
+  "lastTransitionId": "2026-07-20T12-48-34-582Z-close-25338199ffd3",
+  "lastTransitionAt": "2026-07-20T12:48:34.582Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-07-20T12:43:59.332Z",
   "promotedAt": "2026-07-20T12:43:59.336Z",
@@ -105,7 +105,7 @@
     "actorId": "codex-captain-0203",
     "leaseId": "lease-a2b2f1b6cf31",
     "claimedAt": "2026-07-20T12:44:17.016Z",
-    "heartbeatAt": "2026-07-20T12:44:17.016Z",
+    "heartbeatAt": "2026-07-20T12:48:34.578Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0203.json",
@@ -123,14 +123,14 @@
       "templates/**",
       "tests/cli/first-layer-command-contracts.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720124417-codex-captain-0203-e8e755dd55",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720124417-codex-captain-0203-e8e755dd55\""
-    }
+    },
+    "reason": "ATM-GOV-0203 landed as intentional shared delivery: first commit updated generated integration projections alongside the canonical first-layer contract, second commit stabilized prompt-scoped routing regressions, third commit added the declared contract test and evidence."
   },
   "startedAt": "2026-07-20T11:33:41.067Z",
   "startedByActor": "codex-captain-0203",
@@ -174,5 +174,10 @@
     },
     "createdAt": "2026-07-20T12:44:22.805Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T12:48:34.578Z",
+  "closedByActor": "codex-captain-0203",
+  "closedBySessionId": "session-20260720124417-codex-captain-0203-ATM-GOV-0203-fc7bb751b8",
+  "closeReason": "ATM-GOV-0203 landed as intentional shared delivery: first commit updated generated integration projections alongside the canonical first-layer contract, second commit stabilized prompt-scoped routing regressions, third commit added the declared contract test and evidence.",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0203.closure-packet.json"
 }
