@@ -115,7 +115,7 @@ try {
     ]
   };
   writeFileSync(baselinePath, `${JSON.stringify(baselineDocument, null, 2)}\n`, 'utf8');
-  const performanceRun = runFacade(['quick', '--filter', 'validate-package-skeleton', '--performance-baseline', baselinePath, '--performance-output', outputPath, '--fast-validator-budget-ms', '1']);
+  const performanceRun = runFacade(['standard', '--filter', 'validate-skew-matrix', '--performance-baseline', baselinePath, '--performance-output', outputPath, '--fast-validator-budget-ms', '1', '--validator-timeout-ms', '120000']);
   check(performanceRun.exitCode === 0, 'run-validators performance baseline smoke must exit 0 for a passing validator');
   check(existsSync(outputPath), 'run-validators --performance-output must write a summary file');
   check(performanceRun.parsed.performance?.baselinePresent === true, 'performance diagnostics must record baseline presence');

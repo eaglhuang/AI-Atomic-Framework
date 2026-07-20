@@ -16,6 +16,7 @@ import {
   writeFileSync,
   writeJson
 } from './context.ts';
+import { createHumanReviewQueueDocument, createHumanReviewQueueRecord } from '../../packages/plugin-human-review/src/index.ts';
 
 export async function runFullSuite(ctx: ValidateCliContext) {
   ctx.logProgress('full fixture workspace setup');
@@ -49,6 +50,12 @@ async function assertEmergencyAndCacheFixtures(tempRoot: string) {
   const revoke = await runAtm(['emergency', 'revoke', '--cwd', tempRoot, '--lease', leaseId, '--actor', 'captain', '--json'], tempRoot);
   assert(revoke.parsed.evidence?.lease?.status === 'revoked', 'emergency revoke must mark the lease revoked');
 
+  writeJson(path.join(tempRoot, '.atm/history/tasks/TASK-CID-TEST.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-CID-TEST',
+    title: 'Emergency reconcile approval gate fixture',
+    status: 'running'
+  });
   const backendWithoutApproval = await runAtm(['tasks', 'reconcile', '--cwd', tempRoot, '--task', 'TASK-CID-TEST', '--actor', 'validator', '--delivery-commit', 'deadbeef', '--json'], tempRoot);
   assert(backendWithoutApproval.exitCode === 1, 'protected direct tasks reconcile without emergency approval must fail closed');
   assertMessageCode(backendWithoutApproval, 'ATM_EMERGENCY_LANE_APPROVAL_REQUIRED');
@@ -105,12 +112,10 @@ async function assertSpecVerifyReviewFixtures(tempRoot: string, ctx: ValidateCli
   const reviewRepo = path.join(tempRoot, 'review-repo');
   mkdirSync(path.join(reviewRepo, '.atm/history/reports'), { recursive: true });
   const proposal = JSON.parse(readFileSync(path.join(root, 'fixtures/upgrade/proposal-pass.json'), 'utf8'));
-  writeJson(path.join(reviewRepo, '.atm/history/reports/upgrade-proposals.json'), {
-    schemaId: 'atm.humanReviewQueue',
-    specVersion: '0.1.0',
-    generatedAt: '2026-01-01T00:00:00.000Z',
-    entries: [{ proposalId: proposal.proposalId, atomId: proposal.atomId, status: 'pending', proposal }]
-  });
+  writeJson(
+    path.join(reviewRepo, '.atm/history/reports/upgrade-proposals.json'),
+    createHumanReviewQueueDocument([createHumanReviewQueueRecord(proposal)], { generatedAt: '2026-01-01T00:00:00.000Z' })
+  );
   const reviewList = await runAtm(['review', 'list', '--cwd', reviewRepo], reviewRepo);
   assert(reviewList.exitCode === 0, 'review list must exit 0');
   assertReadable(reviewList, 'review');

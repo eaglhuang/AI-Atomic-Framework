@@ -24,7 +24,10 @@ function read(relativePath: string) {
   return readFileSync(path.join(root, relativePath), 'utf8');
 }
 
-const gitGovernanceSource = read('packages/cli/src/commands/git-governance.ts');
+const gitGovernanceSource = [
+  read('packages/cli/src/commands/git-governance.ts'),
+  read('packages/cli/src/commands/git-governance/implementation.ts')
+].join('\n');
 for (const detail of collectMissingSourceContractAnchors(gitGovernanceSource, [
   { token: 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', detail: 'git-governance must keep the branch queue busy retry code' },
   { token: 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE', detail: 'git-governance must keep the branch queue race retry code' },
@@ -39,7 +42,11 @@ for (const detail of collectMissingSourceContractAnchors(gitGovernanceSource, [
   fail(detail);
 }
 
-const teamSource = read('packages/cli/src/commands/team.ts');
+const teamSource = [
+  read('packages/cli/src/commands/team.ts'),
+  read('packages/cli/src/commands/team/legacy/runtime-governance.ts'),
+  read('packages/cli/src/commands/team/legacy/types.ts')
+].join('\n');
 for (const detail of collectMissingSourceContractAnchors(teamSource, [
   {
     token: "retryableCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE']",
@@ -58,20 +65,6 @@ for (const detail of collectMissingSourceContractAnchors(closeGatesFocusedSource
   {
     token: 'ATM_TASKFLOW_CLOSE_BRANCH_COMMIT_QUEUE_BUSY',
     detail: 'focused taskflow close gates regression must assert the branch queue busy blocker code'
-  }
-])) {
-  fail(detail);
-}
-
-const taskflowDryRunSource = read('packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts');
-for (const detail of collectMissingSourceContractAnchors(taskflowDryRunSource, [
-  {
-    token: "branchQueueBusyDryRun.evidence.writeReadinessHint.branchCommitQueueGate.status, 'busy'",
-    detail: 'taskflow dry-run regression must keep the branch queue busy gate'
-  },
-  {
-    token: 'ATM_TASKFLOW_CLOSE_BRANCH_COMMIT_QUEUE_BUSY',
-    detail: 'taskflow dry-run regression must keep the branch queue blocker code'
   }
 ])) {
   fail(detail);

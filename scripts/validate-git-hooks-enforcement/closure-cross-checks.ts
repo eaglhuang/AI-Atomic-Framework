@@ -105,7 +105,8 @@ for (const sameFileTaskId of [sameFileTaskA, sameFileTaskB]) {
 writeFileSync(path.join(closureRepo, 'docs', 'same-file-shared.md'), '# shared fixture\n', 'utf8');
 writeFileSync(path.join(closureRepo, 'docs', 'same-file-a-only.md'), '# a only fixture\n', 'utf8');
 writeFileSync(path.join(closureRepo, 'docs', 'same-file-b-only.md'), '# b only fixture\n', 'utf8');
-assert(parsePayload(runCli(closureRepo, ['tasks', 'claim', '--cwd', closureRepo, '--task', sameFileTaskA, '--actor', 'fixture-agent', '--files', 'docs/same-file-shared.md,docs/same-file-a-only.md', '--json'])).ok === true, 'same-file claim A must report ok=true');
+const sameFileClaimA = parsePayload(runCli(closureRepo, ['tasks', 'claim', '--cwd', closureRepo, '--task', sameFileTaskA, '--actor', 'fixture-agent', '--files', 'docs/same-file-shared.md,docs/same-file-a-only.md', '--json']));
+assert(sameFileClaimA.ok === true, 'same-file claim A must report ok=true');
 const sameFileClaimB = parsePayload(runCli(closureRepo, ['tasks', 'claim', '--cwd', closureRepo, '--task', sameFileTaskB, '--actor', 'fixture-agent', '--files', 'docs/same-file-shared.md,docs/same-file-b-only.md', '--json']));
 assert(sameFileClaimB.ok === true, 'same-file claim B must be claimable in parallel with claim A on the same file');
 
@@ -128,8 +129,15 @@ assert(sameFileAmbiguousHook.status === 1, 'pre-commit hook must reject mixed st
 const sameFileAmbiguousPayload = parsePayload(sameFileAmbiguousHook);
 assert((sameFileAmbiguousPayload.evidence?.sameFileClaimReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS' && entry.file === 'docs/same-file-b-only.md'), 'ambiguous staged ownership must emit ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS');
 runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
+const sameFileClaimLaneByTask = new Map<string, string | null>([
+  [sameFileTaskA, typeof sameFileClaimA.evidence?.claim?.laneSession?.laneSessionId === 'string' ? sameFileClaimA.evidence.claim.laneSession.laneSessionId : null],
+  [sameFileTaskB, typeof sameFileClaimB.evidence?.claim?.laneSession?.laneSessionId === 'string' ? sameFileClaimB.evidence.claim.laneSession.laneSessionId : null]
+]);
 for (const sameFileTaskId of [sameFileTaskA, sameFileTaskB]) {
-  assert(parsePayload(runCli(closureRepo, ['tasks', 'release', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--reason', 'same-file fixture cleanup', '--json'])).ok === true, `${sameFileTaskId} release must report ok=true`);
+  const laneSessionId = sameFileClaimLaneByTask.get(sameFileTaskId);
+  assert(parsePayload(runCli(closureRepo, ['tasks', 'release', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--reason', 'same-file fixture cleanup', '--json'], {
+    env: laneSessionId ? { ATM_LANE_SESSION_ID: laneSessionId } : undefined
+  })).ok === true, `${sameFileTaskId} release must report ok=true`);
 }
 rmSync(path.join(closureRepo, 'docs', 'same-file-shared.md'), { force: true });
 rmSync(path.join(closureRepo, 'docs', 'same-file-a-only.md'), { force: true });

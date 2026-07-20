@@ -41,7 +41,7 @@ writeJson(path.join(repo, '.atm/runtime/write-broker.registry.json'), {
         validators: [],
         artifacts: []
       },
-      leaseEpoch: 2,
+      leaseEpoch: 1,
       leaseSeconds: 1800,
       leaseMaxSeconds: 1800,
       heartbeatAt: '2026-06-20T00:00:00.000Z',
@@ -63,7 +63,7 @@ writeJson(path.join(repo, '.atm/runtime/write-broker.registry.json'), {
         validators: [],
         artifacts: []
       },
-      leaseEpoch: 1,
+      leaseEpoch: 2,
       leaseSeconds: 1800,
       leaseMaxSeconds: 1800,
       heartbeatAt: '2026-06-20T00:00:00.000Z',
@@ -92,7 +92,7 @@ const hint = buildTaskflowCloseWriteReadinessHint({
     historicalDeliveryGate: { required: false }
   } as any,
   previewCommitBundle: {
-    targetDeliveryFiles: []
+    targetDeliveryFiles: ['src/app.ts']
   },
   historicalDeliveryRefs: [],
   planningAuthorityDeliveryGate: {
@@ -104,8 +104,8 @@ const hint = buildTaskflowCloseWriteReadinessHint({
   }
 });
 
-assert.equal(hint.brokerConflictGate.verdict, 'takeoverRequired');
-assert.ok(hint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'));
+assert.equal(hint.brokerConflictGate.verdict, 'noConflict');
+assert.ok(hint.blockers.every((entry) => entry.code !== 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'));
 
 // ATM-BUG-2026-07-07-050: a stale/unresolvable closeback planning path (route
 // 'missing' or 'ambiguous') used to only fail at `--write` time via

@@ -223,7 +223,20 @@ export async function validateAdopterGoverned(tempRoot: string) {
     '--files', 'src/one.ts'
   ]);
   assert(inScope.ok === true, 'adopter in-scope edit must pass after direction lock');
-  await runLock(['release', '--cwd', repo, '--task', 'TASK-ADOPT-0001', '--owner', 'adopter-agent', '--json']);
+  const claimLaneSessionId = (claim.evidence.laneSession as any)?.laneSessionId;
+  const previousLaneSessionId = process.env.ATM_LANE_SESSION_ID;
+  if (typeof claimLaneSessionId === 'string' && claimLaneSessionId.length > 0) {
+    process.env.ATM_LANE_SESSION_ID = claimLaneSessionId;
+  }
+  try {
+    await runTasks(['release', '--cwd', repo, '--task', 'TASK-ADOPT-0001', '--actor', 'adopter-agent', '--reason', 'validator fixture re-claim regression', '--json']);
+  } finally {
+    if (previousLaneSessionId === undefined) {
+      delete process.env.ATM_LANE_SESSION_ID;
+    } else {
+      process.env.ATM_LANE_SESSION_ID = previousLaneSessionId;
+    }
+  }
   const reclaimed = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
   assert(reclaimed.ok === true, 'next --claim must re-claim a previously released governance lock');
   const reclaimedLocks = readActiveTaskDirectionLocks(repo);
