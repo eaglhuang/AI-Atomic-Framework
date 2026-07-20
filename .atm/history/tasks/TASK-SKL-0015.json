@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-SKL-0015",
   "title": "Entry skill governance-flow backwrite",
-  "status": "running",
+  "status": "done",
   "milestone": "P1",
   "dependencies": [
     "TASK-SKL-0005",
@@ -149,8 +149,8 @@
     }
   },
   "importedAt": "2026-07-20T22:32:00.711Z",
-  "lastTransitionId": "2026-07-20T22-37-26-087Z-scope-amendment-dd09e31672a2",
-  "lastTransitionAt": "2026-07-20T22:37:26.087Z",
+  "lastTransitionId": "2026-07-20T22-43-00-345Z-close-0c959b18465f",
+  "lastTransitionAt": "2026-07-20T22:43:00.345Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-07-20T22:32:09.561Z",
@@ -159,7 +159,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-d9b45beaff51",
     "claimedAt": "2026-07-20T22:32:32.545Z",
-    "heartbeatAt": "2026-07-20T22:32:32.545Z",
+    "heartbeatAt": "2026-07-20T22:43:00.343Z",
     "ttlSeconds": 1800,
     "files": [
       ".agents/skills/atm-dispatch/**",
@@ -205,14 +205,14 @@
       "templates/skills/atm-next.skill.md",
       "tests/cli/integration-skill-template-sync.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720223232-codex-gpt-5.4-mini-7d9c087498",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720223232-codex-gpt-5.4-mini-7d9c087498\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T22:32:32.545Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -295,5 +295,9 @@
     },
     "createdAt": "2026-07-20T22:32:36.202Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T22:43:00.343Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260720223232-codex-gpt-5.4-mini-TASK-SKL-0015-e580c1bf77",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0015.closure-packet.json"
 }

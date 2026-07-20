@@ -1,0 +1,281 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0015",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8105c3d786723493a450d0c37a780346622579d4",
+  "governedTreeSha": "fcdad6958183e023d4685e30a9ec506e5e500b3e",
+  "targetCommitDelta": {
+    "currentCommitSha": "8105c3d786723493a450d0c37a780346622579d4",
+    "parentCommitShas": [
+      "8105c3d786723493a450d0c37a780346622579d4"
+    ],
+    "governedTreeSha": "fcdad6958183e023d4685e30a9ec506e5e500b3e",
+    "changedFiles": [
+      ".agents/skills/atm-governance-router/SKILL.md",
+      ".agents/skills/atm-next/SKILL.md",
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      ".atm/history/tasks/ATM-GOV-0196.json",
+      ".atm/integrations/antigravity.manifest.json",
+      ".atm/integrations/claude-code.manifest.json",
+      ".atm/integrations/codex.manifest.json",
+      ".atm/integrations/copilot.manifest.json",
+      ".atm/integrations/cursor.manifest.json",
+      ".atm/integrations/gemini.manifest.json",
+      ".claude/skills/atm-governance-router/SKILL.md",
+      ".claude/skills/atm-next/SKILL.md",
+      ".cursor/rules/skills/atm-governance-router/SKILL.md",
+      ".cursor/rules/skills/atm-next/SKILL.md",
+      ".gemini/commands/atm-governance-router.toml",
+      ".gemini/commands/atm-next.toml",
+      ".github/instructions/atm-governance-router.instructions.md",
+      ".github/instructions/atm-next.instructions.md",
+      ".github/prompts/atm-dispatch.prompt.md",
+      ".github/prompts/atm-evidence.prompt.md",
+      ".github/prompts/atm-handoff.prompt.md",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "integrations/codex-skills/atm-next/SKILL.md",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/integrations/codex-skills/atm-governance-router/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-next/SKILL.md",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+      "release/atm-root-drop/templates/skills/atm-evidence.skill.md",
+      "release/atm-root-drop/templates/skills/atm-handoff.skill.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-handoff.skill.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run validate:skill-templates",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a82411efdc469a3dcc28ea711678579c7fcd669d1ca33c18f2a17f940b0280eb",
+      "stderrSha256": "sha256:60c1e26da5d2868b76e1f103451549d40376f3a1654334f37c39523865b2936a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify antigravity --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f7fc68184851653866671d96d3dfd94a8827c976cc42faee733768a7a004a63c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify claude-code --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:85c0df3d9e25b5eb05b6cd66a4bc77162befb46580b7dde8156b23382dc0e654",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify codex --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:22ccb5a467506282afba05d0aacc69dab215889e21247e3d2af8a7db4a32dc6f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify copilot --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1a414c791f968145e834b5e3e924ec6b7ead2466ad9bb26519200df51151fb73",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify cursor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:283c8a0526563c7ea33b4e2512f46b60edde9001f2de35703abfda588bcc9b54",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify gemini --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da067ee3352077c4e305c0755ffd65204771e61ec6f1db084963daa509383486",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f320d2d889fd75b1d015db4be8cf4fe67a94047bc51204d17df677b691dad22c",
+      "stderrSha256": "sha256:b61f450706ae453d410955feae8cf0c6e22a7b22835772ffa2ae23cd4bb32bcf",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node atm.mjs integration verify antigravity --json",
+    "node atm.mjs integration verify claude-code --json",
+    "node atm.mjs integration verify codex --json",
+    "node atm.mjs integration verify copilot --json",
+    "node atm.mjs integration verify cursor --json",
+    "node atm.mjs integration verify gemini --json",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:skill-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T22:43:00.338Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/**",
+      ".agents/skills/atm-evidence/**",
+      ".agents/skills/atm-governance-router/**",
+      ".agents/skills/atm-handoff/**",
+      ".agents/skills/atm-next/**",
+      ".agents/skills/atm-next/SKILL.md",
+      ".atm/history/evidence/TASK-SKL-0015.*",
+      ".atm/history/task-events/TASK-SKL-0015/**",
+      ".atm/history/tasks/TASK-SKL-0015.json",
+      ".claude/skills/atm-dispatch/**",
+      ".claude/skills/atm-evidence/**",
+      ".claude/skills/atm-governance-router/**",
+      ".claude/skills/atm-handoff/**",
+      ".claude/skills/atm-next/**",
+      ".cursor/rules/skills/atm-dispatch/**",
+      ".cursor/rules/skills/atm-evidence/**",
+      ".cursor/rules/skills/atm-governance-router/**",
+      ".cursor/rules/skills/atm-handoff/**",
+      ".cursor/rules/skills/atm-next/**",
+      ".gemini/commands/atm-dispatch.toml",
+      ".gemini/commands/atm-evidence.toml",
+      ".gemini/commands/atm-governance-router.toml",
+      ".gemini/commands/atm-handoff.toml",
+      ".gemini/commands/atm-next.toml",
+      ".github/instructions/atm-dispatch.instructions.md",
+      ".github/instructions/atm-evidence.instructions.md",
+      ".github/instructions/atm-governance-router.instructions.md",
+      ".github/instructions/atm-handoff.instructions.md",
+      ".github/instructions/atm-next.instructions.md",
+      "GEMINI.md",
+      "integrations/codex-skills/atm-dispatch/**",
+      "integrations/codex-skills/atm-evidence/**",
+      "integrations/codex-skills/atm-governance-router/**",
+      "integrations/codex-skills/atm-handoff/**",
+      "integrations/codex-skills/atm-next/**",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-handoff.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "tests/cli/integration-skill-template-sync.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "integrations/codex-skills/atm-dispatch/**",
+      "integrations/codex-skills/atm-evidence/**",
+      "integrations/codex-skills/atm-governance-router/**",
+      "integrations/codex-skills/atm-handoff/**",
+      "integrations/codex-skills/atm-next/**",
+      "scripts/validate-skill-templates.ts",
+      "tests/cli/integration-skill-template-sync.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0015.json",
+  "closedAt": "2026-07-20T22:43:00.339Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720223232-codex-gpt-5.4-mini-TASK-SKL-0015-e580c1bf77",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "8105c3d786723493a450d0c37a780346622579d4",
+    "taskMatchedFiles": [
+      ".agents/skills/atm-governance-router/SKILL.md",
+      ".agents/skills/atm-next/SKILL.md",
+      ".claude/skills/atm-governance-router/SKILL.md",
+      ".claude/skills/atm-next/SKILL.md",
+      ".cursor/rules/skills/atm-governance-router/SKILL.md",
+      ".cursor/rules/skills/atm-next/SKILL.md",
+      ".gemini/commands/atm-governance-router.toml",
+      ".gemini/commands/atm-next.toml",
+      ".github/instructions/atm-governance-router.instructions.md",
+      ".github/instructions/atm-next.instructions.md",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "integrations/codex-skills/atm-next/SKILL.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-handoff.skill.md"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0015.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0015/2026-07-20T22-32-00-802Z-import-4b3faa802abe.json",
+      ".atm/history/task-events/TASK-SKL-0015/2026-07-20T22-32-09-561Z-reserve-6857173564bf.json",
+      ".atm/history/task-events/TASK-SKL-0015/2026-07-20T22-32-09-564Z-promote-0575768158d5.json",
+      ".atm/history/task-events/TASK-SKL-0015/2026-07-20T22-32-36-186Z-claim-b56a3cea8882.json",
+      ".atm/history/task-events/TASK-SKL-0015/2026-07-20T22-37-26-087Z-scope-amendment-dd09e31672a2.json",
+      ".atm/history/tasks/TASK-SKL-0015.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
