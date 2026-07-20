@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0196",
+  "actorId": "codex-captain",
+  "stewardWorkId": "runner-sync-216fd2a4",
+  "sealedSourceSha": "f0625e71379741f7d27e64c85aa62784837e7c5a",
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:b8852a3226130a7646d0265e948d6c94b3fe659afe4b827baa9344eb4e1e994a",
+  "buildDecision": "cacheHitSkip",
+  "decisionReason": "build input tree hash matches release manifests",
+  "incrementalPlan": null,
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-07-20T04-24-39-962Z-runner-sync.jsonl",
+  "tsBuildCache": null,
+  "phaseTimingsMs": {
+    "inputHashCalculation": 56,
+    "skipDecision": 59,
+    "worktreeSetup": 0,
+    "typescriptBuild": 0,
+    "rootDropReleaseAssembly": 0,
+    "onefileReleaseAssembly": 0,
+    "artifactSync": 7,
+    "cleanup": 0,
+    "totalElapsed": 335
+  },
+  "treatmentTelemetry": {
+    "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
+    "executionMode": "cache-hit-skip",
+    "commandExecuted": false,
+    "outputObserved": true,
+    "receiptValidity": "valid",
+    "buildDecision": "cacheHitSkip",
+    "phaseTimingsMs": {
+      "inputHashCalculation": 56,
+      "skipDecision": 59,
+      "worktreeSetup": 0,
+      "typescriptBuild": 0,
+      "rootDropReleaseAssembly": 0,
+      "onefileReleaseAssembly": 0,
+      "artifactSync": 7,
+      "cleanup": 0,
+      "totalElapsed": 335
+    },
+    "rawTelemetryPolicy": "gitignored-runtime-only",
+    "tsBuildCacheDigest": null
+  },
+  "publishedAt": "2026-07-20T04:24:39.963Z"
+}

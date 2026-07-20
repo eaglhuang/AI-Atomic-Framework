@@ -1,6 +1,9 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
+import type { TelemetryCorrelationFields, TelemetryTimingFields } from './observation.ts';
+export type { TelemetryCorrelationFields, TelemetryObservationBase, TelemetryTimingFields } from './observation.ts';
+export { normalizeTelemetryDurationMs } from './observation.ts';
 
 export const gateTelemetrySpecVersion = 'atm.gateTelemetry.v1';
 export const gateTelemetryRuntimeRelativePath = path.join('.atm', 'runtime', 'telemetry');
@@ -79,11 +82,10 @@ export interface GateTelemetryTaskSummary {
   readonly configDigest: string;
 }
 
-export interface GateTelemetryEvent {
+export interface GateTelemetryEvent extends Required<Pick<TelemetryTimingFields, 'observedAt' | 'durationMs'>>, Required<Pick<TelemetryCorrelationFields, 'actorId' | 'runId' | 'correlationId'>> {
   readonly specVersion: typeof gateTelemetrySpecVersion;
   readonly eventId: string;
   readonly sequence: number;
-  readonly observedAt: string;
   readonly gate: string;
   readonly checkId: string;
   readonly checkVersion: string;
@@ -91,10 +93,6 @@ export interface GateTelemetryEvent {
   readonly eligible: boolean;
   readonly result: GateTelemetryResult;
   readonly reasonClass: string;
-  readonly durationMs: number;
-  readonly actorId: string;
-  readonly runId: string;
-  readonly correlationId: string;
   readonly laneSessionId?: string | null;
   readonly taskId?: string | null;
   readonly batchId?: string | null;

@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T03-30-30-805Z-repair-claim-9b6d88a04ab8",
+  "taskId": "ATM-GOV-0196",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "planned",
+  "toStatus": "planned",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0196.json",
+  "taskSha256": "sha256:3045979ca2d293e60814c7f77de82398913b18815f13e8d1dd085e064a52e189",
+  "createdAt": "2026-07-20T03:30:30.805Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0196 --actor codex-captain --write --reason \"Repair orphaned active session after protected ledger restore; unblock governed plan v2 batch recovery\" --json"
+}
