@@ -1,0 +1,200 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0211",
+  "title": "Compose first broker ticket state machine and fair scheduling",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0206",
+    "ATM-GOV-0207",
+    "ATM-GOV-0209",
+    "ATM-GOV-0210"
+  ],
+  "acceptance": [
+    "所有 shared-write gates 回 execute/queue/batch ticket；compose 只作 batch strategy，queue/adjudication 狀態不新增 ErrorCode。",
+    "release 後下一 ticket 自動 rearbitrate/wakeup，沒有人工 CLI retry。",
+    "100+ captains fixture 無 starvation、duplicate wakeup、thundering herd 或 lost ticket。",
+    "每張eligible ticket都在sealed policy bound內進入executing/released，或帶合法cancelled/reconcile/terminal reason；fixture逐ticket驗證arrival、bypass、wait、seed與observation horizon，不以有限run中「沒看到餓死」代替bound。",
+    "R1 hard reject、R2 code-only gate、R3 related-task batching、R4 docs exclusion 均有 E2E。",
+    "0206 live activation 由本卡 feature gate 控制；本卡前只能 shadow。",
+    "focused scheduler tests、brokered-write、typecheck 與 validate:cli 全數通過。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/ticket-state.ts",
+    "packages/core/src/broker/ticket-policy.ts",
+    "packages/core/src/broker/decision.ts",
+    "packages/core/src/broker/shared-surface-queue.ts",
+    "packages/cli/src/commands/broker/shared-surface.ts",
+    "packages/cli/src/commands/broker/registry-actions.ts",
+    "schemas/governance/broker-ticket.schema.json",
+    "schemas/governance/broker-decision.schema.json",
+    "tests/cli/compose-first-ticket-state-machine.test.ts",
+    "tests/cli/broker-ticket-fairness-scale.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/decision.ts",
+    "packages/core/src/broker/decision/**",
+    "packages/core/src/broker/shared-surface-queue.ts",
+    "packages/core/src/broker/related-task-batching.ts",
+    "packages/core/src/broker/wave-broker-scheduler.ts",
+    "packages/core/src/broker/ticket-state.ts",
+    "packages/core/src/broker/ticket-policy.ts",
+    "packages/cli/src/commands/broker/shared-surface.ts",
+    "packages/cli/src/commands/broker/registry-actions.ts",
+    "packages/cli/src/commands/broker/persistence.ts",
+    "schemas/governance/broker-ticket.schema.json",
+    "schemas/governance/broker-decision.schema.json",
+    "tests/cli/compose-first-ticket-state-machine.test.ts",
+    "tests/cli/broker-ticket-fairness-scale.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/compose-first-ticket-state-machine.test.ts",
+    "node --strip-types tests/cli/broker-ticket-fairness-scale.test.ts",
+    "node --strip-types tests/cli/durable-broker-scheduler.test.ts",
+    "npm run validate:schemas",
+    "npm run validate:brokered-write",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No patch composition algorithm, semantic correctness decision, commit, build, projection, checkpoint, closeback, or push."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "circuit-breaker-and-serial-drain",
+  "rollbackNotes": "Disable compose batch eligibility, preserve all durable tickets and ordering evidence, drain existing tickets through queue mode without deleting or reordering entries, and keep 0206 matcher in shadow.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-broker",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker-ticket-state",
+        "pattern": "Result Contract Object",
+        "source": "packages/core/src/broker/ticket-state.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.compose-first-admission-policy",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/ticket-policy.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0211-compose-first-broker-ticket-state-machine-and-fair-scheduling.task.md",
+    "sectionTitle": "ATM-GOV-0211",
+    "headingLine": 97,
+    "hash": "edd9e73d5cdcc287",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0211-compose-first-broker-ticket-state-machine-and-fair-scheduling.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:edd9e73d5cdcc287a3a27e7fc5e151b80f7a8cc387aa9ba0612113b1f421a5a7",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T08:49:51.069Z"
+    }
+  },
+  "importedAt": "2026-07-20T08:49:51.069Z",
+  "lastTransitionId": "2026-07-20T08-50-05-325Z-claim-843dae044ab2",
+  "lastTransitionAt": "2026-07-20T08:50:05.325Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0211",
+  "reservedAt": "2026-07-20T08:50:00.420Z",
+  "promotedAt": "2026-07-20T08:50:00.424Z",
+  "claim": {
+    "actorId": "codex-captain-0211",
+    "leaseId": "lease-c82651f1d8f0",
+    "claimedAt": "2026-07-20T08:50:00.430Z",
+    "heartbeatAt": "2026-07-20T08:50:00.430Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0211.json",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/cli/src/commands/broker/shared-surface.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/decision/**",
+      "packages/core/src/broker/related-task-batching.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "packages/core/src/broker/ticket-policy.ts",
+      "packages/core/src/broker/ticket-state.ts",
+      "packages/core/src/broker/wave-broker-scheduler.ts",
+      "schemas/governance/broker-decision.schema.json",
+      "schemas/governance/broker-ticket.schema.json",
+      "tests/cli/broker-ticket-fairness-scale.test.ts",
+      "tests/cli/compose-first-ticket-state-machine.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720085000-codex-captain-0211-f20ec5adb5",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720085000-codex-captain-0211-f20ec5adb5\""
+    }
+  },
+  "startedAt": "2026-07-20T08:50:00.430Z",
+  "startedByActor": "codex-captain-0211",
+  "startedBySessionId": "session-20260720085000-codex-captain-0211-ATM-GOV-0211-ffff511f0b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0211",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0211.*",
+      ".atm/history/task-events/ATM-GOV-0211/**",
+      ".atm/history/tasks/ATM-GOV-0211.json",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/cli/src/commands/broker/shared-surface.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/decision/**",
+      "packages/core/src/broker/related-task-batching.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "packages/core/src/broker/ticket-policy.ts",
+      "packages/core/src/broker/ticket-state.ts",
+      "packages/core/src/broker/wave-broker-scheduler.ts",
+      "schemas/governance/broker-decision.schema.json",
+      "schemas/governance/broker-ticket.schema.json",
+      "tests/cli/broker-ticket-fairness-scale.test.ts",
+      "tests/cli/compose-first-ticket-state-machine.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1b5d71412211351c8b5fb60acf07b5b07b44a4be6c7ca2898d6ac67cc8890196",
+    "actorId": "codex-captain-0211",
+    "sessionId": "session-20260720085000-codex-captain-0211-ATM-GOV-0211-ffff511f0b",
+    "laneSession": {
+      "laneSessionId": "lane-20260720085000-codex-captain-0211-f20ec5adb5",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720085000-codex-captain-0211-f20ec5adb5\""
+    },
+    "createdAt": "2026-07-20T08:50:05.323Z",
+    "status": "active"
+  }
+}
