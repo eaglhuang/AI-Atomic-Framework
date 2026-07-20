@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0002",
   "title": "Error and recovery contract",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [],
   "acceptance": [
@@ -91,8 +91,8 @@
     }
   },
   "importedAt": "2026-07-20T15:15:08.986Z",
-  "lastTransitionId": "2026-07-20T15-15-25-795Z-claim-e9d8586d9d2f",
-  "lastTransitionAt": "2026-07-20T15:15:25.795Z",
+  "lastTransitionId": "2026-07-20T15-29-42-443Z-close-fec9ef36fda6",
+  "lastTransitionAt": "2026-07-20T15:29:42.443Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-07-20T15:15:18.943Z",
@@ -101,7 +101,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-1656d191c89c",
     "claimedAt": "2026-07-20T15:15:18.955Z",
-    "heartbeatAt": "2026-07-20T15:15:18.955Z",
+    "heartbeatAt": "2026-07-20T15:29:42.440Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-ERR-0002.json",
@@ -114,14 +114,14 @@
       "tests/cli/error-recovery-contract.test.ts",
       "tests/cli/task-import-diagnostic-contract.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720151519-codex-gpt-5.4-mini-bc091ebe7b",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720151519-codex-gpt-5.4-mini-bc091ebe7b\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T15:15:18.955Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -161,5 +161,9 @@
     },
     "createdAt": "2026-07-20T15:15:25.794Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T15:29:42.440Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260720151518-codex-gpt-5.4-mini-TASK-ERR-0002-5d0c62dd97",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0002.closure-packet.json"
 }
