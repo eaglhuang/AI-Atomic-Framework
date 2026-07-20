@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T16-10-22-106Z-close-82b3b502d08e",
+  "taskId": "ATM-GOV-0217",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720155444-codex-gpt-5.4-mini-ATM-GOV-0217-28b730cc55",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0217.json",
+  "taskSha256": "sha256:987ddf88934ead4dc73fbff6d31b5ec51edf380d5953b797230ec180fac12ac2",
+  "createdAt": "2026-07-20T16:10:22.106Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0217 --actor codex-gpt-5.4-mini --status done --historical-delivery 6ca2c01230eea7e679ec9f19adadd4d051f57fe6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720155444-codex-gpt-5.4-mini-ATM-GOV-0217-28b730cc55",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0217.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/broker-ticket-cas-consistency.test.ts",
+      "node --strip-types tests/cli/broker-ticket-crash-recovery.test.ts",
+      "node --strip-types tests/cli/broker-ticket-fairness.test.ts",
+      "typecheck",
+      "validate:broker-registry",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:physical-line-budget",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T16:10:22.095Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0217.*",
+        ".atm/history/task-events/ATM-GOV-0217/**",
+        ".atm/history/tasks/ATM-GOV-0217.json",
+        "packages/core/src/broker/lifecycle.ts",
+        "packages/core/src/broker/registry.ts",
+        "packages/core/src/broker/ticket-store.ts",
+        "packages/core/src/broker/wave-broker-scheduler.ts",
+        "schemas/governance/broker-ticket.schema.json",
+        "tests/cli/broker-ticket-cas-consistency.test.ts",
+        "tests/cli/broker-ticket-crash-recovery.test.ts",
+        "tests/cli/broker-ticket-fairness.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/lifecycle.ts",
+        "packages/core/src/broker/registry.ts",
+        "packages/core/src/broker/ticket-store.ts",
+        "packages/core/src/broker/wave-broker-scheduler.ts",
+        "schemas/governance/broker-ticket.schema.json",
+        "tests/cli/broker-ticket-cas-consistency.test.ts",
+        "tests/cli/broker-ticket-crash-recovery.test.ts",
+        "tests/cli/broker-ticket-fairness.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
