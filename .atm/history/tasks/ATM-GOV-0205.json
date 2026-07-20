@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0205",
+  "title": "Canonical telemetry observation interface migration",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0196"
+  ],
+  "acceptance": [
+    "A repository-wide inventory lists every ATM timing/correlation producer and classifies it as `canonical`, `adapter-backed`, `legacy-readable`, or `not-yet-migrated`.",
+    "`packages/core/src/telemetry/**` exports the canonical observation contract and normalizers used by migrated producers.",
+    "Evidence command runs prove one canary producer through the canonical contract; validator, runner, broker, test-runner, and executor producers have versioned adapter ports plus explicit owning-card migration status.",
+    "Readers remain backward-compatible with historical records that lack timing fields; compatibility is explicit and test-covered.",
+    "Raw logs/traces remain gitignored runtime data; tracked evidence stores only compact timing/correlation/digest summaries.",
+    "A focused validator proves no migrated producer defines private duration/correlation parsing when the shared normalizer should be used.",
+    "A dogfood evidence command-run canary round-trips through the canonical interface; validator/runner/broker/executor adapter-port schema fixtures prove future producers can migrate without importing their behavior into this foundation card. Live runner/build samples belong to ATM-GOV-0201."
+  ],
+  "deliverables": [
+    "packages/core/src/telemetry/**",
+    "packages/cli/src/commands/evidence/**",
+    "packages/cli/src/commands/telemetry.ts",
+    "scripts/validate-telemetry-observation-interface.ts",
+    "tests/cli/telemetry-observation-interface-migration.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/telemetry/**",
+    "packages/cli/src/commands/evidence/**",
+    "packages/cli/src/commands/telemetry.ts",
+    "scripts/validate-telemetry-observation-interface.ts",
+    "tests/cli/telemetry-observation-interface-migration.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/telemetry-observation-interface-migration.test.ts",
+    "node --strip-types scripts/validate-telemetry-observation-interface.ts --mode validate",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No broker ticket, compose, queue, validator-tiering, runner optimization, or plan-executor policy implementation.",
+    "No migration of all producers in this foundation card; each owning consumer card performs its adapter migration."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the migration commit and keep the pre-migration observation inventory as evidence; do not delete raw runtime telemetry, and do not rewrite historical evidence bundles by hand.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.telemetry-observation-interface-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.telemetry-observation-contract",
+        "pattern": "Shared Interface Contract",
+        "source": "packages/core/src/telemetry/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.command-run-observation-normalizer",
+        "pattern": "Normalizer Adapter",
+        "source": "packages/cli/src/commands/evidence/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0205-canonical-telemetry-observation-interface-migration.task.md",
+    "sectionTitle": "ATM-GOV-0205",
+    "headingLine": 70,
+    "hash": "6cf11840ebc5d77c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0205-canonical-telemetry-observation-interface-migration.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:6cf11840ebc5d77c32af98c60e68e4fcbb251f8de870e369b30a974f74f8b2ef",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T07:24:53.118Z"
+    }
+  },
+  "importedAt": "2026-07-20T07:24:53.118Z",
+  "lastTransitionId": "2026-07-20T07-25-10-240Z-claim-0f99c21d12e4",
+  "lastTransitionAt": "2026-07-20T07:25:10.240Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0205",
+  "reservedAt": "2026-07-20T07:25:09.447Z",
+  "promotedAt": "2026-07-20T07:25:09.449Z",
+  "claim": {
+    "actorId": "codex-captain-0205",
+    "leaseId": "lease-e698cc339ee8",
+    "claimedAt": "2026-07-20T07:25:09.452Z",
+    "heartbeatAt": "2026-07-20T07:25:09.452Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0205.json",
+      "packages/cli/src/commands/evidence/**",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/**",
+      "scripts/validate-telemetry-observation-interface.ts",
+      "tests/cli/telemetry-observation-interface-migration.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720072509-codex-captain-0205-26c4128c92",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720072509-codex-captain-0205-26c4128c92\""
+    }
+  },
+  "startedAt": "2026-07-20T07:25:09.452Z",
+  "startedByActor": "codex-captain-0205",
+  "startedBySessionId": "session-20260720072509-codex-captain-0205-ATM-GOV-0205-606e99e9e8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0205",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0205.*",
+      ".atm/history/task-events/ATM-GOV-0205/**",
+      ".atm/history/tasks/ATM-GOV-0205.json",
+      "packages/cli/src/commands/evidence/**",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/**",
+      "scripts/validate-telemetry-observation-interface.ts",
+      "tests/cli/telemetry-observation-interface-migration.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b36a8e20f0dd336195d4576ddf9962085c0b5400ddfacc910274e00b3129160a",
+    "actorId": "codex-captain-0205",
+    "sessionId": "session-20260720072509-codex-captain-0205-ATM-GOV-0205-606e99e9e8",
+    "laneSession": {
+      "laneSessionId": "lane-20260720072509-codex-captain-0205-26c4128c92",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720072509-codex-captain-0205-26c4128c92\""
+    },
+    "createdAt": "2026-07-20T07:25:10.239Z",
+    "status": "active"
+  }
+}

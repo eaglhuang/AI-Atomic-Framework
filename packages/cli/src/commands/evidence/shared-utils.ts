@@ -1,4 +1,4 @@
-import type { TelemetryTimingFields } from '../../../../core/src/telemetry/observation.ts';
+import type { TelemetryObservationBase, TelemetryTimingFields } from '../../../../core/src/telemetry/observation.ts';
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -33,4 +33,5 @@ export interface CommandRunEvidenceInput extends TelemetryTimingFields {
   readonly runnerVersion?: string;
   readonly stdoutPreview?: string;
   readonly stderrPreview?: string;
+  readonly canonicalObservation?: TelemetryObservationBase;
 }

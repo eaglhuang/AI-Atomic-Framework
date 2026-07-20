@@ -2,8 +2,20 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync,
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import type { TelemetryCorrelationFields, TelemetryTimingFields } from './observation.ts';
-export type { TelemetryCorrelationFields, TelemetryObservationBase, TelemetryTimingFields } from './observation.ts';
-export { normalizeTelemetryDurationMs } from './observation.ts';
+export type {
+  TelemetryCorrelationFields,
+  TelemetryObservationBase,
+  TelemetryObservationStatus,
+  TelemetrySourceAvailability,
+  TelemetryStoragePolicy,
+  TelemetryTimingFields
+} from './observation.ts';
+export {
+  buildTelemetryObservation,
+  normalizeTelemetryDurationMs,
+  normalizeTelemetryTimestamp,
+  telemetryObservationProducerInventory
+} from './observation.ts';
 
 export const gateTelemetrySpecVersion = 'atm.gateTelemetry.v1';
 export const gateTelemetryRuntimeRelativePath = path.join('.atm', 'runtime', 'telemetry');
