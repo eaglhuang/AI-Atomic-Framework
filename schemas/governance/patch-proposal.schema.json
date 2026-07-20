@@ -154,8 +154,51 @@
           "minLength": 1
         },
         "contentAnchor": {
-          "$ref": "https://schemas.ai-atomic-framework.dev/governance/content-anchor.schema.json"
+          "$ref": "#/$defs/contentAnchor"
         }
+      }
+    },
+    "contentAnchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaId", "specVersion", "migration", "anchorId", "baseDigest", "filePath", "fileDigest", "kind", "preimageDigest", "provenance", "confidence"],
+      "properties": {
+        "schemaId": { "const": "atm.contentAnchor.v1" },
+        "specVersion": { "const": "0.1.0" },
+        "migration": { "$ref": "#/$defs/migration" },
+        "anchorId": { "type": "string", "minLength": 1 },
+        "baseDigest": { "type": "string", "minLength": 1 },
+        "filePath": { "type": "string", "minLength": 1 },
+        "fileDigest": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["symbol", "ast-node", "text-context", "file"] },
+        "symbolName": { "type": "string", "minLength": 1 },
+        "astPath": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "contextBefore": { "type": "array", "items": { "type": "string" } },
+        "contextAfter": { "type": "array", "items": { "type": "string" } },
+        "preimageDigest": { "type": "string", "minLength": 1 },
+        "location": { "$ref": "#/$defs/contentAnchorLocation" },
+        "provenance": { "$ref": "#/$defs/contentAnchorProvenance" },
+        "confidence": { "enum": ["high", "medium", "low"] }
+      }
+    },
+    "contentAnchorLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filePath", "lineStart", "lineEnd"],
+      "properties": {
+        "filePath": { "type": "string", "minLength": 1 },
+        "lineStart": { "type": "integer", "minimum": 1 },
+        "lineEnd": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "contentAnchorProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapterId", "adapterVersion", "createdAt"],
+      "properties": {
+        "adapterId": { "type": "string", "minLength": 1 },
+        "adapterVersion": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string" }
       }
     }
   }

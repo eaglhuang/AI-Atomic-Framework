@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0206",
+  "title": "Broker resource overlap matcher repair (pattern-aware conflict detection)",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [],
+  "acceptance": [
+    "The probe A matcher returns a structured `file-range` overlap with matched resource keys, normalization, provenance, and input digest; shadow mode records the legacy `parallel-safe` discrepancy without live terminal block.",
+    "The probe B literal case is unchanged.",
+    "Both directions (active pattern / new literal, and the reverse) are detected.",
+    "Pattern-vs-pattern intersection is detected (`commands/**` vs `commands/taskflow/**`).",
+    "Genuinely disjoint patterns return a structured matcher-clear result; only after ATM-GOV-0211 activates the ticket state machine may that result become an `execute` ticket rather than a legacy `parallel-safe` terminal verdict. (`templates/skills/**` vs `packages/core/**`) — the fix must not collapse into serializing everything.",
+    "Every resource axis is covered by the shared matcher, proven by a test per axis, not only `files`.",
+    "Ambiguous/unsupported key syntax returns a structured `unknown/possible-overlap` fact and shadow discrepancy, with a test. It may map to compose/queue only after ATM-GOV-0211 is sealed and must never become a direct terminal overlap block.",
+    "The `gateResults`-vs-`conflicts` inconsistency noted in the evidence document is diagnosed. If it shares this root cause, fix it here; if not, record a structured follow-up rather than silently leaving a decision that reports `clear` while carrying a conflict."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/conflict-matrix.ts",
+    "tests/core/broker-resource-overlap.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/core/src/broker/types.ts",
+    "tests/core/broker-resource-overlap.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:broker-proposal",
+    "npm run validate:brokered-write",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Do not add a compose/parallel-admission verdict; this card only makes existing detection correct.",
+    "Do not change broker telemetry or seal behaviour; that is ATM-GOV-0199.",
+    "Do not widen or narrow any task card's declared scopePaths as a workaround."
+  ],
+  "nonGoals": [
+    "No change to lease, admission trigger, or lane routing policy.",
+    "No rewrite of the broker registry storage format."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the matcher change. Pre-fix behaviour is exact-match, which is less safe but well understood; a partial or ambiguous matcher is worse than either, so revert rather than patch forward under time pressure.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-conflict-matrix",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker-resource-overlap-matcher",
+        "pattern": "Shared pattern-aware resource key matcher",
+        "source": "packages/core/src/broker/conflict-matrix.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/types.ts",
+        "tests/core/broker-resource-overlap.test.ts",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "This card makes existing detection **correct**. It does not make overlapping\ntasks runnable in parallel — that is a capability change to the verdict model\nand belongs to its own card. Fixing this one first is what makes that later work\nsafe to attempt, because you cannot compose conflicts you cannot see.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0206-broker-resource-overlap-matcher-repair.task.md",
+    "sectionTitle": "ATM-GOV-0206",
+    "headingLine": 67,
+    "hash": "1c61dffa522d68ef",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0206-broker-resource-overlap-matcher-repair.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:1c61dffa522d68efb5f61283ca6e59889a4692faf629ecd6d2735056d647aeaf",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T08:06:22.299Z"
+    }
+  },
+  "importedAt": "2026-07-20T08:06:22.299Z",
+  "lastTransitionId": "2026-07-20T08-09-24-817Z-scope-amendment-952f9c43f59d",
+  "lastTransitionAt": "2026-07-20T08:09:24.817Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0206",
+  "reservedAt": "2026-07-20T08:06:24.908Z",
+  "promotedAt": "2026-07-20T08:06:24.911Z",
+  "claim": {
+    "actorId": "codex-captain-0206",
+    "leaseId": "lease-66aa477c87d1",
+    "claimedAt": "2026-07-20T08:06:24.916Z",
+    "heartbeatAt": "2026-07-20T08:06:24.916Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0206.*",
+      ".atm/history/task-events/ATM-GOV-0206/**",
+      ".atm/history/tasks/ATM-GOV-0206.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "tests/core/broker-resource-overlap.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720080625-codex-captain-0206-3c7f6cc9da",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720080625-codex-captain-0206-3c7f6cc9da\""
+    }
+  },
+  "startedAt": "2026-07-20T08:06:24.916Z",
+  "startedByActor": "codex-captain-0206",
+  "startedBySessionId": "session-20260720080624-codex-captain-0206-ATM-GOV-0206-ae3a887b13",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0206",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0206.*",
+      ".atm/history/task-events/ATM-GOV-0206/**",
+      ".atm/history/tasks/ATM-GOV-0206.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "tests/core/broker-resource-overlap.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0206-broker-resource-overlap-matcher-repair.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0206-broker-resource-overlap-matcher-repair.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "e005be9e403ca32062ed2e77e791fa344d567742054b89050cb1e503f0ef10d0",
+    "actorId": "codex-captain-0206",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260720080625-codex-captain-0206-3c7f6cc9da",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720080625-codex-captain-0206-3c7f6cc9da\""
+    },
+    "createdAt": "2026-07-20T08:06:28.923Z",
+    "status": "active"
+  }
+}
