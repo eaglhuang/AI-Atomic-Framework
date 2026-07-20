@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T17-29-03-102Z-close-0752d7ff9b90",
+  "taskId": "ATM-GOV-0220",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720171208-codex-gpt-5.4-mini-ATM-GOV-0220-4800d4e6ee",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0220.json",
+  "taskSha256": "sha256:adb039ded11f62691990e5c006866adea39de03090cea222b74aa6b74058607d",
+  "createdAt": "2026-07-20T17:29:03.102Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0220 --actor codex-gpt-5.4-mini --status done --historical-delivery b7ae7c83130ed19c125cd3654488c60b582effb5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720171208-codex-gpt-5.4-mini-ATM-GOV-0220-4800d4e6ee",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0220.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/orphan-in-progress-adoption.test.ts",
+      "node --strip-types tests/cli/protected-ledger-destructive-guard.test.ts",
+      "node --strip-types tests/cli/task-lane-lifecycle-repair.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:status-machine",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T17:29:03.089Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0220.*",
+        ".atm/history/task-events/ATM-GOV-0220/**",
+        ".atm/history/tasks/ATM-GOV-0220.json",
+        "fixtures/registry/status/legal-transition.json",
+        "packages/cli/src/commands/next/claim-readiness.ts",
+        "packages/cli/src/commands/tasks/**",
+        "packages/core/src/lane/**",
+        "tests/cli/orphan-in-progress-adoption.test.ts",
+        "tests/cli/protected-ledger-destructive-guard.test.ts",
+        "tests/cli/task-lane-lifecycle-repair.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/claim-readiness.ts",
+        "packages/cli/src/commands/tasks/**",
+        "packages/core/src/lane/**",
+        "tests/cli/orphan-in-progress-adoption.test.ts",
+        "tests/cli/protected-ledger-destructive-guard.test.ts",
+        "tests/cli/task-lane-lifecycle-repair.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

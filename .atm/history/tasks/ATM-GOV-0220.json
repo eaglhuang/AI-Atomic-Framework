@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0220",
   "title": "Task and lane lifecycle repair",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [
     "ATM-GOV-0217"
@@ -79,8 +79,8 @@
     }
   },
   "importedAt": "2026-07-20T17:11:58.454Z",
-  "lastTransitionId": "2026-07-20T17-19-13-624Z-scope-amendment-dcadc2991703",
-  "lastTransitionAt": "2026-07-20T17:19:13.624Z",
+  "lastTransitionId": "2026-07-20T17-29-03-102Z-close-0752d7ff9b90",
+  "lastTransitionAt": "2026-07-20T17:29:03.102Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-07-20T17:12:08.633Z",
@@ -89,7 +89,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-cf064800340a",
     "claimedAt": "2026-07-20T17:12:08.641Z",
-    "heartbeatAt": "2026-07-20T17:12:08.641Z",
+    "heartbeatAt": "2026-07-20T17:29:03.100Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0220.*",
@@ -103,14 +103,14 @@
       "tests/cli/protected-ledger-destructive-guard.test.ts",
       "tests/cli/task-lane-lifecycle-repair.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720171208-codex-gpt-5.4-mini-190ad1c979",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720171208-codex-gpt-5.4-mini-190ad1c979\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T17:12:08.641Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -156,5 +156,9 @@
     },
     "createdAt": "2026-07-20T17:12:13.277Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T17:29:03.100Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260720171208-codex-gpt-5.4-mini-ATM-GOV-0220-4800d4e6ee",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0220.closure-packet.json"
 }
