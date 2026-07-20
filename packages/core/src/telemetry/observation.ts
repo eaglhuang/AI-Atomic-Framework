@@ -94,10 +94,10 @@ export const telemetryObservationProducerInventory: readonly TelemetryObservatio
   {
     producerId: 'plan-executor.phase',
     ownerTaskId: 'ATM-GOV-0198',
-    status: 'not-yet-migrated',
+    status: 'canonical',
     sourcePaths: ['packages/cli/src/commands/batch/**', 'packages/core/src/batch/**'],
     adapterPort: 'TelemetryObservationBase',
-    notes: 'Plan executor phase observations are planned downstream consumers of this base contract.'
+    notes: 'Plan executor phase observations expose resumable phase, ticket, revalidation, and exactly-once side-effect digests.'
   },
   {
     producerId: 'test-runner.timing',

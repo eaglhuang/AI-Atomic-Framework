@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0198",
+  "title": "True resumable plan executor orchestration loop",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0196",
+    "ATM-GOV-0188",
+    "ATM-GOV-0189",
+    "ATM-GOV-0210",
+    "ATM-GOV-0211",
+    "ATM-GOV-0214"
+  ],
+  "acceptance": [
+    "isolated target/planning repos 真跑至少一個多卡 wave 至 terminal state。",
+    "commit 前後、checkpoint 中、target push 後 crash 均能 resume 且不重複副作用。",
+    "pause/adopt/recovery 僅從 durable journal 恢復，輸出唯一 action。",
+    "phase journal 可與 0196 task summary、task/lane/batch/wave stamps join。",
+    "mock-only test 不算 live acceptance evidence。",
+    "開工 `dataDrivenDecision` 已引用 0196 history/config digest 並留下 consumed receipt；本卡 close 已 seal 可由同卡 validator 讀回的 summary，供 0202 後續消費。",
+    "circuit breaker 可退回原 advisory 路徑，且 rollback/recovery 測試證明已完成副作用不會重放。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch/**",
+    "packages/core/src/batch/**",
+    "packages/cli/src/atm.ts",
+    "tests/cli/plan-level-executor-recovery.test.ts",
+    "tests/cli/plan-level-executor-live-loop.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch/**",
+    "packages/core/src/batch/**",
+    "packages/cli/src/atm.ts",
+    "tests/cli/plan-level-executor-recovery.test.ts",
+    "tests/cli/plan-level-executor-live-loop.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+    "node --strip-types tests/cli/plan-level-executor-recovery.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Open the execute-plan circuit breaker, restore the prior advisory next-command path, preserve the durable journal for diagnosis, and prove no commit/close/push side effect is replayed during rollback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.plan-level-executor",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.plan-phase-driver",
+        "pattern": "Resumable Phase Driver",
+        "source": "packages/cli/src/commands/batch/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0198-true-resumable-plan-executor-orchestration-loop.task.md",
+    "sectionTitle": "ATM-GOV-0198",
+    "headingLine": 56,
+    "hash": "72053603aa92e2e6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0198-true-resumable-plan-executor-orchestration-loop.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:72053603aa92e2e6bf4a97a1a16dd31e8642c16a19b8eea59ed2da77ebb8ee2e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T10:15:52.725Z"
+    }
+  },
+  "importedAt": "2026-07-20T10:15:52.725Z",
+  "lastTransitionId": "2026-07-20T10-22-37-507Z-scope-amendment-25c1ae682398",
+  "lastTransitionAt": "2026-07-20T10:22:37.507Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0198",
+  "reservedAt": "2026-07-20T10:16:07.800Z",
+  "promotedAt": "2026-07-20T10:16:07.804Z",
+  "claim": {
+    "actorId": "codex-captain-0198",
+    "leaseId": "lease-83bfcbb452c9",
+    "claimedAt": "2026-07-20T10:16:07.810Z",
+    "heartbeatAt": "2026-07-20T10:16:07.810Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0198.*",
+      ".atm/history/task-events/ATM-GOV-0198/**",
+      ".atm/history/tasks/ATM-GOV-0198.json",
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/commands/batch/**",
+      "packages/core/src/batch/**",
+      "packages/core/src/telemetry/observation.ts",
+      "tests/cli/plan-level-executor-live-loop.test.ts",
+      "tests/cli/plan-level-executor-recovery.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720101607-codex-captain-0198-0600418985",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720101607-codex-captain-0198-0600418985\""
+    }
+  },
+  "startedAt": "2026-07-20T10:16:07.810Z",
+  "startedByActor": "codex-captain-0198",
+  "startedBySessionId": "session-20260720101607-codex-captain-0198-ATM-GOV-0198-229a6fdf73",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0198",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0198.*",
+      ".atm/history/task-events/ATM-GOV-0198/**",
+      ".atm/history/tasks/ATM-GOV-0198.json",
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/commands/batch/**",
+      "packages/core/src/batch/**",
+      "packages/core/src/telemetry/observation.ts",
+      "tests/cli/plan-level-executor-live-loop.test.ts",
+      "tests/cli/plan-level-executor-recovery.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0198-true-resumable-plan-executor-orchestration-loop.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0198-true-resumable-plan-executor-orchestration-loop.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "5ad06eb2182d31127b09ee83908850b32dc46ee7d14aeceb24236638a6e1e52e",
+    "actorId": "codex-captain-0198",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260720101607-codex-captain-0198-0600418985",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720101607-codex-captain-0198-0600418985\""
+    },
+    "createdAt": "2026-07-20T10:16:12.036Z",
+    "status": "active"
+  }
+}
