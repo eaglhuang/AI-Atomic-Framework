@@ -36,7 +36,6 @@ export interface TaskImportRecord {
     readonly title: string;
     readonly status: TaskImportStatus;
     readonly milestone?: string | null;
-    readonly waveId?: string | null;
     readonly dependencies: readonly string[];
     readonly acceptance: readonly string[];
     readonly deliverables: readonly string[];
@@ -48,7 +47,6 @@ export interface TaskImportRecord {
     readonly closureAuthority?: string | null;
     readonly planningReadOnlyPaths?: readonly string[];
     readonly planningMirrorPaths?: readonly string[];
-    readonly planningArtifacts?: readonly string[];
     readonly outOfScope?: readonly string[];
     readonly nonGoals?: readonly string[];
     readonly evidenceRequired?: string | null;

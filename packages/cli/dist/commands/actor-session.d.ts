@@ -66,11 +66,4 @@ export declare function updateActorWorkSessionState(input: {
     readonly session: ActorWorkSessionDocument;
     readonly sessionPath: string;
 } | null;
-/** Transfer active work-session authority after its lane is adopted. */
-export declare function rebindActiveWorkSessionsForLane(input: {
-    readonly cwd: string;
-    readonly laneSessionId: string;
-    readonly actorId: string;
-    readonly timestamp?: string;
-}): readonly ActorWorkSessionDocument[];
 export {};

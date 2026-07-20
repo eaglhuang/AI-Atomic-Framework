@@ -49,7 +49,7 @@ export declare function buildCaptainDecision(task: Record<string, unknown> | nul
             largeScriptRisk: boolean;
             closureSignals: boolean;
             validationOk: boolean;
-            brokerVerdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
+            brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
         };
         suggestedPermissions: {
             captain: string[];
@@ -58,7 +58,7 @@ export declare function buildCaptainDecision(task: Record<string, unknown> | nul
     };
     decisionSurface: {
         validationOk: boolean;
-        brokerVerdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
+        brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
         largeScriptRisk: {
             level: string;
             threshold: number;
@@ -103,7 +103,7 @@ export declare function assessLieutenantEscalation(task: Record<string, unknown>
             largeScriptRisk: boolean;
             closureSignals: boolean;
             validationOk: boolean;
-            brokerVerdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
+            brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
         };
         suggestedPermissions: {
             captain: string[];
@@ -144,16 +144,16 @@ export declare function buildMinimalTaskCrewBriefingContract(task: Record<string
         blockedReasons?: undefined;
     } | {
         schemaId: string;
-        verdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
-        chosenLane: "blocked" | "serial" | "direct-brokered" | "deterministic-composer";
+        verdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
+        chosenLane: "blocked" | "direct-brokered" | "deterministic-composer" | "serial";
         decision: import("@ai-atomic-framework/core").BrokerDecision;
         stewardId?: undefined;
         composerPath?: undefined;
         blockedReasons?: undefined;
     } | {
         schemaId: string;
-        verdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
-        chosenLane: "blocked" | "serial" | "direct-brokered" | "deterministic-composer";
+        verdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
+        chosenLane: "blocked" | "direct-brokered" | "deterministic-composer" | "serial";
         blockedReasons: readonly string[];
         decision: import("@ai-atomic-framework/core").BrokerDecision;
         stewardId?: undefined;

@@ -10,7 +10,7 @@ export declare function runIntegrationHookInvocationInProcess(argv: string[]): i
 export declare function installEditorIntegrationHooks(cwd: string, adapterId: string, options?: InstallEditorHooksOptions): {
     schemaId: string;
     generatedAt: string;
-    adapterId: "codex" | "gemini" | "cursor" | "antigravity";
+    adapterId: "cursor" | "gemini" | "codex" | "antigravity";
     supported: boolean;
     repoIdentity: import("../framework-development.ts").FrameworkRepoIdentity;
     writtenFiles: never[];
@@ -20,7 +20,7 @@ export declare function installEditorIntegrationHooks(cwd: string, adapterId: st
 } | {
     schemaId: string;
     generatedAt: string;
-    adapterId: "copilot" | "claude-code";
+    adapterId: "claude-code" | "copilot";
     supported: boolean;
     repoIdentity: import("../framework-development.ts").FrameworkRepoIdentity;
     writtenFiles: string[];

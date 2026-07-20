@@ -137,11 +137,11 @@ export declare function buildTeamPlanningContext(input: {
             };
         };
         governanceRuntime: import("./types.ts").TeamGovernanceRuntimeFields;
-        decisionClass: "blocked" | "auto-execution" | "human-signoff-required" | "adr-required";
+        decisionClass: "blocked" | "human-signoff-required" | "adr-required" | "auto-execution";
         decisionReason: string;
         requiresHumanSignoff: boolean;
         requiresAdr: boolean;
-        violationStatus: "none" | "blocked" | "warning" | "broker-conflict-blocked" | "human-signoff-required" | "adr-required";
+        violationStatus: "none" | "warning" | "blocked" | "broker-conflict-blocked" | "human-signoff-required" | "adr-required";
         escalationTarget: string | null;
         providerSelectionSource: {
             schemaId: "atm.teamAgentsConfig.v1";

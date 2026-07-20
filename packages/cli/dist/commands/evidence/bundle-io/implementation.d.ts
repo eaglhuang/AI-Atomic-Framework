@@ -1,12 +1,12 @@
-import { normalizeValidatorGateName, normalizeValidatorToken, canonicalizeValidatorIdentity, classifyValidatorTier, isClosureRequiredValidator, resolveValidatorExpectedCommand, detectAutoLinkedValidator, type ValidatorTier, type EvidenceFreshness, type ValidatorEvidenceState } from "../validator-classification.ts";
-import { collectRecordCommandRuns, readRecordValidationPasses, readRecordFreshness, hashString, readCommandRunsInputFile, normalizeEvidenceCommandRuns, readCurrentCommit, type CommandRunEvidenceInput } from "../command-runs.ts";
-import { classifyValidatorEvidenceState, buildMissingValidatorFinding, computeMissingValidatorReport, type MissingValidatorFinding, type ValidatorCatalogEntry, type MissingValidatorReport } from "../missing-report.ts";
-import { isRecord, isCommandRunProof, quoteForShell } from "../shared-utils.ts";
-export type EvidenceGate = "close" | "commit" | "pr";
-export type { EvidenceFreshness, ValidatorTier, ValidatorEvidenceState, CommandRunEvidenceInput, };
-export type { MissingValidatorFinding, ValidatorCatalogEntry, MissingValidatorReport, };
-export { computeMissingValidatorReport, classifyValidatorEvidenceState, buildMissingValidatorFinding, normalizeValidatorGateName, normalizeValidatorToken, canonicalizeValidatorIdentity, classifyValidatorTier, isClosureRequiredValidator, resolveValidatorExpectedCommand, detectAutoLinkedValidator, collectRecordCommandRuns, readRecordValidationPasses, readRecordFreshness, hashString, readCommandRunsInputFile, normalizeEvidenceCommandRuns, isRecord, isCommandRunProof, quoteForShell, readCurrentCommit, };
-type CanonicalEvidenceKind = "test" | "artifact" | "attestation" | "review" | "commit" | "waiver" | "other";
+import { normalizeValidatorGateName, normalizeValidatorToken, canonicalizeValidatorIdentity, classifyValidatorTier, isClosureRequiredValidator, resolveValidatorExpectedCommand, detectAutoLinkedValidator, type ValidatorTier, type EvidenceFreshness, type ValidatorEvidenceState } from '../validator-classification.ts';
+import { collectRecordCommandRuns, readRecordValidationPasses, readRecordFreshness, hashString, readCommandRunsInputFile, normalizeEvidenceCommandRuns, readCurrentCommit, type CommandRunEvidenceInput } from '../command-runs.ts';
+import { classifyValidatorEvidenceState, buildMissingValidatorFinding, computeMissingValidatorReport, type MissingValidatorFinding, type ValidatorCatalogEntry, type MissingValidatorReport } from '../missing-report.ts';
+import { isRecord, isCommandRunProof, quoteForShell } from '../shared-utils.ts';
+export type EvidenceGate = 'close' | 'commit' | 'pr';
+export type { EvidenceFreshness, ValidatorTier, ValidatorEvidenceState, CommandRunEvidenceInput };
+export type { MissingValidatorFinding, ValidatorCatalogEntry, MissingValidatorReport };
+export { computeMissingValidatorReport, classifyValidatorEvidenceState, buildMissingValidatorFinding, normalizeValidatorGateName, normalizeValidatorToken, canonicalizeValidatorIdentity, classifyValidatorTier, isClosureRequiredValidator, resolveValidatorExpectedCommand, detectAutoLinkedValidator, collectRecordCommandRuns, readRecordValidationPasses, readRecordFreshness, hashString, readCommandRunsInputFile, normalizeEvidenceCommandRuns, isRecord, isCommandRunProof, quoteForShell, readCurrentCommit };
+type CanonicalEvidenceKind = 'test' | 'artifact' | 'attestation' | 'review' | 'commit' | 'waiver' | 'other';
 export declare const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = "atm.evidenceBundleManifest.v1";
 export declare const TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID = "atm.teamArtifactHandoffEvidence.v1";
 export declare const TEAM_CLOSURE_ATTESTATION_SCHEMA_ID = "atm.teamClosureAttestation.v1";
@@ -107,10 +107,10 @@ export interface EvidenceGateResult {
     readonly missing: readonly string[];
 }
 export declare function runEvidenceValidators(argv: string[]): import("../../shared.ts").CommandResult;
-export type AutoEvidenceDisposition = "to-run" | "already-satisfied" | "skipped-out-of-scope" | "requires-approval";
+export type AutoEvidenceDisposition = 'to-run' | 'already-satisfied' | 'skipped-out-of-scope' | 'requires-approval';
 export interface AutoEvidencePlanEntry {
     readonly validator: string;
-    readonly capability: "validator" | "integration-test";
+    readonly capability: 'validator' | 'integration-test';
     readonly catalogKey: string | null;
     readonly disposition: AutoEvidenceDisposition;
     readonly command: string | null;
@@ -120,9 +120,9 @@ export interface AutoEvidencePlanEntry {
     readonly linkedValidators: readonly string[];
 }
 export interface AutoEvidencePlan {
-    readonly schemaId: "atm.autoEvidencePlan.v1";
+    readonly schemaId: 'atm.autoEvidencePlan.v1';
     readonly taskId: string;
-    readonly mode: "dry-run" | "execute";
+    readonly mode: 'dry-run' | 'execute';
     readonly ok: boolean;
     readonly toRun: readonly AutoEvidencePlanEntry[];
     readonly alreadySatisfied: readonly AutoEvidencePlanEntry[];
@@ -131,7 +131,7 @@ export interface AutoEvidencePlan {
     readonly remediationCommand: string | null;
 }
 export interface AutoEvidenceExecutionResult {
-    readonly schemaId: "atm.autoEvidenceExecution.v1";
+    readonly schemaId: 'atm.autoEvidenceExecution.v1';
     readonly taskId: string;
     readonly ok: boolean;
     readonly plan: AutoEvidencePlan;
@@ -148,7 +148,7 @@ export declare function buildAutoEvidencePlan(input: {
     cwd: string;
     taskId: string;
     actorId: string;
-    mode?: "dry-run" | "execute";
+    mode?: 'dry-run' | 'execute';
     commandMapper?: (declaredCommand: string) => string;
 }): AutoEvidencePlan;
 export declare function executeAutoEvidencePlan(input: {

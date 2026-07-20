@@ -80,16 +80,16 @@ export declare function buildTeamPlanningContext(input: {
                 blockedReasons?: undefined;
             } | {
                 schemaId: string;
-                verdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
-                chosenLane: "blocked" | "serial" | "direct-brokered" | "deterministic-composer";
+                verdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
+                chosenLane: "blocked" | "direct-brokered" | "deterministic-composer" | "serial";
                 decision: import("@ai-atomic-framework/core").BrokerDecision;
                 stewardId?: undefined;
                 composerPath?: undefined;
                 blockedReasons?: undefined;
             } | {
                 schemaId: string;
-                verdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
-                chosenLane: "blocked" | "serial" | "direct-brokered" | "deterministic-composer";
+                verdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
+                chosenLane: "blocked" | "direct-brokered" | "deterministic-composer" | "serial";
                 blockedReasons: readonly string[];
                 decision: import("@ai-atomic-framework/core").BrokerDecision;
                 stewardId?: undefined;
@@ -137,11 +137,11 @@ export declare function buildTeamPlanningContext(input: {
             };
         };
         governanceRuntime: import("./types.ts").TeamGovernanceRuntimeFields;
-        decisionClass: "blocked" | "auto-execution" | "human-signoff-required" | "adr-required";
+        decisionClass: "blocked" | "human-signoff-required" | "adr-required" | "auto-execution";
         decisionReason: string;
         requiresHumanSignoff: boolean;
         requiresAdr: boolean;
-        violationStatus: "none" | "blocked" | "warning" | "broker-conflict-blocked" | "human-signoff-required" | "adr-required";
+        violationStatus: "none" | "warning" | "blocked" | "broker-conflict-blocked" | "human-signoff-required" | "adr-required";
         escalationTarget: string | null;
         providerSelectionSource: {
             schemaId: "atm.teamAgentsConfig.v1";
@@ -211,7 +211,7 @@ export declare function buildTeamPlanningContext(input: {
                     largeScriptRisk: boolean;
                     closureSignals: boolean;
                     validationOk: boolean;
-                    brokerVerdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
+                    brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
                 };
                 suggestedPermissions: {
                     captain: string[];
@@ -220,7 +220,7 @@ export declare function buildTeamPlanningContext(input: {
             };
             decisionSurface: {
                 validationOk: boolean;
-                brokerVerdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
+                brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
                 largeScriptRisk: {
                     level: string;
                     threshold: number;

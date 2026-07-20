@@ -2,7 +2,7 @@ import type { GovernedVendorConfigSurface } from './types.ts';
 export declare function discoverGovernedVendorConfigSurface(repositoryRoot: string): GovernedVendorConfigSurface;
 export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
     repoBootstrapped: boolean;
-    currentEditorId: "codex" | "copilot" | "gemini" | "cursor" | "claude-code" | "antigravity" | null;
+    currentEditorId: "claude-code" | "copilot" | "cursor" | "gemini" | "codex" | "antigravity" | null;
     currentEditorDetectedFrom: import("./adapters.ts").EditorDetectionSource | null;
     currentEditorRawValue: string | null;
     currentEditorAdapter: {
@@ -46,7 +46,7 @@ export declare function describeIntegrationInstallHint(bootstrap: ReturnType<typ
     text: string;
     data: {
         reason: string | null;
-        currentEditorId: "codex" | "copilot" | "gemini" | "cursor" | "claude-code" | "antigravity" | null;
+        currentEditorId: "claude-code" | "copilot" | "cursor" | "gemini" | "codex" | "antigravity" | null;
         currentEditorDetectedFrom: import("./adapters.ts").EditorDetectionSource | null;
         currentEditorRawValue: string | null;
         suggestedAction: string | null;

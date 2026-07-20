@@ -5,9 +5,6 @@ export interface ClaimReadinessTaskSummary {
     readonly status: string;
     readonly format: 'json' | 'markdown';
     readonly sourcePlanPath: string | null;
-    readonly scopePaths?: readonly string[];
-    readonly targetAllowedFiles?: readonly string[];
-    readonly activeClaimActorId?: string | null;
 }
 export interface ClaimReadinessDiagnostic {
     readonly taskId: string;
@@ -29,6 +26,4 @@ export declare function extractClaimIntentFlag(argv: readonly string[]): {
     claimIntent: NextClaimIntent | null;
     autoIntent: boolean;
 };
-export declare function diagnoseClaimReadinessForTasks(cwd: string, tasks: readonly ClaimReadinessTaskSummary[], claimIntent: NextClaimIntent, options?: {
-    readonly dependencyMode?: 'claim-files' | 'hard';
-}): ClaimReadinessReport;
+export declare function diagnoseClaimReadinessForTasks(cwd: string, tasks: readonly ClaimReadinessTaskSummary[], claimIntent: NextClaimIntent): ClaimReadinessReport;

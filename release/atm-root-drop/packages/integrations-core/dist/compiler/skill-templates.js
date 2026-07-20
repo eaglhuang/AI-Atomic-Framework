@@ -98,6 +98,12 @@ export const minimumAtmEntrySkillDefinitions = [
         command: 'node atm.mjs internal-release sync $ARGUMENTS --json'
     },
     {
+        id: 'atm-framework-temp-claim',
+        title: 'ATM Framework Temp Claim',
+        summary: 'Governed, tool-first route for scoped ATM framework quickfix work — dedicated skill for framework-mode claim, runner-sync queue-head reservation, sealed runner rebuild, and release, with CLI fallback that stays copy-paste runnable.',
+        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
+    },
+    {
         id: 'atm-atom-map-refactor',
         title: 'ATM Atom Map Refactor',
         summary: 'Plan ATM framework refactors by preserving atom/map semantics before splitting large governance modules.',

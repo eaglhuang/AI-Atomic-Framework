@@ -16,7 +16,7 @@ export declare function pathFieldMatches(field: string, hint: string): boolean;
 export declare function looksLikeNamedPlanPrompt(prompt: string): boolean;
 export declare function allowsPlanningMirror(record: Record<string, unknown>): boolean;
 export declare function statusQueueWeight(status: string): number;
-export declare function humanReviewStatusWeight(status: HumanReviewQueueStatus): 0 | 2 | 3 | 1;
+export declare function humanReviewStatusWeight(status: HumanReviewQueueStatus): 0 | 3 | 1 | 2;
 export declare function decisionResultForStatus(status: string): NextDecisionTrailEntry['result'];
 export declare function tokenizeForMatch(value: string): readonly string[];
 export declare function countTokenOverlap(prompt: string, title: string): number;
