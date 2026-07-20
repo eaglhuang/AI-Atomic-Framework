@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0002",
+  "title": "Historical residue governance cleanup",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0217",
+    "ATM-GOV-0218",
+    "ATM-GOV-0219",
+    "ATM-GOV-0221"
+  ],
+  "acceptance": [
+    "dry-run 與 write-run mutation list 一致。",
+    "每個 residue 有 disposed/quarantined/kept-with-reason 狀態。",
+    "無 active task 或 fresh queue entry 被清理。",
+    "ATM-GOV-0225 可消費 cleanup summary。"
+  ],
+  "deliverables": [
+    "scripts/cleanup-historical-governance-residue.ts",
+    "tests/cli/historical-residue-cleanup.test.ts",
+    "docs/reports/historical-governance-residue-cleanup.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+    "packages/cli/src/commands/tasks/**",
+    "packages/cli/src/commands/evidence/**",
+    "scripts/cleanup-historical-governance-residue.ts",
+    "tests/cli/historical-residue-cleanup.test.ts",
+    "docs/reports/historical-governance-residue-cleanup.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/historical-residue-cleanup.test.ts",
+    "node --strip-types scripts/cleanup-historical-governance-residue.ts --dry-run --json",
+    "npm run validate:task-ledger-governance",
+    "npm run validate:broker-registry",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No product bug fixes.",
+    "No cleanup before dependencies close."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "formal-reconcile-or-revert",
+  "rollbackNotes": "Use cleanup receipts to restore quarantined artifacts or revert the cleanup commit; do not reconstruct state from chat memory.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "temporary-governance/tasks/TASK-TMP-0002-historical-residue-governance-cleanup.task.md",
+    "sectionTitle": "TASK-TMP-0002",
+    "headingLine": 63,
+    "hash": "5ee14a6317714e0b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "temporary-governance/tasks/TASK-TMP-0002-historical-residue-governance-cleanup.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:5ee14a6317714e0bea4c4bf7dc7cf8f80a7d693f461b60cfd34b13e42f7ad303",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T18:46:41.754Z"
+    }
+  },
+  "importedAt": "2026-07-20T18:46:41.754Z",
+  "lastTransitionId": "2026-07-20T18-46-52-911Z-claim-f162ebb67bbf",
+  "lastTransitionAt": "2026-07-20T18:46:52.911Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T18:46:48.186Z",
+  "promotedAt": "2026-07-20T18:46:48.189Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-0dec59137f9d",
+    "claimedAt": "2026-07-20T18:46:48.193Z",
+    "heartbeatAt": "2026-07-20T18:46:48.193Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TMP-0002.json",
+      "docs/reports/historical-governance-residue-cleanup.md",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/cli/src/commands/evidence/**",
+      "packages/cli/src/commands/tasks/**",
+      "scripts/cleanup-historical-governance-residue.ts",
+      "tests/cli/historical-residue-cleanup.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720184648-codex-gpt-5.4-mini-1651be4628",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720184648-codex-gpt-5.4-mini-1651be4628\""
+    }
+  },
+  "startedAt": "2026-07-20T18:46:48.193Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720184648-codex-gpt-5.4-mini-TASK-TMP-0002-76c467c9ba",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0002",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0002.*",
+      ".atm/history/task-events/TASK-TMP-0002/**",
+      ".atm/history/tasks/TASK-TMP-0002.json",
+      "docs/reports/historical-governance-residue-cleanup.md",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/cli/src/commands/evidence/**",
+      "packages/cli/src/commands/tasks/**",
+      "scripts/cleanup-historical-governance-residue.ts",
+      "tests/cli/historical-residue-cleanup.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "21759d812b3024c2b8556acc1dae2253e6c894a690df5d1f9951bef411f5dcf9",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260720184648-codex-gpt-5.4-mini-TASK-TMP-0002-76c467c9ba",
+    "laneSession": {
+      "laneSessionId": "lane-20260720184648-codex-gpt-5.4-mini-1651be4628",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720184648-codex-gpt-5.4-mini-1651be4628\""
+    },
+    "createdAt": "2026-07-20T18:46:52.910Z",
+    "status": "active"
+  }
+}
