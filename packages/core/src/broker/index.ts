@@ -2,6 +2,8 @@ export * from './types.ts';
 export * from './decision.ts';
 export * from './candidate-bridge.ts';
 export * from './registry.ts';
+export * from './registry-store.ts';
+export * from './transaction-authority.ts';
 export * from './proposal.ts';
 export * from './merge-plan.ts';
 export * from './compose.ts';

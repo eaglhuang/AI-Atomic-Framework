@@ -1,0 +1,210 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0207",
+  "title": "Canonical broker transaction authority and linearizable state",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0196"
+  ],
+  "acceptance": [
+    "next claim、broker register、Team 與 batch 共用 canonical authority 與 same-task fence；沒有旁路 writer。",
+    "128-process fixture 中 acknowledged transaction 可完整重建，lost/duplicate acknowledged mutation 為零。",
+    "parse/checksum/partial-write failures 均 fail closed 並提供 recovery facts；沒有任何錯誤回空 healthy registry。",
+    "CAS conflict 可安全重試，且 retry 不重複 intent、ticket、release 或 adopt transition。",
+    "focused tests、broker registry validator、typecheck 與 validate:cli 全數通過。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/transaction-authority.ts",
+    "packages/core/src/broker/registry-store.ts",
+    "packages/cli/src/commands/broker/registry-actions.ts",
+    "packages/cli/src/commands/broker/persistence.ts",
+    "schemas/governance/broker-transaction.schema.json",
+    "tests/cli/broker-transaction-authority.test.ts",
+    "tests/cli/broker-registry-concurrency.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/registry.ts",
+    "packages/core/src/broker/lifecycle.ts",
+    "packages/core/src/broker/transaction-authority.ts",
+    "packages/core/src/broker/registry-store.ts",
+    "packages/cli/src/commands/broker/registry-actions.ts",
+    "packages/cli/src/commands/broker/persistence.ts",
+    "schemas/governance/broker-transaction.schema.json",
+    "tests/cli/broker-transaction-authority.test.ts",
+    "tests/cli/broker-registry-concurrency.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/broker-transaction-authority.test.ts",
+    "node --strip-types tests/cli/broker-registry-concurrency.test.ts",
+    "node --strip-types scripts/validate-broker-registry.ts",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No overlap classification, compose policy, queue fairness, patch application, commit, or push behavior.",
+    "No manual rewrite of .atm runtime or history state."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Disable the new authoritative writer, replay acknowledged transaction receipts into the previous snapshot format at a sealed watermark, preserve the journal for diagnosis, and never run two authoritative writers concurrently.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-broker",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker-transaction-authority",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/transaction-authority.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.broker-linearizable-store",
+        "pattern": "Adapter/Port",
+        "source": "packages/core/src/broker/registry-store.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/registry.ts",
+        "packages/core/src/broker/lifecycle.ts",
+        "packages/core/src/broker/transaction-authority.ts",
+        "packages/core/src/broker/registry-store.ts",
+        "packages/cli/src/commands/broker/registry-actions.ts",
+        "packages/cli/src/commands/broker/persistence.ts",
+        "schemas/governance/broker-transaction.schema.json",
+        "tests/cli/broker-transaction-authority.test.ts",
+        "tests/cli/broker-registry-concurrency.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0207-canonical-broker-transaction-authority-and-linearizable-state.task.md",
+    "sectionTitle": "ATM-GOV-0207",
+    "headingLine": 82,
+    "hash": "85640bb666cfecd6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0207-canonical-broker-transaction-authority-and-linearizable-state.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:85640bb666cfecd61f31cc9f65d61247be2165ae7ca40be9d09e91c7fb0322b3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T07:38:24.605Z"
+    }
+  },
+  "importedAt": "2026-07-20T07:38:24.605Z",
+  "lastTransitionId": "2026-07-20T07-48-24-347Z-scope-amendment-6489b5fa627b",
+  "lastTransitionAt": "2026-07-20T07:48:24.347Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0207",
+  "reservedAt": "2026-07-20T07:38:36.332Z",
+  "promotedAt": "2026-07-20T07:38:36.334Z",
+  "claim": {
+    "actorId": "codex-captain-0207",
+    "leaseId": "lease-10c572adeeb7",
+    "claimedAt": "2026-07-20T07:38:36.337Z",
+    "heartbeatAt": "2026-07-20T07:38:36.337Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0207.*",
+      ".atm/history/task-events/ATM-GOV-0207/**",
+      ".atm/history/tasks/ATM-GOV-0207.json",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry-store.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/transaction-authority.ts",
+      "schemas/governance/broker-transaction.schema.json",
+      "tests/cli/broker-registry-concurrency.test.ts",
+      "tests/cli/broker-transaction-authority.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720073836-codex-captain-0207-16457e0a5b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720073836-codex-captain-0207-16457e0a5b\""
+    }
+  },
+  "startedAt": "2026-07-20T07:38:36.337Z",
+  "startedByActor": "codex-captain-0207",
+  "startedBySessionId": "session-20260720073836-codex-captain-0207-ATM-GOV-0207-1295304993",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0207",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0207.*",
+      ".atm/history/task-events/ATM-GOV-0207/**",
+      ".atm/history/tasks/ATM-GOV-0207.json",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry-store.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/transaction-authority.ts",
+      "schemas/governance/broker-transaction.schema.json",
+      "tests/cli/broker-registry-concurrency.test.ts",
+      "tests/cli/broker-transaction-authority.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0207-canonical-broker-transaction-authority-and-linearizable-state.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0207-canonical-broker-transaction-authority-and-linearizable-state.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "cb7a693d6c9f882cc90519fd0a4a953597feffae0a0c13ce1ad6e2f5bc763a55",
+    "actorId": "codex-captain-0207",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260720073836-codex-captain-0207-16457e0a5b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720073836-codex-captain-0207-16457e0a5b\""
+    },
+    "createdAt": "2026-07-20T07:38:40.444Z",
+    "status": "active"
+  }
+}

@@ -149,7 +149,7 @@ export function calculateBrokerDecision(
     const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
 
     for (const refId of active.resourceKeys.atomIds) {
-      if (materialCidWrite && newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
+      if (newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
         pushCidConflict('write', 'ID', refId, active.taskId);
       }
       if (newReadAtomIds.has(refId)) {
