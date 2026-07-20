@@ -38,7 +38,7 @@ export function extractClaimIntentFlag(argv) {
     }
     return { argv: remaining, claimIntent, autoIntent };
 }
-export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent) {
+export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent, options = {}) {
     const diagnostics = [];
     for (const task of tasks) {
         const status = normalizeTaskRouteStatus(task.status);
@@ -78,7 +78,7 @@ export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent) {
                 try {
                     const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
                     return findTaskClaimDependencyBlockers(cwd, task.workItemId, taskDocument, {
-                        claimFiles: task.targetAllowedFiles ?? task.scopePaths ?? []
+                        claimFiles: options.dependencyMode === 'hard' ? undefined : (task.targetAllowedFiles ?? task.scopePaths ?? [])
                     });
                 }
                 catch {

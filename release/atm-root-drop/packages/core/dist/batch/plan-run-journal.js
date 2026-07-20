@@ -3,6 +3,25 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 export const ATM_BATCH_PLAN_DIGEST_MISMATCH = 'ATM_BATCH_PLAN_DIGEST_MISMATCH';
 export const ATM_BATCH_RUN_EVENT_JOURNAL_INVALID = 'ATM_BATCH_RUN_EVENT_JOURNAL_INVALID';
+export const planExecutorPhaseChain = Object.freeze([
+    'preflight',
+    'select',
+    'claim',
+    'workers',
+    'reconcile',
+    'validate',
+    'proposal-sealed',
+    'broker-ticketed',
+    'composing',
+    'semantic-revalidation',
+    'prepared',
+    'published',
+    'generated-writes',
+    'commit',
+    'checkpoint',
+    'closeback',
+    'analyze'
+]);
 export function startPlanBatchRun(input) {
     const nowIso = input.nowIso ?? new Date().toISOString();
     const planDigest = computePlanDigest(input.cwd, input.planPath ?? null, input.taskIds);
@@ -50,9 +69,15 @@ export function appendPlanBatchRunEvent(cwd, batchId, input) {
         batchId,
         kind: input.kind,
         taskId: input.taskId ?? null,
+        phase: input.phase ?? null,
         actorId: input.actorId,
         laneSessionId: input.laneSessionId ?? null,
         idempotencyKey: input.idempotencyKey,
+        inputDigest: input.inputDigest ?? null,
+        outputDigest: input.outputDigest ?? null,
+        sideEffectReceiptDigest: input.sideEffectReceiptDigest ?? null,
+        terminal: input.terminal ?? false,
+        skipReason: input.skipReason ?? null,
         createdAt
     };
     const event = {
@@ -66,7 +91,13 @@ export function appendPlanBatchRunEvent(cwd, batchId, input) {
             source: input.tokenSource ?? 'unavailable'
         },
         waitedMs: Math.max(0, input.waitedMs ?? 0),
-        eventDigest: `sha256:${hashJson(eventSeed)}`
+        eventDigest: `sha256:${hashJson(eventSeed)}`,
+        phase: input.phase ?? undefined,
+        inputDigest: input.inputDigest ?? undefined,
+        outputDigest: input.outputDigest ?? undefined,
+        sideEffectReceiptDigest: input.sideEffectReceiptDigest ?? null,
+        terminal: input.terminal ?? false,
+        skipReason: input.skipReason ?? null
     };
     appendJournalEvent(cwd, batchRun.journalPath, event);
     const updated = {
@@ -74,10 +105,18 @@ export function appendPlanBatchRunEvent(cwd, batchId, input) {
         phase: nextPhase(batchRun.phase, input.kind),
         updatedAt: createdAt,
         eventCount: existing.length + 1,
-        lastEventDigest: event.eventDigest
+        lastEventDigest: event.eventDigest,
+        completedPhaseKeys: nextCompletedPhaseKeys(batchRun.completedPhaseKeys ?? [], event),
+        sideEffectReceiptDigests: nextSideEffectReceiptDigests(batchRun.sideEffectReceiptDigests ?? {}, event)
     };
     writePlanBatchRun(cwd, updated);
     return { batchRun: updated, event, duplicate: false };
+}
+export function readPlanBatchRunEvents(cwd, batchId) {
+    const batchRun = readPlanBatchRun(cwd, batchId);
+    if (!batchRun)
+        return [];
+    return readJournalEvents(cwd, batchRun.journalPath);
 }
 export function readPlanBatchRun(cwd, batchId) {
     const filePath = path.join(cwd, '.atm', 'runtime', 'batch-runs', `${batchId}.json`);
@@ -123,6 +162,16 @@ function nextPhase(current, kind) {
     if (current === 'created')
         return 'active';
     return current;
+}
+function nextCompletedPhaseKeys(current, event) {
+    if (!event.phase || !event.taskId || !event.terminal)
+        return current;
+    return [...new Set([...current, `${event.taskId}:${event.phase}`])].sort();
+}
+function nextSideEffectReceiptDigests(current, event) {
+    if (!event.taskId || !event.phase || !event.sideEffectReceiptDigest)
+        return current;
+    return { ...current, [`${event.taskId}:${event.phase}`]: event.sideEffectReceiptDigest };
 }
 function hashJson(value) {
     return hashText(JSON.stringify(value));

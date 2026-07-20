@@ -289,14 +289,14 @@ function resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId) {
         const workItemId = typeof lock.workItemId === 'string' ? lock.workItemId.trim() : '';
         const leaseId = typeof lock.leaseId === 'string' ? lock.leaseId.trim() : '';
         const heartbeatAt = typeof lock.heartbeatAt === 'string' ? lock.heartbeatAt : null;
+        const released = lock.released === true || String(lock.status ?? '').trim().toLowerCase() === 'released';
         const ttlSeconds = typeof lock.ttlSeconds === 'number' && Number.isFinite(lock.ttlSeconds)
             ? lock.ttlSeconds
             : 0;
         if (workItemId !== normalizedTaskId || !leaseId || !heartbeatAt || ttlSeconds <= 0) {
             return 'task-missing';
         }
-        const expiresAt = Date.parse(heartbeatAt) + ttlSeconds * 1000;
-        return Number.isFinite(expiresAt) && expiresAt > Date.now() ? 'task-active' : 'task-terminal';
+        return released ? 'task-terminal' : 'task-active';
     }
     catch {
         return 'task-missing';

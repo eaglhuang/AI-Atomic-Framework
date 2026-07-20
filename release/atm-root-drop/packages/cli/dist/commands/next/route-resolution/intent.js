@@ -100,9 +100,9 @@ export function createDeterministicTaskIntent(prompt, explicitTaskIds = []) {
         : /\u524d\s*(?:2|\u5169|\u4e8c)\s*\u5f35|first\s+2/i.test(prompt)
             ? { kind: 'first', count: 2 }
             : null;
-    const queueRequested = !journalingPrompt && (isQueueRequestedPrompt(prompt) || Boolean(ordinalScope));
+    const queueRequested = isQueueRequestedPrompt(prompt) || (!journalingPrompt && Boolean(ordinalScope));
     const orderedExplicitTaskIds = uniqueInOrder(explicitTaskIds.map((entry) => entry.toUpperCase()));
-    const taskScopeMentioned = !journalingPrompt && (orderedExplicitTaskIds.length > 0
+    const taskScopeMentioned = (queueRequested || !journalingPrompt) && (orderedExplicitTaskIds.length > 0
         || mentionedTaskIds.length > 0
         || mentionedPlanPaths.length > 0
         || taskRootHints.length > 0
@@ -132,7 +132,7 @@ export function detectRequestedTaskAction(prompt) {
         return 'redo';
     if (/\u91cd\u65b0\u6253\u958b|reopen/i.test(prompt))
         return 'reopen';
-    if (/\u95dc\u9589|\u5b8c\u6210|close|done/i.test(prompt))
+    if (/\u95dc\u9589|\u5b8c\u6210|(?<![A-Za-z0-9-])close(?![A-Za-z0-9-])|(?<![A-Za-z0-9-])done(?![A-Za-z0-9-])/i.test(prompt))
         return 'close';
     if (/audit|\u7a3d\u6838|\u6aa2\u8a0e/i.test(prompt))
         return 'audit';

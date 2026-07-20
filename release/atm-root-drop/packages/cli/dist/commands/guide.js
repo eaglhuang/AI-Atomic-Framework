@@ -2,11 +2,11 @@ import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { classifyGuidanceIntent, loadHostIntentLexicon, probeProject, recordGuidanceIntentPhrase } from '../../../core/dist/guidance/index.js';
+import { classifyGuidanceIntent, buildFirstLayerCommandContract, loadHostIntentLexicon, probeProject, recordGuidanceIntentPhrase } from '../../../core/dist/guidance/index.js';
 import { getCommandSpec, listCommandSpecs } from './command-specs.js';
 import { glossaryEntries } from './glossary-data.js';
 import { CliError, makeHelpResult, makeResult, message } from './shared.js';
-const supportedGuideIntents = ['overview', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
+const supportedGuideIntents = ['overview', 'first-layer', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
 const supportedLearnIntents = ['legacy-atomization', 'legacy-candidate-ranking', 'task-plan-import'];
 const supportedLearnStatuses = ['suggested', 'active-host', 'promoted-framework'];
 const supportedSkillInstallTargets = ['host', 'codex'];
@@ -168,10 +168,17 @@ function parseGuideArgs(argv = []) {
     };
 }
 function buildOverviewGuide() {
+    const firstLayer = buildFirstLayerCommandContract();
     return {
         intent: 'overview',
         summary: 'Start with guidance: orient the repository, start a goal-bound session, then follow the single next action.',
         supportedIntents: supportedGuideIntents,
+        firstLayer: {
+            command: 'node atm.mjs guide first-layer --json',
+            routeMatrixDigest: firstLayer.routeMatrixDigest,
+            commonCommands: firstLayer.commonCommands,
+            compactOrientationDefault: firstLayer.compactOrientationDefault
+        },
         channels: [
             {
                 channel: 'free-text-intent',
@@ -194,6 +201,13 @@ function buildOverviewGuide() {
                 action: 'Run `node atm.mjs explain --why blocked --cwd . --json` and satisfy the listed evidence before retrying.'
             }
         ]
+    };
+}
+function buildFirstLayerGuide() {
+    return {
+        intent: 'first-layer',
+        summary: 'First-layer ATM routing, command, ticket-state, and Windows-safe IO contract.',
+        ...buildFirstLayerCommandContract()
     };
 }
 function buildGoalGuide(cwd, goal) {
@@ -424,6 +438,8 @@ function buildGuide(parsed) {
             return buildGoalGuide(parsed.cwd, parsed.goal ?? '');
         case 'overview':
             return buildOverviewGuide();
+        case 'first-layer':
+            return buildFirstLayerGuide();
         case 'create-atom':
             return buildCreateAtomGuide();
         case 'create-map':

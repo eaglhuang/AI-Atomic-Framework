@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { classifyFirstLayerIntent } from './first-layer-command-contracts.js';
 const defaultLegacyActionTerms = [
     'atomize',
     'atomization',
@@ -212,6 +213,7 @@ export function classifyGuidanceIntent(goal, options = {}) {
     const docMatches = matchTerms(normalizedGoal, docsTerms);
     const atomCreateMatches = matchTerms(normalizedGoal, atomCreateTerms);
     const upgradeMatches = matchTerms(normalizedGoal, upgradeTerms);
+    const firstLayerMatch = classifyFirstLayerIntent(goal);
     if (legacyCandidateRankingMatches.length > 0) {
         return buildClassification({
             goal,
@@ -232,6 +234,27 @@ export function classifyGuidanceIntent(goal, options = {}) {
                 'mutate host files before source inventory and police evidence exist'
             ],
             lexiconSources: activeHostEntries.length > 0 ? ['framework-default', 'host-local'] : ['framework-default']
+        });
+    }
+    if (firstLayerMatch && firstLayerMatch.intent !== 'create') {
+        return buildClassification({
+            goal,
+            matchedIntent: 'governance-first-layer',
+            confidence: 0.89,
+            matchedTerms: firstLayerMatch.matchedTerms.filter((term) => normalizedGoal.includes(normalizeIntentPhrase(term))),
+            requiredFlow: [
+                'atm guide first-layer',
+                firstLayerMatch.command,
+                'read-only status/audit before mutation',
+                'scoped task/backlog evidence before implementation'
+            ],
+            nextCommand: firstLayerMatch.command,
+            blockedAntiPatterns: [
+                firstLayerMatch.negativeCase,
+                'route backlog, audit, or governance optimization prompts through atom birth',
+                'use PowerShell range indexing to parse Markdown/JSON/text planning documents'
+            ],
+            lexiconSources: ['framework-default']
         });
     }
     if (taskPlanImportMatches.length > 0) {

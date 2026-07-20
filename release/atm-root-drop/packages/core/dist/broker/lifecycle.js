@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, readdirSync, rmSync, unlinkSync, writeFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { loadRegistry, releaseTask, cleanupStale, saveRegistry, renewIntentLease } from './registry.js';
+import { loadRegistry, cleanupStale } from './registry.js';
 import { DEFAULT_BROKER_REGISTRY_RELATIVE_PATH } from './team-lane.js';
+import { createBrokerTransactionAuthority } from './transaction-authority.js';
 export const DEFAULT_BROKER_LIFECYCLE_REGISTRY_RELATIVE_PATH = DEFAULT_BROKER_REGISTRY_RELATIVE_PATH;
 export function readBrokerLifecycleState(cwd) {
     const registryPath = resolveBrokerRegistryPath(cwd);
@@ -36,39 +37,36 @@ export function inspectBrokerClaimLifecycle(input) {
 }
 export function recordBrokerClaimIntent(input) {
     const registryPath = resolveBrokerRegistryPath(input.cwd);
-    const registry = cleanupStale(loadRegistry(registryPath));
     const now = new Date().toISOString();
-    const nextRegistry = {
-        ...registry,
-        currentEpoch: Date.now(),
-        activeIntents: [
-            ...registry.activeIntents.filter((intent) => intent.taskId !== input.taskId),
-            {
-                intentId: `intent-${Date.now()}`,
-                taskId: input.taskId,
-                teamRunId: null,
-                actorId: input.actorId,
-                baseCommit: 'unknown-base-commit',
-                resourceKeys: {
-                    files: uniqueStrings(input.targetFiles ?? []),
-                    atomIds: [],
-                    atomCids: [],
-                    generators: [],
-                    projections: [],
-                    registries: [],
-                    validators: [],
-                    artifacts: []
-                },
-                leaseEpoch: Date.now(),
-                leaseSeconds: Math.max(1, Math.floor(input.ttlSeconds ?? 1800)),
-                leaseMaxSeconds: Math.max(1, Math.floor(input.leaseMaxSeconds ?? input.ttlSeconds ?? 1800)),
-                heartbeatAt: now,
-                lane: input.lane ?? 'direct-brokered',
-                expiresAt: new Date(Date.now() + (input.ttlSeconds ?? 1800) * 1000).toISOString()
+    const authority = createBrokerTransactionAuthority(registryPath);
+    authority.register({
+        intent: {
+            schemaId: 'atm.writeIntent.v1',
+            specVersion: '0.1.0',
+            migration: { strategy: 'none', fromVersion: null, notes: 'broker lifecycle claim intent' },
+            taskId: input.taskId,
+            actorId: input.actorId,
+            baseCommit: 'unknown-base-commit',
+            targetFiles: uniqueStrings(input.targetFiles ?? []),
+            atomRefs: [],
+            sharedSurfaces: {
+                generators: [],
+                projections: [],
+                registries: [],
+                validators: [],
+                artifacts: []
+            },
+            requestedLane: input.lane ?? 'direct-brokered',
+            leaseBounds: {
+                requestedSeconds: Math.max(1, Math.floor(input.ttlSeconds ?? 1800)),
+                maxSeconds: Math.max(1, Math.floor(input.leaseMaxSeconds ?? input.ttlSeconds ?? 1800))
             }
-        ]
-    };
-    saveRegistry(registryPath, nextRegistry);
+        },
+        lane: input.lane ?? 'direct-brokered',
+        ttlSeconds: input.ttlSeconds,
+        idempotencyKey: `claim:${input.taskId}:${input.actorId}:${now}`
+    });
+    const nextRegistry = authority.read().document;
     return {
         registryPath,
         registry: nextRegistry,
@@ -78,8 +76,14 @@ export function recordBrokerClaimIntent(input) {
 export function clearBrokerRuntimeStateForTask(input) {
     const registryPath = resolveBrokerRegistryPath(input.cwd);
     const registry = cleanupStale(loadRegistry(registryPath));
-    const nextRegistry = releaseTask(registry, input.taskId);
-    saveRegistry(registryPath, nextRegistry);
+    const existingActor = registry.activeIntents.find((intent) => intent.taskId === input.taskId)?.actorId ?? 'system';
+    const authority = createBrokerTransactionAuthority(registryPath);
+    authority.release({
+        taskId: input.taskId,
+        actorId: existingActor,
+        idempotencyKey: `clear:${input.taskId}:${existingActor}`
+    });
+    const nextRegistry = authority.read().document;
     const runtimeCleanup = cleanupBrokerRuntimeSnapshots({
         cwd: input.cwd,
         releasedTaskIds: [input.taskId],
@@ -121,9 +125,14 @@ export function cleanupBrokerRuntimeSnapshots(input) {
 }
 export function renewBrokerClaimIntent(input) {
     const registryPath = resolveBrokerRegistryPath(input.cwd);
-    const registry = cleanupStale(loadRegistry(registryPath));
-    const nextRegistry = renewIntentLease(registry, input.taskId, input.actorId, input.ttlSeconds ?? 1800);
-    saveRegistry(registryPath, nextRegistry);
+    const authority = createBrokerTransactionAuthority(registryPath);
+    authority.heartbeat({
+        taskId: input.taskId,
+        actorId: input.actorId,
+        ttlSeconds: input.ttlSeconds ?? 1800,
+        idempotencyKey: `renew:${input.taskId}:${input.actorId}:${Date.now()}`
+    });
+    const nextRegistry = authority.read().document;
     return {
         registryPath,
         registry: nextRegistry,
@@ -136,7 +145,6 @@ export function removeBrokerRegistryIfEmpty(cwd) {
         return false;
     const registry = cleanupStale(loadRegistry(registryPath));
     if ((registry.activeIntents ?? []).length > 0) {
-        saveRegistry(registryPath, registry);
         return false;
     }
     unlinkSync(registryPath);

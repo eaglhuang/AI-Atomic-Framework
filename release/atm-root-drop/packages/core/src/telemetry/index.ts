@@ -2,8 +2,26 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync,
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import type { TelemetryCorrelationFields, TelemetryTimingFields } from './observation.ts';
-export type { TelemetryCorrelationFields, TelemetryObservationBase, TelemetryTimingFields } from './observation.ts';
-export { normalizeTelemetryDurationMs } from './observation.ts';
+import {
+  mergeCompactCorrelation,
+  mergeReports,
+  readCompactSealDigests,
+  reportFromCompactSeals
+} from './compact-receipts.ts';
+export type {
+  TelemetryCorrelationFields,
+  TelemetryObservationBase,
+  TelemetryObservationStatus,
+  TelemetrySourceAvailability,
+  TelemetryStoragePolicy,
+  TelemetryTimingFields
+} from './observation.ts';
+export {
+  buildTelemetryObservation,
+  normalizeTelemetryDurationMs,
+  normalizeTelemetryTimestamp,
+  telemetryObservationProducerInventory
+} from './observation.ts';
 
 export const gateTelemetrySpecVersion = 'atm.gateTelemetry.v1';
 export const gateTelemetryRuntimeRelativePath = path.join('.atm', 'runtime', 'telemetry');
@@ -119,8 +137,20 @@ export interface GateTelemetrySealDigest {
   readonly sealedAt: string;
   readonly watermark: string;
   readonly eventCount: number;
+  readonly storagePolicy: 'runtime-raw-tracked-digest';
+  readonly sourceAvailability: GateTelemetrySourceAvailability;
+  readonly runtimeLocator: {
+    readonly root: '.atm/runtime/telemetry/gate-events';
+    readonly watermark: string;
+    readonly source: 'local-runtime';
+  };
   readonly historyPath: string;
   readonly historyDigest: string;
+  readonly rawEventDigest: string;
+  readonly aggregates: GateTelemetryReport['byCheckId'];
+  readonly correlation: GateTelemetryTaskSummary['correlation'];
+  readonly uniqueBlocks: readonly string[];
+  readonly evidenceReadbacks: number;
   readonly metaHealth: GateTelemetryMetaHealth;
 }
 
@@ -201,11 +231,16 @@ export function buildGateTelemetryTaskSummary(cwd: string, input: {
   readonly role?: GateTelemetryTaskSummary['baselineOrTreatmentRole'];
 }): GateTelemetryTaskSummary {
   const historyEvents = readHistoryEvents(path.join(cwd, gateTelemetryHistoryRelativePath));
+  const compactSeals = readCompactSealDigests(path.join(cwd, gateTelemetryEvidenceRelativePath))
+    .filter((seal) => seal.taskId === input.taskId);
   const events = historyEvents.valid.filter((event) => event.taskId === input.taskId);
   const coverage = buildGateTelemetryRegistryCoverageReport(cwd);
-  const report = reportEvents(events, historyEvents.malformed, historyEvents.warnings, 'sealed-history');
+  const report = compactSeals.length > 0
+    ? reportFromCompactSeals(compactSeals, historyEvents.malformed, historyEvents.warnings)
+    : reportEvents(events, historyEvents.malformed, historyEvents.warnings, 'sealed-history');
   const observed = events.map((event) => event.observedAt).sort();
   const missingTelemetry = coverage.requiredNodes.flatMap((node) => node.missingTelemetry);
+  const compactCorrelation = mergeCompactCorrelation(compactSeals);
   return {
     schemaId: 'atm.gateTelemetryTaskSummary.v1',
     taskId: input.taskId,
@@ -216,10 +251,10 @@ export function buildGateTelemetryTaskSummary(cwd: string, input: {
       watermark: observed[observed.length - 1] ?? null
     },
     correlation: {
-      runIds: sortedUnique(events.map((event) => event.runId)),
-      laneSessionIds: sortedUnique(events.map((event) => event.laneSessionId ?? null)),
-      batchIds: sortedUnique(events.map((event) => event.batchId ?? null)),
-      waveIds: sortedUnique(events.map((event) => event.waveId ?? null))
+      runIds: compactCorrelation.runIds.length > 0 ? compactCorrelation.runIds : sortedUnique(events.map((event) => event.runId)),
+      laneSessionIds: compactCorrelation.laneSessionIds.length > 0 ? compactCorrelation.laneSessionIds : sortedUnique(events.map((event) => event.laneSessionId ?? null)),
+      batchIds: compactCorrelation.batchIds.length > 0 ? compactCorrelation.batchIds : sortedUnique(events.map((event) => event.batchId ?? null)),
+      waveIds: compactCorrelation.waveIds.length > 0 ? compactCorrelation.waveIds : sortedUnique(events.map((event) => event.waveId ?? null))
     },
     gateEvents: report.byCheckId,
     uniqueBlocks: report.uniqueBlocks,
@@ -229,7 +264,11 @@ export function buildGateTelemetryTaskSummary(cwd: string, input: {
     droppedEvents: report.metaHealth.droppedEvents,
     missingTelemetry,
     baselineOrTreatmentRole: input.role ?? 'unknown',
-    sourceAvailability: missingTelemetry.length > 0 ? 'partial' : 'available',
+    sourceAvailability: compactSeals.some((seal) => seal.sourceAvailability === 'unavailable')
+      ? 'unavailable'
+      : missingTelemetry.length > 0
+        ? 'partial'
+        : 'available',
     historyDigest: coverage.historyDigest,
     configDigest: coverage.configDigest
   };
@@ -294,14 +333,12 @@ export function sealGateTelemetry(cwd: string, input: {
   const watermark = input.watermark ?? sealedAt;
   const runtimeRoot = path.join(cwd, gateTelemetryRuntimeRelativePath, 'gate-events');
   const events = readRuntimeEvents(runtimeRoot, watermark);
-  const historyDir = path.join(cwd, gateTelemetryHistoryRelativePath);
   const evidenceDir = path.join(cwd, gateTelemetryEvidenceRelativePath);
-  mkdirSync(historyDir, { recursive: true });
   mkdirSync(evidenceDir, { recursive: true });
-  const historyPath = path.join(historyDir, `gate-events-${sanitizePathPart(input.taskId)}-${sanitizePathPart(windowId)}.jsonl`);
   const body = events.valid.map((event) => JSON.stringify(event)).join('\n');
-  writeFileSync(historyPath, body.length > 0 ? `${body}\n` : '', 'utf8');
-  const historyDigest = digestText(readFileSync(historyPath, 'utf8'));
+  const rawEventDigest = digestText(body.length > 0 ? `${body}\n` : '');
+  const compactReport = reportEvents(events.valid, events.malformed, events.warnings, 'sealed-history');
+  const evidencePath = path.join(evidenceDir, `${sanitizePathPart(windowId)}.json`);
   const digest: GateTelemetrySealDigest = {
     schemaId: 'atm.gateTelemetrySealDigest.v1',
     taskId: input.taskId,
@@ -309,23 +346,53 @@ export function sealGateTelemetry(cwd: string, input: {
     sealedAt,
     watermark,
     eventCount: events.valid.length,
-    historyPath: path.relative(cwd, historyPath).replace(/\\/g, '/'),
-    historyDigest,
+    storagePolicy: 'runtime-raw-tracked-digest',
+    sourceAvailability: existsSync(runtimeRoot) ? 'available' : 'unavailable',
+    runtimeLocator: {
+      root: '.atm/runtime/telemetry/gate-events',
+      watermark,
+      source: 'local-runtime'
+    },
+    historyPath: path.relative(cwd, evidencePath).replace(/\\/g, '/'),
+    historyDigest: digestJson({
+      taskId: input.taskId,
+      windowId,
+      watermark,
+      eventCount: events.valid.length,
+      rawEventDigest,
+      aggregates: compactReport.byCheckId
+    }),
+    rawEventDigest,
+    aggregates: compactReport.byCheckId,
+    correlation: {
+      runIds: sortedUnique(events.valid.map((event) => event.runId)),
+      laneSessionIds: sortedUnique(events.valid.map((event) => event.laneSessionId ?? null)),
+      batchIds: sortedUnique(events.valid.map((event) => event.batchId ?? null)),
+      waveIds: sortedUnique(events.valid.map((event) => event.waveId ?? null))
+    },
+    uniqueBlocks: compactReport.uniqueBlocks,
+    evidenceReadbacks: Object.values(compactReport.byCheckId).reduce((sum, bucket) => sum + bucket.evidenceReadbacks, 0),
     metaHealth: {
       droppedEvents: 0,
       malformedEvents: events.malformed,
       warnings: events.warnings
     }
   };
-  writeFileSync(path.join(evidenceDir, `${sanitizePathPart(windowId)}.json`), `${JSON.stringify(digest, null, 2)}\n`, 'utf8');
+  writeFileSync(evidencePath, `${JSON.stringify(digest, null, 2)}\n`, 'utf8');
   return digest;
 }
 
 export function reportGateTelemetry(cwd: string, includeRuntime = false): GateTelemetryReport {
   const historyEvents = readHistoryEvents(path.join(cwd, gateTelemetryHistoryRelativePath));
+  const compactSeals = readCompactSealDigests(path.join(cwd, gateTelemetryEvidenceRelativePath));
   const runtimeEvents = includeRuntime ? readRuntimeEvents(path.join(cwd, gateTelemetryRuntimeRelativePath, 'gate-events')).valid : [];
+  if (compactSeals.length > 0 && runtimeEvents.length === 0) {
+    return reportFromCompactSeals(compactSeals, historyEvents.malformed, historyEvents.warnings);
+  }
   const events = [...historyEvents.valid, ...runtimeEvents];
-  return reportEvents(events, historyEvents.malformed, historyEvents.warnings, includeRuntime ? 'sealed-history+runtime' : 'sealed-history');
+  const eventReport = reportEvents(events, historyEvents.malformed, historyEvents.warnings, includeRuntime ? 'sealed-history+runtime' : 'sealed-history');
+  if (compactSeals.length === 0) return eventReport;
+  return mergeReports(reportFromCompactSeals(compactSeals, historyEvents.malformed, historyEvents.warnings), eventReport, includeRuntime ? 'sealed-history+runtime' : 'sealed-history');
 }
 
 function reportEvents(

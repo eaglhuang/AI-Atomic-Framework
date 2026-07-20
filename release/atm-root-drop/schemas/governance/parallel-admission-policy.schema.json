@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/parallel-admission-policy.schema.json",
+  "title": "ATM Parallel Admission Policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "mode",
+    "circuitBreakerEnabled",
+    "fallbackMode",
+    "rolloutScope",
+    "configDigest",
+    "tripped",
+    "trippedAt",
+    "trippedBy",
+    "tripReason",
+    "resetEvidenceDigest",
+    "resetAt",
+    "gatePolicies"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.parallelAdmissionPolicy.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "mode": { "enum": ["enforce", "observe"] },
+    "circuitBreakerEnabled": { "type": "boolean" },
+    "fallbackMode": { "enum": ["queue-only", "fail-closed"] },
+    "rolloutScope": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "configDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "tripped": { "type": "boolean" },
+    "trippedAt": { "type": ["string", "null"], "format": "date-time" },
+    "trippedBy": { "type": ["string", "null"] },
+    "tripReason": { "type": ["string", "null"] },
+    "resetEvidenceDigest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" },
+    "resetAt": { "type": ["string", "null"], "format": "date-time" },
+    "gatePolicies": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gateId",
+          "gateClass",
+          "owner",
+          "adapter",
+          "statusCommand",
+          "nextAction",
+          "recoveryCommand",
+          "canPolicyRelax"
+        ],
+        "properties": {
+          "gateId": {
+            "enum": [
+              "R1_SAME_TASK_SECOND_LANE",
+              "R2_DEPENDENCY_GATE",
+              "R3_SHARED_WRITE_SURFACE",
+              "R4_SHARED_SIDE_EFFECT"
+            ]
+          },
+          "gateClass": { "enum": ["hard-exception", "ticketed-shared-write"] },
+          "owner": { "type": "string", "minLength": 1 },
+          "adapter": { "type": "string", "minLength": 1 },
+          "statusCommand": { "type": "string", "minLength": 1 },
+          "nextAction": { "type": "string", "minLength": 1 },
+          "recoveryCommand": { "type": "string", "minLength": 1 },
+          "canPolicyRelax": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

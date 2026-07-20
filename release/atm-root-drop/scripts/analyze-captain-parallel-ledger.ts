@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { renderMarkdown } from './captain-parallel-ledger-report.ts';
-import { buildPlanPerformanceReport, type PlanPerformanceReport } from './plan-performance-report-v3.ts';
+import { buildPlanPerformanceReport, validateRealPairedAbV4, type PlanPerformanceReport } from './plan-performance-report-v3.ts';
 
 type TaskTransition = {
   readonly taskId?: string;
@@ -148,12 +148,16 @@ const eventRoot = args.get('event-root') ?? '.atm/history/task-events';
 const sessionEventRoot = args.get('session-event-root') ?? '.atm/history/session-events';
 const lockRoot = args.get('lock-root') ?? '.atm/runtime/locks';
 const coverageReportPath = args.get('coverage-report') ?? null;
+const sealedCohortsPath = args.get('sealed-cohorts') ?? 'scripts/fixtures/parallel-admission-scale/sealed-cohorts.json';
 const reportPath = args.get('report') ?? null;
+const validate = args.has('validate');
+const requireSealedCohorts = args.has('require-sealed-cohorts');
 const tasks = loadTaskTransitions(eventRoot);
 const intervals = buildIntervals(tasks).filter((interval) => /^TASK-RFT-\d{4}$/.test(interval.taskId));
 const allIntervals = buildIntervals(tasks);
 const laneEvents = loadLaneSessionEvents(sessionEventRoot);
 const autoBatchPipeline = summarizeAutoBatchPipeline(laneEvents);
+const sealedCohorts = readJsonIfExists(sealedCohortsPath);
 
 const serial = summarizeWave('serial-baseline-rft-0020-0025', intervals, /^TASK-RFT-00(20|21|22|23|24|25)$/);
 const parallel = summarizeWave('parallel-wave-rft-0030-0082', intervals, /^TASK-RFT-00(3\d|4\d|5\d|6\d|7\d|8[0-2])$/);
@@ -178,7 +182,8 @@ const result: CaptainParallelLedgerAnalysis = {
     laneEvents,
     autoBatchPipeline,
     coverageReport: readJsonIfExists(coverageReportPath),
-    comparison: compare(serial, parallel)
+    comparison: compare(serial, parallel),
+    sealedCohorts
   }),
   observabilityGaps: [
     {
@@ -203,6 +208,13 @@ const result: CaptainParallelLedgerAnalysis = {
 
 const json = JSON.stringify(result, null, 2);
 console.log(json);
+if (validate) {
+  const findings = validateRealPairedAbV4(result.planPerformanceReport.realPairedAbV4, requireSealedCohorts);
+  if (findings.length) {
+    console.error(`ATM-GOV-0202 validation failed:\n- ${findings.join('\n- ')}`);
+    process.exitCode = 1;
+  }
+}
 if (reportPath) {
   const slash = reportPath.replace(/\\/g, '/');
   const parent = slash.includes('/') ? slash.slice(0, slash.lastIndexOf('/')) : '';

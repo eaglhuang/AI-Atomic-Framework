@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.dev/schemas/governance/proposal-lane.schema.json",
+  "title": "ATM Proposal Lane",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "taskId",
+    "actorId",
+    "laneId",
+    "baseDigest",
+    "allowedPrivatePaths",
+    "candidateSharedSurfaces",
+    "waitingOn",
+    "durableProposalRef",
+    "status",
+    "heartbeatAt",
+    "ttlSeconds",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.proposalLane.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "taskId": { "type": "string", "minLength": 1 },
+    "actorId": { "type": "string", "minLength": 1 },
+    "laneId": { "type": "string", "minLength": 1 },
+    "baseDigest": { "type": "string", "minLength": 1 },
+    "allowedPrivatePaths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(\\.atm/runtime/proposal-lanes/|\\.atm/runtime/broker-proposals/|\\.atm/history/evidence/)"
+      },
+      "uniqueItems": true
+    },
+    "candidateSharedSurfaces": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "waitingOn": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["surfacePath", "queueHeadTaskId", "position"],
+        "properties": {
+          "surfacePath": { "type": "string", "minLength": 1 },
+          "queueHeadTaskId": { "type": "string", "minLength": 1 },
+          "position": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "durableProposalRef": {
+      "type": "string",
+      "pattern": "^\\.atm/runtime/broker-proposals/"
+    },
+    "status": { "enum": ["active", "sealed", "cancelled", "adopted"] },
+    "heartbeatAt": { "type": "string", "format": "date-time" },
+    "ttlSeconds": { "type": "integer", "minimum": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

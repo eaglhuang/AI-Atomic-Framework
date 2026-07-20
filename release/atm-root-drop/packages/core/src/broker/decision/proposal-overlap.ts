@@ -8,6 +8,18 @@ import type {
 } from '../types.ts';
 import { finalizeProposalAdmission, normalizeBoundedRegions } from './admission.ts';
 import { withFailureReason } from './failure.ts';
+import { findResourceOverlapMatches } from '../resource-overlap.ts';
+
+function collectSharedFiles(newIntent: WriteIntent, activeIntent: ActiveWriteIntent): readonly string[] {
+  const matches = findResourceOverlapMatches('file', newIntent.targetFiles, activeIntent.resourceKeys.files);
+  const shared = new Set<string>();
+  // Prefer the active (literal) key when available; that is the physical path
+  // any downstream region resolver will look up in the active intent.
+  for (const match of matches) {
+    shared.add(match.rightKey);
+  }
+  return [...shared];
+}
 
 export function evaluateProposalOverlap(
   newIntent: WriteIntent,
@@ -24,7 +36,7 @@ export function evaluateProposalOverlap(
       continue;
     }
 
-    const sharedFiles = newIntent.targetFiles.filter((filePath) => activeIntent.resourceKeys.files.includes(filePath));
+    const sharedFiles = collectSharedFiles(newIntent, activeIntent);
     if (sharedFiles.length === 0) {
       continue;
     }
@@ -181,7 +193,7 @@ export function shouldRefineProposalScopedCidConflict(
     return false;
   }
 
-  const sharedFiles = newIntent.targetFiles.filter((filePath) => activeIntent.resourceKeys.files.includes(filePath));
+  const sharedFiles = collectSharedFiles(newIntent, activeIntent);
   if (sharedFiles.length === 0) {
     return false;
   }

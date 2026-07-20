@@ -58,7 +58,7 @@ export function tryBuildQuickfixClaimResult(input) {
     return null;
 }
 export function buildNoClaimableTaskResult(input) {
-    const claimReadiness = diagnoseClaimReadinessForTasks(input.cwd, input.importedTaskQueue.promptScope?.selectedTasks ?? input.importedTaskQueue.tasks, input.claimIntent);
+    const claimReadiness = diagnoseClaimReadinessForTasks(input.cwd, input.importedTaskQueue.promptScope?.selectedTasks ?? input.importedTaskQueue.tasks, input.claimIntent, { dependencyMode: input.importedTaskQueue.claimableTask ? 'claim-files' : 'hard' });
     const primaryBlocker = claimReadiness.primaryBlocker;
     const selectedReviewTask = input.importedTaskQueue.selectedTask
         && normalizeTaskRouteStatus(input.importedTaskQueue.selectedTask.status) === 'review'
@@ -82,9 +82,11 @@ export function buildNoClaimableTaskResult(input) {
             }
         });
     }
-    const claimCode = input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
-        ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
-        : 'ATM_NEXT_CLAIM_NO_TASK';
+    const claimCode = primaryBlocker?.blockerCode === 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED'
+        ? 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED'
+        : input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
+            ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
+            : 'ATM_NEXT_CLAIM_NO_TASK';
     const singleVisibleTask = input.importedTaskQueue.tasks.length === 1 ? input.importedTaskQueue.tasks[0] : null;
     const promptScopeMiss = !input.importedTaskQueue.promptScope && !primaryBlocker && singleVisibleTask;
     const claimText = primaryBlocker?.blockerSummary

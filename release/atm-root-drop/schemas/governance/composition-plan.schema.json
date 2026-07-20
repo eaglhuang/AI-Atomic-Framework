@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/governance/composition-plan.schema.json",
+  "title": "ATM Composition Plan",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "planId",
+    "baseTree",
+    "outputTree",
+    "bounded",
+    "selectedRequestIds",
+    "skippedRequestIds",
+    "blockedRequestIds",
+    "fileSlices",
+    "memberAttribution",
+    "serializabilityProof",
+    "rollback",
+    "validatorRefs"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.compositionPlan.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": { "type": "object" },
+    "planId": { "type": "string", "minLength": 1 },
+    "baseTree": { "const": "in-memory" },
+    "outputTree": { "const": "in-memory" },
+    "bounded": { "const": true },
+    "selectedRequestIds": { "type": "array", "items": { "type": "string" } },
+    "skippedRequestIds": { "type": "array", "items": { "type": "string" } },
+    "blockedRequestIds": { "type": "array", "items": { "type": "string" } },
+    "fileSlices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["filePath", "adapterId", "baseHash", "outputHash", "selectedRequestIds"],
+        "properties": {
+          "filePath": { "type": "string" },
+          "adapterId": { "type": "string" },
+          "baseHash": { "type": "string", "pattern": "^sha256:" },
+          "outputHash": { "type": "string", "pattern": "^sha256:" },
+          "selectedRequestIds": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "memberAttribution": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requestId", "actorId", "taskId", "transactionIds", "filePath", "adapterId", "verdict", "reason"],
+        "properties": {
+          "requestId": { "type": "string" },
+          "actorId": { "type": "string" },
+          "taskId": { "type": ["string", "null"] },
+          "transactionIds": { "type": "array", "items": { "type": "string" } },
+          "filePath": { "type": "string" },
+          "adapterId": { "type": ["string", "null"] },
+          "verdict": { "enum": ["selected", "skipped", "blocked"] },
+          "reason": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "serializabilityProof": {
+      "type": "object",
+      "required": ["legalSerialOrder", "permutationStable", "equivalentOutputHash", "checkedPermutationCount"],
+      "properties": {
+        "legalSerialOrder": { "type": "array", "items": { "type": "string" } },
+        "permutationStable": { "type": "boolean" },
+        "equivalentOutputHash": { "type": "string", "pattern": "^sha256:" },
+        "checkedPermutationCount": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "rollback": {
+      "type": "object",
+      "required": ["strategy", "tempTreeMutation", "liveWorktreeMutation", "returnedQueueRequestIds"],
+      "properties": {
+        "strategy": { "const": "discard-temp-tree" },
+        "tempTreeMutation": { "const": false },
+        "liveWorktreeMutation": { "const": false },
+        "returnedQueueRequestIds": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "validatorRefs": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

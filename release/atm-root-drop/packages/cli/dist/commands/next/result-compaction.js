@@ -1,3 +1,4 @@
+import { buildFirstLayerCommandContract } from '../../../../core/dist/guidance/index.js';
 const NEXT_LARGE_ARRAY_TRUNCATION_LIMIT = 20;
 const NEXT_TRUNCATABLE_FRAMEWORK_STATUS_FIELDS = ['changedFiles', 'criticalChangedFiles', 'docsOnlyChangedFiles'];
 const NEXT_DUPLICATED_TOP_LEVEL_KEYS = [
@@ -48,10 +49,24 @@ function compactPlaybookMessageData(data) {
  */
 export function compactNextRouteResult(result) {
     const evidence = result.evidence;
+    const firstLayerContract = buildFirstLayerCommandContract();
+    const firstLayerCompactOrientation = {
+        status: readNestedString(evidence, ['nextAction', 'status']) ?? readNestedString(result, ['nextAction', 'status']) ?? null,
+        command: readNestedString(evidence, ['nextAction', 'command']) ?? readNestedString(result, ['nextAction', 'command']) ?? null,
+        recommendedChannel: readNestedString(evidence, ['nextAction', 'recommendedChannel']) ?? null,
+        ticketStates: firstLayerContract.ticketStates.map((entry) => ({
+            state: entry.state,
+            errorCode: entry.errorCode,
+            statusCommand: entry.statusCommand,
+            nextAction: entry.nextAction
+        })),
+        validatorSummary: buildValidatorSummary(evidence),
+        fullOutput: 'rerun the same next command with --verbose --json'
+    };
     const compactedEvidence = evidence && isPlainRecord(evidence.frameworkStatus)
-        ? { ...evidence, frameworkStatus: compactFrameworkStatusFileLists(evidence.frameworkStatus), suppressToolBridgeProjection: true }
+        ? { ...evidence, frameworkStatus: compactFrameworkStatusFileLists(evidence.frameworkStatus), suppressToolBridgeProjection: true, firstLayerCompactOrientation }
         : evidence
-            ? { ...evidence, suppressToolBridgeProjection: true }
+            ? { ...evidence, suppressToolBridgeProjection: true, firstLayerCompactOrientation }
             : evidence;
     const messages = Array.isArray(result.messages)
         ? result.messages.map((entry) => {
@@ -71,4 +86,35 @@ export function compactNextRouteResult(result) {
         delete compacted[key];
     }
     return compacted;
+}
+function readNestedString(root, path) {
+    let cursor = root;
+    for (const key of path) {
+        if (!isPlainRecord(cursor)) {
+            return null;
+        }
+        cursor = cursor[key];
+    }
+    return typeof cursor === 'string' ? cursor : null;
+}
+function buildValidatorSummary(evidence) {
+    if (!evidence)
+        return null;
+    const nextAction = evidence.nextAction;
+    if (isPlainRecord(nextAction) && Array.isArray(nextAction.validators)) {
+        return {
+            count: nextAction.validators.length,
+            validators: nextAction.validators.slice(0, 8),
+            truncated: nextAction.validators.length > 8
+        };
+    }
+    const doctorSummary = evidence.doctorSummary;
+    if (Array.isArray(doctorSummary)) {
+        return {
+            count: doctorSummary.length,
+            failed: doctorSummary.filter((entry) => isPlainRecord(entry) && entry.ok !== true).length,
+            checks: doctorSummary.slice(0, 8)
+        };
+    }
+    return null;
 }

@@ -1,0 +1,9 @@
+export type { NextClaimIntent, PromptScopedTaskContext } from './route-resolution/intent.ts';
+export { createDeterministicTaskIntent, detectRequestedTaskAction, extractPromptPathHints, normalizeOptionalString, resolvePromptScopedTaskContext, resolveTaskIntent } from './route-resolution/intent.ts';
+export { findActiveBatchRunForIntent, findActiveTaskQueueForIntent, reconcilePromptScopeRuntimeForClaim } from './route-resolution/runtime.ts';
+export { applyOrdinalScope, assertPromptBatchDoesNotConflict, dedupeTasks, expandTaskIdReferenceAliases, extractTaskFamilyRootHintsFromPrompt, extractTaskIdReferencesFromPrompt, extractTaskRootHintsFromPrompt, findTaskByTaskIdReference, isActiveClaimedTask, isBacklogIdentifier, isHandoffPrompt, isTaskIdMentioned, isTaskIdSuffixMentioned, resolveHandoffResumeTaskRoute, resolvePromptScopedTaskRoute, resolveRouteTargetRepo, scoreTaskForIntent } from './route-resolution/matching.ts';
+export type { ImportedTaskSummaryWithOutOfScope } from './route-resolution/artifact-scope.ts';
+export { extractDeclaredTaskPathsFromDocument, extractLinkedSourceTaskArtifactPaths, extractTaskArtifactPathsFromMarkdown, finalizeImportedTaskSummary, resolveQuickfixScope, withMirrorSyncOnlyTarget, withMirrorSyncOnlyTargetQueue } from './route-resolution/artifact-scope.ts';
+export { buildNonPlaybookRouteHints, checkPendingTaskArtifactScopeExpansion } from './route-resolution/pending-worktree.ts';
+export { findNearbyPlanPaths, isTaskPathUnderPreferredPlanningRoots, listPromptScopedExternalTaskCardFiles, listTaskCardFiles } from './route-resolution/task-card-discovery.ts';
+export { buildMinimalImportedJsonTaskSummary, extractJsonTaskMetadata, hasPromptScopedWorkItems, inspectImportedTaskQueue, isSelectedTaskClaimableForIntent, selectImportedTaskForPromptScope, shouldSkipExternalTaskCardScan, shouldSkipMarkdownTaskDiscovery } from './route-resolution/queue-inspection.ts';

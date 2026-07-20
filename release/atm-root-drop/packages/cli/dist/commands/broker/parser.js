@@ -15,6 +15,11 @@ export function parseBrokerArgs(argv) {
         projectionAction: null,
         scheduleAction: null,
         batchAction: null,
+        parallelAdmissionAction: null,
+        policyMode: null,
+        policyFallbackMode: null,
+        policyCircuitBreaker: null,
+        reason: null,
         task: null,
         actorId: null,
         sealedSourceSha: null,
@@ -45,6 +50,7 @@ export function parseBrokerArgs(argv) {
         claimedTasks: [],
         validatorTasks: [],
         fileSlices: [],
+        commandManifestPath: null,
         runCommand: null,
         outputFiles: [],
         stewardId: null,
@@ -173,6 +179,38 @@ export function parseBrokerArgs(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--mode') {
+            const mode = requireValue(argv, index, '--mode');
+            if (!['enforce', 'observe'].includes(mode)) {
+                throw new CliError('ATM_CLI_USAGE', `unsupported --mode ${mode}`, { exitCode: 2 });
+            }
+            state.policyMode = mode;
+            index += 1;
+            continue;
+        }
+        if (arg === '--fallback-mode') {
+            const mode = requireValue(argv, index, '--fallback-mode');
+            if (!['queue-only', 'fail-closed'].includes(mode)) {
+                throw new CliError('ATM_CLI_USAGE', `unsupported --fallback-mode ${mode}`, { exitCode: 2 });
+            }
+            state.policyFallbackMode = mode;
+            index += 1;
+            continue;
+        }
+        if (arg === '--circuit-breaker') {
+            const value = requireValue(argv, index, '--circuit-breaker').trim().toLowerCase();
+            if (!['true', 'false'].includes(value)) {
+                throw new CliError('ATM_CLI_USAGE', '--circuit-breaker requires true or false.', { exitCode: 2 });
+            }
+            state.policyCircuitBreaker = value === 'true';
+            index += 1;
+            continue;
+        }
+        if (arg === '--reason') {
+            state.reason = requireValue(argv, index, '--reason');
+            index += 1;
+            continue;
+        }
         if (arg === '--proposal-file') {
             state.proposalFiles.push(requireValue(argv, index, '--proposal-file'));
             index += 1;
@@ -215,6 +253,11 @@ export function parseBrokerArgs(argv) {
         }
         if (arg === '--run-command') {
             state.runCommand = requireValue(argv, index, '--run-command');
+            index += 1;
+            continue;
+        }
+        if (arg === '--command-manifest') {
+            state.commandManifestPath = requireValue(argv, index, '--command-manifest');
             index += 1;
             continue;
         }
@@ -285,6 +328,9 @@ export function parseBrokerArgs(argv) {
         else if (state.action === 'batch' && state.batchAction === 'execute' && arg === 'commit') {
             state.surfaces.push(arg);
         }
+        else if (state.action === 'parallel-admission' && !state.parallelAdmissionAction) {
+            state.parallelAdmissionAction = arg;
+        }
         else {
             throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
         }
@@ -304,6 +350,11 @@ export function parseBrokerArgs(argv) {
         projectionAction: state.projectionAction,
         scheduleAction: state.scheduleAction,
         batchAction: state.batchAction,
+        parallelAdmissionAction: state.parallelAdmissionAction,
+        policyMode: state.policyMode,
+        policyFallbackMode: state.policyFallbackMode,
+        policyCircuitBreaker: state.policyCircuitBreaker,
+        reason: state.reason,
         task: state.task,
         actorId: state.actorId,
         sealedSourceSha: state.sealedSourceSha,
@@ -333,6 +384,7 @@ export function parseBrokerArgs(argv) {
         claimedTasks: state.claimedTasks,
         validatorTasks: state.validatorTasks,
         fileSlices: state.fileSlices,
+        commandManifestPath: state.commandManifestPath,
         runCommand: state.runCommand,
         outputFiles: state.outputFiles,
         stewardId: state.stewardId,

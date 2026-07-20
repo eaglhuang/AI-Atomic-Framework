@@ -1,88 +1,29 @@
-import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
 import { classifyLeasePhase } from './orphan-cleanup.js';
+import { createBrokerRegistryStore, createEmptyBrokerRegistryDocument } from './registry-store.js';
 export const DEFAULT_BROKER_CLEANUP_COMMAND = 'node atm.mjs broker cleanup --json';
 export function loadRegistry(filePath, options = {}) {
     const persistCleanup = options.persistCleanup !== false;
-    if (!existsSync(filePath)) {
-        return {
-            schemaId: 'atm.writeBrokerRegistry.v1',
-            specVersion: '0.1.0',
-            repoId: 'local-repo',
-            workspaceId: 'main',
-            currentEpoch: Date.now(),
-            activeIntents: []
-        };
+    const store = createBrokerRegistryStore(filePath);
+    const snapshot = store.read();
+    const parsed = snapshot.document;
+    const cleaned = cleanupStaleWithEvidence(parsed, { registryPath: filePath });
+    if (persistCleanup
+        && (cleaned.removedCount > 0 || cleaned.registry.currentEpoch !== parsed.currentEpoch)) {
+        saveRegistry(filePath, cleaned.registry);
     }
-    try {
-        const raw = readFileSync(filePath, 'utf8');
-        const parsed = JSON.parse(raw);
-        const cleaned = cleanupStaleWithEvidence(parsed, { registryPath: filePath });
-        if (persistCleanup
-            && (cleaned.removedCount > 0 || cleaned.registry.currentEpoch !== parsed.currentEpoch)) {
-            saveRegistry(filePath, cleaned.registry);
-        }
-        return cleaned.registry;
-    }
-    catch {
-        return {
-            schemaId: 'atm.writeBrokerRegistry.v1',
-            specVersion: '0.1.0',
-            repoId: 'local-repo',
-            workspaceId: 'main',
-            currentEpoch: Date.now(),
-            activeIntents: []
-        };
-    }
+    return cleaned.registry;
 }
 export function saveRegistry(filePath, doc) {
-    const dir = dirname(filePath);
-    if (!existsSync(dir)) {
-        mkdirSync(dir, { recursive: true });
-    }
-    writeAtomicUtf8(filePath, `${JSON.stringify(doc, null, 2)}\n`);
-}
-function writeAtomicUtf8(filePath, content) {
-    const dir = dirname(filePath);
-    const tempPath = `${filePath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    let fd = null;
-    try {
-        fd = openSync(tempPath, 'wx');
-        writeFileSync(fd, content, 'utf8');
-        fsyncSync(fd);
-        closeSync(fd);
-        fd = null;
-        renameSync(tempPath, filePath);
-        fsyncDirectory(dir);
-    }
-    catch (error) {
-        if (fd !== null) {
-            try {
-                closeSync(fd);
-            }
-            catch {
-                // Best effort cleanup after a failed atomic registry write.
-            }
-        }
-        rmSync(tempPath, { force: true });
-        throw error;
-    }
-}
-function fsyncDirectory(dir) {
-    let fd = null;
-    try {
-        fd = openSync(dir, 'r');
-        fsyncSync(fd);
-    }
-    catch {
-        // Some platforms do not allow fsync on directories; the file-level fsync
-        // plus atomic rename remains the portable minimum.
-    }
-    finally {
-        if (fd !== null) {
-            closeSync(fd);
-        }
-    }
+    const store = createBrokerRegistryStore(filePath);
+    const base = store.read();
+    store.write({
+        base,
+        next: {
+            ...createEmptyBrokerRegistryDocument(),
+            ...doc
+        },
+        transactionId: `legacy-save:${process.pid}:${Date.now()}`
+    });
 }
 export function registerIntent(doc, intent, lane, ttlSeconds = 1800, admissionOverride) {
     const leaseSeconds = resolveLeaseSeconds(intent, ttlSeconds);

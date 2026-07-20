@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-206",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Guidance / first-layer routing",
+  "finding": "A Chinese closeout prompt with an explicit task id (`繼續收 ATM-GOV-0196`) was not recognized as task-scoped closeout guidance. `next --prompt` routed to generic `guide`, and `start --goal` then recommended `create-atom` instead of task closeout, even though `next --prompt \"close task ATM-GOV-0196\"` correctly resolved the same task.",
+  "expectedBehavior": "Prompts containing an explicit existing task id plus closeout verbs such as 收、收單、結案、關閉, or close should route to the same task-scoped normal playbook as `close task <id>`, not to create-atom guidance.",
+  "evidenceOrRepro": "2026-07-20 dogfood while closing ATM-GOV-0196: `node atm.mjs next --prompt \"繼續收 ATM-GOV-0196；如果有卡住的 bug 就先回寫 backlog，並且用泛用方法修正排除\" --json` returned `ATM_NEXT_PROMPT_GUIDANCE_REQUIRED`; `node atm.mjs start --cwd . --goal \"繼續收 ATM-GOV-0196；如果有卡住的 bug 就先回寫 backlog，並且用泛用方法修正排除\" --json` recommended `create-atom`; control command `node atm.mjs next --prompt \"close task ATM-GOV-0196\" --json` returned `ATM_NEXT_TASK_ROUTE_READY` for ATM-GOV-0196.",
+  "followUp": "Add a generalized first-layer intent rule/test: explicit task ids plus multilingual closeout verbs must enter task-scoped next/playbook routing. Do not hard-code ATM-GOV-0196; derive the existing task id from the ledger and classify the verb set through data-driven lexicon/config."
+}

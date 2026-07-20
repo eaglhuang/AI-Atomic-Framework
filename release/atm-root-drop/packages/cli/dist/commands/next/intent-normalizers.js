@@ -44,7 +44,7 @@ function detectRequestedTaskAction(prompt) {
         return 'redo';
     if (/\u91cd\u65b0\u6253\u958b|reopen/i.test(prompt))
         return 'reopen';
-    if (/\u95dc\u9589|\u5b8c\u6210|close|done/i.test(prompt))
+    if (/\u95dc\u9589|\u5b8c\u6210|(?<![A-Za-z0-9-])close(?![A-Za-z0-9-])|(?<![A-Za-z0-9-])done(?![A-Za-z0-9-])/i.test(prompt))
         return 'close';
     if (/audit|\u7a3d\u6838|\u6aa2\u8a0e/i.test(prompt))
         return 'audit';
@@ -146,8 +146,8 @@ export function normalizeTaskIntent(value, fallbackSource) {
         confidence: typeof value.confidence === 'number' && Number.isFinite(value.confidence) ? Math.max(0, Math.min(1, value.confidence)) : 0.5,
         source: normalizeTaskIntentSource(value.source) ?? fallbackSource,
         ordinalScope: normalizeOrdinalScope(value.ordinalScope),
-        queueRequested: !journalingPrompt && (value.queueRequested === true || isQueueRequestedPrompt(prompt)),
-        taskScopeMentioned: !journalingPrompt && (value.taskScopeMentioned === true
+        queueRequested: isQueueRequestedPrompt(prompt) || (!journalingPrompt && value.queueRequested === true),
+        taskScopeMentioned: (isQueueRequestedPrompt(prompt) || !journalingPrompt) && (value.taskScopeMentioned === true
             || explicitTaskIds.length > 0
             || mentionedTaskIds.length > 0
             || mentionedPlanPaths.length > 0

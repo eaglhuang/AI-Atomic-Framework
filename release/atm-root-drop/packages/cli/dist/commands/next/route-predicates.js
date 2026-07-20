@@ -1,8 +1,12 @@
 import { isJournalingPrompt, isQueueRequestedPrompt, normalizeSearchText, normalizeTaskRouteStatus } from './intent-normalizers.js';
 function isFrameworkMaintenancePrompt(prompt) {
+    const normalized = normalizeSearchText(prompt);
+    if (normalized.includes(normalizeSearchText('atm-bug'))
+        || (normalized.includes(normalizeSearchText('atm')) && (normalized.includes(normalizeSearchText('backlog')) || normalized.includes(normalizeSearchText('bug'))))) {
+        return true;
+    }
     if (isJournalingPrompt(prompt))
         return false;
-    const normalized = normalizeSearchText(prompt);
     return [
         'framework',
         'atm',
@@ -16,6 +20,9 @@ function isFrameworkMaintenancePrompt(prompt) {
         'integration',
         'runner',
         'governance',
+        'atm-bug',
+        'backlog',
+        'bug',
         '治理',
         '框架',
         '基線',

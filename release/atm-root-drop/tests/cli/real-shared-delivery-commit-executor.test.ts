@@ -82,6 +82,9 @@ const cli = spawnSync(process.execPath, [
 assert.equal(cli.status, 0, cli.stderr || cli.stdout);
 const parsed = JSON.parse(cli.stdout);
 assert.equal(parsed.ok, true);
+assert.equal(parsed.evidence.saga.schemaId, 'atm.sharedDeliverySagaPlan.v1');
+assert.equal(parsed.evidence.saga.receipt.recoveryAction, 'none');
+assert.equal(parsed.evidence.saga.receipt.exactlyOnce, true);
 assert.equal(parsed.evidence.payloadAssertion.expectedStagedFiles.includes('README.md'), true);
 
 const receipt = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'evidence', 'shared-write.json'), 'utf8'));

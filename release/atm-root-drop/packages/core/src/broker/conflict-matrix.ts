@@ -1,5 +1,7 @@
 import type { ActiveWriteIntent, BrokerArbitrationVerdict, BrokerConflictClassResult, BrokerConflictGateResult, BrokerConflictMatrix, BrokerDecision, WriteIntent, WriteIntentAtomRef } from './types.ts';
 export type { BrokerArbitrationVerdict, BrokerConflictClassResult, BrokerConflictGateResult, BrokerConflictMatrix } from './types.ts';
+import { buildResourceOverlapReport, compareResourceKeys, findResourceOverlapMatches, resourceListsOverlap, type ResourceKeyOverlapFact, type ResourceKeyOverlapVerdict, type ResourceOverlapMatch } from './resource-overlap.ts';
+export { compareResourceKeys, type ResourceKeyOverlapFact, type ResourceKeyOverlapVerdict } from './resource-overlap.ts';
 
 const conflictMatrixSchemaId = 'atm.brokerConflictMatrix.v1' as const;
 const conflictMatrixSpecVersion = '0.1.0' as const;
@@ -35,6 +37,7 @@ export function evaluateConflictMatrix(
 
   const arbitrationVerdict = chooseArbitrationVerdict(conflicts);
   const dedupedConflicts = dedupeConflictResults(conflicts);
+  const resourceOverlapReport = buildResourceOverlapReport(newIntent, activeIntents);
 
   return {
     schemaId: conflictMatrixSchemaId,
@@ -43,7 +46,8 @@ export function evaluateConflictMatrix(
     taskId: newIntent.taskId,
     arbitrationVerdict,
     conflicts: dedupedConflicts,
-    gateResults: buildSevenLayerGateResults(dedupedConflicts)
+    gateResults: buildSevenLayerGateResults(dedupedConflicts),
+    resourceOverlaps: resourceOverlapReport.facts.filter((fact) => fact.verdict !== 'disjoint')
   };
 }
 
@@ -108,60 +112,22 @@ function detectSharedSurfaceConflicts(
   activeIntents: readonly ActiveWriteIntent[]
 ): BrokerConflictClassResult[] {
   const conflicts: BrokerConflictClassResult[] = [];
-  const newGenerators = new Set(newIntent.sharedSurfaces.generators);
-  const newProjections = new Set(newIntent.sharedSurfaces.projections);
-  const newRegistries = new Set(newIntent.sharedSurfaces.registries);
-  const newValidators = new Set(newIntent.sharedSurfaces.validators);
-  const newArtifacts = new Set(newIntent.sharedSurfaces.artifacts);
+  const axes: ReadonlyArray<{ readonly axis: string; readonly left: readonly string[]; readonly rightOf: (active: ActiveWriteIntent) => readonly string[]; readonly label: string }> = [
+    { axis: 'generator', left: newIntent.sharedSurfaces.generators, rightOf: (a) => a.resourceKeys.generators, label: 'generator' },
+    { axis: 'projection', left: newIntent.sharedSurfaces.projections, rightOf: (a) => a.resourceKeys.projections, label: 'projection' },
+    { axis: 'registry', left: newIntent.sharedSurfaces.registries, rightOf: (a) => a.resourceKeys.registries, label: 'registry' },
+    { axis: 'validator', left: newIntent.sharedSurfaces.validators, rightOf: (a) => a.resourceKeys.validators, label: 'validator' },
+    { axis: 'artifact', left: newIntent.sharedSurfaces.artifacts, rightOf: (a) => a.resourceKeys.artifacts, label: 'artifact' }
+  ];
 
   for (const active of activeIntents) {
     if (active.taskId === newIntent.taskId) continue;
 
-    for (const generator of active.resourceKeys.generators) {
-      if (newGenerators.has(generator)) {
+    for (const { axis, left, rightOf, label } of axes) {
+      for (const match of findResourceOverlapMatches(axis, left, rightOf(active))) {
         conflicts.push({
           kind: 'shared-surface',
-          detail: `Shared generator conflict: '${generator}' is in use by '${active.taskId}'.`,
-          blockingTask: active.taskId
-        });
-      }
-    }
-
-    for (const projection of newProjections) {
-      if (active.resourceKeys.projections.includes(projection)) {
-        conflicts.push({
-          kind: 'shared-surface',
-          detail: `Shared projection conflict: '${projection}' is in use by '${active.taskId}'.`,
-          blockingTask: active.taskId
-        });
-      }
-    }
-
-    for (const registry of newRegistries) {
-      if (active.resourceKeys.registries.includes(registry)) {
-        conflicts.push({
-          kind: 'shared-surface',
-          detail: `Shared registry conflict: '${registry}' is in use by '${active.taskId}'.`,
-          blockingTask: active.taskId
-        });
-      }
-    }
-
-    for (const validator of newValidators) {
-      if (active.resourceKeys.validators.includes(validator)) {
-        conflicts.push({
-          kind: 'shared-surface',
-          detail: `Shared validator conflict: '${validator}' is in use by '${active.taskId}'.`,
-          blockingTask: active.taskId
-        });
-      }
-    }
-
-    for (const artifact of newArtifacts) {
-      if (active.resourceKeys.artifacts.includes(artifact)) {
-        conflicts.push({
-          kind: 'shared-surface',
-          detail: `Shared artifact conflict: '${artifact}' is in use by '${active.taskId}'.`,
+          detail: formatSharedSurfaceConflictDetail(label, match, active.taskId),
           blockingTask: active.taskId
         });
       }
@@ -177,10 +143,10 @@ function detectCidConflictClasses(
 ): BrokerConflictClassResult[] {
   const conflicts: BrokerConflictClassResult[] = [];
 
-  const newAtomIds = new Set(newIntent.atomRefs.map((ref) => ref.atomId));
-  const newAtomCids = new Set(newIntent.atomRefs.map((ref) => ref.atomCid));
-  const newReadAtomIds = new Set((newIntent.readAtoms ?? []).map((ref) => ref.atomId));
-  const newReadAtomCids = new Set((newIntent.readAtoms ?? []).map((ref) => ref.atomCid));
+  const newAtomIds = newIntent.atomRefs.map((ref) => ref.atomId);
+  const newAtomCids = newIntent.atomRefs.map((ref) => ref.atomCid);
+  const newReadAtomIds = (newIntent.readAtoms ?? []).map((ref) => ref.atomId);
+  const newReadAtomCids = (newIntent.readAtoms ?? []).map((ref) => ref.atomCid);
   const seen = new Set<string>();
 
   for (const active of activeIntents) {
@@ -190,7 +156,7 @@ function detectCidConflictClasses(
     const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
 
     for (const activeAtomId of active.resourceKeys.atomIds) {
-      if (materialCidWrite && newAtomIds.has(activeAtomId)) {
+      if (materialCidWrite && resourceListsOverlap('atom-id', newAtomIds, [activeAtomId])) {
         const key = `cid:${active.taskId}:${activeAtomId}`;
         if (!seen.has(key)) {
           conflicts.push({
@@ -201,7 +167,7 @@ function detectCidConflictClasses(
           seen.add(key);
         }
       }
-      if (newReadAtomIds.has(activeAtomId)) {
+      if (resourceListsOverlap('atom-id', newReadAtomIds, [activeAtomId])) {
         const key = `read:${active.taskId}:${activeAtomId}`;
         if (!seen.has(key)) {
           conflicts.push({
@@ -215,7 +181,7 @@ function detectCidConflictClasses(
     }
 
     for (const activeReadAtomId of activeReadAtomIds) {
-      if (newAtomIds.has(activeReadAtomId)) {
+      if (resourceListsOverlap('atom-id', newAtomIds, [activeReadAtomId])) {
         const key = `active-read:${active.taskId}:${activeReadAtomId}`;
         if (!seen.has(key)) {
           conflicts.push({
@@ -229,7 +195,7 @@ function detectCidConflictClasses(
     }
 
     for (const activeAtomCid of active.resourceKeys.atomCids) {
-      if (materialCidWrite && newAtomCids.has(activeAtomCid)) {
+      if (materialCidWrite && resourceListsOverlap('atom-cid', newAtomCids, [activeAtomCid])) {
         const key = `cid-c:${active.taskId}:${activeAtomCid}`;
         if (!seen.has(key)) {
           conflicts.push({
@@ -240,7 +206,7 @@ function detectCidConflictClasses(
           seen.add(key);
         }
       }
-      if (newReadAtomCids.has(activeAtomCid)) {
+      if (resourceListsOverlap('atom-cid', newReadAtomCids, [activeAtomCid])) {
         const key = `read-c:${active.taskId}:${activeAtomCid}`;
         if (!seen.has(key)) {
           conflicts.push({
@@ -254,7 +220,7 @@ function detectCidConflictClasses(
     }
 
     for (const activeReadAtomCid of activeReadAtomCids) {
-      if (newAtomCids.has(activeReadAtomCid)) {
+      if (resourceListsOverlap('atom-cid', newAtomCids, [activeReadAtomCid])) {
         const key = `active-read-c:${active.taskId}:${activeReadAtomCid}`;
         if (!seen.has(key)) {
           conflicts.push({
@@ -271,19 +237,23 @@ function detectCidConflictClasses(
   return conflicts;
 }
 
+function formatSharedSurfaceConflictDetail(label: string, match: ResourceOverlapMatch, activeTaskId: string): string {
+  const displayKey = match.leftKey === match.rightKey ? `'${match.leftKey}'` : `'${match.leftKey}' vs active '${match.rightKey}'`;
+  const suffix = match.verdict === 'unknown' ? ' (possible overlap; unresolved key syntax)' : '';
+  return `Shared ${label} conflict: ${displayKey} is in use by '${activeTaskId}'.${suffix}`;
+}
+
 function hasSharedWriteSurface(intent: WriteIntent, active: ActiveWriteIntent): boolean {
-  const files = new Set(intent.targetFiles.map((file) => file.trim().replace(/\\/g, '/')));
-  if (active.resourceKeys.files.some((file) => files.has(file.trim().replace(/\\/g, '/')))) return true;
-  return intersects(intent.sharedSurfaces.generators, active.resourceKeys.generators)
-    || intersects(intent.sharedSurfaces.projections, active.resourceKeys.projections)
-    || intersects(intent.sharedSurfaces.registries, active.resourceKeys.registries)
-    || intersects(intent.sharedSurfaces.validators, active.resourceKeys.validators)
-    || intersects(intent.sharedSurfaces.artifacts, active.resourceKeys.artifacts);
+  return resourceListsOverlap('file', intent.targetFiles, active.resourceKeys.files)
+    || resourceListsOverlap('generator', intent.sharedSurfaces.generators, active.resourceKeys.generators)
+    || resourceListsOverlap('projection', intent.sharedSurfaces.projections, active.resourceKeys.projections)
+    || resourceListsOverlap('registry', intent.sharedSurfaces.registries, active.resourceKeys.registries)
+    || resourceListsOverlap('validator', intent.sharedSurfaces.validators, active.resourceKeys.validators)
+    || resourceListsOverlap('artifact', intent.sharedSurfaces.artifacts, active.resourceKeys.artifacts);
 }
 
 function intersects(left: readonly string[], right: readonly string[]): boolean {
-  const values = new Set(left);
-  return right.some((value) => values.has(value));
+  return resourceListsOverlap('resource', left, right);
 }
 
 function detectFileRangeConflictClasses(
@@ -306,6 +276,24 @@ function detectFileRangeConflictClasses(
   }
 
   for (const targetFile of newIntent.targetFiles) {
+    for (const active of activeIntents) {
+      if (active.taskId === newIntent.taskId) continue;
+      for (const activeFile of active.resourceKeys.files) {
+        const fact = compareResourceKeys('file', targetFile, activeFile);
+        if (fact.verdict === 'clear') continue;
+        const key = `file-surface:${fact.verdict}:${targetFile}:${active.taskId}:${activeFile}`;
+        if (seen.has(key)) continue;
+        conflicts.push({
+          kind: 'file-range',
+          detail: fact.verdict === 'overlap'
+            ? `File overlap on '${targetFile}' with active resource '${activeFile}' (${fact.reason}).`
+            : `File possible-overlap on '${targetFile}' with active resource '${activeFile}' (${fact.reason}).`,
+          blockingTask: active.taskId
+        });
+        seen.add(key);
+      }
+    }
+
     const sourceRanges = newIntent.atomRefs
       .map((entry) => ({ entry, range: entry.sourceRange }))
       .filter((candidate): candidate is { entry: WriteIntentAtomRef; range: NonNullable<WriteIntentAtomRef['sourceRange']> } => {
@@ -351,31 +339,14 @@ function detectFileRangeConflictClasses(
 function hasResourceOverlap(newIntent: WriteIntent, active: ActiveWriteIntent): boolean {
   if (active.taskId === newIntent.taskId) return true;
 
-  const activeFiles = new Set(active.resourceKeys.files);
-  if (newIntent.targetFiles.some(file => activeFiles.has(file))) return true;
-
-  const activeAtomIds = new Set(active.resourceKeys.atomIds);
-  if (newIntent.atomRefs.some(ref => activeAtomIds.has(ref.atomId))) return true;
-
-  const activeAtomCids = new Set(active.resourceKeys.atomCids);
-  if (newIntent.atomRefs.some(ref => activeAtomCids.has(ref.atomCid))) return true;
-
-  const activeGenerators = new Set(active.resourceKeys.generators);
-  if (newIntent.sharedSurfaces.generators.some(gen => activeGenerators.has(gen))) return true;
-
-  const activeProjections = new Set(active.resourceKeys.projections);
-  if (newIntent.sharedSurfaces.projections.some(proj => activeProjections.has(proj))) return true;
-
-  const activeRegistries = new Set(active.resourceKeys.registries);
-  if (newIntent.sharedSurfaces.registries.some(reg => activeRegistries.has(reg))) return true;
-
-  const activeValidators = new Set(active.resourceKeys.validators);
-  if (newIntent.sharedSurfaces.validators.some(val => activeValidators.has(val))) return true;
-
-  const activeArtifacts = new Set(active.resourceKeys.artifacts);
-  if (newIntent.sharedSurfaces.artifacts.some(art => activeArtifacts.has(art))) return true;
-
-  return false;
+  return resourceListsOverlap('file', newIntent.targetFiles, active.resourceKeys.files)
+    || resourceListsOverlap('atom-id', newIntent.atomRefs.map(ref => ref.atomId), active.resourceKeys.atomIds)
+    || resourceListsOverlap('atom-cid', newIntent.atomRefs.map(ref => ref.atomCid), active.resourceKeys.atomCids)
+    || resourceListsOverlap('generator', newIntent.sharedSurfaces.generators, active.resourceKeys.generators)
+    || resourceListsOverlap('projection', newIntent.sharedSurfaces.projections, active.resourceKeys.projections)
+    || resourceListsOverlap('registry', newIntent.sharedSurfaces.registries, active.resourceKeys.registries)
+    || resourceListsOverlap('validator', newIntent.sharedSurfaces.validators, active.resourceKeys.validators)
+    || resourceListsOverlap('artifact', newIntent.sharedSurfaces.artifacts, active.resourceKeys.artifacts);
 }
 
 function detectLeaseConflicts(

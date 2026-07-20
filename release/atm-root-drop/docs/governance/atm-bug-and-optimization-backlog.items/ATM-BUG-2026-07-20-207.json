@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-207",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2b85526b3",
+  "area": "Evidence / telemetry / validator timing",
+  "finding": "`evidence run` records command, exitCode, stdout/stderr digests, generatedAt, runnerKind, sourceCommit, cacheKey, and cached state, but the commandRuns stored in task evidence and bundle manifests do not include durationMs/start/end timing. Long validators such as `npm run typecheck` and `npm run validate:cli` are therefore command-backed but weak for future performance analysis.",
+  "expectedBehavior": "Every command-backed evidence run should persist compact timing fields suitable for later analysis, at minimum durationMs and preferably startedAt/finishedAt or equivalent phase timing. Raw logs and detailed timing traces should stay in gitignored runtime, while Git-tracked evidence keeps compact digests and summary timing.",
+  "evidenceOrRepro": "2026-07-20 ATM-GOV-0196 dogfood: `.atm/history/evidence/ATM-GOV-0196.json` and `.atm/history/evidence/ATM-GOV-0196.bundle-manifest.json` contain successful entries for `npm run typecheck` and `npm run validate:cli`, but each commandRuns entry lacks durationMs or started/finished timestamps.",
+  "followUp": "Fixed by adding a generalized evidence-run timing contract for command-backed evidence. ATM-GOV-0205 should still migrate the broader validator lifecycle and runner telemetry surfaces onto the canonical telemetry observation interface."
+}

@@ -18,6 +18,26 @@ type EffectivenessMethodSummary = {
   readonly reason: string;
 };
 
+const requiredTasks = ['ATM-GOV-0198', 'ATM-GOV-0199', 'ATM-GOV-0200', 'ATM-GOV-0201', 'ATM-GOV-0211', 'ATM-GOV-0212', 'ATM-GOV-0213', 'ATM-GOV-0214'];
+const requiredArms = ['serial', 'queue-only', 'atm-compose-first', 'isolated-git-branch-merge'];
+const requiredScales = [2, 4, 8, 16, 32, 64, 100];
+const requiredContention = ['disjoint', 'same-file-disjoint-anchor', 'commutative-cid', 'noncommutative-cid', 'generated-shared-surface'];
+
+export type RealPairedAbV4Report = {
+  readonly schemaId: 'atm.realPairedAbV4.v1';
+  readonly benchmarkConfigDigest: string | null;
+  readonly crossCardConsumption: { readonly requiredTaskCount: number; readonly consumedTaskCount: number; readonly missingTasks: readonly string[]; readonly digestMismatchTasks: readonly string[]; readonly verdict: Verdict };
+  readonly arms: readonly { readonly arm: string; readonly cellCount: number; readonly sufficientCellCount: number; readonly missingCellCount: number; readonly insufficientCellCount: number; readonly verdict: Verdict }[];
+  readonly validationMethods: readonly { readonly method: string; readonly verdict: Verdict; readonly sourceDigest: string | null }[];
+  readonly rolloutDimensions: { readonly speed: Verdict; readonly cost: Verdict; readonly safety: Verdict; readonly observability: Verdict; readonly broker: Verdict; readonly runner: Verdict };
+  readonly gitArmIsolation: { readonly disposableRepo: boolean; readonly liveFrameworkWorktree: boolean; readonly brokerBypass: boolean; readonly verdict: Verdict };
+  readonly rollbackReceipt: { readonly verified: boolean; readonly recoveryCommand: string | null; readonly receiptDigest: string | null; readonly verdict: Verdict };
+  readonly supplementalSamplingProposal: readonly string[];
+  readonly failClosedFindings: readonly string[];
+  readonly verdict: Verdict;
+  readonly reason: string;
+};
+
 export type PlanPerformanceReport = {
   readonly schemaId: 'atm.planPerformanceReport.v1';
   readonly version: 'v3';
@@ -84,6 +104,7 @@ export type PlanPerformanceReport = {
     readonly reason: string;
   };
   readonly nextConfigDigest: string;
+  readonly realPairedAbV4: RealPairedAbV4Report;
 };
 
 export function buildPlanPerformanceReport(input: {
@@ -91,6 +112,7 @@ export function buildPlanPerformanceReport(input: {
   readonly autoBatchPipeline: { readonly rolloutVerdict: { readonly verdict: string }; readonly evidenceSources: { readonly brokerTickets: number } };
   readonly coverageReport: unknown;
   readonly comparison: WaveComparison;
+  readonly sealedCohorts?: unknown;
 }): PlanPerformanceReport {
   const tickets = brokerTickets(input.laneEvents);
   const coverageLimitations = coverageLimitationsFrom(input.coverageReport);
@@ -115,6 +137,8 @@ export function buildPlanPerformanceReport(input: {
     gateEffectiveness.canonicalParity.verdict === 'inconclusive' ? 'canonical evaluator parity samples' : null,
     coverageLimitations.length ? 'ready M2 coverage report' : null
   ].filter((entry): entry is string => Boolean(entry));
+  const realPairedAbV4 = summarizeRealPairedAbV4(input.sealedCohorts);
+  const allMissingData = [...missingData, ...realPairedAbV4.failClosedFindings, ...realPairedAbV4.supplementalSamplingProposal];
   return {
     schemaId: 'atm.planPerformanceReport.v1',
     version: 'v3',
@@ -125,27 +149,116 @@ export function buildPlanPerformanceReport(input: {
     telemetrySelfGovernance: telemetrySelfGovernance(telemetryDecisionCount),
     rolloutVerdict: {
       schemaId: 'atm.rolloutVerdict.v1',
-      speed,
-      cost,
-      safety,
-      observability,
-      overall,
-      reason: overall === 'improved' ? 'All rollout dimensions have comparable positive evidence.' : 'At least one rollout dimension lacks comparable evidence or has an inconclusive safety/observability input.'
+      speed: weakest([speed, realPairedAbV4.rolloutDimensions.speed]),
+      cost: weakest([cost, realPairedAbV4.rolloutDimensions.cost]),
+      safety: weakest([safety, realPairedAbV4.rolloutDimensions.safety]),
+      observability: weakest([observability, realPairedAbV4.rolloutDimensions.observability]),
+      overall: rolloutOverall([overall, realPairedAbV4.verdict]),
+      reason: realPairedAbV4.verdict === 'improved' ? 'All rollout dimensions have comparable positive evidence.' : realPairedAbV4.reason
     },
     coverageLimitations,
     dataDrivenDecision: {
-      adoptedExistingData: ['task-event claim/close ledger', 'lane-session brokerTicket details when present', '0195 coverage/M2 preflight report when supplied', 'runtime framework lock snapshot as observability-only evidence'],
-      missingData,
-      changedImplementationStrategy: missingData.length > 0,
+      adoptedExistingData: ['task-event claim/close ledger', 'lane-session brokerTicket details when present', '0195 coverage/M2 preflight report when supplied', 'runtime framework lock snapshot as observability-only evidence', ...(realPairedAbV4.crossCardConsumption.missingTasks.length ? [] : ['0202 sealed cross-card consumption manifest'])],
+      missingData: allMissingData,
+      changedImplementationStrategy: allMissingData.length > 0,
       stopAndDiscussRequired: false,
-      reason: missingData.length > 0 ? 'Analyzer emits an explicit inconclusive M2 verdict instead of converting missing data into zero-cost, zero-block, or success claims.' : 'Analyzer has sufficient comparable inputs for a rollout verdict.'
+      reason: allMissingData.length > 0 ? 'Analyzer emits an explicit inconclusive M2 verdict instead of converting missing cells into zero-cost, zero-block, or O(1) claims.' : 'Analyzer has sufficient comparable inputs for a rollout verdict.'
     },
-    nextConfigDigest: digestObject({ matchedCohorts, brokerDecisionAnalysis, gateEffectiveness, coverageLimitations })
+    nextConfigDigest: digestObject({ matchedCohorts, brokerDecisionAnalysis, gateEffectiveness, coverageLimitations, realPairedAbV4 }),
+    realPairedAbV4
   };
 }
 
 function brokerTickets(events: readonly LaneSessionEvent[]) {
   return events.map((event) => event.details?.brokerTicket).filter((ticket): ticket is Record<string, unknown> => Boolean(ticket && typeof ticket === 'object'));
+}
+
+export function validateRealPairedAbV4(report: RealPairedAbV4Report, requireSealedCohorts: boolean): readonly string[] {
+  if (!requireSealedCohorts) return [];
+  const findings = [...report.failClosedFindings];
+  if (!report.benchmarkConfigDigest) findings.push('sealed cohort benchmarkConfigDigest is missing');
+  if (report.crossCardConsumption.missingTasks.length) findings.push(`unconsumed dependency summaries: ${report.crossCardConsumption.missingTasks.join(', ')}`);
+  if (report.crossCardConsumption.digestMismatchTasks.length) findings.push(`digest mismatches: ${report.crossCardConsumption.digestMismatchTasks.join(', ')}`);
+  for (const arm of report.arms) if (arm.missingCellCount > 0) findings.push(`${arm.arm} is missing ${arm.missingCellCount} required cells`);
+  if (report.gitArmIsolation.verdict !== 'improved') findings.push('isolated Git arm is not proven disposable/non-bypass');
+  if (report.rollbackReceipt.verdict !== 'improved') findings.push('rollback/circuit-breaker recovery receipt is not verified');
+  return [...new Set(findings)];
+}
+
+function summarizeRealPairedAbV4(value: unknown): RealPairedAbV4Report {
+  const manifest = objectRecord(value);
+  const config = objectRecord(manifest?.benchmarkConfig);
+  const refs = arrayRecords(manifest?.consumedSummaries);
+  const cells = expandCells(manifest);
+  const methods = arrayRecords(manifest?.validationMethods);
+  const consumed = new Set(refs.filter((ref) => ref.consumedBy === 'ATM-GOV-0202' && String(ref.digest ?? '').startsWith('sha256:')).map((ref) => String(ref.taskId)));
+  const digestMismatchTasks = refs.filter((ref) => ref.digestMismatch === true).map((ref) => String(ref.taskId));
+  const missingTasks = requiredTasks.filter((task) => !consumed.has(task));
+  const arms = requiredArms.map((arm) => summarizeArm(arm, cells, Number(config?.minimumRepeats ?? 3)));
+  const methodReports = ['historicalReplay', 'shadowMode', 'canonicalParity', 'matchedBatchAb'].map((method) => {
+    const found = methods.find((entry) => String(entry.method) === method);
+    return { method, verdict: verdictOf(found?.verdict), sourceDigest: typeof found?.sourceDigest === 'string' ? found.sourceDigest : null };
+  });
+  const git = objectRecord(manifest?.gitArmIsolation);
+  const rollback = objectRecord(manifest?.rollbackReceipt);
+  const dimensions = objectRecord(manifest?.rolloutDimensions);
+  const failClosedFindings = [
+    !manifest ? 'sealed cohort manifest missing' : null,
+    missingTasks.length ? 'cross-card consumption is incomplete' : null,
+    digestMismatchTasks.length ? 'cross-card digest mismatch is present' : null,
+    methodReports.some((method) => !method.sourceDigest) ? 'one or more validation methods lack an independent source digest' : null
+  ].filter((entry): entry is string => Boolean(entry));
+  const supplementalSamplingProposal = arms.flatMap((arm) => arm.verdict === 'improved' ? [] : [`collect supplemental samples for ${arm.arm}: ${arm.insufficientCellCount} insufficient cells, ${arm.missingCellCount} missing cells`]);
+  const baseVerdicts = [verdictOf(dimensions?.speed), verdictOf(dimensions?.cost), verdictOf(dimensions?.safety), verdictOf(dimensions?.observability), verdictOf(dimensions?.broker), verdictOf(dimensions?.runner)];
+  const structuralVerdict: Verdict = missingTasks.length || digestMismatchTasks.length ? 'regressed' : 'improved';
+  const rollbackVerdict: Verdict = rollback?.verified === true && typeof rollback?.recoveryCommand === 'string' && typeof rollback?.receiptDigest === 'string' ? 'improved' : 'regressed';
+  const verdict = rolloutOverall([...baseVerdicts, ...arms.map((arm) => arm.verdict), ...methodReports.map((method) => method.verdict), structuralVerdict, rollbackVerdict]);
+  return {
+    schemaId: 'atm.realPairedAbV4.v1',
+    benchmarkConfigDigest: typeof manifest?.benchmarkConfigDigest === 'string' ? manifest.benchmarkConfigDigest : null,
+    crossCardConsumption: { requiredTaskCount: requiredTasks.length, consumedTaskCount: consumed.size, missingTasks, digestMismatchTasks, verdict: structuralVerdict },
+    arms,
+    validationMethods: methodReports,
+    rolloutDimensions: { speed: baseVerdicts[0], cost: baseVerdicts[1], safety: baseVerdicts[2], observability: baseVerdicts[3], broker: baseVerdicts[4], runner: baseVerdicts[5] },
+    gitArmIsolation: { disposableRepo: git?.disposableRepo === true, liveFrameworkWorktree: git?.liveFrameworkWorktree === true, brokerBypass: git?.brokerBypass === true, verdict: git?.disposableRepo === true && git?.liveFrameworkWorktree !== true && git?.brokerBypass !== true ? 'improved' : 'regressed' },
+    rollbackReceipt: { verified: rollback?.verified === true, recoveryCommand: typeof rollback?.recoveryCommand === 'string' ? rollback.recoveryCommand : null, receiptDigest: typeof rollback?.receiptDigest === 'string' ? rollback.receiptDigest : null, verdict: rollbackVerdict },
+    supplementalSamplingProposal,
+    failClosedFindings,
+    verdict,
+    reason: verdict === 'improved' ? 'All required real paired AB v4 cells and safety receipts are sufficient.' : 'One or more required cells are explicitly insufficient, so rollout remains opt-in behind the circuit breaker.'
+  };
+}
+
+function summarizeArm(arm: string, cells: readonly Record<string, unknown>[], minimumRepeats: number) {
+  const selected = cells.filter((cell) => cell.arm === arm);
+  let missingCellCount = 0;
+  let insufficientCellCount = 0;
+  let sufficientCellCount = 0;
+  for (const scale of requiredScales) for (const contention of requiredContention) {
+    const cell = selected.find((entry) => Number(entry.scale) === scale && entry.contention === contention);
+    if (!cell) { missingCellCount += 1; continue; }
+    const ok = Number(cell.sampleCount ?? 0) >= minimumRepeats && cell.status === 'sufficient';
+    if (ok) sufficientCellCount += 1; else insufficientCellCount += 1;
+  }
+  return { arm, cellCount: selected.length, sufficientCellCount, missingCellCount, insufficientCellCount, verdict: missingCellCount || insufficientCellCount ? 'inconclusive' as const : 'improved' as const };
+}
+
+function expandCells(manifest: Record<string, unknown> | null): Record<string, unknown>[] {
+  const explicit = arrayRecords(manifest?.cells);
+  const matrix = objectRecord(manifest?.cellMatrix);
+  if (!matrix) return explicit;
+  const arms = stringArray(matrix.arms);
+  const scales = numberArray(matrix.scales);
+  const contentions = stringArray(matrix.contention);
+  const generated = arms.flatMap((arm) => scales.flatMap((scale) => contentions.map((contention) => ({
+    arm,
+    scale,
+    contention,
+    status: matrix.status ?? 'inconclusive',
+    sampleCount: matrix.sampleCount ?? 0,
+    exclusionReason: matrix.exclusionReason ?? 'supplemental sample required'
+  }))));
+  return [...explicit, ...generated];
 }
 
 function summarizeMatchedCohorts(tickets: readonly Record<string, unknown>[]): PlanPerformanceReport['matchedCohorts'] {
@@ -246,6 +359,30 @@ function telemetrySelfGovernance(telemetryDecisionCount: number): PlanPerformanc
 
 function rolloutOverall(verdicts: readonly Verdict[]): Verdict {
   return verdicts.includes('regressed') ? 'regressed' : verdicts.every((verdict) => verdict === 'improved') ? 'improved' : 'inconclusive';
+}
+
+function weakest(verdicts: readonly Verdict[]): Verdict {
+  return verdicts.includes('regressed') ? 'regressed' : verdicts.includes('inconclusive') ? 'inconclusive' : 'improved';
+}
+
+function verdictOf(value: unknown): Verdict {
+  return value === 'improved' || value === 'regressed' || value === 'inconclusive' ? value : 'inconclusive';
+}
+
+function objectRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+
+function arrayRecords(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value) ? value.map(objectRecord).filter((entry): entry is Record<string, unknown> => Boolean(entry)) : [];
+}
+
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
+}
+
+function numberArray(value: unknown): number[] {
+  return Array.isArray(value) ? value.map(Number).filter((entry) => Number.isFinite(entry)) : [];
 }
 
 function numberField(records: readonly Record<string, unknown>[], field: string): number[] {

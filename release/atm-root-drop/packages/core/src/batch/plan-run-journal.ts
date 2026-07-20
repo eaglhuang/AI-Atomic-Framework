@@ -6,6 +6,44 @@ export const ATM_BATCH_PLAN_DIGEST_MISMATCH = 'ATM_BATCH_PLAN_DIGEST_MISMATCH';
 export const ATM_BATCH_RUN_EVENT_JOURNAL_INVALID = 'ATM_BATCH_RUN_EVENT_JOURNAL_INVALID';
 
 export type PlanBatchRunPhase = 'created' | 'active' | 'held' | 'completed' | 'abandoned';
+export type PlanExecutorPhaseKind =
+  | 'preflight'
+  | 'select'
+  | 'claim'
+  | 'workers'
+  | 'reconcile'
+  | 'validate'
+  | 'proposal-sealed'
+  | 'broker-ticketed'
+  | 'composing'
+  | 'semantic-revalidation'
+  | 'prepared'
+  | 'published'
+  | 'generated-writes'
+  | 'commit'
+  | 'checkpoint'
+  | 'closeback'
+  | 'analyze';
+
+export const planExecutorPhaseChain: readonly PlanExecutorPhaseKind[] = Object.freeze([
+  'preflight',
+  'select',
+  'claim',
+  'workers',
+  'reconcile',
+  'validate',
+  'proposal-sealed',
+  'broker-ticketed',
+  'composing',
+  'semantic-revalidation',
+  'prepared',
+  'published',
+  'generated-writes',
+  'commit',
+  'checkpoint',
+  'closeback',
+  'analyze'
+]);
 
 export interface PlanBatchRunJournalEvent {
   readonly schemaId: 'atm.batchRunJournalEvent.v1';
@@ -25,6 +63,12 @@ export interface PlanBatchRunJournalEvent {
   readonly createdAt: string;
   readonly idempotencyKey: string;
   readonly eventDigest: string;
+  readonly phase?: PlanExecutorPhaseKind;
+  readonly inputDigest?: string;
+  readonly outputDigest?: string;
+  readonly sideEffectReceiptDigest?: string | null;
+  readonly terminal?: boolean;
+  readonly skipReason?: string | null;
 }
 
 export interface PlanBatchRunRecord {
@@ -42,6 +86,8 @@ export interface PlanBatchRunRecord {
   readonly journalPath: string;
   readonly eventCount: number;
   readonly lastEventDigest: string | null;
+  readonly completedPhaseKeys?: readonly string[];
+  readonly sideEffectReceiptDigests?: Readonly<Record<string, string>>;
 }
 
 export function startPlanBatchRun(input: {
@@ -87,9 +133,15 @@ export function startPlanBatchRun(input: {
 export function appendPlanBatchRunEvent(cwd: string, batchId: string, input: {
   readonly kind: string;
   readonly taskId?: string | null;
+  readonly phase?: PlanExecutorPhaseKind | null;
   readonly actorId: string;
   readonly laneSessionId?: string | null;
   readonly idempotencyKey: string;
+  readonly inputDigest?: string | null;
+  readonly outputDigest?: string | null;
+  readonly sideEffectReceiptDigest?: string | null;
+  readonly terminal?: boolean | null;
+  readonly skipReason?: string | null;
   readonly inputTokens?: number | null;
   readonly outputTokens?: number | null;
   readonly cacheReadTokens?: number | null;
@@ -110,9 +162,15 @@ export function appendPlanBatchRunEvent(cwd: string, batchId: string, input: {
     batchId,
     kind: input.kind,
     taskId: input.taskId ?? null,
+    phase: input.phase ?? null,
     actorId: input.actorId,
     laneSessionId: input.laneSessionId ?? null,
     idempotencyKey: input.idempotencyKey,
+    inputDigest: input.inputDigest ?? null,
+    outputDigest: input.outputDigest ?? null,
+    sideEffectReceiptDigest: input.sideEffectReceiptDigest ?? null,
+    terminal: input.terminal ?? false,
+    skipReason: input.skipReason ?? null,
     createdAt
   };
   const event: PlanBatchRunJournalEvent = {
@@ -126,7 +184,13 @@ export function appendPlanBatchRunEvent(cwd: string, batchId: string, input: {
       source: input.tokenSource ?? 'unavailable'
     },
     waitedMs: Math.max(0, input.waitedMs ?? 0),
-    eventDigest: `sha256:${hashJson(eventSeed)}`
+    eventDigest: `sha256:${hashJson(eventSeed)}`,
+    phase: input.phase ?? undefined,
+    inputDigest: input.inputDigest ?? undefined,
+    outputDigest: input.outputDigest ?? undefined,
+    sideEffectReceiptDigest: input.sideEffectReceiptDigest ?? null,
+    terminal: input.terminal ?? false,
+    skipReason: input.skipReason ?? null
   };
   appendJournalEvent(cwd, batchRun.journalPath, event);
   const updated: PlanBatchRunRecord = {
@@ -134,10 +198,18 @@ export function appendPlanBatchRunEvent(cwd: string, batchId: string, input: {
     phase: nextPhase(batchRun.phase, input.kind),
     updatedAt: createdAt,
     eventCount: existing.length + 1,
-    lastEventDigest: event.eventDigest
+    lastEventDigest: event.eventDigest,
+    completedPhaseKeys: nextCompletedPhaseKeys(batchRun.completedPhaseKeys ?? [], event),
+    sideEffectReceiptDigests: nextSideEffectReceiptDigests(batchRun.sideEffectReceiptDigests ?? {}, event)
   };
   writePlanBatchRun(cwd, updated);
   return { batchRun: updated, event, duplicate: false };
+}
+
+export function readPlanBatchRunEvents(cwd: string, batchId: string): readonly PlanBatchRunJournalEvent[] {
+  const batchRun = readPlanBatchRun(cwd, batchId);
+  if (!batchRun) return [];
+  return readJournalEvents(cwd, batchRun.journalPath);
 }
 
 export function readPlanBatchRun(cwd: string, batchId: string): PlanBatchRunRecord | null {
@@ -185,6 +257,16 @@ function nextPhase(current: PlanBatchRunPhase, kind: string): PlanBatchRunPhase 
   if (kind.endsWith('.held')) return 'held';
   if (current === 'created') return 'active';
   return current;
+}
+
+function nextCompletedPhaseKeys(current: readonly string[], event: PlanBatchRunJournalEvent) {
+  if (!event.phase || !event.taskId || !event.terminal) return current;
+  return [...new Set([...current, `${event.taskId}:${event.phase}`])].sort();
+}
+
+function nextSideEffectReceiptDigests(current: Readonly<Record<string, string>>, event: PlanBatchRunJournalEvent) {
+  if (!event.taskId || !event.phase || !event.sideEffectReceiptDigest) return current;
+  return { ...current, [`${event.taskId}:${event.phase}`]: event.sideEffectReceiptDigest };
 }
 
 function hashJson(value: unknown) {

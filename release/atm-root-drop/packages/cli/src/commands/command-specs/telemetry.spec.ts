@@ -34,6 +34,12 @@ export default defineCommandSpec({
     { flag: '--reason', value: 'class', summary: 'Reason class for local fixture emission.' },
     { flag: '--duration-ms', value: 'number', summary: 'Duration for local fixture emission.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for local fixture emission.' },
+    { flag: '--run-id', value: 'id', summary: 'Run id correlation key for local fixture emission.' },
+    { flag: '--lane-session-id', value: 'id', summary: 'Lane session correlation key for local fixture emission.' },
+    { flag: '--batch-id', value: 'id', summary: 'Batch id correlation key for local fixture emission.' },
+    { flag: '--wave-id', value: 'id', summary: 'Wave id correlation key for local fixture emission.' },
+    { flag: '--correlation-id', value: 'id', summary: 'Correlation id for local fixture emission.' },
+    { flag: '--evidence-read-ref', value: 'ref', summary: 'Compact evidence readback reference consumed by this telemetry event.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption

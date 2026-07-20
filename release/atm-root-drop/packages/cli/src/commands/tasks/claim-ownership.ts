@@ -68,6 +68,18 @@ export function throwIfForeignSameTaskClaim(input: {
 }): ClaimOwnerComparison {
   const comparison = evaluateSameTaskClaimOwnership(input);
   if (comparison.sameOwner) return comparison;
+  if (input.currentActorId === input.requestedActorId) {
+    return {
+      schemaId: 'atm.claimOwnerComparison.v1',
+      mode: 'same-actor-claim-reentry',
+      sameOwner: true,
+      currentActorId: input.currentActorId,
+      conflictingActorId: input.requestedActorId,
+      currentLaneSessionId: input.currentLaneSessionId ?? null,
+      conflictingLaneSessionId: input.requestedLaneSessionId ?? null,
+      reason: 'tasks claim treats same-actor reentry as idempotent even when lane ids differ; stricter lane checks still apply to renew, release, handoff, and close actions.'
+    };
+  }
   throw new CliError(
     'ATM_LOCK_CONFLICT',
     `Task ${input.taskId} is already claimed by ${input.currentActorId}`

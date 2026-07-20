@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { collectResolutionAuthorizedForeignTaskIds } from '../broker-conflict-resolution.js';
 import { buildBrokerConflictUxProjection } from '../team.js';
 import { runTasks } from '../tasks/public-surface.js';
@@ -5,9 +6,11 @@ import { CliError } from '../shared.js';
 import { compareClaimLifecycleOwners, deriveActiveWriteConflictFromOwnerComparison, deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission, resolveEffectiveShouldBlockPerCid } from './claim-admission.js';
 import { evaluateBrokerQueueAdmission } from './broker-queue-admission.js';
 import { buildClaimAdmissionDecisionLog } from './claim-conflict-log.js';
+import { createProposalLaneAdmission, readActiveProposalLane, writeProposalLane } from './proposal-lane.js';
 export async function runClaimParallelPreflight(input) {
     let parallelAdvisory = undefined;
     let brokerQueueAdmission = undefined;
+    let proposalLaneAdmission = undefined;
     let claimAllowedFiles = input.claimAllowedFiles.slice();
     try {
         const parallelResult = await runTasks([
@@ -98,10 +101,31 @@ export async function runClaimParallelPreflight(input) {
                             });
                         }
                         if (queueAdmission.status === 'queued-blocked') {
-                            throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `broker-conflict-blocked: ${queueAdmission.reason}`, {
-                                exitCode: 1,
-                                details: { taskId: input.claimableTask.workItemId, brokerQueueAdmission: queueAdmission }
+                            const proposalAdmission = createProposalLaneAdmission({
+                                cwd: input.cwd,
+                                taskId: input.claimableTask.workItemId,
+                                actorId: input.actorId,
+                                baseDigest: readGitHeadDigest(input.cwd),
+                                overlappingFiles,
+                                queueAdmission,
+                                existingLane: readActiveProposalLane(input.cwd, input.claimableTask.workItemId)
                             });
+                            if (proposalAdmission.status === 'same-task-conflict') {
+                                throw new CliError('ATM_LOCK_CONFLICT', proposalAdmission.reason, {
+                                    exitCode: 1,
+                                    details: { taskId: input.claimableTask.workItemId, brokerQueueAdmission: queueAdmission, proposalLaneAdmission: proposalAdmission }
+                                });
+                            }
+                            if (!proposalAdmission.proposalLane) {
+                                throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `broker-conflict-blocked: ${queueAdmission.reason}`, {
+                                    exitCode: 1,
+                                    details: { taskId: input.claimableTask.workItemId, brokerQueueAdmission: queueAdmission, proposalLaneAdmission: proposalAdmission }
+                                });
+                            }
+                            writeProposalLane(input.cwd, proposalAdmission.proposalLane);
+                            proposalLaneAdmission = proposalAdmission;
+                            brokerQueueAdmission = queueAdmission;
+                            claimAllowedFiles = proposalAdmission.allowedPrivatePaths.slice();
                         }
                         if (queueAdmission.status === 'queued-private-work') {
                             brokerQueueAdmission = queueAdmission;
@@ -134,8 +158,8 @@ export async function runClaimParallelPreflight(input) {
                         // registry adds a distinct verdict feed here in a follow-up, the
                         // divergence detector will start firing.
                         const brokerVerdict = deriveBrokerVerdict({
-                            queuedPrivateWork: queueAdmission.status === 'queued-private-work',
-                            shouldBlockPerCid: effectiveShouldBlockPerCid
+                            queuedPrivateWork: queueAdmission.status === 'queued-private-work' || proposalLaneAdmission?.status === 'proposal-lane-opened',
+                            shouldBlockPerCid: proposalLaneAdmission?.status === 'proposal-lane-opened' ? false : effectiveShouldBlockPerCid
                         });
                         const admission = evaluateClaimAdmission({
                             brokerVerdict,
@@ -148,11 +172,13 @@ export async function runClaimParallelPreflight(input) {
                         const admissionReason = admission.admitted
                             ? (queueAdmission.status === 'queued-private-work'
                                 ? 'broker-shared-surface-queue-private-work'
-                                : insufficientMutationIntent
-                                    ? 'broker-conflict-not-confirmed'
-                                    : input.claimIntent === 'closeout-only'
-                                        ? 'closeout-only-claim-intent'
-                                        : 'cid-overlap-without-active-write-claim')
+                                : proposalLaneAdmission?.status === 'proposal-lane-opened'
+                                    ? 'broker-isolated-proposal-lane'
+                                    : insufficientMutationIntent
+                                        ? 'broker-conflict-not-confirmed'
+                                        : input.claimIntent === 'closeout-only'
+                                            ? 'closeout-only-claim-intent'
+                                            : 'cid-overlap-without-active-write-claim')
                             : null;
                         const claimAdmissionDecisionLog = buildClaimAdmissionDecisionLog({
                             taskId: input.claimableTask.workItemId,
@@ -217,6 +243,7 @@ export async function runClaimParallelPreflight(input) {
                                 brokerVerdict,
                                 cidVerdict,
                                 claimAdmissionDecisionLog,
+                                ...(proposalLaneAdmission ? { proposalLaneAdmission } : {}),
                                 ...(admission.divergence ? { admissionDivergence: admission.divergence } : {})
                             };
                         }
@@ -245,7 +272,7 @@ export async function runClaimParallelPreflight(input) {
         }
         // Other parallel errors are handled as best-effort
     }
-    return { parallelAdvisory, brokerQueueAdmission, claimAllowedFiles };
+    return { parallelAdvisory, brokerQueueAdmission, proposalLaneAdmission, claimAllowedFiles };
 }
 function normalizeCandidateLaneSessionId(candidate) {
     const direct = normalizeString(candidate.activeClaimLaneSessionId)
@@ -264,4 +291,8 @@ function normalizeCandidateLaneSessionId(candidate) {
 }
 function normalizeString(value) {
     return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+function readGitHeadDigest(cwd) {
+    const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd, encoding: 'utf8' });
+    return result.status === 0 && result.stdout.trim() ? result.stdout.trim() : 'unresolved-head';
 }

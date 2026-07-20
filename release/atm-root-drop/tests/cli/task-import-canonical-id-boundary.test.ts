@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { parsePlanMarkdown } from '../../packages/atm-markdown-task-source/src/task-card-parser.ts';
+import { parsePlanMarkdown } from '../../packages/cli/src/commands/tasks/plan-import-boundary.ts';
 
 const parsed = parsePlanMarkdown({
   importedAt: '2026-07-19T00:00:00.000Z',
@@ -33,7 +33,18 @@ const parsed = parsePlanMarkdown({
     '',
     '### ATM-GOV-018200 Six digits must not become ATM-GOV-01820',
     '',
-    'This section documents an invalid suffix and should not emit a prefix fragment.'
+    'This section documents an invalid suffix and should not emit a prefix fragment.',
+    '',
+    '```yaml',
+    'dataDrivenDecision:',
+    '  consumedSummaries:',
+    '    - taskId: TASK-ID-0000',
+    '      historyDigest: sha256:...',
+    '```',
+    '',
+    '```markdown',
+    '## TASK-EXAMPLE-0000 Example heading inside a code fence',
+    '```'
   ].join('\n')
 });
 
@@ -51,6 +62,18 @@ assert.equal(
   parsed.diagnostics.some((entry) => entry.code === 'ATM_TASK_IMPORT_REFERENCE_ONLY_ID_FRAGMENT' && entry.workItemId === 'ATM-GOV-018200'),
   true,
   'six digit heading should be diagnosed as reference-only instead of importing a five digit prefix'
+);
+assert.equal(ids.includes('TASK-ID-0000'), false);
+assert.equal(ids.includes('TASK-EXAMPLE-0000'), false);
+assert.equal(
+  parsed.diagnostics.some((entry) => entry.code === 'ATM_TASK_IMPORT_REFERENCE_ONLY_ID_FRAGMENT' && entry.workItemId === 'TASK-ID-0000'),
+  true,
+  'task-like yaml examples inside fenced code must be diagnosed as reference-only instead of imported'
+);
+assert.equal(
+  parsed.diagnostics.some((entry) => entry.code === 'ATM_TASK_IMPORT_REFERENCE_ONLY_ID_FRAGMENT' && entry.workItemId === 'TASK-EXAMPLE-0000'),
+  true,
+  'task-like markdown headings inside fenced code must be diagnosed as reference-only instead of imported'
 );
 
 console.log('task-import-canonical-id-boundary.test passed');

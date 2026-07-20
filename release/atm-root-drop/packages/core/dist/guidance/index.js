@@ -1,4 +1,5 @@
 export * from './guidance-packet.js';
+export * from './first-layer-command-contracts.js';
 export * from './intent-classifier.js';
 export * from './legacy-route-plan.js';
 export * from './mutation-gate.js';

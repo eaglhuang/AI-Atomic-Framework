@@ -1,0 +1,14 @@
+import { CliError } from '../shared.ts';
+import { type SharedSurfaceQueue } from '../../../../core/src/broker/shared-surface-queue.ts';
+import { type RunnerSyncStewardQueueDocument } from '../../../../core/src/broker/runner-sync-steward-queue.ts';
+import { type GeneratedProjectionStewardDocument } from '../../../../core/src/broker/generated-projection-steward.ts';
+declare function readSharedSurfaceFreezeRecords(filePath: string): SharedSurfaceFreezeRecord[];
+declare function writeSharedSurfaceFreezeRecords(filePath: string, records: readonly SharedSurfaceFreezeRecord[]): void;
+declare function readSharedSurfaceQueues(filePath: string): SharedSurfaceQueue[];
+declare function writeSharedSurfaceQueues(filePath: string, queues: readonly SharedSurfaceQueue[]): void;
+declare function readRunnerSyncStewardQueue(filePath: string): RunnerSyncStewardQueueDocument;
+declare function writeRunnerSyncStewardQueue(filePath: string, queue: RunnerSyncStewardQueueDocument): void;
+declare function toRunnerSyncReleaseCliError(error: unknown): CliError;
+declare function readGeneratedProjectionSteward(filePath: string): GeneratedProjectionStewardDocument;
+declare function writeGeneratedProjectionSteward(filePath: string, queue: GeneratedProjectionStewardDocument): void;
+export { readSharedSurfaceFreezeRecords, writeSharedSurfaceFreezeRecords, readSharedSurfaceQueues, writeSharedSurfaceQueues, readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward };

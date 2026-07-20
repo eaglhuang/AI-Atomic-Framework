@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/broker-ticket.schema.json",
+  "title": "ATM Broker Ticket v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "ticketId",
+    "idempotencyKey",
+    "taskId",
+    "actorId",
+    "resourceKey",
+    "state",
+    "generation",
+    "arrivalIndex",
+    "enqueuedAt",
+    "updatedAt",
+    "heartbeatAt",
+    "ttlSeconds",
+    "bypassCount",
+    "wakeupCount",
+    "terminalReason",
+    "transitions"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.brokerTicket.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "ticketId": { "type": "string", "minLength": 1 },
+    "idempotencyKey": { "type": "string", "minLength": 1 },
+    "taskId": { "type": "string", "minLength": 1 },
+    "actorId": { "type": "string", "minLength": 1 },
+    "resourceKey": { "type": "string", "minLength": 1 },
+    "state": {
+      "enum": [
+        "created",
+        "collecting",
+        "ready",
+        "composing",
+        "revalidation-required",
+        "queued",
+        "wakeup-pending",
+        "executing",
+        "released",
+        "cancelled",
+        "adoptable",
+        "reconcile-required"
+      ]
+    },
+    "generation": { "type": "integer", "minimum": 0 },
+    "arrivalIndex": { "type": "integer", "minimum": 0 },
+    "enqueuedAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "heartbeatAt": { "type": "string", "format": "date-time" },
+    "ttlSeconds": { "type": "integer", "minimum": 1 },
+    "bypassCount": { "type": "integer", "minimum": 0 },
+    "wakeupCount": { "type": "integer", "minimum": 0 },
+    "terminalReason": {
+      "type": ["string", "null"],
+      "enum": ["released", "cancelled", "adopted", "reconcile-required", "policy-terminal", null]
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["eventId", "idempotencyKey", "from", "to", "generation", "actorId", "reason", "occurredAt"],
+        "properties": {
+          "eventId": { "type": "string", "minLength": 1 },
+          "idempotencyKey": { "type": "string", "minLength": 1 },
+          "from": { "$ref": "#/properties/state" },
+          "to": { "$ref": "#/properties/state" },
+          "generation": { "type": "integer", "minimum": 0 },
+          "actorId": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 },
+          "occurredAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "storeDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "specVersion",
+        "storeId",
+        "generation",
+        "tickets",
+        "transitions",
+        "updatedAt"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.brokerTicketStore.v1" },
+        "specVersion": { "const": "0.1.0" },
+        "storeId": { "type": "string", "minLength": 1 },
+        "generation": { "type": "integer", "minimum": 0 },
+        "tickets": {
+          "type": "array",
+          "items": { "$ref": "#" }
+        },
+        "transitions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/storeTransitionEvidence" }
+        },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "storeTransitionEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "transitionId",
+        "idempotencyKey",
+        "taskId",
+        "actorId",
+        "laneId",
+        "ticketId",
+        "action",
+        "previousDigest",
+        "nextDigest",
+        "previousGeneration",
+        "nextGeneration",
+        "occurredAt"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.brokerTicketStoreTransitionEvidence.v1" },
+        "transitionId": { "type": "string", "minLength": 1 },
+        "idempotencyKey": { "type": "string", "minLength": 1 },
+        "taskId": { "type": "string", "minLength": 1 },
+        "actorId": { "type": "string", "minLength": 1 },
+        "laneId": { "type": ["string", "null"] },
+        "ticketId": { "type": ["string", "null"] },
+        "action": {
+          "enum": [
+            "enqueue",
+            "transition",
+            "wake-next",
+            "adopt-orphan",
+            "cancel",
+            "reconcile-side-effect"
+          ]
+        },
+        "previousDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "nextDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "previousGeneration": { "type": "integer", "minimum": 0 },
+        "nextGeneration": { "type": "integer", "minimum": 0 },
+        "occurredAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

@@ -2,6 +2,19 @@ import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
 import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../../../core/dist/broker/proposal.js';
 import { relativeStorePath } from './parser.js';
+import { isProposalLanePrivatePath, isLiveSharedMutationPath } from '../next/proposal-lane.js';
+export function validateProposalLaneDurableRef(filePath) {
+    const normalized = String(filePath).trim().replace(/\\/g, '/').replace(/^\.\//, '');
+    if (!normalized)
+        return { ok: false, reason: 'Proposal lane durable reference is empty.' };
+    if (!isProposalLanePrivatePath(normalized)) {
+        return { ok: false, reason: 'Proposal lane durable reference must stay under runtime proposal or evidence paths.' };
+    }
+    if (isLiveSharedMutationPath(normalized)) {
+        return { ok: false, reason: 'Proposal lane durable reference cannot target live shared mutation surfaces.' };
+    }
+    return { ok: true, reason: 'Proposal lane durable reference is isolated from live shared mutation surfaces.' };
+}
 export function handleBrokerProposalActions(options) {
     if (options.action === 'proposal') {
         if (!options.proposalAction) {

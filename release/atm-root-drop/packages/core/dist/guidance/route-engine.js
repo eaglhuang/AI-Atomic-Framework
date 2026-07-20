@@ -1,8 +1,10 @@
+import { classifyFirstLayerIntent } from './first-layer-command-contracts.js';
 export function decideGuidanceRoute(input) {
     const goal = input.goal.trim();
     const lowerGoal = goal.toLowerCase();
     const evidence = input.evidence ?? {};
     const releaseBlockers = input.orientation.releaseBlockers;
+    const firstLayerMatch = classifyFirstLayerIntent(goal);
     const evidenceFollowupGoal = (/\b(backfill|follow[- ]up|repair record|repair lane|signature)\b/.test(lowerGoal)
         && /\b(evidence|artifact|git-head|review)\b/.test(lowerGoal)) || (/\bcross-agent review\b/.test(lowerGoal)
         && /\b(evidence|signature)\b/.test(lowerGoal));
@@ -14,6 +16,20 @@ export function decideGuidanceRoute(input) {
             requiredEvidence: ['plan markdown source', 'task import dry-run manifest', 'task import write evidence'],
             blockedBy: releaseBlockers.filter((blocker) => blocker !== 'package-json-missing'),
             nextCommand: 'node atm.mjs tasks import --from <plan.md> --dry-run --json'
+        });
+    }
+    if (firstLayerMatch && firstLayerMatch.intent !== 'create') {
+        return buildDecision({
+            route: firstLayerMatch.route,
+            confidence: 0.89,
+            reasons: [`First-layer ${firstLayerMatch.intent} prompt matched the governance command contract, so ATM must not default to atom birth.`],
+            requiredEvidence: ['first-layer command contract', 'read-only status/audit output or scoped backlog/task evidence'],
+            blockedBy: releaseBlockers,
+            nextCommand: firstLayerMatch.command,
+            routeChoices: [
+                { route: firstLayerMatch.route, reason: firstLayerMatch.authority },
+                { route: 'create-atom', reason: firstLayerMatch.negativeCase }
+            ]
         });
     }
     if (input.orientation.adapterStatus.status === 'missing') {

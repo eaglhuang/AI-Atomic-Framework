@@ -60,11 +60,13 @@ function buildRunnerSyncEnqueueCommand(input) {
     const surfaces = ['release/atm-onefile/atm.mjs', 'release/atm-root-drop']
         .map((surface) => ` --surface ${quoteCliArg(surface)}`)
         .join('');
-    return `node atm.mjs broker runner-sync enqueue --task ${quoteCliArg(taskId)} --actor ${quoteCliArg(input.stewardActorId)} --sealed-source-sha ${quoteCliArg(input.sealedSourceSha ?? '<sha>')}${surfaces} --json`;
+    const claimFiles = ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'].join(',');
+    const reason = `runner-sync steward reservation for ${input.sealedSourceSha ?? '<sha>'}`;
+    return `node atm.mjs framework-mode claim --actor ${quoteCliArg(input.stewardActorId)} --files ${quoteCliArg(claimFiles)} --reason ${quoteCliArg(reason)} --json && node atm.mjs broker runner-sync enqueue --task ${quoteCliArg(taskId)} --actor ${quoteCliArg(input.stewardActorId)} --sealed-source-sha ${quoteCliArg(input.sealedSourceSha ?? '<sha>')}${surfaces} --json`;
 }
 function inferRunnerSyncTaskId(input) {
     const tempTaskId = `ATM-FRAMEWORK-TEMP-${input.stewardActorId}`;
-    return tempTaskId.replace(/[^A-Za-z0-9._-]/g, '-');
+    return tempTaskId.replace(/[^A-Za-z0-9_-]/g, '-').replace(/^-+|-+$/g, '');
 }
 function quoteCliArg(value) {
     return JSON.stringify(String(value ?? ''));
@@ -347,14 +349,14 @@ function resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId) {
         const workItemId = typeof lock.workItemId === 'string' ? lock.workItemId.trim() : '';
         const leaseId = typeof lock.leaseId === 'string' ? lock.leaseId.trim() : '';
         const heartbeatAt = typeof lock.heartbeatAt === 'string' ? lock.heartbeatAt : null;
+        const released = lock.released === true || String(lock.status ?? '').trim().toLowerCase() === 'released';
         const ttlSeconds = typeof lock.ttlSeconds === 'number' && Number.isFinite(lock.ttlSeconds)
             ? lock.ttlSeconds
             : 0;
         if (workItemId !== normalizedTaskId || !leaseId || !heartbeatAt || ttlSeconds <= 0) {
             return 'task-missing';
         }
-        const expiresAt = Date.parse(heartbeatAt) + ttlSeconds * 1000;
-        return Number.isFinite(expiresAt) && expiresAt > Date.now() ? 'task-active' : 'task-terminal';
+        return released ? 'task-terminal' : 'task-active';
     }
     catch {
         return 'task-missing';

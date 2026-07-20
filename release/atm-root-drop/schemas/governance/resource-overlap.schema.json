@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/resource-overlap.schema.json",
+  "title": "ATM Resource Overlap v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "resourceKind",
+    "leftTaskId",
+    "leftActorId",
+    "leftLaneSessionId",
+    "leftIntentId",
+    "rightTaskId",
+    "rightActorId",
+    "rightLaneSessionId",
+    "rightIntentId",
+    "leftKey",
+    "rightKey",
+    "normalizedLeftKey",
+    "normalizedRightKey",
+    "verdict",
+    "matcherVersion",
+    "resolverVersion",
+    "provenance",
+    "confidence",
+    "anchors",
+    "intersection",
+    "inputDigest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.resourceOverlap.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "resourceKind": { "type": "string", "minLength": 1 },
+    "leftTaskId": { "type": "string", "minLength": 1 },
+    "leftActorId": { "type": "string", "minLength": 1 },
+    "leftLaneSessionId": { "type": ["string", "null"] },
+    "leftIntentId": { "type": ["string", "null"] },
+    "rightTaskId": { "type": "string", "minLength": 1 },
+    "rightActorId": { "type": "string", "minLength": 1 },
+    "rightLaneSessionId": { "type": ["string", "null"] },
+    "rightIntentId": { "type": ["string", "null"] },
+    "leftKey": { "type": "string" },
+    "rightKey": { "type": "string" },
+    "normalizedLeftKey": { "type": "string" },
+    "normalizedRightKey": { "type": "string" },
+    "verdict": { "enum": ["overlap", "disjoint", "unknown"] },
+    "matcherVersion": { "const": "resource-overlap@0.1.0" },
+    "resolverVersion": { "const": "resource-key-matcher@0.2.0" },
+    "provenance": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "confidence": { "enum": ["high", "medium", "low"] },
+    "anchors": { "type": "array", "items": { "$ref": "#/$defs/anchor" } },
+    "intersection": { "$ref": "#/$defs/intersection" },
+    "inputDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "shadow": { "$ref": "#/$defs/shadow" }
+  },
+  "$defs": {
+    "anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskId", "contentAnchorIds"],
+      "properties": {
+        "taskId": { "type": "string", "minLength": 1 },
+        "atomId": { "type": "string", "minLength": 1 },
+        "atomCid": { "type": "string", "minLength": 1 },
+        "filePath": { "type": "string", "minLength": 1 },
+        "lineStart": { "type": "integer", "minimum": 1 },
+        "lineEnd": { "type": "integer", "minimum": 1 },
+        "contentAnchorIds": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "intersection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "detail"],
+      "properties": {
+        "kind": { "enum": ["key", "line-range", "pattern", "unknown"] },
+        "detail": { "type": "string" }
+      }
+    },
+    "shadow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["legacyPredicate", "structuredVerdict", "parity", "reason"],
+      "properties": {
+        "legacyPredicate": { "type": "boolean" },
+        "structuredVerdict": { "enum": ["overlap", "disjoint", "unknown"] },
+        "parity": { "enum": ["match", "mismatch"] },
+        "reason": { "type": "string" }
+      }
+    }
+  }
+}

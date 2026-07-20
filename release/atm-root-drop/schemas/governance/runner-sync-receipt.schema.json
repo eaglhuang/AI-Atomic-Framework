@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/governance/runner-sync-receipt.schema.json",
+  "title": "ATM Runner Sync Receipt",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "taskId",
+    "actorId",
+    "actorIdentity",
+    "stewardWorkId",
+    "sealedSourceSha",
+    "requestedSurfaces",
+    "buildTarget",
+    "buildInputsTreeHash",
+    "buildDecision",
+    "atomicWrite",
+    "autoReleaseCommand",
+    "treatmentTelemetry",
+    "publishedAt"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.runnerSyncReceipt.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actorIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actorId", "source"],
+      "properties": {
+        "actorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": ["ATM_ACTOR_ID", "AGENT_IDENTITY", "fallback", "explicit"]
+        }
+      }
+    },
+    "stewardWorkId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sealedSourceSha": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestedSurfaces": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "buildTarget": {
+      "enum": ["full", "packages", "root-drop", "onefile"]
+    },
+    "buildInputsTreeHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "buildDecision": {
+      "enum": ["built", "cacheHitSkip", "incrementalBuild", "fullRebuild"]
+    },
+    "atomicWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaId", "strategy", "platform", "maxAttempts"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.runnerSyncAtomicWrite.v1"
+        },
+        "strategy": {
+          "const": "temp-file-rename-with-retry"
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "autoReleaseCommand": {
+      "type": "string",
+      "pattern": "^node atm\\.mjs broker runner-sync release "
+    },
+    "treatmentTelemetry": {
+      "type": "object",
+      "required": ["schemaId", "receiptValidity", "rawTelemetryPolicy"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.generatedWriteTreatmentTelemetry.v1"
+        },
+        "receiptValidity": {
+          "const": "valid"
+        },
+        "rawTelemetryPolicy": {
+          "const": "gitignored-runtime-only"
+        }
+      }
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

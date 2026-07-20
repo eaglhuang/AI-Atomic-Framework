@@ -1,5 +1,16 @@
 import { finalizeProposalAdmission, normalizeBoundedRegions } from './admission.js';
 import { withFailureReason } from './failure.js';
+import { findResourceOverlapMatches } from '../resource-overlap.js';
+function collectSharedFiles(newIntent, activeIntent) {
+    const matches = findResourceOverlapMatches('file', newIntent.targetFiles, activeIntent.resourceKeys.files);
+    const shared = new Set();
+    // Prefer the active (literal) key when available; that is the physical path
+    // any downstream region resolver will look up in the active intent.
+    for (const match of matches) {
+        shared.add(match.rightKey);
+    }
+    return [...shared];
+}
 export function evaluateProposalOverlap(newIntent, activeIntents, baseAdmission, conflictMatrix) {
     if (!baseAdmission.requiresProposal) {
         return null;
@@ -8,7 +19,7 @@ export function evaluateProposalOverlap(newIntent, activeIntents, baseAdmission,
         if (activeIntent.taskId === newIntent.taskId) {
             continue;
         }
-        const sharedFiles = newIntent.targetFiles.filter((filePath) => activeIntent.resourceKeys.files.includes(filePath));
+        const sharedFiles = collectSharedFiles(newIntent, activeIntent);
         if (sharedFiles.length === 0) {
             continue;
         }
@@ -142,7 +153,7 @@ export function shouldRefineProposalScopedCidConflict(newIntent, activeIntent, b
     if (!activeAdmission?.requiresProposal) {
         return false;
     }
-    const sharedFiles = newIntent.targetFiles.filter((filePath) => activeIntent.resourceKeys.files.includes(filePath));
+    const sharedFiles = collectSharedFiles(newIntent, activeIntent);
     if (sharedFiles.length === 0) {
         return false;
     }

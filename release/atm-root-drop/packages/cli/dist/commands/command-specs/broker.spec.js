@@ -2,12 +2,13 @@ import { defineCommandSpec } from '../shared.js';
 import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption, } from './_common.js';
 export default defineCommandSpec({
     name: 'broker',
-    summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, and inspect the local write-broker registry.',
+    summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, parallel admission policy, and inspect the local write-broker registry.',
     positional: [
-        { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch', required: true },
+        { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission', required: true },
         { name: 'proposal-action', summary: 'create | list | show | validate', required: false },
         { name: 'steward-action', summary: 'plan | apply', required: false },
         { name: 'runtime-action', summary: 'activate', required: false },
+        { name: 'parallel-admission-action', summary: 'status | set | trip | reset', required: false },
         { name: 'proposal-id', summary: 'Proposal id for show / validate.', required: false }
     ],
     options: [
@@ -33,6 +34,7 @@ export default defineCommandSpec({
         { flag: '--claimed-task', value: 'id', summary: 'Task id with claim evidence for broker batch execute. Repeatable.' },
         { flag: '--validator-task', value: 'id', summary: 'Task id with validator evidence for broker batch execute. Repeatable.' },
         { flag: '--file-slice', value: 'task:path', summary: 'Task-owned file slice for shared delivery commit receipts. Repeatable.' },
+        { flag: '--command-manifest', value: 'path', summary: 'atm.commandManifest.v1 JSON used for shellless generated build/projection execution.' },
         { flag: '--collection-timeout-ms', value: 'ms', summary: 'Broker schedule collection timeout before reseal or serial fallback.' },
         { flag: '--source-item', value: 'path', summary: 'Source item shard for broker projection enqueue. Repeatable.' },
         { flag: '--proposal-file', value: 'path', summary: 'Path to PatchProposal JSON payload. Repeatable for compose / steward.' },
@@ -42,6 +44,10 @@ export default defineCommandSpec({
         { flag: '--steward-id', value: 'id', summary: 'Neutral write steward identifier.' },
         { flag: '--evidence-out', value: 'path', summary: 'Output path for steward apply or runtime activation evidence JSON.' },
         { flag: '--run-evidence-dir', value: 'path', summary: 'Directory to write broker batch run records (default: .atm/runtime/broker-collision-evidence/runs, resolved against --cwd).' },
+        { flag: '--mode', value: 'mode', summary: 'Parallel admission policy mode: enforce or observe.' },
+        { flag: '--fallback-mode', value: 'mode', summary: 'Parallel admission fallback mode: queue-only or fail-closed.' },
+        { flag: '--circuit-breaker', value: 'boolean', summary: 'Enable or disable the parallel admission circuit breaker.' },
+        { flag: '--reason', value: 'text', summary: 'Reason for broker parallel-admission trip.' },
         { flag: '--store', value: 'path', summary: 'Path to broker proposal store JSON.' },
         commonJsonOption,
         commonPrettyOption,
@@ -59,7 +65,7 @@ export default defineCommandSpec({
         'node atm.mjs broker schedule enqueue --task TASK-GOV-0100 --wave wave-123 --surface-kind commit --surface-family cli --payload-digest sha256:abc --json',
         'node atm.mjs broker schedule plan --wave wave-123 --surface-kind commit --surface-family cli --expected-task TASK-GOV-0100 --expected-task TASK-GOV-0101 --json',
         'node atm.mjs broker batch execute --surface commit --wave wave-123 --surface-family cli --manifest-digest sha256:abc --sealed-source-sha <sha> --claimed-task TASK-GOV-0100 --validator-task TASK-GOV-0100 --scope-file src/a.ts --evidence-out .atm/history/evidence/wave-123.shared-write.json --json',
-        'node atm.mjs broker batch execute --surface build --wave wave-123 --surface-family cli --manifest-digest sha256:abc --sealed-source-sha <sha> --payload-digest sha256:source --receipt-digest sha256:output --evidence-out .atm/history/evidence/wave-123.build.json --json',
+        'node atm.mjs broker batch execute --surface build --wave wave-123 --surface-family cli --manifest-digest sha256:abc --sealed-source-sha <sha> --payload-digest sha256:source --command-manifest command-manifest.json --output-file dist/out.json --evidence-out .atm/history/evidence/wave-123.build.json --json',
         'node atm.mjs broker proposal create --proposal-file proposal.json --json',
         'node atm.mjs broker proposal list --json',
         'node atm.mjs broker proposal show proposal-123 --json',
@@ -70,6 +76,10 @@ export default defineCommandSpec({
         'node atm.mjs broker runtime activate --task TASK-GOV-0100 --actor team-planner --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out runtime-evidence.json --json',
         'node atm.mjs broker steward plan --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --json',
         'node atm.mjs broker steward apply --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out steward-evidence.json --json',
-        'node atm.mjs broker plan-batch --request-file tmp/request-a.json --request-file tmp/request-b.json --apply --run-evidence-dir .atm/runtime/broker-collision-evidence/runs --json'
+        'node atm.mjs broker plan-batch --request-file tmp/request-a.json --request-file tmp/request-b.json --apply --run-evidence-dir .atm/runtime/broker-collision-evidence/runs --json',
+        'node atm.mjs broker parallel-admission status --json',
+        'node atm.mjs broker parallel-admission set --mode enforce --fallback-mode queue-only --json',
+        'node atm.mjs broker parallel-admission trip --actor worker-1 --reason "shared-write gate failed" --json',
+        'node atm.mjs broker parallel-admission reset --actor worker-1 --receipt-digest sha256:<digest> --json'
     ]
 });

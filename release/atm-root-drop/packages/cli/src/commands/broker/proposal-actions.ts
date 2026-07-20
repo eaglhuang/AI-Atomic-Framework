@@ -31,6 +31,19 @@ import { readSharedSurfaceFreezeRecords, writeSharedSurfaceFreezeRecords, readSh
 import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleasedSharedSurfaceFreezes, shouldQueueSharedSurface, resolveSharedSurfaceQueueAdmission, replaceIntentLane, assertBrokerRegisterCliParity, syncTeamRunRearbitrationSnapshots } from './shared-surface.ts';
 import { loadComposeProposals, relativeStorePath, resolveBrokerRunEvidenceDir, normalizeEvidencePath } from './parser.ts';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
+import { isProposalLanePrivatePath, isLiveSharedMutationPath } from '../next/proposal-lane.ts';
+
+export function validateProposalLaneDurableRef(filePath: string): { readonly ok: boolean; readonly reason: string } {
+  const normalized = String(filePath).trim().replace(/\\/g, '/').replace(/^\.\//, '');
+  if (!normalized) return { ok: false, reason: 'Proposal lane durable reference is empty.' };
+  if (!isProposalLanePrivatePath(normalized)) {
+    return { ok: false, reason: 'Proposal lane durable reference must stay under runtime proposal or evidence paths.' };
+  }
+  if (isLiveSharedMutationPath(normalized)) {
+    return { ok: false, reason: 'Proposal lane durable reference cannot target live shared mutation surfaces.' };
+  }
+  return { ok: true, reason: 'Proposal lane durable reference is isolated from live shared mutation surfaces.' };
+}
 
 
 export function handleBrokerProposalActions(options: ParsedBrokerOptions) {

@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'guide',
   summary: 'Show guided ATM workflows, classify free-text goals, and record host-local intent phrases.',
   positional: [
-    { name: 'intent', summary: 'overview | create-atom | create-map | bootstrap | glossary | help | learn | install-skill', required: false },
+    { name: 'intent', summary: 'overview | first-layer | create-atom | create-map | bootstrap | glossary | help | learn | install-skill', required: false },
     { name: 'command', summary: 'Command name when intent is help.', required: false }
   ],
   options: [
@@ -32,6 +32,7 @@ export default defineCommandSpec({
     'node atm.mjs guide --goal "Rank the messiest Python pipeline scripts" --json',
     'node atm.mjs guide learn --phrase "brown path washing" --intent legacy-atomization --reason "host phrasing for legacy atomization" --status active-host --json',
     'node atm.mjs guide install-skill --target host --json',
+    'node atm.mjs guide first-layer --json',
     'node atm.mjs guide overview --json',
     'node atm.mjs guide glossary --json',
     'node atm.mjs guide help next --json'

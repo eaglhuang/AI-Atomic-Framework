@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { CliError, makeResult, message } from '../shared.js';
 import { planWaveBrokerBatch } from '../../../../core/dist/broker/wave-broker-scheduler.js';
 import { planSharedDeliveryCommit } from '../../../../core/dist/broker/shared-delivery-commit.js';
+import { planSharedDeliverySaga } from '../../../../core/dist/broker/shared-delivery-saga.js';
 import { planWaveGeneratedWrite } from '../../../../core/dist/broker/wave-generated-executor.js';
 import { assertRecordCommitPayloadPresent } from '../git-governance/record-commit-payload-assertion.js';
 function readJson(pathName) {
@@ -40,6 +41,23 @@ function runGit(cwd, args, env = {}) {
     }
     return result.stdout.trim();
 }
+function runGitWithPathspecStdin(cwd, args, files, env = {}) {
+    const pathspec = uniqueSorted(files).join('\0') + '\0';
+    const result = spawnSync('git', [...args, '--pathspec-from-file=-', '--pathspec-file-nul'], {
+        cwd,
+        input: pathspec,
+        encoding: 'utf8',
+        env: { ...process.env, ...env },
+        stdio: ['pipe', 'pipe', 'pipe']
+    });
+    if (result.status !== 0) {
+        throw new CliError('ATM_BROKER_BATCH_COMMIT_BLOCKED', `git ${args.join(' ')} failed while executing shared delivery commit.`, {
+            exitCode: 1,
+            details: { args, stdout: result.stdout, stderr: result.stderr }
+        });
+    }
+    return result.stdout.trim();
+}
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/').replace(/^\.\//, '').trim()).filter(Boolean))]
         .sort((left, right) => left.localeCompare(right));
@@ -54,7 +72,7 @@ function executeTemporaryIndexCommit(input) {
     }
     const env = { GIT_INDEX_FILE: input.temporaryIndexPath };
     runGit(input.cwd, ['read-tree', input.expectedHeadSha], env);
-    runGit(input.cwd, ['add', '-A', '-f', '--', ...files], env);
+    runGitWithPathspecStdin(input.cwd, ['add', '-A', '-f'], files, env);
     const treeSha = runGit(input.cwd, ['write-tree'], env);
     const headTreeSha = runGit(input.cwd, ['rev-parse', `${input.expectedHeadSha}^{tree}`]);
     if (treeSha === headTreeSha) {
@@ -137,7 +155,72 @@ function timeOutputDigest(cwd, files) {
     const digest = digestOutputFiles(cwd, files);
     return { digest, durationMs: Date.now() - started };
 }
-function runGeneratedCommand(cwd, command) {
+function digestCommandManifest(manifest) {
+    return `sha256:${createHash('sha256').update(JSON.stringify(manifest)).digest('hex')}`;
+}
+function readCommandManifest(cwd, manifestPath) {
+    const absolute = path.resolve(cwd, manifestPath);
+    let parsed;
+    try {
+        parsed = JSON.parse(readFileSync(absolute, 'utf8'));
+    }
+    catch (error) {
+        throw new CliError('ATM_COMMAND_MANIFEST_INVALID', `command manifest is not valid JSON: ${manifestPath}`, {
+            exitCode: 2,
+            details: { error: error instanceof Error ? error.message : String(error) }
+        });
+    }
+    const record = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+    if (!record
+        || record.schemaId !== 'atm.commandManifest.v1'
+        || typeof record.executable !== 'string'
+        || !record.executable.trim()
+        || !Array.isArray(record.argv)
+        || !record.argv.every((entry) => typeof entry === 'string')) {
+        throw new CliError('ATM_COMMAND_MANIFEST_INVALID', 'command manifest must be atm.commandManifest.v1 with executable and argv[].', { exitCode: 2 });
+    }
+    if ('command' in record || 'shell' in record) {
+        throw new CliError('ATM_COMMAND_MANIFEST_SHELL_FORBIDDEN', 'command manifest must not contain shell command string fields.', { exitCode: 2 });
+    }
+    const timeoutMs = typeof record.timeoutMs === 'number' && Number.isFinite(record.timeoutMs) && record.timeoutMs > 0
+        ? Math.floor(record.timeoutMs)
+        : undefined;
+    const env = record.env && typeof record.env === 'object' && !Array.isArray(record.env)
+        ? Object.fromEntries(Object.entries(record.env).filter(([, value]) => typeof value === 'string'))
+        : undefined;
+    return {
+        schemaId: 'atm.commandManifest.v1',
+        specVersion: record.specVersion === '0.1.0' ? '0.1.0' : '0.1.0',
+        executable: record.executable.trim(),
+        argv: record.argv.map((entry) => entry),
+        cwd: typeof record.cwd === 'string' && record.cwd.trim() ? record.cwd.trim() : undefined,
+        env,
+        envRefs: Array.isArray(record.envRefs) ? record.envRefs.filter((entry) => typeof entry === 'string' && entry.trim().length > 0) : undefined,
+        timeoutMs,
+        stdinSha256: typeof record.stdinSha256 === 'string' ? record.stdinSha256 : null,
+        ioDigest: typeof record.ioDigest === 'string' ? record.ioDigest : null
+    };
+}
+function runGeneratedCommandManifest(cwd, manifest) {
+    const started = Date.now();
+    const result = spawnSync(manifest.executable, [...manifest.argv], {
+        cwd: manifest.cwd ? path.resolve(cwd, manifest.cwd) : cwd,
+        shell: false,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+        timeout: manifest.timeoutMs,
+        env: { ...process.env, ...(manifest.env ?? {}) }
+    });
+    const durationMs = Date.now() - started;
+    if ((result.status ?? 1) !== 0) {
+        throw new CliError('ATM_BROKER_BATCH_GENERATED_BLOCKED', `generated write command failed: ${manifest.executable}`, {
+            exitCode: 1,
+            details: { commandManifestDigest: digestCommandManifest(manifest), exitCode: result.status ?? 1, stdout: result.stdout, stderr: result.stderr, durationMs }
+        });
+    }
+    return { exitCode: result.status ?? 0, stdout: result.stdout, stderr: result.stderr, durationMs };
+}
+function runDeprecatedGeneratedShellCommand(cwd, command) {
     const started = Date.now();
     const result = spawnSync(command, {
         cwd,
@@ -172,17 +255,25 @@ export function handleBrokerBatchExecute(options, context) {
         if (!options.payloadDigest) {
             throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection requires --payload-digest <source-digest>.', { exitCode: 2 });
         }
-        if (options.apply && !options.runCommand && !options.receiptDigest) {
-            throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection --apply requires --run-command or --receipt-digest.', { exitCode: 2 });
+        if (options.apply && options.runCommand && options.policyFallbackMode !== 'queue-only') {
+            throw new CliError('ATM_COMMAND_MANIFEST_REQUIRED', 'broker batch execute generated writes reject shell command strings by default; use --command-manifest or --fallback-mode queue-only for deprecated queue-only compatibility.', { exitCode: 2 });
         }
-        if (options.runCommand && options.outputFiles.length === 0) {
-            throw new CliError('ATM_CLI_USAGE', 'broker batch execute --run-command requires at least one --output-file so ATM can observe the output digest.', { exitCode: 2 });
+        if (options.apply && !options.commandManifestPath && !options.runCommand && !options.receiptDigest) {
+            throw new CliError('ATM_CLI_USAGE', 'broker batch execute --surface build|projection --apply requires --command-manifest or --receipt-digest.', { exitCode: 2 });
+        }
+        if ((options.commandManifestPath || options.runCommand) && options.outputFiles.length === 0) {
+            throw new CliError('ATM_CLI_USAGE', 'broker batch execute generated writes require at least one --output-file so ATM can observe the output digest.', { exitCode: 2 });
         }
         const surfaceKind = selectedSurface;
-        const commandRun = options.apply && options.runCommand
-            ? runGeneratedCommand(options.cwd, options.runCommand)
+        const commandManifest = options.commandManifestPath ? readCommandManifest(options.cwd, options.commandManifestPath) : null;
+        const commandRun = options.apply
+            ? commandManifest
+                ? runGeneratedCommandManifest(options.cwd, commandManifest)
+                : options.runCommand && options.policyFallbackMode === 'queue-only'
+                    ? runDeprecatedGeneratedShellCommand(options.cwd, options.runCommand)
+                    : null
             : null;
-        const outputDigestMeasurement = options.runCommand
+        const outputDigestMeasurement = options.commandManifestPath || options.runCommand
             ? timeOutputDigest(options.cwd, options.outputFiles)
             : null;
         const observedOutputDigest = outputDigestMeasurement?.digest ?? options.receiptDigest;
@@ -207,7 +298,11 @@ export function handleBrokerBatchExecute(options, context) {
             sealedSourceSha: options.sealedSourceSha,
             sourceDigest: options.payloadDigest,
             outputDigest: observedOutputDigest,
-            command: commandRun ? options.runCommand : null,
+            command: commandRun
+                ? commandManifest
+                    ? `${commandManifest.executable} ${commandManifest.argv.join(' ')}`
+                    : options.runCommand
+                : null,
             commandExitCode: commandRun?.exitCode ?? null,
             commandDurationMs: commandRun?.durationMs ?? null,
             phaseTimingsMs: commandRun ? {
@@ -215,7 +310,7 @@ export function handleBrokerBatchExecute(options, context) {
                 outputDigestCalculation: outputDigestMeasurement?.durationMs ?? 0,
                 totalElapsed: commandRun.durationMs + (outputDigestMeasurement?.durationMs ?? 0)
             } : null,
-            observedOutputFiles: options.runCommand ? options.outputFiles : [],
+            observedOutputFiles: options.commandManifestPath || options.runCommand ? options.outputFiles : [],
             expectedTaskIds: options.expectedTasks
         });
         const receiptPath = options.evidenceOutPath && plan.receipt
@@ -228,8 +323,12 @@ export function handleBrokerBatchExecute(options, context) {
             messages: [
                 message(plan.ok ? 'info' : 'error', plan.ok ? 'ATM_BROKER_BATCH_GENERATED_RECEIPT_READY' : 'ATM_BROKER_BATCH_GENERATED_BLOCKED', plan.reason, {
                     receiptPath,
-                    blockers: plan.blockers
-                })
+                    blockers: plan.blockers,
+                    commandManifestDigest: commandManifest ? digestCommandManifest(commandManifest) : null
+                }),
+                ...(options.runCommand && options.policyFallbackMode === 'queue-only'
+                    ? [message('warning', 'ATM_RUN_COMMAND_DEPRECATED', '--run-command is deprecated for generated writes and is allowed only in queue-only compatibility mode.', {})]
+                    : [])
             ],
             evidence: {
                 action: 'broker-batch-execute',
@@ -283,6 +382,16 @@ export function handleBrokerBatchExecute(options, context) {
         commitSha: applied?.commitSha ?? null,
         temporaryIndexPath
     });
+    const saga = planSharedDeliverySaga({
+        decision,
+        scheduler,
+        expectedHeadSha: expectedHead,
+        actualHeadSha: applied?.commitSha ?? options.currentHeadSha ?? expectedHead,
+        sharedWriteReceipt: plan.receipt,
+        fileSlices,
+        validatorRefs: Object.fromEntries(taskIds.map((taskId) => [taskId, options.validatorTasks.includes(taskId) ? ['validator-evidence:present'] : []])),
+        semanticRefs: Object.fromEntries(taskIds.map((taskId) => [taskId, ['semantic-revalidation:pre-publish']]))
+    });
     const receiptPath = options.evidenceOutPath && plan.receipt
         ? writeReceipt(options.cwd, options.evidenceOutPath, plan.receipt)
         : null;
@@ -302,6 +411,7 @@ export function handleBrokerBatchExecute(options, context) {
             schedulerPath: '.atm/runtime/wave-broker-scheduler.json',
             decision,
             plan,
+            saga,
             receiptPath,
             temporaryIndexPath,
             payloadAssertion: applied?.payloadAssertion ?? null

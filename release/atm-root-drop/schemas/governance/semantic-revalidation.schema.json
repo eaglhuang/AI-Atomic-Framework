@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/semantic-revalidation.schema.json",
+  "title": "ATM Semantic Revalidation Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "requestId",
+    "taskId",
+    "domain",
+    "verdict",
+    "ticketNextAction",
+    "digests",
+    "assumptions",
+    "validatorRefs",
+    "reasons",
+    "staleReadAnchors",
+    "operationConflicts"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.semanticRevalidationResult.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": { "$ref": "#/$defs/migration" },
+    "requestId": { "type": "string", "minLength": 1 },
+    "taskId": { "type": "string", "minLength": 1 },
+    "domain": { "enum": ["code", "docs", "planning", "private"] },
+    "verdict": {
+      "enum": ["valid", "recompute-required", "queue-required", "steward-required", "inconclusive"]
+    },
+    "ticketNextAction": {
+      "enum": ["publish", "recompute", "queue", "steward-review", "keep-read-lane"]
+    },
+    "digests": { "$ref": "#/$defs/digestSet" },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "validatorRefs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/validatorRef" }
+    },
+    "reasons": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "staleReadAnchors": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "operationConflicts": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "enum": ["none", "additive", "breaking"] },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "digestSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseDigest", "currentDigest", "publishedSetDigest"],
+      "properties": {
+        "baseDigest": { "type": "string", "minLength": 1 },
+        "currentDigest": { "type": "string", "minLength": 1 },
+        "publishedSetDigest": { "type": "string", "minLength": 1 }
+      }
+    },
+    "validatorRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "available"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "available": { "type": "boolean" },
+        "result": { "enum": ["pass", "fail", "not-run"] }
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { DEFAULT_AGR_LAYER2_THRESHOLDS, shouldTriggerLayer2 } from '../policy.js';
 import { intersectRanges, normalizeLineRange, rangesOverlap } from '../agr.js';
+import { findResourceOverlapMatches } from '../resource-overlap.js';
 export function toVirtualAtoms(intent) {
     return intent.atomRefs
         .filter((ref) => ref.sourceRange && ref.sourceRange.filePath && ref.sourceRange.lineStart > 0 && ref.sourceRange.lineEnd > 0)
@@ -73,12 +74,14 @@ export function maybeBuildCidConflictDecompositionRequest(newIntent, activeInten
             continue;
         }
         const activeRanges = toVirtualAtomRangesFromActiveIntent(activeIntent);
-        for (const newFile of newIntent.targetFiles) {
-            if (!activeIntent.resourceKeys.files.includes(newFile)) {
+        const seenFilePair = new Set();
+        for (const match of findResourceOverlapMatches('file', newIntent.targetFiles, activeIntent.resourceKeys.files)) {
+            const pairKey = `${match.leftKey}::${match.rightKey}`;
+            if (seenFilePair.has(pairKey))
                 continue;
-            }
-            const newCandidates = newIntentRanges.filter((entry) => entry.sourceRange.filePath === newFile);
-            const activeCandidates = activeRanges.filter((entry) => entry.sourceRange.filePath === newFile);
+            seenFilePair.add(pairKey);
+            const newCandidates = newIntentRanges.filter((entry) => entry.sourceRange.filePath === match.leftKey);
+            const activeCandidates = activeRanges.filter((entry) => entry.sourceRange.filePath === match.rightKey);
             for (const newAtom of newCandidates) {
                 for (const activeAtom of activeCandidates) {
                     if (!rangesOverlap(newAtom.sourceRange, activeAtom.sourceRange)) {

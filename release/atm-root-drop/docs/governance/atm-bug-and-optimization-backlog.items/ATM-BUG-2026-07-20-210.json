@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-210",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Open",
+  "area": "Runner build telemetry / incremental benchmark / decision quality",
+  "finding": "The sealed runner selected `incrementalBuild`, but the observed runtime sample was slower than recent `fullRebuild` samples. Without matched A/B grouping, operators can misread an incremental decision as an actual speedup even when fixed costs dominate.",
+  "expectedBehavior": "Runner telemetry should provide a matched comparison envelope or explicitly mark unpaired speedup claims as inconclusive. Build guidance should distinguish `decision=incrementalBuild` from `outcome=faster`, and expose phase-level dominant-cost hints before reporting acceleration percentages.",
+  "evidenceOrRepro": "During ATM-GOV-0196 closeout, `.atm/runtime/telemetry/runner-sync-build/2026-07-20T04-27-56-146Z-runner-sync.jsonl` recorded `buildDecision=incrementalBuild`, `changedPathCount=3`, `affectedPackageCount=2`, and `totalElapsed=42741ms`. Recent full rebuild runtime telemetry in the same directory included samples around `24116ms` and `24167ms`, making this unpaired incremental sample roughly 77% slower than the nearest full sample. Dominant phases included worktree setup, TypeScript build, root-drop assembly, and artifact sync.",
+  "followUp": "Have ATM-GOV-0201 or ATM-GOV-0205 define a canonical paired build timing interface with matched full/incremental/cache samples, speedup confidence labels, and phase-attribution fields consumed by build guidance."
+}

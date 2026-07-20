@@ -1,4 +1,6 @@
 import type { FreezeAck, FreezeResolution, FreezeSignal } from './freeze.ts';
+import type { ContentAnchor } from './boundaries/content-anchor.ts';
+import type { ResourceOverlap } from './resource-overlap.ts';
 
 export interface MigrationRecord {
   readonly strategy: 'none' | 'additive' | 'breaking';
@@ -10,6 +12,7 @@ export interface WriteIntentAtomRef {
   readonly atomId: string;
   readonly atomCid: string;
   readonly operation: 'create' | 'modify' | 'delete';
+  readonly contentAnchors?: readonly ContentAnchor[];
   readonly sourceRange?: {
     readonly filePath: string;
     readonly lineStart: number;
@@ -66,6 +69,7 @@ export interface WriteIntent {
   readonly targetFiles: readonly string[];
   readonly atomRefs: readonly WriteIntentAtomRef[];
   readonly readAtoms?: readonly WriteIntentAtomRef[];
+  readonly resourceOverlaps?: readonly ResourceOverlap[];
   readonly sharedSurfaces: SharedSurfacesRecord;
   readonly requestedLane: 'auto' | 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
   readonly leaseBounds?: LeaseBounds;
@@ -127,6 +131,7 @@ export interface ProposalAtomRef {
 export interface PatchAnchor {
   readonly kind: string;
   readonly hint: string;
+  readonly contentAnchor?: ContentAnchor;
 }
 
 export interface PatchProposal {
@@ -144,6 +149,7 @@ export interface PatchProposal {
   readonly targetFile: string;
   readonly atomRefs: readonly ProposalAtomRef[];
   readonly anchors: readonly PatchAnchor[];
+  readonly resourceOverlaps?: readonly ResourceOverlap[];
   readonly intent: string;
   readonly patch: string;
   readonly validators: readonly string[];
@@ -300,6 +306,7 @@ export interface BrokerConflictMatrix {
   readonly arbitrationVerdict: BrokerArbitrationVerdict;
   readonly conflicts: readonly BrokerConflictClassResult[];
   readonly gateResults: readonly BrokerConflictGateResult[];
+  readonly resourceOverlaps?: readonly ResourceOverlap[];
 }
 
 // ---------------------------------------------------------------------------

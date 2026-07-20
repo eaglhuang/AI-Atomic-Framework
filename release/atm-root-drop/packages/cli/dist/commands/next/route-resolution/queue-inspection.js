@@ -215,7 +215,7 @@ export function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write')
     const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
     profile.mark('dedupe-tasks');
     const tasks = allTasks
-        .filter((task) => !isTerminalImportedTask(task)
+        .filter((task) => (!isTerminalImportedTask(task) || isTaskExplicitlyMentioned(task, taskIntent))
         && (isTaskRoutable(task.status, taskIntent)
             || isTaskExplicitlyMentioned(task, taskIntent)
             || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && isActiveClaimedTask(task))))

@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { CliError } from '../shared.ts';
-import { normalizeTelemetryDurationMs } from '../../../../core/src/telemetry/observation.ts';
+import { buildTelemetryObservation, normalizeTelemetryDurationMs } from '../../../../core/src/telemetry/observation.ts';
 import { canonicalizeValidatorIdentity } from './validator-classification.ts';
 import type { EvidenceFreshness } from './validator-classification.ts';
 import { isRecord, type CommandRunEvidenceInput } from './shared-utils.ts';
@@ -105,7 +105,7 @@ export function normalizeEvidenceCommandRuns(input: {
     ...input.fileRuns
   ].map((run) => {
     const runnerKind = normalizeRunnerKind(run.runnerKind ?? input.runnerKind ?? inferRunnerKindFromCommand(run.command));
-    return {
+    const normalized = {
       ...run,
       cwd: run.cwd ?? '.',
       runnerKind,
@@ -121,6 +121,10 @@ export function normalizeEvidenceCommandRuns(input: {
       }),
       cached: run.cached === true,
       generatedAt: run.generatedAt ?? run.finishedAt ?? new Date().toISOString()
+    };
+    return {
+      ...normalized,
+      canonicalObservation: buildCommandRunObservation(normalized)
     };
   }));
 }
@@ -151,22 +155,34 @@ export function normalizeCommandRunInput(value: unknown, label: string): Command
       details: { label }
     });
   }
-  return {
+  const cwd = typeof value.cwd === 'string' && value.cwd.trim() ? normalizeRelativePath(value.cwd) : undefined;
+  const runnerKind = typeof value.runnerKind === 'string' && value.runnerKind.trim() ? normalizeRunnerKind(value.runnerKind) : undefined;
+  const generatedAt = typeof value.generatedAt === 'string' && value.generatedAt.trim() ? value.generatedAt.trim() : undefined;
+  const startedAt = typeof value.startedAt === 'string' && value.startedAt.trim() ? value.startedAt.trim() : undefined;
+  const finishedAt = typeof value.finishedAt === 'string' && value.finishedAt.trim() ? value.finishedAt.trim() : undefined;
+  const durationMs = normalizeTelemetryDurationMs(value.durationMs);
+  const cacheKey = typeof value.cacheKey === 'string' && value.cacheKey.trim() ? value.cacheKey.trim() : undefined;
+  const cached = value.cached === true;
+  const normalized: CommandRunEvidenceInput = {
     command,
-    cwd: typeof value.cwd === 'string' && value.cwd.trim() ? normalizeRelativePath(value.cwd) : undefined,
+    cwd,
     exitCode,
     stdoutSha256,
     stderrSha256,
     validators: Array.isArray(value.validators) ? value.validators.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => canonicalizeValidatorIdentity(entry)) : undefined,
-    cached: value.cached === true,
-    cacheKey: typeof value.cacheKey === 'string' && value.cacheKey.trim() ? value.cacheKey.trim() : undefined,
-    runnerKind: typeof value.runnerKind === 'string' && value.runnerKind.trim() ? normalizeRunnerKind(value.runnerKind) : undefined,
+    cached,
+    cacheKey,
+    runnerKind,
     sourceCommit: typeof value.sourceCommit === 'string' && value.sourceCommit.trim() ? value.sourceCommit.trim() : undefined,
     runnerVersion: typeof value.runnerVersion === 'string' && value.runnerVersion.trim() ? value.runnerVersion.trim() : undefined,
-    generatedAt: typeof value.generatedAt === 'string' && value.generatedAt.trim() ? value.generatedAt.trim() : undefined,
-    startedAt: typeof value.startedAt === 'string' && value.startedAt.trim() ? value.startedAt.trim() : undefined,
-    finishedAt: typeof value.finishedAt === 'string' && value.finishedAt.trim() ? value.finishedAt.trim() : undefined,
-    durationMs: normalizeTelemetryDurationMs(value.durationMs)
+    generatedAt,
+    startedAt,
+    finishedAt,
+    durationMs
+  };
+  return {
+    ...normalized,
+    canonicalObservation: buildCommandRunObservation(normalized)
   };
 }
 
@@ -214,6 +230,55 @@ export function computeCommandRunCacheKey(run: {
     stderrSha256: run.stderrSha256,
     runnerKind: run.runnerKind ?? null,
     sourceCommit: run.sourceCommit ?? null
+  });
+}
+
+export function buildCommandRunObservation(run: CommandRunEvidenceInput) {
+  return buildTelemetryObservation({
+    observationId: run.cacheKey ?? computeCommandRunCacheKey({
+      command: run.command,
+      cwd: run.cwd ?? '.',
+      exitCode: run.exitCode,
+      stdoutSha256: run.stdoutSha256,
+      stderrSha256: run.stderrSha256,
+      runnerKind: run.runnerKind,
+      sourceCommit: run.sourceCommit
+    }),
+    producerId: 'evidence.command-runs',
+    producerVersion: '0.1.0',
+    observationKind: 'command-run',
+    status: 'canonical',
+    source: 'evidence-command-run-normalizer',
+    sourceAvailability: 'available',
+    storagePolicy: 'tracked-compact-digest',
+    timing: {
+      generatedAt: run.generatedAt,
+      startedAt: run.startedAt,
+      finishedAt: run.finishedAt,
+      durationMs: run.durationMs
+    },
+    inputDigest: hashJson({
+      command: run.command,
+      cwd: run.cwd ?? '.',
+      runnerKind: run.runnerKind ?? null,
+      sourceCommit: run.sourceCommit ?? null
+    }),
+    outputDigest: hashJson({
+      exitCode: run.exitCode,
+      stdoutSha256: run.stdoutSha256,
+      stderrSha256: run.stderrSha256
+    }),
+    cacheKey: run.cacheKey,
+    cached: run.cached,
+    extensions: {
+      command: run.command,
+      cwd: run.cwd ?? '.',
+      exitCode: run.exitCode,
+      validators: run.validators ?? [],
+      runnerKind: run.runnerKind ?? 'unknown',
+      sourceCommit: run.sourceCommit ?? null,
+      runnerVersion: run.runnerVersion ?? null
+    }
   });
 }
 

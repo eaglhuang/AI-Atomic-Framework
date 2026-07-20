@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/governance/broker-transaction.schema.json",
+  "title": "ATM Broker Transaction Receipt",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "transactionId",
+    "operation",
+    "taskId",
+    "actorId",
+    "idempotencyKey",
+    "status",
+    "registryPath",
+    "baseGeneration",
+    "nextGeneration",
+    "baseDigest",
+    "nextDigest",
+    "committedAt"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.brokerTransactionReceipt.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "transactionId": { "type": "string", "minLength": 1 },
+    "operation": { "enum": ["register", "heartbeat", "release", "adopt"] },
+    "taskId": { "type": "string", "minLength": 1 },
+    "actorId": { "type": "string", "minLength": 1 },
+    "idempotencyKey": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["committed", "idempotent-replay"] },
+    "registryPath": { "type": "string", "minLength": 1 },
+    "baseGeneration": { "type": "number" },
+    "nextGeneration": { "type": "number" },
+    "baseDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "nextDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "committedAt": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": true
+}

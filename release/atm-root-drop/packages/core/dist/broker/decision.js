@@ -5,6 +5,12 @@ import { evaluatePhysicalOverlap } from './decision/physical-overlap.js';
 import { evaluateProposalOverlap, shouldRefineProposalScopedCidConflict } from './decision/proposal-overlap.js';
 import { hasSharedWriteSurface } from './decision/surfaces.js';
 import { withFailureReason } from './decision/failure.js';
+import { findResourceOverlapMatches } from './resource-overlap.js';
+function formatSharedSurfaceDetail(axis, match, activeTaskId) {
+    const keyDisplay = match.leftKey === match.rightKey ? `'${match.leftKey}'` : `'${match.leftKey}' vs active '${match.rightKey}'`;
+    const suffix = match.verdict === 'unknown' ? ' (possible overlap; unresolved key syntax)' : '';
+    return `Shared ${axis} conflict: ${keyDisplay} is in use by task '${activeTaskId}'${suffix}`;
+}
 export function calculateBrokerDecision(newIntent, registry) {
     const conflicts = [];
     const taskId = newIntent.taskId;
@@ -35,38 +41,20 @@ export function calculateBrokerDecision(newIntent, registry) {
         return withFailureReason(decision);
     }
     // 1. Shared Surfaces conflict check
-    const newGenerators = new Set(newIntent.sharedSurfaces.generators);
-    const newProjections = new Set(newIntent.sharedSurfaces.projections);
-    const newRegistries = new Set(newIntent.sharedSurfaces.registries);
-    const newValidators = new Set(newIntent.sharedSurfaces.validators);
-    const newArtifacts = new Set(newIntent.sharedSurfaces.artifacts);
+    const sharedSurfaceAxes = [
+        { axis: 'generator', conflictKind: 'generator', left: newIntent.sharedSurfaces.generators, rightOf: (a) => a.resourceKeys.generators },
+        { axis: 'projection', conflictKind: 'projection', left: newIntent.sharedSurfaces.projections, rightOf: (a) => a.resourceKeys.projections },
+        { axis: 'registry', conflictKind: 'registry', left: newIntent.sharedSurfaces.registries, rightOf: (a) => a.resourceKeys.registries },
+        { axis: 'validator', conflictKind: 'validator', left: newIntent.sharedSurfaces.validators, rightOf: (a) => a.resourceKeys.validators },
+        { axis: 'artifact', conflictKind: 'artifact', left: newIntent.sharedSurfaces.artifacts, rightOf: (a) => a.resourceKeys.artifacts }
+    ];
     for (const active of registry.activeIntents) {
         if (active.taskId === taskId) {
             continue;
         }
-        for (const generator of active.resourceKeys.generators) {
-            if (newGenerators.has(generator)) {
-                conflicts.push({ kind: 'generator', detail: `Shared generator conflict: '${generator}' is in use by task '${active.taskId}'` });
-            }
-        }
-        for (const projection of newProjections) {
-            if (active.resourceKeys.projections.includes(projection)) {
-                conflicts.push({ kind: 'projection', detail: `Shared projection conflict: '${projection}' is in use by task '${active.taskId}'` });
-            }
-        }
-        for (const registryKey of newRegistries) {
-            if (active.resourceKeys.registries.includes(registryKey)) {
-                conflicts.push({ kind: 'registry', detail: `Shared registry conflict: '${registryKey}' is in use by task '${active.taskId}'` });
-            }
-        }
-        for (const validator of newValidators) {
-            if (active.resourceKeys.validators.includes(validator)) {
-                conflicts.push({ kind: 'validator', detail: `Shared validator conflict: '${validator}' is in use by task '${active.taskId}'` });
-            }
-        }
-        for (const artifact of newArtifacts) {
-            if (active.resourceKeys.artifacts.includes(artifact)) {
-                conflicts.push({ kind: 'artifact', detail: `Shared artifact conflict: '${artifact}' is in use by task '${active.taskId}'` });
+        for (const { axis, conflictKind, left, rightOf } of sharedSurfaceAxes) {
+            for (const match of findResourceOverlapMatches(axis, left, rightOf(active))) {
+                conflicts.push({ kind: conflictKind, detail: formatSharedSurfaceDetail(axis, match, active.taskId) });
             }
         }
     }
@@ -123,7 +111,7 @@ export function calculateBrokerDecision(newIntent, registry) {
         const activeReadAtomIds = active.resourceKeys.readAtomIds ?? [];
         const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
         for (const refId of active.resourceKeys.atomIds) {
-            if (materialCidWrite && newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
+            if (newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
                 pushCidConflict('write', 'ID', refId, active.taskId);
             }
             if (newReadAtomIds.has(refId)) {

@@ -1,5 +1,6 @@
 import { DEFAULT_AGR_LAYER2_THRESHOLDS, shouldTriggerLayer2 } from '../policy.js';
 import { intersectRanges, rangesOverlap } from '../agr.js';
+import { findResourceOverlapMatches } from '../resource-overlap.js';
 import { buildDecompositionRequest, buildLayer2ConflictDetail, toVirtualAtomRangesFromActiveIntent, toVirtualAtoms } from './decomposition.js';
 export function evaluatePhysicalOverlap(newIntent, activeIntents) {
     const newIntentRanges = toVirtualAtoms(newIntent);
@@ -11,14 +12,22 @@ export function evaluatePhysicalOverlap(newIntent, activeIntents) {
             continue;
         }
         const activeRanges = toVirtualAtomRangesFromActiveIntent(activeIntent);
-        for (const newFile of newIntent.targetFiles) {
-            if (!activeIntent.resourceKeys.files.includes(newFile)) {
+        const seenPair = new Set();
+        for (const match of findResourceOverlapMatches('file', newIntent.targetFiles, activeIntent.resourceKeys.files)) {
+            const pairKey = `${match.leftKey}::${match.rightKey}`;
+            if (seenPair.has(pairKey))
                 continue;
-            }
-            const newCandidates = newIntentRanges.filter((entry) => entry.sourceRange.filePath === newFile);
-            const activeCandidates = activeRanges.filter((entry) => entry.sourceRange.filePath === newFile);
+            seenPair.add(pairKey);
+            const newKey = match.leftKey;
+            const activeKey = match.rightKey;
+            // Range-level evidence lives on concrete literal filePaths in atomRefs[].sourceRange.
+            // For pattern-vs-literal or pattern-vs-pattern matches we fall through to the
+            // unresolved branch and report the concrete active key, which is what a compose
+            // or split lane will physically contend for.
+            const newCandidates = newIntentRanges.filter((entry) => entry.sourceRange.filePath === newKey);
+            const activeCandidates = activeRanges.filter((entry) => entry.sourceRange.filePath === activeKey);
             if (newCandidates.length === 0 || activeCandidates.length === 0) {
-                unresolvedOverlaps.add(newFile);
+                unresolvedOverlaps.add(activeKey);
                 continue;
             }
             for (const newAtom of newCandidates) {
@@ -26,7 +35,7 @@ export function evaluatePhysicalOverlap(newIntent, activeIntents) {
                     if (!rangesOverlap(newAtom.sourceRange, activeAtom.sourceRange)) {
                         conflicts.push({
                             kind: 'file-range',
-                            detail: `Syntactic disjoint overlap on '${newFile}' for atom '${newAtom.atomCid}' and '${activeAtom.atomCid}'.`
+                            detail: `Syntactic disjoint overlap on '${activeKey}' for atom '${newAtom.atomCid}' and '${activeAtom.atomCid}'.`
                         });
                         continue;
                     }

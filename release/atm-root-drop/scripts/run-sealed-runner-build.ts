@@ -9,51 +9,36 @@ import {
   type RunnerSyncAdmissionReport
 } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import {
+  buildRunnerSyncReleaseCommand,
+  buildRunnerSyncBuildObservation,
+  buildRunnerSyncReceipt,
   digestJson,
   phaseTimingsRecord,
   planRunnerIncrementalBuild,
   prepareTsBuildCache,
   persistTsBuildCache,
+  summarizeDominantPhase,
   syncDirectoryHashChanged,
+  writeJsonWithRetry,
   writeRunnerBuildRuntimeTelemetry,
+  writeRunnerSyncReceipt,
   type RunnerIncrementalBuildPlan,
+  type RunnerSyncBuildObservation,
+  type RunnerSyncDominantPhaseSummary,
+  type RunnerSyncReceipt,
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 export type BuildDecision = 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
 type RunnerSyncPhaseTimings = ReturnType<typeof phaseTimingsRecord>;
-export { planRunnerIncrementalBuild, type RunnerIncrementalBuildPlan } from './runner-sync-incremental-build.ts';
-
-export type RunnerSyncReceipt = {
-  readonly schemaId: 'atm.runnerSyncReceipt.v1';
-  readonly specVersion: '0.1.0';
-  readonly taskId: string;
-  readonly actorId: string;
-  readonly stewardWorkId: string;
-  readonly sealedSourceSha: string;
-  readonly requestedSurfaces: readonly string[];
-  readonly buildTarget: BuildTarget;
-  readonly buildInputsTreeHash: string;
-  readonly buildDecision: BuildDecision;
-  readonly decisionReason: string;
-  readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
-  readonly runtimeTelemetryRef: string | null;
-  readonly tsBuildCache: TsBuildCacheSummary | null;
-  readonly phaseTimingsMs: RunnerSyncPhaseTimings;
-  readonly treatmentTelemetry: {
-    readonly schemaId: 'atm.generatedWriteTreatmentTelemetry.v1';
-    readonly executionMode: 'cache-hit-skip' | 'command-executed';
-    readonly commandExecuted: boolean;
-    readonly outputObserved: boolean;
-    readonly receiptValidity: 'valid';
-    readonly buildDecision: BuildDecision;
-    readonly phaseTimingsMs: RunnerSyncPhaseTimings;
-    readonly rawTelemetryPolicy: 'gitignored-runtime-only';
-    readonly tsBuildCacheDigest: string | null;
-  };
-  readonly publishedAt: string;
-};
+export {
+  buildRunnerSyncReceipt,
+  planRunnerIncrementalBuild,
+  writeRunnerSyncReceipt,
+  type RunnerIncrementalBuildPlan,
+  type RunnerSyncReceipt
+} from './runner-sync-incremental-build.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const invokedAsCli = process.argv[1] !== undefined
@@ -121,6 +106,11 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   const actorId = process.env.ATM_ACTOR_ID?.trim()
     || process.env.AGENT_IDENTITY?.trim()
     || 'release-steward';
+  const actorIdentitySource = process.env.ATM_ACTOR_ID?.trim()
+    ? 'ATM_ACTOR_ID'
+    : process.env.AGENT_IDENTITY?.trim()
+      ? 'AGENT_IDENTITY'
+      : 'fallback';
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
 
@@ -138,29 +128,8 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     buildInputsTreeHash
   }));
   if (cacheDecision.decision === 'cacheHitSkip') {
-    timePhase(timings, 'artifactSyncMs', () => writeBuildMetadataToReleaseManifests({
-      cwd: repoRoot,
-      sealedSourceSha,
-      buildInputsTreeHash,
-      buildDecision: cacheDecision.decision,
-      decisionReason: cacheDecision.reason,
-      incrementalPlan: null,
-      runtimeTelemetryRef: null,
-      tsBuildCache: null,
-      timings
-    }));
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
-    writeBuildMetadataToReleaseManifests({
-      cwd: repoRoot,
-      sealedSourceSha,
-      buildInputsTreeHash,
-      buildDecision: cacheDecision.decision,
-      decisionReason: cacheDecision.reason,
-      incrementalPlan: null,
-      runtimeTelemetryRef: null,
-      tsBuildCache: null,
-      timings
-    });
+    const dominantPhaseSummary = summarizeDominantPhase(timings);
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
       cwd: repoRoot,
       actorId,
@@ -171,12 +140,26 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       decisionReason: cacheDecision.reason,
       incrementalPlan: null,
       tsBuildCache: null,
-      timings
+      timings,
+      dominantPhaseSummary
     });
-    writeRunnerSyncReceipt({
+    timePhase(timings, 'artifactSyncMs', () => writeBuildMetadataToReleaseManifests({
+      cwd: repoRoot,
+      sealedSourceSha,
+      buildInputsTreeHash,
+      buildDecision: cacheDecision.decision,
+      decisionReason: cacheDecision.reason,
+      incrementalPlan: null,
+      runtimeTelemetryRef,
+      tsBuildCache: null,
+      timings,
+      dominantPhaseSummary
+    }));
+    const receiptRef = writeRunnerSyncReceipt({
       cwd: repoRoot,
       admission,
       actorId,
+      actorIdentitySource,
       sealedSourceSha,
       buildTarget,
       buildInputsTreeHash,
@@ -185,8 +168,10 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       incrementalPlan: null,
       runtimeTelemetryRef,
       tsBuildCache: null,
-      timings
+      timings,
+      dominantPhaseSummary
     });
+    releaseRunnerSyncSteward({ cwd: repoRoot, admission, receiptRef });
     console.log(`[sealed-runner-build] cacheHitSkip ${buildTarget} from ${sealedSourceSha}`);
     return;
   }
@@ -230,6 +215,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       tsBuildCache,
       timings
     });
+    const dominantPhaseSummary = summarizeDominantPhase(timings);
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
       cwd: repoRoot,
       actorId,
@@ -240,12 +226,14 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       decisionReason,
       incrementalPlan,
       tsBuildCache,
-      timings
+      timings,
+      dominantPhaseSummary
     });
-    writeRunnerSyncReceipt({
+    const receiptRef = writeRunnerSyncReceipt({
       cwd: repoRoot,
       admission,
       actorId,
+      actorIdentitySource,
       sealedSourceSha,
       buildTarget,
       buildInputsTreeHash,
@@ -254,8 +242,10 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       incrementalPlan,
       runtimeTelemetryRef,
       tsBuildCache,
-      timings
+      timings,
+      dominantPhaseSummary
     });
+    releaseRunnerSyncSteward({ cwd: repoRoot, admission, receiptRef });
     console.log(`[sealed-runner-build] ${buildDecision} ${buildTarget} from ${sealedSourceSha}`);
   } finally {
     // CRITICAL: unlink the node_modules junction BEFORE git worktree remove.
@@ -389,6 +379,8 @@ export function writeBuildMetadataToReleaseManifests(input: {
   readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef?: string | null;
   readonly tsBuildCache?: TsBuildCacheSummary | null;
+  readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
+  readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
   readonly timings: SealedBuildTimings;
 }): void {
   for (const relative of releaseManifestPaths) {
@@ -402,6 +394,7 @@ export function writeBuildMetadataToReleaseManifests(input: {
     manifest.incrementalPlanDigest = input.incrementalPlan ? digestJson(input.incrementalPlan) : null;
     manifest.tsBuildCacheDigest = input.tsBuildCache ? digestJson(input.tsBuildCache) : null;
     manifest.rawTelemetryPolicy = 'gitignored-runtime-only';
+    manifest.dominantPhaseSummary = input.dominantPhaseSummary ?? summarizeDominantPhase(input.timings);
     manifest.phaseTimingsMs = {
       inputHashCalculation: input.timings.inputHashCalculationMs,
       skipDecision: input.timings.skipDecisionMs,
@@ -413,84 +406,48 @@ export function writeBuildMetadataToReleaseManifests(input: {
       cleanup: input.timings.cleanupMs,
       totalElapsed: input.timings.totalElapsedMs
     };
-    writeFileSync(absolute, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+    writeJsonWithRetry({ filePath: absolute, value: manifest });
   }
-}
-
-export function buildRunnerSyncReceipt(input: {
-  readonly admission: RunnerSyncAdmissionReport;
-  readonly actorId: string;
-  readonly sealedSourceSha: string;
-  readonly buildTarget: BuildTarget;
-  readonly buildInputsTreeHash: string;
-  readonly buildDecision: BuildDecision;
-  readonly decisionReason?: string;
-  readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
-  readonly runtimeTelemetryRef?: string | null;
-  readonly tsBuildCache?: TsBuildCacheSummary | null;
-  readonly timings: SealedBuildTimings;
-  readonly publishedAt?: string;
-}): RunnerSyncReceipt {
-  const taskId = input.admission.queueHeadOwnership.waitingTasks[0] ?? '';
-  const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
-  if (!taskId || !stewardWorkId) {
-    throw new Error('ATM_RUNNER_SYNC_RECEIPT_INVALID: queue-head task and steward work id are required to publish a runner-sync receipt.');
-  }
-  return {
-    schemaId: 'atm.runnerSyncReceipt.v1',
-    specVersion: '0.1.0',
-    taskId,
-    actorId: input.actorId,
-    stewardWorkId,
-    sealedSourceSha: input.sealedSourceSha,
-    requestedSurfaces: [...input.admission.runnerSyncSteward?.requestedSurfaces ?? []].sort(),
-    buildTarget: input.buildTarget,
-    buildInputsTreeHash: input.buildInputsTreeHash,
-    buildDecision: input.buildDecision,
-    decisionReason: input.decisionReason ?? '',
-    incrementalPlan: input.incrementalPlan ?? null,
-    runtimeTelemetryRef: input.runtimeTelemetryRef ?? null,
-    tsBuildCache: input.tsBuildCache ?? null,
-    phaseTimingsMs: phaseTimingsRecord(input.timings),
-    treatmentTelemetry: {
-      schemaId: 'atm.generatedWriteTreatmentTelemetry.v1',
-      executionMode: input.buildDecision === 'cacheHitSkip' ? 'cache-hit-skip' : 'command-executed',
-      commandExecuted: input.buildDecision !== 'cacheHitSkip',
-      outputObserved: true,
-      receiptValidity: 'valid',
-      buildDecision: input.buildDecision,
-      phaseTimingsMs: phaseTimingsRecord(input.timings),
-      rawTelemetryPolicy: 'gitignored-runtime-only',
-      tsBuildCacheDigest: input.tsBuildCache ? digestJson(input.tsBuildCache) : null
-    },
-    publishedAt: input.publishedAt ?? new Date().toISOString()
-  };
-}
-
-export function writeRunnerSyncReceipt(input: {
-  readonly cwd: string;
-  readonly admission: RunnerSyncAdmissionReport;
-  readonly actorId: string;
-  readonly sealedSourceSha: string;
-  readonly buildTarget: BuildTarget;
-  readonly buildInputsTreeHash: string;
-  readonly buildDecision: BuildDecision;
-  readonly decisionReason?: string;
-  readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
-  readonly runtimeTelemetryRef?: string | null;
-  readonly tsBuildCache?: TsBuildCacheSummary | null;
-  readonly timings: SealedBuildTimings;
-}): string {
-  const receipt = buildRunnerSyncReceipt(input);
-  const relative = path.join('.atm', 'history', 'evidence', `${receipt.taskId}.runner-sync-receipt.json`);
-  const absolute = path.join(input.cwd, relative);
-  mkdirSync(path.dirname(absolute), { recursive: true });
-  writeFileSync(absolute, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
-  return relative.replace(/\\/g, '/');
 }
 
 function readJsonRecord(filePath: string): Record<string, unknown> {
   return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+}
+
+function releaseRunnerSyncSteward(input: {
+  readonly cwd: string;
+  readonly admission: RunnerSyncAdmissionReport;
+  readonly receiptRef: string;
+}): void {
+  if (process.env.ATM_RUNNER_SYNC_AUTO_RELEASE === '0') return;
+  const taskId = input.admission.queueHeadOwnership.waitingTasks[0] ?? '';
+  const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
+  if (!taskId || !stewardWorkId) return;
+  const receiptPath = path.join(input.cwd, input.receiptRef);
+  const receiptDigest = `sha256:${createHash('sha256').update(readFileSync(receiptPath, 'utf8')).digest('hex')}`;
+  const retryCommand = buildRunnerSyncReleaseCommand({ taskId, stewardWorkId, receiptRef: input.receiptRef, receiptDigest });
+  const result = spawnSync(process.execPath, [
+    'atm.mjs',
+    'broker',
+    'runner-sync',
+    'release',
+    '--task',
+    taskId,
+    '--steward-work-id',
+    stewardWorkId,
+    '--receipt-ref',
+    input.receiptRef,
+    '--receipt-digest',
+    receiptDigest,
+    '--json'
+  ], {
+    cwd: input.cwd,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if (result.status !== 0) {
+    fail(`Runner-sync steward auto-release failed after receipt publication. Retry: ${retryCommand}\n${result.stderr || result.stdout}`, result.status ?? 1);
+  }
 }
 
 export function unlinkWorktreeNodeModulesLink(worktreeRoot: string): void {

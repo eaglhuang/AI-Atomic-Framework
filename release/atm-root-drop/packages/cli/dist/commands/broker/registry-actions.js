@@ -2,8 +2,9 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
-import { loadRegistry, saveRegistry, registerIntent, renewIntentLease, releaseTask, cleanupStale } from '../../../../core/dist/broker/registry.js';
+import { loadRegistry, saveRegistry, cleanupStale } from '../../../../core/dist/broker/registry.js';
 import { cleanupBrokerRuntimeSnapshots } from '../../../../core/dist/broker/lifecycle.js';
+import { createBrokerTransactionAuthority } from '../../../../core/dist/broker/transaction-authority.js';
 import { calculateBrokerDecision } from '../../../../core/dist/broker/decision.js';
 import { projectTeamBrokerRearbitrationSnapshot } from '../../../../core/dist/broker/team-lane.js';
 import { planSharedSurfaceAcquisition, removeSharedSurfaceEntry } from '../../../../core/dist/broker/shared-surface-queue.js';
@@ -79,7 +80,15 @@ export function handleBrokerRegistryActions(options, context) {
         const conflictMatrix = decision.conflictMatrix;
         const isDecisionSafe = decision.verdict === 'parallel-safe' || decision.verdict === 'serial';
         // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
-        registry = registerIntent(registry, newIntent, decision.lane, options.ttlSeconds, decision.admission);
+        const authority = createBrokerTransactionAuthority(registryPath);
+        const transactionReceipt = authority.register({
+            intent: newIntent,
+            lane: decision.lane,
+            ttlSeconds: options.ttlSeconds,
+            admissionOverride: decision.admission,
+            idempotencyKey: `broker-register:${newIntent.taskId}:${newIntent.actorId}`
+        });
+        registry = authority.read().document;
         const queueUpdate = updateSharedSurfaceQueues({
             queuePath: sharedQueuePath,
             intent: newIntent,
@@ -108,6 +117,7 @@ export function handleBrokerRegistryActions(options, context) {
             ],
             evidence: {
                 decision,
+                transactionReceipt,
                 queueAdmission,
                 registryPath: '.atm/runtime/write-broker.registry.json',
                 sharedSurfaceQueues: queueUpdate.queues,
@@ -122,9 +132,13 @@ export function handleBrokerRegistryActions(options, context) {
         if (!options.actorId) {
             throw new CliError('ATM_CLI_USAGE', 'broker heartbeat requires --actor <actor-id>.', { exitCode: 2 });
         }
-        let registry = cleanupStale(loadRegistry(registryPath));
-        registry = renewIntentLease(registry, options.task, options.actorId, options.ttlSeconds);
-        saveRegistry(registryPath, registry);
+        const authority = createBrokerTransactionAuthority(registryPath);
+        const transactionReceipt = authority.heartbeat({
+            taskId: options.task,
+            actorId: options.actorId,
+            ttlSeconds: options.ttlSeconds,
+            idempotencyKey: `broker-heartbeat:${options.task}:${options.actorId}`
+        });
         return makeResult({
             ok: true,
             command: 'broker',
@@ -135,7 +149,8 @@ export function handleBrokerRegistryActions(options, context) {
             evidence: {
                 registryPath: '.atm/runtime/write-broker.registry.json',
                 renewedTask: options.task,
-                actorId: options.actorId
+                actorId: options.actorId,
+                transactionReceipt
             }
         });
     }
@@ -201,9 +216,14 @@ export function handleBrokerRegistryActions(options, context) {
             throw new CliError('ATM_CLI_USAGE', 'broker release requires --task <task-id>.', { exitCode: 2 });
         }
         const releaseTaskId = options.task;
-        let registry = cleanupStale(loadRegistry(registryPath));
-        registry = releaseTask(registry, releaseTaskId);
-        saveRegistry(registryPath, registry);
+        const authority = createBrokerTransactionAuthority(registryPath);
+        const existingActor = authority.read().document.activeIntents.find((intent) => intent.taskId === releaseTaskId)?.actorId ?? options.actorId ?? 'system';
+        const transactionReceipt = authority.release({
+            taskId: releaseTaskId,
+            actorId: existingActor,
+            idempotencyKey: `broker-release:${releaseTaskId}:${existingActor}`
+        });
+        const registry = authority.read().document;
         const queues = readSharedSurfaceQueues(sharedQueuePath);
         const updatedQueues = queues.flatMap((queue) => {
             const released = removeSharedSurfaceEntry({ queue, taskId: releaseTaskId });
@@ -233,6 +253,7 @@ export function handleBrokerRegistryActions(options, context) {
             evidence: {
                 registryPath: '.atm/runtime/write-broker.registry.json',
                 releasedTask: releaseTaskId,
+                transactionReceipt,
                 sharedSurfaceQueues: updatedQueues,
                 runnerSyncStewardRelease: runnerSyncRelease,
                 sharedSurfaceFreezes: freezes,

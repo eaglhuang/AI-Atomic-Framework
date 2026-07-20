@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
-import { appendPlanBatchRunEvent, readPlanBatchRun, startPlanBatchRun } from '../../../../core/dist/batch/plan-run-journal.js';
+import { appendPlanBatchRunEvent, planExecutorPhaseChain, readPlanBatchRunEvents, readPlanBatchRun, startPlanBatchRun } from '../../../../core/dist/batch/plan-run-journal.js';
+import { buildTelemetryObservation } from '../../../../core/dist/telemetry/observation.js';
 import { resolveActorId } from '../actor-registry.js';
 import { CliError, makeResult, message, parseOptions } from '../shared.js';
 export function runBatchExecutePlan(argv) {
@@ -30,12 +31,26 @@ export function runBatchExecutePlan(argv) {
         startEvent = started.event;
     }
     const control = readPlanExecutorControl(argv, batchRun);
+    const loopReceipt = control.decision === 'next-command' && argv.includes('--run-loop')
+        ? runPlanExecutorLoop({
+            cwd: options.cwd,
+            batchRun,
+            actorId: resolvedActor.actorId,
+            laneSessionId,
+            currentTaskId: control.currentTaskId,
+            crashAfter: readFlagValue(argv, '--crash-after'),
+            ticketMode: readFlagValue(argv, '--ticket') ?? 'execute',
+            nowIso,
+            waitedMs: control.waitedMs
+        })
+        : null;
+    const eventKind = loopReceipt?.terminal ? 'executor.completed' : control.eventKind;
     const event = appendPlanBatchRunEvent(options.cwd, batchRun.batchId, {
-        kind: control.eventKind,
+        kind: eventKind,
         taskId: control.currentTaskId,
         actorId: resolvedActor.actorId,
         laneSessionId,
-        idempotencyKey: `${batchRun.batchId}:${control.eventKind}:${control.currentTaskId ?? 'plan'}:${control.decision}`,
+        idempotencyKey: `${batchRun.batchId}:${eventKind}:${control.currentTaskId ?? 'plan'}:${control.decision}:${loopReceipt?.digest ?? 'advisory'}`,
         waitedMs: control.waitedMs,
         nowIso
     });
@@ -55,7 +70,8 @@ export function runBatchExecutePlan(argv) {
         paused: control.paused,
         cancelled: control.cancelled,
         waitedMs: control.waitedMs,
-        eventDigest: event.event.eventDigest
+        eventDigest: event.event.eventDigest,
+        loopReceipt
     });
     const level = decision.decision === 'cancelled' || decision.decision === 'circuit-open' ? 'warning' : 'info';
     const code = decision.decision === 'completed'
@@ -79,13 +95,13 @@ export function runBatchExecutePlan(argv) {
                 serialFallback: decision.windowDecision.serialFallback,
                 decisionDigest: decision.decisionDigest
             })],
-        evidence: { action: 'execute-plan', batchRun: latestRun, startEvent, event: event.event, duplicateEvent: event.duplicate, decision }
+        evidence: { action: 'execute-plan', batchRun: latestRun, startEvent, event: event.event, duplicateEvent: event.duplicate, loopReceipt, decision }
     });
 }
 function stripPlanExecutorArgs(argv) {
     const stripped = [];
-    const customValueFlags = new Set(['--plan', '--lane', '--waited-ms', '--auto-batch']);
-    const customBooleanFlags = new Set(['--pause', '--cancel']);
+    const customValueFlags = new Set(['--plan', '--lane', '--waited-ms', '--auto-batch', '--crash-after', '--ticket']);
+    const customBooleanFlags = new Set(['--pause', '--cancel', '--run-loop']);
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
         if (customValueFlags.has(arg)) {
@@ -103,8 +119,14 @@ function readPlanExecutorControl(argv, batchRun) {
     const circuitOpen = Boolean(process.env.ATM_AUTO_BATCH_CIRCUIT_OPEN) || readOptionValue(argv, '--auto-batch') === 'off';
     const paused = argv.includes('--pause');
     const cancelled = argv.includes('--cancel');
-    const completed = batchRun.phase === 'completed' || batchRun.eventCount >= Math.max(1, batchRun.taskIds.length + 1);
-    const currentIndex = Math.max(0, Math.min(batchRun.taskIds.length - 1, Math.max(0, batchRun.eventCount - 1)));
+    const runLoop = argv.includes('--run-loop');
+    const completedPhaseKeys = new Set(batchRun.completedPhaseKeys ?? []);
+    const currentIndex = runLoop
+        ? Math.max(0, batchRun.taskIds.findIndex((taskId) => !isTaskPhaseComplete(taskId, completedPhaseKeys)))
+        : Math.max(0, Math.min(batchRun.taskIds.length - 1, Math.max(0, batchRun.eventCount - 1)));
+    const completed = runLoop
+        ? batchRun.taskIds.length > 0 && batchRun.taskIds.every((taskId) => isTaskPhaseComplete(taskId, completedPhaseKeys))
+        : batchRun.phase === 'completed' || batchRun.eventCount >= Math.max(1, batchRun.taskIds.length + 1);
     const currentTaskId = batchRun.taskIds[currentIndex] ?? null;
     const nextTaskId = batchRun.taskIds[currentIndex + 1] ?? null;
     if (cancelled)
@@ -117,6 +139,9 @@ function readPlanExecutorControl(argv, batchRun) {
         return { decision: 'completed', eventKind: 'executor.completed', reason: 'all plan tasks have executor events', currentTaskId: null, nextTaskId: null, nextCommand: null, recoveryCommand: null, serialFallback: false, circuitOpen: false, paused: false, cancelled: false, waitedMs };
     return { decision: 'next-command', eventKind: 'executor.next-selected', reason: 'queue head selected from durable plan journal', currentTaskId, nextTaskId, nextCommand: `node atm.mjs next --claim --actor ${batchRun.createdByActor} --prompt "${currentTaskId}" --auto-intent --json`, recoveryCommand: `node atm.mjs batch execute-plan --actor ${batchRun.createdByActor} --batch ${batchRun.batchId} --json`, serialFallback: batchRun.taskIds.length <= 1, circuitOpen: false, paused: false, cancelled: false, waitedMs };
 }
+function isTaskPhaseComplete(taskId, completedPhaseKeys) {
+    return planExecutorPhaseChain.every((phase) => completedPhaseKeys.has(`${taskId}:${phase}`));
+}
 function createPlanExecutorDecisionReceipt(input) {
     const decisionInput = {
         batchId: input.batchRun.batchId,
@@ -126,7 +151,8 @@ function createPlanExecutorDecisionReceipt(input) {
         decision: input.decision,
         currentTaskId: input.currentTaskId,
         reason: input.reason,
-        eventDigest: input.eventDigest
+        eventDigest: input.eventDigest,
+        loopDigest: input.loopReceipt?.digest ?? null
     };
     return {
         schemaId: 'atm.planExecutorDecisionReceipt.v1',
@@ -140,6 +166,7 @@ function createPlanExecutorDecisionReceipt(input) {
         nextTaskId: input.nextTaskId,
         nextCommand: input.nextCommand,
         recoveryCommand: input.recoveryCommand,
+        loopReceipt: input.loopReceipt,
         windowDecision: {
             schemaId: 'atm.planExecutorWindowDecision.v1',
             serialFallback: input.serialFallback,
@@ -154,6 +181,100 @@ function createPlanExecutorDecisionReceipt(input) {
         inputDigest: digestJson({ taskIds: input.batchRun.taskIds, planDigest: input.batchRun.planDigest }),
         configDigest: digestJson({ autoBatchCircuitOpen: input.circuitOpen, serialFallback: input.serialFallback })
     };
+}
+function runPlanExecutorLoop(input) {
+    if (!input.currentTaskId)
+        return null;
+    const taskId = input.currentTaskId;
+    const existingEvents = readPlanBatchRunEvents(input.cwd, input.batchRun.batchId);
+    const completed = new Set(existingEvents.filter((event) => event.taskId === taskId && event.phase && event.terminal).map((event) => event.phase));
+    const sideEffectReceiptDigests = {};
+    const observations = [];
+    let stoppedAtCrash = false;
+    for (const phase of planExecutorPhaseChain) {
+        if (completed.has(phase)) {
+            const digest = input.batchRun.sideEffectReceiptDigests?.[`${taskId}:${phase}`];
+            if (digest)
+                sideEffectReceiptDigests[phase] = digest;
+            continue;
+        }
+        const inputDigest = digestJson({ taskId, phase, planDigest: input.batchRun.planDigest, ticketMode: input.ticketMode });
+        const receiptDigest = isSideEffectPhase(phase) ? digestJson({ taskId, phase, batchId: input.batchRun.batchId, exactlyOnce: true }) : null;
+        const outputDigest = digestJson({ inputDigest, receiptDigest, terminal: true });
+        const event = appendPlanBatchRunEvent(input.cwd, input.batchRun.batchId, {
+            kind: `phase.${phase}.completed`,
+            taskId,
+            phase,
+            actorId: input.actorId,
+            laneSessionId: input.laneSessionId,
+            idempotencyKey: `${input.batchRun.batchId}:${taskId}:${phase}:terminal`,
+            inputDigest,
+            outputDigest,
+            sideEffectReceiptDigest: receiptDigest,
+            terminal: true,
+            waitedMs: input.waitedMs,
+            nowIso: input.nowIso
+        });
+        completed.add(phase);
+        if (receiptDigest)
+            sideEffectReceiptDigests[phase] = receiptDigest;
+        observations.push(buildTelemetryObservation({
+            observationId: event.event.eventId,
+            producerId: 'plan-executor.phase',
+            observationKind: `phase.${phase}`,
+            status: 'canonical',
+            source: 'packages/cli/src/commands/batch/plan-executor.ts',
+            sourceAvailability: 'available',
+            storagePolicy: 'runtime-raw-tracked-digest',
+            timing: { observedAt: input.nowIso, durationMs: input.waitedMs },
+            correlation: { actorId: input.actorId, laneSessionId: input.laneSessionId, taskId, batchId: input.batchRun.batchId },
+            inputDigest,
+            outputDigest,
+            configDigest: digestJson({ ticketMode: input.ticketMode }),
+            extensions: {
+                phase,
+                sideEffectReceiptDigest: receiptDigest,
+                composeFirstState: composeFirstStateForPhase(phase, input.ticketMode)
+            }
+        }));
+        if (input.crashAfter === phase) {
+            stoppedAtCrash = true;
+            break;
+        }
+    }
+    const completedPhases = planExecutorPhaseChain.filter((phase) => completed.has(phase));
+    const nextPhase = planExecutorPhaseChain.find((phase) => !completed.has(phase)) ?? null;
+    const terminal = !nextPhase && !stoppedAtCrash;
+    const receiptSeed = { batchId: input.batchRun.batchId, taskId, completedPhases, nextPhase, terminal, ticketMode: input.ticketMode, sideEffectReceiptDigests };
+    return {
+        schemaId: 'atm.planExecutorLoopReceipt.v1',
+        batchId: input.batchRun.batchId,
+        taskId,
+        actorId: input.actorId,
+        laneSessionId: input.laneSessionId,
+        phaseCount: planExecutorPhaseChain.length,
+        completedPhases,
+        nextPhase,
+        terminal,
+        ticketMode: input.ticketMode,
+        crashAfter: input.crashAfter,
+        recoveryCommand: terminal ? null : `node atm.mjs batch execute-plan --actor ${input.actorId} --batch ${input.batchRun.batchId} --run-loop --json`,
+        sideEffectReceiptDigests,
+        observations,
+        digest: digestJson(receiptSeed)
+    };
+}
+function isSideEffectPhase(phase) {
+    return phase === 'published' || phase === 'generated-writes' || phase === 'commit' || phase === 'checkpoint' || phase === 'closeback';
+}
+function composeFirstStateForPhase(phase, ticketMode) {
+    if (phase === 'broker-ticketed')
+        return ticketMode === 'queued' ? 'queued-ticket' : 'execute-ticket';
+    if (phase === 'composing')
+        return ticketMode === 'queued' ? 'wakeup-compose' : 'compose-parallel';
+    if (phase === 'semantic-revalidation')
+        return ticketMode === 'stale-read-set' ? 'revalidated-after-stale-read-set' : 'validated';
+    return 'not-shared-write';
 }
 function collectRepeatedValues(argv, flag) {
     const values = [];

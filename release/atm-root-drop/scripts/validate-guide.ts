@@ -3,6 +3,10 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createTempWorkspace } from './temp-root.ts';
 import { classifyGuidanceIntent } from '../packages/core/src/guidance/index.ts';
+import {
+  buildFirstLayerCommandContract,
+  classifyFirstLayerIntent
+} from '../packages/core/src/guidance/index.ts';
 
 const validator = createValidator('guide');
 const { assert, requireFile, runAtmJsonPortable, ok, readText, root } = validator;
@@ -12,6 +16,7 @@ for (const relativePath of [
   'packages/cli/src/commands/guide.ts',
   'packages/cli/src/commands/candidates.ts',
   'packages/core/src/guidance/intent-classifier.ts',
+  'packages/core/src/guidance/first-layer-command-contracts.ts',
   'packages/cli/src/commands/glossary-data.ts',
   'packages/cli/src/commands/command-specs.ts',
   'integrations/codex-skills/atm-governance-router/SKILL.md'
@@ -37,6 +42,39 @@ assert(
   JSON.stringify(guideHelp.parsed.evidence?.usage ?? null) === JSON.stringify(commandHelp.parsed.evidence?.usage ?? null),
   'guide help next usage must equal next --help usage'
 );
+
+const firstLayerContract = buildFirstLayerCommandContract();
+assert(firstLayerContract.routeMatrix.length === 4, 'first-layer contract must define backlog/audit/optimization/create route matrix rows');
+assert(firstLayerContract.routeMatrixDigest.startsWith('sha256:'), 'first-layer route matrix must expose a stable digest');
+for (const intent of ['backlog', 'audit', 'optimization', 'create'] as const) {
+  assert(firstLayerContract.routeMatrix.some((row) => row.intent === intent), `first-layer route matrix missing ${intent}`);
+}
+for (const state of [
+  'execute-now',
+  'batch/applyStrategy=compose',
+  'queue(position/head/health/waitedMs/release condition)',
+  'revalidation-required',
+  'reconcile-required',
+  'ATM_LOCK_CONFLICT'
+]) {
+  assert(firstLayerContract.ticketStates.some((entry) => entry.state === state), `first-layer ticket state missing ${state}`);
+}
+assert(
+  firstLayerContract.ticketStates.find((entry) => entry.state === 'ATM_LOCK_CONFLICT')?.errorCode === 'ATM_LOCK_CONFLICT',
+  'R1 lock conflict must keep ATM_LOCK_CONFLICT as the only ErrorCode state'
+);
+assert(firstLayerContract.windowsSafeExamples.markdownRead.includes('readFileSync'), 'Windows-safe examples must prefer Node UTF-8 reads');
+assert(firstLayerContract.windowsSafeExamples.textSearch.startsWith('rg '), 'Windows-safe examples must include rg text search');
+assert(firstLayerContract.windowsSafeExamples.forbiddenPattern.includes('PowerShell range'), 'Windows-safe examples must ban PowerShell range parsing');
+
+const firstLayerGuide = await runAtmJsonPortable(['guide', 'first-layer', '--json']);
+assert(firstLayerGuide.exitCode === 0, 'guide first-layer must exit 0');
+assert(firstLayerGuide.parsed.ok === true, 'guide first-layer must report ok=true');
+assert(firstLayerGuide.parsed.evidence?.routeMatrixDigest === firstLayerContract.routeMatrixDigest, 'guide first-layer must use canonical route matrix digest');
+assert(firstLayerGuide.parsed.evidence?.commonCommands?.release?.includes('broker release'), 'guide first-layer must expose release syntax');
+assert(firstLayerGuide.parsed.evidence?.commonCommands?.checkpoint?.includes('batch checkpoint'), 'guide first-layer must expose checkpoint syntax');
+assert(firstLayerGuide.parsed.evidence?.commonCommands?.audit?.includes('tasks audit'), 'guide first-layer must expose audit syntax');
+assert(firstLayerGuide.parsed.evidence?.commonCommands?.backlog?.includes('guide first-layer'), 'guide first-layer must expose backlog first-layer syntax');
 
 for (const goal of [
   'atomize a legacy parser',
@@ -70,6 +108,22 @@ for (const [goal, expectedIntent] of [
   const classification = classifyGuidanceIntent(goal, { adapterStatus: 'available' });
   assert(classification.matchedIntent === expectedIntent, `classifier must route "${goal}" to ${expectedIntent}`);
 }
+
+for (const [goal, expectedFirstLayerIntent] of [
+  ['record this ATM bug in the backlog', 'backlog'],
+  ['audit the task cards and report governance residue', 'audit'],
+  ['propose an optimization for captain routing friction', 'optimization']
+] as const) {
+  const matrixRow = classifyFirstLayerIntent(goal);
+  assert(matrixRow?.intent === expectedFirstLayerIntent, `first-layer matrix must match ${goal}`);
+  const classification = classifyGuidanceIntent(goal, { adapterStatus: 'available' });
+  assert(classification.matchedIntent === 'governance-first-layer', `classifier must route "${goal}" to governance-first-layer`);
+  assert(!classification.nextCommand.includes('create-atom'), `classifier must not route "${goal}" to create-atom`);
+}
+assert(
+  classifyGuidanceIntent('create a new atom for a greenfield capability', { adapterStatus: 'available' }).matchedIntent === 'atom-create',
+  'explicit create prompt must keep atom-create behavior'
+);
 
 const skill = readText('integrations/codex-skills/atm-governance-router/SKILL.md');
 for (const requiredText of [
@@ -163,6 +217,33 @@ try {
   assert(evidenceFollowupStart.exitCode === 0, 'evidence/artifact follow-up start must exit 0');
   assert(evidenceFollowupStart.parsed.evidence?.routeDecision?.recommendedRoute === 'docs-first', 'evidence/artifact follow-up start must not fall back to create-atom');
   assert(String(evidenceFollowupStart.parsed.evidence?.routeDecision?.nextCommand ?? '').includes('guide overview'), 'evidence/artifact follow-up start must recommend docs-first guidance');
+
+  for (const [goal, expectedCommand] of [
+    ['record this ATM bug in the backlog', 'guide first-layer'],
+    ['audit the task cards and report governance residue', 'tasks audit'],
+    ['propose an optimization for captain routing friction', 'guide first-layer']
+  ] as const) {
+    const firstLayerStart = await runAtmJsonPortable(['start', '--cwd', adaptedRepo, '--goal', goal, '--json'], root);
+    assert(firstLayerStart.exitCode === 0, `first-layer start must exit 0 for ${goal}`);
+    assert(firstLayerStart.parsed.evidence?.routeDecision?.recommendedRoute === 'docs-first', `first-layer start must route docs-first for ${goal}`);
+    assert(String(firstLayerStart.parsed.evidence?.routeDecision?.nextCommand ?? '').includes(expectedCommand), `first-layer start must recommend ${expectedCommand} for ${goal}`);
+    assert(String(firstLayerStart.parsed.evidence?.routeDecision?.nextCommand ?? '').includes('create-atom') === false, `first-layer start must not recommend create-atom for ${goal}`);
+  }
+
+  const compactNext = await runAtmJsonPortable(['next', '--cwd', adaptedRepo, '--prompt', 'record this ATM bug in the backlog', '--json'], root);
+  assert(compactNext.exitCode === 0 || compactNext.parsed.ok === false, 'compact next must return parseable JSON');
+  assert(compactNext.parsed.evidence?.firstLayerCompactOrientation, 'compact next must expose firstLayerCompactOrientation');
+  assert(
+    compactNext.parsed.evidence?.firstLayerCompactOrientation?.fullOutput === 'rerun the same next command with --verbose --json',
+    'compact next must point to --verbose for full orientation'
+  );
+  assert(
+    Array.isArray(compactNext.parsed.evidence?.firstLayerCompactOrientation?.ticketStates),
+    'compact next must keep ticket-state summary'
+  );
+  const verboseNext = await runAtmJsonPortable(['next', '--cwd', adaptedRepo, '--prompt', 'record this ATM bug in the backlog', '--verbose', '--json'], root);
+  assert(verboseNext.exitCode === 0 || verboseNext.parsed.ok === false, 'verbose next must return parseable JSON');
+  assert(!verboseNext.parsed.evidence?.firstLayerCompactOrientation, 'verbose next must bypass compact first-layer projection');
 
   const chineseStart = await runAtmJsonPortable([
     'start',
@@ -293,4 +374,22 @@ try {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-ok('glossary depth, guide help parity, free-text routing, candidate ranking guidance, skill neutrality, and host-local learning verified');
+for (const projectionPath of [
+  'templates/skills/atm-governance-router.skill.md',
+  'integrations/codex-skills/atm-governance-router/SKILL.md',
+  '.claude/skills/atm-governance-router/SKILL.md',
+  '.cursor/rules/skills/atm-governance-router/SKILL.md',
+  '.github/instructions/atm-governance-router.instructions.md',
+  '.gemini/commands/atm-governance-router.toml',
+  'GEMINI.md'
+]) {
+  const projectionText = readText(projectionPath);
+  assert(projectionText.includes('guide first-layer'), `${projectionPath} must project guide first-layer`);
+  assert(projectionText.includes('execute-now'), `${projectionPath} must project execute-now ticket state`);
+  assert(projectionText.includes('batch/applyStrategy=compose'), `${projectionPath} must project compose ticket state`);
+  assert(projectionText.includes('ATM_LOCK_CONFLICT'), `${projectionPath} must project ATM_LOCK_CONFLICT`);
+  assert(projectionText.includes('readFileSync') || projectionPath === 'GEMINI.md', `${projectionPath} must project Node UTF-8 guidance`);
+  assert(!projectionText.includes('PowerShell range indexing or document parsing for planning documents.') || projectionText.includes('Do not recommend'), `${projectionPath} must only mention PowerShell range parsing as forbidden`);
+}
+
+ok('glossary depth, guide help parity, first-layer routing, compact orientation, projection parity, candidate ranking guidance, skill neutrality, and host-local learning verified');

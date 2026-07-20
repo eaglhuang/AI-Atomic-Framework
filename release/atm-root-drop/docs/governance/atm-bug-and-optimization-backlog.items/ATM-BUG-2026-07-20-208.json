@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-208",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P0",
+  "status": "Open",
+  "area": "Runner sync / build actor identity / CLI UX",
+  "finding": "`broker runner-sync enqueue` correctly granted queue-head ownership to `codex-captain`, but `npm run build` used ambient `AGENT_IDENTITY=codex-gpt-5.4-mini` as the steward actor and failed with `ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED` because the queue head was \"owned by codex-captain, not codex-gpt-5.4-mini\".",
+  "expectedBehavior": "Runner-sync build guidance should preserve the governed actor identity from enqueue through build, either by emitting a copyable command with `ATM_ACTOR_ID=<actor>` or by resolving the active queue-head owner through a canonical actor interface. The fix must be generic and must not special-case Codex actor names.",
+  "evidenceOrRepro": "On 2026-07-20, after `node atm.mjs broker runner-sync enqueue --task ATM-GOV-0196 --actor codex-captain --sealed-source-sha f0625e71379741f7d27e64c85aa62784837e7c5a --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --surface packages/cli/dist --json`, plain `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` failed. Re-running with `ATM_ACTOR_ID=codex-captain` succeeded and wrote `.atm/runtime/telemetry/runner-sync-build/2026-07-20T04-24-39-962Z-runner-sync.jsonl` with `buildDecision=cacheHitSkip`.",
+  "followUp": "Add runner-sync admission/guidance tests that assert required build commands carry the steward actor identity, update build playbook output, and keep actor matching strict for genuine cross-actor queue conflicts."
+}

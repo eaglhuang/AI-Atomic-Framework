@@ -57,6 +57,9 @@
     },
     "failureReason": {
       "$ref": "#/$defs/failureReason"
+    },
+    "ticketPlan": {
+      "$ref": "#/$defs/ticketSelectionTrace"
     }
   },
   "$defs": {
@@ -123,6 +126,20 @@
         "validatorTranscript": {
           "type": ["string", "null"]
         }
+      }
+    },
+    "ticketSelectionTrace": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["schemaId", "selectedTicketIds", "composeCandidateTicketIds", "queuedTicketIds", "fairnessCounters", "policy", "reason"],
+      "properties": {
+        "schemaId": { "const": "atm.brokerTicketSelectionTrace.v1" },
+        "selectedTicketIds": { "type": "array", "items": { "type": "string" } },
+        "composeCandidateTicketIds": { "type": "array", "items": { "type": "string" } },
+        "queuedTicketIds": { "type": "array", "items": { "type": "string" } },
+        "fairnessCounters": { "type": "object" },
+        "policy": { "type": "object" },
+        "reason": { "type": "string" }
       }
     }
   }

@@ -1,4 +1,6 @@
 import { createHash } from 'node:crypto';
+import { createBrokerTicket } from './ticket-state.js';
+import { defaultBrokerTicketFairnessPolicy, selectComposeFirstTickets } from './ticket-policy.js';
 const nonBatchableStates = new Set(['released', 'failed', 'cancelled']);
 const ticketStateTransitions = {
     queued: ['head', 'batched', 'executing', 'failed', 'cancelled'],
@@ -88,6 +90,7 @@ export function planWaveBrokerBatch(input) {
             ticketIds: [],
             missingTaskIds: uniqueSorted(input.expectedTaskIds ?? []),
             waitedMs: 0,
+            selectionTrace: emptySelectionTrace(input.fairnessPolicy),
             reason: 'no eligible tickets'
         };
     }
@@ -107,6 +110,7 @@ export function planWaveBrokerBatch(input) {
             ticketIds: candidates.map((ticket) => ticket.ticketId),
             missingTaskIds: [],
             waitedMs: 0,
+            selectionTrace: buildSelectionTrace(candidates, input.now, input.fairnessPolicy),
             reason: 'candidate tickets span multiple waves or incompatible surfaces'
         };
     }
@@ -129,6 +133,7 @@ export function planWaveBrokerBatch(input) {
             ticketIds: selected.map((ticket) => ticket.ticketId),
             missingTaskIds,
             waitedMs,
+            selectionTrace: buildSelectionTrace(selected, input.now, input.fairnessPolicy),
             reason: waitedMs >= timeoutMs ? 'reseal-or-serial-fallback' : 'waiting for expected wave tickets'
         };
     }
@@ -141,6 +146,45 @@ export function planWaveBrokerBatch(input) {
         ticketIds: selected.map((ticket) => ticket.ticketId),
         missingTaskIds: [],
         waitedMs,
+        selectionTrace: buildSelectionTrace(selected, input.now, input.fairnessPolicy),
         reason: selected.length >= 2 ? 'same wave and compatible surface tickets ready' : 'single ticket uses serial fallback'
+    };
+}
+function buildSelectionTrace(tickets, now, fairnessPolicy) {
+    return selectComposeFirstTickets({
+        now,
+        policy: fairnessPolicy,
+        tickets: tickets.map((ticket, index) => ({
+            ...createBrokerTicket({
+                taskId: ticket.taskId,
+                actorId: ticket.taskId,
+                resourceKey: `${ticket.surfaceKind}:${ticket.surfaceFamily}`,
+                arrivalIndex: index,
+                now: ticket.enqueuedAt
+            }),
+            ticketId: ticket.ticketId,
+            idempotencyKey: ticket.idempotencyKey,
+            state: ticket.state === 'released' ? 'released' : ticket.state === 'cancelled' ? 'cancelled' : ticket.state === 'executing' ? 'executing' : 'ready',
+            updatedAt: ticket.updatedAt,
+            heartbeatAt: ticket.updatedAt
+        }))
+    });
+}
+function emptySelectionTrace(policy = defaultBrokerTicketFairnessPolicy) {
+    return {
+        schemaId: 'atm.brokerTicketSelectionTrace.v1',
+        selectedTicketIds: [],
+        composeCandidateTicketIds: [],
+        queuedTicketIds: [],
+        bypassedTicketIds: [],
+        waitedMsByTicketId: {},
+        fairnessCounters: {
+            maxObservedBypassCount: 0,
+            maxObservedWaitMs: 0,
+            duplicateWakeupCount: 0,
+            starvationRiskTicketIds: []
+        },
+        policy,
+        reason: 'No eligible tickets.'
     };
 }

@@ -4,8 +4,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { composeBrokerProposals } from '../packages/core/src/broker/compose.ts';
 import { compareProposalsForCompose, sortProposalsForCompose } from '../packages/core/src/broker/merge-plan.ts';
+import { composeTransactionalMutations } from '../packages/core/src/broker/transactional-composer.ts';
 import { runBroker } from '../packages/cli/src/commands/broker.ts';
-import type { PatchProposal } from '../packages/core/src/broker/types.ts';
+import { brokerAdapterMigration, type MutationRequest, type PatchProposal } from '../packages/core/src/broker/types.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -59,6 +60,8 @@ function ensureRequiredFiles() {
     'scripts/validators.config.json',
     'packages/core/src/broker/compose.ts',
     'packages/core/src/broker/merge-plan.ts',
+    'packages/core/src/broker/transactional-composer.ts',
+    'schemas/governance/composition-plan.schema.json',
     'packages/cli/src/commands/broker.ts',
     'packages/cli/src/commands/command-specs/broker.spec.ts',
     'tests/cli-fixtures/help-snapshots/broker.json'
@@ -83,6 +86,18 @@ function ensureConfigWiring() {
     validatorsConfig.profiles?.standard?.validators?.includes('validate-broker-compose') === true,
     'standard profile must include validate-broker-compose'
   );
+}
+
+function mutation(overrides: Partial<MutationRequest> & Pick<MutationRequest, 'requestId' | 'filePath' | 'op' | 'target'>): MutationRequest {
+  return {
+    schemaId: 'atm.mutationRequest.v1',
+    specVersion: '0.1.0',
+    migration: brokerAdapterMigration(),
+    actorId: 'compose-validator',
+    taskId: 'ATM-GOV-0212',
+    value: 'value',
+    ...overrides
+  };
 }
 
 ensureRequiredFiles();
@@ -169,5 +184,22 @@ const composeCli = await runAtm([
   path.join('scripts', '__does-not-exist__')
 ]);
 check(composeCli.exitCode !== 0, 'compose CLI must reject missing proposal file');
+
+const transactional = composeTransactionalMutations({
+  files: [
+    { filePath: 'docs/compose.md', content: '# A\nalpha\n# B\nbeta\n' },
+    { filePath: 'data/compose.json', content: '{\n  "records": {}\n}\n' }
+  ],
+  requests: [
+    mutation({ requestId: 'compose-json-a', filePath: 'data/compose.json', op: 'upsert', target: '/records/a', value: { ok: true } }),
+    mutation({ requestId: 'compose-json-b', filePath: 'data/compose.json', op: 'upsert', target: '/records/b', value: { ok: true } }),
+    mutation({ requestId: 'compose-text-a', filePath: 'docs/compose.md', op: 'insertAfterHeading', target: '# A', value: 'inserted-a' })
+  ],
+  validators: ['npm run typecheck']
+});
+check(transactional.ok === true, 'transactional composer must compose disjoint JSON/text requests');
+check(transactional.plan.schemaId === 'atm.compositionPlan.v1', 'transactional composer must emit composition plan schema');
+check(transactional.plan.rollback.liveWorktreeMutation === false, 'transactional composer must not mutate live worktree');
+check(transactional.plan.serializabilityProof.permutationStable === true, 'transactional composer must prove permutation stability for disjoint requests');
 
 console.log(`[broker-compose:${mode}] ok`);
