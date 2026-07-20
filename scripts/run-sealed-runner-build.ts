@@ -9,6 +9,7 @@ import {
   type RunnerSyncAdmissionReport
 } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import {
+  buildRunnerSyncReleaseCommand,
   buildRunnerSyncBuildObservation,
   buildRunnerSyncReceipt,
   digestJson,
@@ -105,6 +106,11 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   const actorId = process.env.ATM_ACTOR_ID?.trim()
     || process.env.AGENT_IDENTITY?.trim()
     || 'release-steward';
+  const actorIdentitySource = process.env.ATM_ACTOR_ID?.trim()
+    ? 'ATM_ACTOR_ID'
+    : process.env.AGENT_IDENTITY?.trim()
+      ? 'AGENT_IDENTITY'
+      : 'fallback';
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
 
@@ -149,10 +155,11 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       timings,
       dominantPhaseSummary
     }));
-    writeRunnerSyncReceipt({
+    const receiptRef = writeRunnerSyncReceipt({
       cwd: repoRoot,
       admission,
       actorId,
+      actorIdentitySource,
       sealedSourceSha,
       buildTarget,
       buildInputsTreeHash,
@@ -164,6 +171,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       timings,
       dominantPhaseSummary
     });
+    releaseRunnerSyncSteward({ cwd: repoRoot, admission, receiptRef });
     console.log(`[sealed-runner-build] cacheHitSkip ${buildTarget} from ${sealedSourceSha}`);
     return;
   }
@@ -221,10 +229,11 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       timings,
       dominantPhaseSummary
     });
-    writeRunnerSyncReceipt({
+    const receiptRef = writeRunnerSyncReceipt({
       cwd: repoRoot,
       admission,
       actorId,
+      actorIdentitySource,
       sealedSourceSha,
       buildTarget,
       buildInputsTreeHash,
@@ -236,6 +245,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       timings,
       dominantPhaseSummary
     });
+    releaseRunnerSyncSteward({ cwd: repoRoot, admission, receiptRef });
     console.log(`[sealed-runner-build] ${buildDecision} ${buildTarget} from ${sealedSourceSha}`);
   } finally {
     // CRITICAL: unlink the node_modules junction BEFORE git worktree remove.
@@ -402,6 +412,42 @@ export function writeBuildMetadataToReleaseManifests(input: {
 
 function readJsonRecord(filePath: string): Record<string, unknown> {
   return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+}
+
+function releaseRunnerSyncSteward(input: {
+  readonly cwd: string;
+  readonly admission: RunnerSyncAdmissionReport;
+  readonly receiptRef: string;
+}): void {
+  if (process.env.ATM_RUNNER_SYNC_AUTO_RELEASE === '0') return;
+  const taskId = input.admission.queueHeadOwnership.waitingTasks[0] ?? '';
+  const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
+  if (!taskId || !stewardWorkId) return;
+  const receiptPath = path.join(input.cwd, input.receiptRef);
+  const receiptDigest = `sha256:${createHash('sha256').update(readFileSync(receiptPath, 'utf8')).digest('hex')}`;
+  const retryCommand = buildRunnerSyncReleaseCommand({ taskId, stewardWorkId, receiptRef: input.receiptRef, receiptDigest });
+  const result = spawnSync(process.execPath, [
+    'atm.mjs',
+    'broker',
+    'runner-sync',
+    'release',
+    '--task',
+    taskId,
+    '--steward-work-id',
+    stewardWorkId,
+    '--receipt-ref',
+    input.receiptRef,
+    '--receipt-digest',
+    receiptDigest,
+    '--json'
+  ], {
+    cwd: input.cwd,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if (result.status !== 0) {
+    fail(`Runner-sync steward auto-release failed after receipt publication. Retry: ${retryCommand}\n${result.stderr || result.stdout}`, result.status ?? 1);
+  }
 }
 
 export function unlinkWorktreeNodeModulesLink(worktreeRoot: string): void {

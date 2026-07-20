@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T16-15-48-182Z-scope-amendment-7b31c59cb61a",
+  "taskId": "ATM-GOV-0218",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0218.json",
+  "taskSha256": "sha256:c950c5e90e00270c088f95a606e6adeb1b007a5d69f33dd28fd62627f68120a7",
+  "createdAt": "2026-07-20T16:15:48.182Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0218 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/framework-development/runner-sync-admission.ts,packages/cli/src/commands/broker/steward-queues.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

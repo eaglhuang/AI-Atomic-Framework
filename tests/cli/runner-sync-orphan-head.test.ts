@@ -38,6 +38,8 @@ function writeTask(taskId: string, status = 'planned'): void {
 }
 
 try {
+  const orphanSha = 'a'.repeat(40);
+  const waiterSha = 'b'.repeat(40);
   const missing = runAtm([
     'broker',
     'runner-sync',
@@ -68,7 +70,7 @@ try {
     'enqueue',
     '--task', 'TASK-ORPHAN',
     '--actor', 'orphan-captain',
-    '--sealed-source-sha', 'sha256:orphan',
+    '--sealed-source-sha', orphanSha,
     '--surface', 'release/atm-onefile/atm.mjs'
   ]);
   assert.equal(orphanHead.evidence.runnerSync.queuePosition, 1);
@@ -82,7 +84,7 @@ try {
     'enqueue',
     '--task', 'TASK-WAITER',
     '--actor', 'waiter-captain',
-    '--sealed-source-sha', 'sha256:waiter',
+    '--sealed-source-sha', waiterSha,
     '--surface', 'release/atm-root-drop/release-manifest.json'
   ]);
   assert.equal(waiter.evidence.runnerSync.queuePosition, 2);
@@ -91,7 +93,7 @@ try {
   const report = inspectRunnerSyncAdmission({
     cwd: repo,
     stewardActorId: 'orphan-captain',
-    sealedSourceSha: 'sha256:orphan',
+    sealedSourceSha: orphanSha,
     dirtyFiles: []
   });
   assert.equal(report.ok, false);

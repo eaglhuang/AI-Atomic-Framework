@@ -94,6 +94,10 @@ export type RunnerSyncReceipt = {
   readonly specVersion: '0.1.0';
   readonly taskId: string;
   readonly actorId: string;
+  readonly actorIdentity: {
+    readonly actorId: string;
+    readonly source: 'ATM_ACTOR_ID' | 'AGENT_IDENTITY' | 'fallback' | 'explicit';
+  };
   readonly stewardWorkId: string;
   readonly sealedSourceSha: string;
   readonly requestedSurfaces: readonly string[];
@@ -108,6 +112,13 @@ export type RunnerSyncReceipt = {
   readonly dominantPhaseSummary: RunnerSyncDominantPhaseSummary;
   readonly buildObservation: RunnerSyncBuildObservation;
   readonly phaseTimingsMs: RunnerSyncPhaseTimings;
+  readonly atomicWrite: {
+    readonly schemaId: 'atm.runnerSyncAtomicWrite.v1';
+    readonly strategy: 'temp-file-rename-with-retry';
+    readonly platform: NodeJS.Platform;
+    readonly maxAttempts: number;
+  };
+  readonly autoReleaseCommand: string;
   readonly treatmentTelemetry: {
     readonly schemaId: 'atm.generatedWriteTreatmentTelemetry.v1';
     readonly executionMode: 'cache-hit-skip' | 'command-executed';
@@ -299,6 +310,7 @@ export function writeJsonWithRetry(input: {
 export function buildRunnerSyncReceipt(input: {
   readonly admission: RunnerSyncAdmissionReport;
   readonly actorId: string;
+  readonly actorIdentitySource?: RunnerSyncReceipt['actorIdentity']['source'];
   readonly sealedSourceSha: string;
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
@@ -323,6 +335,10 @@ export function buildRunnerSyncReceipt(input: {
     specVersion: '0.1.0',
     taskId,
     actorId: input.actorId,
+    actorIdentity: {
+      actorId: input.actorId,
+      source: input.actorIdentitySource ?? 'explicit'
+    },
     stewardWorkId,
     sealedSourceSha: input.sealedSourceSha,
     requestedSurfaces: [...input.admission.runnerSyncSteward?.requestedSurfaces ?? []].sort(),
@@ -343,6 +359,17 @@ export function buildRunnerSyncReceipt(input: {
       brokerTicket
     }),
     phaseTimingsMs: phaseTimingsRecord(input.timings),
+    atomicWrite: {
+      schemaId: 'atm.runnerSyncAtomicWrite.v1',
+      strategy: 'temp-file-rename-with-retry',
+      platform: process.platform,
+      maxAttempts: 4
+    },
+    autoReleaseCommand: buildRunnerSyncReleaseCommand({
+      taskId,
+      stewardWorkId,
+      receiptRef: path.join('.atm', 'history', 'evidence', `${taskId}.runner-sync-receipt.json`).replace(/\\/g, '/')
+    }),
     treatmentTelemetry: {
       schemaId: 'atm.generatedWriteTreatmentTelemetry.v1',
       executionMode: input.buildDecision === 'cacheHitSkip' ? 'cache-hit-skip' : 'command-executed',
@@ -362,6 +389,7 @@ export function writeRunnerSyncReceipt(input: {
   readonly cwd: string;
   readonly admission: RunnerSyncAdmissionReport;
   readonly actorId: string;
+  readonly actorIdentitySource?: RunnerSyncReceipt['actorIdentity']['source'];
   readonly sealedSourceSha: string;
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
@@ -380,6 +408,16 @@ export function writeRunnerSyncReceipt(input: {
   mkdirSync(path.dirname(absolute), { recursive: true });
   writeJsonWithRetry({ filePath: absolute, value: receipt });
   return relative.replace(/\\/g, '/');
+}
+
+export function buildRunnerSyncReleaseCommand(input: {
+  readonly taskId: string;
+  readonly stewardWorkId: string;
+  readonly receiptRef: string;
+  readonly receiptDigest?: string | null;
+}): string {
+  const digest = input.receiptDigest ? ` --receipt-digest ${quoteCliArg(input.receiptDigest)}` : '';
+  return `node atm.mjs broker runner-sync release --task ${quoteCliArg(input.taskId)} --steward-work-id ${quoteCliArg(input.stewardWorkId)} --receipt-ref ${quoteCliArg(input.receiptRef)}${digest} --json`;
 }
 
 export function prepareTsBuildCache(input: {
@@ -478,6 +516,10 @@ export function phaseTimingsRecord(timings: SealedBuildTimings): {
 
 export function digestJson(value: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
+}
+
+function quoteCliArg(value: string): string {
+  return JSON.stringify(String(value ?? ''));
 }
 
 function readPreviousSealedSourceSha(cwd: string): string | null {

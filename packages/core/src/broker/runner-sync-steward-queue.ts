@@ -539,7 +539,7 @@ function staleReleaseReasonFromHealth(
 
 function buildRetryCommand(request: RunnerSyncStewardRequest): string {
   const surfaces = request.requestedSurfaces.map((surface) => ` --surface ${quoteArg(surface)}`).join('');
-  return `node atm.mjs broker runner-sync enqueue --task ${quoteArg(request.taskId)} --actor ${quoteArg(request.actorId)} --sealed-source-sha ${quoteArg(request.sealedSourceSha)}${surfaces} --json`;
+  return `node atm.mjs broker runner-sync enqueue --task ${quoteArg(request.taskId)} --actor ${quoteArg(request.actorId)} --sealed-source-sha HEAD${surfaces} --json`;
 }
 
 function isCompatibleRunnerSyncGroup(group: RunnerSyncStewardGroup, request: NormalizedRequestInput): boolean {
