@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T22-51-24-518Z-repair-claim-7b630ae406ab",
+  "taskId": "ATM-GOV-0196",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720040028-codex-captain-ATM-GOV-0196-d7e3c95c57",
+  "fromStatus": "done",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0196.json",
+  "taskSha256": "sha256:1314d20bcef96c72187f540034ce84e9904e9e085361e01c91168f4223b1d924",
+  "createdAt": "2026-07-20T22:51:24.518Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0196 --actor codex-gpt-5.4-mini --write --reason \"repair orphaned active session so historical governance receipts can be committed under the correct owner lane\" --json"
+}
