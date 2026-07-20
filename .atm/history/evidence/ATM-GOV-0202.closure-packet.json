@@ -1,0 +1,241 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0202",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9025fe681ed7afe07e69b69295adff72fe4fb303",
+  "governedTreeSha": "2df5c9d5b13f723e03a8173eaf995f662832a1e3",
+  "targetCommitDelta": {
+    "currentCommitSha": "9025fe681ed7afe07e69b69295adff72fe4fb303",
+    "parentCommitShas": [
+      "9025fe681ed7afe07e69b69295adff72fe4fb303"
+    ],
+    "governedTreeSha": "2df5c9d5b13f723e03a8173eaf995f662832a1e3",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0202.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0202.json",
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/batch/plan-executor.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/batch-execute-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/proposal-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/registry-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/telemetry.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/claim-parallel-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/batch/plan-executor.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/proposal-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/registry-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/shared-utils.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "release/atm-root-drop/packages/core/dist/batch/plan-run-journal.js",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/dist/broker/decision.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/broker/registry.js",
+      "release/atm-root-drop/packages/core/dist/broker/wave-broker-scheduler.js",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/telemetry/index.js",
+      "release/atm-root-drop/packages/core/src/batch/plan-run-journal.ts",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/broker/registry.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/packages/core/src/broker/wave-broker-scheduler.ts",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/packages/core/src/telemetry/index.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.js",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/index.ts",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/schemas/governance/broker-decision.schema.json",
+      "release/atm-root-drop/schemas/governance/patch-proposal.schema.json",
+      "release/atm-root-drop/schemas/governance/write-intent.schema.json",
+      "release/atm-root-drop/scripts/run-sealed-runner-build.ts",
+      "release/atm-root-drop/scripts/run-validators/implementation.ts",
+      "release/atm-root-drop/scripts/runner-sync-incremental-build.ts",
+      "release/atm-root-drop/scripts/validate-broker-compose.ts",
+      "release/atm-root-drop/scripts/validate-broker-steward.ts",
+      "release/atm-root-drop/scripts/validate-schemas/context.ts",
+      "release/atm-root-drop/tests/cli/gate-telemetry-v1.test.ts",
+      "release/atm-root-drop/tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/parallel-admission-scale/sealed-cohorts.json",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/parallel-admission-scale-benchmark.test.ts",
+      "tests/cli/real-paired-ab-v4.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run check:encoding:touched",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c26b2e1be3e7a4b73f775b7019b0dee6ba546a86483d1f9db06a2df6b6e1f538",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/analyze-captain-parallel-ledger.ts --validate --require-sealed-cohorts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:70b02cc0d9dedf9b786d3445000c45a19f1e242d247c78badd66cbea80312f99",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/parallel-admission-scale-benchmark.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:594438bd877fd3126695ce7e9342f9c2575d6aecbb9ea3efbfb747d3fa66cb2c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/real-paired-ab-v4.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f738a25f46e662f319268e3627a12b6c7821e28d886272fcd6827f099bfe258b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:56fdb522f4830cb5ab1100122f07ebb91da2aa79e89f8c4c80fac877be838588",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types scripts/analyze-captain-parallel-ledger.ts --validate --require-sealed-cohorts",
+    "node --strip-types tests/cli/parallel-admission-scale-benchmark.test.ts",
+    "node --strip-types tests/cli/real-paired-ab-v4.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T11:30:59.772Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0202.*",
+      ".atm/history/task-events/ATM-GOV-0202/**",
+      ".atm/history/tasks/ATM-GOV-0202.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/**",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "scripts/fixtures/parallel-admission-scale/**",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/parallel-admission-scale-benchmark.test.ts",
+      "tests/cli/real-paired-ab-v4.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/**",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "scripts/fixtures/parallel-admission-scale/**",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/parallel-admission-scale-benchmark.test.ts",
+      "tests/cli/real-paired-ab-v4.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0202.json",
+  "closedAt": "2026-07-20T11:30:59.772Z",
+  "closedByActor": "codex-captain-0202",
+  "sessionId": "session-20260720111850-codex-captain-0202-ATM-GOV-0202-9bb8631dd5",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9025fe681ed7afe07e69b69295adff72fe4fb303",
+    "taskMatchedFiles": [
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/parallel-admission-scale/sealed-cohorts.json",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/parallel-admission-scale-benchmark.test.ts",
+      "tests/cli/real-paired-ab-v4.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0202.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0202/2026-07-20T11-18-41-918Z-import-be300f16f7fc.json",
+      ".atm/history/task-events/ATM-GOV-0202/2026-07-20T11-18-50-683Z-reserve-80f5876e011a.json",
+      ".atm/history/task-events/ATM-GOV-0202/2026-07-20T11-18-50-688Z-promote-5fc6cae7ee1a.json",
+      ".atm/history/task-events/ATM-GOV-0202/2026-07-20T11-18-55-521Z-claim-1cf138c87f43.json",
+      ".atm/history/tasks/ATM-GOV-0202.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0202",
   "title": "Real paired AB v4 and rollout verdict",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0198",
@@ -98,8 +98,8 @@
     }
   },
   "importedAt": "2026-07-20T11:18:41.814Z",
-  "lastTransitionId": "2026-07-20T11-18-55-521Z-claim-1cf138c87f43",
-  "lastTransitionAt": "2026-07-20T11:18:55.521Z",
+  "lastTransitionId": "2026-07-20T11-30-59-779Z-close-c4ebfa699144",
+  "lastTransitionAt": "2026-07-20T11:30:59.779Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0202",
   "reservedAt": "2026-07-20T11:18:50.683Z",
@@ -108,7 +108,7 @@
     "actorId": "codex-captain-0202",
     "leaseId": "lease-fd3adb031e09",
     "claimedAt": "2026-07-20T11:18:50.693Z",
-    "heartbeatAt": "2026-07-20T11:18:50.693Z",
+    "heartbeatAt": "2026-07-20T11:30:59.776Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0202.json",
@@ -122,14 +122,14 @@
       "tests/cli/parallel-admission-scale-benchmark.test.ts",
       "tests/cli/real-paired-ab-v4.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720111850-codex-captain-0202-4e396100e2",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720111850-codex-captain-0202-4e396100e2\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T11:18:50.693Z",
   "startedByActor": "codex-captain-0202",
@@ -170,5 +170,9 @@
     },
     "createdAt": "2026-07-20T11:18:55.520Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T11:30:59.777Z",
+  "closedByActor": "codex-captain-0202",
+  "closedBySessionId": "session-20260720111850-codex-captain-0202-ATM-GOV-0202-9bb8631dd5",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0202.closure-packet.json"
 }
