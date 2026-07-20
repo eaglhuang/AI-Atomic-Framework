@@ -1,0 +1,228 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0209",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "355895571b170bb05775ad39698560d369abcea0",
+  "governedTreeSha": "b8e03abc240b51b15823a7d713a463d6fae03f41",
+  "targetCommitDelta": {
+    "currentCommitSha": "355895571b170bb05775ad39698560d369abcea0",
+    "parentCommitShas": [
+      "355895571b170bb05775ad39698560d369abcea0"
+    ],
+    "governedTreeSha": "b8e03abc240b51b15823a7d713a463d6fae03f41",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0209.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0209.json",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/intent-enrichment.ts",
+      "packages/core/src/broker/resource-overlap.ts",
+      "packages/core/src/broker/types.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/registry-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/telemetry.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/registry-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/shared-utils.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/dist/broker/decision.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/broker/registry.js",
+      "release/atm-root-drop/packages/core/dist/telemetry/index.js",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/broker/registry.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/packages/core/src/telemetry/index.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.js",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/index.ts",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/schemas/governance/patch-proposal.schema.json",
+      "release/atm-root-drop/schemas/governance/write-intent.schema.json",
+      "release/atm-root-drop/scripts/validate-schemas/context.ts",
+      "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/resource-overlap.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "tests/core/broker-structured-overlap.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/broker-structured-overlap.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9bf6781513ff42e7394f3a3236b89564886e4095f9e3b6311478b5ed3311766b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/core/broker-resource-overlap.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:68eadb476f741af71f3779972ab0c95fde75fefaaeab61a31c771ae62da696a5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:broker-proposal",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c08486df81f580f042f9ae1b5f51a3aa828c3664687f4b2eddfb67fad3476f3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d253d2d3eed32fdbbc536e0fb20b16f774e1a8e78d845185b224c208dc8bf809",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+      "stderrSha256": "sha256:95852a55ea40b29c7458cba1ba9c8a84657da52e593678ffc40815b543c8455c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/core/broker-resource-overlap.test.ts",
+    "node --strip-types tests/core/broker-structured-overlap.test.ts",
+    "typecheck",
+    "validate:broker-proposal",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T08:32:47.175Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0209.*",
+      ".atm/history/task-events/ATM-GOV-0209/**",
+      ".atm/history/tasks/ATM-GOV-0209.json",
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/conflict-key-overlap.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/intent-enrichment.ts",
+      "packages/core/src/broker/resource-overlap.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/resource-overlap.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "tests/core/broker-structured-overlap.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/conflict-key-overlap.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/intent-enrichment.ts",
+      "packages/core/src/broker/resource-overlap.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/resource-overlap.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "tests/core/broker-structured-overlap.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0209.json",
+  "closedAt": "2026-07-20T08:32:47.175Z",
+  "closedByActor": "codex-captain-0209",
+  "sessionId": "session-20260720081935-codex-captain-0209-ATM-GOV-0209-371c8c66a6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "355895571b170bb05775ad39698560d369abcea0",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/intent-enrichment.ts",
+      "packages/core/src/broker/resource-overlap.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/resource-overlap.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "tests/core/broker-structured-overlap.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0209.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0209/2026-07-20T08-19-26-885Z-import-68e6174da695.json",
+      ".atm/history/task-events/ATM-GOV-0209/2026-07-20T08-19-35-801Z-reserve-f3d13ee38ad9.json",
+      ".atm/history/task-events/ATM-GOV-0209/2026-07-20T08-19-35-805Z-promote-7382955c4a21.json",
+      ".atm/history/task-events/ATM-GOV-0209/2026-07-20T08-19-40-435Z-claim-bb4b0d126891.json",
+      ".atm/history/task-events/ATM-GOV-0209/2026-07-20T08-28-16-110Z-scope-amendment-e721e7cd9a5d.json",
+      ".atm/history/tasks/ATM-GOV-0209.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T08-32-47-183Z-close-5ae1ff9204fe",
+  "taskId": "ATM-GOV-0209",
+  "action": "close",
+  "actorId": "codex-captain-0209",
+  "sessionId": "session-20260720081935-codex-captain-0209-ATM-GOV-0209-371c8c66a6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0209.json",
+  "taskSha256": "sha256:3e48b97c94922f5ad7d57d4b6a2116ffc1c9d3593dfedb12d75942882a272b0e",
+  "createdAt": "2026-07-20T08:32:47.183Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0209 --actor codex-captain-0209 --status done --historical-delivery 355895571b170bb05775ad39698560d369abcea0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720081935-codex-captain-0209-ATM-GOV-0209-371c8c66a6",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0209.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/core/broker-resource-overlap.test.ts",
+      "node --strip-types tests/core/broker-structured-overlap.test.ts",
+      "typecheck",
+      "validate:broker-proposal",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T08:32:47.175Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0209.*",
+        ".atm/history/task-events/ATM-GOV-0209/**",
+        ".atm/history/tasks/ATM-GOV-0209.json",
+        "packages/cli/src/commands/next/claim-helpers.ts",
+        "packages/core/src/broker/candidate-bridge.ts",
+        "packages/core/src/broker/conflict-key-overlap.ts",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/intent-enrichment.ts",
+        "packages/core/src/broker/resource-overlap.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/governance/patch-proposal.schema.json",
+        "schemas/governance/resource-overlap.schema.json",
+        "schemas/governance/write-intent.schema.json",
+        "tests/core/broker-structured-overlap.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/claim-helpers.ts",
+        "packages/core/src/broker/candidate-bridge.ts",
+        "packages/core/src/broker/conflict-key-overlap.ts",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/intent-enrichment.ts",
+        "packages/core/src/broker/resource-overlap.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/governance/patch-proposal.schema.json",
+        "schemas/governance/resource-overlap.schema.json",
+        "schemas/governance/write-intent.schema.json",
+        "tests/core/broker-structured-overlap.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

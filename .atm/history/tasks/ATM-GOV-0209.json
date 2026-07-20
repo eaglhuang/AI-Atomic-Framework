@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0209",
   "title": "Versioned read write sets and structured overlap evidence",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0206",
@@ -123,8 +123,8 @@
     }
   },
   "importedAt": "2026-07-20T08:19:26.787Z",
-  "lastTransitionId": "2026-07-20T08-28-16-110Z-scope-amendment-e721e7cd9a5d",
-  "lastTransitionAt": "2026-07-20T08:28:16.110Z",
+  "lastTransitionId": "2026-07-20T08-32-47-183Z-close-5ae1ff9204fe",
+  "lastTransitionAt": "2026-07-20T08:32:47.183Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0209",
   "reservedAt": "2026-07-20T08:19:35.801Z",
@@ -133,7 +133,7 @@
     "actorId": "codex-captain-0209",
     "leaseId": "lease-d4d9ba328985",
     "claimedAt": "2026-07-20T08:19:35.809Z",
-    "heartbeatAt": "2026-07-20T08:19:35.809Z",
+    "heartbeatAt": "2026-07-20T08:32:47.180Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0209.*",
@@ -152,14 +152,14 @@
       "schemas/governance/write-intent.schema.json",
       "tests/core/broker-structured-overlap.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720081935-codex-captain-0209-683e8b5cd7",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720081935-codex-captain-0209-683e8b5cd7\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T08:19:35.809Z",
   "startedByActor": "codex-captain-0209",
@@ -210,5 +210,9 @@
     },
     "createdAt": "2026-07-20T08:19:40.448Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T08:32:47.180Z",
+  "closedByActor": "codex-captain-0209",
+  "closedBySessionId": "session-20260720081935-codex-captain-0209-ATM-GOV-0209-371c8c66a6",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0209.closure-packet.json"
 }
