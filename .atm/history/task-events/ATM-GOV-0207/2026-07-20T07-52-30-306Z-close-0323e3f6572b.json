@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T07-52-30-306Z-close-0323e3f6572b",
+  "taskId": "ATM-GOV-0207",
+  "action": "close",
+  "actorId": "codex-captain-0207",
+  "sessionId": "session-20260720073836-codex-captain-0207-ATM-GOV-0207-1295304993",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0207.json",
+  "taskSha256": "sha256:f9448464d992946f52a5ca771d6109eb0a5f4318d6ed316d578f2f5f2b547278",
+  "createdAt": "2026-07-20T07:52:30.306Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0207 --actor codex-captain-0207 --status done --historical-delivery 07a24ae13c0ef61494616bb37dac365bf1d915eb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720073836-codex-captain-0207-ATM-GOV-0207-1295304993",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0207.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/broker-registry-concurrency.test.ts",
+      "node --strip-types tests/cli/broker-transaction-authority.test.ts",
+      "typecheck",
+      "validate:broker-registry",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T07:52:30.299Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0207.*",
+        ".atm/history/task-events/ATM-GOV-0207/**",
+        ".atm/history/tasks/ATM-GOV-0207.json",
+        "packages/cli/src/commands/broker/persistence.ts",
+        "packages/cli/src/commands/broker/registry-actions.ts",
+        "packages/core/src/broker/decision.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/lifecycle.ts",
+        "packages/core/src/broker/registry-store.ts",
+        "packages/core/src/broker/registry.ts",
+        "packages/core/src/broker/transaction-authority.ts",
+        "schemas/governance/broker-transaction.schema.json",
+        "tests/cli/broker-registry-concurrency.test.ts",
+        "tests/cli/broker-transaction-authority.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/persistence.ts",
+        "packages/cli/src/commands/broker/registry-actions.ts",
+        "packages/core/src/broker/decision.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/lifecycle.ts",
+        "packages/core/src/broker/registry-store.ts",
+        "packages/core/src/broker/registry.ts",
+        "packages/core/src/broker/transaction-authority.ts",
+        "schemas/governance/broker-transaction.schema.json",
+        "tests/cli/broker-registry-concurrency.test.ts",
+        "tests/cli/broker-transaction-authority.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

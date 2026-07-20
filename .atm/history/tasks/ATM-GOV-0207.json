@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0207",
   "title": "Canonical broker transaction authority and linearizable state",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0196"
@@ -121,8 +121,8 @@
     }
   },
   "importedAt": "2026-07-20T07:38:24.605Z",
-  "lastTransitionId": "2026-07-20T07-48-24-347Z-scope-amendment-6489b5fa627b",
-  "lastTransitionAt": "2026-07-20T07:48:24.347Z",
+  "lastTransitionId": "2026-07-20T07-52-30-306Z-close-0323e3f6572b",
+  "lastTransitionAt": "2026-07-20T07:52:30.306Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0207",
   "reservedAt": "2026-07-20T07:38:36.332Z",
@@ -131,7 +131,7 @@
     "actorId": "codex-captain-0207",
     "leaseId": "lease-10c572adeeb7",
     "claimedAt": "2026-07-20T07:38:36.337Z",
-    "heartbeatAt": "2026-07-20T07:38:36.337Z",
+    "heartbeatAt": "2026-07-20T07:52:30.304Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0207.*",
@@ -149,14 +149,14 @@
       "tests/cli/broker-registry-concurrency.test.ts",
       "tests/cli/broker-transaction-authority.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720073836-codex-captain-0207-16457e0a5b",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720073836-codex-captain-0207-16457e0a5b\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T07:38:36.337Z",
   "startedByActor": "codex-captain-0207",
@@ -206,5 +206,9 @@
     },
     "createdAt": "2026-07-20T07:38:40.444Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T07:52:30.304Z",
+  "closedByActor": "codex-captain-0207",
+  "closedBySessionId": "session-20260720073836-codex-captain-0207-ATM-GOV-0207-1295304993",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0207.closure-packet.json"
 }

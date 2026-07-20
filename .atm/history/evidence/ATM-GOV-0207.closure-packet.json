@@ -1,0 +1,230 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0207",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "07a24ae13c0ef61494616bb37dac365bf1d915eb",
+  "governedTreeSha": "ef5d7997f0aeb6a9525340467e70c026eb062e29",
+  "targetCommitDelta": {
+    "currentCommitSha": "07a24ae13c0ef61494616bb37dac365bf1d915eb",
+    "parentCommitShas": [
+      "07a24ae13c0ef61494616bb37dac365bf1d915eb"
+    ],
+    "governedTreeSha": "ef5d7997f0aeb6a9525340467e70c026eb062e29",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0207.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0207.json",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry-store.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/transaction-authority.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/adapter-local-git/dist/index.d.ts",
+      "release/atm-root-drop/packages/atm-markdown-task-source/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/registry-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/telemetry.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker/registry-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/shared-utils.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "release/atm-root-drop/packages/core/dist/broker/decision.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/broker/registry.js",
+      "release/atm-root-drop/packages/core/dist/telemetry/index.js",
+      "release/atm-root-drop/packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/broker/registry.ts",
+      "release/atm-root-drop/packages/core/src/telemetry/index.ts",
+      "release/atm-root-drop/packages/language-csharp/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-behavior-pack/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-experience-loop/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-human-review/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-review-advisory/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-rule-guard/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
+      "schemas/governance/broker-transaction.schema.json",
+      "tests/cli/broker-registry-concurrency.test.ts",
+      "tests/cli/broker-transaction-authority.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/broker-transaction-authority.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7892edee2d85815004dbc9bc2e8a4c86f545a6e14ff2a632f345d41f9d79db6a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/broker-registry-concurrency.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4068b6a906b1ff787a3bdccdd67b3073dbe6d627f6ddd08a0971944dafc61b46",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:149122433effe1bc98daa38126fd7555f6cf8918cef37fb45bb4b8c89538508c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-registry.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:39c277e192d4c8b7759c6ada54dfb8b0a9afbb09ed73bd5ff35a0c6b1741c1c9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ada84b041df961b4b223801798be1580f5be74b9876565dd2904497168c97257",
+      "stderrSha256": "sha256:1a8aa5405ffe822932a3c7f7f960a6d4670e2fa8d0565076e6fdd1090946c31d",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/broker-registry-concurrency.test.ts",
+    "node --strip-types tests/cli/broker-transaction-authority.test.ts",
+    "typecheck",
+    "validate:broker-registry",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T07:52:30.299Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0207.*",
+      ".atm/history/task-events/ATM-GOV-0207/**",
+      ".atm/history/tasks/ATM-GOV-0207.json",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry-store.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/transaction-authority.ts",
+      "schemas/governance/broker-transaction.schema.json",
+      "tests/cli/broker-registry-concurrency.test.ts",
+      "tests/cli/broker-transaction-authority.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry-store.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/transaction-authority.ts",
+      "schemas/governance/broker-transaction.schema.json",
+      "tests/cli/broker-registry-concurrency.test.ts",
+      "tests/cli/broker-transaction-authority.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0207.json",
+  "closedAt": "2026-07-20T07:52:30.299Z",
+  "closedByActor": "codex-captain-0207",
+  "sessionId": "session-20260720073836-codex-captain-0207-ATM-GOV-0207-1295304993",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "07a24ae13c0ef61494616bb37dac365bf1d915eb",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry-store.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/transaction-authority.ts",
+      "schemas/governance/broker-transaction.schema.json",
+      "tests/cli/broker-registry-concurrency.test.ts",
+      "tests/cli/broker-transaction-authority.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0207.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0207/2026-07-20T07-38-24-694Z-import-7488acc85f97.json",
+      ".atm/history/task-events/ATM-GOV-0207/2026-07-20T07-38-36-332Z-reserve-2a981010a555.json",
+      ".atm/history/task-events/ATM-GOV-0207/2026-07-20T07-38-36-334Z-promote-3a0b4b6e8052.json",
+      ".atm/history/task-events/ATM-GOV-0207/2026-07-20T07-38-40-430Z-claim-ce35299e5f4a.json",
+      ".atm/history/task-events/ATM-GOV-0207/2026-07-20T07-46-27-195Z-scope-amendment-7031f5b5fd6b.json",
+      ".atm/history/task-events/ATM-GOV-0207/2026-07-20T07-48-24-347Z-scope-amendment-6489b5fa627b.json",
+      ".atm/history/tasks/ATM-GOV-0207.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
