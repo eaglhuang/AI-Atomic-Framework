@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0200",
   "title": "Validator observed lifecycle and evidence driven tiering",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0196",
@@ -85,8 +85,8 @@
     }
   },
   "importedAt": "2026-07-20T10:50:22.015Z",
-  "lastTransitionId": "2026-07-20T10-50-40-250Z-claim-4cc236a688f7",
-  "lastTransitionAt": "2026-07-20T10:50:40.250Z",
+  "lastTransitionId": "2026-07-20T11-01-10-576Z-close-4fb51def0cfc",
+  "lastTransitionAt": "2026-07-20T11:01:10.576Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0200",
   "reservedAt": "2026-07-20T10:50:36.038Z",
@@ -95,7 +95,7 @@
     "actorId": "codex-captain-0200",
     "leaseId": "lease-6419c823cf81",
     "claimedAt": "2026-07-20T10:50:36.049Z",
-    "heartbeatAt": "2026-07-20T10:50:36.049Z",
+    "heartbeatAt": "2026-07-20T11:01:10.573Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0200.json",
@@ -106,14 +106,14 @@
       "scripts/validators.config.json",
       "tests/cli/validator-observed-lifecycle.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720105036-codex-captain-0200-00228b0573",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720105036-codex-captain-0200-00228b0573\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T10:50:36.049Z",
   "startedByActor": "codex-captain-0200",
@@ -151,5 +151,9 @@
     },
     "createdAt": "2026-07-20T10:50:40.249Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T11:01:10.573Z",
+  "closedByActor": "codex-captain-0200",
+  "closedBySessionId": "session-20260720105036-codex-captain-0200-ATM-GOV-0200-2cfa8e7f0e",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0200.closure-packet.json"
 }
