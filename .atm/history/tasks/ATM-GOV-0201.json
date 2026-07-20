@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0201",
   "title": "Runner incremental dogfood and dominant phase optimization",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0194",
@@ -94,8 +94,8 @@
     }
   },
   "importedAt": "2026-07-20T11:03:38.422Z",
-  "lastTransitionId": "2026-07-20T11-05-28-436Z-claim-69d4ed4180d0",
-  "lastTransitionAt": "2026-07-20T11:05:28.436Z",
+  "lastTransitionId": "2026-07-20T11-16-57-813Z-close-be08032a416d",
+  "lastTransitionAt": "2026-07-20T11:16:57.813Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0201",
   "reservedAt": "2026-07-20T11:05:24.021Z",
@@ -104,7 +104,7 @@
     "actorId": "codex-captain-0201",
     "leaseId": "lease-6da00cb9be3f",
     "claimedAt": "2026-07-20T11:05:24.026Z",
-    "heartbeatAt": "2026-07-20T11:05:24.026Z",
+    "heartbeatAt": "2026-07-20T11:16:57.811Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0201.json",
@@ -117,14 +117,14 @@
       "scripts/runner-sync-incremental-build.ts",
       "tests/cli/runner-sync-incremental-build-dogfood.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720110524-codex-captain-0201-50bf258f4f",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720110524-codex-captain-0201-50bf258f4f\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T11:05:24.026Z",
   "startedByActor": "codex-captain-0201",
@@ -164,5 +164,9 @@
     },
     "createdAt": "2026-07-20T11:05:28.435Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T11:16:57.811Z",
+  "closedByActor": "codex-captain-0201",
+  "closedBySessionId": "session-20260720110524-codex-captain-0201-ATM-GOV-0201-7f1986b3c7",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0201.closure-packet.json"
 }

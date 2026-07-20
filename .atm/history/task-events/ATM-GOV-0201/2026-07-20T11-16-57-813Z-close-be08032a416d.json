@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T11-16-57-813Z-close-be08032a416d",
+  "taskId": "ATM-GOV-0201",
+  "action": "close",
+  "actorId": "codex-captain-0201",
+  "sessionId": "session-20260720110524-codex-captain-0201-ATM-GOV-0201-7f1986b3c7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0201.json",
+  "taskSha256": "sha256:71a9fb24d3a1a14648ea55791e0ac7c83e389e2d1faff52cc37a0cc3c91893d9",
+  "createdAt": "2026-07-20T11:16:57.813Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0201 --actor codex-captain-0201 --status done --historical-delivery 23bbefa0bf18b1ca997f56768e6408ac8c6f8fa9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720110524-codex-captain-0201-ATM-GOV-0201-7f1986b3c7",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0201.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/runner-sync-incremental-build-dogfood.test.ts --mode live-isolated --require-real-cache-miss",
+      "node --strip-types tests/cli/runner-sync-incremental-build.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:internal-release-sync",
+      "validate:runner-build-scope"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T11:16:57.803Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0201.*",
+        ".atm/history/task-events/ATM-GOV-0201/**",
+        ".atm/history/tasks/ATM-GOV-0201.json",
+        "packages/cli/src/commands/framework-development/**",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-sync-incremental-build-dogfood.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/**",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-sync-incremental-build-dogfood.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
