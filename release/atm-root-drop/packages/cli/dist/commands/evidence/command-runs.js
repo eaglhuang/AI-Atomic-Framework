@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { CliError } from '../shared.js';
+import { normalizeTelemetryDurationMs } from '../../../../core/dist/telemetry/observation.js';
 import { canonicalizeValidatorIdentity } from './validator-classification.js';
 import { isRecord } from './shared-utils.js';
 function isSha256(value) {
@@ -113,7 +114,7 @@ export function normalizeEvidenceCommandRuns(input) {
                 sourceCommit: run.sourceCommit ?? (runnerKind === 'dev-source' ? sourceCommit ?? undefined : undefined)
             }),
             cached: run.cached === true,
-            generatedAt: run.generatedAt ?? new Date().toISOString()
+            generatedAt: run.generatedAt ?? run.finishedAt ?? new Date().toISOString()
         };
     }));
 }
@@ -155,7 +156,10 @@ export function normalizeCommandRunInput(value, label) {
         runnerKind: typeof value.runnerKind === 'string' && value.runnerKind.trim() ? normalizeRunnerKind(value.runnerKind) : undefined,
         sourceCommit: typeof value.sourceCommit === 'string' && value.sourceCommit.trim() ? value.sourceCommit.trim() : undefined,
         runnerVersion: typeof value.runnerVersion === 'string' && value.runnerVersion.trim() ? value.runnerVersion.trim() : undefined,
-        generatedAt: typeof value.generatedAt === 'string' && value.generatedAt.trim() ? value.generatedAt.trim() : undefined
+        generatedAt: typeof value.generatedAt === 'string' && value.generatedAt.trim() ? value.generatedAt.trim() : undefined,
+        startedAt: typeof value.startedAt === 'string' && value.startedAt.trim() ? value.startedAt.trim() : undefined,
+        finishedAt: typeof value.finishedAt === 'string' && value.finishedAt.trim() ? value.finishedAt.trim() : undefined,
+        durationMs: normalizeTelemetryDurationMs(value.durationMs)
     };
 }
 export function normalizeRunnerKind(value) {

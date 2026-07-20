@@ -59,6 +59,12 @@ export async function runTelemetry(argv) {
             durationMs: Number(parsed.options.durationMs ?? 1),
             actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? 'fixture'),
             taskId: typeof parsed.options.task === 'string' ? String(parsed.options.task) : null,
+            runId: typeof parsed.options.runId === 'string' ? String(parsed.options.runId) : undefined,
+            laneSessionId: typeof parsed.options.laneSessionId === 'string' ? String(parsed.options.laneSessionId) : undefined,
+            batchId: typeof parsed.options.batchId === 'string' ? String(parsed.options.batchId) : undefined,
+            waveId: typeof parsed.options.waveId === 'string' ? String(parsed.options.waveId) : undefined,
+            correlationId: typeof parsed.options.correlationId === 'string' ? String(parsed.options.correlationId) : undefined,
+            evidenceReadRef: typeof parsed.options.evidenceReadRef === 'string' ? String(parsed.options.evidenceReadRef) : undefined,
             command: 'telemetry --emit-fixture',
             source: 'fixture'
         });

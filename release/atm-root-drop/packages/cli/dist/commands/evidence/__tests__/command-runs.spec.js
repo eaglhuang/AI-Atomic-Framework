@@ -20,7 +20,10 @@ try {
                 command: 'npm run typecheck',
                 exitCode: 0,
                 stdoutSha256: 'sha256:' + 'a'.repeat(64),
-                stderrSha256: 'sha256:' + 'b'.repeat(64)
+                stderrSha256: 'sha256:' + 'b'.repeat(64),
+                startedAt: '2026-07-20T00:00:00.000Z',
+                finishedAt: '2026-07-20T00:00:01.234Z',
+                durationMs: 1234
             }]
     }));
     const fileRuns = readCommandRunsInputFile(filePath);
@@ -34,6 +37,9 @@ try {
     });
     assert.equal(normalized.length, 1);
     assert.equal(normalized[0]?.runnerKind, 'dev-source');
+    assert.equal(normalized[0]?.startedAt, '2026-07-20T00:00:00.000Z');
+    assert.equal(normalized[0]?.finishedAt, '2026-07-20T00:00:01.234Z');
+    assert.equal(normalized[0]?.durationMs, 1234);
 }
 finally {
     rmSync(temp, { recursive: true, force: true });

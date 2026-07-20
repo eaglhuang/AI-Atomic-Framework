@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
+export { normalizeTelemetryDurationMs } from './observation.js';
 export const gateTelemetrySpecVersion = 'atm.gateTelemetry.v1';
 export const gateTelemetryRuntimeRelativePath = path.join('.atm', 'runtime', 'telemetry');
 export const gateTelemetryHistoryRelativePath = path.join('.atm', 'history', 'telemetry');
