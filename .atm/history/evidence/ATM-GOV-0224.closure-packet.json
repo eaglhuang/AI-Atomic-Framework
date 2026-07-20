@@ -1,0 +1,234 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0224",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4fa2ee1a65e046b3166ce76b93deaeea6a3bcc42",
+  "governedTreeSha": "775f1a5a2c4468a5f377634e50025de5b0b56899",
+  "targetCommitDelta": {
+    "currentCommitSha": "4fa2ee1a65e046b3166ce76b93deaeea6a3bcc42",
+    "parentCommitShas": [
+      "4fa2ee1a65e046b3166ce76b93deaeea6a3bcc42"
+    ],
+    "governedTreeSha": "775f1a5a2c4468a5f377634e50025de5b0b56899",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-evidence/SKILL.md",
+      ".agents/skills/atm-governance-router/SKILL.md",
+      ".agents/skills/atm-handoff/SKILL.md",
+      ".agents/skills/atm-next/SKILL.md",
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0224.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0224.json",
+      ".atm/history/tasks/ATM-GOV-0196.json",
+      ".atm/integrations/antigravity.manifest.json",
+      ".atm/integrations/claude-code.manifest.json",
+      ".atm/integrations/codex.manifest.json",
+      ".atm/integrations/copilot.manifest.json",
+      ".atm/integrations/cursor.manifest.json",
+      ".atm/integrations/gemini.manifest.json",
+      ".claude/skills/atm-dispatch/SKILL.md",
+      ".claude/skills/atm-evidence/SKILL.md",
+      ".claude/skills/atm-governance-router/SKILL.md",
+      ".claude/skills/atm-handoff/SKILL.md",
+      ".claude/skills/atm-next/SKILL.md",
+      ".cursor/rules/skills/atm-dispatch/SKILL.md",
+      ".cursor/rules/skills/atm-evidence/SKILL.md",
+      ".cursor/rules/skills/atm-governance-router/SKILL.md",
+      ".cursor/rules/skills/atm-handoff/SKILL.md",
+      ".cursor/rules/skills/atm-next/SKILL.md",
+      ".gemini/commands/atm-dispatch.toml",
+      ".gemini/commands/atm-evidence.toml",
+      ".gemini/commands/atm-governance-router.toml",
+      ".gemini/commands/atm-handoff.toml",
+      ".gemini/commands/atm-next.toml",
+      ".github/instructions/atm-dispatch.instructions.md",
+      ".github/instructions/atm-evidence.instructions.md",
+      ".github/instructions/atm-governance-router.instructions.md",
+      ".github/instructions/atm-handoff.instructions.md",
+      ".github/instructions/atm-next.instructions.md",
+      "artifacts/generated/atm-ab-v4/cells.json",
+      "artifacts/generated/atm-ab-v4/summary.json",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "integrations/codex-skills/atm-evidence/SKILL.md",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "integrations/codex-skills/atm-handoff/SKILL.md",
+      "integrations/codex-skills/atm-next/SKILL.md",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/core/src/broker/parallel-admission-policy.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-handoff.skill.md",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/paired-ab-v4-safety-controller.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:28af882b24e5cfa3b8952a4931a8cd616ff44b1bd2d05afbc59d3638eafe2fad",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/run-paired-ab-v4.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:operational-bench",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:de805e1d34363848a5a416609a174011384636d6ddb37953c4d8fddc629dbde5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:rollout-metrics",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e41514da72c2262adea7be3da93ce413d74c0ad1db844908055618175c3c8558",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:telemetry",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9ccf68a10924ab5c5d4883402ec13c8a86e908474540dae08471a22f769000a9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:ecf1e1033d74fdb49e9ee3c72a673088c9d4227268ad48e59776b8095192ae3b",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types scripts/run-paired-ab-v4.ts --mode validate",
+    "node --strip-types tests/cli/paired-ab-v4-safety-controller.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:operational-bench",
+    "validate:rollout-metrics",
+    "validate:telemetry"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T18:43:04.985Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0224.*",
+      ".atm/history/task-events/ATM-GOV-0224/**",
+      ".atm/history/tasks/ATM-GOV-0224.json",
+      "artifacts/generated/atm-ab-v4/**",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "packages/core/src/broker/parallel-admission-policy.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/parallel-admission-policy.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0224.json",
+  "closedAt": "2026-07-20T18:43:04.985Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720182235-codex-gpt-5.4-mini-ATM-GOV-0224-cb759c0300",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "baaeddf8a6426aef4e1f9428d9e69934e3664db3",
+    "taskMatchedFiles": [
+      "artifacts/generated/atm-ab-v4/cells.json",
+      "artifacts/generated/atm-ab-v4/summary.json",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "packages/core/src/broker/parallel-admission-policy.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0224.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0224/2026-07-20T18-21-22-895Z-import-e28484037f9b.json",
+      ".atm/history/task-events/ATM-GOV-0224/2026-07-20T18-22-35-951Z-reserve-fbb68573c76f.json",
+      ".atm/history/task-events/ATM-GOV-0224/2026-07-20T18-22-35-953Z-promote-4ea8bddd8886.json",
+      ".atm/history/task-events/ATM-GOV-0224/2026-07-20T18-22-40-388Z-claim-d653a689c370.json",
+      ".atm/history/tasks/ATM-GOV-0224.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

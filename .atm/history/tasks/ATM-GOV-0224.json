@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0224",
   "title": "Complete paired AB and safety controller",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [
     "ATM-GOV-0221",
@@ -81,8 +81,8 @@
     }
   },
   "importedAt": "2026-07-20T18:21:22.702Z",
-  "lastTransitionId": "2026-07-20T18-22-40-388Z-claim-d653a689c370",
-  "lastTransitionAt": "2026-07-20T18:22:40.388Z",
+  "lastTransitionId": "2026-07-20T18-43-04-997Z-close-409f8a692b44",
+  "lastTransitionAt": "2026-07-20T18:43:04.997Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-07-20T18:22:35.951Z",
@@ -91,7 +91,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-12e642c14766",
     "claimedAt": "2026-07-20T18:22:35.958Z",
-    "heartbeatAt": "2026-07-20T18:22:35.958Z",
+    "heartbeatAt": "2026-07-20T18:43:04.995Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0224.json",
@@ -102,14 +102,14 @@
       "scripts/run-paired-ab-v4.ts",
       "tests/cli/paired-ab-v4-safety-controller.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720182236-codex-gpt-5.4-mini-b5f7883b75",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720182236-codex-gpt-5.4-mini-b5f7883b75\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T18:22:35.958Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -147,5 +147,9 @@
     },
     "createdAt": "2026-07-20T18:22:40.387Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T18:43:04.995Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260720182235-codex-gpt-5.4-mini-ATM-GOV-0224-cb759c0300",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0224.closure-packet.json"
 }
