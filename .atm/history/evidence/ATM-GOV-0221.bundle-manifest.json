@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0221",
-  "updatedAt": "2026-07-20T17:39:43.532Z",
+  "updatedAt": "2026-07-20T17:46:09.058Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "git diff --check",
@@ -10,6 +10,7 @@
     "typecheck",
     "validate:cli",
     "validate:gate-telemetry-v1",
+    "validate:git-head-evidence",
     "validate:schemas"
   ],
   "staleValidationPasses": [],
@@ -236,6 +237,22 @@
       "durationMs": 431,
       "runnerKind": "dev-source",
       "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-20T17:46:09.057Z",
+      "startedAt": "2026-07-20T17:45:08.829Z",
+      "finishedAt": "2026-07-20T17:46:09.057Z",
+      "durationMs": 60228,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T17-47-59-152Z-close-70a62d62b16c",
+  "taskId": "ATM-GOV-0221",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0221.json",
+  "taskSha256": "sha256:052caf24e0ee1df4c8d866ca74eb579e63576e639f7e08fcc087834254af2dd9",
+  "createdAt": "2026-07-20T17:47:59.152Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0221 --actor codex-gpt-5.4-mini --status done --historical-delivery aa0a88e92d8e8a2704e136e0b704f83a202989be",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0221.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+      "node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:gate-telemetry-v1",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T17:47:59.141Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0221.*",
+        ".atm/history/task-events/ATM-GOV-0221/**",
+        ".atm/history/tasks/ATM-GOV-0221.json",
+        "package.json",
+        "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+        "packages/cli/src/commands/evidence/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/telemetry/index.ts",
+        "packages/core/src/telemetry/observation.ts",
+        "packages/core/src/telemetry/shared-write-coverage.ts",
+        "schemas/governance/shared-write-gate-coverage.schema.json",
+        "schemas/governance/telemetry-observation.schema.json",
+        "scripts/validate-schemas/context.ts",
+        "tests/cli-fixtures/help-snapshots/telemetry.json",
+        "tests/cli/canonical-telemetry-observation.test.ts",
+        "tests/cli/evidence-seal-task-summary.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+        "packages/cli/src/commands/evidence/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/telemetry/index.ts",
+        "packages/core/src/telemetry/observation.ts",
+        "packages/core/src/telemetry/shared-write-coverage.ts",
+        "schemas/governance/shared-write-gate-coverage.schema.json",
+        "schemas/governance/telemetry-observation.schema.json",
+        "scripts/validate-schemas/context.ts",
+        "tests/cli-fixtures/help-snapshots/telemetry.json",
+        "tests/cli/canonical-telemetry-observation.test.ts",
+        "tests/cli/evidence-seal-task-summary.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
