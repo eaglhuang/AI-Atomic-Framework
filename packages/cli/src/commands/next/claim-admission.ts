@@ -69,7 +69,7 @@ export interface ClaimAdmissionDecision {
   readonly ownerComparison?: ClaimOwnerComparison;
 }
 
-export type ClaimOwnerComparisonMode = 'lane-id' | 'actor-fallback';
+export type ClaimOwnerComparisonMode = 'lane-id' | 'actor-fallback' | 'same-actor-claim-reentry';
 
 export interface ClaimLifecycleOwner {
   readonly actorId?: string | null;

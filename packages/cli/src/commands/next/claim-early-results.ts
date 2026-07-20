@@ -89,7 +89,8 @@ export function buildNoClaimableTaskResult(input: {
     const claimReadiness = diagnoseClaimReadinessForTasks(
       input.cwd,
       input.importedTaskQueue.promptScope?.selectedTasks ?? input.importedTaskQueue.tasks,
-      input.claimIntent
+      input.claimIntent,
+      { dependencyMode: input.importedTaskQueue.claimableTask ? 'claim-files' : 'hard' }
     );
     const primaryBlocker = claimReadiness.primaryBlocker;
     const selectedReviewTask = input.importedTaskQueue.selectedTask
@@ -114,7 +115,9 @@ export function buildNoClaimableTaskResult(input: {
         }
       });
     }
-    const claimCode = input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
+    const claimCode = primaryBlocker?.blockerCode === 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED'
+      ? 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED'
+      : input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
       ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
       : 'ATM_NEXT_CLAIM_NO_TASK';
     const singleVisibleTask = input.importedTaskQueue.tasks.length === 1 ? input.importedTaskQueue.tasks[0] : null;

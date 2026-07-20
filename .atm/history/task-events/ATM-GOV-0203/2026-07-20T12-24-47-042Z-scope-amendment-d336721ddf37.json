@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T12-24-47-042Z-scope-amendment-d336721ddf37",
+  "taskId": "ATM-GOV-0203",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-0203",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0203.json",
+  "taskSha256": "sha256:a33ec84c757381fa9c9fb161b266dbef512163ee25ec7b6aa61468135e116d26",
+  "createdAt": "2026-07-20T12:24:47.042Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0203 --actor codex-captain-0203 --add packages/cli/src/commands/tasks/claim-ownership.ts --reason \"Generic same-actor claim reentry ownership semantics required by prompt-scoped active batch validation; renew/release remain lane-strict.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Generic same-actor claim reentry ownership semantics required by prompt-scoped active batch validation; renew/release remain lane-strict."
+  }
+}

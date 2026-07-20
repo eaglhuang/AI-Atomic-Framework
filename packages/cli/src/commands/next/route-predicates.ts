@@ -67,8 +67,14 @@ interface ImportedTaskQueue {
 }
 
 function isFrameworkMaintenancePrompt(prompt: string) {
-  if (isJournalingPrompt(prompt)) return false;
   const normalized = normalizeSearchText(prompt);
+  if (
+    normalized.includes(normalizeSearchText('atm-bug'))
+    || (normalized.includes(normalizeSearchText('atm')) && (normalized.includes(normalizeSearchText('backlog')) || normalized.includes(normalizeSearchText('bug'))))
+  ) {
+    return true;
+  }
+  if (isJournalingPrompt(prompt)) return false;
   return [
     'framework',
     'atm',
@@ -82,6 +88,9 @@ function isFrameworkMaintenancePrompt(prompt: string) {
     'integration',
     'runner',
     'governance',
+    'atm-bug',
+    'backlog',
+    'bug',
     '治理',
     '框架',
     '基線',

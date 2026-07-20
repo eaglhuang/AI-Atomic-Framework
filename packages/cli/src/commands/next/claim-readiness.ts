@@ -77,7 +77,8 @@ export function extractClaimIntentFlag(argv: readonly string[]): { argv: string[
 export function diagnoseClaimReadinessForTasks(
   cwd: string,
   tasks: readonly ClaimReadinessTaskSummary[],
-  claimIntent: NextClaimIntent
+  claimIntent: NextClaimIntent,
+  options: { readonly dependencyMode?: 'claim-files' | 'hard' } = {}
 ): ClaimReadinessReport {
   const diagnostics: ClaimReadinessDiagnostic[] = [];
   for (const task of tasks) {
@@ -118,7 +119,7 @@ export function diagnoseClaimReadinessForTasks(
         try {
           const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
           return findTaskClaimDependencyBlockers(cwd, task.workItemId, taskDocument, {
-            claimFiles: task.targetAllowedFiles ?? task.scopePaths ?? []
+            claimFiles: options.dependencyMode === 'hard' ? undefined : (task.targetAllowedFiles ?? task.scopePaths ?? [])
           });
         } catch {
           return [];

@@ -136,7 +136,10 @@ export function classifyFirstLayerIntent(goal: string): FirstLayerRouteMatrixRow
   const normalized = normalizeFirstLayerText(goal);
   return firstLayerRouteMatrix.find((row) =>
     row.promptFixtures.some((fixture) => normalizeFirstLayerText(fixture) === normalized)
-    || row.matchedTerms.some((term) => normalized.includes(normalizeFirstLayerText(term)))
+    || (
+      hasFirstLayerActionVerb(normalized, row.intent)
+      && row.matchedTerms.some((term) => normalized.includes(normalizeFirstLayerText(term)))
+    )
   ) ?? null;
 }
 
@@ -180,6 +183,22 @@ function normalizeFirstLayerText(value: string): string {
     .replace(/[^\p{Letter}\p{Number}#/_ -]+/gu, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function hasFirstLayerActionVerb(normalized: string, intent: FirstLayerIntent): boolean {
+  const actionTerms: Record<FirstLayerIntent, readonly string[]> = {
+    backlog: ['record', 'add', 'write down', 'log', 'backlog item'],
+    audit: ['audit', 'inspect', 'review', 'report'],
+    optimization: ['propose', 'optimize', 'optimization', 'friction'],
+    create: ['create', 'birth', 'new atom']
+  };
+  return actionTerms[intent].some((term) => matchesFirstLayerTerm(normalized, term));
+}
+
+function matchesFirstLayerTerm(normalized: string, term: string): boolean {
+  const normalizedTerm = normalizeFirstLayerText(term);
+  const escaped = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?:^| )${escaped}(?: |$)`).test(normalized);
 }
 
 function sha256Json(value: unknown): string {

@@ -311,6 +311,28 @@ export function classifyGuidanceIntent(
     });
   }
 
+  if (firstLayerMatch && firstLayerMatch.intent !== 'create') {
+    return buildClassification({
+      goal,
+      matchedIntent: 'governance-first-layer',
+      confidence: 0.89,
+      matchedTerms: firstLayerMatch.matchedTerms.filter((term) => normalizedGoal.includes(normalizeIntentPhrase(term))),
+      requiredFlow: [
+        'atm guide first-layer',
+        firstLayerMatch.command,
+        'read-only status/audit before mutation',
+        'scoped task/backlog evidence before implementation'
+      ],
+      nextCommand: firstLayerMatch.command,
+      blockedAntiPatterns: [
+        firstLayerMatch.negativeCase,
+        'route backlog, audit, or governance optimization prompts through atom birth',
+        'use PowerShell range indexing to parse Markdown/JSON/text planning documents'
+      ],
+      lexiconSources: ['framework-default']
+    });
+  }
+
   if (taskPlanImportMatches.length > 0) {
     return buildClassification({
       goal,
@@ -332,28 +354,6 @@ export function classifyGuidanceIntent(
         'acquire runtime locks for import-only task-plan operations'
       ],
       lexiconSources: activeHostEntries.length > 0 ? ['framework-default', 'host-local'] : ['framework-default']
-    });
-  }
-
-  if (firstLayerMatch && firstLayerMatch.intent !== 'create') {
-    return buildClassification({
-      goal,
-      matchedIntent: 'governance-first-layer',
-      confidence: 0.89,
-      matchedTerms: firstLayerMatch.matchedTerms.filter((term) => normalizedGoal.includes(normalizeIntentPhrase(term))),
-      requiredFlow: [
-        'atm guide first-layer',
-        firstLayerMatch.command,
-        'read-only status/audit before mutation',
-        'scoped task/backlog evidence before implementation'
-      ],
-      nextCommand: firstLayerMatch.command,
-      blockedAntiPatterns: [
-        firstLayerMatch.negativeCase,
-        'route backlog, audit, or governance optimization prompts through atom birth',
-        'use PowerShell range indexing to parse Markdown/JSON/text planning documents'
-      ],
-      lexiconSources: ['framework-default']
     });
   }
 

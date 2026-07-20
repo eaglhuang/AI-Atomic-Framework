@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T12-18-45-779Z-scope-amendment-6cd3952ddfee",
+  "taskId": "ATM-GOV-0203",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-0203",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0203.json",
+  "taskSha256": "sha256:0285dad594fd66e14dfe530540a6e16a5708b8403d69ffbb3e02f16b8393f473",
+  "createdAt": "2026-07-20T12:18:45.779Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0203 --actor codex-captain-0203 --add packages/cli/src/commands/task-direction.ts --reason \"Expose existing governance direction-lock reader for generic active-batch claim reuse without hard-coded runtime lock path helpers.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Expose existing governance direction-lock reader for generic active-batch claim reuse without hard-coded runtime lock path helpers."
+  }
+}
