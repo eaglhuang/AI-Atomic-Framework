@@ -1,4 +1,5 @@
 import { type BrokerQueueAdmission } from './broker-queue-admission.ts';
+import { type ProposalLaneAdmission } from './proposal-lane.ts';
 import type { NextClaimIntent } from './claim-readiness.ts';
 import type { ImportedTaskSummary } from './route-predicates.ts';
 export declare function runClaimParallelPreflight(input: {
@@ -10,5 +11,6 @@ export declare function runClaimParallelPreflight(input: {
 }): Promise<{
     readonly parallelAdvisory: Record<string, unknown> | undefined;
     readonly brokerQueueAdmission: BrokerQueueAdmission | undefined;
+    readonly proposalLaneAdmission: ProposalLaneAdmission | undefined;
     readonly claimAllowedFiles: readonly string[];
 }>;

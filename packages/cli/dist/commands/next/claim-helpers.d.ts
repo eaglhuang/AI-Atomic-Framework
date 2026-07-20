@@ -7,9 +7,9 @@ export declare function prepareImportedTaskForClaim(input: {
     taskId: string;
     originalStatus: string;
     steps: {
-        action: "promote" | "reserve";
+        action: "reserve" | "promote";
         evidence: {
-            action: "promote" | "reserve";
+            action: "reserve" | "promote";
             taskId: string;
             actorId: string;
             status: "ready" | "reserved";

@@ -10,7 +10,7 @@ export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
         primaryEntryPresent: boolean;
         installCommand: string;
         verifyCommand: string;
-        status: "missing" | "installed" | "manifest-only" | "entry-only";
+        status: "installed" | "missing" | "manifest-only" | "entry-only";
         id: import("@ai-atomic-framework/integrations-core").IntegrationAdapterId;
         displayName: string;
         adapterVersion: string;
@@ -30,7 +30,7 @@ export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
         primaryEntryPresent: boolean;
         installCommand: string;
         verifyCommand: string;
-        status: "missing" | "installed" | "manifest-only" | "entry-only";
+        status: "installed" | "missing" | "manifest-only" | "entry-only";
         id: import("@ai-atomic-framework/integrations-core").IntegrationAdapterId;
         displayName: string;
         adapterVersion: string;
@@ -53,7 +53,7 @@ export declare function describeIntegrationInstallHint(bootstrap: ReturnType<typ
         adapters: {
             id: import("@ai-atomic-framework/integrations-core").IntegrationAdapterId;
             displayName: string;
-            status: "missing" | "installed" | "manifest-only" | "entry-only";
+            status: "installed" | "missing" | "manifest-only" | "entry-only";
             primaryEntryPath: string;
             installCommand: string;
             verifyCommand: string;

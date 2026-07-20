@@ -85,7 +85,9 @@ export async function runDoctor(argv) {
     const baselineTsNoCheckFiles = tsNoCheckFiles.filter((filePath) => knownTsNoCheckBaseline.has(filePath));
     const tsNoCheckCleanupOwnerGroups = createTsNoCheckCleanupOwnerGroups(baselineTsNoCheckFiles);
     const missingDist = packageDirs
-        .map((packageDir) => ({ packageDir, js: path.join(root, packageDir, 'dist', 'index.js'), dts: path.join(root, packageDir, 'dist', 'index.d.ts') }))
+        .map((packageDir) => packageDirLabel(root, packageDir) === '@ai-atomic-framework/cli'
+        ? { packageDir, js: path.join(root, packageDir, 'dist', 'atm.js'), dts: path.join(root, packageDir, 'dist', 'atm.d.ts') }
+        : { packageDir, js: path.join(root, packageDir, 'dist', 'index.js'), dts: path.join(root, packageDir, 'dist', 'index.d.ts') })
         .filter((entry) => !existsSync(entry.js) || !existsSync(entry.dts))
         .map((entry) => packageDirLabel(root, entry.packageDir));
     const charterIntegrity = checkCharterIntegrityV2(root);
