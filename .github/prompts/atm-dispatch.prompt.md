@@ -84,6 +84,30 @@ After every `next --prompt` or `next --claim` response, read
 `evidence.nextAction.playbook` before drafting dispatch instructions, editing,
 closing, or committing. The playbook is the short channel-specific work order.
 
+## Captain Governance Flow Checklist
+
+For Captain, dispatch, condition review, and closeout work, require the worker
+or report to identify:
+
+- consumed sealed summaries;
+- missing data;
+- assumption changes;
+- stop rule;
+- whether the task touches a shared-write gate;
+- the closeout evidence window, watermark, counters, duration/timing, source
+  availability, compact digest, and unavailable receipts.
+
+When a task touches a shared-write gate, do not treat a bare refusal or terminal
+block as normal until it has been checked against `INV-ATM-008`. Prefer broker
+ticket, compose/steward, or queue-ticket coordination. If the blocker is not an
+owner-ruled exception and cannot be resolved in scope, dispatch must record the
+backlog or stop-rule path.
+
+Skill and framework repairs must be generalized and data-driven. Do not encode
+one card id, actor id, queue id, local path, date, or incident string as the
+rule. Promote the reusable rule into source templates or shared learning
+references; leave incident details in task evidence, backlog, or handoff.
+
 If a route, validator, hook, worker report, plan, or task card includes an
 `ATM_*` error code, route interpretation and authoring through
 `atm-error-code-resolver` and its shared registry instead of keeping private

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T17-52-18-863Z-scope-amendment-c27082284291",
+  "taskId": "ATM-GOV-0222",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0222.json",
+  "taskSha256": "sha256:d2932244e767baedc96fb6804ab0e5a80f0673ef36908c09b5bb78674aa09256",
+  "createdAt": "2026-07-20T17:52:18.863Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0222 --actor codex-gpt-5.4-mini --add \".github/prompts/atm-governance-router.prompt.md,scripts/validate-skill-templates.ts,templates/skills/atm-next.skill.md\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

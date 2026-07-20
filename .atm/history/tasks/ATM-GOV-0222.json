@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0222",
+  "title": "Managed plan executor and first-layer UX",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0216",
+    "ATM-GOV-0217",
+    "ATM-GOV-0218",
+    "ATM-GOV-0219",
+    "ATM-GOV-0220",
+    "ATM-GOV-0221"
+  ],
+  "acceptance": [
+    "crash/resume 不重複 claim/ticket/commit/close。",
+    "first-layer UX 對 audit/backlog/closeout/執行計畫 回正確 command。",
+    "功能閘門過後預設 compose-first，失敗自動 queue-only。",
+    "new install / upgrade / rollback adopter 均有 receipt。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch/plan-executor.ts",
+    "packages/core/src/batch/plan-run-journal.ts",
+    "packages/cli/src/commands/guide.ts",
+    "packages/cli/src/commands/next/result-compaction.ts",
+    "templates/skills/atm-governance-router.skill.md",
+    "tests/cli/managed-plan-executor.test.ts",
+    "tests/cli/first-layer-ux-routing.test.ts",
+    "tests/cli/adopter-compose-first-default.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch/plan-executor.ts",
+    "packages/core/src/batch/plan-run-journal.ts",
+    "packages/cli/src/commands/guide.ts",
+    "packages/cli/src/commands/next/result-compaction.ts",
+    "templates/skills/atm-governance-router.skill.md",
+    "tests/cli/managed-plan-executor.test.ts",
+    "tests/cli/first-layer-ux-routing.test.ts",
+    "tests/cli/adopter-compose-first-default.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/managed-plan-executor.test.ts",
+    "node --strip-types tests/cli/first-layer-ux-routing.test.ts",
+    "node --strip-types tests/cli/adopter-compose-first-default.test.ts",
+    "npm run validate:guidance",
+    "npm run validate:skill-templates",
+    "npm run validate:integration-adapter",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No direct edits to .atm/runtime or .atm/history.",
+    "No new task/ticket registry."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and dispose generated artifacts through formal ATM commands; do not edit .atm runtime state directly.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0222-managed-plan-executor-and-first-layer-ux.task.md",
+    "sectionTitle": "ATM-GOV-0222",
+    "headingLine": 75,
+    "hash": "c48d35342dd507bf",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0222-managed-plan-executor-and-first-layer-ux.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:c48d35342dd507bfacca4c9f231e8f1945dd1493ced29485c9b6bdde1fd46f24",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T17:51:46.185Z"
+    }
+  },
+  "importedAt": "2026-07-20T17:51:46.185Z",
+  "lastTransitionId": "2026-07-20T17-56-31-946Z-scope-amendment-c133de97a9f9",
+  "lastTransitionAt": "2026-07-20T17:56:31.946Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T17:52:13.031Z",
+  "promotedAt": "2026-07-20T17:52:13.036Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-d8320d4204f2",
+    "claimedAt": "2026-07-20T17:52:13.040Z",
+    "heartbeatAt": "2026-07-20T17:53:16.858Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0222.*",
+      ".atm/history/task-events/ATM-GOV-0222/**",
+      ".atm/history/tasks/ATM-GOV-0222.json",
+      ".github/prompts/atm-dispatch.prompt.md",
+      ".github/prompts/atm-evidence.prompt.md",
+      ".github/prompts/atm-governance-router.prompt.md",
+      ".github/prompts/atm-handoff.prompt.md",
+      ".github/prompts/atm-next.prompt.md",
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/guide.ts",
+      "packages/cli/src/commands/next/result-compaction.ts",
+      "packages/core/src/batch/plan-run-journal.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "tests/cli/adopter-compose-first-default.test.ts",
+      "tests/cli/first-layer-ux-routing.test.ts",
+      "tests/cli/managed-plan-executor.test.ts",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260720175213-codex-gpt-5.4-mini-8347d86008",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720175213-codex-gpt-5.4-mini-8347d86008\""
+    }
+  },
+  "startedAt": "2026-07-20T17:52:13.040Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720175213-codex-gpt-5.4-mini-ATM-GOV-0222-8ca33652c5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0222",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0222.*",
+      ".atm/history/task-events/ATM-GOV-0222/**",
+      ".atm/history/tasks/ATM-GOV-0222.json",
+      ".github/prompts/atm-dispatch.prompt.md",
+      ".github/prompts/atm-evidence.prompt.md",
+      ".github/prompts/atm-governance-router.prompt.md",
+      ".github/prompts/atm-handoff.prompt.md",
+      ".github/prompts/atm-next.prompt.md",
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/guide.ts",
+      "packages/cli/src/commands/next/result-compaction.ts",
+      "packages/core/src/batch/plan-run-journal.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "tests/cli/adopter-compose-first-default.test.ts",
+      "tests/cli/first-layer-ux-routing.test.ts",
+      "tests/cli/managed-plan-executor.test.ts",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0222-managed-plan-executor-and-first-layer-ux.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0222-managed-plan-executor-and-first-layer-ux.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "47bf506a06df0e2d4c38b5df46cfd6c078bfe81b6a04d8260a8ef0ce4f51d1b9",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260720175213-codex-gpt-5.4-mini-8347d86008",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720175213-codex-gpt-5.4-mini-8347d86008\""
+    },
+    "createdAt": "2026-07-20T17:53:17.178Z",
+    "status": "active"
+  }
+}

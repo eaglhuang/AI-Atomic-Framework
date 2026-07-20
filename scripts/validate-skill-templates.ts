@@ -91,6 +91,57 @@ const requiredTeamAgentsTermsByTemplate: Record<string, readonly string[]> = {
   ]
 };
 
+const requiredGovernanceFlowTermsByTemplate: Record<string, readonly string[]> = {
+  'atm-governance-router': [
+    'Governance Flow Backwrite',
+    'opening data-driven',
+    'consumed sealed summaries',
+    'missing data',
+    'assumption changes',
+    'stop rule',
+    'shared-write gate',
+    'INV-ATM-008',
+    'INV-ATM-009',
+    'duration/timing',
+    'compact digest',
+    'unavailable receipts',
+    'frozen-entry smoke'
+  ],
+  'atm-next': [
+    'Governed Card Opening And Close Checks',
+    'consumed sealed summaries',
+    'shared-write gate',
+    'INV-ATM-008',
+    'duration/timing',
+    'compact digest',
+    'frozen-entry smoke'
+  ],
+  'atm-dispatch': [
+    'Captain Governance Flow Checklist',
+    'consumed sealed summaries',
+    'shared-write gate',
+    'INV-ATM-008',
+    'duration/timing',
+    'compact digest'
+  ],
+  'atm-handoff': [
+    'Governance Flow Summary',
+    'consumed sealed summaries',
+    'INV-ATM-008',
+    'duration/timing',
+    'compact digest',
+    'frozen-entry smoke'
+  ],
+  'atm-evidence': [
+    'Governance Evidence Checklist',
+    'consumed sealed summaries',
+    'INV-ATM-008',
+    'duration/timing',
+    'compact digest',
+    'unavailable receipts'
+  ]
+};
+
 interface InstalledSkillDriftFinding {
   readonly templateId: string;
   readonly installedPath: string;
@@ -240,6 +291,9 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   }
   for (const requiredTerm of requiredTeamAgentsTermsByTemplate[entryDefinition.id] || []) {
     assert(template.body.includes(requiredTerm), `${entryDefinition.id} missing Team Agents skill surface term: ${requiredTerm}`);
+  }
+  for (const requiredTerm of requiredGovernanceFlowTermsByTemplate[entryDefinition.id] || []) {
+    assert(template.body.includes(requiredTerm), `${entryDefinition.id} missing governance-flow skill surface term: ${requiredTerm}`);
   }
   assert(!hasForbiddenPlanningHint(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
 }
