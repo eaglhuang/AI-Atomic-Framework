@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T18-57-50-063Z-close-747af8004886",
+  "taskId": "TASK-TMP-0002",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720184648-codex-gpt-5.4-mini-TASK-TMP-0002-76c467c9ba",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0002.json",
+  "taskSha256": "sha256:b5fba975d965366bde67a736250900355360812cc5b145c80c2b0567d4b7d364",
+  "createdAt": "2026-07-20T18:57:50.063Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0002 --actor codex-gpt-5.4-mini --status done --historical-delivery 9b2bf9b4bea17a8d53157ecfcf8aa1a715dad353",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720184648-codex-gpt-5.4-mini-TASK-TMP-0002-76c467c9ba",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0002.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types scripts/cleanup-historical-governance-residue.ts --dry-run --json",
+      "node --strip-types tests/cli/historical-residue-cleanup.test.ts",
+      "typecheck",
+      "validate:broker-registry",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T18:57:50.055Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0002.*",
+        ".atm/history/task-events/TASK-TMP-0002/**",
+        ".atm/history/tasks/TASK-TMP-0002.json",
+        "docs/reports/historical-governance-residue-cleanup.md",
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "packages/cli/src/commands/evidence/**",
+        "packages/cli/src/commands/tasks/**",
+        "scripts/cleanup-historical-governance-residue.ts",
+        "tests/cli/historical-residue-cleanup.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "packages/cli/src/commands/evidence/**",
+        "packages/cli/src/commands/tasks/**",
+        "scripts/cleanup-historical-governance-residue.ts",
+        "tests/cli/historical-residue-cleanup.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

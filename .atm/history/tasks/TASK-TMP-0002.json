@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0002",
   "title": "Historical residue governance cleanup",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [
     "ATM-GOV-0217",
@@ -77,8 +77,8 @@
     }
   },
   "importedAt": "2026-07-20T18:46:41.754Z",
-  "lastTransitionId": "2026-07-20T18-46-52-911Z-claim-f162ebb67bbf",
-  "lastTransitionAt": "2026-07-20T18:46:52.911Z",
+  "lastTransitionId": "2026-07-20T18-57-50-063Z-close-747af8004886",
+  "lastTransitionAt": "2026-07-20T18:57:50.063Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-07-20T18:46:48.186Z",
@@ -87,7 +87,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-0dec59137f9d",
     "claimedAt": "2026-07-20T18:46:48.193Z",
-    "heartbeatAt": "2026-07-20T18:46:48.193Z",
+    "heartbeatAt": "2026-07-20T18:57:50.060Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TMP-0002.json",
@@ -98,14 +98,14 @@
       "scripts/cleanup-historical-governance-residue.ts",
       "tests/cli/historical-residue-cleanup.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720184648-codex-gpt-5.4-mini-1651be4628",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720184648-codex-gpt-5.4-mini-1651be4628\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T18:46:48.193Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -143,5 +143,9 @@
     },
     "createdAt": "2026-07-20T18:46:52.910Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T18:57:50.060Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260720184648-codex-gpt-5.4-mini-TASK-TMP-0002-76c467c9ba",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0002.closure-packet.json"
 }
