@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0225",
+  "title": "Final closure for ATM 2.0 and 2.1",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0215",
+    "TASK-ERR-0002",
+    "ATM-GOV-0216",
+    "ATM-GOV-0217",
+    "ATM-GOV-0218",
+    "ATM-GOV-0219",
+    "ATM-GOV-0220",
+    "ATM-GOV-0221",
+    "ATM-GOV-0222",
+    "ATM-GOV-0223",
+    "ATM-GOV-0224",
+    "TASK-TMP-0002"
+  ],
+  "acceptance": [
+    "所有上游卡 closed 且有 sealed summary。",
+    "runner parity、adopter new install/upgrade/rollback 全過。",
+    "真平行 dogfood 與 420-cell A/B 達標。",
+    "只有全部為真才關閉；否則本卡保持 open 並列 recovery。"
+  ],
+  "deliverables": [
+    "docs/reports/atm-2-1-final-closure.md",
+    "scripts/validate-atm-2-1-closure.ts",
+    "tests/cli/atm-2-1-final-closure.test.ts"
+  ],
+  "scopePaths": [
+    "docs/reports/atm-2-1-final-closure.md",
+    "scripts/validate-atm-2-1-closure.ts",
+    "tests/cli/atm-2-1-final-closure.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/atm-2-1-final-closure.test.ts",
+    "node --strip-types scripts/validate-atm-2-1-closure.ts --mode validate",
+    "npm run validate:standard",
+    "npm run validate:runner-entrypoints",
+    "npm run validate:integration-adapter",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No direct edits to .atm/runtime or .atm/history.",
+    "No new task/ticket registry."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and dispose generated artifacts through formal ATM commands; do not edit .atm runtime state directly.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0225-final-closure-for-atm-2-0-and-2-1.task.md",
+    "sectionTitle": "ATM-GOV-0225",
+    "headingLine": 68,
+    "hash": "501aec7af7142735",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0225-final-closure-for-atm-2-0-and-2-1.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:501aec7af7142735e97e19e8afc32f9f44afb4a36fad452183b92ac31977254e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T18:44:01.824Z"
+    }
+  },
+  "importedAt": "2026-07-20T18:44:01.824Z",
+  "lastTransitionId": "2026-07-20T18-58-25-373Z-claim-b679b82a9029",
+  "lastTransitionAt": "2026-07-20T18:58:25.373Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T18:58:21.265Z",
+  "promotedAt": "2026-07-20T18:58:21.267Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-f1f171d27edd",
+    "claimedAt": "2026-07-20T18:58:21.270Z",
+    "heartbeatAt": "2026-07-20T18:58:21.270Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0225.json",
+      "docs/reports/atm-2-1-final-closure.md",
+      "scripts/validate-atm-2-1-closure.ts",
+      "tests/cli/atm-2-1-final-closure.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720185821-codex-gpt-5.4-mini-d103d23bd4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720185821-codex-gpt-5.4-mini-d103d23bd4\""
+    }
+  },
+  "startedAt": "2026-07-20T18:58:21.270Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720185821-codex-gpt-5.4-mini-ATM-GOV-0225-8454aec807",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0225",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0225.*",
+      ".atm/history/task-events/ATM-GOV-0225/**",
+      ".atm/history/tasks/ATM-GOV-0225.json",
+      "docs/reports/atm-2-1-final-closure.md",
+      "scripts/validate-atm-2-1-closure.ts",
+      "tests/cli/atm-2-1-final-closure.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "8d32435ca0d0006debcedd4ca65f44c87bb04f3c71bef8d9b3c61faaa276e614",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260720185821-codex-gpt-5.4-mini-ATM-GOV-0225-8454aec807",
+    "laneSession": {
+      "laneSessionId": "lane-20260720185821-codex-gpt-5.4-mini-d103d23bd4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720185821-codex-gpt-5.4-mini-d103d23bd4\""
+    },
+    "createdAt": "2026-07-20T18:58:25.371Z",
+    "status": "active"
+  }
+}

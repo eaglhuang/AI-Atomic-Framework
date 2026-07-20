@@ -1,0 +1,180 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0225",
+  "updatedAt": "2026-07-20T21:02:03.963Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/atm-2-1-final-closure.test.ts",
+    "typecheck",
+    "validate:atm-2-1-closure",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:integration-adapter",
+    "validate:runner-entrypoints"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-20T19:18:53.123Z",
+      "startedAt": "2026-07-20T19:18:52.613Z",
+      "finishedAt": "2026-07-20T19:18:53.123Z",
+      "durationMs": 510,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0bb1bb54a0a896aac935d3aa292954065ee672e6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/atm-2-1-final-closure.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/atm-2-1-final-closure.test.ts"
+      ],
+      "generatedAt": "2026-07-20T19:18:53.276Z",
+      "startedAt": "2026-07-20T19:18:52.574Z",
+      "finishedAt": "2026-07-20T19:18:53.276Z",
+      "durationMs": 702,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0bb1bb54a0a896aac935d3aa292954065ee672e6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:runner-entrypoints",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0edc8b6d39a7b2e180f8a51ce2a2f663dfcb25effe5453df9afe24f2fbb46b40",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:runner-entrypoints"
+      ],
+      "generatedAt": "2026-07-20T19:18:53.816Z",
+      "startedAt": "2026-07-20T19:18:52.688Z",
+      "finishedAt": "2026-07-20T19:18:53.816Z",
+      "durationMs": 1128,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0bb1bb54a0a896aac935d3aa292954065ee672e6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:integration-adapter",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19063ae4e9017f3439a6036376ae04f39f88e27233b4bfbda0a594b4f7348d3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:integration-adapter"
+      ],
+      "generatedAt": "2026-07-20T19:19:02.944Z",
+      "startedAt": "2026-07-20T19:18:52.702Z",
+      "finishedAt": "2026-07-20T19:19:02.944Z",
+      "durationMs": 10242,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0bb1bb54a0a896aac935d3aa292954065ee672e6",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-20T19:19:25.445Z",
+      "startedAt": "2026-07-20T19:19:14.204Z",
+      "finishedAt": "2026-07-20T19:19:25.445Z",
+      "durationMs": 11241,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0bb1bb54a0a896aac935d3aa292954065ee672e6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-20T19:20:12.581Z",
+      "startedAt": "2026-07-20T19:19:14.314Z",
+      "finishedAt": "2026-07-20T19:20:12.581Z",
+      "durationMs": 58267,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0bb1bb54a0a896aac935d3aa292954065ee672e6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:ea078e50726892d0301dc735a7fd3e220bf6a7fa7421657ad3c8f3a840e7a07b",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-20T19:20:51.102Z",
+      "startedAt": "2026-07-20T19:20:31.898Z",
+      "finishedAt": "2026-07-20T19:20:51.102Z",
+      "durationMs": 19204,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0bb1bb54a0a896aac935d3aa292954065ee672e6",
+      "cached": false
+    },
+    {
+      "command": "git diff --check -- docs/reports/atm-2-1-final-closure.md scripts/validate-atm-2-1-closure.ts tests/cli/atm-2-1-final-closure.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:atm-2-1-closure"
+      ],
+      "generatedAt": "2026-07-20T21:02:03.773Z",
+      "startedAt": "2026-07-20T21:02:03.292Z",
+      "finishedAt": "2026-07-20T21:02:03.773Z",
+      "durationMs": 481,
+      "runnerKind": "dev-source",
+      "sourceCommit": "169e01190bc4354b0ce5a4f9adc23b161dad7607",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/atm-2-1-final-closure.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/atm-2-1-final-closure.test.ts"
+      ],
+      "generatedAt": "2026-07-20T21:02:03.965Z",
+      "startedAt": "2026-07-20T21:02:03.294Z",
+      "finishedAt": "2026-07-20T21:02:03.965Z",
+      "durationMs": 671,
+      "runnerKind": "dev-source",
+      "sourceCommit": "169e01190bc4354b0ce5a4f9adc23b161dad7607",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-validators.ts standard --status --run-id atm-gov-0225-standard-20260720",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d3411640274d51421acb38f126d924dcf76d2a77126e05e3471f18f2ed497bae",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-20T21:02:03.962Z",
+      "startedAt": "2026-07-20T21:02:03.294Z",
+      "finishedAt": "2026-07-20T21:02:03.962Z",
+      "durationMs": 668,
+      "runnerKind": "dev-source",
+      "sourceCommit": "169e01190bc4354b0ce5a4f9adc23b161dad7607",
+      "cached": false
+    }
+  ],
+  "artifactPaths": [
+    "docs/reports/atm-2-1-final-closure.md"
+  ]
+}
