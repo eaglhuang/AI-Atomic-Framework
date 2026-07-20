@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T20-41-28-690Z-close-e5ad834bfde6",
+  "taskId": "TASK-SKL-0016",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720195728-codex-gpt-5.4-mini-TASK-SKL-0016-f5a643236b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0016.json",
+  "taskSha256": "sha256:f5aa7ca503d57812324043a29c5f764a11a03486373cd22be5048aa1ad49d805",
+  "createdAt": "2026-07-20T20:41:28.690Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0016 --actor codex-gpt-5.4-mini --status done --historical-delivery 70914e2659bb6bc3ac23e45da3b4f4276d2087da",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720195728-codex-gpt-5.4-mini-TASK-SKL-0016-f5a643236b",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0016.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types scripts/build-root-drop-release.ts",
+      "node --strip-types tests/cli/root-drop-release-source-list.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T20:41:28.684Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0016.*",
+        ".atm/history/task-events/TASK-SKL-0016/**",
+        ".atm/history/tasks/TASK-SKL-0016.json",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/doctor/constants.ts",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "scripts/build-root-drop-release.ts",
+        "tests/cli/root-drop-release-source-list.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/doctor/constants.ts",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "scripts/build-root-drop-release.ts",
+        "tests/cli/root-drop-release-source-list.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
