@@ -1,0 +1,168 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0196",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "302d8b806c42b64a4f9e266905e3b159a1c8d7a0",
+  "governedTreeSha": "405ac5ed75e692b269c73efb5307c9a78f081781",
+  "targetCommitDelta": {
+    "currentCommitSha": "302d8b806c42b64a4f9e266905e3b159a1c8d7a0",
+    "parentCommitShas": [
+      "302d8b806c42b64a4f9e266905e3b159a1c8d7a0"
+    ],
+    "governedTreeSha": "405ac5ed75e692b269c73efb5307c9a78f081781",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0196.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-RFT-0007.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0007.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+      "packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/command-runs.ts",
+      "packages/cli/src/commands/evidence/shared-utils.ts",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/index.ts",
+      "packages/core/src/telemetry/observation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/telemetry.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/telemetry.ts",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/telemetry/index.js",
+      "release/atm-root-drop/packages/core/src/telemetry/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/gate-telemetry-observed-chain.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c4f049e142e29773683c3d848da98a9acae290812505cea62e3170e0b497c574",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1dcf3ebbe05c537258eb750b4bd0e12cd17b932b5c9ab9f6428eb9450b2aac9d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:fdeeb1e680f56eb54357bbb86fbf267f229c9f3d9eb99d667ae8f356f9eb7c42",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:gate-telemetry-coverage",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T04:28:50.168Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0196.*",
+      ".atm/history/task-events/ATM-GOV-0196/**",
+      ".atm/history/tasks/ATM-GOV-0196.json",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/**",
+      "scripts/validate-gate-telemetry-coverage.ts",
+      "tests/cli/gate-telemetry-observed-chain.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/taskflow/**",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/**",
+      "scripts/validate-gate-telemetry-coverage.ts",
+      "tests/cli/gate-telemetry-observed-chain.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0196.json",
+  "closedAt": "2026-07-20T04:28:50.168Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260720040028-codex-captain-ATM-GOV-0196-d7e3c95c57",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "302d8b806c42b64a4f9e266905e3b159a1c8d7a0",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/index.ts",
+      "packages/core/src/telemetry/observation.ts",
+      "tests/cli/gate-telemetry-observed-chain.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0196.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0196/2026-07-20T03-28-53-885Z-import-4ee3ae0545ba.json",
+      ".atm/history/task-events/ATM-GOV-0196/2026-07-20T03-30-30-805Z-repair-claim-9b6d88a04ab8.json",
+      ".atm/history/task-events/ATM-GOV-0196/2026-07-20T04-00-28-382Z-reserve-0d4eef894420.json",
+      ".atm/history/task-events/ATM-GOV-0196/2026-07-20T04-00-28-384Z-promote-7539aeb28466.json",
+      ".atm/history/task-events/ATM-GOV-0196/2026-07-20T04-00-32-310Z-claim-9a7c52b999d2.json",
+      ".atm/history/tasks/ATM-GOV-0196.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

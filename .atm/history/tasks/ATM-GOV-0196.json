@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0196",
   "title": "Observed telemetry coverage and task seal enforcement",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0195"
@@ -81,8 +81,8 @@
     }
   },
   "importedAt": "2026-07-20T03:28:53.791Z",
-  "lastTransitionId": "2026-07-20T04-00-32-310Z-claim-9a7c52b999d2",
-  "lastTransitionAt": "2026-07-20T04:00:32.310Z",
+  "lastTransitionId": "2026-07-20T04-28-50-180Z-close-9cb5f6166387",
+  "lastTransitionAt": "2026-07-20T04:28:50.180Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-07-20T04:00:28.382Z",
@@ -91,7 +91,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-54693a3feaaa",
     "claimedAt": "2026-07-20T04:00:28.387Z",
-    "heartbeatAt": "2026-07-20T04:00:28.387Z",
+    "heartbeatAt": "2026-07-20T04:28:50.177Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0196.json",
@@ -99,14 +99,14 @@
       "scripts/validate-gate-telemetry-coverage.ts",
       "tests/cli/gate-telemetry-observed-chain.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720040028-codex-captain-c3d8a2ef6c",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720040028-codex-captain-c3d8a2ef6c\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T04:00:28.387Z",
   "startedByActor": "codex-captain",
@@ -141,5 +141,9 @@
     },
     "createdAt": "2026-07-20T04:00:32.308Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T04:28:50.177Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260720040028-codex-captain-ATM-GOV-0196-d7e3c95c57",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0196.closure-packet.json"
 }

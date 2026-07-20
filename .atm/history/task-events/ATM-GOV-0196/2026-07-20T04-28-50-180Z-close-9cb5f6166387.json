@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T04-28-50-180Z-close-9cb5f6166387",
+  "taskId": "ATM-GOV-0196",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260720040028-codex-captain-ATM-GOV-0196-d7e3c95c57",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0196.json",
+  "taskSha256": "sha256:e67371de1586725482795d6219f2301094e48d33cc226ab6a58936eaf48a8367",
+  "createdAt": "2026-07-20T04:28:50.180Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0196 --actor codex-captain --status done --historical-delivery 302d8b806c42b64a4f9e266905e3b159a1c8d7a0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720040028-codex-captain-ATM-GOV-0196-d7e3c95c57",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0196.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:gate-telemetry-coverage",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T04:28:50.168Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0196.*",
+        ".atm/history/task-events/ATM-GOV-0196/**",
+        ".atm/history/tasks/ATM-GOV-0196.json",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/**",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/gate-telemetry-observed-chain.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/**",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/gate-telemetry-observed-chain.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
