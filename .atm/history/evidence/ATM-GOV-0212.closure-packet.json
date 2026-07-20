@@ -1,0 +1,249 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0212",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f2517ef95f3b295a121a76cabcf817f0cb0bf936",
+  "governedTreeSha": "e0516b7dcb74ad1357648331ca2078c3e679e8f1",
+  "targetCommitDelta": {
+    "currentCommitSha": "f2517ef95f3b295a121a76cabcf817f0cb0bf936",
+    "parentCommitShas": [
+      "f2517ef95f3b295a121a76cabcf817f0cb0bf936"
+    ],
+    "governedTreeSha": "e0516b7dcb74ad1357648331ca2078c3e679e8f1",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0212.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0212.json",
+      "packages/core/src/broker/transactional-composer.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/proposal-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/registry-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/telemetry.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/claim-parallel-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/proposal-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/registry-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/shared-utils.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/dist/broker/decision.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/broker/registry.js",
+      "release/atm-root-drop/packages/core/dist/broker/wave-broker-scheduler.js",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/telemetry/index.js",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/broker/registry.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/packages/core/src/broker/wave-broker-scheduler.ts",
+      "release/atm-root-drop/packages/core/src/telemetry/index.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.js",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/index.ts",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/schemas/governance/broker-decision.schema.json",
+      "release/atm-root-drop/schemas/governance/patch-proposal.schema.json",
+      "release/atm-root-drop/schemas/governance/write-intent.schema.json",
+      "release/atm-root-drop/scripts/validate-broker-compose.ts",
+      "release/atm-root-drop/scripts/validate-broker-steward.ts",
+      "release/atm-root-drop/scripts/validate-schemas/context.ts",
+      "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
+      "schemas/governance/composition-plan.schema.json",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validate-broker-steward.ts",
+      "tests/core/composer-serializability.test.ts",
+      "tests/core/transactional-bounded-composer.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/composer-serializability.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b1ebb33e6959ba5eec4f4a64c78d116a6aafd27dd2f45e87e19ef7f8a19c1a46",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/core/transactional-bounded-composer.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60952a3666abe9fd1f52885af1bd3f848c5491ff407b4fa9753503caf1cf3549",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-compose.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ef9e87bf2971bd002ed7e89a52595f6168a902c33b7b3b50f93866fb70edce4e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-steward.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c4e3734903aa3ad77f63c14a32370a6e8b7c487bac22921ed736cbaa74de81f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d253d2d3eed32fdbbc536e0fb20b16f774e1a8e78d845185b224c208dc8bf809",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:brokered-write",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:23c34141b8cc117ebee969b17d7909bb483924cebd05e1c81a1a7f345656d6b3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:31567a3e6a14d5fa1d875253dbb7fff09dde3cf17a4d7d4795f78adbf2d9c837",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/core/composer-serializability.test.ts",
+    "node --strip-types tests/core/transactional-bounded-composer.test.ts",
+    "typecheck",
+    "validate:broker-compose",
+    "validate:broker-steward",
+    "validate:brokered-write",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T09:14:18.128Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0212.*",
+      ".atm/history/task-events/ATM-GOV-0212/**",
+      ".atm/history/tasks/ATM-GOV-0212.json",
+      "packages/core/src/broker/adapters/cas.ts",
+      "packages/core/src/broker/adapters/json-record.ts",
+      "packages/core/src/broker/adapters/text-range.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/merge-plan.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/transactional-composer.ts",
+      "schemas/governance/composition-plan.schema.json",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validate-broker-steward.ts",
+      "tests/core/composer-serializability.test.ts",
+      "tests/core/transactional-bounded-composer.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/adapters/cas.ts",
+      "packages/core/src/broker/adapters/json-record.ts",
+      "packages/core/src/broker/adapters/text-range.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/merge-plan.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/transactional-composer.ts",
+      "schemas/governance/composition-plan.schema.json",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validate-broker-steward.ts",
+      "tests/core/composer-serializability.test.ts",
+      "tests/core/transactional-bounded-composer.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0212.json",
+  "closedAt": "2026-07-20T09:14:18.129Z",
+  "closedByActor": "codex-captain-0212",
+  "sessionId": "session-20260720090405-codex-captain-0212-ATM-GOV-0212-b0636f1ad9",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f2517ef95f3b295a121a76cabcf817f0cb0bf936",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/transactional-composer.ts",
+      "schemas/governance/composition-plan.schema.json",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validate-broker-steward.ts",
+      "tests/core/composer-serializability.test.ts",
+      "tests/core/transactional-bounded-composer.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0212.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0212/2026-07-20T09-03-57-406Z-import-6167ee4c30e8.json",
+      ".atm/history/task-events/ATM-GOV-0212/2026-07-20T09-04-05-378Z-reserve-fb9c426f7d91.json",
+      ".atm/history/task-events/ATM-GOV-0212/2026-07-20T09-04-05-382Z-promote-631de2e0e59c.json",
+      ".atm/history/task-events/ATM-GOV-0212/2026-07-20T09-04-09-830Z-claim-99e49e45bc41.json",
+      ".atm/history/tasks/ATM-GOV-0212.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

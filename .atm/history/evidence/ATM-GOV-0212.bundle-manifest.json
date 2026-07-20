@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0212",
-  "updatedAt": "2026-07-20T09:09:36.669Z",
+  "updatedAt": "2026-07-20T09:12:39.430Z",
   "updatedBy": "codex-captain-0212",
   "freshValidationPasses": [
     "node --strip-types tests/core/composer-serializability.test.ts",
@@ -10,6 +10,8 @@
     "validate:broker-compose",
     "validate:broker-steward",
     "validate:brokered-write",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:schemas"
   ],
   "staleValidationPasses": [],
@@ -124,6 +126,38 @@
       "durationMs": 16689,
       "runnerKind": "dev-source",
       "sourceCommit": "3ec994e2dbea1a3b0118cb609d53123dc226f2fe",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:31567a3e6a14d5fa1d875253dbb7fff09dde3cf17a4d7d4795f78adbf2d9c837",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-20T09:12:03.602Z",
+      "startedAt": "2026-07-20T09:11:43.189Z",
+      "finishedAt": "2026-07-20T09:12:03.602Z",
+      "durationMs": 20413,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f2517ef95f3b295a121a76cabcf817f0cb0bf936",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-20T09:12:39.428Z",
+      "startedAt": "2026-07-20T09:11:43.168Z",
+      "finishedAt": "2026-07-20T09:12:39.428Z",
+      "durationMs": 56260,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f2517ef95f3b295a121a76cabcf817f0cb0bf936",
       "cached": false
     }
   ],

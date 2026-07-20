@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T09-14-18-135Z-close-5c2fa1ebfb0a",
+  "taskId": "ATM-GOV-0212",
+  "action": "close",
+  "actorId": "codex-captain-0212",
+  "sessionId": "session-20260720090405-codex-captain-0212-ATM-GOV-0212-b0636f1ad9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0212.json",
+  "taskSha256": "sha256:6fd920770a89c560d599d72695c374f0810fde16d31a3a3c2471f95dded1a3db",
+  "createdAt": "2026-07-20T09:14:18.135Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0212 --actor codex-captain-0212 --status done --historical-delivery f2517ef95f3b295a121a76cabcf817f0cb0bf936",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720090405-codex-captain-0212-ATM-GOV-0212-b0636f1ad9",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0212.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/core/composer-serializability.test.ts",
+      "node --strip-types tests/core/transactional-bounded-composer.test.ts",
+      "typecheck",
+      "validate:broker-compose",
+      "validate:broker-steward",
+      "validate:brokered-write",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T09:14:18.128Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0212.*",
+        ".atm/history/task-events/ATM-GOV-0212/**",
+        ".atm/history/tasks/ATM-GOV-0212.json",
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/merge-plan.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/transactional-composer.ts",
+        "schemas/governance/composition-plan.schema.json",
+        "scripts/validate-broker-compose.ts",
+        "scripts/validate-broker-steward.ts",
+        "tests/core/composer-serializability.test.ts",
+        "tests/core/transactional-bounded-composer.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/merge-plan.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/transactional-composer.ts",
+        "schemas/governance/composition-plan.schema.json",
+        "scripts/validate-broker-compose.ts",
+        "scripts/validate-broker-steward.ts",
+        "tests/core/composer-serializability.test.ts",
+        "tests/core/transactional-bounded-composer.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

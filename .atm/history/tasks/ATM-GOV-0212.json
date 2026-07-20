@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0212",
   "title": "Transactional bounded composer and serializable publish",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0208",
@@ -120,8 +120,8 @@
     }
   },
   "importedAt": "2026-07-20T09:03:57.301Z",
-  "lastTransitionId": "2026-07-20T09-04-09-830Z-claim-99e49e45bc41",
-  "lastTransitionAt": "2026-07-20T09:04:09.830Z",
+  "lastTransitionId": "2026-07-20T09-14-18-135Z-close-5c2fa1ebfb0a",
+  "lastTransitionAt": "2026-07-20T09:14:18.135Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0212",
   "reservedAt": "2026-07-20T09:04:05.378Z",
@@ -130,7 +130,7 @@
     "actorId": "codex-captain-0212",
     "leaseId": "lease-b7a0b38616ac",
     "claimedAt": "2026-07-20T09:04:05.388Z",
-    "heartbeatAt": "2026-07-20T09:04:05.388Z",
+    "heartbeatAt": "2026-07-20T09:14:18.133Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0212.json",
@@ -147,14 +147,14 @@
       "tests/core/composer-serializability.test.ts",
       "tests/core/transactional-bounded-composer.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720090405-codex-captain-0212-3efe00d75a",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720090405-codex-captain-0212-3efe00d75a\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T09:04:05.388Z",
   "startedByActor": "codex-captain-0212",
@@ -198,5 +198,9 @@
     },
     "createdAt": "2026-07-20T09:04:09.829Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T09:14:18.133Z",
+  "closedByActor": "codex-captain-0212",
+  "closedBySessionId": "session-20260720090405-codex-captain-0212-ATM-GOV-0212-b0636f1ad9",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0212.closure-packet.json"
 }
