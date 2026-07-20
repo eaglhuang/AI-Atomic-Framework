@@ -209,6 +209,9 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   try {
     timePhase(timings, 'worktreeSetupMs', () => runGit(repoRoot, ['worktree', 'add', '--detach', worktreeRoot, sealedSourceSha]));
     linkNodeModules(worktreeRoot);
+    if (buildDecision === 'incrementalBuild') {
+      hydratePackageDistFromCurrentRootDrop({ cwd: repoRoot, worktreeRoot });
+    }
     if (buildTarget === 'full' || buildTarget === 'packages') {
       tsBuildCache = prepareTsBuildCache({ cwd: repoRoot, worktreeRoot });
     }
@@ -539,6 +542,20 @@ function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTar
   }
   if (buildTarget === 'full' || buildTarget === 'onefile') {
     syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'));
+  }
+}
+
+export function hydratePackageDistFromCurrentRootDrop(input: { readonly cwd: string; readonly worktreeRoot: string; }): void {
+  const currentRootDropPackages = path.join(input.cwd, 'release', 'atm-root-drop', 'packages');
+  const worktreePackages = path.join(input.worktreeRoot, 'packages');
+  if (!existsSync(currentRootDropPackages) || !existsSync(worktreePackages)) return;
+
+  for (const packageName of readDirectoryNames(currentRootDropPackages)) {
+    const sourceDist = path.join(currentRootDropPackages, packageName, 'dist');
+    const targetDist = path.join(worktreePackages, packageName, 'dist');
+    if (!existsSync(sourceDist) || !existsSync(path.dirname(targetDist))) continue;
+    removeTreeWithoutFollowingLinks(targetDist);
+    cpSync(sourceDist, targetDist, { recursive: true });
   }
 }
 

@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   buildRunnerSyncReceipt,
+  hydratePackageDistFromCurrentRootDrop,
   writeBuildMetadataToReleaseManifests
 } from '../../scripts/run-sealed-runner-build.ts';
 import {
@@ -76,6 +77,23 @@ const persisted = persistTsBuildCache({ cwd: repo, worktreeRoot, summary: prepar
 assert.equal(persisted?.persistedAfterBuild, true);
 assert.notEqual(persisted?.digestBefore, persisted?.digestAfter);
 assert.equal(persisted?.gitPolicy.rawCacheCommitted, false);
+
+mkdirSync(path.join(repo, 'release/atm-root-drop/packages/core/dist'), { recursive: true });
+mkdirSync(path.join(repo, 'release/atm-root-drop/packages/cli/dist'), { recursive: true });
+mkdirSync(path.join(worktreeRoot, 'packages/core'), { recursive: true });
+mkdirSync(path.join(worktreeRoot, 'packages/cli'), { recursive: true });
+writeFileSync(path.join(repo, 'release/atm-root-drop/packages/core/dist/index.js'), 'export const core = true;\n');
+writeFileSync(path.join(repo, 'release/atm-root-drop/packages/cli/dist/index.js'), 'export const cli = "old";\n');
+writeFileSync(path.join(worktreeRoot, 'packages/cli/dist'), 'stale-file-will-be-replaced\n');
+hydratePackageDistFromCurrentRootDrop({ cwd: repo, worktreeRoot });
+assert.equal(
+  readFileSync(path.join(worktreeRoot, 'packages/core/dist/index.js'), 'utf8'),
+  'export const core = true;\n'
+);
+assert.equal(
+  readFileSync(path.join(worktreeRoot, 'packages/cli/dist/index.js'), 'utf8'),
+  'export const cli = "old";\n'
+);
 
 writeBuildMetadataToReleaseManifests({
   cwd: repo,
