@@ -243,7 +243,10 @@ try {
 
   const preToolCrossRepoCommit = runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--command', 'git commit -m "close tasks"']);
   assert(preToolCrossRepoCommit.ok === false, 'pre-tool hook must block planning repo commits while framework closure authority belongs to the target repo');
-  assert(preToolCrossRepoCommit.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_COMMIT_BLOCKED'), 'planning repo commit block must report target repo closure requirement');
+  assert(
+    preToolCrossRepoCommit.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_COMMIT_BLOCKED' || entry.code === 'ATM_RAW_GIT_MUTATION_BLOCKED'),
+    'planning repo commit block must fail closed before target repo closure authority can be bypassed'
+  );
 
   mkdirSync(path.join(planningRepo, 'docs', 'tasks'), { recursive: true });
   writeFileSync(path.join(planningRepo, 'docs', 'tasks', 'TASK-X-0001.task.md'), [

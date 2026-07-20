@@ -152,7 +152,11 @@ if (!process.exitCode) {
     }
   }
 
-  const policeFamilySource = readText('packages/core/src/police/family.ts');
+  const policeFamilySource = [
+    readText('packages/core/src/police/family.ts'),
+    readText('packages/core/src/police/types.ts'),
+    readText('packages/core/src/police/shared.ts')
+  ].join('\n');
   for (const phrase of [
     'interface PoliceFinding',
     'interface PoliceFamilyGateReport',
