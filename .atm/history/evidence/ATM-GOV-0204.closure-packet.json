@@ -1,0 +1,155 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0204",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0f936232b852a894dbe2963dc4eaf7154917f29e",
+  "governedTreeSha": "a69871e5465ab8e025937cddcefa559db32ee716",
+  "targetCommitDelta": {
+    "currentCommitSha": "0f936232b852a894dbe2963dc4eaf7154917f29e",
+    "parentCommitShas": [
+      "0f936232b852a894dbe2963dc4eaf7154917f29e"
+    ],
+    "governedTreeSha": "a69871e5465ab8e025937cddcefa559db32ee716",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/telemetry.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
+      "tests/cli/task-import-canonical-id-boundary.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:52c1a420134fbe3f7dafa810713a1209caa1eb0f911ff86af4747689eac7a1b0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-import.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5978a12bcfbed4dcaf96038554055174138e5b209731fc37dd0b772d23f28d6f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:241057d795030e5ffb87e8acee4011de215e01ba0c65b548c398930009cd8212",
+      "stderrSha256": "sha256:44c221d5cae510a44edb86a1d6487b9d7efabfb112a6ee22d5fc173fb1c08101",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:task-import"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T07:09:47.501Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0204.*",
+      ".atm/history/task-events/ATM-GOV-0204/**",
+      ".atm/history/tasks/ATM-GOV-0204.json",
+      "packages/cli/src/commands/task-option-parsers.ts",
+      "packages/cli/src/commands/tasks/**",
+      "scripts/validate-task-import.ts",
+      "scripts/validate-task-import/**",
+      "tests/cli/task-import-canonical-id-boundary.test.ts",
+      "tests/cli/task-import.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/task-option-parsers.ts",
+      "packages/cli/src/commands/tasks/**",
+      "scripts/validate-task-import.ts",
+      "scripts/validate-task-import/**",
+      "tests/cli/task-import-canonical-id-boundary.test.ts",
+      "tests/cli/task-import.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0204.json",
+  "closedAt": "2026-07-20T07:09:47.502Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720065455-codex-gpt-5.4-mini-ATM-GOV-0204-c9660a665e",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0f936232b852a894dbe2963dc4eaf7154917f29e",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "tests/cli/task-import-canonical-id-boundary.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0204.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0204/2026-07-20T06-54-45-754Z-import-0f5b9d5aac27.json",
+      ".atm/history/task-events/ATM-GOV-0204/2026-07-20T06-54-55-879Z-reserve-b47cef7b802c.json",
+      ".atm/history/task-events/ATM-GOV-0204/2026-07-20T06-54-55-881Z-promote-7f76f7da9c93.json",
+      ".atm/history/task-events/ATM-GOV-0204/2026-07-20T06-54-57-574Z-claim-7fc43f764cb7.json",
+      ".atm/history/tasks/ATM-GOV-0204.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T07-09-47-511Z-close-04464e472f35",
+  "taskId": "ATM-GOV-0204",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720065455-codex-gpt-5.4-mini-ATM-GOV-0204-c9660a665e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0204.json",
+  "taskSha256": "sha256:4ef919e865f805c88de6c3ceac53b734d175ca8e30b201d4e7dd369090cfc532",
+  "createdAt": "2026-07-20T07:09:47.511Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0204 --actor codex-gpt-5.4-mini --status done --historical-delivery 0f936232b852a894dbe2963dc4eaf7154917f29e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720065455-codex-gpt-5.4-mini-ATM-GOV-0204-c9660a665e",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0204.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-import"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T07:09:47.501Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0204.*",
+        ".atm/history/task-events/ATM-GOV-0204/**",
+        ".atm/history/tasks/ATM-GOV-0204.json",
+        "packages/cli/src/commands/task-option-parsers.ts",
+        "packages/cli/src/commands/tasks/**",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-import/**",
+        "tests/cli/task-import-canonical-id-boundary.test.ts",
+        "tests/cli/task-import.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/task-option-parsers.ts",
+        "packages/cli/src/commands/tasks/**",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-import/**",
+        "tests/cli/task-import-canonical-id-boundary.test.ts",
+        "tests/cli/task-import.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
