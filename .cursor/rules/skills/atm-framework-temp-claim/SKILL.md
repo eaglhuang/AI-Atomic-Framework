@@ -1,0 +1,237 @@
+
+# ATM Framework Temp Claim
+
+Use this skill when the ATM framework itself needs a scoped quickfix — a small,
+targeted change to framework source, release artifacts, or runner-sync surfaces
+— and there is no ordinary governed task card for the work. If a normal ATM task
+covers the change, use that card and do not enter this route.
+
+The route is: **skill intent → tool/playbook surface → CLI fallback → structured
+evidence.** This skill does not replace ATM lifecycle authority — `next`,
+`framework-mode`, guard, taskflow, governed commit, and batch/checkpoint rules
+still own the decisions. The skill only makes framework quickfix work legible as
+a single specialist lane instead of a bag of scattered CLI snippets.
+
+## First command
+
+```bash
+node atm.mjs next --prompt "$ARGUMENTS" --json
+```
+
+Read the returned `nextAction`, `taskIntent`, and `frameworkClaim` fields
+before choosing between the normal task lane and this framework temp lane.
+
+## When to enter this route (not this route)
+
+| Situation | Route |
+|---|---|
+| A governed ATM task card exists for this change | Use the normal task claim — do **not** open a framework temp claim in parallel. |
+| Scoped framework quickfix (framework source, release artifact, runner-sync surface) with no task card | This skill. |
+| Emergency ledger/history recovery (cross-task `.atm/history/**` mutation, foreign claim takeover, forced release-artifact rewrite) | Stop. This is not a temp-claim quickfix — request owner-approved emergency recovery. |
+| Ordinary product feature or refactor | Not this route. Open a task card. |
+
+If `node atm.mjs framework-mode status --json` reports `mode: not-required`,
+this route does not apply — either you are not in the framework repo, or the
+change does not intersect framework-critical files.
+
+## Route layers
+
+Every step of this route uses the same four layers. Prefer higher layers first;
+CLI fallback is copy-paste text, not the primary knowledge source.
+
+1. **Skill intent** — decide which of the six phases below applies.
+2. **Tool / playbook surface** — call the structured tool if the current
+   environment exposes it; consume the returned JSON.
+3. **CLI fallback** — run the corresponding `node atm.mjs …` command.
+4. **Structured evidence** — every phase leaves durable receipts under
+   `.atm/history/**` or `.atm/runtime/**`; the route is only complete when its
+   receipt exists and matches the current `HEAD`.
+
+## Six phases
+
+### 1. Capability detection
+
+Before any write, resolve identity, framework mode, and any prior claim.
+
+CLI fallback:
+
+```bash
+node atm.mjs actor resolve --json
+node atm.mjs framework-mode status --json
+node atm.mjs broker status --json
+node atm.mjs broker runner-sync status --json
+```
+
+Decisions:
+
+- Actor drift (`resolvedFrom` vs env vs git identity mismatch) → stop and
+  reconcile via `node atm.mjs identity set …` before any write.
+- Existing framework claim owned by another actor → hand off or wait; do not
+  clobber.
+- Existing runner-sync reservation whose `sealedSourceSha` is no longer
+  reachable → treat as orphan; see phase 6.
+
+### 2. Framework temp claim acquisition
+
+```bash
+node atm.mjs framework-mode claim --actor <ACTOR> --files "<CSV>" --json
+```
+
+`--files` is **required** and takes a comma-separated list of the scoped
+framework files you intend to edit. The claim mints a task id of the form
+`ATM-FRAMEWORK-TEMP-<normalized-actor>`, where the normalizer strips any
+character that is not `[A-Za-z0-9_-]`. **Always read the minted task id from
+the tool result** (`claim.taskId` in JSON); never reconstruct it from the actor
+string yourself. Two normalizers currently exist in the framework CLI and the
+one used to look up an existing lock does not match the one that mints the id,
+so any hand-reconstruction can silently point at a different lock (backlog
+ATM-BUG-2026-07-20-215; follow-up card TASK-SKL-0014-FU-CLI-EMISSION).
+
+Structured evidence: `.atm/runtime/locks/<taskId>.lock.json`.
+
+### 3. Normal task claim vs temp claim decision
+
+If, at this point, `node atm.mjs tasks status --json` for any related governed
+card reports it is `open`, `ready`, `running`, or `review`, stop and reroute
+through the normal claim. Framework temp claim is not a shortcut past card
+governance; it exists only for changes with no card.
+
+### 4. Runner-sync queue-head reservation
+
+Required whenever the change will be published through the sealed runner build
+(any edit to `packages/**`, `scripts/**`, `templates/**`, `schemas/**`,
+`release/**`, or the framework's root manifests).
+
+```bash
+HEAD=$(git rev-parse HEAD)
+node atm.mjs broker runner-sync enqueue \
+  --task <MINTED-TASK-ID> \
+  --actor <ACTOR> \
+  --sealed-source-sha "$HEAD" \
+  --surface "release/atm-onefile/atm.mjs" \
+  --surface "release/atm-root-drop" \
+  --json
+```
+
+Use the task id returned by phase 2, not any id printed in a build blocker's
+`requiredCommand` string. Verify the response reports `position: 1` and
+`status: queue-head`. If it reports `waiting-different-source`, an earlier
+reservation is pinned to a stale sha — go to phase 6.
+
+Structured evidence: reservation entry in the runner-sync steward queue.
+
+### 5. Governed commit boundaries and sealed rebuild
+
+Framework temp claim commits are governed exactly like task commits:
+
+- One delivery commit per scoped change (source + tests + docs).
+- Release artifacts are rebuilt from the committed HEAD and either amended into
+  the delivery commit or shipped as a follow-up commit — never generated from
+  an uncommitted worktree, because the sealed runner build reads from `HEAD`.
+
+Rebuild:
+
+```bash
+ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build
+```
+
+If the rebuild refuses with `Runner sync refused foreign non-release WIP`
+naming files also held by an ordinary task claim (yours or another actor's),
+this is a genuine scope collision — resolve it through the normal task lane
+first. Do not release the ordinary claim just to unblock the build unless the
+task-flow itself calls for release.
+
+Structured evidence: `atm.runnerSyncReceipt.v1` under
+`.atm/history/evidence/<taskId>.runner-sync-receipt.json`.
+
+### 6. Release, rollback, and recovery
+
+```bash
+node atm.mjs broker runner-sync release \
+  --steward-work-id <ID-FROM-QUEUE> \
+  --task <MINTED-TASK-ID> \
+  --actor <ACTOR> \
+  --receipt-ref .atm/history/evidence/<MINTED-TASK-ID>.runner-sync-receipt.json \
+  --json
+node atm.mjs framework-mode release --actor <ACTOR> --json
+```
+
+Recovery cases:
+
+- **Stale sha reservation** — HEAD advanced past the reservation's
+  `sealedSourceSha` during the flow. `broker runner-sync release` cannot accept
+  a receipt for an unreachable sha. First release the framework claim, then
+  run `node atm.mjs broker runner-sync cleanup --actor <ACTOR> --json`; with no
+  active same-id claim, orphan detection reaps the entry
+  (`reason: orphan-task-missing`). Then reacquire the claim and re-enqueue
+  against the current HEAD. Backlog ATM-BUG-2026-07-20-214.
+- **Cleanup message vs staleReleases disagreement** — cleanup may print
+  `released N stale request(s)` while its `staleReleases` array is empty.
+  Trust the array, not the count. Re-run `broker runner-sync status` to see
+  the real state. Backlog ATM-BUG-2026-07-20-214.
+- **Rollback** — revert the delivery commit, rebuild, then release the queue
+  head with the receipt for the reverted HEAD.
+
+## Error code routing
+
+Do not maintain a private error table in this skill. Route every `ATM_*` code
+this route surfaces — `ATM_FRAMEWORK_MODE_STATUS`,
+`ATM_FRAMEWORK_TEMP_CLAIM_*`, `ATM_FRAMEWORK_STAGED_RESIDUE_DETECTED`,
+`ATM_RUNNER_SYNC_*`, `ATM_BROKER_*`, `ATM_CLI_USAGE` — through the
+[`atm-error-code-resolver`](atm-error-code-resolver.skill.md) skill for
+canonical meaning, retryability, and recovery.
+
+## Fail-closed conditions
+
+Stop and request owner review, do not attempt to unblock silently, if any of
+these hold:
+
+- The change requires cross-task `.atm/history/**` mutation (touching another
+  card's ledger entries or events).
+- Runner-sync queue-head reservation is missing but the change touches sealed
+  runner inputs.
+- Another actor's framework claim is active and unexpired for overlapping
+  files.
+- Release artifacts on disk do not match the receipt's `sealedSourceSha`
+  (stale runner output).
+- The change references an upstream summary or plan that is not yet sealed in
+  the target ledger.
+
+## Guardrails
+
+- Do not treat this skill as authority to bypass `next`, playbook,
+  `framework-mode`, guard, `taskflow`, or governed commit.
+- Do not reconstruct the framework temp task id from the actor string — read
+  `claim.taskId` from the tool result.
+- Do not hand-edit `.atm/runtime/locks/**` or `.atm/runtime/write-broker.registry.json`.
+- Do not `--no-verify` a commit under this route. If the pre-commit hook fails,
+  investigate; if it is slow, wait for it.
+- Do not use this route to publish `release/**` from an ordinary task claim.
+  Runner-sync admission will refuse it, and that refusal is correct.
+
+## Charter Invariants
+
+- `INV-ATM-001` ??**No second registry** (enforcement: `gate`, breaking change: yes)
+  Rule: A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.
+- `INV-ATM-002` ??**Lock before edit** (enforcement: `doctor`, breaking change: no)
+  Rule: No governed file mutation may occur without a valid ScopeLock recorded in .atm/locks/ for the current WorkItem. Agents must call atm lock before editing files.
+- `INV-ATM-003` ??**Schema-validated promotion only** (enforcement: `gate`, breaking change: yes)
+  Rule: An UpgradeProposal must pass all automatedGates (including JSON Schema validation) before promotion. Direct registry mutation that bypasses the UpgradeProposal path is forbidden.
+- `INV-ATM-004` ??**No competing highest authority** (enforcement: `doctor`, breaking change: yes)
+  Rule: No host project rule, profile, or configuration may declare itself to have authority equal to or higher than the AtomicCharter. Any rule that contradicts an invariant must go through a charter waiver proposal.
+- `INV-ATM-005` ??**Host rule amendments require waiver flow** (enforcement: `waiver-required`, breaking change: no)
+  Rule: When a host project rule conflicts with a charter invariant, the host must submit a behavior.evolve UpgradeProposal with a charterWaiver field and a linked HumanReviewDecision. Silent override is not permitted.
+- `INV-ATM-006` ??**Framework work tracking stays target-local** (enforcement: `doctor`, breaking change: yes)
+  Rule: The framework repository must not host downstream adopter planning queues or project-specific work tracking artifacts. ATM framework-development tasks may live in the framework repository only as ATM-managed .atm/history/tasks ledger records with CLI transition evidence.
+- `INV-ATM-007` ??**Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
+  Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.
+- `INV-ATM-008` ??**Broker tickets, not refusals** (enforcement: `doctor`, breaking change: no)
+  Rule: Every governed shared-write gate (runner-sync, build windows, release mirrors, git commit, projection regeneration) must respond with a broker ticket - execute now, enqueue with position, or batch into a shared write window - never a bare refusal. Reads and private writes (own ledger, evidence, task events, lane sessions) never queue. The only standing exceptions are the four owner-ruled cases in docs/governance/parallel-governance-charter.md; any new serialization point requires an explicit project-owner ruling before it ships.
+- `INV-ATM-009` ??**Generalized repair and data-driven policy** (enforcement: `doctor`, breaking change: no)
+  Rule: Any code logic change, bug fix, or governance rule change must first be designed as the most general rule that correctly explains the observed failure class. Hard-coded special cases are allowed only with recorded evidence that the general rule is not currently safe, feasible, or economical, and that the exception is bounded and reversible. Data-shaped behavior, including thresholds, mappings, allowlists, routing choices, telemetry classifications, prompts, message text, fixtures, and domain content, must first be modeled outside control flow through schemas, registries, configuration, observed counters, or compact digest evidence instead of embedded changeable numbers or strings. The generalized solution must remain observable, testable, and no broader than the evidence supports.
+
+## Rules
+
+- Use ATM as the only governance route for this action.
+- Do not create a second registry, task state, or approval workflow.
+- Preserve user-edited integration files; manifest hashes decide uninstall safety.

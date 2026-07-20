@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T19-29-53-985Z-scope-amendment-9ff34a4e0b5f",
+  "taskId": "TASK-SKL-0014",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0014.json",
+  "taskSha256": "sha256:5e369f3ad3723d798e45f9a493ec7ff44ea2f825c45727d5b284f3813ef73d2f",
+  "createdAt": "2026-07-20T19:29:53.985Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0014 --actor codex-gpt-5.4-mini --add \"release/atm-onefile/atm.mjs,release/atm-root-drop/**,packages/cli/dist/**\" --reason \"TASK-SKL-0014 changes minimum skill compiler behavior; frozen runner and release/drop artifacts must be rebuilt so integration add and validators exercise the shipped runner.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-SKL-0014 changes minimum skill compiler behavior; frozen runner and release/drop artifacts must be rebuilt so integration add and validators exercise the shipped runner."
+  }
+}

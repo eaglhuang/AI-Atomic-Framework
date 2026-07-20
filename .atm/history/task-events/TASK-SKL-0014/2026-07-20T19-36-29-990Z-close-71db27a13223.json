@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T19-36-29-990Z-close-71db27a13223",
+  "taskId": "TASK-SKL-0014",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720192526-codex-gpt-5.4-mini-TASK-SKL-0014-cb43dd1fd6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0014.json",
+  "taskSha256": "sha256:af849b59deb4f7d4dc64adcc727b9181949847d7d49af572651b7315825e3b4d",
+  "createdAt": "2026-07-20T19:36:29.990Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0014 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-8be960be93de",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-8be960be93de",
+    "sessionId": "session-20260720192526-codex-gpt-5.4-mini-TASK-SKL-0014-cb43dd1fd6",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0014.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T19:36:29.982Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-framework-temp-claim/**",
+        ".atm/history/evidence/TASK-SKL-0014.*",
+        ".atm/history/task-events/TASK-SKL-0014/**",
+        ".atm/history/tasks/TASK-SKL-0014.json",
+        ".atm/integrations/**",
+        ".claude/skills/atm-framework-temp-claim/**",
+        ".cursor/rules/skills/atm-framework-temp-claim/**",
+        ".gemini/commands/atm-framework-temp-claim.toml",
+        ".github/instructions/atm-framework-temp-claim.instructions.md",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "integrations/codex-skills/atm-framework-temp-claim/**",
+        "packages/cli/dist/**",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop/**",
+        "scripts/validate-integration-adapter.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-framework-temp-claim.skill.md",
+        "templates/skills/atm-governance-router.skill.md",
+        "templates/skills/atm-internal-build-sync.skill.md",
+        "templates/skills/atm-next.skill.md"
+      ],
+      "criticalChangedFiles": [
+        "integrations/codex-skills/atm-framework-temp-claim/**",
+        "packages/cli/dist/**",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "scripts/validate-integration-adapter.ts",
+        "scripts/validate-skill-templates.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

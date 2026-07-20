@@ -25,6 +25,7 @@ const requiredTemplateIds = [
   'atm-handoff',
   'mailbox-worker-execution',
   'atm-internal-build-sync',
+  'atm-framework-temp-claim',
   'atm-atom-map-refactor',
   'atm-memory-consolidate'
 ];

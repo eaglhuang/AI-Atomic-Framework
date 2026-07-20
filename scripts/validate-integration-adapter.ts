@@ -42,6 +42,7 @@ const requiredFiles = [
   'templates/skills/atm-handoff.skill.md',
   'templates/skills/mailbox-worker-execution.skill.md',
   'templates/skills/atm-atom-map-refactor.skill.md',
+  'templates/skills/atm-framework-temp-claim.skill.md',
   'schemas/integrations/install-manifest.schema.json',
   'tests/schema-fixtures/positive/integration-install-manifest.json',
   'integrations/codex-skills/atm-governance-router/SKILL.md'
