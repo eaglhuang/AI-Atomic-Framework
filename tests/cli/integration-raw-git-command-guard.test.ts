@@ -63,6 +63,12 @@ try {
   assert.equal(rawClean.ok, false, 'raw git clean must be blocked');
   assert.equal(rawClean.evidence.rawGitMutation.riskLevel, 'destructive');
 
+  const rawProtectedLedgerRestore = await preTool('git restore -- .atm/history/tasks/ATM-GOV-0196.json');
+  assert.equal(rawProtectedLedgerRestore.ok, false, 'raw destructive git restore must be blocked for protected task ledgers');
+  assert.equal(rawProtectedLedgerRestore.messages[0]?.code, 'ATM_PROTECTED_LEDGER_RAW_GIT_MUTATION_BLOCKED');
+  assert.equal(rawProtectedLedgerRestore.evidence.relatedBacklog, 'ATM-BUG-2026-07-19-045');
+  assert.deepEqual(rawProtectedLedgerRestore.evidence.rawGitMutation.protectedLedgerFiles, ['.atm/history/tasks/ATM-GOV-0196.json']);
+
   const rawRm = await preTool('git rm packages/cli/src/commands/hook/pre-commit.ts');
   assert.equal(rawRm.ok, false, 'raw git rm must be blocked');
   assert.equal(rawRm.evidence.rawGitMutation.riskLevel, 'destructive');
