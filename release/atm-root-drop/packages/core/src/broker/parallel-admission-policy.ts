@@ -53,6 +53,37 @@ export interface ParallelAdmissionPolicyReceipt {
   readonly rollbackCommand: string;
 }
 
+export interface ParallelAdmissionSafetyMetrics {
+  readonly schemaId?: 'atm.parallelAdmissionSafetyMetrics.v1';
+  readonly taskId?: string;
+  readonly cellCount: number;
+  readonly requiredCellCount: number;
+  readonly medianMakespanImprovementPct: number;
+  readonly activeThroughputImprovementPct: number;
+  readonly productionCostRatio: number;
+  readonly coveragePct: number;
+  readonly sideEffectCounts: {
+    readonly silentOverwrite: number;
+    readonly escapedConflict: number;
+    readonly duplicateSideEffect: number;
+    readonly unresolvedStarvation: number;
+  };
+  readonly taskSummary: {
+    readonly window: string;
+    readonly watermark: string;
+    readonly sealedDigest: string;
+  };
+}
+
+export interface ParallelAdmissionSafetyDecision {
+  readonly schemaId: 'atm.parallelAdmissionSafetyDecision.v1';
+  readonly verdict: 'pass' | 'trip';
+  readonly fallbackMode: ParallelAdmissionFallbackMode;
+  readonly evidenceDigest: string;
+  readonly blockers: readonly string[];
+  readonly resetEligible: boolean;
+}
+
 export function defaultParallelAdmissionPolicy(): ParallelAdmissionPolicy {
   const base = {
     schemaId: parallelAdmissionPolicySchemaId,
@@ -183,6 +214,61 @@ export function resetParallelAdmissionPolicy(cwd: string, input: { readonly acto
   });
 }
 
+export function evaluateParallelAdmissionSafety(metrics: ParallelAdmissionSafetyMetrics): ParallelAdmissionSafetyDecision {
+  const blockers = parallelAdmissionSafetyBlockers(metrics);
+  return {
+    schemaId: 'atm.parallelAdmissionSafetyDecision.v1',
+    verdict: blockers.length ? 'trip' : 'pass',
+    fallbackMode: blockers.length ? 'queue-only' : 'queue-only',
+    evidenceDigest: digestSafetyMetrics(metrics),
+    blockers,
+    resetEligible: blockers.length === 0 && metrics.taskSummary.sealedDigest.startsWith('sha256:')
+  };
+}
+
+export function applyParallelAdmissionSafetyDecision(
+  policy: ParallelAdmissionPolicy,
+  input: { readonly actorId: string | null; readonly metrics: ParallelAdmissionSafetyMetrics; readonly now?: string }
+): ParallelAdmissionPolicy {
+  const decision = evaluateParallelAdmissionSafety(input.metrics);
+  if (decision.verdict === 'trip') {
+    return normalizeParallelAdmissionPolicy({
+      ...policy,
+      tripped: true,
+      trippedAt: input.now ?? new Date().toISOString(),
+      trippedBy: input.actorId,
+      tripReason: decision.blockers.join('; '),
+      fallbackMode: decision.fallbackMode
+    });
+  }
+  return normalizeParallelAdmissionPolicy({
+    ...policy,
+    tripped: false,
+    tripReason: null,
+    resetAt: input.now ?? new Date().toISOString(),
+    trippedBy: input.actorId,
+    resetEvidenceDigest: decision.evidenceDigest
+  });
+}
+
+function parallelAdmissionSafetyBlockers(metrics: ParallelAdmissionSafetyMetrics): string[] {
+  const blockers: string[] = [];
+  if (metrics.cellCount !== metrics.requiredCellCount) blockers.push(`cell coverage ${metrics.cellCount}/${metrics.requiredCellCount}`);
+  if (metrics.requiredCellCount < 420) blockers.push('required cell matrix is below 420');
+  if (metrics.medianMakespanImprovementPct < 25) blockers.push('median makespan improvement below 25%');
+  if (metrics.activeThroughputImprovementPct < 25) blockers.push('active throughput improvement below 25%');
+  if (metrics.productionCostRatio > 1.10) blockers.push('production cost ratio above 1.10');
+  if (metrics.coveragePct !== 100) blockers.push('coverage below 100%');
+  if (metrics.sideEffectCounts.silentOverwrite !== 0) blockers.push('silent overwrite detected');
+  if (metrics.sideEffectCounts.escapedConflict !== 0) blockers.push('escaped conflict detected');
+  if (metrics.sideEffectCounts.duplicateSideEffect !== 0) blockers.push('duplicate side effect detected');
+  if (metrics.sideEffectCounts.unresolvedStarvation !== 0) blockers.push('unresolved starvation detected');
+  if (!metrics.taskSummary.window) blockers.push('task summary window missing');
+  if (!metrics.taskSummary.watermark) blockers.push('task summary watermark missing');
+  if (!metrics.taskSummary.sealedDigest.startsWith('sha256:')) blockers.push('task summary sealed digest missing');
+  return blockers;
+}
+
 export function buildParallelAdmissionReceipt(input: {
   readonly cwd: string;
   readonly action: ParallelAdmissionPolicyReceipt['action'];
@@ -228,4 +314,8 @@ function digestPolicyConfig(value: Record<string, unknown>): string {
     resetEvidenceDigest: value.resetEvidenceDigest
   };
   return `sha256:${createHash('sha256').update(JSON.stringify(stable)).digest('hex')}`;
+}
+
+function digestSafetyMetrics(metrics: ParallelAdmissionSafetyMetrics): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify(metrics)).digest('hex')}`;
 }

@@ -1,0 +1,1 @@
+export { captureGitHeadEvidencePreparation, evaluateGitGovernanceCheck, listTaskOwnedProtectedOverrideAuditFiles, resolveActorGitIdentityForCommit, resolveGitExecutable, resolveTaskScopedCommitBundle, reconcileResolvedCrossTaskMutationIncident, rollbackFailedGitHeadEvidencePreparation, runAtmGit } from './git-governance/implementation.ts';

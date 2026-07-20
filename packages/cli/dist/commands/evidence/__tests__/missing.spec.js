@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import { computeMissingValidatorReport } from '../missing-report.js';
+import { runEvidenceMissing } from '../verbs/missing.js';
+const cwd = process.cwd();
+const report = computeMissingValidatorReport(cwd, 'TASK-RFT-0007', 'cursor-composer-rft0007');
+assert.equal(report.schemaId, 'atm.missingValidatorReport.v1');
+assert.equal(typeof report.ok, 'boolean');
+assert.equal(Array.isArray(report.missingValidationPasses), true);
+assert.equal(Array.isArray(report.blockingFindings), true);
+const cli = runEvidenceMissing(['--task', 'TASK-RFT-0007', '--actor', 'cursor-composer-rft0007', '--json']);
+assert.equal(typeof cli.ok, 'boolean');
+console.log('[missing.spec] ok');

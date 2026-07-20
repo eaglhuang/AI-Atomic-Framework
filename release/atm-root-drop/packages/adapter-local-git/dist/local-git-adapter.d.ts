@@ -1,0 +1,40 @@
+import type { WorkItemRef } from '@ai-atomic-framework/core';
+import type { AtomizeAdapterRequest, InfectAdapterRequest, ProjectAdapterLegacyUriResolution } from '@ai-atomic-framework/plugin-sdk';
+import { defaultLocalGitAdapterConfig, type LocalGitAdapterContext, type LocalGitAdapterConfig, type LocalGitAdapterResult, type LocalGitRegistryEntry } from './index.ts';
+export { defaultLocalGitAdapterConfig };
+export declare function createLocalGitAdapter(configOverrides?: Partial<LocalGitAdapterConfig>): {
+    adapterName: "@ai-atomic-framework/adapter-local-git";
+    defaultConfig: LocalGitAdapterConfig;
+    resolveRegistryPath: (context: LocalGitAdapterContext) => string;
+    resolveLegacyUri: (context: LocalGitAdapterContext, legacyUri: string) => ProjectAdapterLegacyUriResolution;
+    scaffold: (context: LocalGitAdapterContext) => LocalGitAdapterResult;
+    lockScope: (context: LocalGitAdapterContext, workItem: WorkItemRef, files: readonly string[]) => LocalGitAdapterResult;
+    runGate: (context: LocalGitAdapterContext, workItem: WorkItemRef) => LocalGitAdapterResult;
+    writeDocRecord: (context: LocalGitAdapterContext, workItem: WorkItemRef, summary: string) => LocalGitAdapterResult;
+    runAtomizeAdapter: (context: LocalGitAdapterContext, request: AtomizeAdapterRequest) => LocalGitAdapterResult;
+    runInfectAdapter: (context: LocalGitAdapterContext, request: InfectAdapterRequest) => LocalGitAdapterResult;
+    listHostGates: () => never[];
+    listNoTouchZones: () => never[];
+    resolveMutationPolicy: () => {
+        requireSession: boolean;
+        requireDryRunProposal: boolean;
+        requireReviewBeforeApply: boolean;
+        allowUnguidedInDev: boolean;
+        allowUnguidedInCI: boolean;
+    };
+    writeRegistryEntry: (context: LocalGitAdapterContext, entry: LocalGitRegistryEntry) => LocalGitAdapterResult;
+    readRegistryEntry: (context: LocalGitAdapterContext, entryId: string) => LocalGitRegistryEntry | null;
+};
+export declare function createNeutralMutationPolicy(): {
+    requireSession: boolean;
+    requireDryRunProposal: boolean;
+    requireReviewBeforeApply: boolean;
+    allowUnguidedInDev: boolean;
+    allowUnguidedInCI: boolean;
+};
+export declare function scaffoldLocalRepository(context: LocalGitAdapterContext, baseConfig?: LocalGitAdapterConfig): LocalGitAdapterResult;
+export declare function resolveRegistryPath(repositoryRoot: string, config?: LocalGitAdapterConfig): string;
+export declare function writeRegistryEntry(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, entry: LocalGitRegistryEntry): LocalGitAdapterResult;
+export declare function readRegistryEntry(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, entryId: string): LocalGitRegistryEntry | null;
+export declare function resolveLegacyUri(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, legacyUri: string): ProjectAdapterLegacyUriResolution;
+export declare function runDryRunAdapter(behaviorId: string, context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, request: AtomizeAdapterRequest | InfectAdapterRequest): LocalGitAdapterResult;

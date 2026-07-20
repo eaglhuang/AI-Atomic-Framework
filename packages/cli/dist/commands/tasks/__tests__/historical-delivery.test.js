@@ -1,0 +1,372 @@
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import os from 'node:os';
+import path from 'node:path';
+import { categorizeHistoricalCommitFiles, detectHistoricalDeliveryCommit, inspectHistoricalDelivery, readPlanningCardDeliveryCommit } from '../historical-delivery.js';
+import { runEvidence, verifyTaskEvidence } from '../../evidence.js';
+import { createClaimRecord } from '../task-ledger-readers.js';
+import { upsertActorWorkSession } from '../../actor-session.js';
+function fail(message) {
+    console.error(`[historical-delivery.test] ${message}`);
+    process.exitCode = 1;
+    throw new Error(message);
+}
+function assert(condition, message) {
+    if (!condition)
+        fail(message);
+}
+function assertEqual(actual, expected, message) {
+    if (actual !== expected) {
+        fail(`${message}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+}
+function assertDeepEqual(actual, expected, message) {
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        fail(`${message}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+}
+function git(cwd, args) {
+    const result = spawnSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });
+    if (result.status !== 0) {
+        fail(`git ${args.join(' ')} failed: ${result.stderr || result.stdout}`);
+    }
+    return result.stdout.trim();
+}
+function commitAll(cwd, message) {
+    git(cwd, ['add', '-A']);
+    git(cwd, ['-c', 'user.name=ATM', '-c', 'user.email=atm@test', 'commit', '-m', message]);
+    return git(cwd, ['rev-parse', 'HEAD']);
+}
+const declaredFiles = ['src/task-owned.ts', 'release/atm-onefile/atm.mjs'];
+const buckets = categorizeHistoricalCommitFiles({
+    taskId: 'TASK-HIST',
+    changedFiles: [
+        'src/task-owned.ts',
+        '.atm/history/evidence/TASK-HIST.json',
+        '.atm/history/evidence/OTHER.json',
+        'release/atm-onefile/atm.mjs',
+        'src/unrelated.ts'
+    ],
+    declaredFiles
+});
+assert(buckets.taskMatchedFiles.includes('src/task-owned.ts'), 'task-owned source must be task-matched');
+assert(buckets.governanceFiles.includes('.atm/history/evidence/TASK-HIST.json'), 'same-task evidence must be governance');
+assert(buckets.allowedRunnerOutputFiles.includes('release/atm-onefile/atm.mjs'), 'declared runner output must be allowed');
+assert(buckets.outOfScopeSourceFiles.includes('src/unrelated.ts'), 'unrelated source must be out of scope');
+assert(buckets.ignoredFiles.includes('.atm/history/evidence/OTHER.json'), 'other-task governance must be ignored');
+const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-historical-delivery-'));
+try {
+    git(repo, ['init']);
+    mkdirSync(path.join(repo, 'src'), { recursive: true });
+    writeFileSync(path.join(repo, 'src', 'task-owned.ts'), 'export const owned = true;\n', 'utf8');
+    commitAll(repo, 'base');
+    writeFileSync(path.join(repo, 'src', 'unrelated-only.ts'), 'export const unrelated = true;\n', 'utf8');
+    const unrelatedCommit = commitAll(repo, 'unrelated');
+    let report = inspectHistoricalDelivery({
+        cwd: repo,
+        taskId: 'TASK-HIST',
+        requestedRef: unrelatedCommit,
+        declaredFiles,
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
+    });
+    assert(!report.ok, 'commit without scoped deliverable must fail');
+    assert(report.reason === 'no-scoped-deliverable-files', 'missing scoped deliverable reason must be stable');
+    writeFileSync(path.join(repo, 'src', 'task-owned.ts'), 'export const owned = false;\n', 'utf8');
+    writeFileSync(path.join(repo, 'src', 'unrelated.ts'), 'export const unrelated = true;\n', 'utf8');
+    const mixedCommit = commitAll(repo, 'mixed');
+    report = inspectHistoricalDelivery({
+        cwd: repo,
+        taskId: 'TASK-HIST',
+        requestedRef: mixedCommit,
+        declaredFiles,
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
+    });
+    assert(!report.ok, 'mixed commit must fail without waiver');
+    assert(report.reason === 'out-of-scope-source-files-present', 'mixed commit reason must identify out-of-scope source');
+    assert(report.fileBuckets.outOfScopeSourceFiles.includes('src/unrelated.ts'), 'mixed report must preserve out-of-scope bucket');
+    report = inspectHistoricalDelivery({
+        cwd: repo,
+        taskId: 'TASK-HIST',
+        requestedRef: mixedCommit,
+        declaredFiles,
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: true,
+        waiverReason: 'captain-approved mixed historical delivery for regression'
+    });
+    assert(report.ok, 'mixed commit must pass with explicit waiver reason');
+    assert(report.waiverApplied, 'waived mixed commit must record waiverApplied');
+    mkdirSync(path.join(repo, '.atm', 'history', 'tasks'), { recursive: true });
+    const claimTimestamp = new Date().toISOString();
+    const claim = createClaimRecord({
+        taskId: 'TASK-HIST',
+        actorId: 'tester',
+        files: ['src/task-owned.ts'],
+        ttlSeconds: 1800,
+        timestamp: claimTimestamp
+    });
+    const taskDirectionLock = {
+        schemaId: 'atm.taskDirectionLock.v1',
+        specVersion: '0.1.0',
+        taskId: 'TASK-HIST',
+        batchId: null,
+        scopeKey: null,
+        queueId: null,
+        queueIndex: null,
+        allowedFiles: [
+            'src/task-owned.ts',
+            '.atm/history/tasks/TASK-HIST.json',
+            '.atm/history/evidence/TASK-HIST.*',
+            '.atm/history/task-events/TASK-HIST/**'
+        ],
+        planningReadOnlyPaths: [],
+        planningMirrorPaths: [],
+        allowPlanningMirror: false,
+        promptHash: null,
+        actorId: 'tester',
+        createdAt: claimTimestamp,
+        status: 'active'
+    };
+    writeFileSync(path.join(repo, '.atm', 'history', 'tasks', 'TASK-HIST.json'), JSON.stringify({
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: 'TASK-HIST',
+        status: 'ready',
+        claim,
+        taskDirectionLock,
+        scopePaths: ['src/task-owned.ts'],
+        deliverables: ['src/task-owned.ts'],
+        validators: ['git diff --check'],
+        atomizationImpact: {
+            ownerAtomOrMap: 'atm.historical-batch-evidence',
+            mapUpdates: ['atm.task-closure-map']
+        }
+    }, null, 2), 'utf8');
+    mkdirSync(path.join(repo, '.atm', 'runtime', 'locks'), { recursive: true });
+    writeFileSync(path.join(repo, '.atm', 'runtime', 'locks', 'TASK-HIST.lock.json'), JSON.stringify({
+        taskId: 'TASK-HIST',
+        actorId: 'tester',
+        files: [...taskDirectionLock.allowedFiles],
+        status: 'active',
+        taskDirectionLock
+    }, null, 2), 'utf8');
+    upsertActorWorkSession({
+        cwd: repo,
+        actorId: 'tester',
+        taskId: 'TASK-HIST',
+        claimLeaseId: claim.leaseId,
+        status: 'active',
+        sourcePrompt: 'TASK-HIST',
+        timestamp: claimTimestamp
+    });
+    const batchResult = await runEvidence([
+        'historical-batch',
+        '--cwd', repo,
+        '--delivery-repo', repo,
+        '--actor', 'tester',
+        '--tasks', 'TASK-HIST',
+        '--commits', mixedCommit,
+        '--validators', 'git diff --check',
+        '--validator-command', 'git diff --check',
+        '--write'
+    ]);
+    assert(batchResult.ok, 'historical-batch write must succeed');
+    const batchPath = path.join(repo, String(batchResult.evidence.batchPath));
+    assert(batchPath.includes(path.join('.atm', 'history', 'evidence', 'historical-batches')), 'historical batch path must be under historical-batches');
+    const taskEvidencePath = path.join(repo, '.atm', 'history', 'evidence', 'TASK-HIST.json');
+    const taskEvidence = JSON.parse(readFileSync(taskEvidencePath, 'utf8'));
+    const record = taskEvidence.evidence?.find((entry) => entry.summary === `Historical batch evidence ${batchResult.evidence.batchId} for TASK-HIST.`);
+    assert(record?.evidenceFreshness === 'historical-reference', 'task slice must be historical-reference');
+    assert(record?.details?.historicalBatch?.batchId, 'task slice must reference historical batch id');
+    assert(record?.details?.historicalBatch?.matchedFiles?.includes('src/task-owned.ts'), 'task slice must keep matched files');
+    assertEqual(record?.details?.historicalBatch?.coverageStatus, 'complete', 'historical batch must classify complete coverage for fully matched deliverables');
+    assertDeepEqual(record?.details?.validationPasses, ['git diff --check'], 'task evidence must only inherit task-specific validation passes');
+    assertDeepEqual(record?.details?.batchWideValidationPasses ?? [], [], 'task evidence must not misclassify task-specific validation as batch-wide');
+    assertEqual(record?.details?.historicalBatch?.okToCloseTask, true, 'complete slice with satisfied validator must be close-ready');
+    assertEqual(record?.details?.historicalBatch?.atomHealthClaims?.length, 2, 'owner atom and map update must both leave health claims');
+    assert(record?.details?.historicalBatch?.atomHealthClaims?.every((entry) => entry.generatedByTask === true && entry.validatorHealthy === true), 'atom health claims must be healthy when validators pass');
+    const freshAttestation = taskEvidence.evidence?.find((entry) => entry.summary === `Fresh validator attestation slice ${batchResult.evidence.batchId} for TASK-HIST.`);
+    assertEqual(freshAttestation?.evidenceFreshness, 'fresh', 'historical batch must also emit a fresh validator attestation slice');
+    assertDeepEqual(freshAttestation?.details?.validationPasses, ['git diff --check'], 'fresh attestation slice must preserve reusable validator passes');
+    const closeEvidenceGate = verifyTaskEvidence({
+        cwd: repo,
+        taskId: 'TASK-HIST',
+        gate: 'close',
+        taskDocument: JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'TASK-HIST.json'), 'utf8')),
+        taskDeclaredFiles: ['src/task-owned.ts'],
+        frameworkTask: false
+    });
+    assertEqual(closeEvidenceGate.ok, true, 'fresh attestation slice must satisfy close evidence without rerunning validators');
+    const genericEvidenceResult = await runEvidence([
+        'add',
+        '--cwd', repo,
+        '--task', 'TASK-HIST',
+        '--actor', 'tester',
+        '--kind', 'test',
+        '--summary', 'generic atom health proof',
+        '--validators', 'git diff --check',
+        '--json'
+    ]);
+    assert(genericEvidenceResult.ok, 'generic evidence add must succeed');
+    const genericEvidence = JSON.parse(readFileSync(taskEvidencePath, 'utf8'));
+    const genericRecord = genericEvidence.evidence?.find((entry) => entry.summary === 'generic atom health proof');
+    assertEqual(genericRecord?.details?.atomHealthClaims?.length, 2, 'generic evidence add must also emit atom health claims');
+    let missingCoverageBlocked = false;
+    try {
+        await runEvidence([
+            'historical-batch',
+            '--cwd', repo,
+            '--delivery-repo', repo,
+            '--actor', 'tester',
+            '--tasks', 'TASK-HIST',
+            '--commits', unrelatedCommit,
+            '--validators', 'git diff --check',
+            '--validator-command', 'git diff --check',
+            '--write'
+        ]);
+    }
+    catch (error) {
+        missingCoverageBlocked = error?.code === 'ATM_HISTORICAL_BATCH_TASK_UNMATCHED';
+    }
+    assert(missingCoverageBlocked, 'missing deliverable coverage must block historical batch write');
+    let unmatchedWithoutApprovalBlocked = false;
+    try {
+        await runEvidence([
+            'historical-batch',
+            '--cwd', repo,
+            '--delivery-repo', repo,
+            '--actor', 'tester',
+            '--tasks', 'TASK-HIST',
+            '--commits', unrelatedCommit,
+            '--validator-command', 'git diff --check',
+            '--allow-unmatched',
+            '--write'
+        ]);
+    }
+    catch (error) {
+        unmatchedWithoutApprovalBlocked = error?.code === 'ATM_CLI_USAGE';
+    }
+    assert(unmatchedWithoutApprovalBlocked, '--allow-unmatched without approval metadata must fail closed');
+    const diagnosticBatchResult = await runEvidence([
+        'historical-batch',
+        '--cwd', repo,
+        '--delivery-repo', repo,
+        '--actor', 'tester',
+        '--tasks', 'TASK-HIST',
+        '--commits', unrelatedCommit,
+        '--validator-command', 'git diff --check',
+        '--allow-unmatched',
+        '--approved-by', 'captain',
+        '--approval-reason', 'diagnostic residue disposition test',
+        '--write'
+    ]);
+    assert(diagnosticBatchResult.ok, 'approved diagnostic historical-batch write must succeed');
+    const diagnosticBatchEvidence = diagnosticBatchResult.evidence;
+    assertEqual(diagnosticBatchEvidence.taskSlices[0].okToCloseTask, false, 'diagnostic slice must not become close-ready');
+    const finalizeDiagnostic = await runEvidence([
+        'historical-batch-finalize',
+        '--cwd', repo,
+        '--actor', 'tester',
+        '--task', 'TASK-HIST',
+        '--batch', diagnosticBatchEvidence.batchId,
+        '--disposition', 'keep-diagnostic',
+        '--reason', 'partial slice is retained as audit evidence only',
+        '--write'
+    ]);
+    assert(finalizeDiagnostic.ok, 'diagnostic historical-batch slice must support explicit disposition');
+    const finalizeDiagnosticEvidence = finalizeDiagnostic.evidence;
+    assertEqual(finalizeDiagnosticEvidence.wroteDispositionRecord, true, 'keep-diagnostic disposition must append an audit evidence record');
+    const finalizedBatch = JSON.parse(readFileSync(path.join(repo, String(diagnosticBatchEvidence.batchPath)), 'utf8'));
+    assertEqual(finalizedBatch.finalizedTaskSlices?.[0]?.disposition, 'keep-diagnostic', 'batch envelope must record finalized diagnostic disposition');
+    const finalizedEvidence = JSON.parse(readFileSync(taskEvidencePath, 'utf8'));
+    const dispositionRecord = finalizedEvidence.evidence?.find((entry) => entry.details?.historicalBatchDisposition?.batchId === diagnosticBatchEvidence.batchId);
+    assertEqual(dispositionRecord?.details?.historicalBatchDisposition?.closeReady, false, 'disposition evidence must not claim close readiness');
+    const removableBatchResult = await runEvidence([
+        'historical-batch',
+        '--cwd', repo,
+        '--delivery-repo', repo,
+        '--actor', 'tester',
+        '--tasks', 'TASK-HIST',
+        '--commits', unrelatedCommit,
+        '--validator-command', 'git diff --check',
+        '--allow-unmatched',
+        '--approved-by', 'captain',
+        '--approval-reason', 'diagnostic cleanup disposition test',
+        '--write'
+    ]);
+    const removableBatchEvidence = removableBatchResult.evidence;
+    const removeDiagnostic = await runEvidence([
+        'historical-batch-finalize',
+        '--cwd', repo,
+        '--actor', 'tester',
+        '--task', 'TASK-HIST',
+        '--batch', removableBatchEvidence.batchId,
+        '--disposition', 'remove-evidence',
+        '--reason', 'diagnostic import was intentionally discarded',
+        '--write'
+    ]);
+    const removeDiagnosticEvidence = removeDiagnostic.evidence;
+    assert(removeDiagnosticEvidence.removedEvidenceRecords >= 2, 'remove-evidence must remove only records that reference the selected diagnostic batch');
+    const afterRemovalEvidence = JSON.parse(readFileSync(taskEvidencePath, 'utf8'));
+    assert(!afterRemovalEvidence.evidence?.some((entry) => entry.details?.historicalBatch?.batchId === removableBatchEvidence.batchId), 'remove-evidence must clear the diagnostic historical slice record');
+    assert(!afterRemovalEvidence.evidence?.some((entry) => entry.details?.historicalBatchValidatorAttestation?.batchId === removableBatchEvidence.batchId), 'remove-evidence must clear the paired validator attestation record');
+    let closeReadyFinalizeBlocked = false;
+    try {
+        await runEvidence([
+            'historical-batch-finalize',
+            '--cwd', repo,
+            '--actor', 'tester',
+            '--task', 'TASK-HIST',
+            '--batch', String(batchResult.evidence.batchId),
+            '--disposition', 'abandon',
+            '--reason', 'should not bypass close-ready slice',
+            '--write'
+        ]);
+    }
+    catch (error) {
+        closeReadyFinalizeBlocked = error?.code === 'ATM_HISTORICAL_BATCH_FINALIZE_CLOSE_READY_REFUSED';
+    }
+    assert(closeReadyFinalizeBlocked, 'close-ready historical-batch slices must go through taskflow close, not finalize');
+}
+finally {
+    rmSync(repo, { recursive: true, force: true });
+}
+const detectionRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-historical-delivery-detect-'));
+try {
+    git(detectionRepo, ['init']);
+    mkdirSync(path.join(detectionRepo, 'src'), { recursive: true });
+    writeFileSync(path.join(detectionRepo, 'src', 'task-owned.ts'), 'export const owned = true;\n', 'utf8');
+    commitAll(detectionRepo, 'base');
+    writeFileSync(path.join(detectionRepo, 'src', 'task-owned.ts'), 'export const owned = true;\nexport const v2 = true;\n', 'utf8');
+    const deliveryCommit = commitAll(detectionRepo, `deliver TASK-HIST\n\nATM-Task: TASK-HIST`);
+    const detected = detectHistoricalDeliveryCommit({
+        cwd: detectionRepo,
+        taskId: 'TASK-HIST',
+        declaredFiles
+    });
+    assertEqual(detected.ref, deliveryCommit, 'detectHistoricalDeliveryCommit must return scoped delivery commit');
+    assertEqual(detected.source, 'git-log-trailer', 'ATM-Task trailer commits must be preferred');
+}
+finally {
+    rmSync(detectionRepo, { recursive: true, force: true });
+}
+const planningCardRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-historical-delivery-planning-card-'));
+try {
+    git(planningCardRepo, ['init']);
+    mkdirSync(path.join(planningCardRepo, 'docs', 'tasks'), { recursive: true });
+    writeFileSync(path.join(planningCardRepo, 'docs', 'tasks', 'TASK-HIST.task.md'), [
+        '---',
+        'task_id: TASK-HIST',
+        'delivery_commit: "abc123def"',
+        '---',
+        '# TASK-HIST',
+        ''
+    ].join('\n'), 'utf8');
+    assertEqual(readPlanningCardDeliveryCommit(planningCardRepo, 'docs/tasks/TASK-HIST.task.md'), 'abc123def', 'readPlanningCardDeliveryCommit must parse quoted delivery_commit frontmatter');
+}
+finally {
+    rmSync(planningCardRepo, { recursive: true, force: true });
+}
+console.log('[historical-delivery.test] ok');

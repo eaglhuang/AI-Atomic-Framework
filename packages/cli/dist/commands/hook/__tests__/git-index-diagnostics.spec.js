@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import { classifyGitIndexPermissionFailure, classifySandboxGitFailure, inspectGitIndexAccess } from '../git-index-diagnostics.js';
+assert.equal(classifySandboxGitFailure('spawnSync git EPERM'), true);
+assert.equal(classifySandboxGitFailure('permission denied on index.lock'), false);
+assert.equal(classifyGitIndexPermissionFailure('unable to create .git/index.lock: permission denied'), true);
+assert.equal(classifyGitIndexPermissionFailure('clean stderr'), false);
+const readable = inspectGitIndexAccess(process.cwd());
+assert.equal(readable.schemaId, 'atm.gitIndexDiagnostic.v1');
+assert.equal(typeof readable.ok, 'boolean');
+console.log('[git-index-diagnostics.spec] ok');

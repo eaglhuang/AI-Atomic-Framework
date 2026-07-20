@@ -124,6 +124,68 @@ export function resetParallelAdmissionPolicy(cwd, input) {
         configDigest: digestPolicyConfig({ ...current, tripped: false, resetEvidenceDigest: input.receiptDigest })
     });
 }
+export function evaluateParallelAdmissionSafety(metrics) {
+    const blockers = parallelAdmissionSafetyBlockers(metrics);
+    return {
+        schemaId: 'atm.parallelAdmissionSafetyDecision.v1',
+        verdict: blockers.length ? 'trip' : 'pass',
+        fallbackMode: blockers.length ? 'queue-only' : 'queue-only',
+        evidenceDigest: digestSafetyMetrics(metrics),
+        blockers,
+        resetEligible: blockers.length === 0 && metrics.taskSummary.sealedDigest.startsWith('sha256:')
+    };
+}
+export function applyParallelAdmissionSafetyDecision(policy, input) {
+    const decision = evaluateParallelAdmissionSafety(input.metrics);
+    if (decision.verdict === 'trip') {
+        return normalizeParallelAdmissionPolicy({
+            ...policy,
+            tripped: true,
+            trippedAt: input.now ?? new Date().toISOString(),
+            trippedBy: input.actorId,
+            tripReason: decision.blockers.join('; '),
+            fallbackMode: decision.fallbackMode
+        });
+    }
+    return normalizeParallelAdmissionPolicy({
+        ...policy,
+        tripped: false,
+        tripReason: null,
+        resetAt: input.now ?? new Date().toISOString(),
+        trippedBy: input.actorId,
+        resetEvidenceDigest: decision.evidenceDigest
+    });
+}
+function parallelAdmissionSafetyBlockers(metrics) {
+    const blockers = [];
+    if (metrics.cellCount !== metrics.requiredCellCount)
+        blockers.push(`cell coverage ${metrics.cellCount}/${metrics.requiredCellCount}`);
+    if (metrics.requiredCellCount < 420)
+        blockers.push('required cell matrix is below 420');
+    if (metrics.medianMakespanImprovementPct < 25)
+        blockers.push('median makespan improvement below 25%');
+    if (metrics.activeThroughputImprovementPct < 25)
+        blockers.push('active throughput improvement below 25%');
+    if (metrics.productionCostRatio > 1.10)
+        blockers.push('production cost ratio above 1.10');
+    if (metrics.coveragePct !== 100)
+        blockers.push('coverage below 100%');
+    if (metrics.sideEffectCounts.silentOverwrite !== 0)
+        blockers.push('silent overwrite detected');
+    if (metrics.sideEffectCounts.escapedConflict !== 0)
+        blockers.push('escaped conflict detected');
+    if (metrics.sideEffectCounts.duplicateSideEffect !== 0)
+        blockers.push('duplicate side effect detected');
+    if (metrics.sideEffectCounts.unresolvedStarvation !== 0)
+        blockers.push('unresolved starvation detected');
+    if (!metrics.taskSummary.window)
+        blockers.push('task summary window missing');
+    if (!metrics.taskSummary.watermark)
+        blockers.push('task summary watermark missing');
+    if (!metrics.taskSummary.sealedDigest.startsWith('sha256:'))
+        blockers.push('task summary sealed digest missing');
+    return blockers;
+}
 export function buildParallelAdmissionReceipt(input) {
     return {
         schemaId: 'atm.parallelAdmissionPolicyReceipt.v1',
@@ -161,4 +223,7 @@ function digestPolicyConfig(value) {
         resetEvidenceDigest: value.resetEvidenceDigest
     };
     return `sha256:${createHash('sha256').update(JSON.stringify(stable)).digest('hex')}`;
+}
+function digestSafetyMetrics(metrics) {
+    return `sha256:${createHash('sha256').update(JSON.stringify(metrics)).digest('hex')}`;
 }

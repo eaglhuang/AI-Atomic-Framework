@@ -1,0 +1,899 @@
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
+import path from 'node:path';
+import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows } from '../../framework-development.js';
+import { findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from '../../actor-registry.js';
+import { resolveActorWorkSession } from '../../actor-session.js';
+import { CliError, quoteCliValue, relativePathFrom } from '../../shared.js';
+import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.js';
+import { isPathAllowedByScope, listActiveBatchRuns } from '../../work-channels.js';
+import { readBrokerLifecycleState } from '../../../../../core/dist/broker/lifecycle.js';
+import { buildPendingCheckpointCommitWindow } from '../../batch.js';
+import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.js';
+import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../../tasks/task-import-validators.js';
+import { normalizeRelativePath, runGit, runGitScalar } from '../git-index-diagnostics.js';
+import { normalizeOptionalText, readJsonText } from '../commit-range-guard.js';
+import { readStagedFiles } from './input-state.js';
+export const INVARIANT_TASK_AUDIT_CODES = new Set(['ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST']);
+const textFileExtensions = new Set(['.cjs', '.css', '.html', '.js', '.json', '.jsx', '.md', '.mjs', '.ps1', '.sh', '.ts', '.tsx', '.txt', '.yaml', '.yml']);
+export function isResolutionAuthorizedCurrentTask(cwd, taskId, conflictTaskId) {
+    const artifactPath = normalizeOptionalText(process.env.ATM_COMMIT_BROKER_CONFLICT_RESOLUTION);
+    if (!artifactPath || !taskId)
+        return false;
+    try {
+        const artifact = JSON.parse(readFileSync(path.resolve(cwd, artifactPath), 'utf8'));
+        const blocked = Array.isArray(artifact.blockedTaskIds) ? artifact.blockedTaskIds.map((value) => String(value).trim()) : [];
+        return artifact.schemaId === 'atm.brokerConflictResolution.v1' && String(artifact.primaryTaskId ?? '').trim() === taskId && String(artifact.currentAllowedTaskId ?? '').trim() === taskId && blocked.includes(conflictTaskId);
+    }
+    catch {
+        return false;
+    }
+}
+export function inspectSameFileClaimOwnership(input) {
+    const inferredTaskIds = inferTaskIdsFromStagedFiles(input.stagedFiles);
+    const committingTaskId = normalizeOptionalText(process.env.ATM_COMMIT_TASK_ID) ?? (inferredTaskIds.length === 1 ? inferredTaskIds[0] : null);
+    const claimIntentByTaskId = new Map();
+    const readClaimIntent = (taskId) => {
+        const cached = claimIntentByTaskId.get(taskId);
+        if (cached)
+            return cached;
+        const taskDocument = readJsonFile(path.join(input.cwd, '.atm', 'history', 'tasks', `${taskId}.json`));
+        const claim = taskDocument?.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim) ? taskDocument.claim : null;
+        const intent = normalizeOptionalText(claim?.intent) ?? 'write';
+        claimIntentByTaskId.set(taskId, intent);
+        return intent;
+    };
+    const writeLocks = input.activeDirectionLocks.filter((lock) => readClaimIntent(lock.taskId) !== 'closeout-only');
+    const committingClaimIntent = committingTaskId ? readClaimIntent(committingTaskId) : null;
+    const stewardCoveredFiles = collectStewardBrokerCoveredFiles(input.cwd);
+    const stewardCoveredSet = new Set(stewardCoveredFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
+    const findings = [];
+    const multiClaimFiles = [];
+    for (const stagedFile of input.stagedFiles) {
+        const normalized = normalizeRelativePath(stagedFile);
+        if (!normalized || normalized.startsWith('.atm/'))
+            continue;
+        if (isTaskDirectionPreCommitExempt(normalized))
+            continue;
+        if (input.exemptAllowedFileSets.some((allowed) => allowed.length > 0 && isPathAllowedByTaskDirection(normalized, allowed)))
+            continue;
+        const coveringWriteLocks = writeLocks.filter((lock) => isPathAllowedByTaskDirection(normalized, lock.allowedFiles));
+        if (coveringWriteLocks.length === 0) {
+            if (committingClaimIntent === 'closeout-only' && input.activeDirectionLocks.some((lock) => lock.taskId === committingTaskId && isPathAllowedByTaskDirection(normalized, lock.allowedFiles))) {
+                findings.push({ code: 'ATM_PRE_COMMIT_CLOSEOUT_ONLY_CLAIM_MUTATION', file: normalized, committingTaskId, writeClaimTaskIds: [], detail: `Task ${committingTaskId} holds a closeout-only / no-more-mutation claim but stages source mutation ${normalized}. Re-claim with a write intent before shipping new source changes.`, requiredCommand: committingTaskId ? `node atm.mjs next --claim --actor <id> --task ${committingTaskId} --claim-intent write --json` : null });
+            }
+            continue;
+        }
+        const writeClaimTaskIds = uniqueSorted(coveringWriteLocks.map((lock) => lock.taskId));
+        if (writeClaimTaskIds.length > 1) {
+            multiClaimFiles.push({ file: normalized, writeClaimTaskIds });
+        }
+        const committingOwnsFile = Boolean(committingTaskId) && writeClaimTaskIds.includes(committingTaskId);
+        if (committingOwnsFile)
+            continue;
+        const ambiguous = committingTaskId ? writeClaimTaskIds.length >= 1 : writeClaimTaskIds.length >= 2;
+        if (!ambiguous)
+            continue;
+        if (stewardCoveredSet.has(normalized.toLowerCase()))
+            continue;
+        findings.push({ code: 'ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS', file: normalized, committingTaskId, writeClaimTaskIds, detail: committingTaskId ? `Staged file ${normalized} belongs to active write claim(s) ${writeClaimTaskIds.join(', ')} but the committing task ${committingTaskId} does not own it, and no steward/broker evidence covers it. Remove it from this commit or route it through the steward lane.` : `Staged file ${normalized} is covered by multiple active write claims (${writeClaimTaskIds.join(', ')}) and ATM cannot prove which task owns this commit. Commit through node atm.mjs git commit --task <id> or provide steward/broker evidence.`, requiredCommand: 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json' });
+    }
+    return { ok: findings.length === 0, committingTaskId, committingClaimIntent, multiClaimFiles, stewardCoveredFiles, findings };
+}
+export function selectRelevantDirectionLocksForCommit(input) {
+    const currentTaskAllowedFiles = uniqueSorted([...input.taskGovernedCommitAllowedFiles, ...input.closeCommitWindowAllowedFiles, ...input.closeCommitWindowPlanningMirrorFiles]);
+    return input.activeDirectionLocks.filter((lock) => {
+        if (input.committingTaskId && taskIdsEqual(lock.taskId, input.committingTaskId)) {
+            return true;
+        }
+        return input.stagedFiles.some((entry) => {
+            if (isTaskDirectionPreCommitExempt(entry))
+                return false;
+            if (currentTaskAllowedFiles.length > 0 && isPathAllowedByTaskDirection(entry, currentTaskAllowedFiles)) {
+                return false;
+            }
+            return isPathAllowedByTaskDirection(entry, lock.allowedFiles) || isPlanningMirrorPath(entry, lock.planningMirrorPaths ?? []);
+        });
+    });
+}
+function collectStewardBrokerCoveredFiles(cwd) {
+    try {
+        const state = readBrokerLifecycleState(cwd);
+        return uniqueSorted(state.activeIntents.filter((intent) => intent.lane === 'neutral-steward' || intent.lane === 'deterministic-composer').flatMap((intent) => intent.resourceKeys?.files ?? []).map((entry) => normalizeRelativePath(entry)).filter(Boolean));
+    }
+    catch {
+        return [];
+    }
+}
+export function isTaskDirectionPreCommitExempt(value) {
+    const normalized = normalizeRelativePath(value).toLowerCase();
+    return normalized.startsWith('.atm/history/task-events/') || normalized.startsWith('.atm/history/evidence/') || normalized.startsWith('.atm/runtime/locks/') || normalized.startsWith('.atm/runtime/task-queues/') || normalized.startsWith('.atm/runtime/batch-runs/') || normalized.startsWith('.atm/runtime/task-direction-locks/');
+}
+export function collectStagedBatchCheckpointScopeFiles(cwd, stagedFiles) {
+    const stagedSet = new Set(stagedFiles.map((entry) => normalizeRelativePath(entry)));
+    const allowedFiles = [];
+    for (const file of stagedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        if (!lower.startsWith('.atm/history/tasks/') || !lower.endsWith('.json')) {
+            continue;
+        }
+        const task = readJsonFile(path.join(cwd, normalized));
+        if (task?.status !== 'done')
+            continue;
+        const taskId = typeof task.workItemId === 'string' ? task.workItemId : path.basename(normalized, '.json');
+        const lastTransitionId = typeof task.lastTransitionId === 'string' ? task.lastTransitionId : '';
+        const expectedEventPath = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
+        if (!lastTransitionId || !stagedSet.has(expectedEventPath)) {
+            continue;
+        }
+        const event = readJsonFile(path.join(cwd, expectedEventPath));
+        const closure = event?.closure;
+        if (typeof event?.command !== 'string' || !event.command.startsWith('node atm.mjs tasks close') || (!event.command.includes('--from-batch-checkpoint') && closure?.schemaId !== 'atm.taskClosureTransition.v1')) {
+            continue;
+        }
+        allowedFiles.push(normalized);
+        allowedFiles.push(...extractCheckpointTaskScopeFiles(task));
+    }
+    return uniqueSorted(allowedFiles);
+}
+export function collectFrameworkTempClaimAllowedFiles(cwd) {
+    const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
+    if (!existsSync(lockRoot))
+        return [];
+    const allowedFiles = [];
+    for (const entry of readdirSync(lockRoot).filter((fileName) => fileName.startsWith('ATM-FRAMEWORK-TEMP-') && fileName.endsWith('.lock.json'))) {
+        const lock = readJsonFile(path.join(lockRoot, entry));
+        collectStringArrayField(lock?.files, allowedFiles);
+    }
+    return uniqueSorted(allowedFiles.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+}
+export function collectCloseCommitWindowPlanningMirrorFiles(cwd) {
+    const files = [];
+    for (const win of readActiveCloseCommitWindows(cwd)) {
+        const task = readJsonFile(path.join(cwd, '.atm', 'history', 'tasks', `${win.taskId}.json`));
+        if (!task || typeof task !== 'object')
+            continue;
+        const source = isPlainObject(task.source) ? task.source : null;
+        const planPath = typeof source?.planPath === 'string' ? normalizeRelativePath(source.planPath) : '';
+        if (planPath)
+            files.push(planPath);
+        collectStringArrayField(task.planningMirrorPaths, files);
+    }
+    return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+}
+export function collectTaskGovernedCommitAllowedFiles(cwd, taskId) {
+    if (!taskId)
+        return [];
+    const files = [`.atm/history/tasks/${taskId}.json`, `.atm/history/evidence/${taskId}.json`, `.atm/history/evidence/${taskId}.bundle-manifest.json`, `.atm/history/evidence/${taskId}.closure-packet.json`, `.atm/history/task-events/${taskId}/**`];
+    const task = readJsonFile(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`));
+    if (task && typeof task === 'object') {
+        const source = isPlainObject(task.source) ? task.source : null;
+        const planPath = typeof source?.planPath === 'string' ? normalizeRelativePath(source.planPath) : '';
+        if (planPath)
+            files.push(planPath);
+        collectStringArrayField(task.planningMirrorPaths, files);
+    }
+    const actorRegistryState = inspectTrackedActorRegistryState(cwd);
+    if (actorRegistryState.tracked && (actorRegistryState.staged || actorRegistryState.unstaged)) {
+        files.push(actorRegistryState.path);
+    }
+    files.push(...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId));
+    return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+}
+function extractCheckpointTaskScopeFiles(task) {
+    const candidates = [];
+    collectStringArrayField(task.scope, candidates);
+    collectStringArrayField(task.scopePaths, candidates);
+    collectStringArrayField(task.deliverables, candidates);
+    collectStringArrayField(task.files, candidates);
+    collectStringArrayField(task.allowedFiles, candidates);
+    const targetWork = isPlainObject(task.targetWork) ? task.targetWork : null;
+    if (targetWork) {
+        collectStringArrayField(targetWork.allowedFiles, candidates);
+        collectStringArrayField(targetWork.files, candidates);
+    }
+    return uniqueSorted(candidates.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+}
+function collectStringArrayField(value, output) {
+    if (!Array.isArray(value))
+        return;
+    for (const entry of value) {
+        if (typeof entry === 'string')
+            output.push(entry);
+    }
+}
+function isPlainObject(value) {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
+    const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry) || isStaticEvidenceArtifactPath(entry));
+    const findings = [];
+    const activeBatches = listActiveBatchRuns(cwd);
+    const stagedBatch = activeBatches.find((batchRun) => batchRun.taskIds.some((taskId) => protectedFiles.some((file) => normalizeRelativePath(file).toLowerCase() === `.atm/history/tasks/${taskId.toLowerCase()}.json`))) ?? null;
+    const pendingBatchCheckpointWindow = activeBatches.map((batchRun) => buildPendingCheckpointCommitWindow(cwd, batchRun, null)).find((window) => window && protectedFiles.every((file) => isPathAllowedByScope(file, uniqueSorted([...window.commitFiles, ...window.changedFiles])))) ?? null;
+    const batchDeliverAndCloseCommit = process.env.ATM_BATCH_DELIVER_AND_CLOSE === '1';
+    const nonAtmStagedFiles = stagedFiles.map((entry) => normalizeRelativePath(entry)).filter((entry) => !entry.toLowerCase().startsWith('.atm/'));
+    if (stagedBatch?.status === 'active' && !batchDeliverAndCloseCommit && !pendingBatchCheckpointWindow && nonAtmStagedFiles.length > 0 && !hasStagedBatchCheckpointClosure(cwd, protectedFiles, stagedBatch.taskIds, stagedBatch.batchId)) {
+        const requiredCommand = `node atm.mjs batch checkpoint --actor <id> --batch ${stagedBatch.batchId} --json`;
+        findings.push({ file: nonAtmStagedFiles[0] ?? '<staged-files>', reason: 'batch-commit-before-checkpoint', detail: `Active batch ${stagedBatch.batchId} has not checkpointed the staged deliverable commit. Run ${requiredCommand} first, then commit the deliverables together with the checkpoint task/evidence/events.`, requiredCommand });
+    }
+    if (protectedFiles.length === 0) {
+        return { ok: findings.length === 0, files: [], findings };
+    }
+    const stagedTaskIds = inferTaskIdsFromStagedFiles(stagedFiles);
+    if (stagedTaskIds.length === 1 && inspectHistoricalLedgerRestoreStagedArtifacts(cwd, stagedTaskIds[0], stagedFiles).ok) {
+        return { ok: findings.length === 0, files: protectedFiles, findings };
+    }
+    const stagedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
+    const singleStagedTaskId = stagedTaskIds.length === 1 ? stagedTaskIds[0] : null;
+    const effectiveSingleStagedTaskId = singleStagedTaskId ?? pendingBatchCheckpointWindow?.taskId ?? null;
+    const pendingBatchCheckpointAllowedFiles = pendingBatchCheckpointWindow ? uniqueSorted([...pendingBatchCheckpointWindow.commitFiles, ...pendingBatchCheckpointWindow.changedFiles]) : [];
+    for (const file of protectedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        const absolutePath = path.join(cwd, normalized);
+        if (isProtectedAtmRuntimeStatePath(normalized)) {
+            findings.push({ file: normalized, reason: 'runtime-state-must-not-be-committed', detail: 'Runtime lock, queue, or active-session state must stay ephemeral and must not be committed.' });
+            continue;
+        }
+        if (lower.startsWith('.atm/history/task-events/')) {
+            const event = readJsonFile(absolutePath);
+            const command = typeof event?.command === 'string' ? event.command.trim() : '';
+            if (event?.schemaId !== 'atm.taskTransition.v1' || typeof event?.transitionId !== 'string' || typeof event?.taskId !== 'string') {
+                findings.push({ file: normalized, reason: 'task-transition-json-invalid', detail: 'Task transition event is missing atm.taskTransition.v1 metadata.' });
+                continue;
+            }
+            if (!command.startsWith('node atm.mjs ')) {
+                findings.push({ file: normalized, reason: 'task-transition-command-invalid', detail: 'Task transition event does not record a node atm.mjs command as its source.' });
+            }
+            continue;
+        }
+        if (lower.startsWith('.atm/history/tasks/')) {
+            const task = readJsonFile(absolutePath);
+            const taskId = typeof task?.workItemId === 'string' ? task.workItemId : path.basename(normalized, '.json');
+            const lastTransitionId = typeof task?.lastTransitionId === 'string' ? task.lastTransitionId : '';
+            const expectedEventPath = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
+            const stagedEventPath = lastTransitionId ? findCaseInsensitiveRelativePath(stagedSet, expectedEventPath) : null;
+            if (!lastTransitionId || !stagedEventPath) {
+                findings.push({ file: normalized, reason: 'task-file-missing-transition', detail: 'Task ledger change must be committed with its matching staged task transition event.' });
+                continue;
+            }
+            const event = readJsonFile(path.join(cwd, stagedEventPath));
+            const taskBytes = readFileSync(absolutePath);
+            const expectedSha = sha256(taskBytes);
+            const releaseOnlyExpectedSha = taskReleaseOnlyTransitionSha(task, event);
+            const owningBatch = activeBatches.find((batchRun) => taskIdsInclude(batchRun.taskIds, taskId)) ?? null;
+            if (event?.schemaId !== 'atm.taskTransition.v1' || event?.transitionId !== lastTransitionId || typeof event?.taskId !== 'string' || !taskIdsEqual(event.taskId, taskId) || event?.taskPath !== normalized || (event?.taskSha256 !== expectedSha && event?.taskSha256 !== releaseOnlyExpectedSha) || typeof event?.command !== 'string' || !event.command.startsWith('node atm.mjs ')) {
+                findings.push({ file: normalized, reason: 'task-file-transition-mismatch', detail: 'Task ledger change does not match a valid staged ATM CLI transition event.' });
+            }
+            else if (owningBatch?.status === 'active' && typeof event?.command === 'string' && event.command.startsWith('node atm.mjs tasks close') && !event.command.includes('--from-batch-checkpoint') && event?.closure?.schemaId !== 'atm.taskClosureTransition.v1') {
+                const requiredCommand = `node atm.mjs batch checkpoint --actor <id> --batch ${owningBatch.batchId} --json`;
+                findings.push({ file: normalized, reason: 'batch-close-must-use-checkpoint', detail: `Task ${taskId} belongs to active batch ${owningBatch.batchId};
+direct tasks close is not allowed. Use batch checkpoint so ATM can close, advance, and claim the next queue head.`, requiredCommand });
+            }
+            continue;
+        }
+        if (lower.startsWith('.atm/history/evidence/')) {
+            const evidence = readJsonFile(absolutePath);
+            if (lower.startsWith('.atm/history/evidence/historical-batches/')) {
+                const envelopeTasks = Array.isArray(evidence?.tasks) ? evidence.tasks : [];
+                const taskIds = envelopeTasks.map((entry) => entry && typeof entry === 'object' && !Array.isArray(entry) ? entry.taskId : null).filter((entry) => typeof entry === 'string' && entry.trim().length > 0);
+                const hasBatchTaskContext = taskIds.some((taskId) => {
+                    const normalizedTaskId = taskId.toLowerCase();
+                    const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${taskId}.json`);
+                    const hasSiblingEvent = protectedFiles.some((entry) => {
+                        const candidate = normalizeRelativePath(entry).toLowerCase();
+                        return candidate.startsWith(`.atm/history/task-events/${normalizedTaskId}/`);
+                    });
+                    return hasSiblingTask || hasSiblingEvent;
+                });
+                if (taskIds.length === 0 || !hasBatchTaskContext) {
+                    findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: 'Historical batch evidence updates must travel with at least one staged task ledger change or transition event referenced by the batch envelope.' });
+                }
+                continue;
+            }
+            if (pendingBatchCheckpointAllowedFiles.length > 0 && isPathAllowedByScope(normalized, pendingBatchCheckpointAllowedFiles)) {
+                continue;
+            }
+            if (effectiveSingleStagedTaskId && isNestedEvidenceArtifactPath(normalized)) {
+                const taskIdLower = effectiveSingleStagedTaskId.toLowerCase();
+                const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${effectiveSingleStagedTaskId}.json`);
+                const hasSiblingEvent = protectedFiles.some((entry) => {
+                    const candidate = normalizeRelativePath(entry).toLowerCase();
+                    return candidate.startsWith(`.atm/history/task-events/${taskIdLower}/`);
+                });
+                const hasSiblingTaskEvidence = stagedSet.has(`.atm/history/evidence/${effectiveSingleStagedTaskId}.json`);
+                if (hasSiblingTask || hasSiblingEvent || hasSiblingTaskEvidence) {
+                    continue;
+                }
+            }
+            const taskId = typeof evidence?.taskId === 'string' ? evidence.taskId : path.basename(normalized, '.json');
+            const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${taskId}.json`);
+            const hasSiblingEvent = protectedFiles.some((entry) => {
+                const candidate = normalizeRelativePath(entry).toLowerCase();
+                return candidate.startsWith(`.atm/history/task-events/${taskId.toLowerCase()}/`);
+            });
+            if (!hasSiblingTask && !hasSiblingEvent) {
+                findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: 'Evidence updates must travel with the related staged task ledger change or transition event.' });
+            }
+        }
+        if (isStaticEvidenceArtifactPath(normalized)) {
+            const hasSiblingEvidence = protectedFiles.some((entry) => {
+                const candidate = normalizeRelativePath(entry).toLowerCase();
+                return candidate.startsWith('.atm/history/evidence/');
+            });
+            const hasSiblingTaskOrEvent = protectedFiles.some((entry) => {
+                const candidate = normalizeRelativePath(entry).toLowerCase();
+                return candidate.startsWith('.atm/history/tasks/') || candidate.startsWith('.atm/history/task-events/');
+            });
+            if (!hasSiblingEvidence || !hasSiblingTaskOrEvent) {
+                findings.push({ file: normalized, reason: 'static-evidence-artifact-without-cli-context', detail: `Static evidence artifacts under atomic_workbench/evidence or atomic_workbench/reports cannot stand alone; commit them together with ATM CLI evidence/task transition context.` });
+            }
+        }
+    }
+    return { ok: findings.length === 0, files: protectedFiles, findings };
+}
+function isNestedEvidenceArtifactPath(value) {
+    const normalized = normalizeRelativePath(value).toLowerCase();
+    if (!normalized.startsWith('.atm/history/evidence/'))
+        return false;
+    const relative = normalized.slice('.atm/history/evidence/'.length);
+    return relative.includes('/');
+}
+function hasStagedBatchCheckpointClosure(cwd, protectedFiles, batchTaskIds, batchId = null) {
+    const protectedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
+    for (const file of protectedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        if (!lower.startsWith('.atm/history/task-events/') || !lower.endsWith('.json')) {
+            continue;
+        }
+        const event = readJsonFile(path.join(cwd, normalized));
+        const closure = event?.closure;
+        if (typeof event?.command === 'string' && event.command.startsWith('node atm.mjs ') && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1') && (!batchId || event.command.includes(`--batch ${batchId}`) || closure?.batchId === batchId)) {
+            return true;
+        }
+    }
+    for (const file of protectedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        if (!lower.startsWith('.atm/history/tasks/') || !lower.endsWith('.json')) {
+            continue;
+        }
+        const task = readJsonFile(path.join(cwd, normalized));
+        const taskId = typeof task?.workItemId === 'string' ? task.workItemId : path.basename(normalized, '.json');
+        if ((!batchId && !batchTaskIds.includes(taskId)) || task?.status !== 'done') {
+            continue;
+        }
+        const lastTransitionId = typeof task?.lastTransitionId === 'string' ? task.lastTransitionId : '';
+        const expectedEventPath = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
+        if (!lastTransitionId || !protectedSet.has(expectedEventPath.toLowerCase())) {
+            continue;
+        }
+        const event = readJsonFile(path.join(cwd, expectedEventPath));
+        const closure = event?.closure;
+        if (typeof event?.command === 'string' && event.command.startsWith('node atm.mjs ') && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1') && (!batchId || event.command.includes(`--batch ${batchId}`) || closure?.batchId === batchId)) {
+            return true;
+        }
+    }
+    return false;
+}
+function isProtectedAtmManagedStatePath(value) {
+    const normalized = normalizeRelativePath(value).toLowerCase();
+    return normalized.startsWith('.atm/history/tasks/') || normalized.startsWith('.atm/history/task-events/') || normalized.startsWith('.atm/history/evidence/') || isProtectedAtmRuntimeStatePath(normalized);
+}
+export function inspectCommitAttribution(cwd, stagedFiles) {
+    const actorId = normalizeOptionalText(process.env.ATM_COMMIT_ACTOR_ID);
+    const taskId = normalizeOptionalText(process.env.ATM_COMMIT_TASK_ID);
+    const claimLeaseId = normalizeOptionalText(process.env.ATM_COMMIT_CLAIM_LEASE_ID);
+    const sessionId = normalizeOptionalText(process.env.ATM_COMMIT_SESSION_ID);
+    const stagedSet = new Set(stagedFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
+    const stagedTaskIds = inferTaskIdsFromStagedFiles(stagedFiles);
+    const knownStagedTaskIds = stagedTaskIds.filter((candidate) => taskLedgerEntryExistsOrIsStaged(cwd, candidate, stagedSet));
+    const pendingBatchCheckpointTaskId = resolvePendingBatchCheckpointTaskId(cwd, stagedFiles);
+    const findings = [];
+    const suggestedTaskId = pendingBatchCheckpointTaskId ?? (knownStagedTaskIds.length === 1 ? knownStagedTaskIds[0] : knownStagedTaskIds[0] ?? null);
+    const actorRegistryState = inspectTrackedActorRegistryState(cwd);
+    if (actorRegistryState.blocking) {
+        const governedRecoveryCommand = suggestedTaskId ? `git add ${quoteCliValue(actorRegistryState.path)} && node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json` : `node atm.mjs git commit --actor <id> --message "<summary>" --json`;
+        findings.push({ code: 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED', source: 'commit-attribution', detail: `Tracked actor registry ${actorRegistryState.path} has ${actorRegistryState.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governed node atm.mjs git commit can auto-stage that tracked registry when it belongs to the governed commit surface, but bare git commit cannot. Re-run through the ATM wrapper or restore the drift first.`, requiredCommand: governedRecoveryCommand, classification: 'current-task' });
+        return { ok: false, findings };
+    }
+    if (!actorId && !taskId && !sessionId) {
+        if (stagedTaskIds.length > 0) {
+            const wrapperRequired = { code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED', source: 'commit-attribution', detail: 'Staged ATM task/evidence changes must commit through node atm.mjs git commit so ATM can bind author, session, claim, and trailers consistently. Direct git commit remains valid for read-only git and non-governed maintenance.', requiredCommand: suggestedTaskId ? `node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json` : 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json', classification: 'current-task' };
+            return { ok: false, findings: [wrapperRequired] };
+        }
+        return { ok: true, findings };
+    }
+    const effectiveTaskId = taskId ?? pendingBatchCheckpointTaskId ?? (knownStagedTaskIds.length === 1 ? knownStagedTaskIds[0] : null);
+    if (!actorId || (stagedTaskIds.length > 0 && !effectiveTaskId)) {
+        findings.push({ code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED', source: 'commit-attribution', detail: 'Governed task commits must use node atm.mjs git commit --actor <id> --task <task> --message "<summary>" so ATM can bind author, session, claim, and trailers consistently. Bare git commit is not banned for inspection or non-governed files.', requiredCommand: 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json', classification: 'current-task' });
+        return { ok: false, findings };
+    }
+    if (!effectiveTaskId) {
+        const expectedIdentity = resolveExpectedGitIdentityForActor(cwd, actorId);
+        findings.push(...collectIdentityProvenanceFindings(actorId, expectedIdentity));
+        const authorName = normalizeOptionalText(process.env.GIT_AUTHOR_NAME) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.name']);
+        const authorEmail = normalizeOptionalText(process.env.GIT_AUTHOR_EMAIL) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.email']);
+        if (!expectedIdentity.gitName || !expectedIdentity.gitEmail) {
+            findings.push({ code: 'ATM_COMMIT_IDENTITY_PROFILE_MISSING', source: 'commit-attribution', detail: `Actor ${actorId} has no resolved git identity profile in actor registry or .atm/runtime/identity/default.json.`, requiredCommand: buildIdentitySetRequiredCommand(cwd, actorId), classification: 'current-task' });
+        }
+        else {
+            if (authorName !== expectedIdentity.gitName) {
+                findings.push({ code: 'ATM_COMMIT_AUTHOR_NAME_MISMATCH', source: 'commit-attribution', detail: `Commit author name is ${authorName ?? 'unset'}, expected ${expectedIdentity.gitName}.`, classification: 'current-task' });
+            }
+            if (authorEmail !== expectedIdentity.gitEmail) {
+                findings.push({ code: 'ATM_COMMIT_AUTHOR_EMAIL_MISMATCH', source: 'commit-attribution', detail: `Commit author email is ${authorEmail ?? 'unset'}, expected ${expectedIdentity.gitEmail}.`, classification: 'current-task' });
+            }
+        }
+        return { ok: findings.length === 0, findings };
+    }
+    const task = readJsonFile(path.join(cwd, '.atm', 'history', 'tasks', `${effectiveTaskId}.json`));
+    const claim = parseHookTaskClaim(task?.claim);
+    const mirrorSyncOnly = inspectMirrorSyncOnlyStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+    const historicalLedgerRestore = inspectHistoricalLedgerRestoreStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+    const closeCommitWindow = inspectCloseCommitWindowStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+    const pendingBatchCheckpoint = inspectPendingBatchCheckpointStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+    const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok || pendingBatchCheckpoint.ok;
+    const claimForSession = bypassesActiveSession ? null : claim;
+    const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, { sessionId, actorId, taskId: effectiveTaskId, claimLeaseId: claimLeaseId ?? claimForSession?.leaseId ?? null, includeNonActive: true });
+    if (!session && !bypassesActiveSession) {
+        findings.push({ code: 'ATM_COMMIT_SESSION_MISSING', source: 'commit-attribution', detail: `No ATM work session matched actor ${actorId} and task ${effectiveTaskId}. Claim the task through ATM before committing.`, requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${effectiveTaskId}" --json`, classification: 'current-task' });
+        return { ok: false, findings };
+    }
+    if (session && session.actorId !== actorId) {
+        findings.push({ code: 'ATM_COMMIT_SESSION_ACTOR_MISMATCH', source: 'commit-attribution', detail: `Session ${session.sessionId} belongs to ${session.actorId}, not ${actorId}.`, classification: 'current-task' });
+    }
+    if (session && session.taskId !== effectiveTaskId) {
+        findings.push({ code: 'ATM_COMMIT_SESSION_TASK_MISMATCH', source: 'commit-attribution', detail: `Session ${session.sessionId} is for ${session.taskId}, not ${effectiveTaskId}.`, classification: 'current-task' });
+    }
+    if (session && (claimLeaseId ?? claimForSession?.leaseId ?? null) && session.claimLeaseId !== (claimLeaseId ?? claimForSession?.leaseId ?? null)) {
+        findings.push({ code: 'ATM_COMMIT_SESSION_CLAIM_MISMATCH', source: 'commit-attribution', detail: `Session ${session.sessionId} is bound to claim ${session.claimLeaseId ?? 'unset'}, not ${(claimLeaseId ?? claimForSession?.leaseId) ?? 'unset'}.`, classification: 'current-task' });
+    }
+    const expectedIdentity = resolveExpectedGitIdentityForActor(cwd, actorId);
+    findings.push(...collectIdentityProvenanceFindings(actorId, expectedIdentity));
+    const authorName = normalizeOptionalText(process.env.GIT_AUTHOR_NAME) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.name']);
+    const authorEmail = normalizeOptionalText(process.env.GIT_AUTHOR_EMAIL) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.email']);
+    if (!expectedIdentity.gitName || !expectedIdentity.gitEmail) {
+        findings.push({ code: 'ATM_COMMIT_IDENTITY_PROFILE_MISSING', source: 'commit-attribution', detail: `Actor ${actorId} has no resolved git identity profile in actor registry or .atm/runtime/identity/default.json.`, requiredCommand: buildIdentitySetRequiredCommand(cwd, actorId), classification: 'current-task' });
+    }
+    else {
+        if (authorName !== expectedIdentity.gitName) {
+            findings.push({ code: 'ATM_COMMIT_AUTHOR_NAME_MISMATCH', source: 'commit-attribution', detail: `Commit author name is ${authorName ?? 'unset'}, expected ${expectedIdentity.gitName}.`, classification: 'current-task' });
+        }
+        if (authorEmail !== expectedIdentity.gitEmail) {
+            findings.push({ code: 'ATM_COMMIT_AUTHOR_EMAIL_MISMATCH', source: 'commit-attribution', detail: `Commit author email is ${authorEmail ?? 'unset'}, expected ${expectedIdentity.gitEmail}.`, classification: 'current-task' });
+        }
+    }
+    return { ok: findings.length === 0, findings };
+}
+function taskLedgerEntryExistsOrIsStaged(cwd, taskId, stagedSet) {
+    const normalizedTaskId = normalizeRelativePath(taskId);
+    if (!normalizedTaskId)
+        return false;
+    const taskPath = `.atm/history/tasks/${normalizedTaskId}.json`;
+    return stagedSet.has(taskPath.toLowerCase()) || existsSync(path.join(cwd, taskPath));
+}
+export function inspectCloseCommitWindowStagedArtifacts(cwd, taskId, stagedFiles) {
+    if (stagedFiles.length === 0) {
+        return { ok: false, reason: 'no-staged-files' };
+    }
+    const activeTaskWindow = readActiveCloseCommitWindows(cwd).find((entry) => entry.taskId === taskId) ?? null;
+    if (activeTaskWindow && stagedFiles.every((filePath) => isAllowedCloseCommitGovernanceArtifactPath(filePath, taskId))) {
+        return { ok: true, reason: 'active-close-commit-window-governance-bundle' };
+    }
+    const windowRecord = findCloseCommitWindowCoveringPaths(cwd, stagedFiles);
+    if (!windowRecord) {
+        return { ok: false, reason: 'no-covering-window' };
+    }
+    if (windowRecord.taskId !== taskId) {
+        return { ok: false, reason: `window-task-mismatch:${windowRecord.taskId}` };
+    }
+    return { ok: true, reason: null };
+}
+function isAllowedCloseCommitGovernanceArtifactPath(filePath, taskId) {
+    const normalized = normalizeRelativePath(filePath);
+    const normalizedTaskId = taskId.toLowerCase();
+    const lower = normalized.toLowerCase();
+    return lower === `.atm/history/tasks/${normalizedTaskId}.json` || lower === `.atm/history/evidence/${normalizedTaskId}.json` || lower === `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json` || lower === `.atm/history/evidence/${normalizedTaskId}.closure-packet.json` || (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json'));
+}
+function isStaticEvidenceArtifactPath(value) {
+    const normalized = normalizeRelativePath(value).toLowerCase();
+    if (normalized.startsWith('atomic_workbench/evidence/') && normalized.endsWith('.json')) {
+        return true;
+    }
+    if (normalized.startsWith('atomic_workbench/reports/') && normalized.endsWith('.json')) {
+        return true;
+    }
+    return false;
+}
+function isProtectedAtmRuntimeStatePath(value) {
+    const normalized = normalizeRelativePath(value).toLowerCase();
+    return normalized.startsWith('.atm/runtime/locks/') || normalized.startsWith('.atm/runtime/task-direction-locks/') || normalized.startsWith('.atm/runtime/task-queues/') || normalized.startsWith('.atm/runtime/batch-runs/') || normalized.startsWith('.atm/runtime/sessions/') || normalized.startsWith('.atm/runtime/identity/') || normalized === '.atm/runtime/current-task.json' || normalized === '.atm/runtime/guidance/active-session.json';
+}
+function readJsonFile(filePath) {
+    if (!existsSync(filePath))
+        return null;
+    try {
+        return JSON.parse(readFileSync(filePath, 'utf8'));
+    }
+    catch {
+        return null;
+    }
+}
+export function inspectEmergencyUseAudit(cwd, stagedFiles) {
+    const useFiles = stagedFiles.map(normalizeRelativePath).filter((entry) => /^\.atm\/runtime\/emergency\/uses\/[^/]+\.json$/i.test(entry));
+    const findings = [];
+    for (const useFile of useFiles) {
+        const use = readJsonFile(path.resolve(cwd, useFile));
+        const leaseId = typeof use?.leaseId === 'string' ? use.leaseId.trim() : '';
+        const leasePath = leaseId ? `.atm/runtime/emergency/leases/${leaseId}.json` : undefined;
+        const lease = leasePath ? readJsonFile(path.resolve(cwd, leasePath)) : null;
+        if (!leaseId || !lease) {
+            findings.push({ code: 'ATM_EMERGENCY_USE_LEASE_MISSING', file: useFile, leasePath, detail: `Emergency use record ${useFile} must have a matching staged or tracked lease record.` });
+            continue;
+        }
+        const usedCount = typeof lease.usedCount === 'number' ? lease.usedCount : Number(lease.usedCount ?? 0);
+        if (!Number.isFinite(usedCount) || usedCount < 1) {
+            findings.push({ code: 'ATM_EMERGENCY_USE_LEASE_NOT_USED', file: useFile, leasePath, detail: `Emergency lease ${leaseId} must be marked used before committing use record ${useFile}.` });
+        }
+        if (String(lease.permission ?? '') !== String(use?.permission ?? '')) {
+            findings.push({ code: 'ATM_EMERGENCY_USE_PERMISSION_MISMATCH', file: useFile, leasePath, detail: `Emergency use permission ${String(use?.permission ?? '<missing>')} does not match lease ${String(lease.permission ?? '<missing>')}.` });
+        }
+        const leaseTaskId = lease.taskId == null ? null : String(lease.taskId);
+        const useTaskId = use?.taskId == null ? null : String(use.taskId);
+        if (leaseTaskId && useTaskId && leaseTaskId !== useTaskId) {
+            findings.push({ code: 'ATM_EMERGENCY_USE_TASK_MISMATCH', file: useFile, leasePath, detail: `Emergency use task ${useTaskId} does not match lease task ${leaseTaskId}.` });
+        }
+        const leaseActorId = typeof lease.actorId === 'string' ? lease.actorId : null;
+        const useActorId = use?.actorId == null ? null : String(use.actorId);
+        if (leaseActorId && useActorId && leaseActorId !== useActorId) {
+            findings.push({ code: 'ATM_EMERGENCY_USE_ACTOR_MISMATCH', file: useFile, leasePath, detail: `Emergency use actor ${useActorId} does not match lease actor ${leaseActorId}.` });
+        }
+    }
+    return { ok: findings.length === 0, inspectedUseFiles: useFiles, findings };
+}
+export function inferTaskIdsFromStagedFiles(stagedFiles) {
+    const taskIds = new Set();
+    for (const file of stagedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const taskMatch = normalized.match(/^\.atm\/history\/tasks\/([^/]+)\.json$/i);
+        if (taskMatch) {
+            taskIds.add(taskMatch[1]);
+            continue;
+        }
+        const closurePacketMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.closure-packet\.json$/i);
+        if (closurePacketMatch) {
+            taskIds.add(closurePacketMatch[1]);
+            continue;
+        }
+        const bundleManifestMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.bundle-manifest\.json$/i);
+        if (bundleManifestMatch) {
+            taskIds.add(bundleManifestMatch[1]);
+            continue;
+        }
+        const evidenceMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.json$/i);
+        if (evidenceMatch) {
+            taskIds.add(evidenceMatch[1]);
+            continue;
+        }
+        const eventMatch = normalized.match(/^\.atm\/history\/task-events\/([^/]+)\//i);
+        if (eventMatch) {
+            taskIds.add(eventMatch[1]);
+        }
+    }
+    return [...taskIds].sort((left, right) => left.localeCompare(right));
+}
+export function resolvePendingBatchCheckpointTaskId(cwd, stagedFiles) {
+    const activeBatches = listActiveBatchRuns(cwd);
+    const window = activeBatches.map((batchRun) => buildPendingCheckpointCommitWindow(cwd, batchRun, null)).find((candidate) => candidate && stagedFiles.every((file) => isPathAllowedByScope(file, uniqueSorted([...candidate.commitFiles, ...candidate.changedFiles])))) ?? null;
+    return window?.taskId ?? null;
+}
+export function inspectPendingBatchCheckpointStagedArtifacts(cwd, taskId, stagedFiles) {
+    const pendingTaskId = resolvePendingBatchCheckpointTaskId(cwd, stagedFiles);
+    if (!pendingTaskId) {
+        return { ok: false, reason: 'no-pending-batch-checkpoint-window' };
+    }
+    if (!taskIdsEqual(pendingTaskId, taskId)) {
+        return { ok: false, reason: `window-task-mismatch:${pendingTaskId}` };
+    }
+    return { ok: true, reason: 'pending-batch-checkpoint-window' };
+}
+export function resolveResidueTaskId(cwd) {
+    const committingTaskId = typeof process.env.ATM_COMMIT_TASK_ID === 'string' ? process.env.ATM_COMMIT_TASK_ID.trim() : '';
+    if (committingTaskId) {
+        return committingTaskId;
+    }
+    const stagedTaskIds = inferTaskIdsFromStagedFiles(readStagedFiles(cwd));
+    if (stagedTaskIds.length === 1) {
+        return stagedTaskIds[0];
+    }
+    const activeLocks = readActiveTaskDirectionLocks(cwd);
+    if (activeLocks.length === 1) {
+        return activeLocks[0].taskId;
+    }
+    return null;
+}
+export function isUnconsumedCloseWindowDeferralSnapshot(cwd, relativePath) {
+    if (!/close-window-governance-dirty-/.test(relativePath))
+        return false;
+    try {
+        const snapshot = JSON.parse(readFileSync(path.join(cwd, relativePath), 'utf8'));
+        return snapshot.schemaId === 'atm.closeWindowGovernanceDirtySnapshot.v1' && snapshot.restoredAt === null;
+    }
+    catch {
+        return true;
+    }
+}
+export function cleanupAutoGeneratedResidue(cwd, findings) {
+    const cleaned = [];
+    for (const finding of findings) {
+        if (finding.cleanupAction === 'remove' && isUnconsumedCloseWindowDeferralSnapshot(cwd, finding.path)) {
+            continue;
+        }
+        if (finding.cleanupAction === 'restore') {
+            try {
+                runGit(cwd, ['restore', '--staged', '--worktree', '--source=HEAD', '--', finding.path]);
+            }
+            catch {
+                try {
+                    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', finding.path]);
+                }
+                catch { }
+                try {
+                    rmSync(path.join(cwd, finding.path), { force: true });
+                }
+                catch { }
+            }
+            cleaned.push(finding);
+            continue;
+        }
+        if (finding.cleanupAction === 'remove') {
+            try {
+                const absolutePath = path.join(cwd, finding.path);
+                const stats = statSync(absolutePath);
+                if (stats.isDirectory()) {
+                    rmSync(absolutePath, { recursive: true, force: true });
+                }
+                else {
+                    rmSync(absolutePath, { force: true });
+                }
+            }
+            catch { }
+            cleaned.push(finding);
+        }
+    }
+    return cleaned;
+}
+export function isActionableManualResidue(filePath) {
+    const lower = normalizeRelativePath(filePath).toLowerCase();
+    return lower.startsWith('.atm/runtime/snapshots/') || /^\.atm\/history\/reports\/.+\.json$/.test(lower) || /^\.atm\/history\/protected-override-audit\/.+\.json$/.test(lower) || /^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(lower) || /^\.atm\/history\/evidence\/[^/]+\.closure-packet\.json$/.test(lower) || /^\.atm\/history\/task-events\/[^/]+\/.+(?:close|reconcile|repair-closure).+\.json$/.test(lower);
+}
+export function inspectMirrorSyncOnlyStagedArtifacts(cwd, taskId, stagedFiles) {
+    if (stagedFiles.length === 0) {
+        return { ok: false, reason: 'no-staged-files' };
+    }
+    const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
+    let hasTaskLedger = false;
+    let hasImportEvent = false;
+    for (const file of stagedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        if (lower === expectedTaskPath) {
+            hasTaskLedger = true;
+            continue;
+        }
+        if (lower.startsWith(`.atm/history/task-events/${taskId.toLowerCase()}/`) && lower.includes('import') && lower.endsWith('.json')) {
+            hasImportEvent = true;
+            continue;
+        }
+        if (lower.startsWith('.atm/history/reports/task-import/') && lower.endsWith('.json') && taskImportReportReferencesTask(cwd, normalized, taskId)) {
+            continue;
+        }
+        return { ok: false, reason: `unexpected-staged-file:${normalized}` };
+    }
+    return { ok: hasTaskLedger && hasImportEvent, reason: hasTaskLedger && hasImportEvent ? null : 'incomplete-mirror-sync-artifacts' };
+}
+export function inspectTaskOpenImportBundleStagedArtifacts(cwd, stagedFiles) {
+    const taskIds = inferTaskIdsFromStagedFiles(stagedFiles);
+    if (taskIds.length !== 1) {
+        return { ok: false, taskId: null, reason: taskIds.length === 0 ? 'no-task-id' : 'multiple-task-ids' };
+    }
+    const taskId = taskIds[0];
+    const report = inspectMirrorSyncOnlyStagedArtifacts(cwd, taskId, stagedFiles);
+    return { ok: report.ok, taskId, reason: report.reason };
+}
+export function inspectHistoricalLedgerRestoreStagedArtifacts(cwd, taskId, stagedFiles) {
+    if (stagedFiles.length === 0) {
+        return { ok: false, reason: 'no-staged-files' };
+    }
+    const normalizedTaskId = taskId.toLowerCase();
+    const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
+    const expectedEvidencePath = `.atm/history/evidence/${taskId}.json`.toLowerCase();
+    const expectedClosurePacketPath = `.atm/history/evidence/${taskId}.closure-packet.json`.toLowerCase();
+    const expectedGitHeadEvidencePath = '.atm/history/evidence/git-head.jsonl';
+    let hasTaskLedger = false;
+    let hasEvidenceBundle = false;
+    let hasClosurePacket = false;
+    let hasTaskEvent = false;
+    let hasGitHeadEvidence = false;
+    for (const file of stagedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        if (lower === expectedTaskPath) {
+            hasTaskLedger = true;
+            continue;
+        }
+        if (lower === expectedEvidencePath) {
+            hasEvidenceBundle = true;
+            continue;
+        }
+        if (lower === expectedClosurePacketPath) {
+            hasClosurePacket = true;
+            continue;
+        }
+        if (lower === expectedGitHeadEvidencePath) {
+            hasGitHeadEvidence = true;
+            continue;
+        }
+        if (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json')) {
+            hasTaskEvent = true;
+            continue;
+        }
+        return { ok: false, reason: `unexpected-staged-file:${normalized}` };
+    }
+    if (!hasTaskLedger)
+        return { ok: false, reason: 'missing-task-ledger' };
+    if (!hasClosurePacket)
+        return { ok: false, reason: 'missing-closure-packet' };
+    if (!hasTaskEvent)
+        return { ok: false, reason: 'missing-task-event' };
+    const taskDocument = readStagedJsonFile(cwd, `.atm/history/tasks/${taskId}.json`);
+    if (!taskDocument || taskDocument.status !== 'done')
+        return { ok: false, reason: 'task-not-done' };
+    if (typeof taskDocument.workItemId === 'string' && taskDocument.workItemId !== taskId) {
+        return { ok: false, reason: 'task-id-mismatch' };
+    }
+    const closurePacket = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.closure-packet.json`);
+    if (!closurePacket || closurePacket.taskId !== taskId) {
+        return { ok: false, reason: 'closure-packet-task-id-mismatch' };
+    }
+    const evidence = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.json`);
+    for (const eventPath of stagedFiles.filter((file) => normalizeRelativePath(file).toLowerCase().startsWith(`.atm/history/task-events/${normalizedTaskId}/`))) {
+        const event = readStagedJsonFile(cwd, eventPath);
+        const command = typeof event?.command === 'string' ? event.command.trim() : '';
+        if (!event || event.schemaId !== 'atm.taskTransition.v1' || event.taskId !== taskId || typeof event.transitionId !== 'string' || !command.startsWith('node atm.mjs ')) {
+            return { ok: false, reason: `task-event-invalid:${normalizeRelativePath(eventPath)}` };
+        }
+    }
+    if (!hasEvidenceBundle) {
+        if (!hasGitHeadEvidence) {
+            return { ok: false, reason: 'missing-evidence-bundle' };
+        }
+        const repairEventPaths = stagedFiles.filter((file) => normalizeRelativePath(file).toLowerCase().startsWith(`.atm/history/task-events/${normalizedTaskId}/`));
+        const repairOnly = repairEventPaths.length > 0 && repairEventPaths.every((eventPath) => {
+            const event = readStagedJsonFile(cwd, eventPath);
+            return event?.action === 'repair-closure';
+        });
+        if (!repairOnly) {
+            return { ok: false, reason: 'missing-evidence-bundle' };
+        }
+    }
+    else if (!evidence || evidence.taskId !== taskId) {
+        return { ok: false, reason: 'evidence-task-id-mismatch' };
+    }
+    return { ok: true, reason: null };
+}
+function readStagedJsonFile(cwd, relativeFile) {
+    const result = runGit(cwd, ['show', `:${normalizeRelativePath(relativeFile)}`]);
+    if (result.exitCode !== 0)
+        return null;
+    return readJsonText(result.stdout);
+}
+function taskImportReportReferencesTask(cwd, file, taskId) {
+    try {
+        const content = readFileSync(path.join(cwd, file), 'utf8');
+        const parsed = JSON.parse(content);
+        return JSON.stringify(parsed).includes(`"${taskId}"`);
+    }
+    catch {
+        return false;
+    }
+}
+export function parseHookTaskClaim(value) {
+    if (!isPlainObject(value))
+        return null;
+    const actorId = normalizeOptionalText(value.actorId);
+    const leaseId = normalizeOptionalText(value.leaseId);
+    return actorId && leaseId ? { actorId, leaseId } : null;
+}
+export function resolveExpectedGitIdentityForActor(cwd, actorId) {
+    const actorRecord = findActorByResolvedId(cwd, { actorId, source: 'option' });
+    const actorIdentity = readRuntimeIdentityForActor(cwd, actorId);
+    const defaultIdentity = readRuntimeIdentityDefault(cwd);
+    const defaultMatches = defaultIdentity?.actorId === actorId;
+    const source = actorRecord?.gitName || actorRecord?.gitEmail ? 'actor-registry' : actorIdentity?.gitName || actorIdentity?.gitEmail ? 'actor-runtime' : defaultMatches && (defaultIdentity?.gitName || defaultIdentity?.gitEmail) ? 'matching-default' : 'missing';
+    return { gitName: actorRecord?.gitName ?? actorIdentity?.gitName ?? (defaultMatches ? defaultIdentity?.gitName ?? null : null), gitEmail: actorRecord?.gitEmail ?? actorIdentity?.gitEmail ?? (defaultMatches ? defaultIdentity?.gitEmail ?? null : null), editor: actorRecord?.editor ?? actorIdentity?.editor ?? (defaultMatches ? defaultIdentity?.editor ?? null : null), provider: actorRecord?.provider ?? actorIdentity?.provider ?? (defaultMatches ? defaultIdentity?.provider ?? null : null), source };
+}
+export function collectIdentityProvenanceFindings(actorId, expectedIdentity) {
+    const findings = [];
+    const currentEditor = normalizeOptionalText(process.env.ATM_EDITOR_ID) ?? (normalizeOptionalText(process.env.CODEX_HOME) ? 'codex' : null);
+    const currentProvider = normalizeOptionalText(process.env.ATM_PROVIDER_ID);
+    if (expectedIdentity.editor && currentEditor && expectedIdentity.editor !== currentEditor) {
+        findings.push({ code: 'ATM_COMMIT_IDENTITY_EDITOR_MISMATCH', source: 'commit-attribution', detail: `Actor ${actorId} identity is bound to editor ${expectedIdentity.editor}, but the current environment reports ${currentEditor}.`, requiredCommand: `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --editor ${quoteCliValue(currentEditor)} --git-name "<git user.name>" --git-email "<git user.email>" --json`, classification: 'current-task' });
+    }
+    if (expectedIdentity.provider && currentProvider && expectedIdentity.provider !== currentProvider) {
+        findings.push({ code: 'ATM_COMMIT_IDENTITY_PROVIDER_MISMATCH', source: 'commit-attribution', detail: `Actor ${actorId} identity is bound to provider ${expectedIdentity.provider}, but the current environment reports ${currentProvider}.`, requiredCommand: `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --provider ${quoteCliValue(currentProvider)} --git-name "<git user.name>" --git-email "<git user.email>" --json`, classification: 'current-task' });
+    }
+    return findings;
+}
+export function buildIdentitySetRequiredCommand(cwd, actorId) {
+    const gitName = runGitScalar(cwd, ['config', '--local', '--get', 'user.name']) ?? '<git user.name>';
+    const gitEmail = runGitScalar(cwd, ['config', '--local', '--get', 'user.email']) ?? '<git user.email>';
+    return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name ${quoteCliValue(gitName)} --git-email ${quoteCliValue(gitEmail)} --json`;
+}
+export function isPathAllowedByTaskDirection(filePath, allowedFiles) {
+    const normalizedFile = normalizeRelativePath(filePath).toLowerCase();
+    const cwd = process.cwd();
+    return allowedFiles.some((candidate) => {
+        let relCandidate = candidate;
+        if (path.isAbsolute(candidate)) {
+            relCandidate = relativePathFrom(cwd, candidate);
+        }
+        return matchesTaskDirectionPath(normalizedFile, normalizeRelativePath(relCandidate).toLowerCase());
+    });
+}
+function matchesTaskDirectionPath(filePath, allowedPath) {
+    if (!allowedPath)
+        return false;
+    if (allowedPath.includes('*')) {
+        const pattern = allowedPath.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*\*/g, '::DOUBLE_STAR::').replace(/\*/g, '[^/]*').replace(/::DOUBLE_STAR::/g, '.*');
+        return new RegExp(`^${pattern}$`, 'i').test(filePath);
+    }
+    if (filePath === allowedPath)
+        return true;
+    if (allowedPath.endsWith('/'))
+        return filePath.startsWith(allowedPath);
+    const allowedPathHasExtension = /\.[a-z0-9]+$/i.test(allowedPath);
+    return !allowedPathHasExtension && filePath.startsWith(`${allowedPath}/`);
+}
+export function uniqueSorted(values) {
+    return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+}
+function sha256(value) {
+    return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+function taskReleaseOnlyTransitionSha(task, event) {
+    if (!task || typeof task !== 'object' || Array.isArray(task))
+        return null;
+    if (!event || typeof event !== 'object' || Array.isArray(event))
+        return null;
+    const eventRecord = event;
+    if (eventRecord.action !== 'close')
+        return null;
+    const taskRecord = task;
+    const lock = taskRecord.taskDirectionLock;
+    if (!lock || typeof lock !== 'object' || Array.isArray(lock))
+        return null;
+    const lockRecord = lock;
+    if (lockRecord.status !== 'released' || lockRecord.released !== true)
+        return null;
+    const normalizedTask = { ...taskRecord, taskDirectionLock: { ...lockRecord, status: 'active' } };
+    delete normalizedTask.taskDirectionLock.released;
+    delete normalizedTask.taskDirectionLock.releasedAt;
+    delete normalizedTask.taskDirectionLock.releasedBy;
+    return sha256(`${JSON.stringify(normalizedTask, null, 2)}\n`);
+}
+function sameStringSet(left, right) {
+    const normalize = (values) => [...new Set(values.map((value) => String(value).trim()).filter(Boolean))].sort();
+    return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right));
+}
+function requireValue(argv, index, flag) {
+    const value = argv[index + 1];
+    if (!value || value.startsWith('--')) {
+        throw new CliError('ATM_CLI_USAGE', `hook command requires a value for ${flag}`, { exitCode: 2 });
+    }
+    return value;
+}

@@ -1,0 +1,301 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { parseAtomicSpecFile } from '../../../core/dist/spec/parse-spec.js';
+import { runAtomicTestRunnerExtended } from '../../../core/dist/manager/test-runner.js';
+import { runMapEquivalence } from '../../../core/dist/equivalence/run-map-equivalence.js';
+import { runMapIntegrationTest } from '../../../core/dist/test-runner/map-integration.js';
+import { createPropagationReport, runPropagationIntegration } from '../../../core/dist/test-runner/propagation.js';
+import { checkMapFingerprint, recordFingerprintCheck } from '../../../core/dist/maps/fingerprint-checker.js';
+import { runEdgeContractCheck } from '../../../core/dist/maps/edge-contract-runner.js';
+import { CliError, makeResult, message, parseOptions, quoteCliValue, relativePathFrom } from './shared.js';
+import { runValidate } from './validate.js';
+const helloWorldSpecPath = path.join('examples', 'hello-world', 'atoms', 'hello-world.atom.json');
+const helloWorldSourcePath = path.join('examples', 'hello-world', 'src', 'hello-world.atom.ts');
+export async function runHelloWorldSmoke(cwd) {
+    const specPath = path.join(cwd, helloWorldSpecPath);
+    const sourcePath = path.join(cwd, helloWorldSourcePath);
+    const checks = [];
+    checks.push({ name: 'spec-exists', passed: existsSync(specPath) });
+    checks.push({ name: 'source-exists', passed: existsSync(sourcePath) });
+    const validation = runValidate(['--cwd', cwd, '--spec', specPath]);
+    checks.push({ name: 'spec-validates', passed: validation.ok === true });
+    let smokeResult = null;
+    if (existsSync(sourcePath)) {
+        const module = await import(`${pathToFileURL(sourcePath).href}?selfHostSmoke=${Date.now()}`);
+        smokeResult = module.run({ name: 'ATM' });
+    }
+    checks.push({ name: 'message-output', passed: smokeResult?.message === 'Hello, ATM!' });
+    checks.push({ name: 'atom-id-output', passed: smokeResult?.atomId === 'ATM-EXAMPLE-0001' });
+    return {
+        ok: checks.every((check) => check.passed),
+        checks,
+        passCount: checks.filter((check) => check.passed).length,
+        total: checks.length,
+        specPath: helloWorldSpecPath,
+        sourcePath: helloWorldSourcePath,
+        smokeResult
+    };
+}
+export async function runTestAsync(argv) {
+    const { options } = parseOptions(argv, 'test');
+    const selectedModes = [options.spec, options.map, options.propagate, options.atom].filter(Boolean);
+    if (selectedModes.length > 1) {
+        throw new CliError('ATM_CLI_USAGE', 'test accepts only one of --spec, --map, --propagate, or --atom.', { exitCode: 2 });
+    }
+    if (options.equivalenceFixtures && !options.map) {
+        throw new CliError('ATM_CLI_USAGE', 'test option --equivalence-fixtures must be paired with --map.', { exitCode: 2 });
+    }
+    if (options.fingerprintCheck && !options.map) {
+        throw new CliError('ATM_CLI_USAGE', 'test option --fingerprint-check must be paired with --map.', { exitCode: 2 });
+    }
+    if (options.edgeContracts && !options.map) {
+        throw new CliError('ATM_CLI_USAGE', 'test option --edge-contracts must be paired with --map.', { exitCode: 2 });
+    }
+    if (options.spec) {
+        return runSpecTest(options.cwd, options.spec, normalizeTestProfile(options.profile), normalizeOptionalText(options.suite));
+    }
+    if (options.map) {
+        if (options.edgeContracts) {
+            return runEdgeContractTest(options.cwd, options.map);
+        }
+        return runMapTest(options.cwd, options.map, options.equivalenceFixtures, options.fingerprintCheck);
+    }
+    if (options.propagate) {
+        return runPropagateTest(options.cwd, options.propagate);
+    }
+    if (options.atom !== 'hello-world') {
+        throw new CliError('ATM_CLI_USAGE', 'test requires --atom hello-world, --spec <path>, --map <mapId>, or --propagate <atomId>; --equivalence-fixtures must be paired with --map.', { exitCode: 2 });
+    }
+    const smoke = await runHelloWorldSmoke(options.cwd);
+    return makeResult({
+        ok: smoke.ok,
+        command: 'test',
+        cwd: options.cwd,
+        messages: [
+            smoke.ok
+                ? message('info', 'ATM_TEST_HELLO_WORLD_OK', 'hello-world atom smoke validation passed.')
+                : message('error', 'ATM_TEST_HELLO_WORLD_FAILED', 'hello-world atom smoke validation failed.', { checks: smoke.checks })
+        ],
+        evidence: {
+            atom: options.atom,
+            passCount: smoke.passCount,
+            total: smoke.total,
+            checks: smoke.checks,
+            specPath: relativePathFrom(options.cwd, path.join(options.cwd, smoke.specPath)),
+            sourcePath: relativePathFrom(options.cwd, path.join(options.cwd, smoke.sourcePath))
+        }
+    });
+}
+async function runEdgeContractTest(cwd, mapId) {
+    const report = runEdgeContractCheck(cwd, mapId);
+    const ok = report.failed === 0;
+    return makeResult({
+        ok,
+        command: 'test',
+        cwd,
+        messages: [
+            message(ok ? 'info' : 'error', ok ? 'ATM_EDGE_CONTRACT_PASS' : 'ATM_EDGE_CONTRACT_FAIL', ok
+                ? `Edge contract check passed: ${report.passed}/${report.totalEdges} edges OK.`
+                : `Edge contract check failed: ${report.failed} edge(s) have schema mismatches.`, { mapId, passed: report.passed, failed: report.failed, total: report.totalEdges })
+        ],
+        evidence: { report }
+    });
+}
+async function runMapTest(cwd, mapId, equivalenceFixtures, fingerprintCheck) {
+    if (fingerprintCheck) {
+        const mapSpecPath = path.join(cwd, 'atomic_workbench', 'maps', mapId, 'map.spec.json');
+        const lineageLogPath = path.join(cwd, 'atomic_workbench', 'maps', mapId, 'lineage-log.json');
+        const checkResult = await checkMapFingerprint(mapId, mapSpecPath);
+        await recordFingerprintCheck(mapId, lineageLogPath, checkResult);
+        return makeResult({
+            ok: !checkResult.driftDetected,
+            command: 'test',
+            cwd,
+            messages: [
+                checkResult.driftDetected
+                    ? message('error', 'ATM_TEST_FINGERPRINT_DRIFT_DETECTED', 'Semantic fingerprint drift detected for atomic map.', { mapId, drift: checkResult.delta })
+                    : message('info', 'ATM_TEST_FINGERPRINT_OK', 'Atomic map semantic fingerprint check passed.', { mapId })
+            ],
+            evidence: {
+                mapId,
+                currentFingerprint: checkResult.currentFingerprint,
+                recordedFingerprint: checkResult.recordedFingerprint,
+                driftDetected: checkResult.driftDetected,
+                delta: checkResult.delta,
+                checkTime: checkResult.checkTime,
+                lineageLogPath: relativePathFrom(cwd, lineageLogPath)
+            }
+        });
+    }
+    if (equivalenceFixtures) {
+        const testRun = await executeMapRunner(() => runMapEquivalence(mapId, equivalenceFixtures, { repositoryRoot: cwd }));
+        return makeResult({
+            ok: testRun.ok,
+            command: 'test',
+            cwd,
+            messages: [
+                testRun.ok
+                    ? message('info', 'ATM_TEST_MAP_EQUIVALENCE_OK', 'Atomic map equivalence test passed.', { mapId, acceptedKnownDivergenceIds: testRun.acceptedKnownDivergenceIds })
+                    : message('error', 'ATM_TEST_MAP_EQUIVALENCE_FAILED', 'Atomic map equivalence test failed.', { mapId, failedCaseIds: testRun.failedCaseIds })
+            ],
+            evidence: {
+                mapId,
+                fixturePath: testRun.fixturePath,
+                reportPath: testRun.reportPath,
+                nextActionHint: testRun.ok ? buildMapEquivalenceNextActionHint(cwd, mapId, testRun.reportPath) : null,
+                resolutionMode: testRun.resolutionMode,
+                warnings: testRun.warnings,
+                legacyUris: testRun.legacyUris,
+                acceptedKnownDivergenceIds: testRun.acceptedKnownDivergenceIds,
+                failedCaseIds: testRun.failedCaseIds,
+                summary: testRun.report.summary,
+                metrics: testRun.report.metrics,
+                cases: testRun.report.cases,
+                knownDivergences: testRun.report.knownDivergences ?? [],
+                passed: testRun.report.passed
+            }
+        });
+    }
+    const testRun = await executeMapRunner(() => runMapIntegrationTest(mapId, { repositoryRoot: cwd }));
+    return makeResult({
+        ok: testRun.ok,
+        command: 'test',
+        cwd,
+        messages: [
+            testRun.ok
+                ? message('info', 'ATM_TEST_MAP_OK', 'Atomic map integration test passed.', { mapId })
+                : message('error', 'ATM_TEST_MAP_FAILED', 'Atomic map integration test failed.', { mapId, failedDownstream: testRun.report.failedDownstream })
+        ],
+        evidence: {
+            mapId,
+            reportPath: relativePathFrom(cwd, path.join(cwd, testRun.reportPath)),
+            nextActionHint: testRun.ok ? buildMapIntegrationNextActionHint(cwd, mapId, testRun.reportPath) : null,
+            resolutionMode: testRun.resolutionMode,
+            warnings: testRun.warnings,
+            specPath: testRun.report.specPath,
+            testPath: testRun.report.testPath,
+            perMapStatus: testRun.report.perMapStatus,
+            failedDownstream: testRun.report.failedDownstream,
+            propagationDuration: testRun.report.propagationDuration,
+            metrics: testRun.report.metrics
+        }
+    });
+}
+function buildMapIntegrationNextActionHint(cwd, mapId, reportPath) {
+    const relativeReportPath = relativePathFrom(cwd, path.join(cwd, reportPath));
+    return {
+        status: 'ready',
+        route: 'replacement-lane-shadow',
+        reason: 'Integration evidence is ready; promote the replacement lane to shadow.',
+        command: `node atm.mjs replacement-lane transition --cwd ${quoteCliValue(cwd)} --map ${quoteCliValue(mapId)} --to shadow --evidence ${quoteCliValue(relativeReportPath)} --json`,
+        consumesEvidenceKind: 'map-integration'
+    };
+}
+function buildMapEquivalenceNextActionHint(cwd, mapId, reportPath) {
+    const relativeReportPath = relativePathFrom(cwd, path.join(cwd, reportPath));
+    return {
+        status: 'ready',
+        route: 'replacement-lane-canary',
+        reason: 'Equivalence evidence is ready; promote the replacement lane to canary or feed it into map upgrade review.',
+        command: `node atm.mjs replacement-lane transition --cwd ${quoteCliValue(cwd)} --map ${quoteCliValue(mapId)} --to canary --evidence ${quoteCliValue(relativeReportPath)} --json`,
+        consumesEvidenceKind: 'map-equivalence'
+    };
+}
+async function runPropagateTest(cwd, atomId) {
+    const propagation = await executeMapRunner(() => runPropagationIntegration(atomId, { repositoryRoot: cwd }));
+    const propagationReport = createPropagationReport(propagation, { atomId });
+    const infoCode = propagation.ok ? 'ATM_TEST_PROPAGATE_OK' : 'ATM_TEST_PROPAGATE_FAILED';
+    const infoText = propagation.ok
+        ? (propagation.discoveredMaps.length > 0
+            ? 'Atomic map propagation test passed for all downstream maps.'
+            : 'No downstream maps referenced this atom; propagation check completed with no work.')
+        : 'Atomic map propagation test failed for one or more downstream maps.';
+    return makeResult({
+        ok: propagation.ok,
+        command: 'test',
+        cwd,
+        messages: [message(propagation.ok ? 'info' : 'error', infoCode, infoText, { atomId, failedDownstream: propagation.failedDownstream })],
+        evidence: {
+            atomId,
+            discoveredMaps: propagation.discoveredMaps,
+            perMapStatus: propagation.perMapStatus,
+            failedDownstream: propagation.failedDownstream,
+            propagationDuration: propagation.propagationDuration,
+            metrics: propagation.metrics,
+            summary: propagation.summary,
+            propagationReport
+        }
+    });
+}
+async function executeMapRunner(callback) {
+    try {
+        return await callback();
+    }
+    catch (error) {
+        if (error instanceof CliError) {
+            throw error;
+        }
+        if (error && typeof error === 'object' && 'code' in error) {
+            const typedError = error;
+            throw new CliError(typedError.code, typedError.message ?? 'Map test runner failed.', {
+                details: typedError.details ?? {}
+            });
+        }
+        throw error;
+    }
+}
+async function runSpecTest(cwd, specPath, profile = 'standard', suite = null) {
+    const parsed = parseAtomicSpecFile(specPath, { cwd });
+    if (!parsed.ok) {
+        return makeResult({
+            ok: false,
+            command: 'test',
+            cwd,
+            messages: [message('error', parsed.promptReport.code, parsed.promptReport.summary, { issues: parsed.promptReport.issues })],
+            evidence: {
+                specPath,
+                validated: []
+            }
+        });
+    }
+    const testRun = await runAtomicTestRunnerExtended(parsed.normalizedModel, { repositoryRoot: cwd, profile, suite });
+    return makeResult({
+        ok: testRun.ok,
+        command: 'test',
+        cwd,
+        messages: [
+            testRun.ok
+                ? message('info', 'ATM_TEST_SPEC_OK', 'Atomic spec validation commands passed.', { atomId: testRun.atomId })
+                : message('error', 'ATM_TEST_SPEC_FAILED', 'Atomic spec validation commands failed.', { atomId: testRun.atomId })
+        ],
+        evidence: {
+            atomId: testRun.atomId,
+            profile,
+            suite,
+            specPath: relativePathFrom(cwd, path.resolve(cwd, specPath)),
+            reportPath: relativePathFrom(cwd, testRun.reportPath),
+            runnerConfigPath: testRun.runnerConfigPath,
+            exitCode: testRun.exitCode,
+            commands: testRun.commandResults.map((entry) => ({
+                commandId: entry.commandId,
+                command: entry.command,
+                ok: entry.ok,
+                exitCode: entry.exitCode
+            })),
+            plugins: testRun.pluginRuns ?? [],
+            gates: testRun.gateResults ?? []
+        }
+    });
+}
+function normalizeTestProfile(value) {
+    const text = String(value ?? '').toLowerCase();
+    if (text === 'quick' || text === 'standard' || text === 'full') {
+        return text;
+    }
+    return 'standard';
+}
+function normalizeOptionalText(value) {
+    const text = String(value ?? '').trim();
+    return text || null;
+}
