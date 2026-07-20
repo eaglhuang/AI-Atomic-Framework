@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T08-05-09-050Z-close-80e8b9b146c2",
+  "taskId": "ATM-GOV-0208",
+  "action": "close",
+  "actorId": "codex-captain-0208",
+  "sessionId": "session-20260720075505-codex-captain-0208-ATM-GOV-0208-c937e06ff0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0208.json",
+  "taskSha256": "sha256:a3d372aee5d5d5687e80e25fdc74dc3da27bffe1c242e10aa5ff632eb1bce65b",
+  "createdAt": "2026-07-20T08:05:09.050Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0208 --actor codex-captain-0208 --status done --historical-delivery 57c1a1e478701590c9649052c53be9c331897890",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720075505-codex-captain-0208-ATM-GOV-0208-c937e06ff0",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0208.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/core/content-anchor-resolver.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:content-anchor",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T08:05:09.043Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0208.*",
+        ".atm/history/task-events/ATM-GOV-0208/**",
+        ".atm/history/tasks/ATM-GOV-0208.json",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/boundaries/**",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/types.ts",
+        "packages/core/src/git/admission.ts",
+        "packages/language-js/src/**",
+        "schemas/governance/content-anchor.schema.json",
+        "schemas/governance/patch-proposal.schema.json",
+        "schemas/governance/write-intent.schema.json",
+        "scripts/validate-content-anchor.ts",
+        "scripts/validate-schemas/context.ts",
+        "tests/core/content-anchor-resolver.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/boundaries/**",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/types.ts",
+        "packages/core/src/git/admission.ts",
+        "packages/language-js/src/**",
+        "schemas/governance/content-anchor.schema.json",
+        "schemas/governance/patch-proposal.schema.json",
+        "schemas/governance/write-intent.schema.json",
+        "scripts/validate-content-anchor.ts",
+        "scripts/validate-schemas/context.ts",
+        "tests/core/content-anchor-resolver.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
