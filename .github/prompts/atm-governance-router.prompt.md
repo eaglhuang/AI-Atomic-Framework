@@ -129,6 +129,57 @@ node atm.mjs next --prompt "$ARGUMENTS" --json
 If the first command returns a user notice, surface it briefly, then continue the
 original user request.
 
+## First-Layer Command Contract
+
+For backlog, audit, optimization, and create prompts, inspect the canonical
+first-layer matrix before falling back to CLI discovery:
+
+```bash
+node atm.mjs guide first-layer --json
+```
+
+The matrix is `intent -> route -> command -> authority -> negative case`.
+Backlog, audit, and governance/product optimization prompts are docs-first or
+read-only status work until a scoped task/backlog record exists; they must not
+fall through to `create-atom`. Explicit atom birth keeps the
+`node atm.mjs guide create-atom --json` path.
+
+Normal release/checkpoint/backlog/audit syntax should be visible from this
+first layer:
+
+```bash
+node atm.mjs broker release --task <task-id> --actor <actor> --json
+node atm.mjs batch checkpoint --actor <actor> --json
+node atm.mjs guide first-layer --json
+node atm.mjs tasks audit --json
+```
+
+Default `next` output is compact: it keeps blocker/status, recommended action,
+ticket state, queue/revalidation/reconcile hints, and validator summary. Use
+`--verbose --json` only when you need the full duplicated playbook body, large
+file lists, or complete diagnostic arrays.
+
+Ticket states are route truth. Preserve distinct next actions for
+`execute-now`, `batch/applyStrategy=compose`,
+`queue(position/head/health/waitedMs/release condition)`,
+`revalidation-required`, `reconcile-required`, and R1 `ATM_LOCK_CONFLICT`.
+Queued, compose, revalidation, and reconcile states are ticket/status states,
+not new ErrorCodes. A waiting shared write still permits reads, docs, private
+evidence, and isolated proposals; only intersecting dependent code side effects
+are restricted.
+
+For Windows Markdown/JSON/text planning docs, use Node UTF-8 reads and `rg`
+searches:
+
+```bash
+node -e "const fs=require('node:fs'); console.log(fs.readFileSync(process.argv[1],'utf8').slice(0,4000))" -- <file.md>
+rg "pattern" <path>
+rg --files <path>
+```
+
+Do not recommend PowerShell range indexing or document parsing for planning
+documents.
+
 If `evidence.nextAction.governanceReadiness` is present, prepare those items
 before you reach commit or push. Treat framework claim, protected push
 evidence, `doctor`, and branch queue retry codes as early blockers, not as

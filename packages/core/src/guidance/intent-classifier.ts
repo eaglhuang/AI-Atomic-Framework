@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { classifyFirstLayerIntent } from './first-layer-command-contracts.ts';
 
 export type GuidanceIntent =
   | 'legacy-atomization'
@@ -7,6 +8,7 @@ export type GuidanceIntent =
   | 'task-plan-import'
   | 'adapter-bootstrap'
   | 'docs-spec'
+  | 'governance-first-layer'
   | 'atom-create'
   | 'upgrade-existing'
   | 'unknown';
@@ -284,6 +286,7 @@ export function classifyGuidanceIntent(
   const docMatches = matchTerms(normalizedGoal, docsTerms);
   const atomCreateMatches = matchTerms(normalizedGoal, atomCreateTerms);
   const upgradeMatches = matchTerms(normalizedGoal, upgradeTerms);
+  const firstLayerMatch = classifyFirstLayerIntent(goal);
 
   if (legacyCandidateRankingMatches.length > 0) {
     return buildClassification({
@@ -329,6 +332,28 @@ export function classifyGuidanceIntent(
         'acquire runtime locks for import-only task-plan operations'
       ],
       lexiconSources: activeHostEntries.length > 0 ? ['framework-default', 'host-local'] : ['framework-default']
+    });
+  }
+
+  if (firstLayerMatch && firstLayerMatch.intent !== 'create') {
+    return buildClassification({
+      goal,
+      matchedIntent: 'governance-first-layer',
+      confidence: 0.89,
+      matchedTerms: firstLayerMatch.matchedTerms.filter((term) => normalizedGoal.includes(normalizeIntentPhrase(term))),
+      requiredFlow: [
+        'atm guide first-layer',
+        firstLayerMatch.command,
+        'read-only status/audit before mutation',
+        'scoped task/backlog evidence before implementation'
+      ],
+      nextCommand: firstLayerMatch.command,
+      blockedAntiPatterns: [
+        firstLayerMatch.negativeCase,
+        'route backlog, audit, or governance optimization prompts through atom birth',
+        'use PowerShell range indexing to parse Markdown/JSON/text planning documents'
+      ],
+      lexiconSources: ['framework-default']
     });
   }
 

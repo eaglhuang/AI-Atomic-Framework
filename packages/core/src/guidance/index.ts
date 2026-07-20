@@ -1,4 +1,5 @@
 export * from './guidance-packet.ts';
+export * from './first-layer-command-contracts.ts';
 export * from './intent-classifier.ts';
 export * from './legacy-route-plan.ts';
 export * from './mutation-gate.ts';

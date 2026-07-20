@@ -14,6 +14,9 @@ open only the single matching shard.
 
 After every `next --prompt` or `next --claim` response, read `evidence.nextAction.playbook` before editing, closing, or committing. The playbook is the channel-specific work order.
 
+For first-layer backlog, audit, optimization, create, ticket-state, and Windows-safe command contracts, run `node atm.mjs guide first-layer --json` before falling back to broad CLI discovery.
+Preserve distinct ticket states: `execute-now`, `batch/applyStrategy=compose`, `queue(position/head/health/waitedMs/release condition)`, `revalidation-required`, `reconcile-required`, and `ATM_LOCK_CONFLICT`.
+
 Batch requests must stay in batch: claim the original prompt, deliver only the current queue head, add command-backed evidence, run `node atm.mjs batch checkpoint --actor <id> --json`, then commit only after checkpoint succeeds.
 
 Do not manually loop over `tasks reserve`, `tasks promote`, `tasks claim`, or `tasks close`; do not commit before `batch checkpoint` during an active batch.

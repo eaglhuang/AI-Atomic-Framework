@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   classifyGuidanceIntent,
+  buildFirstLayerCommandContract,
   loadHostIntentLexicon,
   probeProject,
   recordGuidanceIntentPhrase,
@@ -14,7 +15,7 @@ import { getCommandSpec, listCommandSpecs } from './command-specs.ts';
 import { glossaryEntries } from './glossary-data.ts';
 import { CliError, makeHelpResult, makeResult, message } from './shared.ts';
 
-const supportedGuideIntents = ['overview', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
+const supportedGuideIntents = ['overview', 'first-layer', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
 const supportedLearnIntents: readonly GuidanceIntent[] = ['legacy-atomization', 'legacy-candidate-ranking', 'task-plan-import'];
 const supportedLearnStatuses: readonly GuidanceIntentStatus[] = ['suggested', 'active-host', 'promoted-framework'];
 const supportedSkillInstallTargets = ['host', 'codex'] as const;
@@ -187,10 +188,17 @@ function parseGuideArgs(argv: string[] = []) {
 }
 
 function buildOverviewGuide() {
+  const firstLayer = buildFirstLayerCommandContract();
   return {
     intent: 'overview',
     summary: 'Start with guidance: orient the repository, start a goal-bound session, then follow the single next action.',
     supportedIntents: supportedGuideIntents,
+    firstLayer: {
+      command: 'node atm.mjs guide first-layer --json',
+      routeMatrixDigest: firstLayer.routeMatrixDigest,
+      commonCommands: firstLayer.commonCommands,
+      compactOrientationDefault: firstLayer.compactOrientationDefault
+    },
     channels: [
       {
         channel: 'free-text-intent',
@@ -213,6 +221,14 @@ function buildOverviewGuide() {
         action: 'Run `node atm.mjs explain --why blocked --cwd . --json` and satisfy the listed evidence before retrying.'
       }
     ]
+  };
+}
+
+function buildFirstLayerGuide() {
+  return {
+    intent: 'first-layer',
+    summary: 'First-layer ATM routing, command, ticket-state, and Windows-safe IO contract.',
+    ...buildFirstLayerCommandContract()
   };
 }
 
@@ -455,6 +471,8 @@ function buildGuide(parsed: ReturnType<typeof parseGuideArgs>) {
       return buildGoalGuide(parsed.cwd, parsed.goal ?? '');
     case 'overview':
       return buildOverviewGuide();
+    case 'first-layer':
+      return buildFirstLayerGuide();
     case 'create-atom':
       return buildCreateAtomGuide();
     case 'create-map':
