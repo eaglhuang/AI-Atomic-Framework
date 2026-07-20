@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0197",
   "title": "Runtime telemetry boundary compact receipts and session lifecycle",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0196",
@@ -87,8 +87,8 @@
     }
   },
   "importedAt": "2026-07-20T09:49:46.452Z",
-  "lastTransitionId": "2026-07-20T10-05-21-553Z-scope-amendment-d02fba2a55e2",
-  "lastTransitionAt": "2026-07-20T10:05:21.553Z",
+  "lastTransitionId": "2026-07-20T10-12-26-352Z-close-d05e88a5f36f",
+  "lastTransitionAt": "2026-07-20T10:12:26.352Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0197",
   "reservedAt": "2026-07-20T09:50:10.399Z",
@@ -97,7 +97,7 @@
     "actorId": "codex-captain-0197",
     "leaseId": "lease-c1d9ba7fca9c",
     "claimedAt": "2026-07-20T09:50:10.404Z",
-    "heartbeatAt": "2026-07-20T09:50:10.404Z",
+    "heartbeatAt": "2026-07-20T10:12:26.348Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0197.*",
@@ -114,14 +114,14 @@
       "tests/cli/gate-telemetry-v1.test.ts",
       "tests/cli/runtime-telemetry-boundary.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720095010-codex-captain-0197-a26f32e244",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720095010-codex-captain-0197-a26f32e244\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T09:50:10.404Z",
   "startedByActor": "codex-captain-0197",
@@ -170,5 +170,9 @@
     },
     "createdAt": "2026-07-20T09:50:14.679Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T10:12:26.348Z",
+  "closedByActor": "codex-captain-0197",
+  "closedBySessionId": "session-20260720095010-codex-captain-0197-ATM-GOV-0197-d6a62a01da",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0197.closure-packet.json"
 }
