@@ -29,6 +29,27 @@ When a handoff mentions unresolved `ATM_*` codes, point the next agent to
 `atm-error-code-resolver` instead of copying ad hoc recovery prose. Include the
 code, command that produced it, and whether the registry entry was found.
 
+## Governance Flow Summary
+
+For governed work, include the reusable governance-flow state that the next
+agent needs, without copying historical noise into skill text:
+
+- consumed sealed summaries;
+- missing data;
+- assumption changes;
+- stop rule;
+- touched shared-write gates and the `INV-ATM-008` outcome;
+- closeout telemetry window, watermark, counters, duration/timing, source
+  availability, compact digest, and unavailable receipts;
+- whether runner, release, broker shared-write behavior, first-layer entry,
+  skill template projection, or generated integration output changed and
+  whether frozen-entry smoke evidence exists.
+
+Do not turn task-specific status, dirty worktree residue, local commit shas,
+actor ids, queue ids, or date-bound incident details into reusable instructions.
+Those details belong in the handoff artifact, backlog, task evidence, or shared
+learning references.
+
 ## Route Command
 
 Use this ATM command only after the first command confirms it is the current governed route:
