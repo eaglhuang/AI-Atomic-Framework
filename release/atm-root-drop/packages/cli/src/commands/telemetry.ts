@@ -3,6 +3,7 @@ import { getCommandSpec } from './command-specs.ts';
 import { type CommandSpec, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.ts';
 import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/src/telemetry/index.ts';
+import { buildSharedWriteGateCoverageReport } from '../../../core/src/telemetry/shared-write-coverage.ts';
 
 export async function runTelemetry(argv: string[]) {
   const spec = getCommandSpec('telemetry') as CommandSpec;
@@ -13,6 +14,7 @@ export async function runTelemetry(argv: string[]) {
   const requestedOff = parsed.options.off === true;
   const requestedGateRegistry = parsed.options.gateRegistry === true;
   const requestedCoverageReport = parsed.options.coverageReport === true || parsed.options.m2Preflight === true;
+  const requestedSharedWriteCoverage = parsed.options.sharedWriteCoverage === true;
   const requestedTaskSummary = parsed.options.taskSummary === true;
   const requestedEmitFixture = parsed.options.emitFixture === true;
   const requestedSeal = parsed.options.seal === true;
@@ -38,6 +40,16 @@ export async function runTelemetry(argv: string[]) {
       cwd,
       messages: [message('info', 'ATM_GATE_TELEMETRY_COVERAGE_READY', 'Gate telemetry registry coverage report is ready.')],
       evidence: buildGateTelemetryRegistryCoverageReport(cwd)
+    });
+  }
+
+  if (requestedSharedWriteCoverage) {
+    return makeResult({
+      ok: true,
+      command: 'telemetry',
+      cwd,
+      messages: [message('info', 'ATM_SHARED_WRITE_GATE_COVERAGE_READY', 'Shared-write gate coverage report is ready.')],
+      evidence: buildSharedWriteGateCoverageReport(cwd)
     });
   }
 

@@ -98,6 +98,8 @@ export interface GateTelemetryTaskSummary {
   readonly sourceAvailability: GateTelemetrySourceAvailability;
   readonly historyDigest: string;
   readonly configDigest: string;
+  readonly inputDigest: string;
+  readonly sealedDigest: string;
 }
 
 export interface GateTelemetryEvent extends Required<Pick<TelemetryTimingFields, 'observedAt' | 'durationMs'>>, Required<Pick<TelemetryCorrelationFields, 'actorId' | 'runId' | 'correlationId'>> {
@@ -241,6 +243,19 @@ export function buildGateTelemetryTaskSummary(cwd: string, input: {
   const observed = events.map((event) => event.observedAt).sort();
   const missingTelemetry = coverage.requiredNodes.flatMap((node) => node.missingTelemetry);
   const compactCorrelation = mergeCompactCorrelation(compactSeals);
+  const inputDigest = digestJson({
+    taskId: input.taskId,
+    eventCount: events.length,
+    compactSealCount: compactSeals.length,
+    historyDigest: coverage.historyDigest,
+    configDigest: coverage.configDigest
+  });
+  const sealedDigest = digestJson({
+    inputDigest,
+    window: observed,
+    compactSeals: compactSeals.map((seal) => seal.historyDigest).sort(),
+    gateEvents: report.byCheckId
+  });
   return {
     schemaId: 'atm.gateTelemetryTaskSummary.v1',
     taskId: input.taskId,
@@ -270,7 +285,9 @@ export function buildGateTelemetryTaskSummary(cwd: string, input: {
         ? 'partial'
         : 'available',
     historyDigest: coverage.historyDigest,
-    configDigest: coverage.configDigest
+    configDigest: coverage.configDigest,
+    inputDigest,
+    sealedDigest
   };
 }
 

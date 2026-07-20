@@ -84,6 +84,11 @@ export function buildTelemetryObservation(input) {
     return {
         schemaId: 'atm.telemetryObservation.v1',
         specVersion: '0.1.0',
+        migration: {
+            strategy: 'none',
+            fromVersion: null,
+            notes: 'Canonical telemetry observation contract.'
+        },
         observationId: input.observationId,
         producerId: input.producerId,
         producerVersion: input.producerVersion ?? '0.1.0',

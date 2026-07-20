@@ -57,11 +57,11 @@ export declare function writeTeamRun(input: {
         findings: PermissionFinding[];
     };
     governanceRuntime: import("./types.ts").TeamGovernanceRuntimeFields;
-    decisionClass: "blocked" | "human-signoff-required" | "adr-required" | "auto-execution";
+    decisionClass: "blocked" | "auto-execution" | "human-signoff-required" | "adr-required";
     decisionReason: string;
     requiresHumanSignoff: boolean;
     requiresAdr: boolean;
-    violationStatus: "warning" | "none" | "blocked" | "human-signoff-required" | "adr-required" | "broker-conflict-blocked";
+    violationStatus: "warning" | "none" | "blocked" | "broker-conflict-blocked" | "human-signoff-required" | "adr-required";
     escalationTarget: string | null;
     brokerLane: import("@ai-atomic-framework/core").TeamBrokerLaneEvidence;
     captainDecision: {
@@ -110,7 +110,7 @@ export declare function writeTeamRun(input: {
                 largeScriptRisk: boolean;
                 closureSignals: boolean;
                 validationOk: boolean;
-                brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
+                brokerVerdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
             };
             suggestedPermissions: {
                 captain: string[];
@@ -119,7 +119,7 @@ export declare function writeTeamRun(input: {
         };
         decisionSurface: {
             validationOk: boolean;
-            brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
+            brokerVerdict: "blocked-cid-conflict" | "parallel-safe" | "needs-physical-split" | "blocked-shared-surface" | "serial" | "blocked-active-lease";
             largeScriptRisk: {
                 level: string;
                 threshold: number;
@@ -140,7 +140,7 @@ export declare function writeTeamRun(input: {
         roleTiers: {
             role: string;
             agentId: string;
-            runtimeTier: "raw-api" | "agent-sdk" | "editor";
+            runtimeTier: "editor" | "raw-api" | "agent-sdk";
             rationale: string;
         }[];
     };
@@ -160,7 +160,7 @@ export declare function writeTeamRun(input: {
             brokerDecisionSurface: "brokerLane";
             brokerStewardId: "neutral-write-steward";
             brokerGoverns: ("steward-apply" | "write-intents" | "scope-conflicts" | "commit-lane")[];
-            brokerEvidenceRequired: ("atm.teamBrokerLaneEvidence.v1" | "atm.stewardApplyEvidence.v1" | "atm.brokerOperationRunRecordEnvelope.v1")[];
+            brokerEvidenceRequired: ("atm.stewardApplyEvidence.v1" | "atm.teamBrokerLaneEvidence.v1" | "atm.brokerOperationRunRecordEnvelope.v1")[];
             commitLaneSerializedBy: "branch-commit-queue";
             commitLaneOwnerRole: "coordinator";
             workerGitWrite: false;

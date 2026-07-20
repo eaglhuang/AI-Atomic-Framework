@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/governance/shared-write-gate-coverage.schema.json",
+  "title": "ATM Shared Write Gate Coverage",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "generatedAt",
+    "producerCount",
+    "observedProducerCount",
+    "coveragePercentage",
+    "producers",
+    "unavailableReceipts",
+    "inputDigest",
+    "sealedDigest"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.sharedWriteGateCoverage.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "type": "object",
+      "required": [
+        "strategy",
+        "fromVersion",
+        "notes"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string"
+        },
+        "fromVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "producerCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "observedProducerCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "coveragePercentage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "producers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "checkId",
+          "owner",
+          "status",
+          "sourceAvailability",
+          "receiptRef"
+        ],
+        "properties": {
+          "checkId": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "sourceAvailability": {
+            "enum": [
+              "available",
+              "partial",
+              "unavailable"
+            ]
+          },
+          "receiptRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "unavailableReceipts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "checkId",
+          "receiptRef",
+          "reason"
+        ],
+        "properties": {
+          "checkId": {
+            "type": "string"
+          },
+          "receiptRef": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "inputDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "sealedDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    }
+  }
+}
