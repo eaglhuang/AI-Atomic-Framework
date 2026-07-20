@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T15-46-39-975Z-scope-amendment-5fccca158d0f",
+  "taskId": "ATM-GOV-0216",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0216.json",
+  "taskSha256": "sha256:b83d8a17009e020df98f53e8381e371adc2ea21f2d7786052714a1024ac26f49",
+  "createdAt": "2026-07-20T15:46:39.975Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0216 --actor codex-gpt-5.4-mini --add \"packages/core/src/broker/index.ts,tests/cli-fixtures/help-snapshots/broker.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

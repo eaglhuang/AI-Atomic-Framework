@@ -9,6 +9,7 @@ import { handleBrokerStewardRuntimeActions } from './steward-runtime-actions.ts'
 import { handleBrokerPlanBatch } from './plan-batch-action.ts';
 import { handleBrokerWaveScheduler } from './wave-scheduler-actions.ts';
 import { handleBrokerBatchExecute } from './batch-execute-actions.ts';
+import { handleBrokerParallelAdmissionPolicy } from './policy-actions.ts';
 
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);
@@ -35,6 +36,8 @@ export async function runBroker(argv: string[]) {
   if (waveSchedulerResult) return waveSchedulerResult;
   const batchExecuteResult = handleBrokerBatchExecute(options, context);
   if (batchExecuteResult) return batchExecuteResult;
+  const policyResult = handleBrokerParallelAdmissionPolicy(options, context);
+  if (policyResult) return policyResult;
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch, parallel-admission', { exitCode: 2 });
 }

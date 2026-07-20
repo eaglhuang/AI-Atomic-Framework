@@ -39,7 +39,7 @@ const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
 
 export interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | 'parallel-admission' | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
@@ -47,6 +47,11 @@ export interface ParsedBrokerOptions {
   readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;
   readonly scheduleAction: 'enqueue' | 'plan' | 'status' | null;
   readonly batchAction: 'execute' | null;
+  readonly parallelAdmissionAction: 'status' | 'set' | 'trip' | 'reset' | null;
+  readonly policyMode: 'enforce' | 'observe' | null;
+  readonly policyFallbackMode: 'queue-only' | 'fail-closed' | null;
+  readonly policyCircuitBreaker: boolean | null;
+  readonly reason: string | null;
   readonly task: string | null;
   readonly actorId: string | null;
   readonly sealedSourceSha: string | null;
@@ -97,6 +102,11 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     projectionAction: null as ParsedBrokerOptions['projectionAction'],
     scheduleAction: null as ParsedBrokerOptions['scheduleAction'],
     batchAction: null as ParsedBrokerOptions['batchAction'],
+    parallelAdmissionAction: null as ParsedBrokerOptions['parallelAdmissionAction'],
+    policyMode: null as ParsedBrokerOptions['policyMode'],
+    policyFallbackMode: null as ParsedBrokerOptions['policyFallbackMode'],
+    policyCircuitBreaker: null as boolean | null,
+    reason: null as string | null,
     task: null as string | null,
     actorId: null as string | null,
     sealedSourceSha: null as string | null,
@@ -256,6 +266,38 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--mode') {
+      const mode = requireValue(argv, index, '--mode');
+      if (!['enforce', 'observe'].includes(mode)) {
+        throw new CliError('ATM_CLI_USAGE', `unsupported --mode ${mode}`, { exitCode: 2 });
+      }
+      state.policyMode = mode as ParsedBrokerOptions['policyMode'];
+      index += 1;
+      continue;
+    }
+    if (arg === '--fallback-mode') {
+      const mode = requireValue(argv, index, '--fallback-mode');
+      if (!['queue-only', 'fail-closed'].includes(mode)) {
+        throw new CliError('ATM_CLI_USAGE', `unsupported --fallback-mode ${mode}`, { exitCode: 2 });
+      }
+      state.policyFallbackMode = mode as ParsedBrokerOptions['policyFallbackMode'];
+      index += 1;
+      continue;
+    }
+    if (arg === '--circuit-breaker') {
+      const value = requireValue(argv, index, '--circuit-breaker').trim().toLowerCase();
+      if (!['true', 'false'].includes(value)) {
+        throw new CliError('ATM_CLI_USAGE', '--circuit-breaker requires true or false.', { exitCode: 2 });
+      }
+      state.policyCircuitBreaker = value === 'true';
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      state.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
     if (arg === '--proposal-file') {
       state.proposalFiles.push(requireValue(argv, index, '--proposal-file'));
       index += 1;
@@ -358,6 +400,8 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       state.batchAction = arg as ParsedBrokerOptions['batchAction'];
     } else if (state.action === 'batch' && state.batchAction === 'execute' && arg === 'commit') {
       state.surfaces.push(arg);
+    } else if (state.action === 'parallel-admission' && !state.parallelAdmissionAction) {
+      state.parallelAdmissionAction = arg as ParsedBrokerOptions['parallelAdmissionAction'];
     } else {
       throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
     }
@@ -379,6 +423,11 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     projectionAction: state.projectionAction,
     scheduleAction: state.scheduleAction,
     batchAction: state.batchAction,
+    parallelAdmissionAction: state.parallelAdmissionAction,
+    policyMode: state.policyMode,
+    policyFallbackMode: state.policyFallbackMode,
+    policyCircuitBreaker: state.policyCircuitBreaker,
+    reason: state.reason,
     task: state.task,
     actorId: state.actorId,
     sealedSourceSha: state.sealedSourceSha,

@@ -8,12 +8,13 @@ import {
 
 export default defineCommandSpec({
   name: 'broker',
-  summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, and inspect the local write-broker registry.',
+  summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, parallel admission policy, and inspect the local write-broker registry.',
   positional: [
-    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch', required: true },
+    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission', required: true },
     { name: 'proposal-action', summary: 'create | list | show | validate', required: false },
     { name: 'steward-action', summary: 'plan | apply', required: false },
     { name: 'runtime-action', summary: 'activate', required: false },
+    { name: 'parallel-admission-action', summary: 'status | set | trip | reset', required: false },
     { name: 'proposal-id', summary: 'Proposal id for show / validate.', required: false }
   ],
   options: [
@@ -48,6 +49,10 @@ export default defineCommandSpec({
     { flag: '--steward-id', value: 'id', summary: 'Neutral write steward identifier.' },
     { flag: '--evidence-out', value: 'path', summary: 'Output path for steward apply or runtime activation evidence JSON.' },
     { flag: '--run-evidence-dir', value: 'path', summary: 'Directory to write broker batch run records (default: .atm/runtime/broker-collision-evidence/runs, resolved against --cwd).' },
+    { flag: '--mode', value: 'mode', summary: 'Parallel admission policy mode: enforce or observe.' },
+    { flag: '--fallback-mode', value: 'mode', summary: 'Parallel admission fallback mode: queue-only or fail-closed.' },
+    { flag: '--circuit-breaker', value: 'boolean', summary: 'Enable or disable the parallel admission circuit breaker.' },
+    { flag: '--reason', value: 'text', summary: 'Reason for broker parallel-admission trip.' },
     { flag: '--store', value: 'path', summary: 'Path to broker proposal store JSON.' },
     commonJsonOption,
     commonPrettyOption,
@@ -76,6 +81,10 @@ export default defineCommandSpec({
     'node atm.mjs broker runtime activate --task TASK-GOV-0100 --actor team-planner --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out runtime-evidence.json --json',
     'node atm.mjs broker steward plan --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --json',
     'node atm.mjs broker steward apply --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out steward-evidence.json --json',
-    'node atm.mjs broker plan-batch --request-file tmp/request-a.json --request-file tmp/request-b.json --apply --run-evidence-dir .atm/runtime/broker-collision-evidence/runs --json'
+    'node atm.mjs broker plan-batch --request-file tmp/request-a.json --request-file tmp/request-b.json --apply --run-evidence-dir .atm/runtime/broker-collision-evidence/runs --json',
+    'node atm.mjs broker parallel-admission status --json',
+    'node atm.mjs broker parallel-admission set --mode enforce --fallback-mode queue-only --json',
+    'node atm.mjs broker parallel-admission trip --actor worker-1 --reason "shared-write gate failed" --json',
+    'node atm.mjs broker parallel-admission reset --actor worker-1 --receipt-digest sha256:<digest> --json'
   ]
 });
