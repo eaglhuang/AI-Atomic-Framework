@@ -1,5 +1,25 @@
 type Verdict = 'improved' | 'inconclusive' | 'regressed';
 
+type RealParallelDogfoodReportInput = {
+  readonly schemaId: 'atm.realParallelDogfood.v1';
+  readonly taskId: string;
+  readonly generatedAt: string;
+  readonly workerCount: number;
+  readonly maxSimultaneousWork: number;
+  readonly actualOverlapMs: number;
+  readonly parallelAdmissionCount: number;
+  readonly ticketTransitions: readonly { readonly from: string; readonly to: string; readonly count: number }[];
+  readonly sideEffectCounts: {
+    readonly silentOverwrite: number;
+    readonly escapedConflict: number;
+    readonly duplicateSideEffect: number;
+    readonly unresolvedStarvation: number;
+  };
+  readonly workers: readonly { readonly actorId: string; readonly laneSessionId: string; readonly scenario: string; readonly ticketState: string; readonly evidenceSeal: string }[];
+  readonly artifacts: { readonly summaryPath: string; readonly workerManifestPath: string; readonly reportPath: string };
+  readonly verdict: 'pass' | 'fail';
+};
+
 type LaneSessionEvent = {
   readonly details?: Record<string, unknown>;
 };
@@ -167,6 +187,49 @@ export function buildPlanPerformanceReport(input: {
     nextConfigDigest: digestObject({ matchedCohorts, brokerDecisionAnalysis, gateEffectiveness, coverageLimitations, realPairedAbV4 }),
     realPairedAbV4
   };
+}
+
+export function buildRealParallelDogfoodMarkdown(summary: RealParallelDogfoodReportInput): string {
+  const sideEffects = summary.sideEffectCounts;
+  const transitionLines = summary.ticketTransitions.map((transition) => `- ${transition.from} -> ${transition.to}: ${transition.count}`).join('\n');
+  const workerRows = summary.workers
+    .map((worker) => `| ${worker.actorId} | ${worker.laneSessionId} | ${worker.scenario} | ${worker.ticketState} | ${worker.evidenceSeal} |`)
+    .join('\n');
+  return [
+    '# ATM 2.1 Real Parallel Dogfood',
+    '',
+    `Generated: ${summary.generatedAt}`,
+    `Task: ${summary.taskId}`,
+    `Verdict: ${summary.verdict}`,
+    '',
+    '## Metrics',
+    '',
+    `- workerCount: ${summary.workerCount}`,
+    `- maxSimultaneousWork: ${summary.maxSimultaneousWork}`,
+    `- actualOverlapMs: ${summary.actualOverlapMs}`,
+    `- parallelAdmissionCount: ${summary.parallelAdmissionCount}`,
+    `- silentOverwrite: ${sideEffects.silentOverwrite}`,
+    `- escapedConflict: ${sideEffects.escapedConflict}`,
+    `- duplicateSideEffect: ${sideEffects.duplicateSideEffect}`,
+    `- unresolvedStarvation: ${sideEffects.unresolvedStarvation}`,
+    '',
+    '## Ticket Transitions',
+    '',
+    transitionLines,
+    '',
+    '## Workers',
+    '',
+    '| Actor | Lane session | Scenario | Ticket state | Evidence seal |',
+    '| --- | --- | --- | --- | --- |',
+    workerRows,
+    '',
+    '## Artifacts',
+    '',
+    `- Summary: ${summary.artifacts.summaryPath}`,
+    `- Worker manifest: ${summary.artifacts.workerManifestPath}`,
+    `- Report: ${summary.artifacts.reportPath}`,
+    ''
+  ].join('\n');
 }
 
 function brokerTickets(events: readonly LaneSessionEvent[]) {
