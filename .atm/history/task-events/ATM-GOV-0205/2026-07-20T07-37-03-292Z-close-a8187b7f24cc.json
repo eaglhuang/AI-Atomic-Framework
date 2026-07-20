@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T07-37-03-292Z-close-a8187b7f24cc",
+  "taskId": "ATM-GOV-0205",
+  "action": "close",
+  "actorId": "codex-captain-0205",
+  "sessionId": "session-20260720072509-codex-captain-0205-ATM-GOV-0205-606e99e9e8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0205.json",
+  "taskSha256": "sha256:6fa72556f6c3b56f73a858e39a94891eff199a6cf33420803a32315487573fc2",
+  "createdAt": "2026-07-20T07:37:03.292Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0205 --actor codex-captain-0205 --status done --historical-delivery b1de0bf94ff66d130220717f2550e2c704bbc450",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720072509-codex-captain-0205-ATM-GOV-0205-606e99e9e8",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0205.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/telemetry-observation-interface-migration.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:telemetry-observation-interface"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T07:37:03.285Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0205.*",
+        ".atm/history/task-events/ATM-GOV-0205/**",
+        ".atm/history/tasks/ATM-GOV-0205.json",
+        "packages/cli/src/commands/evidence/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/**",
+        "scripts/validate-telemetry-observation-interface.ts",
+        "tests/cli/telemetry-observation-interface-migration.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/**",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/**",
+        "scripts/validate-telemetry-observation-interface.ts",
+        "tests/cli/telemetry-observation-interface-migration.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
