@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0200",
+  "title": "Validator observed lifecycle and evidence driven tiering",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0196",
+    "ATM-GOV-0205"
+  ],
+  "acceptance": [
+    "每個執行/skip/cache/fan-out 路徑都有 observed lifecycle event。",
+    "default/full 前後 outcome parity，安全違規為零。",
+    "至少一個 canonical duplicate evaluator parity case 與一個 shared cache/fan-out case。",
+    "tier proposal 使用真 runtime window，資料不足項明示 insufficient-observation。",
+    "rollback 可恢復原 ordering/tier 並留下 compact receipt。",
+    "開工 `dataDrivenDecision` 已引用 0196 history/config digest並留下 consumed receipt；本卡 sealed summary 可由同卡 validator 讀回並供 0202 後續消費。",
+    "rollback 會失效 treatment cache、恢復原 config digest／ordering／tier，且 parity validator 通過。"
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/**",
+    "packages/cli/src/commands/evidence/**",
+    "scripts/run-validators/**",
+    "scripts/run-validators.ts",
+    "scripts/validators.config.json",
+    "tests/cli/validator-observed-lifecycle.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/**",
+    "packages/cli/src/commands/evidence/**",
+    "scripts/run-validators/**",
+    "scripts/run-validators.ts",
+    "scripts/validators.config.json",
+    "tests/cli/validator-observed-lifecycle.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validator-observed-lifecycle.test.ts",
+    "node --strip-types tests/cli/validator-dag-shared-cache.test.ts",
+    "node --strip-types tests/cli/validator-run-resume-and-status.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Restore the prior validator ordering/tier configuration, invalidate treatment cache entries, disable the optimizationId, and retain the compact rollback receipt plus runtime traces for audit.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-dag-cache",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-lifecycle-observation",
+        "pattern": "Validator Lifecycle Observation",
+        "source": "packages/core/src/evidence/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0200-validator-observed-lifecycle-and-evidence-driven-tiering.task.md",
+    "sectionTitle": "ATM-GOV-0200",
+    "headingLine": 54,
+    "hash": "f52589b698cb0ec0",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0200-validator-observed-lifecycle-and-evidence-driven-tiering.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:f52589b698cb0ec0690c93cffca958883678a4620bb5a47d4ee1d7c574d11a59",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T10:50:22.015Z"
+    }
+  },
+  "importedAt": "2026-07-20T10:50:22.015Z",
+  "lastTransitionId": "2026-07-20T10-50-40-250Z-claim-4cc236a688f7",
+  "lastTransitionAt": "2026-07-20T10:50:40.250Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0200",
+  "reservedAt": "2026-07-20T10:50:36.038Z",
+  "promotedAt": "2026-07-20T10:50:36.043Z",
+  "claim": {
+    "actorId": "codex-captain-0200",
+    "leaseId": "lease-6419c823cf81",
+    "claimedAt": "2026-07-20T10:50:36.049Z",
+    "heartbeatAt": "2026-07-20T10:50:36.049Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0200.json",
+      "packages/cli/src/commands/evidence/**",
+      "packages/core/src/evidence/**",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/**",
+      "scripts/validators.config.json",
+      "tests/cli/validator-observed-lifecycle.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720105036-codex-captain-0200-00228b0573",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720105036-codex-captain-0200-00228b0573\""
+    }
+  },
+  "startedAt": "2026-07-20T10:50:36.049Z",
+  "startedByActor": "codex-captain-0200",
+  "startedBySessionId": "session-20260720105036-codex-captain-0200-ATM-GOV-0200-2cfa8e7f0e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0200",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0200.*",
+      ".atm/history/task-events/ATM-GOV-0200/**",
+      ".atm/history/tasks/ATM-GOV-0200.json",
+      "packages/cli/src/commands/evidence/**",
+      "packages/core/src/evidence/**",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/**",
+      "scripts/validators.config.json",
+      "tests/cli/validator-observed-lifecycle.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "df122060feb86d2b2d36751dfa788775a04e988988db9acdadf358dfc517f293",
+    "actorId": "codex-captain-0200",
+    "sessionId": "session-20260720105036-codex-captain-0200-ATM-GOV-0200-2cfa8e7f0e",
+    "laneSession": {
+      "laneSessionId": "lane-20260720105036-codex-captain-0200-00228b0573",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720105036-codex-captain-0200-00228b0573\""
+    },
+    "createdAt": "2026-07-20T10:50:40.249Z",
+    "status": "active"
+  }
+}
