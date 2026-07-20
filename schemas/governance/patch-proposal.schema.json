@@ -93,6 +93,19 @@
         "$ref": "#/$defs/resourceOverlap"
       }
     },
+    "readAtoms": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/proposalAtomRef"
+      }
+    },
+    "semanticAssumptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
     "intent": {
       "type": "string",
       "minLength": 1

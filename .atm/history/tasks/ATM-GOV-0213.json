@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0213",
+  "title": "CID and read set semantic revalidation adjudicator",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0208",
+    "ATM-GOV-0209",
+    "ATM-GOV-0211"
+  ],
+  "acceptance": [
+    "disjoint write/write 但 read/write 相交的 stale-reasoning fixture 必須重新驗證，不可直接 publish。",
+    "rename+modify、delete+modify、commutative scalar、same CID disjoint anchor 與 validator unavailable 均有 deterministic adjudication。",
+    "revalidation result 包含 base/current/published-set digest、assumptions、validator refs 與具體 ticket next action。",
+    "reads/docs/private work 從不因 revalidation 排隊；code publish 在 inconclusive 時不通過。",
+    "focused semantic tests、broker proposal/schema validators與 typecheck 全數通過。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/semantic-adjudication/**",
+    "packages/core/src/broker/semantic-contract.ts",
+    "schemas/governance/semantic-revalidation.schema.json",
+    "tests/core/broker-semantic-revalidation.test.ts",
+    "tests/core/broker-cid-operation-algebra.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/semantic-adjudication/**",
+    "packages/core/src/broker/semantic-contract.ts",
+    "packages/core/src/broker/policy.ts",
+    "schemas/governance/semantic-revalidation.schema.json",
+    "schemas/governance/write-intent.schema.json",
+    "schemas/governance/patch-proposal.schema.json",
+    "tests/core/broker-semantic-revalidation.test.ts",
+    "tests/core/broker-cid-operation-algebra.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/core/broker-semantic-revalidation.test.ts",
+    "node --strip-types tests/core/broker-cid-operation-algebra.test.ts",
+    "npm run validate:broker-proposal",
+    "npm run validate:schemas",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No patch application, queue fairness implementation, live commit/update-ref, build, projection, checkpoint, closeback, or push."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "circuit-breaker",
+  "rollbackNotes": "Disable semantic auto-admit, preserve revalidation evidence, route affected code-publish tickets to queue/steward review, and leave reads/docs/private work available.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-broker",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker-semantic-adjudicator",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/semantic-adjudication/policy.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.broker-semantic-result",
+        "pattern": "Result Contract Object",
+        "source": "packages/core/src/broker/semantic-contract.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0213-cid-and-read-set-semantic-revalidation-adjudicator.task.md",
+    "sectionTitle": "ATM-GOV-0213",
+    "headingLine": 77,
+    "hash": "31aa83a526a57d07",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0213-cid-and-read-set-semantic-revalidation-adjudicator.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:31aa83a526a57d0708eee55fd77259fba84ef44a0e0cf7eb67df2c04fc476291",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T09:17:23.439Z"
+    }
+  },
+  "importedAt": "2026-07-20T09:17:23.439Z",
+  "lastTransitionId": "2026-07-20T09-17-38-124Z-claim-4fef9c46d9a7",
+  "lastTransitionAt": "2026-07-20T09:17:38.124Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0213",
+  "reservedAt": "2026-07-20T09:17:33.469Z",
+  "promotedAt": "2026-07-20T09:17:33.474Z",
+  "claim": {
+    "actorId": "codex-captain-0213",
+    "leaseId": "lease-589ae9a5c8ab",
+    "claimedAt": "2026-07-20T09:17:33.479Z",
+    "heartbeatAt": "2026-07-20T09:17:33.479Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0213.json",
+      "packages/core/src/broker/policy.ts",
+      "packages/core/src/broker/semantic-adjudication/**",
+      "packages/core/src/broker/semantic-contract.ts",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/semantic-revalidation.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "tests/core/broker-cid-operation-algebra.test.ts",
+      "tests/core/broker-semantic-revalidation.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720091733-codex-captain-0213-615cad8656",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720091733-codex-captain-0213-615cad8656\""
+    }
+  },
+  "startedAt": "2026-07-20T09:17:33.479Z",
+  "startedByActor": "codex-captain-0213",
+  "startedBySessionId": "session-20260720091733-codex-captain-0213-ATM-GOV-0213-58be27e5e0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0213",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0213.*",
+      ".atm/history/task-events/ATM-GOV-0213/**",
+      ".atm/history/tasks/ATM-GOV-0213.json",
+      "packages/core/src/broker/policy.ts",
+      "packages/core/src/broker/semantic-adjudication/**",
+      "packages/core/src/broker/semantic-contract.ts",
+      "schemas/governance/patch-proposal.schema.json",
+      "schemas/governance/semantic-revalidation.schema.json",
+      "schemas/governance/write-intent.schema.json",
+      "tests/core/broker-cid-operation-algebra.test.ts",
+      "tests/core/broker-semantic-revalidation.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "779ee7e2c2f3a7327e6adf27d6ce6993cbdd994029e9f7acf65bc881fedc7b45",
+    "actorId": "codex-captain-0213",
+    "sessionId": "session-20260720091733-codex-captain-0213-ATM-GOV-0213-58be27e5e0",
+    "laneSession": {
+      "laneSessionId": "lane-20260720091733-codex-captain-0213-615cad8656",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720091733-codex-captain-0213-615cad8656\""
+    },
+    "createdAt": "2026-07-20T09:17:38.123Z",
+    "status": "active"
+  }
+}
