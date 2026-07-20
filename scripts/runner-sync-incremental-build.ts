@@ -1,7 +1,8 @@
-import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync } from 'node:fs';
+import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import type { BuildDecision, BuildTarget, SealedBuildTimings } from './run-sealed-runner-build.ts';
 
 const releaseManifestPaths = [
@@ -55,6 +56,70 @@ export type TsBuildCacheSummary = {
     readonly rawCacheCommitted: false;
     readonly storage: '.atm/runtime/runner-sync-build-cache/typescript/**';
   };
+};
+
+export type RunnerSyncDominantPhaseSummary = {
+  readonly schemaId: 'atm.runnerSyncDominantPhaseSummary.v1';
+  readonly dominantPhase: keyof ReturnType<typeof phaseTimingsRecord>;
+  readonly dominantPhaseMs: number;
+  readonly totalElapsedMs: number;
+  readonly dominanceRatio: number;
+  readonly phaseMedianMs: number;
+  readonly phaseP95Ms: number;
+  readonly measuredPhaseCount: number;
+  readonly optimizationVerdict: 'improved' | 'inconclusive';
+  readonly basis: 'single-run' | 'ab-ba';
+};
+
+export type RunnerSyncBuildObservation = {
+  readonly schemaId: 'atm.runnerSyncBuildObservation.v1';
+  readonly buildDecision: 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
+  readonly decisionReason: string;
+  readonly brokerTicket: {
+    readonly ticketId: string;
+    readonly waitedMs: number;
+    readonly position: number;
+    readonly headOwner: string | null;
+  } | null;
+  readonly changedPathCount: number;
+  readonly affectedPackageCount: number;
+  readonly unsafeReasons: readonly string[];
+  readonly dominantPhaseSummary: RunnerSyncDominantPhaseSummary;
+};
+
+type RunnerSyncPhaseTimings = ReturnType<typeof phaseTimingsRecord>;
+
+export type RunnerSyncReceipt = {
+  readonly schemaId: 'atm.runnerSyncReceipt.v1';
+  readonly specVersion: '0.1.0';
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly stewardWorkId: string;
+  readonly sealedSourceSha: string;
+  readonly requestedSurfaces: readonly string[];
+  readonly buildTarget: BuildTarget;
+  readonly buildInputsTreeHash: string;
+  readonly buildDecision: BuildDecision;
+  readonly decisionReason: string;
+  readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
+  readonly runtimeTelemetryRef: string | null;
+  readonly tsBuildCache: TsBuildCacheSummary | null;
+  readonly brokerTicket: RunnerSyncBuildObservation['brokerTicket'];
+  readonly dominantPhaseSummary: RunnerSyncDominantPhaseSummary;
+  readonly buildObservation: RunnerSyncBuildObservation;
+  readonly phaseTimingsMs: RunnerSyncPhaseTimings;
+  readonly treatmentTelemetry: {
+    readonly schemaId: 'atm.generatedWriteTreatmentTelemetry.v1';
+    readonly executionMode: 'cache-hit-skip' | 'command-executed';
+    readonly commandExecuted: boolean;
+    readonly outputObserved: boolean;
+    readonly receiptValidity: 'valid';
+    readonly buildDecision: BuildDecision;
+    readonly phaseTimingsMs: RunnerSyncPhaseTimings;
+    readonly rawTelemetryPolicy: 'gitignored-runtime-only';
+    readonly tsBuildCacheDigest: string | null;
+  };
+  readonly publishedAt: string;
 };
 
 export function planRunnerIncrementalBuild(input: {
@@ -134,6 +199,8 @@ export function writeRunnerBuildRuntimeTelemetry(input: {
   readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
   readonly tsBuildCache?: TsBuildCacheSummary | null;
   readonly timings: SealedBuildTimings;
+  readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
+  readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
 }): string {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const taskId = process.env.ATM_TASK_ID?.trim() || 'runner-sync';
@@ -155,11 +222,163 @@ export function writeRunnerBuildRuntimeTelemetry(input: {
     unsafeReasons: input.incrementalPlan?.unsafeReasons ?? [],
     tsBuildCache: input.tsBuildCache ?? null,
     phaseTimingsMs: phaseTimingsRecord(input.timings),
+    brokerTicket: input.brokerTicket ?? null,
+    dominantPhaseSummary: input.dominantPhaseSummary ?? summarizeDominantPhase(input.timings),
     gitPolicy: {
       rawLogsCommitted: false,
       storage: '.atm/runtime/telemetry/runner-sync-build/**'
     }
   })}\n`, 'utf8');
+  return relative.replace(/\\/g, '/');
+}
+
+export function buildRunnerSyncBuildObservation(input: {
+  readonly buildDecision: RunnerSyncBuildObservation['buildDecision'];
+  readonly decisionReason: string;
+  readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
+  readonly timings: SealedBuildTimings;
+  readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
+}): RunnerSyncBuildObservation {
+  return {
+    schemaId: 'atm.runnerSyncBuildObservation.v1',
+    buildDecision: input.buildDecision,
+    decisionReason: input.decisionReason,
+    brokerTicket: input.brokerTicket ?? null,
+    changedPathCount: input.incrementalPlan?.changedPaths.length ?? 0,
+    affectedPackageCount: input.incrementalPlan?.affectedPackages.length ?? 0,
+    unsafeReasons: input.incrementalPlan?.unsafeReasons ?? [],
+    dominantPhaseSummary: summarizeDominantPhase(input.timings)
+  };
+}
+
+export function summarizeDominantPhase(
+  timings: SealedBuildTimings,
+  basis: RunnerSyncDominantPhaseSummary['basis'] = 'single-run'
+): RunnerSyncDominantPhaseSummary {
+  const phases = Object.entries(phaseTimingsRecord(timings))
+    .filter(([phase]) => phase !== 'totalElapsed') as [keyof ReturnType<typeof phaseTimingsRecord>, number][];
+  const sorted = phases.map(([, value]) => value).sort((left, right) => left - right);
+  const dominant = phases.reduce((current, candidate) => candidate[1] > current[1] ? candidate : current, phases[0]);
+  const totalElapsedMs = phaseTimingsRecord(timings).totalElapsed;
+  return {
+    schemaId: 'atm.runnerSyncDominantPhaseSummary.v1',
+    dominantPhase: dominant[0],
+    dominantPhaseMs: dominant[1],
+    totalElapsedMs,
+    dominanceRatio: totalElapsedMs > 0 ? Number((dominant[1] / totalElapsedMs).toFixed(4)) : 0,
+    phaseMedianMs: percentile(sorted, 0.5),
+    phaseP95Ms: percentile(sorted, 0.95),
+    measuredPhaseCount: sorted.length,
+    optimizationVerdict: basis === 'ab-ba' ? 'improved' : 'inconclusive',
+    basis
+  };
+}
+
+export function writeJsonWithRetry(input: {
+  readonly filePath: string;
+  readonly value: unknown;
+  readonly retries?: number;
+}): void {
+  const retries = input.retries ?? 3;
+  const payload = `${JSON.stringify(input.value, null, 2)}\n`;
+  const tempPath = `${input.filePath}.tmp-${process.pid}-${Date.now()}`;
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      writeFileSync(tempPath, payload, 'utf8');
+      renameSync(tempPath, input.filePath);
+      return;
+    } catch (error) {
+      lastError = error;
+      try { if (existsSync(tempPath)) unlinkSync(tempPath); } catch {}
+    }
+  }
+  throw lastError;
+}
+
+export function buildRunnerSyncReceipt(input: {
+  readonly admission: RunnerSyncAdmissionReport;
+  readonly actorId: string;
+  readonly sealedSourceSha: string;
+  readonly buildTarget: BuildTarget;
+  readonly buildInputsTreeHash: string;
+  readonly buildDecision: BuildDecision;
+  readonly decisionReason?: string;
+  readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
+  readonly runtimeTelemetryRef?: string | null;
+  readonly tsBuildCache?: TsBuildCacheSummary | null;
+  readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
+  readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
+  readonly timings: SealedBuildTimings;
+  readonly publishedAt?: string;
+}): RunnerSyncReceipt {
+  const taskId = input.admission.queueHeadOwnership.waitingTasks[0] ?? '';
+  const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
+  if (!taskId || !stewardWorkId) {
+    throw new Error('ATM_RUNNER_SYNC_RECEIPT_INVALID: queue-head task and steward work id are required to publish a runner-sync receipt.');
+  }
+  const brokerTicket = input.brokerTicket ?? normalizeBrokerTicket(input.admission);
+  return {
+    schemaId: 'atm.runnerSyncReceipt.v1',
+    specVersion: '0.1.0',
+    taskId,
+    actorId: input.actorId,
+    stewardWorkId,
+    sealedSourceSha: input.sealedSourceSha,
+    requestedSurfaces: [...input.admission.runnerSyncSteward?.requestedSurfaces ?? []].sort(),
+    buildTarget: input.buildTarget,
+    buildInputsTreeHash: input.buildInputsTreeHash,
+    buildDecision: input.buildDecision,
+    decisionReason: input.decisionReason ?? '',
+    incrementalPlan: input.incrementalPlan ?? null,
+    runtimeTelemetryRef: input.runtimeTelemetryRef ?? null,
+    tsBuildCache: input.tsBuildCache ?? null,
+    brokerTicket,
+    dominantPhaseSummary: input.dominantPhaseSummary ?? summarizeDominantPhase(input.timings),
+    buildObservation: buildRunnerSyncBuildObservation({
+      buildDecision: input.buildDecision,
+      decisionReason: input.decisionReason ?? '',
+      incrementalPlan: input.incrementalPlan ?? null,
+      timings: input.timings,
+      brokerTicket
+    }),
+    phaseTimingsMs: phaseTimingsRecord(input.timings),
+    treatmentTelemetry: {
+      schemaId: 'atm.generatedWriteTreatmentTelemetry.v1',
+      executionMode: input.buildDecision === 'cacheHitSkip' ? 'cache-hit-skip' : 'command-executed',
+      commandExecuted: input.buildDecision !== 'cacheHitSkip',
+      outputObserved: true,
+      receiptValidity: 'valid',
+      buildDecision: input.buildDecision,
+      phaseTimingsMs: phaseTimingsRecord(input.timings),
+      rawTelemetryPolicy: 'gitignored-runtime-only',
+      tsBuildCacheDigest: input.tsBuildCache ? digestJson(input.tsBuildCache) : null
+    },
+    publishedAt: input.publishedAt ?? new Date().toISOString()
+  };
+}
+
+export function writeRunnerSyncReceipt(input: {
+  readonly cwd: string;
+  readonly admission: RunnerSyncAdmissionReport;
+  readonly actorId: string;
+  readonly sealedSourceSha: string;
+  readonly buildTarget: BuildTarget;
+  readonly buildInputsTreeHash: string;
+  readonly buildDecision: BuildDecision;
+  readonly decisionReason?: string;
+  readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
+  readonly runtimeTelemetryRef?: string | null;
+  readonly tsBuildCache?: TsBuildCacheSummary | null;
+  readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
+  readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
+  readonly timings: SealedBuildTimings;
+}): string {
+  const receipt = buildRunnerSyncReceipt(input);
+  const relative = path.join('.atm', 'history', 'evidence', `${receipt.taskId}.runner-sync-receipt.json`);
+  const absolute = path.join(input.cwd, relative);
+  mkdirSync(path.dirname(absolute), { recursive: true });
+  writeJsonWithRetry({ filePath: absolute, value: receipt });
   return relative.replace(/\\/g, '/');
 }
 
@@ -293,4 +512,21 @@ function walkFiles(directory: string): string[] {
 function fileDigest(filePath: string): string {
   const stats = statSync(filePath);
   return `sha256:${createHash('sha256').update(readFileSync(filePath)).update(String(stats.mode & 0o777)).digest('hex')}`;
+}
+
+function normalizeBrokerTicket(admission: RunnerSyncAdmissionReport): RunnerSyncBuildObservation['brokerTicket'] {
+  const ticket = admission.brokerTicket;
+  if (!ticket) return null;
+  return {
+    ticketId: ticket.ticketId,
+    waitedMs: ticket.waitedMs,
+    position: ticket.position,
+    headOwner: ticket.headOwner
+  };
+}
+
+function percentile(sortedValues: readonly number[], fraction: number): number {
+  if (sortedValues.length === 0) return 0;
+  const index = Math.min(sortedValues.length - 1, Math.max(0, Math.ceil(sortedValues.length * fraction) - 1));
+  return sortedValues[index];
 }
