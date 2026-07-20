@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0202",
+  "title": "Real paired AB v4 and rollout verdict",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0198",
+    "ATM-GOV-0199",
+    "ATM-GOV-0200",
+    "ATM-GOV-0201",
+    "ATM-GOV-0214"
+  ],
+  "acceptance": [
+    "0198–0201 的 sealed summaries/config digests 均有 0202 cross-card consumed receipt，opening `dataDrivenDecision` 可追溯。",
+    "0211–0214 的ticket/composer/semantic/saga summaries與config digests均已consumed。",
+    "serial、queue-only、ATM compose-first、isolated Git branch+merge四臂在相同workload/config下皆有結果；缺臂一律`inconclusive`。",
+    "2/4/8/16/32/64/100+每個required arm×contention cell均達versioned benchmark config的minimum repeats、seed/order與observation horizon；不足cell逐一標`inconclusive`，不使用「compose O(1)」宣稱。",
+    "Git臂只在disposable fixture repo執行，沒有live framework branch/worktree或broker bypass。",
+    "四種驗證方法各有獨立 verdict 與 source digest；speed/cost/safety/observability/broker/runner 分維，不可判項明示原因。",
+    "`--validate --require-sealed-cohorts` 對缺 summary、未 consumed、cohort 漂移與 digest mismatch 均 fail closed。",
+    "rollback/circuit breaker recovery command 已在隔離環境執行並驗證 receipt；0202 sealed summary 已完成同卡 readback。",
+    "**A — rollout verdict**：所有required arm×scale×contention cells均達sealed benchmark config門檻、matched ordering/exclusion manifest完整，且所有必要維度可判、安全違規為零，才可產生rollout/default-on verdict。",
+    "**B — data-insufficient closeout**：任一required cell或必要維度不可判時，保留aggregate=`inconclusive`，逐cell輸出exclusion與最小補樣proposal，維持opt-in/circuit breaker；不得以synthetic fixture、填零或降門檻冒充A分支。"
+  ],
+  "deliverables": [
+    "scripts/analyze-captain-parallel-ledger.ts",
+    "scripts/captain-parallel-ledger-report.ts",
+    "scripts/plan-performance-report-v3.ts",
+    "scripts/fixtures/auto-batch-analyzer/**",
+    "scripts/fixtures/parallel-admission-scale/**",
+    "packages/cli/src/commands/batch/**",
+    "docs/reports/captain-parallel-ledger-analysis.md",
+    "tests/cli/real-paired-ab-v4.test.ts",
+    "tests/cli/parallel-admission-scale-benchmark.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/analyze-captain-parallel-ledger.ts",
+    "scripts/captain-parallel-ledger-report.ts",
+    "scripts/plan-performance-report-v3.ts",
+    "scripts/fixtures/auto-batch-analyzer/**",
+    "scripts/fixtures/parallel-admission-scale/**",
+    "packages/cli/src/commands/batch/**",
+    "docs/reports/captain-parallel-ledger-analysis.md",
+    "tests/cli/real-paired-ab-v4.test.ts",
+    "tests/cli/parallel-admission-scale-benchmark.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/real-paired-ab-v4.test.ts",
+    "node --strip-types tests/cli/parallel-admission-scale-benchmark.test.ts",
+    "node --strip-types scripts/analyze-captain-parallel-ledger.ts --validate --require-sealed-cohorts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Keep treatment opt-in until the sufficient-data branch passes; restore the prior config digest through the circuit breaker and verify the emitted recovery command and receipt.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.plan-performance-analyzer",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.matched-cohort-verdict",
+        "pattern": "Matched Cohort Verdict",
+        "source": "scripts/analyze-captain-parallel-ledger.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0202-real-paired-ab-v4-and-rollout-verdict.task.md",
+    "sectionTitle": "ATM-GOV-0202",
+    "headingLine": 64,
+    "hash": "1bb85ff15944f870",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0202-real-paired-ab-v4-and-rollout-verdict.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:1bb85ff15944f8709378e32b977ef6f7f11fac47426a91c4e1fa3f4bf4452a23",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T11:18:41.814Z"
+    }
+  },
+  "importedAt": "2026-07-20T11:18:41.814Z",
+  "lastTransitionId": "2026-07-20T11-18-55-521Z-claim-1cf138c87f43",
+  "lastTransitionAt": "2026-07-20T11:18:55.521Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0202",
+  "reservedAt": "2026-07-20T11:18:50.683Z",
+  "promotedAt": "2026-07-20T11:18:50.688Z",
+  "claim": {
+    "actorId": "codex-captain-0202",
+    "leaseId": "lease-fd3adb031e09",
+    "claimedAt": "2026-07-20T11:18:50.693Z",
+    "heartbeatAt": "2026-07-20T11:18:50.693Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0202.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/**",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "scripts/fixtures/parallel-admission-scale/**",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/parallel-admission-scale-benchmark.test.ts",
+      "tests/cli/real-paired-ab-v4.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720111850-codex-captain-0202-4e396100e2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720111850-codex-captain-0202-4e396100e2\""
+    }
+  },
+  "startedAt": "2026-07-20T11:18:50.693Z",
+  "startedByActor": "codex-captain-0202",
+  "startedBySessionId": "session-20260720111850-codex-captain-0202-ATM-GOV-0202-9bb8631dd5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0202",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0202.*",
+      ".atm/history/task-events/ATM-GOV-0202/**",
+      ".atm/history/tasks/ATM-GOV-0202.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/**",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/fixtures/auto-batch-analyzer/**",
+      "scripts/fixtures/parallel-admission-scale/**",
+      "scripts/plan-performance-report-v3.ts",
+      "tests/cli/parallel-admission-scale-benchmark.test.ts",
+      "tests/cli/real-paired-ab-v4.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e3bbbdf82ca2f8bd3e18d34f7e8b4604eb3da6dc3e19b95269bd858a78928fd9",
+    "actorId": "codex-captain-0202",
+    "sessionId": "session-20260720111850-codex-captain-0202-ATM-GOV-0202-9bb8631dd5",
+    "laneSession": {
+      "laneSessionId": "lane-20260720111850-codex-captain-0202-4e396100e2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720111850-codex-captain-0202-4e396100e2\""
+    },
+    "createdAt": "2026-07-20T11:18:55.520Z",
+    "status": "active"
+  }
+}

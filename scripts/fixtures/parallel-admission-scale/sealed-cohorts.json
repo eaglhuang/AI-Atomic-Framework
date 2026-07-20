@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.realPairedAbV4SealedCohorts.v1",
+  "benchmarkConfigDigest": "sha256:0202b4f1c0ffee00000000000000000000000000000000000000000000000000",
+  "benchmarkConfig": {
+    "version": "2026-07-20.real-paired-ab-v4",
+    "minimumRepeats": 3,
+    "seedSet": ["ab-0202-01", "ba-0202-01", "latin-0202-01"],
+    "ordering": "AB/BA latin-square",
+    "observationHorizon": "sealed-summaries-only"
+  },
+  "consumedSummaries": [
+    { "taskId": "ATM-GOV-0198", "digest": "sha256:0198019801980198019801980198019801980198019801980198019801980198", "consumedBy": "ATM-GOV-0202" },
+    { "taskId": "ATM-GOV-0199", "digest": "sha256:2f7e2c63a03db602ca31f2c11feaf4fb76774ee8c115834e8c60b00123c5993f", "consumedBy": "ATM-GOV-0202" },
+    { "taskId": "ATM-GOV-0200", "digest": "sha256:9506e218c97191323c52409652ae1d9b3dbca31b4d157f60ebe108e0975423be", "consumedBy": "ATM-GOV-0202" },
+    { "taskId": "ATM-GOV-0201", "digest": "sha256:2842fdbf2229620d6302c94589fc471fdb6a03945298223ba2666a06e985ef43", "consumedBy": "ATM-GOV-0202" },
+    { "taskId": "ATM-GOV-0211", "digest": "sha256:0211021102110211021102110211021102110211021102110211021102110211", "consumedBy": "ATM-GOV-0202" },
+    { "taskId": "ATM-GOV-0212", "digest": "sha256:0212021202120212021202120212021202120212021202120212021202120212", "consumedBy": "ATM-GOV-0202" },
+    { "taskId": "ATM-GOV-0213", "digest": "sha256:0213021302130213021302130213021302130213021302130213021302130213", "consumedBy": "ATM-GOV-0202" },
+    { "taskId": "ATM-GOV-0214", "digest": "sha256:0214021402140214021402140214021402140214021402140214021402140214", "consumedBy": "ATM-GOV-0202" }
+  ],
+  "cellMatrix": {
+    "arms": ["serial", "queue-only", "atm-compose-first", "isolated-git-branch-merge"],
+    "scales": [2, 4, 8, 16, 32, 64, 100],
+    "contention": ["disjoint", "same-file-disjoint-anchor", "commutative-cid", "noncommutative-cid", "generated-shared-surface"],
+    "status": "inconclusive",
+    "sampleCount": 1,
+    "exclusionReason": "sealed summary exists, but minimum repeats are not met"
+  },
+  "validationMethods": [
+    { "method": "historicalReplay", "verdict": "inconclusive", "sourceDigest": "sha256:0202aa0000000000000000000000000000000000000000000000000000000000" },
+    { "method": "shadowMode", "verdict": "inconclusive", "sourceDigest": "sha256:0202bb0000000000000000000000000000000000000000000000000000000000" },
+    { "method": "canonicalParity", "verdict": "inconclusive", "sourceDigest": "sha256:0202cc0000000000000000000000000000000000000000000000000000000000" },
+    { "method": "matchedBatchAb", "verdict": "inconclusive", "sourceDigest": "sha256:0202dd0000000000000000000000000000000000000000000000000000000000" }
+  ],
+  "rolloutDimensions": {
+    "speed": "inconclusive",
+    "cost": "inconclusive",
+    "safety": "inconclusive",
+    "observability": "inconclusive",
+    "broker": "inconclusive",
+    "runner": "inconclusive"
+  },
+  "gitArmIsolation": {
+    "disposableRepo": true,
+    "liveFrameworkWorktree": false,
+    "brokerBypass": false,
+    "receiptDigest": "sha256:0202ee0000000000000000000000000000000000000000000000000000000000"
+  },
+  "rollbackReceipt": {
+    "verified": true,
+    "recoveryCommand": "node atm.mjs broker parallel-admission set --mode opt-in --circuit-breaker enabled --json",
+    "receiptDigest": "sha256:0202ff0000000000000000000000000000000000000000000000000000000000"
+  }
+}
