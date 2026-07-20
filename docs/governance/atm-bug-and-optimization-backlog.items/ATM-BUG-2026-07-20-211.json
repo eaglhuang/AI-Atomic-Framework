@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-211",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Taskflow closeout / dirty classification / generated release artifacts",
+  "finding": "After ATM-GOV-0196 closeout succeeded, runner-sync receipt and release artifact files remained dirty but were classified as excluded/outside task scope during close. This leaves operators with unclear post-close cleanup/commit guidance for generated release sync outputs that were necessary for the close path.",
+  "expectedBehavior": "Taskflow close should either include required runner-sync receipts and release artifact manifests in a governed follow-up bundle, or emit a precise post-close instruction that says which generated files are intentionally left dirty, which should be committed by the runner-sync steward, and which should be restored or ignored. The rule should be data-driven from the runner-sync receipt and task scope, not hard-coded file strings.",
+  "evidenceOrRepro": "ATM-GOV-0196 close --write succeeded with target close commit `cc0ec2a728a40ea7e82618c0037815ddc8148607`, but `git status --short` still showed `.atm/history/evidence/ATM-GOV-0196.runner-sync-receipt.json`, `release/atm-onefile/atm.mjs`, release manifests, and release root-drop outputs as dirty. The close result listed these files under `excludedDirtyFiles` even though the preceding runner-sync build was required for stale-runner close readiness.",
+  "followUp": "Add a closeout postflight that reconciles runner-sync generated outputs with task scope and steward receipts, then emits a copyable governed commit, release, or restore recommendation without requiring manual interpretation."
+}
