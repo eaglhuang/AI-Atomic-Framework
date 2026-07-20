@@ -1,0 +1,252 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0214",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b95abf409536d5879389b00d9ab1f32d5e972cdb",
+  "governedTreeSha": "dd6cd51a5127d705b94004be07329c26373de295",
+  "targetCommitDelta": {
+    "currentCommitSha": "b95abf409536d5879389b00d9ab1f32d5e972cdb",
+    "parentCommitShas": [
+      "b95abf409536d5879389b00d9ab1f32d5e972cdb"
+    ],
+    "governedTreeSha": "dd6cd51a5127d705b94004be07329c26373de295",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/core/src/broker/shared-delivery-saga.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/batch-execute-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/proposal-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/registry-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/telemetry.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/claim-parallel-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/proposal-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/registry-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/telemetry.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/shared-utils.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/dist/broker/decision.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/broker/registry.js",
+      "release/atm-root-drop/packages/core/dist/broker/wave-broker-scheduler.js",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/telemetry/index.js",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/broker/registry.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/packages/core/src/broker/wave-broker-scheduler.ts",
+      "release/atm-root-drop/packages/core/src/telemetry/index.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.js",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/index.ts",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/schemas/governance/broker-decision.schema.json",
+      "release/atm-root-drop/schemas/governance/patch-proposal.schema.json",
+      "release/atm-root-drop/schemas/governance/write-intent.schema.json",
+      "release/atm-root-drop/scripts/validate-broker-compose.ts",
+      "release/atm-root-drop/scripts/validate-broker-steward.ts",
+      "release/atm-root-drop/scripts/validate-schemas/context.ts",
+      "release/atm-root-drop/tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
+      "schemas/governance/shared-delivery-saga.schema.json",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+      "tests/cli/shared-delivery-saga-ordering.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/shared-delivery-saga-ordering.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1861917e52356370fbd542541d93fee7b192f4c6a16cd69ca3f29a1d15495f62",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f08eb95f60f099993ef6ff47c37425b217373b35c8d120b0f4b0dc250cab0ab4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d0d81b035fe5893d9014475a64ffdc8d14d4088eba4637298eaebc130ed3171",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/shared-delivery-commit-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:365bd593d95740bb63102b7f77a7a4c9a4e3a3dfb8673dcda8d00be0212350c1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d253d2d3eed32fdbbc536e0fb20b16f774e1a8e78d845185b224c208dc8bf809",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:brokered-write",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:23c34141b8cc117ebee969b17d7909bb483924cebd05e1c81a1a7f345656d6b3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:3e3fe6e289ac72d3773011ac42c561cc314a54a9dfe47a9d91067c1ee96edf27",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b2f387b2ff398293ef5f7eb4c54ee277623233627a7b125d614cca8bc64f518c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "node --strip-types tests/cli/shared-delivery-commit-executor.test.ts",
+    "node --strip-types tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+    "node --strip-types tests/cli/shared-delivery-saga-ordering.test.ts",
+    "typecheck",
+    "validate:brokered-write",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T09:46:27.562Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0214.*",
+      ".atm/history/task-events/ATM-GOV-0214/**",
+      ".atm/history/tasks/ATM-GOV-0214.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/core/src/broker/recovery.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-delivery-saga.ts",
+      "schemas/governance/shared-delivery-saga.schema.json",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+      "tests/cli/shared-delivery-saga-ordering.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/core/src/broker/recovery.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-delivery-saga.ts",
+      "schemas/governance/shared-delivery-saga.schema.json",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+      "tests/cli/shared-delivery-saga-ordering.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0214.json",
+  "closedAt": "2026-07-20T09:46:27.562Z",
+  "closedByActor": "codex-captain-0214",
+  "sessionId": "session-20260720093111-codex-captain-0214-ATM-GOV-0214-b1b543d320",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "b95abf409536d5879389b00d9ab1f32d5e972cdb",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/core/src/broker/shared-delivery-saga.ts",
+      "schemas/governance/shared-delivery-saga.schema.json",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+      "tests/cli/shared-delivery-saga-ordering.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0214.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0214/2026-07-20T09-30-59-305Z-import-58b31410dfa8.json",
+      ".atm/history/task-events/ATM-GOV-0214/2026-07-20T09-31-11-766Z-reserve-998480b281f9.json",
+      ".atm/history/task-events/ATM-GOV-0214/2026-07-20T09-31-11-770Z-promote-9d1e7c352ccf.json",
+      ".atm/history/task-events/ATM-GOV-0214/2026-07-20T09-31-16-339Z-claim-f4b89052ced1.json",
+      ".atm/history/tasks/ATM-GOV-0214.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

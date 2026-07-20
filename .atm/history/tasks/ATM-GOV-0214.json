@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0214",
   "title": "Shared delivery saga and crash safe exactly once lifecycle",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0211",
@@ -116,8 +116,8 @@
     }
   },
   "importedAt": "2026-07-20T09:30:59.205Z",
-  "lastTransitionId": "2026-07-20T09-31-16-339Z-claim-f4b89052ced1",
-  "lastTransitionAt": "2026-07-20T09:31:16.339Z",
+  "lastTransitionId": "2026-07-20T09-46-27-569Z-close-56b88dc1ede7",
+  "lastTransitionAt": "2026-07-20T09:46:27.569Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0214",
   "reservedAt": "2026-07-20T09:31:11.766Z",
@@ -126,7 +126,7 @@
     "actorId": "codex-captain-0214",
     "leaseId": "lease-cccb836b7a06",
     "claimedAt": "2026-07-20T09:31:11.776Z",
-    "heartbeatAt": "2026-07-20T09:31:11.776Z",
+    "heartbeatAt": "2026-07-20T09:46:27.567Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0214.json",
@@ -140,14 +140,14 @@
       "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
       "tests/cli/shared-delivery-saga-ordering.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720093111-codex-captain-0214-1258cc717d",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720093111-codex-captain-0214-1258cc717d\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T09:31:11.776Z",
   "startedByActor": "codex-captain-0214",
@@ -188,5 +188,9 @@
     },
     "createdAt": "2026-07-20T09:31:16.332Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T09:46:27.567Z",
+  "closedByActor": "codex-captain-0214",
+  "closedBySessionId": "session-20260720093111-codex-captain-0214-ATM-GOV-0214-b1b543d320",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0214.closure-packet.json"
 }

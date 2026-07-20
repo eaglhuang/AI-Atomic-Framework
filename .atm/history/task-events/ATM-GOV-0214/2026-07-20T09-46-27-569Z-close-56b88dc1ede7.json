@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T09-46-27-569Z-close-56b88dc1ede7",
+  "taskId": "ATM-GOV-0214",
+  "action": "close",
+  "actorId": "codex-captain-0214",
+  "sessionId": "session-20260720093111-codex-captain-0214-ATM-GOV-0214-b1b543d320",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0214.json",
+  "taskSha256": "sha256:f62b6eddfa3a29fc5e04719ba4a6039fd4902ac38b40e2fc4337449e477e6666",
+  "createdAt": "2026-07-20T09:46:27.569Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0214 --actor codex-captain-0214 --status done --historical-delivery b95abf409536d5879389b00d9ab1f32d5e972cdb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720093111-codex-captain-0214-ATM-GOV-0214-b1b543d320",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0214.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "node --strip-types tests/cli/shared-delivery-commit-executor.test.ts",
+      "node --strip-types tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+      "node --strip-types tests/cli/shared-delivery-saga-ordering.test.ts",
+      "typecheck",
+      "validate:brokered-write",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T09:46:27.562Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0214.*",
+        ".atm/history/task-events/ATM-GOV-0214/**",
+        ".atm/history/tasks/ATM-GOV-0214.json",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "packages/core/src/broker/recovery.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-delivery-saga.ts",
+        "schemas/governance/shared-delivery-saga.schema.json",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts",
+        "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+        "tests/cli/shared-delivery-saga-ordering.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "packages/core/src/broker/recovery.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-delivery-saga.ts",
+        "schemas/governance/shared-delivery-saga.schema.json",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts",
+        "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+        "tests/cli/shared-delivery-saga-ordering.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
