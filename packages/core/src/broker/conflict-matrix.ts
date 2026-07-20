@@ -1,5 +1,7 @@
 import type { ActiveWriteIntent, BrokerArbitrationVerdict, BrokerConflictClassResult, BrokerConflictGateResult, BrokerConflictMatrix, BrokerDecision, WriteIntent, WriteIntentAtomRef } from './types.ts';
 export type { BrokerArbitrationVerdict, BrokerConflictClassResult, BrokerConflictGateResult, BrokerConflictMatrix } from './types.ts';
+import { buildResourceOverlapReport, compareResourceKeys, resourceListsOverlap, type ResourceKeyOverlapFact, type ResourceKeyOverlapVerdict } from './resource-overlap.ts';
+export { compareResourceKeys, type ResourceKeyOverlapFact, type ResourceKeyOverlapVerdict } from './resource-overlap.ts';
 
 const conflictMatrixSchemaId = 'atm.brokerConflictMatrix.v1' as const;
 const conflictMatrixSpecVersion = '0.1.0' as const;
@@ -35,6 +37,7 @@ export function evaluateConflictMatrix(
 
   const arbitrationVerdict = chooseArbitrationVerdict(conflicts);
   const dedupedConflicts = dedupeConflictResults(conflicts);
+  const resourceOverlapReport = buildResourceOverlapReport(newIntent, activeIntents);
 
   return {
     schemaId: conflictMatrixSchemaId,
@@ -43,7 +46,8 @@ export function evaluateConflictMatrix(
     taskId: newIntent.taskId,
     arbitrationVerdict,
     conflicts: dedupedConflicts,
-    gateResults: buildSevenLayerGateResults(dedupedConflicts)
+    gateResults: buildSevenLayerGateResults(dedupedConflicts),
+    resourceOverlaps: resourceOverlapReport.facts.filter((fact) => fact.verdict !== 'disjoint')
   };
 }
 
@@ -375,109 +379,6 @@ function hasResourceOverlap(newIntent: WriteIntent, active: ActiveWriteIntent): 
     || resourceListsOverlap('registry', newIntent.sharedSurfaces.registries, active.resourceKeys.registries)
     || resourceListsOverlap('validator', newIntent.sharedSurfaces.validators, active.resourceKeys.validators)
     || resourceListsOverlap('artifact', newIntent.sharedSurfaces.artifacts, active.resourceKeys.artifacts);
-}
-
-export type ResourceKeyOverlapVerdict = 'overlap' | 'clear' | 'unknown';
-
-export interface ResourceKeyOverlapFact {
-  readonly resourceKind: string;
-  readonly leftKey: string;
-  readonly rightKey: string;
-  readonly normalizedLeftKey: string;
-  readonly normalizedRightKey: string;
-  readonly verdict: ResourceKeyOverlapVerdict;
-  readonly reason: string;
-  readonly matcherVersion: 'resource-key-matcher@0.1.0';
-}
-
-export function compareResourceKeys(resourceKind: string, leftKey: string, rightKey: string): ResourceKeyOverlapFact {
-  const left = normalizeResourceKey(leftKey);
-  const right = normalizeResourceKey(rightKey);
-  if (!left || !right) {
-    return resourceFact(resourceKind, leftKey, rightKey, left, right, 'unknown', 'empty resource key cannot be matched safely');
-  }
-  if (left === right) {
-    return resourceFact(resourceKind, leftKey, rightKey, left, right, 'overlap', 'resource keys are equal after normalization');
-  }
-  const leftPattern = parseResourcePattern(left);
-  const rightPattern = parseResourcePattern(right);
-  if (leftPattern.unsupported || rightPattern.unsupported) {
-    return resourceFact(resourceKind, leftKey, rightKey, left, right, 'unknown', 'unsupported pattern syntax');
-  }
-  if (leftPattern.hasPattern && !rightPattern.hasPattern) {
-    return resourceFact(resourceKind, leftKey, rightKey, left, right, matchGlob(left, right) ? 'overlap' : 'clear', 'left pattern tested against right literal');
-  }
-  if (!leftPattern.hasPattern && rightPattern.hasPattern) {
-    return resourceFact(resourceKind, leftKey, rightKey, left, right, matchGlob(right, left) ? 'overlap' : 'clear', 'right pattern tested against left literal');
-  }
-  if (leftPattern.hasPattern && rightPattern.hasPattern) {
-    const verdict = patternPrefixesIntersect(left, right) ? 'overlap' : 'clear';
-    return resourceFact(resourceKind, leftKey, rightKey, left, right, verdict, 'pattern prefixes compared for non-empty intersection');
-  }
-  return resourceFact(resourceKind, leftKey, rightKey, left, right, 'clear', 'distinct literal resource keys');
-}
-
-function resourceListsOverlap(resourceKind: string, left: readonly string[], right: readonly string[]): boolean {
-  return left.some((leftKey) => right.some((rightKey) => compareResourceKeys(resourceKind, leftKey, rightKey).verdict !== 'clear'));
-}
-
-function resourceFact(
-  resourceKind: string,
-  leftKey: string,
-  rightKey: string,
-  normalizedLeftKey: string,
-  normalizedRightKey: string,
-  verdict: ResourceKeyOverlapVerdict,
-  reason: string
-): ResourceKeyOverlapFact {
-  return {
-    resourceKind,
-    leftKey,
-    rightKey,
-    normalizedLeftKey,
-    normalizedRightKey,
-    verdict,
-    reason,
-    matcherVersion: 'resource-key-matcher@0.1.0'
-  };
-}
-
-function normalizeResourceKey(value: string): string {
-  return value.trim().replace(/\\/g, '/').replace(/\/+/g, '/');
-}
-
-function parseResourcePattern(value: string): { readonly hasPattern: boolean; readonly unsupported: boolean } {
-  const hasPattern = /[*?[\]{}]/.test(value);
-  return { hasPattern, unsupported: /[?[\]{}]/.test(value) };
-}
-
-function matchGlob(pattern: string, literal: string): boolean {
-  let source = '';
-  for (let index = 0; index < pattern.length; index += 1) {
-    const char = pattern[index];
-    if (char === '*' && pattern[index + 1] === '*') {
-      source += '.*';
-      index += 1;
-      continue;
-    }
-    if (char === '*') {
-      source += '[^/]*';
-      continue;
-    }
-    source += /[.+^${}()|[\]\\]/.test(char) ? `\\${char}` : char;
-  }
-  return new RegExp(`^${source}$`).test(literal);
-}
-
-function patternPrefixesIntersect(leftPattern: string, rightPattern: string): boolean {
-  const leftPrefix = literalPrefix(leftPattern);
-  const rightPrefix = literalPrefix(rightPattern);
-  return leftPrefix.startsWith(rightPrefix) || rightPrefix.startsWith(leftPrefix);
-}
-
-function literalPrefix(pattern: string): string {
-  const index = pattern.search(/[*?[\]{}]/);
-  return index < 0 ? pattern : pattern.slice(0, index);
 }
 
 function detectLeaseConflicts(

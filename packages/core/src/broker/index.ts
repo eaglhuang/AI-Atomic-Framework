@@ -17,6 +17,8 @@ export * from './freeze.ts';
 export * from './patch-envelope.ts';
 export * from './failure-reason.ts';
 export * from './conflict-key-overlap.ts';
+export * from './resource-overlap.ts';
+export * from './intent-enrichment.ts';
 export * from './global-resource-projection.ts';
 export * from './runner-sync-steward-queue.ts';
 export * from './generated-projection-steward.ts';
