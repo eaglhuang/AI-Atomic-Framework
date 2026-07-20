@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -47,9 +47,14 @@ try {
   assert.equal(sealJson.evidence.schemaId, 'atm.gateTelemetrySealDigest.v1');
   assert.equal(sealJson.evidence.taskId, 'ATM-GOV-0193');
   assert.equal(sealJson.evidence.eventCount, 1);
+  assert.equal(sealJson.evidence.storagePolicy, 'runtime-raw-tracked-digest');
+  assert.equal(sealJson.evidence.runtimeLocator.root, '.atm/runtime/telemetry/gate-events');
 
-  const historyText = readFileSync(path.join(tmp, sealJson.evidence.historyPath), 'utf8');
-  assert.match(historyText, /"specVersion":"atm.gateTelemetry.v1"/);
+  const compactText = readFileSync(path.join(tmp, sealJson.evidence.historyPath), 'utf8');
+  assert.match(compactText, /"rawEventDigest": "sha256:/);
+  assert.doesNotMatch(compactText, /"specVersion":"atm.gateTelemetry.v1"/);
+  assert.equal(existsSync(path.join(tmp, '.atm/history/telemetry')), false);
+  assert.deepEqual(readdirSync(path.join(tmp, '.atm/history/evidence/governance-telemetry')), ['test-window.json']);
 
   const report = runAtm(['telemetry', '--cwd', tmp, '--report', '--json']);
   assert.equal(report.status, 0, report.combined);

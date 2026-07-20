@@ -54,10 +54,14 @@ try {
   assert.equal(sealedJson.evidence.taskId, 'ATM-GOV-0196');
   assert.equal(sealedJson.evidence.eventCount, 1);
   assert.ok(sealedJson.evidence.historyDigest.startsWith('sha256:'));
+  assert.ok(sealedJson.evidence.rawEventDigest.startsWith('sha256:'));
+  assert.deepEqual(sealedJson.evidence.correlation.laneSessionIds, ['lane-observed-chain']);
+  assert.equal(sealedJson.evidence.evidenceReadbacks, 1);
 
-  const historyText = readFileSync(path.join(tmp, sealedJson.evidence.historyPath), 'utf8');
-  assert.match(historyText, /"evidenceReadRef":"\.atm\/history\/evidence\/ATM-GOV-0196\.seal-and-commit\.json"/);
-  assert.match(historyText, /"laneSessionId":"lane-observed-chain"/);
+  const compactText = readFileSync(path.join(tmp, sealedJson.evidence.historyPath), 'utf8');
+  assert.match(compactText, /"evidenceReadbacks": 1/);
+  assert.match(compactText, /"lane-observed-chain"/);
+  assert.doesNotMatch(compactText, /"evidenceReadRef":"\.atm\/history\/evidence\/ATM-GOV-0196\.seal-and-commit\.json"/);
 
   const summary = runAtm(['telemetry', '--cwd', tmp, '--task-summary', '--task', 'ATM-GOV-0196', '--role', 'treatment', '--json']);
   assert.equal(summary.status, 0, summary.combined);

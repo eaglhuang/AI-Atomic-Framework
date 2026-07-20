@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T10-05-21-553Z-scope-amendment-d02fba2a55e2",
+  "taskId": "ATM-GOV-0197",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-0197",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0197.json",
+  "taskSha256": "sha256:380381d8c6ece7c3370a3feb50214f570e876a15f7a93e00f396a10eb530dad2",
+  "createdAt": "2026-07-20T10:05:21.553Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0197 --actor codex-captain-0197 --add \"tests/cli/gate-telemetry-v1.test.ts,tests/cli/gate-telemetry-observed-chain.test.ts\" --reason \"Update existing telemetry regression assertions for compact tracked receipt boundary.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Update existing telemetry regression assertions for compact tracked receipt boundary."
+  }
+}
