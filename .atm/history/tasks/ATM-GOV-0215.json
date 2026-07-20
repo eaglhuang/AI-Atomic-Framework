@@ -1,0 +1,189 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0215",
+  "title": "Broker overlap call-site convergence repair (finish ATM-GOV-0206)",
+  "status": "done",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0206"
+  ],
+  "acceptance": [
+    "Every call site in the inventory routes through the shared matcher; proven per site, not in aggregate.",
+    "**Sample 0001 / probe A passes on the frozen runner**: with an active intent holding `packages/cli/src/commands/telemetry.ts`, a write intent declaring `packages/cli/src/commands/**` returns a `file-range` conflict, not `parallel-safe`. This must be demonstrated through `node atm.mjs broker decision` after rebuild — not via a unit test against source, and not via `packages/core/dist`. 0206 passed its unit tests while the shipped runner stayed broken; that failure mode is what this criterion exists to catch.",
+    "The literal case is unchanged (`needs-physical-split`).",
+    "Disjoint patterns still return clear (`templates/skills/**` vs `packages/core/**`) — convergence must not collapse into serializing everything.",
+    "Both directions detected: active-pattern/new-literal and the reverse.",
+    "Pattern-vs-pattern intersection detected (`commands/**` vs `commands/taskflow/**`).",
+    "Every axis covered — files, atom ids, atom cids, generators, projections, registries, validators, artifacts — with a test per axis.",
+    "**Call-site inventory test** fails when a new exact-match comparison against a resource-key collection is introduced anywhere in the broker tree. Prove it by adding a deliberate violation in the test and asserting the guard catches it.",
+    "Ambiguous key syntax yields structured `unknown/possible-overlap`, with a test.",
+    "The `gateResults`-vs-`conflicts` inconsistency inherited from 0206 is diagnosed; fixed here if it shares this root cause, otherwise recorded as a structured follow-up.",
+    "Runner rebuilt after the fix and the frozen `node atm.mjs` behaviour verified; the runner-sync receipt is part of closure evidence."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/core/src/broker/decision.ts",
+    "packages/core/src/broker/decision/**",
+    "tests/core/broker-overlap-callsite-inventory.test.ts",
+    "tests/core/broker-resource-overlap.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/core/src/broker/decision.ts",
+    "packages/core/src/broker/decision/**",
+    "packages/core/src/broker/resource-overlap.ts",
+    "packages/core/src/broker/conflict-key-overlap.ts",
+    "tests/core/broker-overlap-callsite-inventory.test.ts",
+    "tests/core/broker-resource-overlap.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:broker-proposal",
+    "npm run validate:brokered-write",
+    "npm run validate:broker-compose",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Do not add a compose/parallel-admission verdict; this card only makes detection correct.",
+    "Do not change broker telemetry or seal behaviour; that is ATM-GOV-0199.",
+    "Do not widen or narrow any task card's declared scopePaths as a workaround.",
+    "Do not proceed with TASK-SKL-0014 under this card."
+  ],
+  "nonGoals": [
+    "No change to lease, admission trigger, or lane routing policy.",
+    "No rewrite of the broker registry storage format."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the convergence commit. Pre-fix behaviour is exact-match at every site: unsafe but uniform and understood. A half-converged matcher where some axes are pattern-aware and others are not is worse than either, so revert rather than patch forward under time pressure.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-conflict-matrix",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker-resource-overlap-matcher",
+        "pattern": "Shared pattern-aware resource key matcher",
+        "source": "packages/core/src/broker/resource-overlap.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.broker-overlap-callsite-inventory",
+        "pattern": "Programmatic call-site inventory guard",
+        "source": "tests/core/broker-overlap-callsite-inventory.test.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "The lesson worth carrying: 0206's stop rule forbade per-axis patching but said\nnothing about call-site coverage, so a fix that satisfied every stated\nconstraint still shipped the original defect. Correctness of a *predicate* is\nnot correctness of a *system* until every caller uses it. That is why the\ninventory guard, not the matcher, is this card's most durable deliverable.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0215-broker-overlap-callsite-convergence-repair.task.md",
+    "sectionTitle": "ATM-GOV-0215",
+    "headingLine": 85,
+    "hash": "9ba38e4d9990ed43",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0215-broker-overlap-callsite-convergence-repair.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:9ba38e4d9990ed432bd1c5afd59c36de0cc31d44cf82ee5377b175774e54db5d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T14:23:17.838Z"
+    }
+  },
+  "importedAt": "2026-07-20T14:23:17.838Z",
+  "lastTransitionId": "2026-07-20T15-31-27-543Z-close-80c697b95e3b",
+  "lastTransitionAt": "2026-07-20T15:31:27.543Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-captain",
+  "reservedAt": "2026-07-20T15:14:55.688Z",
+  "promotedAt": "2026-07-20T15:14:55.692Z",
+  "claim": {
+    "actorId": "claude-captain",
+    "leaseId": "lease-7ed17d37ad5f",
+    "claimedAt": "2026-07-20T15:14:55.698Z",
+    "heartbeatAt": "2026-07-20T15:31:27.540Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0215.json",
+      ".atm/history/evidence/ATM-GOV-0215.*",
+      ".atm/history/task-events/ATM-GOV-0215/**",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/core/src/broker/conflict-key-overlap.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/decision/**",
+      "packages/core/src/broker/resource-overlap.ts",
+      "tests/core/broker-overlap-callsite-inventory.test.ts",
+      "tests/core/broker-resource-overlap.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260720151455-claude-captain-1ce836ba20",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720151455-claude-captain-1ce836ba20\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-20T14:27:43.314Z",
+  "startedByActor": "claude-captain",
+  "startedBySessionId": "session-20260720151455-claude-captain-ATM-GOV-0215-7d30c0a18a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0215",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0215.*",
+      ".atm/history/task-events/ATM-GOV-0215/**",
+      ".atm/history/tasks/ATM-GOV-0215.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/core/src/broker/conflict-key-overlap.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/decision/**",
+      "packages/core/src/broker/resource-overlap.ts",
+      "tests/core/broker-overlap-callsite-inventory.test.ts",
+      "tests/core/broker-resource-overlap.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "30fd65ab482d84bdc77f2c8d97dbc794b912099248bdd25c0764bdc4d6a54416",
+    "actorId": "claude-captain",
+    "sessionId": "session-20260720151455-claude-captain-ATM-GOV-0215-7d30c0a18a",
+    "laneSession": {
+      "laneSessionId": "lane-20260720151455-claude-captain-1ce836ba20",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720151455-claude-captain-1ce836ba20\""
+    },
+    "createdAt": "2026-07-20T15:15:01.483Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-20T15:31:27.541Z",
+  "closedByActor": "claude-captain",
+  "closedBySessionId": "session-20260720151455-claude-captain-ATM-GOV-0215-7d30c0a18a",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0215.closure-packet.json"
+}
