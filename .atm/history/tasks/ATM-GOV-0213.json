@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0213",
   "title": "CID and read set semantic revalidation adjudicator",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0208",
@@ -97,8 +97,8 @@
     }
   },
   "importedAt": "2026-07-20T09:17:23.439Z",
-  "lastTransitionId": "2026-07-20T09-17-38-124Z-claim-4fef9c46d9a7",
-  "lastTransitionAt": "2026-07-20T09:17:38.124Z",
+  "lastTransitionId": "2026-07-20T09-29-11-807Z-close-62e9f1e1e24c",
+  "lastTransitionAt": "2026-07-20T09:29:11.807Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0213",
   "reservedAt": "2026-07-20T09:17:33.469Z",
@@ -107,7 +107,7 @@
     "actorId": "codex-captain-0213",
     "leaseId": "lease-589ae9a5c8ab",
     "claimedAt": "2026-07-20T09:17:33.479Z",
-    "heartbeatAt": "2026-07-20T09:17:33.479Z",
+    "heartbeatAt": "2026-07-20T09:29:11.805Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0213.json",
@@ -120,14 +120,14 @@
       "tests/core/broker-cid-operation-algebra.test.ts",
       "tests/core/broker-semantic-revalidation.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720091733-codex-captain-0213-615cad8656",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720091733-codex-captain-0213-615cad8656\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T09:17:33.479Z",
   "startedByActor": "codex-captain-0213",
@@ -167,5 +167,9 @@
     },
     "createdAt": "2026-07-20T09:17:38.123Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T09:29:11.805Z",
+  "closedByActor": "codex-captain-0213",
+  "closedBySessionId": "session-20260720091733-codex-captain-0213-ATM-GOV-0213-58be27e5e0",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0213.closure-packet.json"
 }

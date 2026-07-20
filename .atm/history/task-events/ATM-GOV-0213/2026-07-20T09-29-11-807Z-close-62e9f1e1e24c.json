@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T09-29-11-807Z-close-62e9f1e1e24c",
+  "taskId": "ATM-GOV-0213",
+  "action": "close",
+  "actorId": "codex-captain-0213",
+  "sessionId": "session-20260720091733-codex-captain-0213-ATM-GOV-0213-58be27e5e0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0213.json",
+  "taskSha256": "sha256:5334629ccc2febfc208a5935868f64f3f602280370ab736653834a4e7e15f10b",
+  "createdAt": "2026-07-20T09:29:11.807Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0213 --actor codex-captain-0213 --status done --historical-delivery a34380ad40e238fe78209893fe42a8f83e9e807b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720091733-codex-captain-0213-ATM-GOV-0213-58be27e5e0",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0213.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/core/broker-cid-operation-algebra.test.ts",
+      "node --strip-types tests/core/broker-semantic-revalidation.test.ts",
+      "typecheck",
+      "validate:broker-proposal",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T09:29:11.798Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0213.*",
+        ".atm/history/task-events/ATM-GOV-0213/**",
+        ".atm/history/tasks/ATM-GOV-0213.json",
+        "packages/core/src/broker/policy.ts",
+        "packages/core/src/broker/semantic-adjudication/**",
+        "packages/core/src/broker/semantic-contract.ts",
+        "schemas/governance/patch-proposal.schema.json",
+        "schemas/governance/semantic-revalidation.schema.json",
+        "schemas/governance/write-intent.schema.json",
+        "tests/core/broker-cid-operation-algebra.test.ts",
+        "tests/core/broker-semantic-revalidation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/policy.ts",
+        "packages/core/src/broker/semantic-adjudication/**",
+        "packages/core/src/broker/semantic-contract.ts",
+        "schemas/governance/patch-proposal.schema.json",
+        "schemas/governance/semantic-revalidation.schema.json",
+        "schemas/governance/write-intent.schema.json",
+        "tests/core/broker-cid-operation-algebra.test.ts",
+        "tests/core/broker-semantic-revalidation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
