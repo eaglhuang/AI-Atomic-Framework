@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T17-19-13-624Z-scope-amendment-dcadc2991703",
+  "taskId": "ATM-GOV-0220",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0220.json",
+  "taskSha256": "sha256:2877fadd603de88d8c7d1ba831b1ca7df926bc6152e62504d61ebec70a1f8531",
+  "createdAt": "2026-07-20T17:19:13.624Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0220 --actor codex-gpt-5.4-mini --add fixtures/registry/status/legal-transition.json --reason \"validate:status-machine requires legal transition fixture to include existing registry experience actions\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "validate:status-machine requires legal transition fixture to include existing registry experience actions"
+  }
+}

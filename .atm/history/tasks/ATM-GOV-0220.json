@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0220",
+  "title": "Task and lane lifecycle repair",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0217"
+  ],
+  "acceptance": [
+    "orphan in_progress fixture 可 adopt 且保留 event history。",
+    "actor/lane mismatch diagnose 輸出最小 reconcile command。",
+    "scope path 含 quote/glob/space/Windows slash 的 import/claim/close 一致。",
+    "protected ledger guard 擋下直接刪改 .atm/history。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/**",
+    "packages/cli/src/commands/next/claim-readiness.ts",
+    "packages/core/src/lane/**",
+    "tests/cli/task-lane-lifecycle-repair.test.ts",
+    "tests/cli/orphan-in-progress-adoption.test.ts",
+    "tests/cli/protected-ledger-destructive-guard.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/**",
+    "packages/cli/src/commands/next/claim-readiness.ts",
+    "packages/core/src/lane/**",
+    "tests/cli/task-lane-lifecycle-repair.test.ts",
+    "tests/cli/orphan-in-progress-adoption.test.ts",
+    "tests/cli/protected-ledger-destructive-guard.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/task-lane-lifecycle-repair.test.ts",
+    "node --strip-types tests/cli/orphan-in-progress-adoption.test.ts",
+    "node --strip-types tests/cli/protected-ledger-destructive-guard.test.ts",
+    "npm run validate:task-ledger-governance",
+    "npm run validate:status-machine",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No direct edits to .atm/runtime or .atm/history.",
+    "No new task/ticket registry."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and dispose generated artifacts through formal ATM commands; do not edit .atm runtime state directly.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0220-task-and-lane-lifecycle-repair.task.md",
+    "sectionTitle": "ATM-GOV-0220",
+    "headingLine": 65,
+    "hash": "1b208c96d33f4093",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0220-task-and-lane-lifecycle-repair.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:1b208c96d33f40932a472807028199701b085833d918fcf2cd2f0a59c1b8877d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T17:11:58.454Z"
+    }
+  },
+  "importedAt": "2026-07-20T17:11:58.454Z",
+  "lastTransitionId": "2026-07-20T17-19-13-624Z-scope-amendment-dcadc2991703",
+  "lastTransitionAt": "2026-07-20T17:19:13.624Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T17:12:08.633Z",
+  "promotedAt": "2026-07-20T17:12:08.637Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-cf064800340a",
+    "claimedAt": "2026-07-20T17:12:08.641Z",
+    "heartbeatAt": "2026-07-20T17:12:08.641Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0220.*",
+      ".atm/history/task-events/ATM-GOV-0220/**",
+      ".atm/history/tasks/ATM-GOV-0220.json",
+      "fixtures/registry/status/legal-transition.json",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/tasks/**",
+      "packages/core/src/lane/**",
+      "tests/cli/orphan-in-progress-adoption.test.ts",
+      "tests/cli/protected-ledger-destructive-guard.test.ts",
+      "tests/cli/task-lane-lifecycle-repair.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720171208-codex-gpt-5.4-mini-190ad1c979",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720171208-codex-gpt-5.4-mini-190ad1c979\""
+    }
+  },
+  "startedAt": "2026-07-20T17:12:08.641Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720171208-codex-gpt-5.4-mini-ATM-GOV-0220-4800d4e6ee",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0220",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0220.*",
+      ".atm/history/task-events/ATM-GOV-0220/**",
+      ".atm/history/tasks/ATM-GOV-0220.json",
+      "fixtures/registry/status/legal-transition.json",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/tasks/**",
+      "packages/core/src/lane/**",
+      "tests/cli/orphan-in-progress-adoption.test.ts",
+      "tests/cli/protected-ledger-destructive-guard.test.ts",
+      "tests/cli/task-lane-lifecycle-repair.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0220-task-and-lane-lifecycle-repair.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0220-task-and-lane-lifecycle-repair.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7a0ae58d930396ebf1e10ecf888ca213827a3fc9ff8d7c671749c6a9da7b248a",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260720171208-codex-gpt-5.4-mini-190ad1c979",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720171208-codex-gpt-5.4-mini-190ad1c979\""
+    },
+    "createdAt": "2026-07-20T17:12:13.277Z",
+    "status": "active"
+  }
+}
