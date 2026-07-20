@@ -1,3 +1,5 @@
+import type { TelemetryTimingFields } from '../../../../core/src/telemetry/observation.ts';
+
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
@@ -17,7 +19,7 @@ export function quoteForShell(arg: string): string {
   return `"${arg.replace(/"/g, '\\"')}"`;
 }
 
-export interface CommandRunEvidenceInput {
+export interface CommandRunEvidenceInput extends TelemetryTimingFields {
   readonly command: string;
   readonly cwd?: string;
   readonly exitCode: number;
@@ -29,7 +31,6 @@ export interface CommandRunEvidenceInput {
   readonly runnerKind?: string;
   readonly sourceCommit?: string;
   readonly runnerVersion?: string;
-  readonly generatedAt?: string;
   readonly stdoutPreview?: string;
   readonly stderrPreview?: string;
 }
