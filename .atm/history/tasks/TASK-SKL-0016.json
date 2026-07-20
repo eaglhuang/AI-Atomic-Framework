@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0016",
+  "title": "Root-drop release source list stale generated output guard",
+  "status": "running",
+  "milestone": "P1",
+  "dependencies": [
+    "TASK-SKL-0014"
+  ],
+  "acceptance": [
+    "scripts/build-root-drop-release.ts no longer attempts to copy missing tracked generated files from packages/*/dist.",
+    "A focused test proves a tracked-but-missing release source path is excluded while existing release source paths are preserved.",
+    "Root-drop assembly succeeds after a package dist rebuild.",
+    "Runner-sync can rebuild frozen release artifacts from the committed source HEAD and publish the normal receipt."
+  ],
+  "deliverables": [
+    "scripts/build-root-drop-release.ts",
+    "tests/cli/root-drop-release-source-list.test.ts",
+    "release/atm-root-drop/**",
+    "release/atm-onefile/**"
+  ],
+  "scopePaths": [
+    "scripts/build-root-drop-release.ts",
+    "tests/cli/root-drop-release-source-list.test.ts",
+    "release/atm-root-drop/**",
+    "release/atm-onefile/**",
+    "packages/cli/dist/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/root-drop-release-source-list.test.ts",
+    "node --strip-types scripts/build-root-drop-release.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Do not hand-edit .atm/runtime runner-sync queues.",
+    "Do not fold this repair into ATM-GOV-0225 final closure scope.",
+    "Do not create file-name-specific exceptions for stale generated outputs."
+  ],
+  "nonGoals": [
+    "No rewrite of the sealed runner build pipeline.",
+    "No task ledger or ErrorCode registry changes in this card."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the source-list guard and any generated release artifacts; rerun runner-sync from the previous passing HEAD if needed.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-root-drop-build",
+    "atomCid": null,
+    "mapUpdates": [
+      "scripts/AtmCore/runner-build-scope.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.root-drop-source-list",
+        "pattern": "Release source inventory guard",
+        "source": "scripts/build-root-drop-release.ts",
+        "disposition": "inline",
+        "inlineReason": "The change is one filter in the existing source inventory helper and does not introduce a new module boundary."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0016-root-drop-release-source-list-stale-generated-output.task.md",
+    "sectionTitle": "TASK-SKL-0016",
+    "headingLine": 63,
+    "hash": "d6ea85d7ec853665",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0016-root-drop-release-source-list-stale-generated-output.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:d6ea85d7ec853665cd34e009c3aed5787ecf40b8124bc837e9c6cc8c1da608f1",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T19:56:43.934Z"
+    }
+  },
+  "importedAt": "2026-07-20T19:56:43.934Z",
+  "lastTransitionId": "2026-07-20T19-57-29-977Z-claim-6626d20474ab",
+  "lastTransitionAt": "2026-07-20T19:57:29.977Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T19:57:28.277Z",
+  "promotedAt": "2026-07-20T19:57:28.280Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-e452e081df3e",
+    "claimedAt": "2026-07-20T19:57:28.285Z",
+    "heartbeatAt": "2026-07-20T19:57:28.285Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0016.json",
+      "packages/cli/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/build-root-drop-release.ts",
+      "tests/cli/root-drop-release-source-list.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720195728-codex-gpt-5.4-mini-bd716d1ae1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720195728-codex-gpt-5.4-mini-bd716d1ae1\""
+    }
+  },
+  "startedAt": "2026-07-20T19:57:28.285Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720195728-codex-gpt-5.4-mini-TASK-SKL-0016-f5a643236b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0016",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0016.*",
+      ".atm/history/task-events/TASK-SKL-0016/**",
+      ".atm/history/tasks/TASK-SKL-0016.json",
+      "packages/cli/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/build-root-drop-release.ts",
+      "tests/cli/root-drop-release-source-list.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "18e6c0f752a24e00ba2eadf0ab4a38899d796ea4af37205b4324e7760ffb462f",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260720195728-codex-gpt-5.4-mini-TASK-SKL-0016-f5a643236b",
+    "laneSession": {
+      "laneSessionId": "lane-20260720195728-codex-gpt-5.4-mini-bd716d1ae1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720195728-codex-gpt-5.4-mini-bd716d1ae1\""
+    },
+    "createdAt": "2026-07-20T19:57:29.976Z",
+    "status": "active"
+  }
+}

@@ -135,7 +135,7 @@ export function buildRootDropRelease(options: any = {}) {
   };
 }
 
-function listReleaseSourceFiles(repositoryRoot: string) {
+export function listReleaseSourceFiles(repositoryRoot: string) {
   const result = spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], {
     cwd: repositoryRoot,
     encoding: 'utf8',
@@ -149,6 +149,7 @@ function listReleaseSourceFiles(repositoryRoot: string) {
     .filter(Boolean)
     .map((entry) => entry.replace(/\\/g, '/'))
     .filter((relativePath) => releaseEntries.some((releaseEntry) => relativePath === releaseEntry || relativePath.startsWith(`${releaseEntry}/`)))
+    .filter((relativePath) => existsSync(path.join(repositoryRoot, relativePath)))
   return [...new Set([
     ...sourceFiles,
     ...listGeneratedRuntimeFiles(repositoryRoot),
