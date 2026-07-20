@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0225",
   "title": "Final closure for ATM 2.0 and 2.1",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [
     "ATM-GOV-0215",
@@ -82,36 +82,38 @@
     }
   },
   "importedAt": "2026-07-20T18:44:01.824Z",
-  "lastTransitionId": "2026-07-20T18-58-25-373Z-claim-b679b82a9029",
-  "lastTransitionAt": "2026-07-20T18:58:25.373Z",
+  "lastTransitionId": "2026-07-20T22-22-28-422Z-close-a3f47eca9774",
+  "lastTransitionAt": "2026-07-20T22:22:28.422Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-07-20T18:58:21.265Z",
-  "promotedAt": "2026-07-20T18:58:21.267Z",
+  "reservedAt": "2026-07-20T22:00:24.146Z",
+  "promotedAt": "2026-07-20T22:00:24.149Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-f1f171d27edd",
-    "claimedAt": "2026-07-20T18:58:21.270Z",
-    "heartbeatAt": "2026-07-20T18:58:21.270Z",
+    "leaseId": "lease-dc18a549491f",
+    "claimedAt": "2026-07-20T22:00:24.154Z",
+    "heartbeatAt": "2026-07-20T22:22:28.419Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0225.json",
+      ".atm/history/evidence/ATM-GOV-0225.*",
+      ".atm/history/task-events/ATM-GOV-0225/**",
       "docs/reports/atm-2-1-final-closure.md",
       "scripts/validate-atm-2-1-closure.ts",
       "tests/cli/atm-2-1-final-closure.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260720185821-codex-gpt-5.4-mini-d103d23bd4",
+      "laneSessionId": "lane-20260720220024-codex-gpt-5.4-mini-d6f12dee13",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720185821-codex-gpt-5.4-mini-d103d23bd4\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720220024-codex-gpt-5.4-mini-d6f12dee13\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T18:58:21.270Z",
   "startedByActor": "codex-gpt-5.4-mini",
-  "startedBySessionId": "session-20260720185821-codex-gpt-5.4-mini-ATM-GOV-0225-8454aec807",
+  "startedBySessionId": "session-20260720220024-codex-gpt-5.4-mini-ATM-GOV-0225-a8a0cc6816",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -133,14 +135,18 @@
     "allowPlanningMirror": false,
     "promptHash": "8d32435ca0d0006debcedd4ca65f44c87bb04f3c71bef8d9b3c61faaa276e614",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260720185821-codex-gpt-5.4-mini-ATM-GOV-0225-8454aec807",
+    "sessionId": "session-20260720220024-codex-gpt-5.4-mini-ATM-GOV-0225-a8a0cc6816",
     "laneSession": {
-      "laneSessionId": "lane-20260720185821-codex-gpt-5.4-mini-d103d23bd4",
+      "laneSessionId": "lane-20260720220024-codex-gpt-5.4-mini-d6f12dee13",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720185821-codex-gpt-5.4-mini-d103d23bd4\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720220024-codex-gpt-5.4-mini-d6f12dee13\""
     },
-    "createdAt": "2026-07-20T18:58:25.371Z",
+    "createdAt": "2026-07-20T22:00:25.054Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T22:22:28.419Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260720220024-codex-gpt-5.4-mini-ATM-GOV-0225-a8a0cc6816",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0225.closure-packet.json"
 }
