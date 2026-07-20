@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0217",
+  "title": "Multi-process ticket consistency",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0216"
+  ],
+  "acceptance": [
+    "100 個並行 transition fixture 無 lost update、duplicate head 或 starvation。",
+    "orphan owner 可由正式 adopt command 接手，原 owner 復活不能覆蓋新 state。",
+    "stale sealed base 產 revalidation ticket，不追逐 HEAD loop。",
+    "cancel stale queue entry 不需偽造 runner/build receipt。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/registry.ts",
+    "packages/core/src/broker/lifecycle.ts",
+    "packages/core/src/broker/ticket-store.ts",
+    "packages/core/src/broker/wave-broker-scheduler.ts",
+    "schemas/governance/broker-ticket.schema.json",
+    "tests/cli/broker-ticket-cas-consistency.test.ts",
+    "tests/cli/broker-ticket-crash-recovery.test.ts",
+    "tests/cli/broker-ticket-fairness.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/registry.ts",
+    "packages/core/src/broker/lifecycle.ts",
+    "packages/core/src/broker/ticket-store.ts",
+    "packages/core/src/broker/wave-broker-scheduler.ts",
+    "schemas/governance/broker-ticket.schema.json",
+    "tests/cli/broker-ticket-cas-consistency.test.ts",
+    "tests/cli/broker-ticket-crash-recovery.test.ts",
+    "tests/cli/broker-ticket-fairness.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/broker-ticket-cas-consistency.test.ts",
+    "node --strip-types tests/cli/broker-ticket-crash-recovery.test.ts",
+    "node --strip-types tests/cli/broker-ticket-fairness.test.ts",
+    "npm run validate:schemas",
+    "npm run validate:broker-registry",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No direct edits to .atm/runtime or .atm/history.",
+    "No new task/ticket registry."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and dispose generated artifacts through formal ATM commands; do not edit .atm runtime state directly.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0217-multi-process-ticket-consistency.task.md",
+    "sectionTitle": "ATM-GOV-0217",
+    "headingLine": 69,
+    "hash": "9996031839fc4cb0",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0217-multi-process-ticket-consistency.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:9996031839fc4cb0248c3a9741be456d5c55701e377b7e8422dc6c1b6f0ea4cd",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T15:54:31.345Z"
+    }
+  },
+  "importedAt": "2026-07-20T15:54:31.345Z",
+  "lastTransitionId": "2026-07-20T15-54-50-619Z-claim-edc5027d5709",
+  "lastTransitionAt": "2026-07-20T15:54:50.619Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T15:54:44.745Z",
+  "promotedAt": "2026-07-20T15:54:44.749Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-9c19058a0e27",
+    "claimedAt": "2026-07-20T15:54:44.754Z",
+    "heartbeatAt": "2026-07-20T15:54:44.754Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0217.json",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/ticket-store.ts",
+      "packages/core/src/broker/wave-broker-scheduler.ts",
+      "schemas/governance/broker-ticket.schema.json",
+      "tests/cli/broker-ticket-cas-consistency.test.ts",
+      "tests/cli/broker-ticket-crash-recovery.test.ts",
+      "tests/cli/broker-ticket-fairness.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720155444-codex-gpt-5.4-mini-8325f5bf07",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720155444-codex-gpt-5.4-mini-8325f5bf07\""
+    }
+  },
+  "startedAt": "2026-07-20T15:54:44.754Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720155444-codex-gpt-5.4-mini-ATM-GOV-0217-28b730cc55",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0217",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0217.*",
+      ".atm/history/task-events/ATM-GOV-0217/**",
+      ".atm/history/tasks/ATM-GOV-0217.json",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/ticket-store.ts",
+      "packages/core/src/broker/wave-broker-scheduler.ts",
+      "schemas/governance/broker-ticket.schema.json",
+      "tests/cli/broker-ticket-cas-consistency.test.ts",
+      "tests/cli/broker-ticket-crash-recovery.test.ts",
+      "tests/cli/broker-ticket-fairness.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "36a3bbb0a7cbaf2c44e341eeb03ec17fd045b4de9e731014d42d515b81d63618",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260720155444-codex-gpt-5.4-mini-ATM-GOV-0217-28b730cc55",
+    "laneSession": {
+      "laneSessionId": "lane-20260720155444-codex-gpt-5.4-mini-8325f5bf07",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720155444-codex-gpt-5.4-mini-8325f5bf07\""
+    },
+    "createdAt": "2026-07-20T15:54:50.617Z",
+    "status": "active"
+  }
+}

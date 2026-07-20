@@ -78,5 +78,78 @@
         }
       }
     }
+  },
+  "$defs": {
+    "storeDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "specVersion",
+        "storeId",
+        "generation",
+        "tickets",
+        "transitions",
+        "updatedAt"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.brokerTicketStore.v1" },
+        "specVersion": { "const": "0.1.0" },
+        "storeId": { "type": "string", "minLength": 1 },
+        "generation": { "type": "integer", "minimum": 0 },
+        "tickets": {
+          "type": "array",
+          "items": { "$ref": "#" }
+        },
+        "transitions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/storeTransitionEvidence" }
+        },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "storeTransitionEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "transitionId",
+        "idempotencyKey",
+        "taskId",
+        "actorId",
+        "laneId",
+        "ticketId",
+        "action",
+        "previousDigest",
+        "nextDigest",
+        "previousGeneration",
+        "nextGeneration",
+        "occurredAt"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.brokerTicketStoreTransitionEvidence.v1" },
+        "transitionId": { "type": "string", "minLength": 1 },
+        "idempotencyKey": { "type": "string", "minLength": 1 },
+        "taskId": { "type": "string", "minLength": 1 },
+        "actorId": { "type": "string", "minLength": 1 },
+        "laneId": { "type": ["string", "null"] },
+        "ticketId": { "type": ["string", "null"] },
+        "action": {
+          "enum": [
+            "enqueue",
+            "transition",
+            "wake-next",
+            "adopt-orphan",
+            "cancel",
+            "reconcile-side-effect"
+          ]
+        },
+        "previousDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "nextDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "previousGeneration": { "type": "integer", "minimum": 0 },
+        "nextGeneration": { "type": "integer", "minimum": 0 },
+        "occurredAt": { "type": "string", "format": "date-time" }
+      }
+    }
   }
 }
