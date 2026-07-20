@@ -139,6 +139,14 @@ function runPreToolHook(options) {
     const quickfixDriftFiles = mutatingIntent && !gitCommitIntent && Boolean(activeQuickfixLock) && quickfixAllowedPaths.length > 0 ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter((entry) => !isPromptScopeDriftExempt(entry)).filter((entry) => !isPathAllowedByScope(entry, quickfixAllowedPaths)) : [];
     const staticEvidenceArtifactFiles = mutatingIntent && !gitCommitIntent ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isStaticEvidenceArtifactPath) : [];
     const rawGitMutation = classifyRawGitMutationCommand(toolCommand);
+    const rawGitProtectedLedgerFiles = rawGitMutation && rawGitMutation.riskLevel === 'destructive'
+        ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isProtectedAtmLedgerStatePath)
+        : [];
+    if (rawGitMutation && rawGitProtectedLedgerFiles.length > 0) {
+        return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_PROTECTED_LEDGER_RAW_GIT_MUTATION_BLOCKED', 'Raw destructive Git cleanup against ATM task/evidence ledger state is blocked. Use a governed ATM recovery or lifecycle command for the exact task instead.', { editor: options.editor, command: toolCommand,
+                    gitAction: rawGitMutation.action, riskLevel: rawGitMutation.riskLevel, protectedLedgerFiles: rawGitProtectedLedgerFiles, requiredCommand: 'node atm.mjs tasks verify|reconcile|repair-closure --task <task-id> --actor <actor-id> --json, or request an explicit governed destructive-override lease for the exact task scope' })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, toolCommand, rawGitMutation: { ...rawGitMutation, protectedLedgerFiles: rawGitProtectedLedgerFiles, ledgerProtection: 'fail-closed' }, frameworkStatus: status, relatedBacklog: 'ATM-BUG-2026-07-19-045' }
+        });
+    }
     if (rawGitMutation) {
         return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_RAW_GIT_MUTATION_BLOCKED', 'Raw Git mutation is blocked for AI agents in supported integrations. Use ATM-governed Git tools or a scoped Broker lease instead.', { editor: options.editor, command: toolCommand,
                     gitAction: rawGitMutation.action, riskLevel: rawGitMutation.riskLevel, requiredCommand: rawGitMutation.requiredCommand, overridePolicy: rawGitMutation.overridePolicy })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, toolCommand, rawGitMutation, frameworkStatus: status, relatedBacklog: 'ATM-BUG-2026-07-12-161', relatedTask: 'TASK-AAO-0189' }
@@ -385,7 +393,7 @@ function extractFilesFromPayload(value) {
 }
 function extractCommandFromPayload(value) { return readStringPath(value, ['command', 'cmd', 'script', 'bash', 'shell_command']) ?? readStringPath(value, ['tool_input.command', 'toolInput.command', 'input.command', 'arguments.command']); }
 function extractFilesFromCommand(command) {
-    const matches = command.match(/[A-Za-z0-9_.@:/\\-]+\.(?:ts|tsx|js|mjs|json|md|yml|yaml|sh|ps1)/g) ?? [];
+    const matches = command.match(/[A-Za-z0-9_.@:/\\-]+\.(?:tsx|ts|mjs|json|yaml|yml|ps1|js|md|sh)/g) ?? [];
     return uniqueSorted(matches.map(normalizeRelativePath));
 }
 function frameworkDevelopmentInstructions() {
@@ -604,6 +612,10 @@ function isProtectedAtmManagedStatePath(value) {
     const normalized = normalizeRelativePath(value).toLowerCase();
     return normalized.startsWith('.atm/history/tasks/') || normalized.startsWith('.atm/history/task-events/') || normalized.startsWith('.atm/history/evidence/') || normalized.startsWith('.atm/runtime/locks/') || normalized.startsWith('.atm/runtime/task-direction-locks/') || normalized.startsWith('.atm/runtime/batch-runs/')
         || normalized.startsWith('.atm/runtime/task-queues/') || normalized === '.atm/runtime/current-task.json' || normalized === '.atm/runtime/guidance/active-session.json';
+}
+function isProtectedAtmLedgerStatePath(value) {
+    const normalized = normalizeRelativePath(value).toLowerCase();
+    return normalized.startsWith('.atm/history/tasks/') || normalized.startsWith('.atm/history/task-events/') || normalized.startsWith('.atm/history/evidence/');
 }
 function isRuntimeLockStatePath(value) { return normalizeRelativePath(value).toLowerCase().startsWith('.atm/runtime/locks/'); }
 function isStaticEvidenceArtifactPath(value) {

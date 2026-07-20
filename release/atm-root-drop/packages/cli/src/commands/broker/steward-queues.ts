@@ -295,6 +295,10 @@ function resolveRunnerSyncTaskHealth(cwd: string, request: RunnerSyncStewardRequ
 }
 
 function resolveRunnerSyncTaskIdHealth(cwd: string, taskId: string): RunnerSyncTaskHealth {
+  const frameworkTempHealth = resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId);
+  if (frameworkTempHealth) {
+    return frameworkTempHealth;
+  }
   const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
   if (!existsSync(taskPath)) {
     return 'task-missing';
@@ -307,6 +311,33 @@ function resolveRunnerSyncTaskIdHealth(cwd: string, taskId: string): RunnerSyncT
       : 'task-active';
   } catch {
     return 'task-active';
+  }
+}
+
+function resolveFrameworkTempRunnerSyncTaskHealth(cwd: string, taskId: string): RunnerSyncTaskHealth | null {
+  const normalizedTaskId = String(taskId ?? '').trim();
+  if (!normalizedTaskId.startsWith('ATM-FRAMEWORK-TEMP-')) {
+    return null;
+  }
+  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${normalizedTaskId}.lock.json`);
+  if (!existsSync(lockPath)) {
+    return 'task-missing';
+  }
+  try {
+    const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+    const workItemId = typeof lock.workItemId === 'string' ? lock.workItemId.trim() : '';
+    const leaseId = typeof lock.leaseId === 'string' ? lock.leaseId.trim() : '';
+    const heartbeatAt = typeof lock.heartbeatAt === 'string' ? lock.heartbeatAt : null;
+    const ttlSeconds = typeof lock.ttlSeconds === 'number' && Number.isFinite(lock.ttlSeconds)
+      ? lock.ttlSeconds
+      : 0;
+    if (workItemId !== normalizedTaskId || !leaseId || !heartbeatAt || ttlSeconds <= 0) {
+      return 'task-missing';
+    }
+    const expiresAt = Date.parse(heartbeatAt) + ttlSeconds * 1000;
+    return Number.isFinite(expiresAt) && expiresAt > Date.now() ? 'task-active' : 'task-terminal';
+  } catch {
+    return 'task-missing';
   }
 }
 

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-039",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Task Import / Plan Parser",
+  "finding": "tasks import dry-run parsed a spurious task id `ATM-GOV-018` from the governance optimization v2 plan even though the actual cards are ATM-GOV-0182 through ATM-GOV-0195.",
+  "expectedBehavior": "The plan importer should only emit real task-card ids and should reject or ignore partial id fragments that are not backed by a sibling task card or valid frontmatter.",
+  "evidenceOrRepro": "`node atm.mjs tasks import --from C:\\\\Users\\\\User\\\\3KLife\\\\docs\\\\ai_atomic_framework\\\\governance-optimization\\\\end-to-end-auto-batch-performance-plan-v2.md --dry-run --cwd . --json` returned 13 tasks, including an `ATM-GOV-018` item with empty deliverables and status open.",
+  "followUp": "Tighten task-id heading extraction to require full canonical ids, add regression coverage for numeric-prefix families such as ATM-GOV-0182/0183, and surface a warning that names the source line when a fragment is ignored."
+}

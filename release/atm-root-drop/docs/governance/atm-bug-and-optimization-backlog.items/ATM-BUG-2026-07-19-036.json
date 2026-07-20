@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-036",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Telemetry / Broker",
+  "finding": "Broker conflict decisions, compose-vs-serialize decisions, parallel-entry admission, and conflict-resolution correctness are not yet first-class telemetry observations in the coverage summary.",
+  "expectedBehavior": "Telemetry should record broker decision inputs/outcomes, whether agents were allowed to enter parallel work before conflict analysis, whether writes could be composed, and whether the resolution later proved correct or caused rework.",
+  "evidenceOrRepro": "The final `docs/reports/captain-parallel-ledger-analysis.md` reports broker tickets=1, correctness samples=0, parallel admission=0.00%, compose acceptance=n/a, and broker verdict=inconclusive because outcomeRef/decisionCorrect samples are absent. The synthetic fixture proves analyzer shape only, not live conflict-resolution correctness.",
+  "followUp": "Emit live broker decision/outcome pairs with decisionClass, conflict set/axis, parallel-admission attempt and reason, compose candidate/decision/group, wait time, downstream rework or escaped conflict, owner override, and delayed correctness verdict. Require analyzer joins against outcomeRef before claiming broker improvement."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-027",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Governance telemetry",
+  "finding": "ATM-GOV-0193 and the ATM-GOV-0195 coverage repair are marked done, but coverage status still conflates registry declaration with observed runtime emission. Five node families are labeled `instrumented`, while the retained runtime gate journal contains only `next.route-resolution` events; this is insufficient proof that claim, doctor, guard, taskflow, batch, broker, team, or checkpoint paths actually emitted during dogfood.",
+  "expectedBehavior": "Before any M2 effectiveness, retirement, or matched A/B analysis, ATM should require a machine-readable registry coverage report proving each claim, gate, validator, checkpoint, close, evidence readback, git governance, runner-sync, batch, broker, team, and telemetry self-operation node is classified as instrumented, read-only-summary, out-of-scope, or not-yet-covered. Missing coverage must block causal claims and force inconclusive or a repair task, not silently pass.",
+  "evidenceOrRepro": "`.atm/runtime/telemetry/analysis-inputs/ATM-GOV-0190-coverage.json` labels claim/reservation, next/preflight, task close/checkpoint, batch/broker/team, and telemetry self-health as instrumented. Enumerating `.atm/runtime/telemetry/gate-events/**` finds 22 files and 22 events, all with checkId `next.route-resolution`. The same coverage report still marks validator and evidence readback as not-yet-covered and git/runner-sync as read-only-summary, so M2 remains inconclusive.",
+  "followUp": "Extend coverage to report separate `registered`, `code-wired`, `observed`, and `sealed/read-back` states with event counts and last-observed timestamps per checkId. M2 readiness must require observed emissions for the selected cohort, not registry membership alone."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-020",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Taskflow Close / Release Artifacts",
+  "finding": "Required runner-sync release mirror outputs are generated after framework source delivery but are excluded from the taskflow close bundle as out-of-scope advisory dirty files, leaving a second manual governance decision before push.",
+  "expectedBehavior": "When runner-sync is required by a framework task, ATM should provide a governed follow-up lane or commit bundle for release artifacts and runner-sync receipts instead of leaving them as ambiguous dirty residue.",
+  "evidenceOrRepro": "ATM-GOV-0186 close dry-run/write reported release/atm-onefile and release/atm-root-drop files as excludedDirtyFiles while the runner-sync build/release had already been required for the sealed source commit.",
+  "followUp": "Create a taskflow/runner-sync integration card: close should either include allowed runner output files with receipt proof or emit an explicit next command to claim and commit release artifacts safely."
+}

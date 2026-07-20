@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-041",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Low",
+  "status": "Open",
+  "area": "CLI UX / Windows Command Examples",
+  "finding": "ATM hook guidance emitted a `requiredCommand` containing `&&`, which fails in the current Windows PowerShell surface and repeats the exact shell-syntax class of dogfood failure the owner asked agents to avoid.",
+  "expectedBehavior": "ATM guidance should emit Windows-safe command sequences or shell-specific variants instead of assuming POSIX/cmd-style command separators.",
+  "evidenceOrRepro": "During backlog commit, the hook warning `ATM_HOOK_COMMIT_ACTOR_NOT_EXPLICIT` returned `node atm.mjs identity clear --json && node atm.mjs identity set ...`; a previous attempt to use `&&` in this thread failed with PowerShell `The token '&&' is not a valid statement separator in this version`.",
+  "followUp": "Add shell-aware command rendering for guidance/hook messages, prefer separate commands in JSON arrays, and update first-layer skills to avoid PowerShell-hostile examples."
+}

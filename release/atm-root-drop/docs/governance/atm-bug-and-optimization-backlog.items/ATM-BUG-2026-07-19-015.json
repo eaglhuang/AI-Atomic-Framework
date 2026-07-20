@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-015",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Taskflow / Closeback",
+  "finding": "taskflow close --write can complete live-ledger close, target governance commit, and planning closeback commit, then still return failure with ATM_PLANNING_SOURCE_IDENTITY_DRIFT because the planning source content changed during its own closeback flow.",
+  "expectedBehavior": "taskflow close --write should be atomic or idempotent: after successful side effects, it should return success, or a recovery/status result that recognizes the already-completed close instead of a blocking drift error.",
+  "evidenceOrRepro": "ATM-GOV-0185 close on 2026-07-19: command `node atm.mjs taskflow close --task ATM-GOV-0185 --actor codex-governance-optimizer --historical-delivery a1d7fb9759aa1d2b684af71e907ef0df23195e3f --write --json` returned ATM_PLANNING_SOURCE_IDENTITY_DRIFT, while `node atm.mjs tasks status --task ATM-GOV-0185 --json` reported liveLedger done/released with no divergence; target commit 18da75e51 and planning commit fc36ae13 exist.",
+  "followUp": "Add a taskflow close idempotency/recovery card: write should re-read post-side-effect state, accept same-command planning closeback drift as completed, and surface a recovery receipt instead of failure."
+}

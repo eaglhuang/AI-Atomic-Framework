@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-040",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Runtime Residue / Session Events",
+  "finding": "A lane adoption event was written under `.atm/history/session-events/...` as an untracked file, classified as manual-review residue, and then treated by `atm next` as unowned dirty WIP requiring an L3 Broker even though there were zero active claims, actors, locks, or staged files.",
+  "expectedBehavior": "Ephemeral lane/session events should either be written under ignored runtime storage or be lifecycle-managed into a compact tracked digest; they should not leave ambiguous untracked history files that block or distract later governed work.",
+  "evidenceOrRepro": "After ATM-GOV-0195 closeback, `git status --short` showed `?? .atm/history/session-events/lane-20260719134847-codex-governance-optimizer-ef8a433602/`. A later `node atm.mjs next --prompt ... --json` reported activeClaimCount=0 and activeActors=[], yet set hasForeignActiveWork=true and recommended Team L3 solely because that same ATM-managed file was unowned dirty WIP.",
+  "followUp": "Decide whether lane session events are runtime logs or tracked evidence. If runtime, move them to `.atm/runtime/session-events` and gitignore them; if evidence, add deterministic seal/cleanup and pre-commit recognition."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-018",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Evidence / Journal Concurrency",
+  "finding": "Parallel `node atm.mjs evidence run` commands for the same task can race on the same `.atm/history/evidence/<task>.json` bundle, risking overwritten validator records.",
+  "expectedBehavior": "Evidence writes for a task should be serialized, append/CAS-protected, or brokered so parallel validators cannot silently clobber each other's results.",
+  "evidenceOrRepro": "ATM-GOV-0186 evidence collection launched multiple evidence runs against `.atm/history/evidence/ATM-GOV-0186.json`; the operator had to rerun validators sequentially to restore confidence.",
+  "followUp": "Add a task-scoped evidence write lease or append-only event journal plus a focused race test that runs two evidence writers concurrently and verifies both records survive."
+}

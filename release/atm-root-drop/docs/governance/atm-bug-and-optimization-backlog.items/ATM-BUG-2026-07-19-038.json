@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-038",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Low",
+  "status": "Open",
+  "area": "Task Direction / Scope Amendment",
+  "finding": "ATM-GOV-0195 pre-close displayed scope amendment addedPaths with a stray quote embedded in the first path.",
+  "expectedBehavior": "Scope amendment paths should be normalized as clean path strings without embedded quoting artifacts.",
+  "evidenceOrRepro": "taskflow pre-close closebackPlan.amendmentHistory for ATM-GOV-0195 showed addedPaths: [\"\\\"release/atm-onefile/atm.mjs\", \"release/atm-onefile/release-manifest.json\", \"release/atm-root-drop\\\"\"] after the release artifact scope amendment.",
+  "followUp": "Normalize amendment path parsing and add a regression test for multi-path scope amendments passed through CLI text arguments."
+}

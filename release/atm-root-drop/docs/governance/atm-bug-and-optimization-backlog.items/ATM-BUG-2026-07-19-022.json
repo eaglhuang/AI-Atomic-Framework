@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-022",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Runtime Telemetry / Build Telemetry",
+  "finding": "ATM-GOV-0193/0194 added gitignored runtime telemetry, but raw/high-frequency build statistics are still duplicated into tracked runner-sync receipts. The repository currently tracks 18 `*.runner-sync-receipt.json` files; recent receipts include full incremental plans, phase timings, cache details, and runtime telemetry references rather than a minimal decision digest.",
+  "expectedBehavior": "All raw statistics and logs should be written to local disk under .atm/runtime/telemetry or another gitignored log surface. This includes counters, per-run timing events, validation usage, debug logs, broker decision traces, runner-sync receipts, and other high-frequency telemetry. Git history should keep only compact decision digests, close summaries, or deliberately selected baselines; repeated raw telemetry/log/receipt streams must not be committed by default.",
+  "evidenceOrRepro": "`git ls-files '.atm/history/evidence/*runner-sync-receipt.json'` returns 18 tracked receipts. ATM-GOV-0194 and ATM-GOV-0195 receipts are 2674 and 3524 bytes and contain `incrementalPlan`, `phaseTimingsMs`, `tsBuildCache`, and `treatmentTelemetry`, while the same per-run data already exists under `.atm/runtime/telemetry/runner-sync-build/**`.",
+  "followUp": "Split runner-sync output into a local detailed receipt and a tracked compact decision digest. The tracked form should retain task/source/output/config digests, decision class, rollback reference, and local-runtime pointer only; per-phase timing series, changed-path lists, cache internals, and repeated counters stay gitignored."
+}

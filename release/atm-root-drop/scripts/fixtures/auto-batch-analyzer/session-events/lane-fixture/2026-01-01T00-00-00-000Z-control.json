@@ -1,0 +1,36 @@
+{
+  "schemaId": "atm.laneSessionEvent.v1",
+  "eventId": "fixture-control",
+  "laneId": "lane-fixture-control",
+  "sequence": 1,
+  "action": "broker-decision",
+  "actorId": "fixture-agent-a",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "details": {
+    "taskId": "TASK-FIXTURE-0001",
+    "brokerTicket": {
+      "ticketId": "ticket-control",
+      "waveId": "wave-fixture",
+      "baselineOrTreatmentRole": "control",
+      "sharedSurface": "control",
+      "batchEligible": false,
+      "waitedMs": 1200,
+      "waitedMsSaved": 0,
+      "parallelAdmitted": false,
+      "conflictDetected": true,
+      "trueConflict": true,
+      "decisionCorrect": true,
+      "outcomeRef": "fixture://control-ok",
+      "decisionLatencyMs": 80,
+      "composeAttempted": false,
+      "manualOverride": false,
+      "validationMethod": "historicalReplay",
+      "checkId": "fixture.safety-check",
+      "eligible": 600,
+      "uniqueBlocks": 1,
+      "truePositiveCount": 1,
+      "falsePositiveCount": 0,
+      "evidenceReadbacks": 1
+    }
+  }
+}

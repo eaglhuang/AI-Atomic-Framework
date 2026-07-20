@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-028",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Taskflow / Routing",
+  "finding": "During ATM-GOV-0195, a continuation prompt that mentioned the external 3KLife plan path was blocked as active-task divergence even though the operator intent was to continue the active task.",
+  "expectedBehavior": "When an active task has planningMirrorPaths or planningReadOnlyPaths matching the mentioned external plan, next should either recognize it as same-task context or provide a concise continuation command that preserves the active task without treating the planning path as foreign scope.",
+  "evidenceOrRepro": "Command: node atm.mjs next --prompt \"... C:\\\\Users\\\\User\\\\3KLife\\\\docs\\\\ai_atomic_framework\\\\governance-optimization\\\\end-to-end-auto-batch-performance-plan-v2.md ...\" --json. Result: ATM_NEXT_ACTIVE_TASK_DIVERGENCE_BLOCKED for active task ATM-GOV-0195, promptPaths: docs.",
+  "followUp": "Add planning-root-aware divergence handling and a regression test where an active task prompt references its external planning root or parent plan."
+}

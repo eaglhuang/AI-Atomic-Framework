@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-019",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Runner Sync / CLI UX",
+  "finding": "Runner-sync commands require operators to discover required surfaces and option combinations through CLI help/trial, including release accepting actor positionally and not `--task`.",
+  "expectedBehavior": "The first-layer skill/playbook should reveal the exact enqueue/build/release command sequence and valid option surface so agents do not need exploratory CLI calls during governed delivery.",
+  "evidenceOrRepro": "During ATM-GOV-0186, `framework-mode release` did not accept `--task`; the operator had to query `framework-mode --help` and rerun with the correct actor surface.",
+  "followUp": "Update runner-sync/framework-mode source skills and generated integration entries with explicit copy-paste commands, including release syntax, receipt-ref handling, and common failure recovery."
+}

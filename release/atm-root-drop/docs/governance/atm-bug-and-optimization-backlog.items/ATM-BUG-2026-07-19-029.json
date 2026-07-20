@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-029",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Batch / Taskflow",
+  "finding": "ATM-GOV-0195 surfaced a batch queue-head playbook that instructed batch checkpoint, but batch checkpoint failed because no active batch run existed; a later next --claim switched the same task to normal single-task playbook.",
+  "expectedBehavior": "The router and playbook should not oscillate between batch and normal for the same active queue-head. If checkpoint is required, next --claim should create or recover the active batch run; if normal close is correct, the preview should not instruct batch checkpoint.",
+  "evidenceOrRepro": "node atm.mjs next --prompt \"Continue active task ATM-GOV-0195...\" --json returned channel=batch and checkpointCommand. node atm.mjs batch checkpoint --actor codex-governance-optimizer --json then failed with ATM_BATCH_RUN_MISSING. node atm.mjs next --claim ... later returned recommendedChannel=normal.",
+  "followUp": "Create a lifecycle parity test covering active imported task -> next preview -> claim -> checkpoint/close surface, and make ATM_BATCH_RUN_MISSING provide a repair command that actually converges."
+}

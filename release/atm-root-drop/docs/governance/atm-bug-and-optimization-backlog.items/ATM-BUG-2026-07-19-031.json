@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-031",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Lane / CLI UX",
+  "finding": "After adopting the existing lane, next --claim still minted a new requested lane unless ATM_LANE_SESSION_ID was injected manually. The first-layer guidance did not make this environment requirement obvious.",
+  "expectedBehavior": "A successful lane adopt should make the next command copyable and self-contained, or next --claim should reuse the adopted active lane for the same actor/task without requiring hidden environment propagation.",
+  "evidenceOrRepro": "node atm.mjs lane adopt lane-20260719134847-codex-governance-optimizer-ef8a433602 --actor codex-governance-optimizer --confirm --json succeeded. A subsequent next --claim without ATM_LANE_SESSION_ID still requested a new lane and failed. A Node spawn with ATM_LANE_SESSION_ID succeeded.",
+  "followUp": "Expose a copyable Windows-safe continuation command after lane adopt and teach next --claim to read/reuse adopted same-task lane state by default when safe."
+}

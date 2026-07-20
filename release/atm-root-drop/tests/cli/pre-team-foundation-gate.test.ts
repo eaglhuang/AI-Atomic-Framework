@@ -32,6 +32,7 @@ runTest('tests/cli/pre-team-dual-captain-e2e.test.ts');
 runTest('packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts');
 runTest('packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts');
 runTest('tests/cli/runner-sync-foreign-dirty-owner.test.ts');
+runTest('tests/cli/runner-sync-framework-temp-hotfix.test.ts');
 
 const validators = JSON.parse(validatorCatalog) as {
   readonly validators?: ReadonlyArray<{ readonly name?: string; readonly entry?: string; readonly tags?: readonly string[] }>;

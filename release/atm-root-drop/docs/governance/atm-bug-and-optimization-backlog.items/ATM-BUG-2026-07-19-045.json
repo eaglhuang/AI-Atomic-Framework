@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-045",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P0",
+  "status": "Open",
+  "area": "Validator cleanup / protected task ledger",
+  "finding": "A validator or cleanup lane could remove the live imported task ledger file `.atm/history/tasks/ATM-GOV-0196.json` before the governed checkpoint/commit boundary, causing the task lifecycle to lose its canonical JSON state and risking `ATM_TASK_NOT_FOUND` or broken batch checkpoint recovery.",
+  "expectedBehavior": "Cleanup, validator, and integration command guards must treat `.atm/history/tasks/**`, `.atm/history/task-events/**`, and task evidence files as protected governance ledger state. They may stage or inspect those paths through governed ATM lifecycle commands, but must not delete, raw-clean, or raw-restore live ledger files unless an explicit governed recovery/disposition command owns the exact task scope.",
+  "evidenceOrRepro": "Observed during the ATM-GOV-0196 batch lane on 2026-07-20 Asia/Taipei after import/claim/validator work: `.atm/history/tasks/ATM-GOV-0196.json` had to be re-imported/re-added before checkpoint, and the current staged recovery bundle includes the restored task JSON plus task-events.",
+  "followUp": "Add a generic protected-ledger destructive-command guard and regression coverage proving cleanup-style raw commands cannot target `.atm/history/tasks/<task>.json`; keep task-specific recovery for ATM-GOV-0196 separate from the product-level guard."
+}

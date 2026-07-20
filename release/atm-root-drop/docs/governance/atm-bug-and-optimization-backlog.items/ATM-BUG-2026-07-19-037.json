@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-037",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Skills / First-layer UX",
+  "finding": "Multiple ATM operations required the operator to query CLI help or source code for basic usage, including framework-mode release actor-only surface, broker release syntax, lane continuation env, and commit fallback env.",
+  "expectedBehavior": "First-layer ATM skills should expose common recovery and lifecycle command surfaces directly, especially commands needed during taskflow, runner-sync, broker release, lane adoption, and governed git fallback.",
+  "evidenceOrRepro": "Dogfood observations during ATM-GOV-0195 and adjacent work: framework-mode release did not accept --task; broker release / runner-sync release required exact actor/steward syntax; lane continuation needed ATM_LANE_SESSION_ID; hook fallback needed ATM_COMMIT_TASK_ID.",
+  "followUp": "Create a skill-source repair task to add a compact command surface table and Windows-safe examples to the relevant ATM skills."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-044",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Taskflow close / Telemetry obligations",
+  "finding": "The 2.0 task cards require every card to seal an `atm.gateTelemetryTaskSummary.v1` and produce a data-driven decision before close, but all cards were allowed to close without those machine-readable artifacts. This breaks the intended producer-consumer chain and leaves later cards unable to consume prior-card evidence.",
+  "expectedBehavior": "When a task card declares telemetry producer/consumer obligations, taskflow pre-close must verify a sealed task summary or an explicit observability-missing decision receipt with history/config digests. Missing data may not fail the underlying product command, but it must prevent the card from claiming the telemetry obligation complete or silently disappearing from close evidence.",
+  "evidenceOrRepro": "After ATM-GOV-0182 through ATM-GOV-0190 and ATM-GOV-0193 through ATM-GOV-0195 were marked done, searching all `.atm/history/**/*.json` found no actual `atm.gateTelemetryTaskSummary.v1`, `dataDrivenDecision`, `baselineOrTreatmentRole`, or `missingTelemetry` artifact; the only hit is requirement prose stored in the ATM-GOV-0195 task ledger. Runtime contains only 22 next-route gate events plus runner-build logs, not per-card sealed summaries.",
+  "followUp": "Add a task-card obligation projection and pre-close validator that checks declared telemetry contracts. Provide `telemetry seal --task <id>` as the required repair command, store raw details locally, and attach only a compact summary/digest or explicit unavailable receipt to close evidence. Backfill 0182-0195 as observability-missing rather than fabricating historical zeroes."
+}

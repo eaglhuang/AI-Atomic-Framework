@@ -31,7 +31,9 @@ export function inspectRunnerSyncAdmission(input) {
             ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
             : queueHeadOwnership.ok
                 ? null
-                : queueHeadOwnership.reason
+                : queueHeadOwnership.stewardWorkId
+                    ? queueHeadOwnership.reason
+                    : buildRunnerSyncEnqueueCommand(input)
     };
 }
 function buildAdmissionBrokerTicket(input, ownership) {
@@ -52,6 +54,20 @@ function buildAdmissionBrokerTicket(input, ownership) {
         sharedSurface: 'runner-sync',
         scopeClass: ['code']
     };
+}
+function buildRunnerSyncEnqueueCommand(input) {
+    const taskId = inferRunnerSyncTaskId(input);
+    const surfaces = ['release/atm-onefile/atm.mjs', 'release/atm-root-drop']
+        .map((surface) => ` --surface ${quoteCliArg(surface)}`)
+        .join('');
+    return `node atm.mjs broker runner-sync enqueue --task ${quoteCliArg(taskId)} --actor ${quoteCliArg(input.stewardActorId)} --sealed-source-sha ${quoteCliArg(input.sealedSourceSha ?? '<sha>')}${surfaces} --json`;
+}
+function inferRunnerSyncTaskId(input) {
+    const tempTaskId = `ATM-FRAMEWORK-TEMP-${input.stewardActorId}`;
+    return tempTaskId.replace(/[^A-Za-z0-9._-]/g, '-');
+}
+function quoteCliArg(value) {
+    return JSON.stringify(String(value ?? ''));
 }
 export function assertRunnerSyncAdmission(report) {
     if (!report.ok) {
@@ -299,6 +315,10 @@ function resolveQueueHeadHealth(cwd, requests) {
     const taskId = String(requests[0]?.taskId ?? '').trim();
     if (!taskId)
         return 'task-active';
+    const frameworkTempHealth = resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId);
+    if (frameworkTempHealth) {
+        return frameworkTempHealth;
+    }
     const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
     if (!existsSync(taskPath))
         return 'task-missing';
@@ -311,5 +331,32 @@ function resolveQueueHeadHealth(cwd, requests) {
     }
     catch {
         return 'task-active';
+    }
+}
+function resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId) {
+    const normalizedTaskId = String(taskId ?? '').trim();
+    if (!normalizedTaskId.startsWith('ATM-FRAMEWORK-TEMP-')) {
+        return null;
+    }
+    const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${normalizedTaskId}.lock.json`);
+    if (!existsSync(lockPath)) {
+        return 'task-missing';
+    }
+    try {
+        const lock = JSON.parse(readFileSync(lockPath, 'utf8'));
+        const workItemId = typeof lock.workItemId === 'string' ? lock.workItemId.trim() : '';
+        const leaseId = typeof lock.leaseId === 'string' ? lock.leaseId.trim() : '';
+        const heartbeatAt = typeof lock.heartbeatAt === 'string' ? lock.heartbeatAt : null;
+        const ttlSeconds = typeof lock.ttlSeconds === 'number' && Number.isFinite(lock.ttlSeconds)
+            ? lock.ttlSeconds
+            : 0;
+        if (workItemId !== normalizedTaskId || !leaseId || !heartbeatAt || ttlSeconds <= 0) {
+            return 'task-missing';
+        }
+        const expiresAt = Date.parse(heartbeatAt) + ttlSeconds * 1000;
+        return Number.isFinite(expiresAt) && expiresAt > Date.now() ? 'task-active' : 'task-terminal';
+    }
+    catch {
+        return 'task-missing';
     }
 }
