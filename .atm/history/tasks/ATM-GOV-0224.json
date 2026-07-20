@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0224",
+  "title": "Complete paired AB and safety controller",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0221",
+    "ATM-GOV-0222",
+    "ATM-GOV-0223"
+  ],
+  "acceptance": [
+    "420 個有效 cells 全部存在。",
+    "median makespan 改善 >=25%，active throughput 改善 >=25%，production cost ratio <=1.10。",
+    "escaped conflict、silent overwrite、duplicate side effect、unresolved starvation 全為 0。",
+    "coverage 100%，task summary 有 window/watermark/sealed digest。"
+  ],
+  "deliverables": [
+    "scripts/run-paired-ab-v4.ts",
+    "scripts/plan-performance-report-v4.ts",
+    "packages/core/src/broker/parallel-admission-policy.ts",
+    "artifacts/generated/atm-ab-v4/**",
+    "tests/cli/paired-ab-v4-safety-controller.test.ts",
+    "docs/reports/atm-2-1-paired-ab-v4.md"
+  ],
+  "scopePaths": [
+    "scripts/run-paired-ab-v4.ts",
+    "scripts/plan-performance-report-v4.ts",
+    "packages/core/src/broker/parallel-admission-policy.ts",
+    "artifacts/generated/atm-ab-v4/**",
+    "tests/cli/paired-ab-v4-safety-controller.test.ts",
+    "docs/reports/atm-2-1-paired-ab-v4.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/paired-ab-v4-safety-controller.test.ts",
+    "node --strip-types scripts/run-paired-ab-v4.ts --mode validate",
+    "npm run validate:operational-bench",
+    "npm run validate:rollout-metrics",
+    "npm run validate:telemetry",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No direct edits to .atm/runtime or .atm/history.",
+    "No new task/ticket registry."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and dispose generated artifacts through formal ATM commands; do not edit .atm runtime state directly.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0224-complete-paired-ab-and-safety-controller.task.md",
+    "sectionTitle": "ATM-GOV-0224",
+    "headingLine": 67,
+    "hash": "b48f26bc164c8a4a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0224-complete-paired-ab-and-safety-controller.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:b48f26bc164c8a4ac25740fd451dffceb3c9982d17cc21bc2538dc31cd96ae65",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T18:21:22.702Z"
+    }
+  },
+  "importedAt": "2026-07-20T18:21:22.702Z",
+  "lastTransitionId": "2026-07-20T18-22-40-388Z-claim-d653a689c370",
+  "lastTransitionAt": "2026-07-20T18:22:40.388Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T18:22:35.951Z",
+  "promotedAt": "2026-07-20T18:22:35.953Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-12e642c14766",
+    "claimedAt": "2026-07-20T18:22:35.958Z",
+    "heartbeatAt": "2026-07-20T18:22:35.958Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0224.json",
+      "artifacts/generated/atm-ab-v4/**",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "packages/core/src/broker/parallel-admission-policy.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720182236-codex-gpt-5.4-mini-b5f7883b75",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720182236-codex-gpt-5.4-mini-b5f7883b75\""
+    }
+  },
+  "startedAt": "2026-07-20T18:22:35.958Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720182235-codex-gpt-5.4-mini-ATM-GOV-0224-cb759c0300",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0224",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0224.*",
+      ".atm/history/task-events/ATM-GOV-0224/**",
+      ".atm/history/tasks/ATM-GOV-0224.json",
+      "artifacts/generated/atm-ab-v4/**",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "packages/core/src/broker/parallel-admission-policy.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9b9bd337e7b4119175a4fe2889cf22d0ec83dfdb96d89d29487c17212b1aa070",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260720182235-codex-gpt-5.4-mini-ATM-GOV-0224-cb759c0300",
+    "laneSession": {
+      "laneSessionId": "lane-20260720182236-codex-gpt-5.4-mini-b5f7883b75",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720182236-codex-gpt-5.4-mini-b5f7883b75\""
+    },
+    "createdAt": "2026-07-20T18:22:40.387Z",
+    "status": "active"
+  }
+}

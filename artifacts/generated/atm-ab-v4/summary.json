@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.pairedAbV4Summary.v1",
+  "taskId": "ATM-GOV-0224",
+  "generatedAt": "2026-07-20T18:26:03.097Z",
+  "cellCount": 420,
+  "requiredCellCount": 420,
+  "arms": [
+    "serial",
+    "queue-only",
+    "atm-compose-first",
+    "isolated-git-branch-merge"
+  ],
+  "scales": [
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    100
+  ],
+  "contentions": [
+    "disjoint",
+    "same-file-disjoint-anchor",
+    "commutative-cid",
+    "noncommutative-cid",
+    "generated-shared-surface"
+  ],
+  "repeats": [
+    1,
+    2,
+    3
+  ],
+  "metrics": {
+    "medianMakespanImprovementPct": 35.8,
+    "activeThroughputImprovementPct": 56,
+    "productionCostRatio": 1.06,
+    "coveragePct": 100
+  },
+  "sideEffectCounts": {
+    "silentOverwrite": 0,
+    "escapedConflict": 0,
+    "duplicateSideEffect": 0,
+    "unresolvedStarvation": 0
+  },
+  "safetyController": {
+    "verdict": "pass",
+    "fallbackMode": "queue-only",
+    "evidenceDigest": "sha256:7811c0cee0383a4888f665a638aec13e8c77b517edaf62719033468cc320e7c9",
+    "resetEligible": true,
+    "blockers": []
+  },
+  "taskSummary": {
+    "taskId": "ATM-GOV-0224",
+    "window": "2026-07-20T18:00:00.000Z/2026-07-20T19:00:00.000Z",
+    "watermark": "atm-ab-v4-watermark-420-cells",
+    "cellCount": 420,
+    "sealedDigest": "sha256:136270476829cbd4efaf18b00c56fe5b0c265984f9cfefa8a9d0aa0ddea001d6"
+  },
+  "artifacts": {
+    "summaryPath": "artifacts/generated/atm-ab-v4/summary.json",
+    "cellsPath": "artifacts/generated/atm-ab-v4/cells.json",
+    "reportPath": "docs/reports/atm-2-1-paired-ab-v4.md"
+  },
+  "verdict": "pass"
+}
