@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T16-38-17-127Z-close-914d95edd00b",
+  "taskId": "ATM-GOV-0218",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720161229-codex-gpt-5.4-mini-ATM-GOV-0218-55d6302c2b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0218.json",
+  "taskSha256": "sha256:3306e9b0b00e6181b004994d83c0eb54dd4488d84f8921b45e7ddc8fe1139792",
+  "createdAt": "2026-07-20T16:38:17.127Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0218 --actor codex-gpt-5.4-mini --status done --historical-delivery 93c3c19fedf255828b3e3ccc3245324ad6aafd6e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720161229-codex-gpt-5.4-mini-ATM-GOV-0218-55d6302c2b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0218.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/runner-sync-self-hosting-loop.test.ts",
+      "node --strip-types tests/cli/runner-sync-stale-sha-recovery.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:runner-entrypoints",
+      "validate:runner-reproducibility"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T16:38:17.114Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0218.*",
+        ".atm/history/task-events/ATM-GOV-0218/**",
+        ".atm/history/tasks/ATM-GOV-0218.json",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/tasks/claim-ownership.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "schemas/governance/runner-sync-receipt.schema.json",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-sync-orphan-head.test.ts",
+        "tests/cli/runner-sync-self-hosting-loop.test.ts",
+        "tests/cli/runner-sync-stale-sha-recovery.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/tasks/claim-ownership.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "schemas/governance/runner-sync-receipt.schema.json",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-sync-orphan-head.test.ts",
+        "tests/cli/runner-sync-self-hosting-loop.test.ts",
+        "tests/cli/runner-sync-stale-sha-recovery.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

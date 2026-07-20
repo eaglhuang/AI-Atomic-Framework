@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0218",
   "title": "Runner sync self-hosting closed loop",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [
     "ATM-GOV-0216",
@@ -82,8 +82,8 @@
     }
   },
   "importedAt": "2026-07-20T16:12:18.845Z",
-  "lastTransitionId": "2026-07-20T16-24-24-974Z-scope-amendment-170f09ba0788",
-  "lastTransitionAt": "2026-07-20T16:24:24.974Z",
+  "lastTransitionId": "2026-07-20T16-38-17-127Z-close-914d95edd00b",
+  "lastTransitionAt": "2026-07-20T16:38:17.127Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-07-20T16:12:29.832Z",
@@ -92,7 +92,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-6e4989f3aade",
     "claimedAt": "2026-07-20T16:12:29.842Z",
-    "heartbeatAt": "2026-07-20T16:12:29.842Z",
+    "heartbeatAt": "2026-07-20T16:38:17.124Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0218.*",
@@ -111,14 +111,14 @@
       "tests/cli/runner-sync-self-hosting-loop.test.ts",
       "tests/cli/runner-sync-stale-sha-recovery.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720161230-codex-gpt-5.4-mini-da9c76691a",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720161230-codex-gpt-5.4-mini-da9c76691a\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T16:12:29.842Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -169,5 +169,9 @@
     },
     "createdAt": "2026-07-20T16:12:34.674Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T16:38:17.124Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260720161229-codex-gpt-5.4-mini-ATM-GOV-0218-55d6302c2b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0218.closure-packet.json"
 }
