@@ -1,20 +1,14 @@
 import type { ActiveWriteIntent, WriteIntent } from '../types.ts';
+import { resourceListsOverlap } from '../resource-overlap.ts';
 
+// Route every axis through the shared pattern-aware matcher (ATM-GOV-0206 / 0215).
+// Do not reintroduce Array.includes / Set.has over resource-key lists here; the
+// call-site inventory guard test will fail if the exact-match pattern reappears.
 export function hasSharedWriteSurface(intent: WriteIntent, active: ActiveWriteIntent): boolean {
-  const normalizedFiles = new Set(intent.targetFiles.map(normalizeBrokerPath));
-  if (active.resourceKeys.files.some((file) => normalizedFiles.has(normalizeBrokerPath(file)))) return true;
-  return hasIntersection(intent.sharedSurfaces.generators, active.resourceKeys.generators)
-    || hasIntersection(intent.sharedSurfaces.projections, active.resourceKeys.projections)
-    || hasIntersection(intent.sharedSurfaces.registries, active.resourceKeys.registries)
-    || hasIntersection(intent.sharedSurfaces.validators, active.resourceKeys.validators)
-    || hasIntersection(intent.sharedSurfaces.artifacts, active.resourceKeys.artifacts);
-}
-
-export function hasIntersection(left: readonly string[], right: readonly string[]): boolean {
-  const values = new Set(left);
-  return right.some((value) => values.has(value));
-}
-
-export function normalizeBrokerPath(value: string): string {
-  return value.trim().replace(/\\/g, '/');
+  return resourceListsOverlap('file', intent.targetFiles, active.resourceKeys.files)
+    || resourceListsOverlap('generator', intent.sharedSurfaces.generators, active.resourceKeys.generators)
+    || resourceListsOverlap('projection', intent.sharedSurfaces.projections, active.resourceKeys.projections)
+    || resourceListsOverlap('registry', intent.sharedSurfaces.registries, active.resourceKeys.registries)
+    || resourceListsOverlap('validator', intent.sharedSurfaces.validators, active.resourceKeys.validators)
+    || resourceListsOverlap('artifact', intent.sharedSurfaces.artifacts, active.resourceKeys.artifacts);
 }

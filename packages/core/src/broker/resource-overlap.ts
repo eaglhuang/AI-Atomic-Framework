@@ -115,6 +115,33 @@ export function resourceListsOverlap(resourceKind: string, left: readonly string
   return collectResourceKeyOverlapFacts(resourceKind, left, right).some((fact) => fact.verdict !== 'clear');
 }
 
+export interface ResourceOverlapMatch {
+  readonly resourceKind: string;
+  readonly leftKey: string;
+  readonly rightKey: string;
+  readonly verdict: 'overlap' | 'unknown';
+  readonly reason: string;
+}
+
+export function findResourceOverlapMatches(
+  resourceKind: string,
+  left: readonly string[],
+  right: readonly string[]
+): readonly ResourceOverlapMatch[] {
+  const matches: ResourceOverlapMatch[] = [];
+  for (const fact of collectResourceKeyOverlapFacts(resourceKind, left, right)) {
+    if (fact.verdict === 'clear') continue;
+    matches.push({
+      resourceKind: fact.resourceKind,
+      leftKey: fact.leftKey,
+      rightKey: fact.rightKey,
+      verdict: fact.verdict,
+      reason: fact.reason
+    });
+  }
+  return matches;
+}
+
 export function buildResourceOverlapReport(newIntent: WriteIntent, activeIntents: readonly ActiveWriteIntent[]): ResourceOverlapReport {
   const facts = activeIntents.flatMap((active) => active.taskId === newIntent.taskId ? [] : buildResourceOverlaps(newIntent, active));
   const summary = {

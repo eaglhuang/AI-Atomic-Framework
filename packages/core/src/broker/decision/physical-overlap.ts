@@ -1,6 +1,7 @@
 import type { ActiveWriteIntent, ConflictDetail, DecompositionRequest, WriteIntent } from '../types.ts';
 import { DEFAULT_AGR_LAYER2_THRESHOLDS, shouldTriggerLayer2 } from '../policy.ts';
 import { intersectRanges, rangesOverlap, type Layer2Conflict } from '../agr.ts';
+import { findResourceOverlapMatches } from '../resource-overlap.ts';
 import {
   buildDecompositionRequest,
   buildLayer2ConflictDetail,
@@ -29,16 +30,24 @@ export function evaluatePhysicalOverlap(
     }
 
     const activeRanges = toVirtualAtomRangesFromActiveIntent(activeIntent);
-    for (const newFile of newIntent.targetFiles) {
-      if (!activeIntent.resourceKeys.files.includes(newFile)) {
-        continue;
-      }
+    const seenPair = new Set<string>();
+    for (const match of findResourceOverlapMatches('file', newIntent.targetFiles, activeIntent.resourceKeys.files)) {
+      const pairKey = `${match.leftKey}::${match.rightKey}`;
+      if (seenPair.has(pairKey)) continue;
+      seenPair.add(pairKey);
 
-      const newCandidates = newIntentRanges.filter((entry) => entry.sourceRange.filePath === newFile);
-      const activeCandidates = activeRanges.filter((entry) => entry.sourceRange.filePath === newFile);
+      const newKey = match.leftKey;
+      const activeKey = match.rightKey;
+
+      // Range-level evidence lives on concrete literal filePaths in atomRefs[].sourceRange.
+      // For pattern-vs-literal or pattern-vs-pattern matches we fall through to the
+      // unresolved branch and report the concrete active key, which is what a compose
+      // or split lane will physically contend for.
+      const newCandidates = newIntentRanges.filter((entry) => entry.sourceRange.filePath === newKey);
+      const activeCandidates = activeRanges.filter((entry) => entry.sourceRange.filePath === activeKey);
 
       if (newCandidates.length === 0 || activeCandidates.length === 0) {
-        unresolvedOverlaps.add(newFile);
+        unresolvedOverlaps.add(activeKey);
         continue;
       }
 
@@ -47,7 +56,7 @@ export function evaluatePhysicalOverlap(
           if (!rangesOverlap(newAtom.sourceRange, activeAtom.sourceRange)) {
             conflicts.push({
               kind: 'file-range',
-              detail: `Syntactic disjoint overlap on '${newFile}' for atom '${newAtom.atomCid}' and '${activeAtom.atomCid}'.`
+              detail: `Syntactic disjoint overlap on '${activeKey}' for atom '${newAtom.atomCid}' and '${activeAtom.atomCid}'.`
             });
             continue;
           }

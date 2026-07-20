@@ -1,6 +1,6 @@
 import type { ActiveWriteIntent, BrokerArbitrationVerdict, BrokerConflictClassResult, BrokerConflictGateResult, BrokerConflictMatrix, BrokerDecision, WriteIntent, WriteIntentAtomRef } from './types.ts';
 export type { BrokerArbitrationVerdict, BrokerConflictClassResult, BrokerConflictGateResult, BrokerConflictMatrix } from './types.ts';
-import { buildResourceOverlapReport, compareResourceKeys, resourceListsOverlap, type ResourceKeyOverlapFact, type ResourceKeyOverlapVerdict } from './resource-overlap.ts';
+import { buildResourceOverlapReport, compareResourceKeys, findResourceOverlapMatches, resourceListsOverlap, type ResourceKeyOverlapFact, type ResourceKeyOverlapVerdict, type ResourceOverlapMatch } from './resource-overlap.ts';
 export { compareResourceKeys, type ResourceKeyOverlapFact, type ResourceKeyOverlapVerdict } from './resource-overlap.ts';
 
 const conflictMatrixSchemaId = 'atm.brokerConflictMatrix.v1' as const;
@@ -112,60 +112,22 @@ function detectSharedSurfaceConflicts(
   activeIntents: readonly ActiveWriteIntent[]
 ): BrokerConflictClassResult[] {
   const conflicts: BrokerConflictClassResult[] = [];
-  const newGenerators = new Set(newIntent.sharedSurfaces.generators);
-  const newProjections = new Set(newIntent.sharedSurfaces.projections);
-  const newRegistries = new Set(newIntent.sharedSurfaces.registries);
-  const newValidators = new Set(newIntent.sharedSurfaces.validators);
-  const newArtifacts = new Set(newIntent.sharedSurfaces.artifacts);
+  const axes: ReadonlyArray<{ readonly axis: string; readonly left: readonly string[]; readonly rightOf: (active: ActiveWriteIntent) => readonly string[]; readonly label: string }> = [
+    { axis: 'generator', left: newIntent.sharedSurfaces.generators, rightOf: (a) => a.resourceKeys.generators, label: 'generator' },
+    { axis: 'projection', left: newIntent.sharedSurfaces.projections, rightOf: (a) => a.resourceKeys.projections, label: 'projection' },
+    { axis: 'registry', left: newIntent.sharedSurfaces.registries, rightOf: (a) => a.resourceKeys.registries, label: 'registry' },
+    { axis: 'validator', left: newIntent.sharedSurfaces.validators, rightOf: (a) => a.resourceKeys.validators, label: 'validator' },
+    { axis: 'artifact', left: newIntent.sharedSurfaces.artifacts, rightOf: (a) => a.resourceKeys.artifacts, label: 'artifact' }
+  ];
 
   for (const active of activeIntents) {
     if (active.taskId === newIntent.taskId) continue;
 
-    for (const generator of active.resourceKeys.generators) {
-      if (newGenerators.has(generator)) {
+    for (const { axis, left, rightOf, label } of axes) {
+      for (const match of findResourceOverlapMatches(axis, left, rightOf(active))) {
         conflicts.push({
           kind: 'shared-surface',
-          detail: `Shared generator conflict: '${generator}' is in use by '${active.taskId}'.`,
-          blockingTask: active.taskId
-        });
-      }
-    }
-
-    for (const projection of newProjections) {
-      if (active.resourceKeys.projections.includes(projection)) {
-        conflicts.push({
-          kind: 'shared-surface',
-          detail: `Shared projection conflict: '${projection}' is in use by '${active.taskId}'.`,
-          blockingTask: active.taskId
-        });
-      }
-    }
-
-    for (const registry of newRegistries) {
-      if (active.resourceKeys.registries.includes(registry)) {
-        conflicts.push({
-          kind: 'shared-surface',
-          detail: `Shared registry conflict: '${registry}' is in use by '${active.taskId}'.`,
-          blockingTask: active.taskId
-        });
-      }
-    }
-
-    for (const validator of newValidators) {
-      if (active.resourceKeys.validators.includes(validator)) {
-        conflicts.push({
-          kind: 'shared-surface',
-          detail: `Shared validator conflict: '${validator}' is in use by '${active.taskId}'.`,
-          blockingTask: active.taskId
-        });
-      }
-    }
-
-    for (const artifact of newArtifacts) {
-      if (active.resourceKeys.artifacts.includes(artifact)) {
-        conflicts.push({
-          kind: 'shared-surface',
-          detail: `Shared artifact conflict: '${artifact}' is in use by '${active.taskId}'.`,
+          detail: formatSharedSurfaceConflictDetail(label, match, active.taskId),
           blockingTask: active.taskId
         });
       }
@@ -273,6 +235,12 @@ function detectCidConflictClasses(
   }
 
   return conflicts;
+}
+
+function formatSharedSurfaceConflictDetail(label: string, match: ResourceOverlapMatch, activeTaskId: string): string {
+  const displayKey = match.leftKey === match.rightKey ? `'${match.leftKey}'` : `'${match.leftKey}' vs active '${match.rightKey}'`;
+  const suffix = match.verdict === 'unknown' ? ' (possible overlap; unresolved key syntax)' : '';
+  return `Shared ${label} conflict: ${displayKey} is in use by '${activeTaskId}'.${suffix}`;
 }
 
 function hasSharedWriteSurface(intent: WriteIntent, active: ActiveWriteIntent): boolean {
