@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0223",
+  "title": "Real multi-process and multi-agent dogfood",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0218",
+    "ATM-GOV-0219",
+    "ATM-GOV-0220",
+    "ATM-GOV-0221",
+    "ATM-GOV-0222"
+  ],
+  "acceptance": [
+    "max simultaneous work >= 4。",
+    "actual overlap > 0，parallel admission > 0。",
+    "silent overwrite、escaped conflict、duplicate side effect、unresolved starvation 全為 0。",
+    "每個 actor 有獨立 lane/session/evidence seal。"
+  ],
+  "deliverables": [
+    "scripts/run-real-parallel-dogfood.ts",
+    "scripts/plan-performance-report-v3.ts",
+    "artifacts/generated/atm-parallel-dogfood/**",
+    "tests/cli/real-parallel-dogfood-harness.test.ts",
+    "docs/reports/atm-2-1-real-parallel-dogfood.md"
+  ],
+  "scopePaths": [
+    "scripts/run-real-parallel-dogfood.ts",
+    "scripts/plan-performance-report-v3.ts",
+    "artifacts/generated/atm-parallel-dogfood/**",
+    "tests/cli/real-parallel-dogfood-harness.test.ts",
+    "docs/reports/atm-2-1-real-parallel-dogfood.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/real-parallel-dogfood-harness.test.ts",
+    "node --strip-types scripts/run-real-parallel-dogfood.ts --mode validate",
+    "npm run validate:broker-compose",
+    "npm run validate:team-brokered-write",
+    "npm run validate:telemetry",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No direct edits to .atm/runtime or .atm/history.",
+    "No new task/ticket registry."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and dispose generated artifacts through formal ATM commands; do not edit .atm runtime state directly.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0223-real-multi-process-and-multi-agent-dogfood.task.md",
+    "sectionTitle": "ATM-GOV-0223",
+    "headingLine": 67,
+    "hash": "21e9e4baa87af53e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0223-real-multi-process-and-multi-agent-dogfood.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:21e9e4baa87af53e0b984cfbad3bede2f48f095afdcc8cc702d46fbf56374b27",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T18:07:17.164Z"
+    }
+  },
+  "importedAt": "2026-07-20T18:07:17.164Z",
+  "lastTransitionId": "2026-07-20T18-10-30-923Z-scope-amendment-3e9c40d933f9",
+  "lastTransitionAt": "2026-07-20T18:10:30.923Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T18:07:25.596Z",
+  "promotedAt": "2026-07-20T18:07:25.600Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-035eacc92ae7",
+    "claimedAt": "2026-07-20T18:07:25.606Z",
+    "heartbeatAt": "2026-07-20T18:07:25.606Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0223.*",
+      ".atm/history/task-events/ATM-GOV-0223/**",
+      ".atm/history/tasks/ATM-GOV-0223.json",
+      "artifacts/generated/atm-parallel-dogfood/**",
+      "docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "package.json",
+      "scripts/plan-performance-report-v3.ts",
+      "scripts/run-real-parallel-dogfood.ts",
+      "tests/cli/real-parallel-dogfood-harness.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720180725-codex-gpt-5.4-mini-af1c1e3b05",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720180725-codex-gpt-5.4-mini-af1c1e3b05\""
+    }
+  },
+  "startedAt": "2026-07-20T18:07:25.606Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720180725-codex-gpt-5.4-mini-ATM-GOV-0223-8319b578f6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0223",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0223.*",
+      ".atm/history/task-events/ATM-GOV-0223/**",
+      ".atm/history/tasks/ATM-GOV-0223.json",
+      "artifacts/generated/atm-parallel-dogfood/**",
+      "docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "package.json",
+      "scripts/plan-performance-report-v3.ts",
+      "scripts/run-real-parallel-dogfood.ts",
+      "tests/cli/real-parallel-dogfood-harness.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0223-real-multi-process-and-multi-agent-dogfood.task.md",
+      "C:/Users/User/AI-Atomic-Framework/artifacts/generated/atm-parallel-dogfood/**"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0223-real-multi-process-and-multi-agent-dogfood.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "bbfe0fdec48ffe3a35ad753e043bedbc6079f5300f9426e4494db960771bc872",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260720180725-codex-gpt-5.4-mini-af1c1e3b05",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720180725-codex-gpt-5.4-mini-af1c1e3b05\""
+    },
+    "createdAt": "2026-07-20T18:07:30.644Z",
+    "status": "active"
+  }
+}
