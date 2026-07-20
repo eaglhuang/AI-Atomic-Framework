@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T08-18-33-018Z-close-5374718b790a",
+  "taskId": "ATM-GOV-0206",
+  "action": "close",
+  "actorId": "codex-captain-0206",
+  "sessionId": "session-20260720080624-codex-captain-0206-ATM-GOV-0206-ae3a887b13",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0206.json",
+  "taskSha256": "sha256:d664228488bb854de0fdaf864a672efc24549859761f8d0c2e056d19031f015d",
+  "createdAt": "2026-07-20T08:18:33.018Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0206 --actor codex-captain-0206 --status done --historical-delivery 667dc4cc5a0c539a1aba6e1a957c8352f82c1daf",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720080624-codex-captain-0206-ATM-GOV-0206-ae3a887b13",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0206.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/core/broker-resource-overlap.test.ts",
+      "typecheck",
+      "validate:broker-proposal",
+      "validate:brokered-write",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T08:18:33.011Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0206.*",
+        ".atm/history/task-events/ATM-GOV-0206/**",
+        ".atm/history/tasks/ATM-GOV-0206.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/governance/patch-proposal.schema.json",
+        "schemas/governance/write-intent.schema.json",
+        "tests/core/broker-resource-overlap.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/governance/patch-proposal.schema.json",
+        "schemas/governance/write-intent.schema.json",
+        "tests/core/broker-resource-overlap.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

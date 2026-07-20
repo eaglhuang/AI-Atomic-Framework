@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0206",
   "title": "Broker resource overlap matcher repair (pattern-aware conflict detection)",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [],
   "acceptance": [
@@ -102,8 +102,8 @@
     }
   },
   "importedAt": "2026-07-20T08:06:22.299Z",
-  "lastTransitionId": "2026-07-20T08-09-24-817Z-scope-amendment-952f9c43f59d",
-  "lastTransitionAt": "2026-07-20T08:09:24.817Z",
+  "lastTransitionId": "2026-07-20T08-18-33-018Z-close-5374718b790a",
+  "lastTransitionAt": "2026-07-20T08:18:33.018Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-0206",
   "reservedAt": "2026-07-20T08:06:24.908Z",
@@ -112,7 +112,7 @@
     "actorId": "codex-captain-0206",
     "leaseId": "lease-66aa477c87d1",
     "claimedAt": "2026-07-20T08:06:24.916Z",
-    "heartbeatAt": "2026-07-20T08:06:24.916Z",
+    "heartbeatAt": "2026-07-20T08:18:33.016Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0206.*",
@@ -125,14 +125,14 @@
       "schemas/governance/write-intent.schema.json",
       "tests/core/broker-resource-overlap.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260720080625-codex-captain-0206-3c7f6cc9da",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720080625-codex-captain-0206-3c7f6cc9da\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-20T08:06:24.916Z",
   "startedByActor": "codex-captain-0206",
@@ -177,5 +177,9 @@
     },
     "createdAt": "2026-07-20T08:06:28.923Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-20T08:18:33.016Z",
+  "closedByActor": "codex-captain-0206",
+  "closedBySessionId": "session-20260720080624-codex-captain-0206-ATM-GOV-0206-ae3a887b13",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0206.closure-packet.json"
 }
