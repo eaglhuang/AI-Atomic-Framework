@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/shared-delivery-saga.schema.json",
+  "title": "ATM Shared Delivery Saga Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "sagaId",
+    "waveId",
+    "taskIds",
+    "ticketIds",
+    "expectedHeadSha",
+    "actualHeadSha",
+    "commitSha",
+    "sharedWriteReceiptDigest",
+    "memberSlices",
+    "sideEffects",
+    "recoveryAction",
+    "exactlyOnce"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.sharedDeliverySagaReceipt.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": { "$ref": "#/$defs/migration" },
+    "sagaId": { "type": "string", "minLength": 1 },
+    "waveId": { "type": "string", "minLength": 1 },
+    "taskIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "ticketIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "expectedHeadSha": { "type": "string", "minLength": 1 },
+    "actualHeadSha": { "type": ["string", "null"] },
+    "commitSha": { "type": ["string", "null"] },
+    "sharedWriteReceiptDigest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "memberSlices": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/member" },
+      "minItems": 1
+    },
+    "sideEffects": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sideEffect" }
+    },
+    "recoveryAction": { "enum": ["none", "replay-receipt", "rearbitrate", "compensate"] },
+    "exactlyOnce": { "type": "boolean" }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "enum": ["none", "additive", "breaking"] },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskId", "ticketId", "fileSlice", "validatorRefs", "semanticRefs"],
+      "properties": {
+        "taskId": { "type": "string", "minLength": 1 },
+        "ticketId": { "type": "string", "minLength": 1 },
+        "fileSlice": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "validatorRefs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "semanticRefs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "sideEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operationId", "kind", "state", "attempt", "acknowledged", "compensation"],
+      "properties": {
+        "operationId": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["commit", "update-ref", "receipt", "build", "projection", "checkpoint", "closeback", "push"] },
+        "state": { "enum": ["planned", "acknowledged", "replayed", "compensate", "blocked"] },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "acknowledged": { "type": "boolean" },
+        "compensation": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

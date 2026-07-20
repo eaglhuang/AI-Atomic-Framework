@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0214",
+  "title": "Shared delivery saga and crash safe exactly once lifecycle",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0211",
+    "ATM-GOV-0212",
+    "ATM-GOV-0213"
+  ],
+  "acceptance": [
+    "所有 blocker、composition與 semantic checks 在 `update-ref` 前完成；失敗時 HEAD/tree/working index 不變。",
+    "killpoint fixtures 無 duplicate commit/close/push、無 partial live mutation、無 acknowledged side effect 遺失。",
+    "shared receipt 可重算 commit tree、member file slices、ticket transitions、validators 與 semantic refs。",
+    "unrelated tasks 無法共用 commit；related members attribution 不遺失。",
+    "focused saga、real executor、brokered-write、typecheck 與 validate:cli 全數通過。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/shared-delivery-saga.ts",
+    "packages/core/src/broker/shared-delivery-commit.ts",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "schemas/governance/shared-delivery-saga.schema.json",
+    "tests/cli/shared-delivery-saga-ordering.test.ts",
+    "tests/cli/shared-delivery-saga-crash-recovery.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/shared-delivery-commit.ts",
+    "packages/core/src/broker/recovery.ts",
+    "packages/core/src/broker/shared-delivery-saga.ts",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+    "schemas/governance/shared-delivery-saga.schema.json",
+    "tests/cli/shared-delivery-saga-ordering.test.ts",
+    "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+    "tests/cli/real-shared-delivery-commit-executor.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/shared-delivery-saga-ordering.test.ts",
+    "node --strip-types tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+    "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "node --strip-types tests/cli/shared-delivery-commit-executor.test.ts",
+    "npm run validate:schemas",
+    "npm run validate:brokered-write",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No overlap detection, compose eligibility, ticket fairness, composition algorithm, or semantic policy."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "compensation-and-governed-revert",
+  "rollbackNotes": "Discard prepared but unpublished temp trees/indexes; replay durable receipts after crash; never reset an already-published shared commit automatically, and use governed revert/compensation for published mistakes.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.shared-delivery-commit-executor",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.shared-delivery-saga",
+        "pattern": "Facade",
+        "source": "packages/core/src/broker/shared-delivery-saga.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/recovery.ts",
+        "packages/core/src/broker/shared-delivery-saga.ts",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "schemas/governance/shared-delivery-saga.schema.json",
+        "tests/cli/shared-delivery-saga-ordering.test.ts",
+        "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0214-shared-delivery-saga-and-crash-safe-exactly-once-lifecycle.task.md",
+    "sectionTitle": "ATM-GOV-0214",
+    "headingLine": 78,
+    "hash": "22571ce0575542af",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0214-shared-delivery-saga-and-crash-safe-exactly-once-lifecycle.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:22571ce0575542af4edf7c3f359d201361b4cde00a97dd1412271aa0f059ed4a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T09:30:59.205Z"
+    }
+  },
+  "importedAt": "2026-07-20T09:30:59.205Z",
+  "lastTransitionId": "2026-07-20T09-31-16-339Z-claim-f4b89052ced1",
+  "lastTransitionAt": "2026-07-20T09:31:16.339Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0214",
+  "reservedAt": "2026-07-20T09:31:11.766Z",
+  "promotedAt": "2026-07-20T09:31:11.770Z",
+  "claim": {
+    "actorId": "codex-captain-0214",
+    "leaseId": "lease-cccb836b7a06",
+    "claimedAt": "2026-07-20T09:31:11.776Z",
+    "heartbeatAt": "2026-07-20T09:31:11.776Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0214.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/core/src/broker/recovery.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-delivery-saga.ts",
+      "schemas/governance/shared-delivery-saga.schema.json",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+      "tests/cli/shared-delivery-saga-ordering.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720093111-codex-captain-0214-1258cc717d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720093111-codex-captain-0214-1258cc717d\""
+    }
+  },
+  "startedAt": "2026-07-20T09:31:11.776Z",
+  "startedByActor": "codex-captain-0214",
+  "startedBySessionId": "session-20260720093111-codex-captain-0214-ATM-GOV-0214-b1b543d320",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0214",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0214.*",
+      ".atm/history/task-events/ATM-GOV-0214/**",
+      ".atm/history/tasks/ATM-GOV-0214.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/core/src/broker/recovery.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-delivery-saga.ts",
+      "schemas/governance/shared-delivery-saga.schema.json",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "tests/cli/shared-delivery-saga-crash-recovery.test.ts",
+      "tests/cli/shared-delivery-saga-ordering.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f7e57b241b3e334ec2269402ffcd090bc00bd41a04d68f9e44b06fd25c16ad3c",
+    "actorId": "codex-captain-0214",
+    "sessionId": "session-20260720093111-codex-captain-0214-ATM-GOV-0214-b1b543d320",
+    "laneSession": {
+      "laneSessionId": "lane-20260720093111-codex-captain-0214-1258cc717d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720093111-codex-captain-0214-1258cc717d\""
+    },
+    "createdAt": "2026-07-20T09:31:16.332Z",
+    "status": "active"
+  }
+}

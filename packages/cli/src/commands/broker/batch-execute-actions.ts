@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { CliError, makeResult, message } from '../shared.ts';
 import { planWaveBrokerBatch } from '../../../../core/src/broker/wave-broker-scheduler.ts';
 import { planSharedDeliveryCommit } from '../../../../core/src/broker/shared-delivery-commit.ts';
+import { planSharedDeliverySaga } from '../../../../core/src/broker/shared-delivery-saga.ts';
 import { planWaveGeneratedWrite, type WaveGeneratedSurfaceKind } from '../../../../core/src/broker/wave-generated-executor.ts';
 import { assertRecordCommitPayloadPresent } from '../git-governance/record-commit-payload-assertion.ts';
 import type { ParsedBrokerOptions } from './parser.ts';
@@ -269,7 +270,7 @@ export function handleBrokerBatchExecute(options: ParsedBrokerOptions, context: 
     expectedTaskIds: options.expectedTasks,
     collectionTimeoutMs: options.collectionTimeoutMs
   });
-  const taskIds = scheduler.tickets
+  const taskIds: string[] = scheduler.tickets
     .filter((ticket: { ticketId: string }) => decision.ticketIds.includes(ticket.ticketId))
     .map((ticket: { taskId: string }) => ticket.taskId);
   const tempIndexDir = mkdtempSync(path.join(tmpdir(), 'atm-shared-delivery-index-'));
@@ -303,6 +304,16 @@ export function handleBrokerBatchExecute(options: ParsedBrokerOptions, context: 
     commitSha: applied?.commitSha ?? null,
     temporaryIndexPath
   });
+  const saga = planSharedDeliverySaga({
+    decision,
+    scheduler,
+    expectedHeadSha: expectedHead,
+    actualHeadSha: applied?.commitSha ?? options.currentHeadSha ?? expectedHead,
+    sharedWriteReceipt: plan.receipt,
+    fileSlices,
+    validatorRefs: Object.fromEntries(taskIds.map((taskId) => [taskId, options.validatorTasks.includes(taskId) ? ['validator-evidence:present'] : []])),
+    semanticRefs: Object.fromEntries(taskIds.map((taskId) => [taskId, ['semantic-revalidation:pre-publish']]))
+  });
   const receiptPath = options.evidenceOutPath && plan.receipt
     ? writeReceipt(options.cwd, options.evidenceOutPath, plan.receipt)
     : null;
@@ -322,6 +333,7 @@ export function handleBrokerBatchExecute(options: ParsedBrokerOptions, context: 
       schedulerPath: '.atm/runtime/wave-broker-scheduler.json',
       decision,
       plan,
+      saga,
       receiptPath,
       temporaryIndexPath,
       payloadAssertion: applied?.payloadAssertion ?? null
