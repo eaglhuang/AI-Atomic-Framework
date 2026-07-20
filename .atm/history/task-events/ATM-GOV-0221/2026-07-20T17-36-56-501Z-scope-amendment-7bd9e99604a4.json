@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T17-36-56-501Z-scope-amendment-7bd9e99604a4",
+  "taskId": "ATM-GOV-0221",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0221.json",
+  "taskSha256": "sha256:fac7f544bd22d8716c925312578d875ff8c47514006a05ba3d56db5eaf57d84f",
+  "createdAt": "2026-07-20T17:36:56.501Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0221 --actor codex-gpt-5.4-mini --add \"packages/core/src/telemetry/observation.ts,packages/core/src/telemetry/shared-write-coverage.ts\" --reason \"Canonical telemetry contract update needs observation migration field and small shared-write coverage module to stay under source line budget\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Canonical telemetry contract update needs observation migration field and small shared-write coverage module to stay under source line budget"
+  }
+}

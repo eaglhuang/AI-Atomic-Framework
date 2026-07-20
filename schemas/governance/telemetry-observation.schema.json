@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/governance/telemetry-observation.schema.json",
+  "title": "ATM Telemetry Observation",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "observationId",
+    "producerId",
+    "producerVersion",
+    "observationKind",
+    "status",
+    "source",
+    "sourceAvailability",
+    "storagePolicy"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.telemetryObservation.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "type": "object",
+      "required": [
+        "strategy",
+        "fromVersion",
+        "notes"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string"
+        },
+        "fromVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "observationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producerId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producerVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observationKind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "canonical",
+        "adapter-backed",
+        "legacy-readable",
+        "not-yet-migrated"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceAvailability": {
+      "enum": [
+        "available",
+        "partial",
+        "unavailable"
+      ]
+    },
+    "storagePolicy": {
+      "enum": [
+        "runtime-raw-tracked-digest",
+        "tracked-compact-digest",
+        "runtime-only",
+        "external-reference"
+      ]
+    }
+  }
+}

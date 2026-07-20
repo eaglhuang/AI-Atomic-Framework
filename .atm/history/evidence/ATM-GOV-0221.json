@@ -1,0 +1,1182 @@
+{
+  "taskId": "ATM-GOV-0221",
+  "updatedAt": "2026-07-20T17:39:43.532Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:34:48.558Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/canonical-telemetry-observation.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f1b8f3218078327aa10cfcad32585884a293b3ffe089db53b422bc2c51627bbd",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:34:45.500Z",
+            "finishedAt": "2026-07-20T17:34:48.558Z",
+            "durationMs": 3058,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/canonical-telemetry-observation.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:a31924794ee3d5ef93e65c658814e6db092908cad56b52f253836ffdf1ddba52",
+            "generatedAt": "2026-07-20T17:34:48.558Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:a31924794ee3d5ef93e65c658814e6db092908cad56b52f253836ffdf1ddba52",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:34:48.558Z",
+              "observedAt": "2026-07-20T17:34:48.558Z",
+              "startedAt": "2026-07-20T17:34:45.500Z",
+              "finishedAt": "2026-07-20T17:34:48.558Z",
+              "durationMs": 3058,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:b6dedbfed98c145bf15126cda3afce2adfe383a10dea7a1be7fc02dc28b45e9b",
+              "outputDigest": "sha256:9124d308184a7d4d46b388715f22173fb36d05a2963d5297499da544fc0052a6",
+              "cache": {
+                "key": "sha256:a31924794ee3d5ef93e65c658814e6db092908cad56b52f253836ffdf1ddba52",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/canonical-telemetry-observation.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:681edba99a82994536022e763d04bcb092e86e0a5f7a5b6169fa82fd631d94c2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:35:09.239Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/evidence-seal-task-summary.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b70d407f22eb48d3b68e1e09a43ec10c6e1d39f0e71aa492e51bafb2794d614c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:35:01.242Z",
+            "finishedAt": "2026-07-20T17:35:09.238Z",
+            "durationMs": 7996,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/evidence-seal-task-summary.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:2ddd70ea752c1ab15862aff28a54a9a74a2b3e592eb23d7b6a1c3e735fa911e1",
+            "generatedAt": "2026-07-20T17:35:09.238Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:2ddd70ea752c1ab15862aff28a54a9a74a2b3e592eb23d7b6a1c3e735fa911e1",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:35:09.238Z",
+              "observedAt": "2026-07-20T17:35:09.238Z",
+              "startedAt": "2026-07-20T17:35:01.242Z",
+              "finishedAt": "2026-07-20T17:35:09.238Z",
+              "durationMs": 7996,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:f2c815e72830ebb48696cb18713c06a1ba3fdf98f1933c8dd5cbf57b5f496a15",
+              "outputDigest": "sha256:69289fca164d9766b57f5075eba4b42d544ae87bcf62cb9e15133a51562beb11",
+              "cache": {
+                "key": "sha256:2ddd70ea752c1ab15862aff28a54a9a74a2b3e592eb23d7b6a1c3e735fa911e1",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/evidence-seal-task-summary.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f50d89cd546d258a24046034b859c7487e8ba4ca074d0c010a20844249d3e274",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:schemas",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:35:13.104Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:schemas"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:schemas",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:35:11.385Z",
+            "finishedAt": "2026-07-20T17:35:13.103Z",
+            "durationMs": 1718,
+            "cached": false,
+            "validators": [
+              "validate:schemas"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:c48c17e586934e12e16b844812af2525f30f2b8009feeae56f9fb165c09cc4f3",
+            "generatedAt": "2026-07-20T17:35:13.103Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:c48c17e586934e12e16b844812af2525f30f2b8009feeae56f9fb165c09cc4f3",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:35:13.103Z",
+              "observedAt": "2026-07-20T17:35:13.103Z",
+              "startedAt": "2026-07-20T17:35:11.385Z",
+              "finishedAt": "2026-07-20T17:35:13.103Z",
+              "durationMs": 1718,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:7b59a09f5a1d46a6451c2b624d9e1da7bafaa8b423744b880786aebf460157e3",
+              "outputDigest": "sha256:496e587f8680134ecc826eacb294da3d5d6115b0fc03ab98b890871a777f2c9a",
+              "cache": {
+                "key": "sha256:c48c17e586934e12e16b844812af2525f30f2b8009feeae56f9fb165c09cc4f3",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:schemas",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:schemas"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:26cc6ac2783c3bc7b4379a1e083f825f7ec9dfd0165033c38d07f84dc1224057",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:gate-telemetry-v1",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:35:29.316Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:gate-telemetry-v1"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:gate-telemetry-v1",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:801d3f6afcd61622182bce52e282aa139b069b149a56ae7ace7a77b103987f7c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:35:16.256Z",
+            "finishedAt": "2026-07-20T17:35:29.315Z",
+            "durationMs": 13059,
+            "cached": false,
+            "validators": [
+              "validate:gate-telemetry-v1"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:99f1aae71de574906d6be2163ba2bfec90c30e189c68f639f8f1c6b41f3a3adf",
+            "generatedAt": "2026-07-20T17:35:29.315Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:99f1aae71de574906d6be2163ba2bfec90c30e189c68f639f8f1c6b41f3a3adf",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:35:29.315Z",
+              "observedAt": "2026-07-20T17:35:29.315Z",
+              "startedAt": "2026-07-20T17:35:16.256Z",
+              "finishedAt": "2026-07-20T17:35:29.315Z",
+              "durationMs": 13059,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:57639cb5bb611f095ffca2e429652188792c7a07eddc946bf87c427869cd6ca4",
+              "outputDigest": "sha256:8d1b414b377b4411dfbe539bf846ca6a233c426b2ba3e760c9dcc6545420df17",
+              "cache": {
+                "key": "sha256:99f1aae71de574906d6be2163ba2bfec90c30e189c68f639f8f1c6b41f3a3adf",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:gate-telemetry-v1",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:gate-telemetry-v1"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:bde02ef6a565c72cd03f1832c9208e2eae032af299f136b04fc674d1074757d9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:35:46.079Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:35:32.358Z",
+            "finishedAt": "2026-07-20T17:35:46.078Z",
+            "durationMs": 13720,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:b09cb4847114e973c8a6be68a22ddbe66ba196ed40363ce6eeaa74653e805258",
+            "generatedAt": "2026-07-20T17:35:46.078Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:b09cb4847114e973c8a6be68a22ddbe66ba196ed40363ce6eeaa74653e805258",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:35:46.078Z",
+              "observedAt": "2026-07-20T17:35:46.078Z",
+              "startedAt": "2026-07-20T17:35:32.358Z",
+              "finishedAt": "2026-07-20T17:35:46.078Z",
+              "durationMs": 13720,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:2544a1d701900bcb97827ecb983d5e1c62024b30e42f2f5c2272900c254c7fc7",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:b09cb4847114e973c8a6be68a22ddbe66ba196ed40363ce6eeaa74653e805258",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:44e265efabdb605ef5108faa7876f23c97dffb9241dbf723dc195785fe316901",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:36:10.314Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+            "stderrSha256": "sha256:d1d0ea2b5c8f5063f38b69763d2a1fc7d4c797cd6061a0e6b66a80838df6e278",
+            "startedAt": "2026-07-20T17:35:49.179Z",
+            "finishedAt": "2026-07-20T17:36:10.312Z",
+            "durationMs": 21133,
+            "cached": false,
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:a1f2436becb086c86430d155cb22daf8fa03a859155eab7f09b41fda23789ae2",
+            "generatedAt": "2026-07-20T17:36:10.312Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:a1f2436becb086c86430d155cb22daf8fa03a859155eab7f09b41fda23789ae2",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:36:10.312Z",
+              "observedAt": "2026-07-20T17:36:10.312Z",
+              "startedAt": "2026-07-20T17:35:49.179Z",
+              "finishedAt": "2026-07-20T17:36:10.312Z",
+              "durationMs": 21133,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:a68d128bd213bd5a04e11fc783f2ebba6e64e4f0259a4b855ff69a79fd18c86d",
+              "outputDigest": "sha256:fa00e1d3ef69654c42437fa5fb276bbdbf221d9174b0d3233444e80f0c81a836",
+              "cache": {
+                "key": "sha256:a1f2436becb086c86430d155cb22daf8fa03a859155eab7f09b41fda23789ae2",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:cli",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:cli"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5e97e571475686d1ff75a2d0f792e289f5da64f7cbfc06e2edc408d9f7f3cc2a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:36:13.548Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:36:13.051Z",
+            "finishedAt": "2026-07-20T17:36:13.547Z",
+            "durationMs": 496,
+            "cached": false,
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:928ce00586d19e22b2662fdca04d56e6b4eef06caaec04fb37a6e6a60d0d833d",
+            "generatedAt": "2026-07-20T17:36:13.547Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:928ce00586d19e22b2662fdca04d56e6b4eef06caaec04fb37a6e6a60d0d833d",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:36:13.547Z",
+              "observedAt": "2026-07-20T17:36:13.547Z",
+              "startedAt": "2026-07-20T17:36:13.051Z",
+              "finishedAt": "2026-07-20T17:36:13.547Z",
+              "durationMs": 496,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:c24422372358f236bfd2966e6de96864419522dceda2539d18aacb2306ca1831",
+              "outputDigest": "sha256:73b4db795a7055d8fd5aadf94d2963333f0d33cd9a13d51041d00710dad53e5b",
+              "cache": {
+                "key": "sha256:928ce00586d19e22b2662fdca04d56e6b4eef06caaec04fb37a6e6a60d0d833d",
+                "hit": false
+              },
+              "extensions": {
+                "command": "git diff --check",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "git diff --check"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6642d9439351cfdac9c6931541c3f3ca7b46cfd25d255939b88372be4151cec0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:38:21.115Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/canonical-telemetry-observation.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f1b8f3218078327aa10cfcad32585884a293b3ffe089db53b422bc2c51627bbd",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:38:19.195Z",
+            "finishedAt": "2026-07-20T17:38:21.114Z",
+            "durationMs": 1919,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/canonical-telemetry-observation.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:a31924794ee3d5ef93e65c658814e6db092908cad56b52f253836ffdf1ddba52",
+            "generatedAt": "2026-07-20T17:38:21.114Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:a31924794ee3d5ef93e65c658814e6db092908cad56b52f253836ffdf1ddba52",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:38:21.114Z",
+              "observedAt": "2026-07-20T17:38:21.114Z",
+              "startedAt": "2026-07-20T17:38:19.195Z",
+              "finishedAt": "2026-07-20T17:38:21.114Z",
+              "durationMs": 1919,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:b6dedbfed98c145bf15126cda3afce2adfe383a10dea7a1be7fc02dc28b45e9b",
+              "outputDigest": "sha256:9124d308184a7d4d46b388715f22173fb36d05a2963d5297499da544fc0052a6",
+              "cache": {
+                "key": "sha256:a31924794ee3d5ef93e65c658814e6db092908cad56b52f253836ffdf1ddba52",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/canonical-telemetry-observation.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:681edba99a82994536022e763d04bcb092e86e0a5f7a5b6169fa82fd631d94c2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:38:39.842Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/evidence-seal-task-summary.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b70d407f22eb48d3b68e1e09a43ec10c6e1d39f0e71aa492e51bafb2794d614c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:38:31.935Z",
+            "finishedAt": "2026-07-20T17:38:39.842Z",
+            "durationMs": 7907,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/evidence-seal-task-summary.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:2ddd70ea752c1ab15862aff28a54a9a74a2b3e592eb23d7b6a1c3e735fa911e1",
+            "generatedAt": "2026-07-20T17:38:39.842Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:2ddd70ea752c1ab15862aff28a54a9a74a2b3e592eb23d7b6a1c3e735fa911e1",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:38:39.842Z",
+              "observedAt": "2026-07-20T17:38:39.842Z",
+              "startedAt": "2026-07-20T17:38:31.935Z",
+              "finishedAt": "2026-07-20T17:38:39.842Z",
+              "durationMs": 7907,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:f2c815e72830ebb48696cb18713c06a1ba3fdf98f1933c8dd5cbf57b5f496a15",
+              "outputDigest": "sha256:69289fca164d9766b57f5075eba4b42d544ae87bcf62cb9e15133a51562beb11",
+              "cache": {
+                "key": "sha256:2ddd70ea752c1ab15862aff28a54a9a74a2b3e592eb23d7b6a1c3e735fa911e1",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/evidence-seal-task-summary.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f50d89cd546d258a24046034b859c7487e8ba4ca074d0c010a20844249d3e274",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:schemas",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:38:44.720Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:schemas"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:schemas",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:38:42.863Z",
+            "finishedAt": "2026-07-20T17:38:44.719Z",
+            "durationMs": 1856,
+            "cached": false,
+            "validators": [
+              "validate:schemas"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:c48c17e586934e12e16b844812af2525f30f2b8009feeae56f9fb165c09cc4f3",
+            "generatedAt": "2026-07-20T17:38:44.719Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:c48c17e586934e12e16b844812af2525f30f2b8009feeae56f9fb165c09cc4f3",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:38:44.719Z",
+              "observedAt": "2026-07-20T17:38:44.719Z",
+              "startedAt": "2026-07-20T17:38:42.863Z",
+              "finishedAt": "2026-07-20T17:38:44.719Z",
+              "durationMs": 1856,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:7b59a09f5a1d46a6451c2b624d9e1da7bafaa8b423744b880786aebf460157e3",
+              "outputDigest": "sha256:496e587f8680134ecc826eacb294da3d5d6115b0fc03ab98b890871a777f2c9a",
+              "cache": {
+                "key": "sha256:c48c17e586934e12e16b844812af2525f30f2b8009feeae56f9fb165c09cc4f3",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:schemas",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:schemas"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:26cc6ac2783c3bc7b4379a1e083f825f7ec9dfd0165033c38d07f84dc1224057",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:gate-telemetry-v1",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:39:00.989Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:gate-telemetry-v1"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:gate-telemetry-v1",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:801d3f6afcd61622182bce52e282aa139b069b149a56ae7ace7a77b103987f7c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:38:47.296Z",
+            "finishedAt": "2026-07-20T17:39:00.987Z",
+            "durationMs": 13691,
+            "cached": false,
+            "validators": [
+              "validate:gate-telemetry-v1"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:99f1aae71de574906d6be2163ba2bfec90c30e189c68f639f8f1c6b41f3a3adf",
+            "generatedAt": "2026-07-20T17:39:00.987Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:99f1aae71de574906d6be2163ba2bfec90c30e189c68f639f8f1c6b41f3a3adf",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:39:00.987Z",
+              "observedAt": "2026-07-20T17:39:00.987Z",
+              "startedAt": "2026-07-20T17:38:47.296Z",
+              "finishedAt": "2026-07-20T17:39:00.987Z",
+              "durationMs": 13691,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:57639cb5bb611f095ffca2e429652188792c7a07eddc946bf87c427869cd6ca4",
+              "outputDigest": "sha256:8d1b414b377b4411dfbe539bf846ca6a233c426b2ba3e760c9dcc6545420df17",
+              "cache": {
+                "key": "sha256:99f1aae71de574906d6be2163ba2bfec90c30e189c68f639f8f1c6b41f3a3adf",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:gate-telemetry-v1",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:gate-telemetry-v1"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:bde02ef6a565c72cd03f1832c9208e2eae032af299f136b04fc674d1074757d9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:39:16.860Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:39:04.067Z",
+            "finishedAt": "2026-07-20T17:39:16.859Z",
+            "durationMs": 12792,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:b09cb4847114e973c8a6be68a22ddbe66ba196ed40363ce6eeaa74653e805258",
+            "generatedAt": "2026-07-20T17:39:16.859Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:b09cb4847114e973c8a6be68a22ddbe66ba196ed40363ce6eeaa74653e805258",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:39:16.859Z",
+              "observedAt": "2026-07-20T17:39:16.859Z",
+              "startedAt": "2026-07-20T17:39:04.067Z",
+              "finishedAt": "2026-07-20T17:39:16.859Z",
+              "durationMs": 12792,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:2544a1d701900bcb97827ecb983d5e1c62024b30e42f2f5c2272900c254c7fc7",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:b09cb4847114e973c8a6be68a22ddbe66ba196ed40363ce6eeaa74653e805258",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:44e265efabdb605ef5108faa7876f23c97dffb9241dbf723dc195785fe316901",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:39:40.378Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+            "stderrSha256": "sha256:3624f7841d873d8d624df14041de6a364f55e3f041d467ed89bc6e829be1f73b",
+            "startedAt": "2026-07-20T17:39:20.012Z",
+            "finishedAt": "2026-07-20T17:39:40.377Z",
+            "durationMs": 20365,
+            "cached": false,
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:cb866ffbae1ff3bc27016f3c950825b51c81498a00866b0ce21fee0ddb0fe71f",
+            "generatedAt": "2026-07-20T17:39:40.377Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:cb866ffbae1ff3bc27016f3c950825b51c81498a00866b0ce21fee0ddb0fe71f",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:39:40.377Z",
+              "observedAt": "2026-07-20T17:39:40.377Z",
+              "startedAt": "2026-07-20T17:39:20.012Z",
+              "finishedAt": "2026-07-20T17:39:40.377Z",
+              "durationMs": 20365,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:a68d128bd213bd5a04e11fc783f2ebba6e64e4f0259a4b855ff69a79fd18c86d",
+              "outputDigest": "sha256:2b769cbbea03a38434e33c2fc520179e413da88856e6f70a1d6416ff3e78999c",
+              "cache": {
+                "key": "sha256:cb866ffbae1ff3bc27016f3c950825b51c81498a00866b0ce21fee0ddb0fe71f",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:cli",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:cli"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:81f3e647a0116d123bfa5de592dd1f7263939ba41cfdd37861310b3f4dfdff20",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+      "createdAt": "2026-07-20T17:39:43.532Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720173120-codex-gpt-5.4-mini-ATM-GOV-0221-c460b2431e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T17:39:43.099Z",
+            "finishedAt": "2026-07-20T17:39:43.530Z",
+            "durationMs": 431,
+            "cached": false,
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+            "cacheKey": "sha256:928ce00586d19e22b2662fdca04d56e6b4eef06caaec04fb37a6e6a60d0d833d",
+            "generatedAt": "2026-07-20T17:39:43.530Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:928ce00586d19e22b2662fdca04d56e6b4eef06caaec04fb37a6e6a60d0d833d",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T17:39:43.530Z",
+              "observedAt": "2026-07-20T17:39:43.530Z",
+              "startedAt": "2026-07-20T17:39:43.099Z",
+              "finishedAt": "2026-07-20T17:39:43.530Z",
+              "durationMs": 431,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:c24422372358f236bfd2966e6de96864419522dceda2539d18aacb2306ca1831",
+              "outputDigest": "sha256:73b4db795a7055d8fd5aadf94d2963333f0d33cd9a13d51041d00710dad53e5b",
+              "cache": {
+                "key": "sha256:928ce00586d19e22b2662fdca04d56e6b4eef06caaec04fb37a6e6a60d0d833d",
+                "hit": false
+              },
+              "extensions": {
+                "command": "git diff --check",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "git diff --check"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6642d9439351cfdac9c6931541c3f3ca7b46cfd25d255939b88372be4151cec0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

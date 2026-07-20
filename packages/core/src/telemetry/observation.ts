@@ -23,6 +23,11 @@ export interface TelemetryCorrelationFields {
 export interface TelemetryObservationBase extends TelemetryTimingFields, TelemetryCorrelationFields {
   readonly schemaId: 'atm.telemetryObservation.v1';
   readonly specVersion: '0.1.0';
+  readonly migration: {
+    readonly strategy: 'none';
+    readonly fromVersion: null;
+    readonly notes: string;
+  };
   readonly observationId: string;
   readonly producerId: string;
   readonly producerVersion: string;
@@ -153,6 +158,11 @@ export function buildTelemetryObservation(input: {
   return {
     schemaId: 'atm.telemetryObservation.v1',
     specVersion: '0.1.0',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'Canonical telemetry observation contract.'
+    },
     observationId: input.observationId,
     producerId: input.producerId,
     producerVersion: input.producerVersion ?? '0.1.0',

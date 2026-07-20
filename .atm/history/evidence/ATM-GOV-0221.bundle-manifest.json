@@ -1,0 +1,243 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0221",
+  "updatedAt": "2026-07-20T17:39:43.532Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+    "node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:gate-telemetry-v1",
+    "validate:schemas"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f1b8f3218078327aa10cfcad32585884a293b3ffe089db53b422bc2c51627bbd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/canonical-telemetry-observation.test.ts"
+      ],
+      "generatedAt": "2026-07-20T17:34:48.558Z",
+      "startedAt": "2026-07-20T17:34:45.500Z",
+      "finishedAt": "2026-07-20T17:34:48.558Z",
+      "durationMs": 3058,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b70d407f22eb48d3b68e1e09a43ec10c6e1d39f0e71aa492e51bafb2794d614c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/evidence-seal-task-summary.test.ts"
+      ],
+      "generatedAt": "2026-07-20T17:35:09.238Z",
+      "startedAt": "2026-07-20T17:35:01.242Z",
+      "finishedAt": "2026-07-20T17:35:09.238Z",
+      "durationMs": 7996,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:schemas",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:schemas"
+      ],
+      "generatedAt": "2026-07-20T17:35:13.103Z",
+      "startedAt": "2026-07-20T17:35:11.385Z",
+      "finishedAt": "2026-07-20T17:35:13.103Z",
+      "durationMs": 1718,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:gate-telemetry-v1",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:801d3f6afcd61622182bce52e282aa139b069b149a56ae7ace7a77b103987f7c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:gate-telemetry-v1"
+      ],
+      "generatedAt": "2026-07-20T17:35:29.315Z",
+      "startedAt": "2026-07-20T17:35:16.256Z",
+      "finishedAt": "2026-07-20T17:35:29.315Z",
+      "durationMs": 13059,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-20T17:35:46.078Z",
+      "startedAt": "2026-07-20T17:35:32.358Z",
+      "finishedAt": "2026-07-20T17:35:46.078Z",
+      "durationMs": 13720,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:d1d0ea2b5c8f5063f38b69763d2a1fc7d4c797cd6061a0e6b66a80838df6e278",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-20T17:36:10.312Z",
+      "startedAt": "2026-07-20T17:35:49.179Z",
+      "finishedAt": "2026-07-20T17:36:10.312Z",
+      "durationMs": 21133,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-20T17:36:13.547Z",
+      "startedAt": "2026-07-20T17:36:13.051Z",
+      "finishedAt": "2026-07-20T17:36:13.547Z",
+      "durationMs": 496,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/canonical-telemetry-observation.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f1b8f3218078327aa10cfcad32585884a293b3ffe089db53b422bc2c51627bbd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/canonical-telemetry-observation.test.ts"
+      ],
+      "generatedAt": "2026-07-20T17:38:21.114Z",
+      "startedAt": "2026-07-20T17:38:19.195Z",
+      "finishedAt": "2026-07-20T17:38:21.114Z",
+      "durationMs": 1919,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/evidence-seal-task-summary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b70d407f22eb48d3b68e1e09a43ec10c6e1d39f0e71aa492e51bafb2794d614c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/evidence-seal-task-summary.test.ts"
+      ],
+      "generatedAt": "2026-07-20T17:38:39.842Z",
+      "startedAt": "2026-07-20T17:38:31.935Z",
+      "finishedAt": "2026-07-20T17:38:39.842Z",
+      "durationMs": 7907,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:schemas",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:schemas"
+      ],
+      "generatedAt": "2026-07-20T17:38:44.719Z",
+      "startedAt": "2026-07-20T17:38:42.863Z",
+      "finishedAt": "2026-07-20T17:38:44.719Z",
+      "durationMs": 1856,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:gate-telemetry-v1",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:801d3f6afcd61622182bce52e282aa139b069b149a56ae7ace7a77b103987f7c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:gate-telemetry-v1"
+      ],
+      "generatedAt": "2026-07-20T17:39:00.987Z",
+      "startedAt": "2026-07-20T17:38:47.296Z",
+      "finishedAt": "2026-07-20T17:39:00.987Z",
+      "durationMs": 13691,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-20T17:39:16.859Z",
+      "startedAt": "2026-07-20T17:39:04.067Z",
+      "finishedAt": "2026-07-20T17:39:16.859Z",
+      "durationMs": 12792,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:3624f7841d873d8d624df14041de6a364f55e3f041d467ed89bc6e829be1f73b",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-20T17:39:40.377Z",
+      "startedAt": "2026-07-20T17:39:20.012Z",
+      "finishedAt": "2026-07-20T17:39:40.377Z",
+      "durationMs": 20365,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-20T17:39:43.530Z",
+      "startedAt": "2026-07-20T17:39:43.099Z",
+      "finishedAt": "2026-07-20T17:39:43.530Z",
+      "durationMs": 431,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0dd772472b9ffb54ec4fcc57be6b41edf9de111",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

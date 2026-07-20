@@ -67,6 +67,8 @@ export const schemaEntries: Record<string, string> = {
   'content-anchor': 'schemas/governance/content-anchor.schema.json',
   'broker-decision': 'schemas/governance/broker-decision.schema.json',
   'command-manifest': 'schemas/governance/command-manifest.schema.json',
+  'telemetry-observation': 'schemas/governance/telemetry-observation.schema.json',
+  'shared-write-gate-coverage': 'schemas/governance/shared-write-gate-coverage.schema.json',
   'merge-plan': 'schemas/governance/merge-plan.schema.json',
   'break-glass-handoff': 'schemas/governance/break-glass-handoff.schema.json',
   'broker-mutation-request': 'schemas/broker/mutation-request.schema.json',

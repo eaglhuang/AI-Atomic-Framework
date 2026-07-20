@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T17-32-33-890Z-scope-amendment-fb4669631040",
+  "taskId": "ATM-GOV-0221",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0221.json",
+  "taskSha256": "sha256:b09fefe126d8392af3e94fe176d57796926cf1a6ca2c604533d737ead23c67a9",
+  "createdAt": "2026-07-20T17:32:33.890Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0221 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/command-specs/telemetry.spec.ts,tests/cli-fixtures/help-snapshots/telemetry.json\" --reason \"Telemetry CLI shared-write coverage surface requires command spec and help snapshot synchronization\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Telemetry CLI shared-write coverage surface requires command spec and help snapshot synchronization"
+  }
+}
