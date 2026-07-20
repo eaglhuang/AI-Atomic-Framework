@@ -7,9 +7,10 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { composeBrokerProposals } from '../packages/core/src/broker/compose.ts';
+import { composeTransactionalMutations } from '../packages/core/src/broker/transactional-composer.ts';
 import { applyStewardPlan, planStewardApply } from '../packages/core/src/broker/steward.ts';
 import { runBroker } from '../packages/cli/src/commands/broker.ts';
-import type { PatchProposal } from '../packages/core/src/broker/types.ts';
+import { brokerAdapterMigration, type MutationRequest, type PatchProposal } from '../packages/core/src/broker/types.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -99,6 +100,7 @@ function ensureRequiredFiles() {
     'package.json',
     'scripts/validators.config.json',
     'packages/core/src/broker/steward.ts',
+    'packages/core/src/broker/transactional-composer.ts',
     'packages/core/src/broker/apply-evidence.ts',
     'packages/cli/src/commands/broker.ts',
     'packages/cli/src/commands/command-specs/broker.spec.ts',
@@ -124,6 +126,18 @@ function ensureConfigWiring() {
     validatorsConfig.profiles?.standard?.validators?.includes('validate-broker-steward') === true,
     'standard profile must include validate-broker-steward'
   );
+}
+
+function mutation(overrides: Partial<MutationRequest> & Pick<MutationRequest, 'requestId' | 'filePath' | 'op' | 'target'>): MutationRequest {
+  return {
+    schemaId: 'atm.mutationRequest.v1',
+    specVersion: '0.1.0',
+    migration: brokerAdapterMigration(),
+    actorId: 'steward-validator',
+    taskId: 'ATM-GOV-0212',
+    value: 'value',
+    ...overrides
+  };
 }
 
 ensureRequiredFiles();
@@ -330,6 +344,20 @@ try {
   );
   assertStewardApplyEvidence(cliApply.parsed.evidence?.applyEvidence, 'CLI steward apply evidence');
   assertStewardApplyEvidence(JSON.parse(readFileSync(evidencePath, 'utf8')), 'CLI persisted steward apply evidence');
+
+  const liveBeforeTransactional = readFileSync(targetFile, 'utf8');
+  const beforeTransactional = '# A\nalpha\n';
+  const transactional = composeTransactionalMutations({
+    files: [{ filePath: 'docs/target.md', content: beforeTransactional }],
+    requests: [
+      mutation({ requestId: 'tx-replace', filePath: 'docs/target.md', op: 'replaceRange', target: '2:2', value: 'transactional' }),
+      mutation({ requestId: 'tx-conflict', filePath: 'docs/target.md', op: 'replaceRange', target: '2:2', value: 'skipped' })
+    ]
+  });
+  check(transactional.plan.selectedRequestIds.length === 1, 'transactional composer must select one compatible member');
+  check(transactional.plan.skippedRequestIds.length === 1, 'transactional composer must keep conflicting member queued');
+  check(transactional.plan.rollback.returnedQueueRequestIds.length === 1, 'transactional composer must return skipped members to queue');
+  check(readFileSync(targetFile, 'utf8') === liveBeforeTransactional, 'transactional composer must not mutate live target file');
 
   console.log(`[broker-steward:${mode}] ok`);
 } finally {

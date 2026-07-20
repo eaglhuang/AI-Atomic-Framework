@@ -1,0 +1,202 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0212",
+  "title": "Transactional bounded composer and serializable publish",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0208",
+    "ATM-GOV-0209",
+    "ATM-GOV-0211"
+  ],
+  "acceptance": [
+    "已知 line-shift silent-corruption 反例被 focused test 捕捉並產生正確結果或安全 queue fallback。",
+    "disjoint permutation/property fixtures 與 serial oracle 全等；零 partial live mutation。",
+    "composition plan 包含 base/output digest、member attribution、selected/skipped reason、rollback 與 validator refs。",
+    "partial compose 後剩餘 tickets 的 age/order 不遺失。",
+    "composer/steward/brokered-write/typecheck validators 全數通過。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/transactional-composer.ts",
+    "packages/core/src/broker/compose.ts",
+    "packages/core/src/broker/merge-plan.ts",
+    "packages/core/src/broker/steward.ts",
+    "schemas/governance/composition-plan.schema.json",
+    "tests/core/transactional-bounded-composer.test.ts",
+    "tests/core/composer-serializability.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/compose.ts",
+    "packages/core/src/broker/merge-plan.ts",
+    "packages/core/src/broker/steward.ts",
+    "packages/core/src/broker/transactional-composer.ts",
+    "packages/core/src/broker/adapters/text-range.ts",
+    "packages/core/src/broker/adapters/json-record.ts",
+    "packages/core/src/broker/adapters/cas.ts",
+    "schemas/governance/composition-plan.schema.json",
+    "tests/core/transactional-bounded-composer.test.ts",
+    "tests/core/composer-serializability.test.ts",
+    "scripts/validate-broker-compose.ts",
+    "scripts/validate-broker-steward.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/core/transactional-bounded-composer.test.ts",
+    "node --strip-types tests/core/composer-serializability.test.ts",
+    "node --strip-types scripts/validate-broker-compose.ts",
+    "node --strip-types scripts/validate-broker-steward.ts",
+    "npm run validate:schemas",
+    "npm run validate:brokered-write",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No read-set semantic validity, ticket fairness policy, live commit/update-ref, build, projection, checkpoint, closeback, or push."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "circuit-breaker-and-discard-temp-tree",
+  "rollbackNotes": "Disable compose admission, discard un-published temp trees/indexes, preserve plans and failure evidence, and return member tickets to queue order; already-published commits require governed revert rather than reset.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-broker",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.transactional-bounded-composer",
+        "pattern": "Strategy Map",
+        "source": "packages/core/src/broker/transactional-composer.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/merge-plan.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/transactional-composer.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/cas.ts",
+        "schemas/governance/composition-plan.schema.json",
+        "tests/core/transactional-bounded-composer.test.ts",
+        "tests/core/composer-serializability.test.ts",
+        "scripts/validate-broker-compose.ts",
+        "scripts/validate-broker-steward.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0212-transactional-bounded-composer-and-serializable-publish.task.md",
+    "sectionTitle": "ATM-GOV-0212",
+    "headingLine": 80,
+    "hash": "286b0314f616ca08",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0212-transactional-bounded-composer-and-serializable-publish.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:286b0314f616ca08c5452744ca2078e2c1206235556489aa7263259ccbcdba30",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T09:03:57.301Z"
+    }
+  },
+  "importedAt": "2026-07-20T09:03:57.301Z",
+  "lastTransitionId": "2026-07-20T09-04-09-830Z-claim-99e49e45bc41",
+  "lastTransitionAt": "2026-07-20T09:04:09.830Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0212",
+  "reservedAt": "2026-07-20T09:04:05.378Z",
+  "promotedAt": "2026-07-20T09:04:05.382Z",
+  "claim": {
+    "actorId": "codex-captain-0212",
+    "leaseId": "lease-b7a0b38616ac",
+    "claimedAt": "2026-07-20T09:04:05.388Z",
+    "heartbeatAt": "2026-07-20T09:04:05.388Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0212.json",
+      "packages/core/src/broker/adapters/cas.ts",
+      "packages/core/src/broker/adapters/json-record.ts",
+      "packages/core/src/broker/adapters/text-range.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/merge-plan.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/transactional-composer.ts",
+      "schemas/governance/composition-plan.schema.json",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validate-broker-steward.ts",
+      "tests/core/composer-serializability.test.ts",
+      "tests/core/transactional-bounded-composer.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720090405-codex-captain-0212-3efe00d75a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720090405-codex-captain-0212-3efe00d75a\""
+    }
+  },
+  "startedAt": "2026-07-20T09:04:05.388Z",
+  "startedByActor": "codex-captain-0212",
+  "startedBySessionId": "session-20260720090405-codex-captain-0212-ATM-GOV-0212-b0636f1ad9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0212",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0212.*",
+      ".atm/history/task-events/ATM-GOV-0212/**",
+      ".atm/history/tasks/ATM-GOV-0212.json",
+      "packages/core/src/broker/adapters/cas.ts",
+      "packages/core/src/broker/adapters/json-record.ts",
+      "packages/core/src/broker/adapters/text-range.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/merge-plan.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/transactional-composer.ts",
+      "schemas/governance/composition-plan.schema.json",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validate-broker-steward.ts",
+      "tests/core/composer-serializability.test.ts",
+      "tests/core/transactional-bounded-composer.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7635c208415d754306ce34f8e2952c21106ea4517d4f3016cddab419231b1535",
+    "actorId": "codex-captain-0212",
+    "sessionId": "session-20260720090405-codex-captain-0212-ATM-GOV-0212-b0636f1ad9",
+    "laneSession": {
+      "laneSessionId": "lane-20260720090405-codex-captain-0212-3efe00d75a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720090405-codex-captain-0212-3efe00d75a\""
+    },
+    "createdAt": "2026-07-20T09:04:09.829Z",
+    "status": "active"
+  }
+}
