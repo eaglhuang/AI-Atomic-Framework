@@ -4,13 +4,13 @@
   "specVersion": "0.1.0",
   "migration": {
     "strategy": "additive",
-    "fromVersion": "2.0.0",
-    "notes": "Incorporate ATM First Principles 1.0.0 as the normative design and acceptance schedule without changing any invariant."
+    "fromVersion": "2.2.0",
+    "notes": "Add generalized repair and data-driven policy as INV-ATM-009."
   },
-  "charterVersion": "2.2.0",
+  "charterVersion": "2.3.0",
   "projectName": "ai-atomic-framework",
-  "lastAmendedAt": "2026-07-17T00:00:00.000Z",
-  "charterHash": "sha256:22420ecae0d95a115e1dcd489a0b0051f3c79f61d2ff0d93c835fc35f41c39c0",
+  "lastAmendedAt": "2026-07-20T00:00:00.000Z",
+  "charterHash": "sha256:f5ff943f783ea7099c34943707dc589b6e77f3ac0b174532b1dbb06e32f43a29",
   "firstPrinciplesHash": "sha256:488d193397ed56b89f6f526aa882ebcb4fd8e9f81d2c4a5c8b30e5a3d5487f5c",
   "scheduleA": {
     "scheduleId": "schedule-a-economic-thresholds",
@@ -154,6 +154,20 @@
         "governance"
       ],
       "rationale": "Parallel lane development is the framework mission; a bare refusal at a shared surface silently serializes unrelated work, while a broker ticket keeps every lane moving with a concrete next step and measurable queue time."
+    },
+    {
+      "id": "INV-ATM-009",
+      "title": "Generalized repair and data-driven policy",
+      "rule": "Any code logic change, bug fix, or governance rule change must first be designed as the most general rule that correctly explains the observed failure class. Hard-coded special cases are allowed only with recorded evidence that the general rule is not currently safe, feasible, or economical, and that the exception is bounded and reversible. Data-shaped behavior, including thresholds, mappings, allowlists, routing choices, telemetry classifications, prompts, message text, fixtures, and domain content, must first be modeled outside control flow through schemas, registries, configuration, observed counters, or compact digest evidence instead of embedded changeable numbers or strings. The generalized solution must remain observable, testable, and no broader than the evidence supports.",
+      "enforcement": "doctor",
+      "breakingChange": false,
+      "tags": [
+        "generalization",
+        "data-driven",
+        "bugfix",
+        "governance"
+      ],
+      "rationale": "Hard-coded fixes make governance brittle and hide repeatable failure classes. A generalized, evidence-bounded repair keeps ATM extensible, while data-driven boundaries prevent changing policy or domain facts from being buried inside code logic."
     }
   ]
 }
