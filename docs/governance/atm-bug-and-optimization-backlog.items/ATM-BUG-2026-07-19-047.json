@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-19-047",
+  "date": "2026-07-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P0",
+  "status": "Fixed in runner-sync incremental release hydration hotfix",
+  "area": "Runner Sync / Release Artifacts",
+  "finding": "A sealed runner incremental build could compile only affected packages, then assemble release/atm-root-drop from a worktree that lacked the previously published dist outputs for unaffected packages. The root-drop cleanup treated those missing dist files as extraneous and deleted them from the generated release artifact, producing a frozen atm.mjs that failed module resolution at startup.",
+  "expectedBehavior": "Incremental runner builds may limit TypeScript package compilation to affected packages, but release assembly must always produce a complete runnable payload containing the current dist outputs for unaffected packages.",
+  "evidenceOrRepro": "After ATM-FRAMEWORK-TEMP-codex-captain runner-sync build for sealed source 229b83ce3218da19721d69337e30d395b6864ac7, node atm.mjs broker runner-sync release failed with Cannot find module packages/core/dist/hash-lock/hash-lock.js from the onefile cache, while git status showed release/atm-root-drop/packages/*/dist deletions.",
+  "followUp": "Hydrate packages/*/dist in the sealed worktree from the current release/atm-root-drop before incremental root-drop and onefile assembly, add regression coverage, rebuild frozen release artifacts, and verify node atm.mjs starts before push."
+}
