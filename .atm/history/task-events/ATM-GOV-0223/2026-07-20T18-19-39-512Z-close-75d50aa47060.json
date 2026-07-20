@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T18-19-39-512Z-close-75d50aa47060",
+  "taskId": "ATM-GOV-0223",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720180725-codex-gpt-5.4-mini-ATM-GOV-0223-8319b578f6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0223.json",
+  "taskSha256": "sha256:d47b1be1d856f606a15f0300329fe369d8091ad2e851e29bee995a98c4254adb",
+  "createdAt": "2026-07-20T18:19:39.512Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0223 --actor codex-gpt-5.4-mini --status done --historical-delivery 7362202dca45f9d2dc506770dc0d2c67392427c0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720180725-codex-gpt-5.4-mini-ATM-GOV-0223-8319b578f6",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0223.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types scripts/run-real-parallel-dogfood.ts --mode validate",
+      "node --strip-types tests/cli/real-parallel-dogfood-harness.test.ts",
+      "typecheck",
+      "validate:broker-compose",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-brokered-write",
+      "validate:telemetry"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T18:19:39.502Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0223.*",
+        ".atm/history/task-events/ATM-GOV-0223/**",
+        ".atm/history/tasks/ATM-GOV-0223.json",
+        "artifacts/generated/atm-parallel-dogfood/**",
+        "docs/reports/atm-2-1-real-parallel-dogfood.md",
+        "package.json",
+        "scripts/plan-performance-report-v3.ts",
+        "scripts/run-real-parallel-dogfood.ts",
+        "tests/cli/real-parallel-dogfood-harness.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/plan-performance-report-v3.ts",
+        "scripts/run-real-parallel-dogfood.ts",
+        "tests/cli/real-parallel-dogfood-harness.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

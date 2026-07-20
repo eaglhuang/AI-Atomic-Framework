@@ -1,0 +1,245 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0223",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "fb25a8c56b5f1a56bd482ae39707ce77897e82f8",
+  "governedTreeSha": "242b9ded7af324f78e124250889b5a70d3c74dc5",
+  "targetCommitDelta": {
+    "currentCommitSha": "fb25a8c56b5f1a56bd482ae39707ce77897e82f8",
+    "parentCommitShas": [
+      "fb25a8c56b5f1a56bd482ae39707ce77897e82f8"
+    ],
+    "governedTreeSha": "242b9ded7af324f78e124250889b5a70d3c74dc5",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-evidence/SKILL.md",
+      ".agents/skills/atm-governance-router/SKILL.md",
+      ".agents/skills/atm-handoff/SKILL.md",
+      ".agents/skills/atm-next/SKILL.md",
+      ".atm/history/evidence/ATM-GOV-0204.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0223.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0223.json",
+      ".atm/history/tasks/ATM-GOV-0196.json",
+      ".atm/integrations/antigravity.manifest.json",
+      ".atm/integrations/claude-code.manifest.json",
+      ".atm/integrations/codex.manifest.json",
+      ".atm/integrations/copilot.manifest.json",
+      ".atm/integrations/cursor.manifest.json",
+      ".atm/integrations/gemini.manifest.json",
+      ".claude/skills/atm-dispatch/SKILL.md",
+      ".claude/skills/atm-evidence/SKILL.md",
+      ".claude/skills/atm-governance-router/SKILL.md",
+      ".claude/skills/atm-handoff/SKILL.md",
+      ".claude/skills/atm-next/SKILL.md",
+      ".cursor/rules/skills/atm-dispatch/SKILL.md",
+      ".cursor/rules/skills/atm-evidence/SKILL.md",
+      ".cursor/rules/skills/atm-governance-router/SKILL.md",
+      ".cursor/rules/skills/atm-handoff/SKILL.md",
+      ".cursor/rules/skills/atm-next/SKILL.md",
+      ".gemini/commands/atm-dispatch.toml",
+      ".gemini/commands/atm-evidence.toml",
+      ".gemini/commands/atm-governance-router.toml",
+      ".gemini/commands/atm-handoff.toml",
+      ".gemini/commands/atm-next.toml",
+      ".github/instructions/atm-dispatch.instructions.md",
+      ".github/instructions/atm-evidence.instructions.md",
+      ".github/instructions/atm-governance-router.instructions.md",
+      ".github/instructions/atm-handoff.instructions.md",
+      ".github/instructions/atm-next.instructions.md",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-01.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-02.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-03.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-04.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-05.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/summary.json",
+      "artifacts/generated/atm-parallel-dogfood/workers.json",
+      "docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "integrations/codex-skills/atm-evidence/SKILL.md",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "integrations/codex-skills/atm-handoff/SKILL.md",
+      "integrations/codex-skills/atm-next/SKILL.md",
+      "package.json",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "scripts/plan-performance-report-v3.ts",
+      "scripts/run-real-parallel-dogfood.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-handoff.skill.md",
+      "tests/cli/real-parallel-dogfood-harness.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/real-parallel-dogfood-harness.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7b47dc82f989531282496b91b078b551a53bdbf7ad5846dbc1f6fe154775fac0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/run-real-parallel-dogfood.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:broker-compose",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c11a51131311e621e9ade6c7cba7f122e8eb1c912eeb3f363506b94a72ed73b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:team-brokered-write",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:615d8003cd80d2b7380f261574f49d073a54f7e5a68a48e4e2caf33f1758d819",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:telemetry",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9ccf68a10924ab5c5d4883402ec13c8a86e908474540dae08471a22f769000a9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:043a7d435c1fee13f0a94856c054b7b75de58dada772522ca8dae72640f48af4",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types scripts/run-real-parallel-dogfood.ts --mode validate",
+    "node --strip-types tests/cli/real-parallel-dogfood-harness.test.ts",
+    "typecheck",
+    "validate:broker-compose",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-brokered-write",
+    "validate:telemetry"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-20T18:19:39.502Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0223.*",
+      ".atm/history/task-events/ATM-GOV-0223/**",
+      ".atm/history/tasks/ATM-GOV-0223.json",
+      "artifacts/generated/atm-parallel-dogfood/**",
+      "docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "package.json",
+      "scripts/plan-performance-report-v3.ts",
+      "scripts/run-real-parallel-dogfood.ts",
+      "tests/cli/real-parallel-dogfood-harness.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "scripts/plan-performance-report-v3.ts",
+      "scripts/run-real-parallel-dogfood.ts",
+      "tests/cli/real-parallel-dogfood-harness.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0223.json",
+  "closedAt": "2026-07-20T18:19:39.502Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720180725-codex-gpt-5.4-mini-ATM-GOV-0223-8319b578f6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "7362202dca45f9d2dc506770dc0d2c67392427c0",
+    "taskMatchedFiles": [
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-01.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-02.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-03.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-04.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/dogfood-worker-05.proposal.json",
+      "artifacts/generated/atm-parallel-dogfood/summary.json",
+      "artifacts/generated/atm-parallel-dogfood/workers.json",
+      "docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "package.json",
+      "scripts/plan-performance-report-v3.ts",
+      "scripts/run-real-parallel-dogfood.ts",
+      "tests/cli/real-parallel-dogfood-harness.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0223.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0223/2026-07-20T18-07-17-286Z-import-13846606e9c2.json",
+      ".atm/history/task-events/ATM-GOV-0223/2026-07-20T18-07-25-596Z-reserve-0b0c6ab4c515.json",
+      ".atm/history/task-events/ATM-GOV-0223/2026-07-20T18-07-25-600Z-promote-2c2a39715771.json",
+      ".atm/history/task-events/ATM-GOV-0223/2026-07-20T18-07-30-598Z-claim-43534ea59391.json",
+      ".atm/history/task-events/ATM-GOV-0223/2026-07-20T18-10-30-923Z-scope-amendment-3e9c40d933f9.json",
+      ".atm/history/tasks/ATM-GOV-0223.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
