@@ -1,0 +1,131 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0199",
+  "updatedAt": "2026-07-20T10:42:29.005Z",
+  "updatedBy": "codex-captain-0199",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/broker-decision-outcome-telemetry.test.ts",
+    "typecheck",
+    "validate:broker-decision-outcome-telemetry",
+    "validate:cli",
+    "validate:gate-telemetry-coverage",
+    "validate:git-head-evidence",
+    "validate:physical-line-budget"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/broker-decision-outcome-telemetry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6b7b6f11925bb7cbf2f3e02111c89529c8f0a8efd43f1415bff4d47cbf0a127",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/broker-decision-outcome-telemetry.test.ts"
+      ],
+      "generatedAt": "2026-07-20T10:38:55.123Z",
+      "startedAt": "2026-07-20T10:38:54.812Z",
+      "finishedAt": "2026-07-20T10:38:55.123Z",
+      "durationMs": 311,
+      "runnerKind": "dev-source",
+      "sourceCommit": "71871dab451c349dcc791f3ad6e0f82bcc715934",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-decision-outcome-telemetry.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9a2d06a0e1fb5ea082edf76baf9aa376bf7bdb298f8360f9a83613dba6ff605f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:broker-decision-outcome-telemetry"
+      ],
+      "generatedAt": "2026-07-20T10:39:03.718Z",
+      "startedAt": "2026-07-20T10:39:03.246Z",
+      "finishedAt": "2026-07-20T10:39:03.718Z",
+      "durationMs": 472,
+      "runnerKind": "dev-source",
+      "sourceCommit": "71871dab451c349dcc791f3ad6e0f82bcc715934",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1dcf3ebbe05c537258eb750b4bd0e12cd17b932b5c9ab9f6428eb9450b2aac9d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:gate-telemetry-coverage"
+      ],
+      "generatedAt": "2026-07-20T10:39:16.528Z",
+      "startedAt": "2026-07-20T10:39:16.081Z",
+      "finishedAt": "2026-07-20T10:39:16.528Z",
+      "durationMs": 447,
+      "runnerKind": "dev-source",
+      "sourceCommit": "71871dab451c349dcc791f3ad6e0f82bcc715934",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-20T10:39:47.097Z",
+      "startedAt": "2026-07-20T10:39:30.323Z",
+      "finishedAt": "2026-07-20T10:39:47.097Z",
+      "durationMs": 16774,
+      "runnerKind": "dev-source",
+      "sourceCommit": "71871dab451c349dcc791f3ad6e0f82bcc715934",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:6613fbe0e15fe44ac0ebe904fb4ba284b1b9b7d3ab82e25afbe90044e4789278",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-20T10:40:19.123Z",
+      "startedAt": "2026-07-20T10:39:57.177Z",
+      "finishedAt": "2026-07-20T10:40:19.123Z",
+      "durationMs": 21946,
+      "runnerKind": "dev-source",
+      "sourceCommit": "71871dab451c349dcc791f3ad6e0f82bcc715934",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-physical-line-budget.ts --json --touched packages/core/src/telemetry/broker/decision-outcome.ts,packages/core/src/telemetry/broker/index.ts,packages/cli/src/commands/broker/broker-decision-observation.ts,scripts/validate-broker-decision-outcome-telemetry.ts,tests/cli/broker-decision-outcome-telemetry.test.ts --task ATM-GOV-0199 --actor codex-captain-0199 --gate pre-close",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df54787d96a0d88ae71e5676eb664bb3fe50330c7a8f05a576d6d1120ab48feb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:physical-line-budget"
+      ],
+      "generatedAt": "2026-07-20T10:40:31.272Z",
+      "startedAt": "2026-07-20T10:40:30.787Z",
+      "finishedAt": "2026-07-20T10:40:31.272Z",
+      "durationMs": 485,
+      "runnerKind": "dev-source",
+      "sourceCommit": "71871dab451c349dcc791f3ad6e0f82bcc715934",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-20T10:42:29.004Z",
+      "startedAt": "2026-07-20T10:41:34.446Z",
+      "finishedAt": "2026-07-20T10:42:29.004Z",
+      "durationMs": 54558,
+      "runnerKind": "dev-source",
+      "sourceCommit": "71871dab451c349dcc791f3ad6e0f82bcc715934",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

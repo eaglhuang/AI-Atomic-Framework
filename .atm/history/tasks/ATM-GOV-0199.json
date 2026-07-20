@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0199",
+  "title": "Live broker decision outcome telemetry and correctness adjudication",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0196",
+    "ATM-GOV-0205",
+    "ATM-GOV-0206",
+    "ATM-GOV-0211",
+    "ATM-GOV-0212",
+    "ATM-GOV-0213",
+    "ATM-GOV-0214"
+  ],
+  "acceptance": [
+    "無衝突 execute、可 compose batch、不安全 queue fallback、R1 hard reject、false-positive、escaped-conflict 各有 deterministic case。",
+    "至少一筆真 dogfood decision 被 observed、sealed、consumed 並完成 outcome adjudication。",
+    "pending correctness 會 aging/升級，不被統計成成功。",
+    "telemetry fail-open，不改變 broker admission 或 side-effect outcome。",
+    "0202 能直接依 decisionId/outcomeRef join，不靠 actor 名稱猜測。",
+    "開工 `dataDrivenDecision` 已引用 0196 history/config digest並留下 consumed receipt；本卡 sealed summary 可由同卡 validator 讀回並供 0202 後續寫入跨卡 consumed receipt。",
+    "rollback 後 broker admission、compose/queue 與 side-effect outcome parity 通過，既有 append-only decision 不被改寫或刪除。"
+  ],
+  "deliverables": [
+    "packages/core/src/telemetry/broker/**",
+    "packages/cli/src/commands/broker/broker-decision-observation.ts",
+    "scripts/validate-broker-decision-outcome-telemetry.ts",
+    "tests/cli/broker-decision-outcome-telemetry.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/telemetry/broker/**",
+    "packages/cli/src/commands/broker/broker-decision-observation.ts",
+    "scripts/validate-broker-decision-outcome-telemetry.ts",
+    "tests/cli/broker-decision-outcome-telemetry.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/broker-decision-outcome-telemetry.test.ts",
+    "node --strip-types scripts/validate-broker-decision-outcome-telemetry.ts",
+    "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode validate",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Disable only the observation adapter, outcome classifier, and aging worker; retain append-only runtime decisions for audit and verify the unchanged 0211-0214 admission/publish behavior has side-effect parity after rollback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-conflict-resolution",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker-decision-outcome-classifier",
+        "pattern": "Broker Decision Outcome Classifier",
+        "source": "packages/core/src/telemetry/broker/",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0199-live-broker-decision-outcome-telemetry-and-correctness-adjudication.task.md",
+    "sectionTitle": "ATM-GOV-0199",
+    "headingLine": 62,
+    "hash": "4f6ab915258263e4",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0199-live-broker-decision-outcome-telemetry-and-correctness-adjudication.task.md",
+      "planningCommitSha": "c84c85e8ad3cb4085d5aa87697743ef525f6cc34",
+      "contentDigest": "sha256:4f6ab915258263e406fac16b4fb738292dbc2b7ffe6100a4308ec544da4c8aae",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T10:32:09.881Z"
+    }
+  },
+  "importedAt": "2026-07-20T10:32:09.881Z",
+  "lastTransitionId": "2026-07-20T10-32-44-809Z-claim-eaff733464d0",
+  "lastTransitionAt": "2026-07-20T10:32:44.809Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-0199",
+  "reservedAt": "2026-07-20T10:32:40.216Z",
+  "promotedAt": "2026-07-20T10:32:40.219Z",
+  "claim": {
+    "actorId": "codex-captain-0199",
+    "leaseId": "lease-e477cf6cc316",
+    "claimedAt": "2026-07-20T10:32:40.221Z",
+    "heartbeatAt": "2026-07-20T10:32:40.221Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0199.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "packages/cli/src/commands/broker/broker-decision-observation.ts",
+      "packages/core/src/telemetry/broker/**",
+      "scripts/validate-broker-decision-outcome-telemetry.ts",
+      "tests/cli/broker-decision-outcome-telemetry.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720103240-codex-captain-0199-b11e78c245",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720103240-codex-captain-0199-b11e78c245\""
+    }
+  },
+  "startedAt": "2026-07-20T10:32:40.221Z",
+  "startedByActor": "codex-captain-0199",
+  "startedBySessionId": "session-20260720103240-codex-captain-0199-ATM-GOV-0199-c061099397",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0199",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0199.*",
+      ".atm/history/task-events/ATM-GOV-0199/**",
+      ".atm/history/tasks/ATM-GOV-0199.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "packages/cli/src/commands/broker/broker-decision-observation.ts",
+      "packages/core/src/telemetry/broker/**",
+      "scripts/validate-broker-decision-outcome-telemetry.ts",
+      "tests/cli/broker-decision-outcome-telemetry.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1eb84d7f6c43215b291de79aa4e5b5e6f221a3a62a2864e86c1eb6128f7b2821",
+    "actorId": "codex-captain-0199",
+    "sessionId": "session-20260720103240-codex-captain-0199-ATM-GOV-0199-c061099397",
+    "laneSession": {
+      "laneSessionId": "lane-20260720103240-codex-captain-0199-b11e78c245",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720103240-codex-captain-0199-b11e78c245\""
+    },
+    "createdAt": "2026-07-20T10:32:44.808Z",
+    "status": "active"
+  }
+}
