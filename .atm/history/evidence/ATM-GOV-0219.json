@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0219",
-  "updatedAt": "2026-07-20T16:51:34.024Z",
+  "updatedAt": "2026-07-20T16:58:21.056Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -668,6 +668,90 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:2bd9f2b17cb396ee312554550c24829fe3bb37102a3c593e443f389bc61104d9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260720164140-codex-gpt-5.4-mini-ATM-GOV-0219-8d325461f4",
+      "createdAt": "2026-07-20T16:58:21.056Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260720164140-codex-gpt-5.4-mini-ATM-GOV-0219-8d325461f4",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-20T16:57:04.956Z",
+            "finishedAt": "2026-07-20T16:58:21.055Z",
+            "durationMs": 76099,
+            "cached": false,
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "acdb5166e9760e55a00c0465ac0410b4728fe7ad",
+            "cacheKey": "sha256:96619884dd1c036bb176db2bf8c3f7712f4b1abf19c7d81dff14ac0a3999848c",
+            "generatedAt": "2026-07-20T16:58:21.055Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "observationId": "sha256:96619884dd1c036bb176db2bf8c3f7712f4b1abf19c7d81dff14ac0a3999848c",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-20T16:58:21.055Z",
+              "observedAt": "2026-07-20T16:58:21.055Z",
+              "startedAt": "2026-07-20T16:57:04.956Z",
+              "finishedAt": "2026-07-20T16:58:21.055Z",
+              "durationMs": 76099,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:3bfe80b0b0713ee2607ff558d8a11e34aab1d4ea9dbe72ef1bcaf435c2b5b059",
+              "outputDigest": "sha256:be4bf9fa561d02eaa8ea014e9c342775cea0dc27cddc293655c129794de2a829",
+              "cache": {
+                "key": "sha256:96619884dd1c036bb176db2bf8c3f7712f4b1abf19c7d81dff14ac0a3999848c",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:git-head-evidence",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:git-head-evidence"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "acdb5166e9760e55a00c0465ac0410b4728fe7ad",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:606b03085d2bb7ccafdb93061d9050dd564d4789f4161024996f4c1719fd2e14",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

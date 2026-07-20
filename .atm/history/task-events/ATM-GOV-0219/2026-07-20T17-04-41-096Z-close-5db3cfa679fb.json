@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T17-04-41-096Z-close-5db3cfa679fb",
+  "taskId": "ATM-GOV-0219",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260720164140-codex-gpt-5.4-mini-ATM-GOV-0219-8d325461f4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0219.json",
+  "taskSha256": "sha256:2537c8f1d20ab17707e5820aedd8fc3149b48eb5a379968abc65264d0a0a5d68",
+  "createdAt": "2026-07-20T17:04:41.096Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0219 --actor codex-gpt-5.4-mini --status done --historical-delivery acdb5166e9760e55a00c0465ac0410b4728fe7ad",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260720164140-codex-gpt-5.4-mini-ATM-GOV-0219-8d325461f4",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0219.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/command-manifest-shellless.test.ts",
+      "node --strip-types tests/cli/generated-write-manifest.test.ts",
+      "node --strip-types tests/cli/shared-delivery-idempotency.test.ts",
+      "typecheck",
+      "validate:brokered-write",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-20T17:04:41.085Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0219.*",
+        ".atm/history/task-events/ATM-GOV-0219/**",
+        ".atm/history/tasks/ATM-GOV-0219.json",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/parser.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/cli/src/commands/evidence/command-runs.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-delivery-saga.ts",
+        "schemas/governance/command-manifest.schema.json",
+        "scripts/validate-schemas/context.ts",
+        "tests/cli-fixtures/help-snapshots/broker.json",
+        "tests/cli/command-manifest-shellless.test.ts",
+        "tests/cli/generated-write-manifest.test.ts",
+        "tests/cli/shared-delivery-idempotency.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/parser.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/cli/src/commands/evidence/command-runs.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-delivery-saga.ts",
+        "schemas/governance/command-manifest.schema.json",
+        "scripts/validate-schemas/context.ts",
+        "tests/cli-fixtures/help-snapshots/broker.json",
+        "tests/cli/command-manifest-shellless.test.ts",
+        "tests/cli/generated-write-manifest.test.ts",
+        "tests/cli/shared-delivery-idempotency.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
