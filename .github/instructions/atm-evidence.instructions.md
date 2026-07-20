@@ -23,6 +23,24 @@ If blocked guidance includes an `ATM_*` code, use `atm-error-code-resolver`
 for the meaning, retryability, approval requirement, and next safe action. Do
 not turn source-index context into a private remediation table here.
 
+## Governance Evidence Checklist
+
+When explaining readiness or missing evidence for a governed task, check for:
+
+- consumed sealed summaries;
+- missing data and assumption changes;
+- a stop rule;
+- touched shared-write gates and the `INV-ATM-008` outcome;
+- telemetry window, watermark, counters, duration/timing, source availability,
+  compact digest, and explicit unavailable receipts;
+- frozen-entry smoke evidence when runner, release, broker shared-write
+  behavior, first-layer entry behavior, skill template projection, or generated
+  integration output changed.
+
+If a required signal is unavailable, say `unavailable` with the receipt or
+reason. Do not treat missing telemetry as zero latency, zero failures, or
+success.
+
 ## Team Agents Evidence Surface
 
 When evidence or blocked guidance involves Team Agents, recognize these as
