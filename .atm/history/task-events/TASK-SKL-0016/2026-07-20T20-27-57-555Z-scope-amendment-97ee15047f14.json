@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-20T20-27-57-555Z-scope-amendment-97ee15047f14",
+  "taskId": "TASK-SKL-0016",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0016.json",
+  "taskSha256": "sha256:a18adf08616bb3651a2287f44b3e20b7b808d908f499e778aead9b3feb29879a",
+  "createdAt": "2026-07-20T20:27:57.555Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0016 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/doctor/run-doctor.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
