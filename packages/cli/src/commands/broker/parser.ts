@@ -81,6 +81,7 @@ export interface ParsedBrokerOptions {
   readonly claimedTasks: readonly string[];
   readonly validatorTasks: readonly string[];
   readonly fileSlices: readonly string[];
+  readonly commandManifestPath: string | null;
   readonly runCommand: string | null;
   readonly outputFiles: readonly string[];
   readonly stewardId: string | null;
@@ -137,6 +138,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     claimedTasks: [] as string[],
     validatorTasks: [] as string[],
     fileSlices: [] as string[],
+    commandManifestPath: null as string | null,
     runCommand: null as string | null,
     outputFiles: [] as string[],
     stewardId: null as string | null,
@@ -343,6 +345,11 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--command-manifest') {
+      state.commandManifestPath = requireValue(argv, index, '--command-manifest');
+      index += 1;
+      continue;
+    }
     if (arg === '--output-file') {
       state.outputFiles.push(requireValue(argv, index, '--output-file'));
       index += 1;
@@ -457,6 +464,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     claimedTasks: state.claimedTasks,
     validatorTasks: state.validatorTasks,
     fileSlices: state.fileSlices,
+    commandManifestPath: state.commandManifestPath,
     runCommand: state.runCommand,
     outputFiles: state.outputFiles,
     stewardId: state.stewardId,

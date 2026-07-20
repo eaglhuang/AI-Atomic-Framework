@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/governance/command-manifest.schema.json",
+  "title": "ATM Command Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "executable", "argv"],
+  "properties": {
+    "schemaId": { "const": "atm.commandManifest.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": { "$ref": "#/$defs/migration" },
+    "executable": { "type": "string", "minLength": 1 },
+    "argv": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "cwd": { "type": "string" },
+    "env": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "envRefs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "timeoutMs": { "type": "integer", "minimum": 1 },
+    "stdinSha256": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[a-fA-F0-9]{64}$"
+    },
+    "ioDigest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[a-fA-F0-9]{64}$"
+    }
+  },
+  "not": {
+    "anyOf": [
+      { "required": ["command"] },
+      { "required": ["shell"] }
+    ]
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "enum": ["none", "additive", "breaking"] },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

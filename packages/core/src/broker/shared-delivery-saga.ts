@@ -201,7 +201,7 @@ function normalizeSideEffects(
   attempted: readonly SharedDeliverySagaSideEffect[] | undefined,
   receipt: SharedWriteReceipt | null | undefined
 ): readonly SharedDeliverySagaSideEffect[] {
-  if (attempted && attempted.length > 0) return attempted;
+  if (attempted && attempted.length > 0) return dedupeSideEffects(attempted);
   if (!receipt?.commitSha) return [];
   return [{
     operationId: `commit:${receipt.commitSha}`,
@@ -225,6 +225,25 @@ function normalizeSideEffects(
     acknowledged: true,
     compensation: null
   }];
+}
+
+function dedupeSideEffects(sideEffects: readonly SharedDeliverySagaSideEffect[]): readonly SharedDeliverySagaSideEffect[] {
+  const byOperation = new Map<string, SharedDeliverySagaSideEffect>();
+  for (const effect of sideEffects) {
+    const existing = byOperation.get(effect.operationId);
+    if (!existing) {
+      byOperation.set(effect.operationId, effect);
+      continue;
+    }
+    byOperation.set(effect.operationId, {
+      ...existing,
+      state: existing.acknowledged || effect.acknowledged ? 'replayed' : existing.state,
+      attempt: Math.max(existing.attempt, effect.attempt),
+      acknowledged: existing.acknowledged || effect.acknowledged,
+      compensation: existing.compensation ?? effect.compensation
+    });
+  }
+  return [...byOperation.values()].sort((left, right) => left.operationId.localeCompare(right.operationId));
 }
 
 function findDuplicateAcknowledgedEffects(sideEffects: readonly SharedDeliverySagaSideEffect[]): readonly string[] {

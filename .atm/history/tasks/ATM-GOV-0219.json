@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0219",
+  "title": "Transactional shared delivery",
+  "status": "running",
+  "milestone": "P0",
+  "dependencies": [
+    "ATM-GOV-0216",
+    "ATM-GOV-0217",
+    "ATM-GOV-0218"
+  ],
+  "acceptance": [
+    "default-on path 拒絕 shell command string。",
+    "同一 delivery 重跑三次不重複 commit/close/push/release/checkpoint。",
+    "空白/quote/Unicode/長路徑 pathspec fixture 通過。",
+    "generated write manifest 可重算 digest，失敗不產成功 receipt。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/shared-delivery-commit.ts",
+    "packages/core/src/broker/shared-delivery-saga.ts",
+    "packages/cli/src/commands/evidence/command-runs.ts",
+    "schemas/governance/command-manifest.schema.json",
+    "tests/cli/command-manifest-shellless.test.ts",
+    "tests/cli/shared-delivery-idempotency.test.ts",
+    "tests/cli/generated-write-manifest.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/shared-delivery-commit.ts",
+    "packages/core/src/broker/shared-delivery-saga.ts",
+    "packages/cli/src/commands/evidence/command-runs.ts",
+    "schemas/governance/command-manifest.schema.json",
+    "tests/cli/command-manifest-shellless.test.ts",
+    "tests/cli/shared-delivery-idempotency.test.ts",
+    "tests/cli/generated-write-manifest.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/command-manifest-shellless.test.ts",
+    "node --strip-types tests/cli/shared-delivery-idempotency.test.ts",
+    "node --strip-types tests/cli/generated-write-manifest.test.ts",
+    "npm run validate:schemas",
+    "npm run validate:brokered-write",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No direct edits to .atm/runtime or .atm/history.",
+    "No new task/ticket registry."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and dispose generated artifacts through formal ATM commands; do not edit .atm runtime state directly.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0219-transactional-shared-delivery.task.md",
+    "sectionTitle": "ATM-GOV-0219",
+    "headingLine": 69,
+    "hash": "6454cdae5adb7f3d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0219-transactional-shared-delivery.task.md",
+      "planningCommitSha": "7595dc5b99eff35833af4cecfaa62144e083e614",
+      "contentDigest": "sha256:6454cdae5adb7f3d54e09548f6aae7d5080cf53bb9f7a133bb106f76ccababd3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-20T16:41:03.339Z"
+    }
+  },
+  "importedAt": "2026-07-20T16:41:03.339Z",
+  "lastTransitionId": "2026-07-20T16-43-58-638Z-scope-amendment-71ab458b261a",
+  "lastTransitionAt": "2026-07-20T16:43:58.638Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-20T16:41:40.166Z",
+  "promotedAt": "2026-07-20T16:41:40.171Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-d239dcdf5f9b",
+    "claimedAt": "2026-07-20T16:41:40.179Z",
+    "heartbeatAt": "2026-07-20T16:41:40.179Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0219.*",
+      ".atm/history/task-events/ATM-GOV-0219/**",
+      ".atm/history/tasks/ATM-GOV-0219.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/evidence/command-runs.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-delivery-saga.ts",
+      "schemas/governance/command-manifest.schema.json",
+      "scripts/validate-schemas/context.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/command-manifest-shellless.test.ts",
+      "tests/cli/generated-write-manifest.test.ts",
+      "tests/cli/shared-delivery-idempotency.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260720164140-codex-gpt-5.4-mini-547c01864a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720164140-codex-gpt-5.4-mini-547c01864a\""
+    }
+  },
+  "startedAt": "2026-07-20T16:41:40.179Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260720164140-codex-gpt-5.4-mini-ATM-GOV-0219-8d325461f4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0219",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0219.*",
+      ".atm/history/task-events/ATM-GOV-0219/**",
+      ".atm/history/tasks/ATM-GOV-0219.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/evidence/command-runs.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-delivery-saga.ts",
+      "schemas/governance/command-manifest.schema.json",
+      "scripts/validate-schemas/context.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/command-manifest-shellless.test.ts",
+      "tests/cli/generated-write-manifest.test.ts",
+      "tests/cli/shared-delivery-idempotency.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0219-transactional-shared-delivery.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0219-transactional-shared-delivery.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7f6d50892be45e01af30c552958f3aad87f13fde22659d58d4f93a5b7a17fdfd",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260720164140-codex-gpt-5.4-mini-547c01864a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260720164140-codex-gpt-5.4-mini-547c01864a\""
+    },
+    "createdAt": "2026-07-20T16:41:46.683Z",
+    "status": "active"
+  }
+}

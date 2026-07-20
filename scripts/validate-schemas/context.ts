@@ -66,6 +66,7 @@ export const schemaEntries: Record<string, string> = {
   'patch-proposal': 'schemas/governance/patch-proposal.schema.json',
   'content-anchor': 'schemas/governance/content-anchor.schema.json',
   'broker-decision': 'schemas/governance/broker-decision.schema.json',
+  'command-manifest': 'schemas/governance/command-manifest.schema.json',
   'merge-plan': 'schemas/governance/merge-plan.schema.json',
   'break-glass-handoff': 'schemas/governance/break-glass-handoff.schema.json',
   'broker-mutation-request': 'schemas/broker/mutation-request.schema.json',
