@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0235",
+  "title": "ATM 3.0 final closure and circuit breaker verdict",
+  "status": "planned",
+  "milestone": "ATM-3.0-F",
+  "dependencies": [
+    "ATM-GOV-0234"
+  ],
+  "acceptance": [
+    "0226 所有 divergence terminal，active stale authorization 為 0。",
+    "0234 真多行程與 paired evidence 有效，correctness 七項均為 0、coverage 100%。",
+    "0234 real-task dogfood 使用兩張未交付且有 declared intersection 的 registered cards，兩位 Captain 均獲 canonical ticket、無 terminal refusal、無移除交集、無人工 wakeup 或 bypass。",
+    "`parallelOverlapRatio >= 0.30`、`serializedAdmissionRatio <= 0.70`，starvation threshold 在 run 前 sealed，且 correctness/performance 來自同一組 valid cells。",
+    "source/frozen/release/adopter parity 與 rollback drill 通過。",
+    "legacy migration 的 immutable pre-snapshot、apply、rollback 與 round-trip digest 全部通過；rollback 不依賴直接修改 runtime JSON。",
+    "healthy replay 的 `unexpectedBreakerTripCount = 0`、`timeInQueueOnlyRatio = 0`；trip/reset 演練通過，reset 引用新的 passing digest。",
+    "所有 2.2 未完成驗收有 terminal disposition；有任何 open 則本卡不得 close。",
+    "`TASK-TMP-0004`、`ATM-GOV-0236` 與 0226–0234 全部 target-close；projection-only backlog item count、unowned Plan 3.0 blocker count、failed/inconclusive readiness probe count皆為 0。"
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**",
+    "docs/governance/atm-3-replay-evidence.md",
+    "packages/cli/src/commands/broker/parallel-admission/**",
+    "tests/cli/atm-3-final-closure.test.ts",
+    "tests/cli/parallel-admission-circuit-breaker.test.ts"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**",
+    "docs/governance/atm-3-replay-evidence.md",
+    "packages/cli/src/commands/broker/parallel-admission/**",
+    "tests/cli/atm-3-final-closure.test.ts",
+    "tests/cli/parallel-admission-circuit-breaker.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+    "node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts",
+    "npm run validate:cli",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No new product implementation beyond minimal verdict/circuit-breaker wiring discovered by final integration.",
+    "No rewriting Plan 2.2 history."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "sealed-cross-plan",
+  "rollbackStrategy": "remain-open-and-queue-only",
+  "rollbackNotes": "On any failure keep ATM 3.0 active, trip queue-only, preserve evidence and emit exact failing cells plus recovery manifests.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.governance.closure",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0235-atm-3-0-final-closure-and-circuit-breaker-verdict.task.md",
+    "sectionTitle": "ATM-GOV-0235",
+    "headingLine": 65,
+    "hash": "83ceafb24c7cf2c0",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0235-atm-3-0-final-closure-and-circuit-breaker-verdict.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:83ceafb24c7cf2c0149d5b522bb4b13e3f5f6268b22f7a3cd0007704fabbe7c6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:51.022Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:51.022Z",
+  "lastTransitionId": "2026-07-21T05-04-51-276Z-import-caaf0a39585f",
+  "lastTransitionAt": "2026-07-21T05:04:51.276Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
