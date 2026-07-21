@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0004",
+  "title": "Plan 3.0 backlog canonical source repair",
+  "status": "planned",
+  "milestone": "ATM-3.0-R0",
+  "dependencies": [],
+  "acceptance": [
+    "六個完整 ID 各有且只有一份 canonical item shard，schema validation 全通過。",
+    "重建兩次得到相同 projection digest，且 `-213` 至 `-218` 不再依賴手寫 Markdown 才存在。",
+    "projection 中六列的語意欄位與 item shards 一致，狀態仍維持原始 `Open`，後續由 owning GOV card 以 evidence closeback。",
+    "target delivery、ledger evidence 與 projection rebuild receipt 完整後，本卡關閉且不留下臨時轉換檔。"
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-213.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-214.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-215.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-216.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-217.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-218.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-213.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-214.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-215.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-216.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-217.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-218.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-governance-projections.ts --write",
+    "node --strip-types scripts/validate-governance-projections.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No product bug fix and no direct edit to generated projection rows after rebuild.",
+    "No status change beyond preserving the currently recorded Open state."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert all six shards and their generated projection together; never leave projection-only rows as the rollback result.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.governance.backlog-projection",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "temporary-governance/tasks/TASK-TMP-0004-plan-3-0-backlog-canonical-source-repair.task.md",
+    "sectionTitle": "TASK-TMP-0004",
+    "headingLine": 59,
+    "hash": "964e7c4ca3ed1eaa",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "temporary-governance/tasks/TASK-TMP-0004-plan-3-0-backlog-canonical-source-repair.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:964e7c4ca3ed1eaad554dd1c723d307738c70564c3534b9776f766278bbbd9ff",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:09.515Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:09.515Z",
+  "lastTransitionId": "2026-07-21T05-04-09-631Z-import-6293d66da174",
+  "lastTransitionAt": "2026-07-21T05:04:09.631Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
