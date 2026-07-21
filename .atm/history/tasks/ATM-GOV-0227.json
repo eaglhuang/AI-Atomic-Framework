@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0227",
+  "title": "Canonical broker arbitration authority",
+  "status": "planned",
+  "milestone": "ATM-3.0-B0",
+  "dependencies": [
+    "ATM-GOV-0226"
+  ],
+  "acceptance": [
+    "任一 shared-write authorization 可反查唯一 canonical ticket id/generation/digest。",
+    "file/path grant 不得抑制 atom id/CID block，atom grant 不得授權無關 path/surface/range；成對 negative fixtures 通過。",
+    "同維度、同 normalized resource、同 operation/gate 且 generation 有效的 grant 必須授權，證明修復不是全序列化或全拒絕。",
+    "census 發現的所有 generation/grant 缺失 legacy sidecars 對 active authorization count 貢獻為 0，且 overlap 仍產生 execute/queue/batch ticket；無 sidecar 被刪改。",
+    "outer decision、matrix arbitration、gate status 與 conflict detail 在同一 generation 不得產生 clear/block 或 clear/freeze 矛盾。",
+    "completed/cancelled/expired ticket 在所有 gate 都 fail closed，不能被 stale BCR 復活。",
+    "schema、TypeScript contract 與 tests 同版，`additionalProperties` 無漂移。",
+    "INV-ATM-008 與 INV-ATM-009 測試通過。",
+    "source 與 frozen `node atm.mjs` 對相同 probe 的 canonical behavior projection digest 一致，runner digest 已封存；source-only 綠燈不得 close。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/contracts/**",
+    "packages/core/src/broker/ticket-authority/**",
+    "packages/cli/src/commands/broker-conflict-resolution.ts",
+    "schemas/atm.broker-ticket.v1.schema.json",
+    "tests/broker/canonical-arbitration-authority.test.ts",
+    "tests/broker/terminal-ticket-authorization.test.ts",
+    "tests/broker/authorization-resource-dimension.test.ts",
+    "tests/cli/legacy-bcr-fail-closed-authorization.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/contracts/**",
+    "packages/core/src/broker/ticket-authority/**",
+    "packages/core/src/schemas/broker-ticket.ts",
+    "packages/cli/src/commands/broker-conflict-resolution.ts",
+    "schemas/atm.broker-ticket.v1.schema.json",
+    "tests/broker/canonical-arbitration-authority.test.ts",
+    "tests/broker/terminal-ticket-authorization.test.ts",
+    "tests/broker/authorization-resource-dimension.test.ts",
+    "tests/cli/legacy-bcr-fail-closed-authorization.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/broker/canonical-arbitration-authority.test.ts",
+    "node --strip-types tests/broker/terminal-ticket-authorization.test.ts",
+    "node --strip-types tests/broker/authorization-resource-dimension.test.ts",
+    "node --strip-types tests/cli/legacy-bcr-fail-closed-authorization.test.ts",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No legacy runtime migration; ATM-GOV-0233 owns migration.",
+    "No queue/freeze/direction-lock storage rewrite; ATM-GOV-0228 owns projection mechanics."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "circuit-breaker-and-revert",
+  "rollbackNotes": "Trip parallel admission to queue-only before reverting the contract implementation. Rollback must not reactivate legacy artifacts that lack canonical generation/dimension grants.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.ticket-authority",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0227-canonical-broker-arbitration-authority.task.md",
+    "sectionTitle": "ATM-GOV-0227",
+    "headingLine": 80,
+    "hash": "fe99f20d012390fd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0227-canonical-broker-arbitration-authority.task.md",
+      "planningCommitSha": "ab4481f9568c78f2bf61ea031f75887a1c487b59",
+      "contentDigest": "sha256:fe99f20d012390fda96c53fbc031e1084e705a527bbf8ceae5c3eb456d0638a9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:33.490Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:33.490Z",
+  "lastTransitionId": "2026-07-21T05-04-33-603Z-import-ed55f5db3bab",
+  "lastTransitionAt": "2026-07-21T05:04:33.603Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
