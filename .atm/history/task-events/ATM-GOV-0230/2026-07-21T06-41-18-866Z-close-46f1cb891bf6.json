@@ -1,0 +1,87 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T06-41-18-866Z-close-46f1cb891bf6",
+  "taskId": "ATM-GOV-0230",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-01",
+  "sessionId": "session-20260721062400-codex-plan3-captain-20260721-01-ATM-GOV-0230-6071854f62",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0230.json",
+  "taskSha256": "sha256:fb6a5f9aa16c54ee50c68ad33951845fb8884b5fd271622b1ea5c498da3d7af7",
+  "createdAt": "2026-07-21T06:41:18.866Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0230 --actor codex-plan3-captain-20260721-01 --status done --historical-delivery 3dd569bf26050040f2ec08e8f21383a84bf5c4f9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260721062400-codex-plan3-captain-20260721-01-ATM-GOV-0230-6071854f62",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0230.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/runner-sync-build-source-preservation.test.ts",
+      "node --strip-types tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+      "node --strip-types tests/cli/runner-sync-framework-temp-hotfix.test.ts",
+      "node --strip-types tests/cli/runner-sync-head-movement.test.ts",
+      "node --strip-types tests/cli/runner-sync-stale-reservation-lifecycle.test.ts",
+      "node --strip-types tests/cli/runner-sync-terminal-task-parity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T06:41:18.857Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0230.*",
+        ".atm/history/task-events/ATM-GOV-0230/**",
+        ".atm/history/tasks/ATM-GOV-0230.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/**",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/broker/runner-sync/**",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/core/src/broker/runner-sync/**",
+        "scripts/assert-runner-sync-admission.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-sync-build-source-preservation.test.ts",
+        "tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+        "tests/cli/runner-sync-framework-temp-hotfix.test.ts",
+        "tests/cli/runner-sync-head-movement.test.ts",
+        "tests/cli/runner-sync-stale-reservation-lifecycle.test.ts",
+        "tests/cli/runner-sync-terminal-task-parity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/runner-sync/**",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/core/src/broker/runner-sync/**",
+        "scripts/assert-runner-sync-admission.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-sync-build-source-preservation.test.ts",
+        "tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+        "tests/cli/runner-sync-framework-temp-hotfix.test.ts",
+        "tests/cli/runner-sync-head-movement.test.ts",
+        "tests/cli/runner-sync-stale-reservation-lifecycle.test.ts",
+        "tests/cli/runner-sync-terminal-task-parity.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
