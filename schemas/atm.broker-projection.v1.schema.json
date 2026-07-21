@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.broker-projection.v1.schema.json",
+  "title": "ATM Broker Projection v1",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "ticketId",
+    "authorityGeneration",
+    "authorityDigest",
+    "projectionDigest",
+    "watermark",
+    "terminalState",
+    "publisherGeneration",
+    "generatedAt",
+    "state"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.brokerProjection.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "ticketId": { "type": "string", "minLength": 1 },
+    "authorityGeneration": { "type": "integer", "minimum": 0 },
+    "authorityDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "projectionDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "watermark": { "type": "string", "minLength": 1 },
+    "terminalState": { "enum": ["open", "terminal", "queue-only"] },
+    "publisherGeneration": { "type": "integer", "minimum": 0 },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "state": {}
+  },
+  "additionalProperties": false
+}
