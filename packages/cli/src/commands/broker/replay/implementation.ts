@@ -81,7 +81,9 @@ export function selectRuntimeDogfoodTasks(input: {
     .filter((name) => name.endsWith('.json'))
     .map((name) => readTaskCandidate(path.join(taskRoot, name)))
     .filter((candidate): candidate is RuntimeDogfoodTaskCandidate => Boolean(candidate))
-    .filter((candidate) => ['planned', 'ready', 'running'].includes(candidate.status))
+    // Dogfood candidates are registered-but-not-delivered tasks. Keep `open`
+    // eligible so operators can release claims without losing closure evidence.
+    .filter((candidate) => ['open', 'planned', 'ready', 'running'].includes(candidate.status))
     .filter((candidate) => candidate.scopePaths.some((scopePath) => required.some((entry) => normalizePath(scopePath).includes(entry))))
     .sort((left, right) => left.taskId.localeCompare(right.taskId));
   return candidates.slice(0, Math.max(0, input.minimum));
