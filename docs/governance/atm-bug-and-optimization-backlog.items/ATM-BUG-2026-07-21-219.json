@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-21-219",
+  "date": "2026-07-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Batch planner / next routing",
+  "finding": "After the first Plan 3.0 prerequisite batch completed and both TASK-ERR-0003 and TASK-TMP-0004 were committed, `atm next --prompt` still resolved the full-plan prompt to a queue whose head was the already-done TASK-ERR-0003 instead of advancing to the next unblocked DAG task.",
+  "expectedBehavior": "Batch prompt routing should skip done tasks, select the next unblocked queue head, or emit an explicit recovery ticket that lets the Captain continue without manually guessing a later task id.",
+  "evidenceOrRepro": "On commit 2b343b5ec4b6a357d3ac5e211d9a4b43509d35b9, with TASK-ERR-0003 closed at 2026-07-21T05:16:44.949Z and TASK-TMP-0004 closed at 2026-07-21T05:24:24.908Z, running `ATM_PLANNING_REPO_ROOT=C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework node atm.mjs next --prompt \"執行完整 Plan 3.0：governance-optimization/end-to-end-auto-batch-performance-plan-v3.md 的全部 13 張任務卡，依 DAG 繼續下一個未完成任務；TASK-ERR-0003 與 TASK-TMP-0004 已完成並提交，請不要重選已完成任務。\" --json` returned ATM_NEXT_TASK_QUEUE_READY with queueHeadTaskId=TASK-ERR-0003 and selectedTasks containing TASK-ERR-0003/TASK-TMP-0004 status=done.",
+  "followUp": "Add a batch-routing regression test for done-task pruning and DAG continuation, then repair `next` queue selection so full-plan prompts advance to the next unblocked task instead of stale completed prerequisites."
+}
