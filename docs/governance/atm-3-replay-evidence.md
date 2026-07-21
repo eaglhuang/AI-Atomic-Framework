@@ -29,6 +29,17 @@ Acceptance receipts:
 - `node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts`
 - `node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts`
 
+Closure diagnostic:
+
+- `node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json`
+
+The diagnostic is intentionally fail-closed until the source cards can really
+close. It checks for two registered, not-yet-delivered dogfood task candidates
+with the declared intersection, a public frozen replay CLI surface, and a
+420-cell matrix whose cells contain command or workload receipts. Use
+`--allow-inconclusive` only when a larger validator needs to consume the JSON
+report without failing the whole run.
+
 Final closure verdict:
 
 - ATM-GOV-0235 now includes an evidence-derived final verdict helper. The helper
