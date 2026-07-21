@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T07-44-00-158Z-close-c533df5c272d",
+  "taskId": "ATM-GOV-0233",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721073122-codex-plan3-captain-20260721-02-ATM-GOV-0233-26185fa021",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0233.json",
+  "taskSha256": "sha256:e82027281fb4e5e751a9e7582d5314d921dc2d2fcfba3884cd27a89515ade2cc",
+  "createdAt": "2026-07-21T07:44:00.158Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0233 --actor codex-plan3-captain-20260721-02 --status done --historical-delivery f30eb8305d5664a06c20794fb7d8de3f6b076a97",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260721073122-codex-plan3-captain-20260721-02-ATM-GOV-0233-26185fa021",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0233.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/broker-authorization-consumer-migration.test.ts",
+      "node --strip-types tests/cli/legacy-bcr-migration-rollback.test.ts",
+      "node --strip-types tests/cli/legacy-bcr-migration.test.ts",
+      "node --strip-types tests/cli/single-successor-wakeup.test.ts",
+      "node --strip-types tests/cli/taskflow-close-exactly-once-result.test.ts",
+      "node --strip-types tests/cli/taskflow-close-index-isolation.test.ts",
+      "node --strip-types tests/cli/transactional-ticket-completion.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T07:44:00.145Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0233.*",
+        ".atm/history/task-events/ATM-GOV-0233/**",
+        ".atm/history/tasks/ATM-GOV-0233.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-13-161.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/broker-conflict-resolution.ts",
+        "packages/cli/src/commands/broker/migrate/**",
+        "packages/cli/src/commands/broker/reconcile/**",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/core/src/broker/lifecycle/**",
+        "tests/cli/broker-authorization-consumer-migration.test.ts",
+        "tests/cli/legacy-bcr-migration-rollback.test.ts",
+        "tests/cli/legacy-bcr-migration.test.ts",
+        "tests/cli/single-successor-wakeup.test.ts",
+        "tests/cli/taskflow-close-exactly-once-result.test.ts",
+        "tests/cli/taskflow-close-index-isolation.test.ts",
+        "tests/cli/transactional-ticket-completion.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker-conflict-resolution.ts",
+        "packages/cli/src/commands/broker/migrate/**",
+        "packages/cli/src/commands/broker/reconcile/**",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/core/src/broker/lifecycle/**",
+        "tests/cli/broker-authorization-consumer-migration.test.ts",
+        "tests/cli/legacy-bcr-migration-rollback.test.ts",
+        "tests/cli/legacy-bcr-migration.test.ts",
+        "tests/cli/single-successor-wakeup.test.ts",
+        "tests/cli/taskflow-close-exactly-once-result.test.ts",
+        "tests/cli/taskflow-close-index-isolation.test.ts",
+        "tests/cli/transactional-ticket-completion.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0233",
   "title": "Transactional ticket completion and legacy BCR migration",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.0-D",
   "dependencies": [
     "ATM-GOV-0228",
@@ -130,8 +130,8 @@
     }
   },
   "importedAt": "2026-07-21T05:04:46.422Z",
-  "lastTransitionId": "2026-07-21T07-31-27-226Z-claim-eef05902c94e",
-  "lastTransitionAt": "2026-07-21T07:31:27.226Z",
+  "lastTransitionId": "2026-07-21T07-44-00-158Z-close-c533df5c272d",
+  "lastTransitionAt": "2026-07-21T07:44:00.158Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-plan3-captain-20260721-02",
   "reservedAt": "2026-07-21T07:31:22.450Z",
@@ -140,7 +140,7 @@
     "actorId": "codex-plan3-captain-20260721-02",
     "leaseId": "lease-5cd0516f0aac",
     "claimedAt": "2026-07-21T07:31:22.455Z",
-    "heartbeatAt": "2026-07-21T07:31:22.455Z",
+    "heartbeatAt": "2026-07-21T07:44:00.156Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0233.json",
@@ -162,14 +162,14 @@
       "tests/cli/taskflow-close-index-isolation.test.ts",
       "tests/cli/transactional-ticket-completion.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260721073122-codex-plan3-captain-20260721-02-1c4ff5ecc8",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721073122-codex-plan3-captain-20260721-02-1c4ff5ecc8\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-21T07:31:22.455Z",
   "startedByActor": "codex-plan3-captain-20260721-02",
@@ -218,5 +218,9 @@
     },
     "createdAt": "2026-07-21T07:31:27.226Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-21T07:44:00.156Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "closedBySessionId": "session-20260721073122-codex-plan3-captain-20260721-02-ATM-GOV-0233-26185fa021",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0233.closure-packet.json"
 }

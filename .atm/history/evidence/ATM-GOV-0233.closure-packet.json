@@ -1,0 +1,262 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0233",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f30eb8305d5664a06c20794fb7d8de3f6b076a97",
+  "governedTreeSha": "b393747ca2ab2284bdabf96afc2e20cdece17ac8",
+  "targetCommitDelta": {
+    "currentCommitSha": "f30eb8305d5664a06c20794fb7d8de3f6b076a97",
+    "parentCommitShas": [
+      "f30eb8305d5664a06c20794fb7d8de3f6b076a97"
+    ],
+    "governedTreeSha": "b393747ca2ab2284bdabf96afc2e20cdece17ac8",
+    "changedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-13-161.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker/migrate/implementation.ts",
+      "packages/core/src/broker/lifecycle/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-13-161.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/broker-authorization-consumer-migration.test.ts",
+      "tests/cli/legacy-bcr-migration-rollback.test.ts",
+      "tests/cli/legacy-bcr-migration.test.ts",
+      "tests/cli/single-successor-wakeup.test.ts",
+      "tests/cli/taskflow-close-exactly-once-result.test.ts",
+      "tests/cli/taskflow-close-index-isolation.test.ts",
+      "tests/cli/transactional-ticket-completion.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/transactional-ticket-completion.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8b30e0303e9a7352344347cbac9d5325f82ee1f171e2e9bee5d6a6dbd0da8a9c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/legacy-bcr-migration.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e2f36df2dbc6f2793a823532d7449572447af93442f06502c24d03832d32e91",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/legacy-bcr-migration-rollback.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8935649121a63b0391882a4196911dc85ea238fcfbe7cd14dfb55871f7f96f08",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/single-successor-wakeup.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5aa76e110f46533439d25ae728c1a9499b1c87a4e809b69be0f522de9d59e15c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/broker-authorization-consumer-migration.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bf0e3cbdc8ffbfcbc4707b897c0f1a01ac6d3bad21bf59a996d2947d00c871eb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-index-isolation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:897a010ae4544659636722bb8c777e579ef328ce6db66424e99147e54d8354de",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-exactly-once-result.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cf3db454a7ca92379b172f386555a0ffede398a1241161d1cfc00ec8ab400c66",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3302b7203a8da0112461a61a9427dd9d765a607288b3feea8d8124c93f3b75d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f320d2d889fd75b1d015db4be8cf4fe67a94047bc51204d17df677b691dad22c",
+      "stderrSha256": "sha256:0361a56aab81fef5d89df2102c2f11aa1528db9bf6a4da423f5f2af60ca8af48",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/broker-authorization-consumer-migration.test.ts",
+    "node --strip-types tests/cli/legacy-bcr-migration-rollback.test.ts",
+    "node --strip-types tests/cli/legacy-bcr-migration.test.ts",
+    "node --strip-types tests/cli/single-successor-wakeup.test.ts",
+    "node --strip-types tests/cli/taskflow-close-exactly-once-result.test.ts",
+    "node --strip-types tests/cli/taskflow-close-index-isolation.test.ts",
+    "node --strip-types tests/cli/transactional-ticket-completion.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-21T07:44:00.145Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0233.*",
+      ".atm/history/task-events/ATM-GOV-0233/**",
+      ".atm/history/tasks/ATM-GOV-0233.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-13-161.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker-conflict-resolution.ts",
+      "packages/cli/src/commands/broker/migrate/**",
+      "packages/cli/src/commands/broker/reconcile/**",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/core/src/broker/lifecycle/**",
+      "tests/cli/broker-authorization-consumer-migration.test.ts",
+      "tests/cli/legacy-bcr-migration-rollback.test.ts",
+      "tests/cli/legacy-bcr-migration.test.ts",
+      "tests/cli/single-successor-wakeup.test.ts",
+      "tests/cli/taskflow-close-exactly-once-result.test.ts",
+      "tests/cli/taskflow-close-index-isolation.test.ts",
+      "tests/cli/transactional-ticket-completion.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker-conflict-resolution.ts",
+      "packages/cli/src/commands/broker/migrate/**",
+      "packages/cli/src/commands/broker/reconcile/**",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/core/src/broker/lifecycle/**",
+      "tests/cli/broker-authorization-consumer-migration.test.ts",
+      "tests/cli/legacy-bcr-migration-rollback.test.ts",
+      "tests/cli/legacy-bcr-migration.test.ts",
+      "tests/cli/single-successor-wakeup.test.ts",
+      "tests/cli/taskflow-close-exactly-once-result.test.ts",
+      "tests/cli/taskflow-close-index-isolation.test.ts",
+      "tests/cli/transactional-ticket-completion.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0233.json",
+  "closedAt": "2026-07-21T07:44:00.145Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721073122-codex-plan3-captain-20260721-02-ATM-GOV-0233-26185fa021",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f30eb8305d5664a06c20794fb7d8de3f6b076a97",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-13-161.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker/migrate/implementation.ts",
+      "packages/core/src/broker/lifecycle/index.ts",
+      "tests/cli/broker-authorization-consumer-migration.test.ts",
+      "tests/cli/legacy-bcr-migration-rollback.test.ts",
+      "tests/cli/legacy-bcr-migration.test.ts",
+      "tests/cli/single-successor-wakeup.test.ts",
+      "tests/cli/taskflow-close-exactly-once-result.test.ts",
+      "tests/cli/taskflow-close-index-isolation.test.ts",
+      "tests/cli/transactional-ticket-completion.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0233.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0233/2026-07-21T07-31-22-450Z-reserve-efd6eb1265e7.json",
+      ".atm/history/task-events/ATM-GOV-0233/2026-07-21T07-31-22-452Z-promote-94c8daeec577.json",
+      ".atm/history/task-events/ATM-GOV-0233/2026-07-21T07-31-27-226Z-claim-eef05902c94e.json",
+      ".atm/history/tasks/ATM-GOV-0233.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
