@@ -23,11 +23,8 @@ export type RunnerSyncStewardGroup = {
 };
 
 export type RunnerSyncStewardQueueDocument = {
-  readonly schemaId: 'atm.runnerSyncStewardQueue.v1';
-  readonly specVersion: '0.1.0';
-  readonly stewardKey: typeof RUNNER_SYNC_STEWARD_GENERATOR;
-  readonly updatedAt: string;
-  readonly groups: readonly RunnerSyncStewardGroup[];
+  readonly schemaId: 'atm.runnerSyncStewardQueue.v1'; readonly specVersion: '0.1.0'; readonly stewardKey: typeof RUNNER_SYNC_STEWARD_GENERATOR;
+  readonly updatedAt: string; readonly groups: readonly RunnerSyncStewardGroup[];
 };
 
 export type RunnerSyncStewardQueueResult = {
@@ -48,71 +45,42 @@ export type BrokerTicketEnvelope = {
 export type RunnerSyncStewardStaleRelease = {
   readonly taskId: string; readonly actorId: string; readonly sealedSourceSha: string; readonly stewardWorkId: string;
   readonly queuePosition: number; readonly expiredAt: string;
-  readonly reason: 'ttl-expired' | 'orphan-task-missing' | 'orphan-task-terminal' | 'malformed-sealed-source';
+  readonly reason: 'ttl-expired' | 'orphan-task-missing' | 'orphan-task-terminal' | 'malformed-sealed-source' | 'superseded-task-generation';
   readonly safeRetryCommand: string;
 };
 
 export type RunnerSyncStewardCleanupResult = {
-  readonly schemaId: 'atm.runnerSyncStewardCleanupResult.v1';
-  readonly ok: boolean;
-  readonly stewardKey: typeof RUNNER_SYNC_STEWARD_GENERATOR;
-  readonly staleReleases: readonly RunnerSyncStewardStaleRelease[];
-  readonly queue: RunnerSyncStewardQueueDocument;
+  readonly schemaId: 'atm.runnerSyncStewardCleanupResult.v1'; readonly ok: boolean; readonly stewardKey: typeof RUNNER_SYNC_STEWARD_GENERATOR;
+  readonly staleReleases: readonly RunnerSyncStewardStaleRelease[]; readonly queue: RunnerSyncStewardQueueDocument;
 };
 
 export type RunnerSyncStewardReleaseInput = {
-  readonly taskId: string;
-  readonly stewardWorkId: string;
-  readonly receiptRef?: string | null;
-  readonly receiptDigest?: string | null;
-  readonly releasedAt?: string;
+  readonly taskId: string; readonly stewardWorkId: string; readonly receiptRef?: string | null; readonly receiptDigest?: string | null; readonly releasedAt?: string;
 };
 
 export type RunnerSyncTaskHealth = 'task-active' | 'task-missing' | 'task-terminal';
 export type TaskHealthResolver = (request: RunnerSyncStewardRequest) => RunnerSyncTaskHealth;
 
 export type RunnerSyncStewardCleanupOptions = {
-  readonly taskHealthResolver?: TaskHealthResolver;
-  readonly shouldReleaseRequest?: (request: RunnerSyncStewardRequest) => boolean;
+  readonly taskHealthResolver?: TaskHealthResolver; readonly shouldReleaseRequest?: (request: RunnerSyncStewardRequest) => boolean;
 };
 
-export type RunnerSyncStewardEnqueueOptions = {
-  readonly taskHealthResolver?: (taskId: string) => RunnerSyncTaskHealth;
-};
+export type RunnerSyncStewardEnqueueOptions = { readonly taskHealthResolver?: (taskId: string) => RunnerSyncTaskHealth; };
 
-export type RunnerSyncStewardExplainOptions = {
-  readonly taskHealthResolver?: TaskHealthResolver;
-};
+export type RunnerSyncStewardExplainOptions = { readonly taskHealthResolver?: TaskHealthResolver; };
 
 export type RunnerSyncStewardReleaseRecord = {
-  readonly taskId: string;
-  readonly actorId: string;
-  readonly sealedSourceSha: string;
-  readonly stewardWorkId: string;
-  readonly queuePosition: number;
-  readonly waitingTasks: readonly string[];
-  readonly requestedSurfaces: readonly string[];
-  readonly receiptRef: string | null;
-  readonly receiptDigest: string | null;
-  readonly releasedAt: string;
+  readonly taskId: string; readonly actorId: string; readonly sealedSourceSha: string; readonly stewardWorkId: string; readonly queuePosition: number;
+  readonly waitingTasks: readonly string[]; readonly requestedSurfaces: readonly string[]; readonly receiptRef: string | null; readonly receiptDigest: string | null; readonly releasedAt: string;
 };
 
 export type RunnerSyncStewardReleaseResult = {
-  readonly schemaId: 'atm.runnerSyncStewardReleaseResult.v1';
-  readonly ok: boolean;
-  readonly stewardKey: typeof RUNNER_SYNC_STEWARD_GENERATOR;
-  readonly released: RunnerSyncStewardReleaseRecord;
-  readonly queue: RunnerSyncStewardQueueDocument;
-  readonly next: RunnerSyncStewardQueueResult | null;
-  readonly suggestedNextAction: string;
+  readonly schemaId: 'atm.runnerSyncStewardReleaseResult.v1'; readonly ok: boolean; readonly stewardKey: typeof RUNNER_SYNC_STEWARD_GENERATOR;
+  readonly released: RunnerSyncStewardReleaseRecord; readonly queue: RunnerSyncStewardQueueDocument; readonly next: RunnerSyncStewardQueueResult | null; readonly suggestedNextAction: string;
 };
 
 export type RunnerSyncStewardTaskReleaseResult = {
-  readonly schemaId: 'atm.runnerSyncStewardTaskReleaseResult.v1';
-  readonly ok: boolean;
-  readonly releasedTaskId: string;
-  readonly releasedCount: number;
-  readonly queue: RunnerSyncStewardQueueDocument;
+  readonly schemaId: 'atm.runnerSyncStewardTaskReleaseResult.v1'; readonly ok: boolean; readonly releasedTaskId: string; readonly releasedCount: number; readonly queue: RunnerSyncStewardQueueDocument;
 };
 
 const defaultTtlSeconds = 420;
@@ -137,7 +105,7 @@ export function enqueueRunnerSyncStewardRequest(
   if (taskHealth !== 'task-active') {
     throw new Error(`ATM_RUNNER_SYNC_ENQUEUE_TASK_INVALID: task ${normalized.taskId} is ${taskHealth}; runner-sync steward enqueue requires an active task.`);
   }
-  const base = normalizeQueue(queue, normalized.createdAt);
+  const base = dropTaskReservationsOutsideCompatibleGeneration(normalizeQueue(queue, normalized.createdAt), normalized);
   const existingIndex = base.groups.findIndex((group) => isCompatibleRunnerSyncGroup(group, normalized));
   const groups = existingIndex >= 0 ? [...base.groups] : [...base.groups, emptyGroup(normalized)];
   const targetIndex = existingIndex >= 0 ? existingIndex : groups.length - 1;
@@ -180,12 +148,15 @@ export function cleanupRunnerSyncStewardQueue(
   options: RunnerSyncStewardCleanupOptions = {}
 ): RunnerSyncStewardCleanupResult {
   const base = normalizeQueue(queue, now);
+  const supersededRequests = supersededRequestsByTaskGeneration(base);
   const staleReleases: RunnerSyncStewardStaleRelease[] = [];
   const groups = base.groups.flatMap((group, groupIndex) => {
     const live = group.requests.filter((request) => {
       const expired = isExpired(request, now);
       const health = expired ? 'task-active' : resolveTaskHealth(request, options);
-      const releaseReason = isFullCommitSha(request.sealedSourceSha)
+      const releaseReason = supersededRequests.has(request)
+        ? 'superseded-task-generation'
+        : isFullCommitSha(request.sealedSourceSha)
         ? (expired ? 'ttl-expired' : staleReleaseReasonFromHealth(health))
         : 'malformed-sealed-source';
       if (releaseReason) {
@@ -211,6 +182,38 @@ export function cleanupRunnerSyncStewardQueue(
     staleReleases,
     queue: materializeQueue({ ...base, updatedAt: now, groups }, options.taskHealthResolver)
   };
+}
+
+function dropTaskReservationsOutsideCompatibleGeneration(queue: RunnerSyncStewardQueueDocument, request: NormalizedRequestInput): RunnerSyncStewardQueueDocument {
+  return materializeQueue({ ...queue, groups: queue.groups.flatMap((group) => {
+    const requests = isCompatibleRunnerSyncGroup(group, request) ? group.requests : group.requests.filter((entry) => entry.taskId !== request.taskId);
+    return requests.length === 0 ? [] : [{ ...group, requests }];
+  }) });
+}
+
+function supersededRequestsByTaskGeneration(queue: RunnerSyncStewardQueueDocument): ReadonlySet<RunnerSyncStewardRequest> {
+  const latestByTask = new Map<string, RunnerSyncStewardRequest>();
+  for (const group of queue.groups) {
+    for (const request of group.requests) {
+      const current = latestByTask.get(request.taskId);
+      if (!current || compareTaskGeneration(request, current) > 0) latestByTask.set(request.taskId, request);
+    }
+  }
+  const superseded = new Set<RunnerSyncStewardRequest>();
+  for (const group of queue.groups) {
+    for (const request of group.requests) {
+      if (latestByTask.get(request.taskId) !== request) superseded.add(request);
+    }
+  }
+  return superseded;
+}
+
+function compareTaskGeneration(left: RunnerSyncStewardRequest, right: RunnerSyncStewardRequest): number {
+  const leftHeartbeat = Date.parse(left.heartbeatAt), rightHeartbeat = Date.parse(right.heartbeatAt);
+  if (Number.isFinite(leftHeartbeat) && Number.isFinite(rightHeartbeat) && leftHeartbeat !== rightHeartbeat) return leftHeartbeat - rightHeartbeat;
+  const createdOrder = left.createdAt.localeCompare(right.createdAt);
+  if (createdOrder !== 0) return createdOrder;
+  return left.sealedSourceSha.localeCompare(right.sealedSourceSha);
 }
 
 export function releaseRunnerSyncStewardQueue(
@@ -516,7 +519,7 @@ function isExpired(request: RunnerSyncStewardRequest, now: string): boolean {
 }
 
 function isFullCommitSha(value: string): boolean {
-  return /^[a-f0-9]{40}$/i.test(value);
+  return /^[a-f0-9]{40}$/i.test(value) || /^sha256:[A-Za-z0-9._:-]+$/.test(value);
 }
 
 function resolveTaskHealth(

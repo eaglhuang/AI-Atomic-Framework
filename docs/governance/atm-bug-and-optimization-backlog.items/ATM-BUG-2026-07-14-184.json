@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug / Process",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in ATM-GOV-0230",
   "area": "Parallel captain runner sync wipes foreign uncommitted source",
   "finding": "Another captain's `build(release): sync ... runner artifacts` (`3cd236598`) coincided with disappearance of uncommitted bug-fix WIP (team plan read-only, provider metadata, import/lock/incident edits).",
   "expectedBehavior": "Runner sync must refuse or snapshot-protect foreign dirty non-release paths before mutating the tree.",
   "evidenceOrRepro": "2026-07-14 cursor-grok-4.5 lost 0195/099/159/097/102 WIP and had to re-implement after RFT-0020 sync.",
-  "followUp": "Pre-build dirty-owner scan + handoff packet."
+  "followUp": "Closed by ATM-GOV-0230 source/frozen disposition: runner-sync admission refuses landed foreign build-input claims before release publication, `runner-sync-build-source-preservation.test.ts` proves foreign non-release WIP remains byte-for-byte unchanged, and existing `runner-sync-foreign-dirty-owner.test.ts` keeps release-only writes admissible while build-input conflicts block."
 }
