@@ -18,6 +18,7 @@ export interface Atm3FinalClosureInput {
   readonly readinessProbeFailures: readonly string[];
   readonly realMultiprocessReplay: boolean;
   readonly realTaskDogfoodIntersection: readonly string[];
+  readonly realTaskDogfoodProven: boolean;
   readonly rollbackExercised: boolean;
   readonly sourceFrozenReleaseParity: boolean;
   readonly observedBreakerTripCount: number;
@@ -62,6 +63,7 @@ export function buildAtm3FinalClosureVerdictFromEvidence(input: Atm3FinalClosure
       && input.replayEvidence.workerReceipts.every((worker) => worker.runner.entrypoint === 'atm.mjs')
       && input.replayEvidence.workerReceipts.every((worker) => (worker.commandReceipts?.length ?? 0) > 0),
     realTaskDogfoodIntersection: input.realTaskDogfoodIntersection,
+    realTaskDogfoodProven: realTaskDogfoodProven(input.replayEvidence, input.realTaskDogfoodIntersection),
     rollbackExercised: input.rollbackExercised,
     sourceFrozenReleaseParity: input.sourceFrozenReleaseParity,
     observedBreakerTripCount: input.replayEvidence.faultCounters.unexpectedBreakerTripCount,
@@ -128,6 +130,7 @@ function finalClosureBlockers(input: Atm3FinalClosureInput): string[] {
   if (input.readinessProbeFailures.length > 0) blockers.push(`readiness probe failures: ${input.readinessProbeFailures.join(', ')}`);
   if (!input.realMultiprocessReplay) blockers.push('real multiprocess replay evidence missing');
   if (input.realTaskDogfoodIntersection.length === 0) blockers.push('real-task dogfood declared intersection missing');
+  if (!input.realTaskDogfoodProven) blockers.push('real-task dogfood lifecycle evidence missing');
   if (!input.rollbackExercised) blockers.push('rollback drill not exercised');
   if (!input.sourceFrozenReleaseParity) blockers.push('source/frozen/release parity missing');
   if (input.observedBreakerTripCount !== 0) blockers.push(`unexpected breaker trip count ${input.observedBreakerTripCount}`);
@@ -143,12 +146,29 @@ function digestFinalClosureInput(input: Atm3FinalClosureInput): string {
     readinessProbeFailures: [...input.readinessProbeFailures].sort(),
     realMultiprocessReplay: input.realMultiprocessReplay,
     realTaskDogfoodIntersection: [...input.realTaskDogfoodIntersection].sort(),
+    realTaskDogfoodProven: input.realTaskDogfoodProven,
     rollbackExercised: input.rollbackExercised,
     sourceFrozenReleaseParity: input.sourceFrozenReleaseParity,
     observedBreakerTripCount: input.observedBreakerTripCount,
     timeInQueueOnlyRatio: input.timeInQueueOnlyRatio
   };
   return `sha256:${createHash('sha256').update(JSON.stringify(stable)).digest('hex')}`;
+}
+
+function realTaskDogfoodProven(evidence: ParallelReplayEvidence, requiredIntersection: readonly string[]): boolean {
+  const dogfood = evidence.realTaskDogfood;
+  if (!dogfood) return false;
+  if (dogfood.taskCount < 2 || dogfood.actorCount < 2) return false;
+  if (!dogfood.preservedIntersection || dogfood.terminalRefusalCount !== 0) return false;
+  if (dogfood.manualWakeupCount !== 0 || dogfood.closurePacketPollutionCount !== 0) return false;
+  if (!requiredIntersection.every((entry) => dogfood.declaredIntersection.includes(entry))) return false;
+  return dogfood.traces.every((trace) =>
+    trace.preservedIntersection
+    && trace.successorWakeup
+    && ['execute-now', 'queue-head', 'parallel-safe', 'not-required'].includes(trace.canonicalTicketState ?? '')
+    && ['claim:registered-task', 'proposal:isolated', 'compose:shared-surface', 'close-packet:sealed']
+      .every((step) => trace.lifecycle.includes(step))
+  );
 }
 
 function metricsFromReplayEvidence(evidence: ParallelReplayEvidence, requiredCellCount: number): ParallelAdmissionSafetyMetrics {

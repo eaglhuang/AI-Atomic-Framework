@@ -113,6 +113,32 @@ export interface ParallelReplayEvidence {
   readonly verdict: 'pass' | 'failed' | 'inconclusive' | 'queue-only';
   readonly unavailableReceipts: readonly string[];
   readonly workerReceipts: readonly ParallelReplayWorkerReceipt[];
+  readonly realTaskDogfood?: ParallelReplayDogfoodEvidence;
+  readonly digest: string;
+}
+
+export interface ParallelReplayDogfoodTaskTrace {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly declaredIntersection: readonly string[];
+  readonly preservedIntersection: boolean;
+  readonly canonicalTicketState: string | null;
+  readonly waitedMs: number;
+  readonly successorWakeup: boolean;
+  readonly closurePacketDigest: string;
+  readonly lifecycle: readonly string[];
+}
+
+export interface ParallelReplayDogfoodEvidence {
+  readonly schemaId: 'atm.parallelReplayDogfoodEvidence.v1';
+  readonly taskCount: number;
+  readonly actorCount: number;
+  readonly declaredIntersection: readonly string[];
+  readonly preservedIntersection: boolean;
+  readonly terminalRefusalCount: number;
+  readonly manualWakeupCount: number;
+  readonly closurePacketPollutionCount: number;
+  readonly traces: readonly ParallelReplayDogfoodTaskTrace[];
   readonly digest: string;
 }
 
@@ -169,6 +195,7 @@ export function buildParallelReplayEvidence(input: {
   readonly serialMakespanMs?: number;
   readonly parallelMakespanMs?: number;
   readonly costRatio?: number;
+  readonly realTaskDogfood?: ParallelReplayDogfoodEvidence;
 }): ParallelReplayEvidence {
   const thresholds = { ...input.scenario.thresholds, ...input.thresholds };
   const workerReceipts = [...input.workerReceipts].sort((left, right) => left.startedAtMs - right.startedAtMs);
@@ -213,7 +240,41 @@ export function buildParallelReplayEvidence(input: {
           ? 'inconclusive' as const
           : 'pass' as const,
     unavailableReceipts,
-    workerReceipts
+    workerReceipts,
+    realTaskDogfood: input.realTaskDogfood
+  };
+  return {
+    ...withoutDigest,
+    digest: sha256Digest(withoutDigest)
+  };
+}
+
+export function buildParallelReplayDogfoodEvidence(input: {
+  readonly declaredIntersection: readonly string[];
+  readonly traces: readonly (Omit<ParallelReplayDogfoodTaskTrace, 'closurePacketDigest'> & { readonly closurePacketDigest?: string })[];
+}): ParallelReplayDogfoodEvidence {
+  const traces = input.traces.map((trace) => ({
+    ...trace,
+    declaredIntersection: [...trace.declaredIntersection],
+    lifecycle: [...trace.lifecycle],
+    closurePacketDigest: trace.closurePacketDigest ?? sha256Digest({
+      taskId: trace.taskId,
+      actorId: trace.actorId,
+      lifecycle: trace.lifecycle,
+      declaredIntersection: trace.declaredIntersection
+    })
+  }));
+  const terminalRefusalCount = traces.filter((trace) => trace.canonicalTicketState === 'refused' || trace.canonicalTicketState === 'blocked').length;
+  const withoutDigest = {
+    schemaId: 'atm.parallelReplayDogfoodEvidence.v1' as const,
+    taskCount: traces.length,
+    actorCount: new Set(traces.map((trace) => trace.actorId)).size,
+    declaredIntersection: [...input.declaredIntersection],
+    preservedIntersection: traces.length > 0 && traces.every((trace) => trace.preservedIntersection),
+    terminalRefusalCount,
+    manualWakeupCount: traces.filter((trace) => !trace.successorWakeup).length,
+    closurePacketPollutionCount: traces.filter((trace) => trace.lifecycle.includes('closure-packet-polluted')).length,
+    traces
   };
   return {
     ...withoutDigest,

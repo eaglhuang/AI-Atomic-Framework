@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { buildAtm3FinalClosureVerdictFromEvidence } from '../../packages/cli/src/commands/broker/parallel-admission/final-verdict.ts';
-import { buildParallelReplayEvidence, buildParallelReplayScenario } from '../../packages/core/src/broker/replay/index.ts';
+import { buildParallelReplayDogfoodEvidence, buildParallelReplayEvidence, buildParallelReplayScenario } from '../../packages/core/src/broker/replay/index.ts';
 
 const scenario = buildParallelReplayScenario({
   scenarioId: 'atm-3-final-closure',
@@ -51,7 +51,8 @@ const replayEvidence = buildParallelReplayEvidence({
   ],
   serialMakespanMs: 250,
   parallelMakespanMs: 100,
-  costRatio: 1.02
+  costRatio: 1.02,
+  realTaskDogfood: dogfoodEvidence()
 });
 
 const verdict = buildAtm3FinalClosureVerdictFromEvidence({
@@ -73,6 +74,26 @@ assert.equal(verdict.blockers.length, 0);
 assert.match(verdict.evidenceDigest, /^sha256:[a-f0-9]{64}$/);
 assert.equal(verdict.policyAfterDecision.tripped, false);
 assert.equal(verdict.policyAfterDecision.resetEvidenceDigest, verdict.evidenceDigest);
+
+const noDogfoodEvidence = buildParallelReplayEvidence({
+  scenario,
+  workerReceipts: replayEvidence.workerReceipts,
+  serialMakespanMs: 250,
+  parallelMakespanMs: 100,
+  costRatio: 1.02
+});
+const noDogfoodVerdict = buildAtm3FinalClosureVerdictFromEvidence({
+  actorId: 'tester',
+  replayEvidence: noDogfoodEvidence,
+  inheritedAcceptanceOpenCount: 0,
+  blockerBacklogIds: [],
+  readinessProbeFailures: [],
+  realTaskDogfoodIntersection: ['docs/governance/atm-3-replay-evidence.md'],
+  rollbackExercised: true,
+  sourceFrozenReleaseParity: true
+});
+assert.equal(noDogfoodVerdict.decision, 'remain-open');
+assert.equal(noDogfoodVerdict.blockers.some((entry) => entry.includes('real-task dogfood lifecycle evidence missing')), true);
 
 const noReceiptEvidence = buildParallelReplayEvidence({
   scenario,
@@ -107,4 +128,27 @@ function commandReceipts(workerId: string, startedAtMs: number, finishedAtMs: nu
     brokerTicketState: 'execute-now',
     waitedMs: 0
   }));
+}
+
+function dogfoodEvidence() {
+  return buildParallelReplayDogfoodEvidence({
+    declaredIntersection: ['docs/governance/atm-3-replay-evidence.md'],
+    traces: ['ATM-DOGFOOD-A', 'ATM-DOGFOOD-B'].map((taskId, index) => ({
+      taskId,
+      actorId: `captain-${index + 1}`,
+      declaredIntersection: ['docs/governance/atm-3-replay-evidence.md'],
+      preservedIntersection: true,
+      canonicalTicketState: 'execute-now',
+      waitedMs: index,
+      successorWakeup: true,
+      lifecycle: [
+        'claim:registered-task',
+        'canonical-ticket:execute-now',
+        'proposal:isolated',
+        'compose:shared-surface',
+        'successor-wakeup:auto',
+        'close-packet:sealed'
+      ]
+    }))
+  });
 }

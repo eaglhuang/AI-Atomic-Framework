@@ -12,9 +12,12 @@ document now distinguishes implemented guardrails from final closure evidence.
 - Telemetry derives `maxConcurrentWorkers`, `overlapWindowMs`, `parallelOverlapRatio`, `serializedAdmissionRatio`, queue-only residency, throughput, cost, and correctness counters from those receipts.
 - Runtime dogfood task selection reads registered `.atm/history/tasks/*.json`
   records at run time and filters by declared scope intersection. The selector
-  does not hardcode task ids, and the regression now uses two not-yet-delivered
-  registered cards in an isolated ledger fixture so it remains reproducible
-  after the live repository queue is empty.
+  does not hardcode task ids. Dogfood evidence now has a separate
+  `atm.parallelReplayDogfoodEvidence.v1` segment so final closure can require
+  two registered tasks, two actors, preserved declared intersection, canonical
+  ticket state, `waitedMs`, successor wakeup, isolated proposal/compose traces,
+  and sealed close-packet traces instead of accepting "selected two cards" as
+  proof.
 - Fault-injection evidence trips `queue-only` on duplicate side effects or other correctness counters instead of reporting a healthy replay.
 - Throughput evidence no longer defaults to `1.25` when serial/parallel timing is
   absent; missing timing makes the replay inconclusive.
@@ -31,14 +34,17 @@ Final closure verdict:
 - ATM-GOV-0235 now includes an evidence-derived final verdict helper. The helper
   reads sealed replay evidence into safety metrics instead of accepting a caller
   supplied "healthy" boolean bundle. Evidence without broker command receipts
-  remains open even when fixture timing looks healthy.
+  remains open even when fixture timing looks healthy. Evidence without the
+  dogfood lifecycle segment also remains open; a declared intersection string is
+  no longer enough to close the plan.
 - The formal final closure threshold is still the 420-cell matrix. Small
   focused tests prove the gate behavior; they do not by themselves close Plan
   3.0 performance acceptance.
 - The ATM-GOV-0234 dogfood run surfaced backlog item
-  `ATM-BUG-2026-07-21-222`. That item remains a High/Open product blocker until
-  transactional batch runner-sync recovery is implemented and validated; it is
-  not a waiver for final closure gates.
+  `ATM-BUG-2026-07-21-222`. The batch checkpoint / runner-sync deadlock class
+  now has focused recovery regressions and its item shard is marked fixed, but
+  that fix is not a waiver for final closure gates: Plan 3.0 still needs fresh
+  sealed 0234/0235 evidence before the source cards can close.
 - Final verdict receipts:
   - `node --strip-types tests/cli/atm-3-final-closure.test.ts`
   - `node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts`

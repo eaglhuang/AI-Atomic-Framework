@@ -31,6 +31,7 @@ const verdict = buildAtm3FinalClosureVerdict({
   readinessProbeFailures: ['planning mirror residue'],
   realMultiprocessReplay: false,
   realTaskDogfoodIntersection: [],
+  realTaskDogfoodProven: false,
   rollbackExercised: false,
   sourceFrozenReleaseParity: false,
   observedBreakerTripCount: 1,

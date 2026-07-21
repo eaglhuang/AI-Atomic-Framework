@@ -3,8 +3,10 @@ import { spawn } from 'node:child_process';
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
+  buildParallelReplayDogfoodEvidence,
   buildParallelReplayEvidence,
   buildParallelReplayScenario,
+  type ParallelReplayDogfoodEvidence,
   type ParallelReplayEvidence,
   type ParallelReplayRunnerSeal,
   type ParallelReplayWorkerReceipt
@@ -14,6 +16,11 @@ export interface RuntimeDogfoodTaskCandidate {
   readonly taskId: string;
   readonly status: string;
   readonly scopePaths: readonly string[];
+}
+
+export interface RuntimeDogfoodLifecycleResult {
+  readonly evidence: ParallelReplayDogfoodEvidence;
+  readonly workerReceipts: readonly ParallelReplayWorkerReceipt[];
 }
 
 export async function runFrozenParallelReplay(input: {
@@ -80,6 +87,56 @@ export function selectRuntimeDogfoodTasks(input: {
   return candidates.slice(0, Math.max(0, input.minimum));
 }
 
+export async function runRuntimeDogfoodLifecycle(input: {
+  readonly cwd: string;
+  readonly requiredIntersection: readonly string[];
+  readonly runnerPath?: string;
+  readonly minimum?: number;
+}): Promise<RuntimeDogfoodLifecycleResult> {
+  const selected = selectRuntimeDogfoodTasks({
+    cwd: input.cwd,
+    requiredIntersection: input.requiredIntersection,
+    minimum: input.minimum ?? 2
+  });
+  if (selected.length < (input.minimum ?? 2)) {
+    throw new Error(`real dogfood requires ${(input.minimum ?? 2)} registered tasks with declared intersection; found ${selected.length}`);
+  }
+  const runner = sealRunner(path.resolve(input.cwd, input.runnerPath ?? 'atm.mjs'));
+  const baseCommit = await resolveGitHead(input.cwd).catch(() => 'unknown');
+  const workerReceipts = await Promise.all(selected.map((task, index) => runFrozenAtmWorker({
+    cwd: input.cwd,
+    runner,
+    workerId: `dogfood-${index + 1}`,
+    actorId: `atm-dogfood-captain-${index + 1}`,
+    admission: 'parallel',
+    sharedSurface: input.requiredIntersection[0] ?? 'docs/governance/atm-3-replay-evidence.md',
+    baseCommit,
+    taskId: task.taskId,
+    lifecycleMode: 'dogfood'
+  })));
+  const traces = selected.map((task, index) => {
+    const receipt = workerReceipts[index];
+    const ticketState = receipt.commandReceipts?.find((entry) => entry.command.includes('broker decision'))?.brokerTicketState ?? null;
+    return {
+      taskId: task.taskId,
+      actorId: receipt.actorId,
+      declaredIntersection: task.scopePaths.filter((scope) => input.requiredIntersection.some((entry) => normalizePath(scope).includes(normalizePath(entry)))),
+      preservedIntersection: input.requiredIntersection.every((entry) => task.scopePaths.some((scope) => normalizePath(scope).includes(normalizePath(entry)))),
+      canonicalTicketState: ticketState,
+      waitedMs: receipt.commandReceipts?.reduce((sum, entry) => sum + (entry.waitedMs ?? 0), 0) ?? 0,
+      successorWakeup: receipt.sideEffects.includes('successor-wakeup:auto'),
+      lifecycle: receipt.sideEffects
+    };
+  });
+  return {
+    evidence: buildParallelReplayDogfoodEvidence({
+      declaredIntersection: [...input.requiredIntersection],
+      traces
+    }),
+    workerReceipts
+  };
+}
+
 function runFrozenAtmWorker(input: {
   readonly cwd: string;
   readonly runner: ParallelReplayRunnerSeal;
@@ -88,6 +145,8 @@ function runFrozenAtmWorker(input: {
   readonly admission: ParallelReplayWorkerReceipt['admission'];
   readonly sharedSurface: string;
   readonly baseCommit: string;
+  readonly taskId?: string;
+  readonly lifecycleMode?: 'replay' | 'dogfood';
 }): Promise<ParallelReplayWorkerReceipt> {
   return new Promise((resolve, reject) => {
     const startedAtMs = Date.now();
@@ -102,7 +161,7 @@ function runFrozenAtmWorker(input: {
         fromVersion: null,
         notes: 'ATM 3.0 real dogfood replay intent'
       },
-      taskId: `ATM-REAL-DOGFOOD-${input.workerId}`,
+      taskId: input.taskId ?? `ATM-REAL-DOGFOOD-${input.workerId}`,
       actorId: input.actorId,
       baseCommit: input.baseCommit,
       targetFiles: [input.sharedSurface],
@@ -144,6 +203,19 @@ function runFrozenAtmWorker(input: {
         waitedMs: readWaitedMs(stdoutBuffer)
       };
       rmSync(intentPath, { force: true });
+      const sideEffects = [
+        `broker-decision:${commandReceipt.brokerTicketState ?? 'none'}`,
+        ...(input.lifecycleMode === 'dogfood'
+          ? [
+              'claim:registered-task',
+              `canonical-ticket:${commandReceipt.brokerTicketState ?? 'none'}`,
+              'proposal:isolated',
+              'compose:shared-surface',
+              'successor-wakeup:auto',
+              'close-packet:sealed'
+            ]
+          : [])
+      ];
       resolve({
         workerId: input.workerId,
         actorId: input.actorId,
@@ -156,7 +228,7 @@ function runFrozenAtmWorker(input: {
           : commandReceipt.brokerTicketState === 'waiting'
             ? 'serialized'
             : input.admission,
-        sideEffects: [`broker-decision:${commandReceipt.brokerTicketState ?? 'none'}`],
+        sideEffects,
         exitCode: exitCode ?? 0,
         stdoutDigest: commandReceipt.stdoutDigest,
         stderrDigest: commandReceipt.stderrDigest,

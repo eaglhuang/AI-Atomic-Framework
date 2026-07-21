@@ -18,10 +18,7 @@ const scenario = buildParallelReplayScenario({
 
 const evidence = buildParallelReplayEvidence({
   scenario,
-  workerReceipts: [
-    { workerId: 'ab', actorId: 'ab', processId: 1, startedAtMs: 0, finishedAtMs: 100, runner: scenario.runner, admission: 'parallel', sideEffects: [], exitCode: 0, stdoutDigest: 'sha256:ok', stderrDigest: 'sha256:ok' },
-    { workerId: 'ba', actorId: 'ba', processId: 2, startedAtMs: 5, finishedAtMs: 95, runner: scenario.runner, admission: 'parallel', sideEffects: [], exitCode: 0, stdoutDigest: 'sha256:ok', stderrDigest: 'sha256:ok' }
-  ],
+  workerReceipts: pairedReceipts(),
   serialMakespanMs: 250,
   parallelMakespanMs: 100,
   costRatio: 1.02
@@ -30,6 +27,9 @@ const evidence = buildParallelReplayEvidence({
 assert.equal(evidence.verdict, 'pass');
 assert.equal(evidence.throughputGainRatio >= 1.25, true);
 assert.equal(evidence.costRatio <= 1.1, true);
+assert.equal(evidence.workerReceipts.length, 6);
+assert.equal(evidence.workerReceipts.every((worker) => (worker.commandReceipts?.length ?? 0) >= 1), true);
+assert.equal(new Set(evidence.workerReceipts.map((worker) => worker.sideEffects.find((effect) => effect.startsWith('paired-arm:')))).size, 2);
 
 const missingTimingEvidence = buildParallelReplayEvidence({
   scenario,
@@ -39,3 +39,36 @@ assert.equal(missingTimingEvidence.throughputGainRatio, 0);
 assert.equal(missingTimingEvidence.verdict, 'inconclusive');
 
 console.log('[atm-3-paired-queue-compose.test] ok');
+
+function pairedReceipts() {
+  return Array.from({ length: 3 }, (_, repeat) => [
+    pairedReceipt(`ab-${repeat + 1}`, 'AB', repeat * 5, repeat * 5 + 100),
+    pairedReceipt(`ba-${repeat + 1}`, 'BA', repeat * 5 + 5, repeat * 5 + 95)
+  ]).flat();
+}
+
+function pairedReceipt(workerId: string, arm: 'AB' | 'BA', startedAtMs: number, finishedAtMs: number) {
+  return {
+    workerId,
+    actorId: workerId,
+    processId: Number.parseInt(workerId.replace(/\D/g, ''), 10),
+    startedAtMs,
+    finishedAtMs,
+    runner: scenario.runner,
+    admission: 'parallel' as const,
+    sideEffects: [`paired-arm:${arm}`, 'policy-cli:queue-only-arm-sealed', 'command-receipt:real-timing'],
+    exitCode: 0,
+    stdoutDigest: 'sha256:ok',
+    stderrDigest: 'sha256:ok',
+    commandReceipts: [{
+      command: `node atm.mjs broker replay paired --arm ${arm} --repeat ${workerId} --json`,
+      startedAtMs,
+      finishedAtMs,
+      exitCode: 0,
+      stdoutDigest: 'sha256:ok',
+      stderrDigest: 'sha256:ok',
+      brokerTicketState: 'execute-now',
+      waitedMs: 0
+    }]
+  };
+}
