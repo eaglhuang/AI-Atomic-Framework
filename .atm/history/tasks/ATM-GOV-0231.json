@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0231",
+  "title": "Generalized command manifest and recovery emission",
+  "status": "planned",
+  "milestone": "ATM-3.0-B0.7",
+  "dependencies": [
+    "ATM-GOV-0230"
+  ],
+  "acceptance": [
+    "dotted/space/Unicode actor fixtures 在 mint、lookup、render 得到同一 canonical id。",
+    "emitted recovery chain 可在隔離 fixture repo 逐步執行，不需人工補旗標。",
+    "Windows quoting/path fixture 不經 shell 仍 round-trip。",
+    "call-site inventory 不再出現私有 identity regex 或第二套 command string authority。",
+    "queue head actor 與 ambient `AGENT_IDENTITY` 不同時，copy-paste manifest 仍以 queue-head actor 完成 build；真正 cross-actor 執行仍被拒絕。",
+    "`ATM-BUG-2026-07-20-208` 以 actor continuity source/frozen receipt closeback，實作不含任何 Codex actor 名稱特例。",
+    "source 與 frozen `node atm.mjs` 對相同 command-manifest/identity probe 的 canonical behavior projection digest 一致，runner digest 已封存。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/shared/identity-normalization.ts",
+    "packages/cli/src/commands/shared/command-manifest.ts",
+    "packages/core/src/schemas/command-manifest.ts",
+    "schemas/atm.command-manifest.v1.schema.json",
+    "tests/cli/command-manifest-recovery-chain.test.ts",
+    "tests/cli/framework-temp-task-id-normalization.test.ts",
+    "tests/cli/runner-sync-build-actor-continuity.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-208.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/shared/identity-normalization.ts",
+    "packages/cli/src/commands/shared/command-manifest.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/core/src/schemas/command-manifest.ts",
+    "schemas/atm.command-manifest.v1.schema.json",
+    "tests/cli/command-manifest-recovery-chain.test.ts",
+    "tests/cli/framework-temp-task-id-normalization.test.ts",
+    "tests/cli/runner-sync-build-actor-continuity.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-208.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/command-manifest-recovery-chain.test.ts",
+    "node --strip-types tests/cli/framework-temp-task-id-normalization.test.ts",
+    "node --strip-types tests/cli/runner-sync-build-actor-continuity.test.ts",
+    "npm run validate:cli",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No runner-sync reservation state transition implementation; ATM-GOV-0230 owns it.",
+    "No second command model beyond atm.commandManifest.v1."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert emitter/helper changes while keeping queue-only behavior; do not restore dotted-id divergence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli.command-manifest",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0231-generalized-command-manifest-and-recovery-emission.task.md",
+    "sectionTitle": "ATM-GOV-0231",
+    "headingLine": 76,
+    "hash": "0b7d263516fe380a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0231-generalized-command-manifest-and-recovery-emission.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:0b7d263516fe380a0959c41389d5d564ed71396230e05f2f3e325264b11ec08b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:41.886Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:41.886Z",
+  "lastTransitionId": "2026-07-21T05-04-42-009Z-import-7c945383d9bb",
+  "lastTransitionAt": "2026-07-21T05:04:42.009Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
