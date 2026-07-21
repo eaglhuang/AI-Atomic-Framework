@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0229",
+  "title": "Linked surface scope closure inference",
+  "status": "planned",
+  "milestone": "ATM-3.0-B1",
+  "dependencies": [
+    "ATM-GOV-0231"
+  ],
+  "acceptance": [
+    "0014/0015 相同形狀 fixture 在 claim 前列出三個 shared/linked surfaces。",
+    "disjoint graph 不被錯誤擴大；cycle 能 deterministic 收斂。",
+    "新增 linked surface 時先更新 ticket 再授權 write，commit gate 不再是首次發現點。",
+    "無 task/path/actor hardcode，INV-ATM-009 測試通過。",
+    "source 與 frozen `node atm.mjs` 對相同 scope-closure/re-arbitration probe 的 canonical behavior projection digest 一致，runner digest 已封存。"
+  ],
+  "deliverables": [
+    "packages/core/src/scope/linked-surface/**",
+    "schemas/atm.linked-surface-closure.v1.schema.json",
+    "packages/cli/src/commands/tasks/scope-preflight/**",
+    "packages/cli/src/commands/tasks/scope-amendment/**",
+    "tests/cli/linked-surface-scope-preflight.test.ts",
+    "tests/cli/scope-amendment-rearbitration.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/scope/linked-surface/**",
+    "packages/core/src/schemas/linked-surface-closure.ts",
+    "schemas/atm.linked-surface-closure.v1.schema.json",
+    "packages/cli/src/commands/tasks/scope-preflight/**",
+    "packages/cli/src/commands/tasks/scope-amendment/**",
+    "tests/cli/linked-surface-scope-preflight.test.ts",
+    "tests/cli/scope-amendment-rearbitration.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/linked-surface-scope-preflight.test.ts",
+    "node --strip-types tests/cli/scope-amendment-rearbitration.test.ts",
+    "npm run validate:cli",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No automatic write to derived surfaces; this card only closes scope and rearbitrates.",
+    "No host-specific integration path policy in core."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert graph inference and return unsupported surfaces as explicit preflight findings; do not silently omit them.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.scope.linked-surface",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0229-linked-surface-scope-closure-inference.task.md",
+    "sectionTitle": "ATM-GOV-0229",
+    "headingLine": 65,
+    "hash": "ecf20fa017383bcf",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0229-linked-surface-scope-closure-inference.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:ecf20fa017383bcffddb7e33174b05749f23b6987a18231d065fca46c3896726",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:37.473Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:37.473Z",
+  "lastTransitionId": "2026-07-21T05-04-37-618Z-import-148b8e9fc1b2",
+  "lastTransitionAt": "2026-07-21T05:04:37.618Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
