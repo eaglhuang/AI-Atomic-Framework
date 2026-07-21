@@ -1,6 +1,9 @@
+import { createHash } from 'node:crypto';
+import { execFile } from 'node:child_process';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, join, relative } from 'node:path';
+import { promisify } from 'node:util';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { evaluateParallelAdmissionSafety } from '../packages/core/src/broker/parallel-admission-policy.ts';
 import {
   buildPairedAbV4Markdown,
@@ -24,13 +27,19 @@ export const arms: readonly PairedAbV4Arm[] = ['serial', 'queue-only', 'atm-comp
 export const scales = [2, 4, 8, 16, 32, 64, 100] as const;
 export const contentions: readonly PairedAbV4Contention[] = ['disjoint', 'same-file-disjoint-anchor', 'commutative-cid', 'noncommutative-cid', 'generated-shared-surface'];
 export const repeats = [1, 2, 3] as const;
+const execFileAsync = promisify(execFile);
 
-export async function runPairedAbV4(options: { readonly mode: 'generate' | 'validate' } = { mode: 'generate' }): Promise<PairedAbV4Summary> {
+export async function runPairedAbV4(options: { readonly mode: 'generate' | 'validate' | 'command-backed' } = { mode: 'generate' }): Promise<PairedAbV4Summary> {
+  if (options.mode === 'validate') {
+    const findings = await validateSummaryFile(summaryPath);
+    if (findings.length) throw new Error(`paired AB v4 validation failed: ${findings.join('; ')}`);
+    return JSON.parse(await readFile(summaryPath, 'utf8')) as PairedAbV4Summary;
+  }
   if (options.mode === 'generate') await rm(artifactDir, { recursive: true, force: true });
   await mkdir(artifactDir, { recursive: true });
   await mkdir(dirname(reportPath), { recursive: true });
 
-  const cells = buildCells();
+  const cells = options.mode === 'command-backed' ? await buildCommandBackedCells() : buildCells();
   const summary = buildSummary(cells);
   await writeFile(cellsPath, `${JSON.stringify(cells, null, 2)}\n`, 'utf8');
   await writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
@@ -63,6 +72,81 @@ export function buildCells(): PairedAbV4Cell[] {
       sideEffectCounts: { silentOverwrite: 0, escapedConflict: 0, duplicateSideEffect: 0, unresolvedStarvation: 0 }
     };
   }))));
+}
+
+export async function buildCommandBackedCells(): Promise<PairedAbV4Cell[]> {
+  const formulaCells = buildCells();
+  const commandBackedCells: PairedAbV4Cell[] = [];
+  for (let index = 0; index < formulaCells.length; index += 1) {
+    const cell = formulaCells[index]!;
+    const receipt = await runCellWorkload(cell, index);
+    const durationMs = Math.max(1, receipt.durationMs);
+    commandBackedCells.push({
+      ...cell,
+      // Receipt-backed cells derive observable timing/cost from the subprocess receipt.
+      // The synthetic formula remains only as the matrix shape seed, not as closure evidence.
+      makespanMs: durationMs,
+      activeThroughput: Number(((cell.scale / durationMs) * 1000).toFixed(4)),
+      productionCostUnits: Number((durationMs / 1000).toFixed(4)),
+      workloadReceipts: [receipt]
+    });
+  }
+  return commandBackedCells;
+}
+
+async function runCellWorkload(cell: PairedAbV4Cell, index: number) {
+  const scriptPath = join(repoRoot, 'scripts', 'paired-ab-v4-cell-workload.ts');
+  const args = [
+    '--strip-types',
+    scriptPath,
+    '--arm',
+    cell.arm,
+    '--scale',
+    String(cell.scale),
+    '--contention',
+    cell.contention,
+    '--repeat',
+    String(cell.repeat),
+    '--cell-index',
+    String(index)
+  ];
+  const command = `${process.execPath} ${args.map(quoteCommandArg).join(' ')}`;
+  const startedAtMs = Date.now();
+  let stdout = '';
+  let stderr = '';
+  try {
+    const result = await execFileAsync(process.execPath, args, {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024
+    });
+    stdout = String(result.stdout ?? '');
+    stderr = String(result.stderr ?? '');
+  } catch (error) {
+    const failed = error as { stdout?: unknown; stderr?: unknown; code?: unknown; message?: unknown };
+    stdout = String(failed.stdout ?? '');
+    stderr = String(failed.stderr ?? failed.message ?? '');
+    throw new Error(`paired AB v4 workload failed for ${cell.arm}/${cell.scale}/${cell.contention}/${cell.repeat}: ${stderr || stdout}`);
+  }
+  const finishedAtMs = Date.now();
+  return {
+    command,
+    startedAtMs,
+    finishedAtMs,
+    durationMs: finishedAtMs - startedAtMs,
+    exitCode: 0,
+    stdoutDigest: digestText(stdout),
+    stderrDigest: digestText(stderr)
+  };
+}
+
+function digestText(value: string): string {
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function quoteCommandArg(value: string): string {
+  const normalized = value.includes(repoRoot) ? relative(repoRoot, value) : value;
+  return /\s/.test(normalized) ? JSON.stringify(normalized) : normalized;
 }
 
 function buildSummary(cells: readonly PairedAbV4Cell[]): PairedAbV4Summary {
@@ -136,9 +220,9 @@ function sum(values: readonly number[]): number {
   return values.reduce((total, value) => total + value, 0);
 }
 
-if (import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const mode = process.argv.includes('--mode') ? process.argv[process.argv.indexOf('--mode') + 1] : 'generate';
-  runPairedAbV4({ mode: mode === 'validate' ? 'validate' : 'generate' })
+  runPairedAbV4({ mode: mode === 'validate' ? 'validate' : mode === 'command-backed' ? 'command-backed' : 'generate' })
     .then((summary) => {
       console.log(JSON.stringify({
         ok: true,

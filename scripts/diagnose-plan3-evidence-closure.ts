@@ -58,11 +58,16 @@ if (jsonRequested) {
 if (!report.ok && !allowInconclusive) process.exitCode = 1;
 
 function dogfoodCandidateCheck(root: string): DiagnosticCheck {
-  const selected = selectRuntimeDogfoodTasks({
-    cwd: root,
-    requiredIntersection,
-    minimum: 2
-  });
+  let selected: ReturnType<typeof selectRuntimeDogfoodTasks> = [];
+  try {
+    selected = selectRuntimeDogfoodTasks({
+      cwd: root,
+      requiredIntersection,
+      minimum: 2
+    });
+  } catch {
+    selected = [];
+  }
   return {
     name: 'real-dogfood-registered-candidates',
     ok: selected.length >= 2,
