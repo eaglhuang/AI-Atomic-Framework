@@ -5,10 +5,14 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Open",
+  "status": "Resolved",
   "area": "Close-window staged-index contention across captains",
   "finding": "Another agent's staged files (source and task-plan) make `taskflow close` fail `ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED`; unattributable staged source cannot be deferred by `--defer-foreign-staged`, so the operator must manually park/restore the foreign staged set.",
   "expectedBehavior": "The close window should snapshot-park unattributable foreign staged entries with an explicit restore contract (or wait on a shared index lease) instead of failing isolation.",
   "evidenceOrRepro": "TASK-AAO-FABLE-002 close required manually unstaging codex-backlog-captain's stalled staged files and restaging them after the closure commit.",
-  "followUp": "Design with the branch commit queue lease; never silently drop another agent's staged content."
+  "followUp": "Resolved by ATM-GOV-0233: taskflow close index isolation now has an immutable park/restore receipt contract (`atm.taskflowCloseIndexIsolationReceipt.v1`) so unattributable foreign staged entries are represented explicitly instead of silently dropped or manually improvised.",
+  "terminalDisposition": "resolved-by-ATM-GOV-0233",
+  "closedByTask": "ATM-GOV-0233",
+  "closedAt": "2026-07-21T07:55:00.000Z",
+  "passingReceipt": "node --strip-types tests/cli/taskflow-close-index-isolation.test.ts"
 }
