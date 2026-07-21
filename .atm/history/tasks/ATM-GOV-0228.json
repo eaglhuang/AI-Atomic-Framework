@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0228",
   "title": "Atomic broker projection and reconciliation",
-  "status": "planned",
+  "status": "done",
   "milestone": "ATM-3.0-B1",
   "dependencies": [
     "ATM-GOV-0231"
@@ -79,7 +79,77 @@
     }
   },
   "importedAt": "2026-07-21T05:04:35.086Z",
-  "lastTransitionId": "2026-07-21T05-04-35-255Z-import-f9f34ea8b576",
-  "lastTransitionAt": "2026-07-21T05:04:35.255Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-21T07-10-09-864Z-close-7a94bdb5a426",
+  "lastTransitionAt": "2026-07-21T07:10:09.864Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-plan3-captain-20260721-02",
+  "reservedAt": "2026-07-21T06:56:24.185Z",
+  "promotedAt": "2026-07-21T06:56:24.187Z",
+  "claim": {
+    "actorId": "codex-plan3-captain-20260721-02",
+    "leaseId": "lease-55c2334b5b3f",
+    "claimedAt": "2026-07-21T06:56:24.190Z",
+    "heartbeatAt": "2026-07-21T07:10:09.862Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0228.json",
+      "packages/cli/src/commands/broker/reconcile/**",
+      "packages/core/src/broker/projections/**",
+      "packages/core/src/broker/reconcile/**",
+      "packages/core/src/broker/ticket-store/**",
+      "schemas/atm.broker-projection.v1.schema.json",
+      "tests/broker/atomic-projection-reconcile.test.ts",
+      "tests/cli/broker-projection-reconcile.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260721065624-codex-plan3-captain-20260721-02-6fb5d04e8f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721065624-codex-plan3-captain-20260721-02-6fb5d04e8f\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-21T06:56:24.190Z",
+  "startedByActor": "codex-plan3-captain-20260721-02",
+  "startedBySessionId": "session-20260721065624-codex-plan3-captain-20260721-02-ATM-GOV-0228-9d9b207b18",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0228",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0228.*",
+      ".atm/history/task-events/ATM-GOV-0228/**",
+      ".atm/history/tasks/ATM-GOV-0228.json",
+      "packages/cli/src/commands/broker/reconcile/**",
+      "packages/core/src/broker/projections/**",
+      "packages/core/src/broker/reconcile/**",
+      "packages/core/src/broker/ticket-store/**",
+      "schemas/atm.broker-projection.v1.schema.json",
+      "tests/broker/atomic-projection-reconcile.test.ts",
+      "tests/cli/broker-projection-reconcile.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "fa7ed0fe6a37e9b929af1e6795effc92a0a5102c145b85a13b84d55587cacb74",
+    "actorId": "codex-plan3-captain-20260721-02",
+    "sessionId": "session-20260721065624-codex-plan3-captain-20260721-02-ATM-GOV-0228-9d9b207b18",
+    "laneSession": {
+      "laneSessionId": "lane-20260721065624-codex-plan3-captain-20260721-02-6fb5d04e8f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721065624-codex-plan3-captain-20260721-02-6fb5d04e8f\""
+    },
+    "createdAt": "2026-07-21T06:56:28.374Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-21T07:10:09.862Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "closedBySessionId": "session-20260721065624-codex-plan3-captain-20260721-02-ATM-GOV-0228-9d9b207b18",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0228.closure-packet.json"
 }

@@ -1,0 +1,184 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0228",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "40da7c63b00694c6a80f940d7c3a6d5a3ab7b2bf",
+  "governedTreeSha": "746cbceede69e94076299feb2fef020bc36a971b",
+  "targetCommitDelta": {
+    "currentCommitSha": "40da7c63b00694c6a80f940d7c3a6d5a3ab7b2bf",
+    "parentCommitShas": [
+      "40da7c63b00694c6a80f940d7c3a6d5a3ab7b2bf"
+    ],
+    "governedTreeSha": "746cbceede69e94076299feb2fef020bc36a971b",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0228.json",
+      ".atm/history/task-events/ATM-GOV-0228/2026-07-21T06-56-24-185Z-reserve-f8b5cdba6e08.json",
+      ".atm/history/task-events/ATM-GOV-0228/2026-07-21T06-56-24-187Z-promote-361bf66d1191.json",
+      ".atm/history/task-events/ATM-GOV-0228/2026-07-21T06-56-28-375Z-claim-a123d9a20b51.json",
+      ".atm/history/tasks/ATM-GOV-0228.json",
+      "packages/cli/src/commands/broker/reconcile/implementation.ts",
+      "packages/core/src/broker/projections/atomic-broker-projection.ts",
+      "packages/core/src/broker/reconcile/broker-projection-reconcile.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/atm.broker-projection.v1.schema.json",
+      "tests/broker/atomic-projection-reconcile.test.ts",
+      "tests/cli/broker-projection-reconcile.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/broker/atomic-projection-reconcile.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:472eff7aada8bcf6bf9b930017c7c3f65576c5d2fe43926bd1fd4f1f531e2ead",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/broker-projection-reconcile.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:45b399392e88bc1387580127e98aa49aec02175645c664d19a39814a5762bb58",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ada84b041df961b4b223801798be1580f5be74b9876565dd2904497168c97257",
+      "stderrSha256": "sha256:a1acb51d5fdfbdb67a84a6785ea10e17066e1b13a5e3ad663a2640e882eee63a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ada84b041df961b4b223801798be1580f5be74b9876565dd2904497168c97257",
+      "stderrSha256": "sha256:7dfd96409d20d9b9e3f130be65ecce6d9a3ce12d33e364dc54bb572fec4ad733",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/broker/atomic-projection-reconcile.test.ts",
+    "node --strip-types tests/cli/broker-projection-reconcile.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-21T07:10:09.856Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0228.*",
+      ".atm/history/task-events/ATM-GOV-0228/**",
+      ".atm/history/tasks/ATM-GOV-0228.json",
+      "packages/cli/src/commands/broker/reconcile/**",
+      "packages/core/src/broker/projections/**",
+      "packages/core/src/broker/reconcile/**",
+      "packages/core/src/broker/ticket-store/**",
+      "schemas/atm.broker-projection.v1.schema.json",
+      "tests/broker/atomic-projection-reconcile.test.ts",
+      "tests/cli/broker-projection-reconcile.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/reconcile/**",
+      "packages/core/src/broker/projections/**",
+      "packages/core/src/broker/reconcile/**",
+      "packages/core/src/broker/ticket-store/**",
+      "schemas/atm.broker-projection.v1.schema.json",
+      "tests/broker/atomic-projection-reconcile.test.ts",
+      "tests/cli/broker-projection-reconcile.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0228.json",
+  "closedAt": "2026-07-21T07:10:09.856Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721065624-codex-plan3-captain-20260721-02-ATM-GOV-0228-9d9b207b18",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "40da7c63b00694c6a80f940d7c3a6d5a3ab7b2bf",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker/reconcile/implementation.ts",
+      "packages/core/src/broker/projections/atomic-broker-projection.ts",
+      "packages/core/src/broker/reconcile/broker-projection-reconcile.ts",
+      "schemas/atm.broker-projection.v1.schema.json",
+      "tests/broker/atomic-projection-reconcile.test.ts",
+      "tests/cli/broker-projection-reconcile.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
