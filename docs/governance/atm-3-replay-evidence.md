@@ -32,6 +32,9 @@ Acceptance receipts:
 Closure diagnostic:
 
 - `node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json`
+- `node atm.mjs broker replay status --json`
+- `node atm.mjs broker replay run --json`
+- `node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json`
 
 The diagnostic is intentionally fail-closed until the source cards can really
 close. It checks for two registered, not-yet-delivered dogfood task candidates
@@ -39,6 +42,13 @@ with the declared intersection, a public frozen replay CLI surface, and a
 420-cell matrix whose cells contain command or workload receipts. Use
 `--allow-inconclusive` only when a larger validator needs to consume the JSON
 report without failing the whole run.
+
+The `broker replay` CLI is a frozen-runner public surface for producing and
+checking replay evidence. `status` reports close readiness and remains
+fail-closed while real dogfood or command-backed 420-cell evidence is missing.
+`run` executes the controlled frozen broker-decision replay segment. `dogfood`
+requires two registered, not-yet-delivered task candidates with the declared
+intersection and fails closed when they are absent.
 
 Final closure verdict:
 

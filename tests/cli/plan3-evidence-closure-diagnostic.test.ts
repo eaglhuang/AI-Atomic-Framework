@@ -14,8 +14,13 @@ const blockedReport = JSON.parse(blocked.stdout);
 assert.equal(blockedReport.schemaId, 'atm.plan3EvidenceClosureDiagnostic.v1');
 assert.equal(blockedReport.verdict, 'remain-open');
 assert.ok(blockedReport.blockers.some((entry: string) => entry.includes('real-dogfood-registered-candidates')));
-assert.ok(blockedReport.blockers.some((entry: string) => entry.includes('frozen-cli-replay-surface')));
+assert.equal(blockedReport.blockers.some((entry: string) => entry.includes('frozen-cli-replay-surface')), false);
 assert.ok(blockedReport.blockers.some((entry: string) => entry.includes('command-backed-420-cell-matrix')));
+assert.equal(
+  blockedReport.checks.find((entry: any) => entry.name === 'frozen-cli-replay-surface')?.ok,
+  true,
+  'diagnostic must recognize the public broker replay CLI surface'
+);
 assert.equal(
   blockedReport.checks.find((entry: any) => entry.name === 'formula-generated-matrix-disclosed')?.ok,
   true,
