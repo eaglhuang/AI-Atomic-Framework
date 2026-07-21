@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0236",
+  "title": "Plan 3.0 shared governance state readiness gate",
+  "status": "planned",
+  "milestone": "ATM-3.0-B0.5",
+  "dependencies": [
+    "ATM-GOV-0227"
+  ],
+  "acceptance": [
+    "現有 `protected-ledger-destructive-guard` 紅色 baseline 轉綠；task、event、evidence 任一 tracked deletion 都在 commit mutation 前被拒絕並列出 path class、owner、operation 與 recovery。",
+    "合法 lifecycle command 仍可更新自己任務的 ledger/evidence，不以全拒絕取得假綠燈。",
+    "同一 close transaction 在 target commit、planning closeback 或 response 之間注入中止後可重試；每個 side effect 實際執行最多一次。",
+    "已完成三項 side effect 後的 `ATM_PLANNING_SOURCE_IDENTITY_DRIFT` 被辨識為 completed/reconciled，不回傳會鼓勵重做的 failure；真正的外來 pre-side-effect drift 仍 fail closed。",
+    "source 與 frozen `node atm.mjs` 對相同 protected-state/close-reconcile probe 的 canonical behavior projection digest 一致，runner digest 已封存。",
+    "`-045`、`-015` canonical item shards 以 passing receipt 更新 terminal disposition，projection 由 generator 重建。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+    "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+    "tests/cli/protected-ledger-destructive-guard.test.ts",
+    "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
+    "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-045.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+    "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+    "tests/cli/protected-ledger-destructive-guard.test.ts",
+    "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
+    "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-045.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/protected-ledger-destructive-guard.test.ts",
+    "node --strip-types tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
+    "node --strip-types tests/cli/plan3-shared-governance-state-readiness.test.ts",
+    "node --strip-types scripts/validate-governance-projections.ts",
+    "npm run validate:cli",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No runner-sync reservation lifecycle or actor normalization; ATM-GOV-0230 and ATM-GOV-0231 own those surfaces.",
+    "No legacy BCR migration or final replay performance claim."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "multiprocess-command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Trip queue-only, preserve failure receipts, and revert both extracted policy atoms together; never restore destructive access to live governance state.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.shared-governance-state-safety",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.protected-governance-state-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.taskflow-close-side-effect-reconcile",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+        "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+        "tests/cli/protected-ledger-destructive-guard.test.ts",
+        "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
+        "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-045.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0236-plan-3-0-shared-governance-state-readiness-gate.task.md",
+    "sectionTitle": "ATM-GOV-0236",
+    "headingLine": 91,
+    "hash": "fd99ea87ed315137",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0236-plan-3-0-shared-governance-state-readiness-gate.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:fd99ea87ed315137283ada95331ba80413c779d690a74a7cf7426ec86768ce01",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:53.226Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:53.226Z",
+  "lastTransitionId": "2026-07-21T05-04-53-403Z-import-7f0d1d0f6392",
+  "lastTransitionAt": "2026-07-21T05:04:53.403Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
