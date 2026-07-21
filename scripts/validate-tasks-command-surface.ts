@@ -90,7 +90,7 @@ function extractExportedSymbols(content: string): { values: Set<string>; types: 
 function runValidation() {
   const sourcePath = path.join(root, 'packages', 'cli', 'src', 'commands', 'tasks', 'public-surface.ts');
   const releaseJsPath = path.join(root, 'release', 'atm-root-drop', 'packages/cli', 'dist', 'commands', 'tasks', 'public-surface.js');
-  const releaseDtsPath = path.join(root, 'release', 'atm-root-drop', 'packages/cli', 'dist', 'commands', 'tasks', 'public-surface.d.ts');
+  const releaseSourcePath = path.join(root, 'release', 'atm-root-drop', 'packages/cli', 'src', 'commands', 'tasks', 'public-surface.ts');
 
   // Check if source contract exists
   if (!existsSync(sourcePath)) {
@@ -116,18 +116,18 @@ function runValidation() {
   }
 
   // B. Validate release-side files (Divergence / Drift Check)
-  if (!existsSync(releaseJsPath) || !existsSync(releaseDtsPath)) {
+  if (!existsSync(releaseJsPath) || !existsSync(releaseSourcePath)) {
     fail(
       'ATM_TASKS_COMMAND_SURFACE_DRIFT',
-      `Release artifacts not built. Missing files: ${!existsSync(releaseJsPath) ? releaseJsPath : ''} ${!existsSync(releaseDtsPath) ? releaseDtsPath : ''}. Please run "npm run build" to synchronize.`
+      `Release artifacts not built. Missing files: ${!existsSync(releaseJsPath) ? releaseJsPath : ''} ${!existsSync(releaseSourcePath) ? releaseSourcePath : ''}. Please run "npm run build" to synchronize.`
     );
   }
 
   const releaseJsContent = readFileSync(releaseJsPath, 'utf8');
-  const releaseDtsContent = readFileSync(releaseDtsPath, 'utf8');
+  const releaseSourceContent = readFileSync(releaseSourcePath, 'utf8');
 
   const releaseJsExports = extractExportedSymbols(releaseJsContent);
-  const releaseDtsExports = extractExportedSymbols(releaseDtsContent);
+  const releaseSourceExports = extractExportedSymbols(releaseSourceContent);
 
   // Divergence check for runtime values in JS
   const missingValuesInRelease: string[] = [];
@@ -144,18 +144,20 @@ function runValidation() {
     );
   }
 
-  // Divergence check for types in d.ts
-  const missingSymbolsInDts: string[] = [];
+  // Divergence check for the root-drop TypeScript source contract. The current
+  // CLI package build does not emit per-module .d.ts files, so the root-drop
+  // source copy is the release-side type authority.
+  const missingSymbolsInReleaseSource: string[] = [];
   for (const sym of ALL_REQUIRED_SYMBOLS) {
-    if (!releaseDtsExports.all.has(sym)) {
-      missingSymbolsInDts.push(sym);
+    if (!releaseSourceExports.all.has(sym)) {
+      missingSymbolsInReleaseSource.push(sym);
     }
   }
 
-  if (missingSymbolsInDts.length > 0) {
+  if (missingSymbolsInReleaseSource.length > 0) {
     fail(
       'ATM_TASKS_COMMAND_SURFACE_DRIFT',
-      `Release-side d.ts declaration drop has diverged from source. Missing symbols: ${missingSymbolsInDts.join(', ')}. Run "npm run build".`
+      `Release-side TypeScript source drop has diverged from source. Missing symbols: ${missingSymbolsInReleaseSource.join(', ')}. Run "npm run build".`
     );
   }
 
