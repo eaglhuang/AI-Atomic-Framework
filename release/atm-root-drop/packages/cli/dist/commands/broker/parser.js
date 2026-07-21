@@ -16,6 +16,7 @@ export function parseBrokerArgs(argv) {
         scheduleAction: null,
         batchAction: null,
         parallelAdmissionAction: null,
+        replayAction: null,
         policyMode: null,
         policyFallbackMode: null,
         policyCircuitBreaker: null,
@@ -331,6 +332,9 @@ export function parseBrokerArgs(argv) {
         else if (state.action === 'parallel-admission' && !state.parallelAdmissionAction) {
             state.parallelAdmissionAction = arg;
         }
+        else if (state.action === 'replay' && !state.replayAction) {
+            state.replayAction = arg;
+        }
         else {
             throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
         }
@@ -351,6 +355,7 @@ export function parseBrokerArgs(argv) {
         scheduleAction: state.scheduleAction,
         batchAction: state.batchAction,
         parallelAdmissionAction: state.parallelAdmissionAction,
+        replayAction: state.replayAction,
         policyMode: state.policyMode,
         policyFallbackMode: state.policyFallbackMode,
         policyCircuitBreaker: state.policyCircuitBreaker,

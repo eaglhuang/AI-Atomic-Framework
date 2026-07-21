@@ -4,7 +4,7 @@
   "positional": [
     {
       "name": "action",
-      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission",
+      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay",
       "required": true
     },
     {
@@ -25,6 +25,11 @@
     {
       "name": "parallel-admission-action",
       "summary": "status | set | trip | reset",
+      "required": false
+    },
+    {
+      "name": "replay-action",
+      "summary": "status | run | dogfood",
       "required": false
     },
     {
@@ -260,6 +265,9 @@
     "node atm.mjs broker parallel-admission status --json",
     "node atm.mjs broker parallel-admission set --mode enforce --fallback-mode queue-only --json",
     "node atm.mjs broker parallel-admission trip --actor worker-1 --reason \"shared-write gate failed\" --json",
-    "node atm.mjs broker parallel-admission reset --actor worker-1 --receipt-digest sha256:<digest> --json"
+    "node atm.mjs broker parallel-admission reset --actor worker-1 --receipt-digest sha256:<digest> --json",
+    "node atm.mjs broker replay status --json",
+    "node atm.mjs broker replay run --json",
+    "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json"
   ]
 }

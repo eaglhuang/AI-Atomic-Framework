@@ -4,11 +4,12 @@ export default defineCommandSpec({
     name: 'broker',
     summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, parallel admission policy, and inspect the local write-broker registry.',
     positional: [
-        { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission', required: true },
+        { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay', required: true },
         { name: 'proposal-action', summary: 'create | list | show | validate', required: false },
         { name: 'steward-action', summary: 'plan | apply', required: false },
         { name: 'runtime-action', summary: 'activate', required: false },
         { name: 'parallel-admission-action', summary: 'status | set | trip | reset', required: false },
+        { name: 'replay-action', summary: 'status | run | dogfood', required: false },
         { name: 'proposal-id', summary: 'Proposal id for show / validate.', required: false }
     ],
     options: [
@@ -80,6 +81,9 @@ export default defineCommandSpec({
         'node atm.mjs broker parallel-admission status --json',
         'node atm.mjs broker parallel-admission set --mode enforce --fallback-mode queue-only --json',
         'node atm.mjs broker parallel-admission trip --actor worker-1 --reason "shared-write gate failed" --json',
-        'node atm.mjs broker parallel-admission reset --actor worker-1 --receipt-digest sha256:<digest> --json'
+        'node atm.mjs broker parallel-admission reset --actor worker-1 --receipt-digest sha256:<digest> --json',
+        'node atm.mjs broker replay status --json',
+        'node atm.mjs broker replay run --json',
+        'node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json'
     ]
 });
