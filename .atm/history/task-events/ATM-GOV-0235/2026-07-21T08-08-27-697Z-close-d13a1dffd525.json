@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T08-08-27-697Z-close-d13a1dffd525",
+  "taskId": "ATM-GOV-0235",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721080228-codex-plan3-captain-20260721-02-ATM-GOV-0235-4b6e8a6da0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0235.json",
+  "taskSha256": "sha256:b42478cc523738680ae75fb08577d55014494f063e76de7aa48ddecf31f03f60",
+  "createdAt": "2026-07-21T08:08:27.697Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0235 --actor codex-plan3-captain-20260721-02 --status done --from-batch-checkpoint --batch batch-6d8ca6b846b6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-6d8ca6b846b6",
+    "sessionId": "session-20260721080228-codex-plan3-captain-20260721-02-ATM-GOV-0235-4b6e8a6da0",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0235.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T08:08:27.685Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0235.*",
+        ".atm/history/task-events/ATM-GOV-0235/**",
+        ".atm/history/tasks/ATM-GOV-0235.json",
+        "docs/governance/atm-3-replay-evidence.md",
+        "docs/governance/atm-bug-and-optimization-backlog.items/**",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/broker/parallel-admission/**",
+        "tests/cli/atm-3-final-closure.test.ts",
+        "tests/cli/parallel-admission-circuit-breaker.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/parallel-admission/**",
+        "tests/cli/atm-3-final-closure.test.ts",
+        "tests/cli/parallel-admission-circuit-breaker.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

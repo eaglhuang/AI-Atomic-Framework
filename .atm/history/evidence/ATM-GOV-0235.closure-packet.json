@@ -1,0 +1,168 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0235",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4f7677c14e1653c59df6ce87327a4319857967a8",
+  "governedTreeSha": "fd79a7358ccd42d764ae73553c164fa512948b5c",
+  "targetCommitDelta": {
+    "currentCommitSha": "4f7677c14e1653c59df6ce87327a4319857967a8",
+    "parentCommitShas": [
+      "4f7677c14e1653c59df6ce87327a4319857967a8"
+    ],
+    "governedTreeSha": "fd79a7358ccd42d764ae73553c164fa512948b5c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0235.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0235.json",
+      ".atm/history/task-events/ATM-GOV-0235/2026-07-21T08-02-28-979Z-reserve-fba59f2bd6ed.json",
+      ".atm/history/task-events/ATM-GOV-0235/2026-07-21T08-02-28-981Z-promote-61345e4f036f.json",
+      ".atm/history/task-events/ATM-GOV-0235/2026-07-21T08-02-31-209Z-claim-439e0cc094e7.json",
+      ".atm/history/tasks/ATM-GOV-0235.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-222.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/cli/parallel-admission-circuit-breaker.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6ed39ddf4f46ea5436c20985ad6fe5c16e5261462c16384426ffd72a12e203e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e80e8c4deef33cb204724c446969c940fa7738adb643957394ae6c903b53f7ec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f320d2d889fd75b1d015db4be8cf4fe67a94047bc51204d17df677b691dad22c",
+      "stderrSha256": "sha256:f141956b5de7ec1ef71c1aa0911a447242b13a13e86ff4b3f727c2ffdabb226e",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts --write",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f3c554fb9a21c3a994837a364463a41d784984c9852fe51df980fc6d0ee6f936",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f3c554fb9a21c3a994837a364463a41d784984c9852fe51df980fc6d0ee6f936",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+    "node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-21T08:08:27.685Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0235.*",
+      ".atm/history/task-events/ATM-GOV-0235/**",
+      ".atm/history/tasks/ATM-GOV-0235.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker/parallel-admission/**",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/cli/parallel-admission-circuit-breaker.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/parallel-admission/**",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/cli/parallel-admission-circuit-breaker.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0235.json",
+  "closedAt": "2026-07-21T08:08:27.685Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721080228-codex-plan3-captain-20260721-02-ATM-GOV-0235-4b6e8a6da0",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

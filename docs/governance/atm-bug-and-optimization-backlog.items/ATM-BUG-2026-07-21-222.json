@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-21-222",
+  "date": "2026-07-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Batch checkpoint / runner-sync / shared-surface recovery",
+  "finding": "ATM-GOV-0234 exposed a governed batch deadlock: batch checkpoint refused stale frozen runner writes, runner-sync build required a sealed HEAD commit, source-first checkpoint partially closed live ledger before refusing, terminal tasks could not enqueue runner-sync, and the broker kept a stale ATM-GOV-0234 write intent that blocked ATM-GOV-0235 shared-surface claim with ATM_BROKER_SHARED_QUEUE_BLOCKED.",
+  "expectedBehavior": "Batch queue-head delivery should expose one executable broker-ticket recovery path: either checkpoint can reserve a runner-sync/build ticket for staged queue-head source, or ATM provides a safe pre-checkpoint delivery commit lane and then auto-releases task broker intents during lock cleanup. Source-first refusal must not leave partial close side effects.",
+  "evidenceOrRepro": "During ATM-GOV-0234 on 2026-07-21, `node atm.mjs batch checkpoint --actor codex-plan3-captain-20260721-02 --json` returned ATM_RUNNER_STALE_WRITE_REFUSED; `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` required ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED; `node atm.dev.mjs batch checkpoint` later returned ATM_SOURCE_FIRST_WRITE_REFUSED after live-ledger close effects; terminal ATM-GOV-0234 then rejected runner-sync enqueue with ATM_RUNNER_SYNC_ENQUEUE_TASK_INVALID, and ATM-GOV-0235 claim failed until `node atm.mjs broker release --task ATM-GOV-0234 --json` cleared the stale intent.",
+  "followUp": "Implement transactional batch runner-sync recovery with exactly-once close side effects, auto broker-intent cleanup on terminal lock cleanup, and a registered recovery command for ATM_BROKER_SHARED_QUEUE_BLOCKED that returns a broker ticket/status instead of a bare refusal."
+}

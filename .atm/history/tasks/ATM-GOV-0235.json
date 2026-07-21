@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0235",
   "title": "ATM 3.0 final closure and circuit breaker verdict",
-  "status": "planned",
+  "status": "done",
   "milestone": "ATM-3.0-F",
   "dependencies": [
     "ATM-GOV-0234"
@@ -82,7 +82,78 @@
     }
   },
   "importedAt": "2026-07-21T05:04:51.022Z",
-  "lastTransitionId": "2026-07-21T05-04-51-276Z-import-caaf0a39585f",
-  "lastTransitionAt": "2026-07-21T05:04:51.276Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-21T08-08-27-825Z-lock-cleanup-f84580c3c87e",
+  "lastTransitionAt": "2026-07-21T08:08:27.825Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-plan3-captain-20260721-02",
+  "reservedAt": "2026-07-21T08:02:28.978Z",
+  "promotedAt": "2026-07-21T08:02:28.981Z",
+  "claim": {
+    "actorId": "codex-plan3-captain-20260721-02",
+    "leaseId": "lease-f74fbb781afc",
+    "claimedAt": "2026-07-21T08:02:28.984Z",
+    "heartbeatAt": "2026-07-21T08:08:27.695Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0235.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker/parallel-admission/**",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/cli/parallel-admission-circuit-breaker.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260721080229-codex-plan3-captain-20260721-02-3fe3248cbe",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721080229-codex-plan3-captain-20260721-02-3fe3248cbe\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-21T08:02:28.984Z",
+  "startedByActor": "codex-plan3-captain-20260721-02",
+  "startedBySessionId": "session-20260721080228-codex-plan3-captain-20260721-02-ATM-GOV-0235-4b6e8a6da0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0235",
+    "batchId": "batch-6d8ca6b846b6",
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-d64120540fd0a64c",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0235.*",
+      ".atm/history/task-events/ATM-GOV-0235/**",
+      ".atm/history/tasks/ATM-GOV-0235.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker/parallel-admission/**",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/cli/parallel-admission-circuit-breaker.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "cd9a456531059b6e7de974ca91038bf0ff2e536b10aa9f379507265f7a3004c6",
+    "actorId": "codex-plan3-captain-20260721-02",
+    "sessionId": "session-20260721080228-codex-plan3-captain-20260721-02-ATM-GOV-0235-4b6e8a6da0",
+    "laneSession": {
+      "laneSessionId": "lane-20260721080229-codex-plan3-captain-20260721-02-3fe3248cbe",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721080229-codex-plan3-captain-20260721-02-3fe3248cbe\""
+    },
+    "createdAt": "2026-07-21T08:02:31.209Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-21T08:08:27.821Z",
+    "releasedBy": "codex-plan3-captain-20260721-02"
+  },
+  "closedAt": "2026-07-21T08:08:27.695Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "closedBySessionId": "session-20260721080228-codex-plan3-captain-20260721-02-ATM-GOV-0235-4b6e8a6da0",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0235.closure-packet.json"
 }
