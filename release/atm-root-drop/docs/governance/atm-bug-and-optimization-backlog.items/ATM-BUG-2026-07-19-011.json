@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in ATM-GOV-0230",
   "area": "Runner sync / Batch routing / Broker",
   "finding": "Frozen runner can continue surfacing a terminal imported task (TASK-SYNC-0001) after source-first routing correctly excludes it, and runner-sync admission can then deadlock because the completed sync task is terminal while the only frozen queue head is the ghost task.",
   "expectedBehavior": "Release runner artifacts must contain the same terminal-task exclusion logic as source, closedAt/closedByActor tasks must not appear in fallback open queues, and runner-sync broker/admission should expose a first-layer recovery path when a release/source split blocks normal build.",
   "evidenceOrRepro": "After commit 4d740e05c48b712154c58ed93292a2044d711d75, `node atm.dev.mjs next --prompt <governance batch prompt> --json` returned `openTaskCount: 0` / `ATM_NEXT_TASK_SCOPE_NOT_FOUND`, while `node atm.mjs next --prompt <same prompt> --json` returned TASK-SYNC-0001 with status blocked plus closedAt=2026-07-17T05:11:07.307Z. `npm run build` then failed with ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED, and `broker runner-sync enqueue --task ATM-FRAMEWORK-TEMP-codex-plan-series-skill` failed with ATM_RUNNER_SYNC_ENQUEUE_TASK_INVALID because that task is terminal.",
-  "followUp": "Add a regression that compares frozen release queue-inspection output against source-first for terminal imported tasks; repair sealed-runner build/cache so release artifacts cannot omit a source routing fix; add broker telemetry for admission decisions, queue-head health, recovery commands, and whether AI agents attempted unsafe compose/write paths."
+  "followUp": "Closed by ATM-GOV-0230: `runner-sync-terminal-task-parity.test.ts` proves terminal ghost queue heads are removed and waiting live work advances; `runner-sync-framework-temp-hotfix.test.ts` keeps live framework temp owners active while ordinary missing/terminal owners remain invalid; retained release artifacts must be synced after the task close so frozen `node atm.mjs` projects the same behavior."
 }

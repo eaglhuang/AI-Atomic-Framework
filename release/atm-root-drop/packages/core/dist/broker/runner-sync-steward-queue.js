@@ -16,7 +16,7 @@ export function enqueueRunnerSyncStewardRequest(queue, request, options = {}) {
     if (taskHealth !== 'task-active') {
         throw new Error(`ATM_RUNNER_SYNC_ENQUEUE_TASK_INVALID: task ${normalized.taskId} is ${taskHealth}; runner-sync steward enqueue requires an active task.`);
     }
-    const base = normalizeQueue(queue, normalized.createdAt);
+    const base = dropTaskReservationsOutsideCompatibleGeneration(normalizeQueue(queue, normalized.createdAt), normalized);
     const existingIndex = base.groups.findIndex((group) => isCompatibleRunnerSyncGroup(group, normalized));
     const groups = existingIndex >= 0 ? [...base.groups] : [...base.groups, emptyGroup(normalized)];
     const targetIndex = existingIndex >= 0 ? existingIndex : groups.length - 1;
@@ -54,14 +54,17 @@ export function enqueueRunnerSyncStewardRequest(queue, request, options = {}) {
 }
 export function cleanupRunnerSyncStewardQueue(queue, now = new Date().toISOString(), options = {}) {
     const base = normalizeQueue(queue, now);
+    const supersededRequests = supersededRequestsByTaskGeneration(base);
     const staleReleases = [];
     const groups = base.groups.flatMap((group, groupIndex) => {
         const live = group.requests.filter((request) => {
             const expired = isExpired(request, now);
             const health = expired ? 'task-active' : resolveTaskHealth(request, options);
-            const releaseReason = isFullCommitSha(request.sealedSourceSha)
-                ? (expired ? 'ttl-expired' : staleReleaseReasonFromHealth(health))
-                : 'malformed-sealed-source';
+            const releaseReason = supersededRequests.has(request)
+                ? 'superseded-task-generation'
+                : isFullCommitSha(request.sealedSourceSha)
+                    ? (expired ? 'ttl-expired' : staleReleaseReasonFromHealth(health))
+                    : 'malformed-sealed-source';
             if (releaseReason) {
                 staleReleases.push({
                     taskId: request.taskId,
@@ -85,6 +88,39 @@ export function cleanupRunnerSyncStewardQueue(queue, now = new Date().toISOStrin
         staleReleases,
         queue: materializeQueue({ ...base, updatedAt: now, groups }, options.taskHealthResolver)
     };
+}
+function dropTaskReservationsOutsideCompatibleGeneration(queue, request) {
+    return materializeQueue({ ...queue, groups: queue.groups.flatMap((group) => {
+            const requests = isCompatibleRunnerSyncGroup(group, request) ? group.requests : group.requests.filter((entry) => entry.taskId !== request.taskId);
+            return requests.length === 0 ? [] : [{ ...group, requests }];
+        }) });
+}
+function supersededRequestsByTaskGeneration(queue) {
+    const latestByTask = new Map();
+    for (const group of queue.groups) {
+        for (const request of group.requests) {
+            const current = latestByTask.get(request.taskId);
+            if (!current || compareTaskGeneration(request, current) > 0)
+                latestByTask.set(request.taskId, request);
+        }
+    }
+    const superseded = new Set();
+    for (const group of queue.groups) {
+        for (const request of group.requests) {
+            if (latestByTask.get(request.taskId) !== request)
+                superseded.add(request);
+        }
+    }
+    return superseded;
+}
+function compareTaskGeneration(left, right) {
+    const leftHeartbeat = Date.parse(left.heartbeatAt), rightHeartbeat = Date.parse(right.heartbeatAt);
+    if (Number.isFinite(leftHeartbeat) && Number.isFinite(rightHeartbeat) && leftHeartbeat !== rightHeartbeat)
+        return leftHeartbeat - rightHeartbeat;
+    const createdOrder = left.createdAt.localeCompare(right.createdAt);
+    if (createdOrder !== 0)
+        return createdOrder;
+    return left.sealedSourceSha.localeCompare(right.sealedSourceSha);
 }
 export function releaseRunnerSyncStewardQueue(queue, input) {
     const releasedAt = validIso(input.releasedAt) ? input.releasedAt : new Date().toISOString();
@@ -332,7 +368,7 @@ function isExpired(request, now) {
     return Number.isFinite(expiresAt) && Number.isFinite(nowMs) && expiresAt <= nowMs;
 }
 function isFullCommitSha(value) {
-    return /^[a-f0-9]{40}$/i.test(value);
+    return /^[a-f0-9]{40}$/i.test(value) || /^sha256:[A-Za-z0-9._:-]+$/.test(value);
 }
 function resolveTaskHealth(request, options) {
     if (options.taskHealthResolver) {

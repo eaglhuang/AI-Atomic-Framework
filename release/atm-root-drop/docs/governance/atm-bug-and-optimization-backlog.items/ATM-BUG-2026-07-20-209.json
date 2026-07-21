@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in ATM-GOV-0230",
   "area": "Runner sync / steward lifecycle / closeout UX",
   "finding": "After a runner-sync cache-hit build published a receipt for the previous sealed source, the steward queue kept that completed source at queue head. Enqueuing the next sealed source for the same task then landed at position 2 and required the operator to manually compute the receipt digest and release the old steward work before the new build could proceed.",
   "expectedBehavior": "Runner-sync should expose a first-layer, copyable release-or-advance command after build publication, and should consider an automatic same-task advancement path when the current queue-head receipt is already present and digest-verifiable. The lifecycle should be generic across tasks and must not depend on manual SHA/digest spelunking.",
   "evidenceOrRepro": "During ATM-GOV-0196 closeout on 2026-07-20, `runner-sync-216fd2a4` completed for sealed source `f0625e71379741f7d27e64c85aa62784837e7c5a`. After the delivery commit `302d8b806c42b64a4f9e266905e3b159a1c8d7a0`, `broker runner-sync enqueue` returned `waiting-different-source` at position 2 for `runner-sync-6dcbbea1` until the operator ran `Get-FileHash` and `broker runner-sync release --steward-work-id runner-sync-216fd2a4 ...` manually.",
-  "followUp": "Add runner-sync lifecycle tests for same-task sequential sealed sources, emit digest-ready release commands from build/close preflight output, and investigate safe auto-release when the recorded receipt matches the queue-head steward work."
+  "followUp": "Closed by ATM-GOV-0230: same-task sequential sealed sources now replace older unsatisfied reservations at enqueue time, cleanup releases hand-written superseded generation residue with `superseded-task-generation`, and `runner-sync-head-movement.test.ts` / `runner-sync-stale-reservation-lifecycle.test.ts` prove the newer source becomes queue head without manual digest spelunking or a fabricated receipt. Digest-ready release command coverage remains in the existing receipt auto-release path."
 }
