@@ -1,4 +1,3 @@
-// @ts-nocheck
 import path from 'node:path';
 import { CliError, makeResult, message } from '../../shared.ts';
 import { createBrokerTicketStore } from '../../../../../core/src/broker/ticket-store.ts';
@@ -6,9 +5,15 @@ import { authorityFromTicketStore } from '../../../../../core/src/broker/project
 import { reconcileBrokerProjection } from '../../../../../core/src/broker/reconcile/broker-projection-reconcile.ts';
 import type { ParsedBrokerOptions } from '../parser.ts';
 
+type BrokerReconcileOptions = Omit<ParsedBrokerOptions, 'action'> & {
+  readonly action: string | null;
+  readonly reconcileAction?: string | null;
+};
+
 export function handleBrokerReconcile(options: ParsedBrokerOptions) {
-  if (options.action !== 'reconcile') return null;
-  if ((options as ParsedBrokerOptions & { reconcileAction?: string | null }).reconcileAction !== 'projection') {
+  const reconcileOptions = options as BrokerReconcileOptions;
+  if (reconcileOptions.action !== 'reconcile') return null;
+  if (reconcileOptions.reconcileAction !== 'projection') {
     throw new CliError('ATM_CLI_USAGE', 'broker reconcile requires projection.', { exitCode: 2 });
   }
   if (!options.task || !options.actorId) {
