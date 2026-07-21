@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Task",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Deferred",
   "area": "Skills / Integration projection",
   "finding": "TASK-SKL-0014 delivered templates/skills/atm-framework-temp-claim.skill.md but did not add the skill to minimumAtmEntrySkillDefinitions in packages/integrations-core/src/compiler/skill-templates.ts nor update requiredTemplateIds in scripts/validate-skill-templates.ts, so no editor integration (claude-code / codex / cursor / gemini / copilot) projects the skill and it cannot be surfaced as a slash command. Deferred out of SKL-0014 because scripts/validate-skill-templates.ts was atom-held by concurrent TASK-SKL-0015; adding to only one of the two files makes npm run validate:skill-templates fail on count assertion.",
   "expectedBehavior": "A follow-up card (TASK-SKL-0014-FU-PROJECT) must (a) add id atm-framework-temp-claim to minimumAtmEntrySkillDefinitions in packages/integrations-core/src/compiler/skill-templates.ts, (b) add the same id to requiredTemplateIds in scripts/validate-skill-templates.ts, (c) run node atm.mjs integration add <adapter> --force for each of claude-code / codex / copilot / cursor / gemini, and (d) commit the resulting projections plus the four .atm/integrations/*.manifest.json updates. Verifies via npm run validate:skill-templates and npm run validate:cli.",
-  "evidenceOrRepro": "Reproducible: after SKL-0014 delivery, ls .claude/skills/atm-framework-temp-claim returns ENOENT because integration add --force at SKL-0014 close time did not project the new skill; the template exists at templates/skills/atm-framework-temp-claim.skill.md but is not in the minimum-set the compiler iterates. Attempting to add both files under SKL-0014 hit a broker file-range conflict on scripts/validate-skill-templates.ts against active TASK-SKL-0015.",
-  "followUp": "Follow-up card TASK-SKL-0014-FU-PROJECT is planned in 3KLife SKL series. Do not open a standalone card in target ledger; land it after TASK-SKL-0015 closes so the two files can be edited atomically."
+  "evidenceOrRepro": "ATM-GOV-0232 reconciled this backlog row as a projected-skill follow-up rather than a task-import parser defect. The current claim scope intentionally does not include packages/integrations-core/src/compiler/skill-templates.ts, scripts/validate-skill-templates.ts, or generated editor projections, so this item remains delegated to the existing SKL follow-up lane.",
+  "followUp": "Terminal disposition for ATM-GOV-0232: deferred to TASK-SKL-0014-FU-PROJECT / SKL lane. Do not open a duplicate GOV task or edit integration projection files under ATM-GOV-0232."
 }
