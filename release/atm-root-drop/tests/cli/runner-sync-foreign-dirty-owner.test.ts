@@ -122,7 +122,7 @@ const missingReservation = inspectRunnerSyncAdmission({
 assert.equal(missingReservation.ok, false);
 assert.equal(missingReservation.queueHeadOwnership.ok, false);
 assert.match(missingReservation.requiredCommand ?? '', /broker runner-sync enqueue/);
-assert.match(missingReservation.requiredCommand ?? '', /--surface "release\/atm-onefile\/atm\.mjs"/);
+assert.match(missingReservation.requiredCommand ?? '', /--surface "?release\/atm-onefile\/atm\.mjs"?/);
 
 const waiting = inspectRunnerSyncAdmission({
   cwd: process.cwd(),
