@@ -322,6 +322,13 @@
       "source_task": "TASK-RFT-0032"
     },
     {
+      "path_pattern": "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "atom_id": "atm.protected-governance-state-policy",
+      "capability": "ATM-GOV-0236 schema-driven protected governance state path classification and destructive deletion fail-closed receipts for task ledger, task-event, and task-evidence files.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0236"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts",
       "atom_id": "atm.git-governance.record-commit-payload-assertion",
       "capability": "ATM-GOV-0166 / ATM-BUG-2026-07-17-002 post-commit payload assertion for git record-commit.",
@@ -613,6 +620,13 @@
       "atom_id": "atm.task-closure-map",
       "capability": "taskflow close backend argv/command builder for protected close surfaces, including pass-through of --historical-batch to tasks close and operator-facing backend command text.",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "atom_id": "atm.taskflow-close-side-effect-reconcile",
+      "capability": "ATM-GOV-0236 idempotent close side-effect result contract distinguishing pre-side-effect planning source drift from post-side-effect reconciled receipts with replayAllowed=false.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0236"
     },
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
