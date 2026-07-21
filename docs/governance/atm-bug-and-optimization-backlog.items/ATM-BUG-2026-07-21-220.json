@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-21-220",
+  "date": "2026-07-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Runner-sync / protected evidence / post-close release artifacts",
+  "finding": "After ATM-GOV-0226 was closed successfully, the required runner-sync build produced release artifacts plus `.atm/history/evidence/ATM-GOV-0226.runner-sync-receipt.json`. `taskflow close --write` excluded the release artifacts from the close bundle as out-of-scope, but the framework temp claim initially included the receipt. When the receipt and updated evidence bundle were staged with the release artifacts, pre-commit blocked with `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT`. `evidence git-head-backfill` succeeded but did not unblock the commit, and the hook provided no `requiredCommand` for a legal post-close evidence transition.",
+  "expectedBehavior": "Runner-sync release publication after task close should have one deterministic governed path: either include the receipt in the close bundle, provide a post-close runner-sync evidence transition command, or mark the receipt as runtime-only so framework temp release commits can proceed without protected evidence conflicts.",
+  "evidenceOrRepro": "During ATM-GOV-0226 close on target commit d13e36dfffceb510e906a91985c05ece7f945fba, `node atm.mjs git commit --actor codex-plan3-captain-20260721-01 --task ATM-GOV-0226 --message \"runner-sync: publish ATM-GOV-0226 release artifacts\" --json` failed with `ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED` for `.atm/history/evidence/ATM-GOV-0226.bundle-manifest.json`, `.atm/history/evidence/ATM-GOV-0226.json`, and `.atm/history/evidence/ATM-GOV-0226.runner-sync-receipt.json`. A no-task release commit also failed while the temp claim included the receipt. Reclaiming only release artifacts allowed commit 7fbd929b74f92a19446ca1195d96ffad314a195e; the receipt was preserved at `.atm/runtime/residue/ATM-GOV-0226.runner-sync-receipt.json` because the protected evidence path remained uncommittable.",
+  "followUp": "Add a regression covering post-close runner-sync receipt publication and implement a canonical recovery command or runtime-only receipt policy. The hook should emit a precise requiredCommand instead of a generic repair hint when this state is encountered."
+}
