@@ -1,0 +1,146 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ERR-0003",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6536c431bf4d4a83322f161fa50ffd020f53b2f7",
+  "governedTreeSha": "60ca9c52956f4793e40d313a65d751ddbe4ab613",
+  "targetCommitDelta": {
+    "currentCommitSha": "6536c431bf4d4a83322f161fa50ffd020f53b2f7",
+    "parentCommitShas": [
+      "6536c431bf4d4a83322f161fa50ffd020f53b2f7"
+    ],
+    "governedTreeSha": "60ca9c52956f4793e40d313a65d751ddbe4ab613",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-ERR-0003.bundle-manifest.json",
+      ".atm/history/evidence/TASK-ERR-0003.json",
+      ".atm/history/task-events/TASK-ERR-0003/2026-07-21T05-09-57-839Z-reserve-d6ea2147cffb.json",
+      ".atm/history/task-events/TASK-ERR-0003/2026-07-21T05-09-57-841Z-promote-489342bf234b.json",
+      ".atm/history/task-events/TASK-ERR-0003/2026-07-21T05-10-01-628Z-claim-a4804274209d.json",
+      ".atm/history/tasks/TASK-ERR-0003.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "tests/cli/atm-3-error-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/atm-3-error-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3778babcc4cd036090756548ff5753f9712b42033694fd19b7b722e42d7f4120",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run generate:error-codes",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dd4929ebb1784ac478fb64c6d3b4839e6132d7d0912f141538b2a279682f6ace",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ada84b041df961b4b223801798be1580f5be74b9876565dd2904497168c97257",
+      "stderrSha256": "sha256:191843dd8cf6c13013fe42c2e9aac8ce4ab54e5395f016a6a5730561dba4e5fa",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "atm-3-error-contract",
+    "diff-check",
+    "generate:error-codes",
+    "git diff --check",
+    "node --strip-types tests/cli/atm-3-error-contract.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-21T05:16:44.937Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ERR-0003.*",
+      ".atm/history/task-events/TASK-ERR-0003/**",
+      ".atm/history/tasks/TASK-ERR-0003.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "tests/cli/atm-3-error-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "tests/cli/atm-3-error-contract.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ERR-0003.json",
+  "closedAt": "2026-07-21T05:16:44.938Z",
+  "closedByActor": "codex-plan3-captain-20260721-01",
+  "sessionId": "session-20260721050957-codex-plan3-captain-20260721-01-TASK-ERR-0003-d8fc122425",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

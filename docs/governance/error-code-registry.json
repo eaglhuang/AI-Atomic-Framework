@@ -435,6 +435,300 @@
       "sourceOwner": "packages/cli/src/commands/broker.ts"
     },
     {
+      "code": "ATM_BROKER_STATE_DIVERGENCE",
+      "category": "team-broker",
+      "shortDescription": "Broker replay or census observed divergent shared-surface state that must be inspected before more writes continue.",
+      "commonCauses": [
+        "A replay scenario reconstructed a different ticket, queue, freeze, or admission state than the live broker registry.",
+        "A shared-surface projection was generated from stale broker inputs.",
+        "Concurrent steward or broker writes landed without a matching receipt or replayable transition."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json to inspect the live shared-surface registry.",
+        "Run the task-provided replay or census validator to identify the divergent state class.",
+        "Do not continue shared writes until the divergent broker state has been reconciled or waived by the owning governance task."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node --strip-types tests/cli/atm-3-divergence-census.test.ts"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "status",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/replay"
+    },
+    {
+      "code": "ATM_EVIDENCE_SEAL_REQUIRED",
+      "category": "evidence",
+      "shortDescription": "A governed operation requires sealed command-backed evidence before the task can checkpoint, close, or publish.",
+      "commonCauses": [
+        "A validator was described in prose but no fresh evidence record was added.",
+        "A task attempted checkpoint or closeout without a command, artifact digest, or exit-code backed seal.",
+        "A planning or target source digest changed after the evidence was recorded."
+      ],
+      "remediation": [
+        "Run the task's focused validator and preserve stdout/stderr digests.",
+        "Add evidence with node atm.mjs evidence add --task <task-id> --actor <actor> --kind test --freshness fresh --summary \"<summary>\" --command \"<command>\" --exit-code 0 --json.",
+        "Retry the checkpoint or closeout only after the evidence verify command passes."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs evidence add --task <task-id> --actor <actor> --kind test --freshness fresh --summary \"<summary>\" --command \"<command>\" --exit-code 0 --json",
+        "node atm.mjs evidence verify --task <task-id> --json"
+      ],
+      "statusCommand": "node atm.mjs evidence verify --task <task-id> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "evidence",
+            "verify",
+            "--task",
+            "<task-id>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/cli/src/commands/evidence.ts"
+    },
+    {
+      "code": "ATM_BROKER_TICKET_STALE_GENERATION",
+      "category": "team-broker",
+      "shortDescription": "A broker ticket was based on an older generation than the current shared-surface registry.",
+      "commonCauses": [
+        "The shared-surface queue, freeze, or admission registry changed after the ticket was minted.",
+        "A worker retried a stale broker ticket after another steward completed or requeued the same surface.",
+        "A cached projection attempted to apply against a newer broker generation."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json and compare the current generation with the ticket generation.",
+        "Discard the stale ticket and rerun the admission or arbitration command that produced it.",
+        "If the stale ticket represents completed work, reconcile it through the owning task evidence instead of applying it."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs next --prompt \"<current goal>\" --json"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "status",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/ticket-authority"
+    },
+    {
+      "code": "ATM_BROKER_AUTHORIZATION_DIMENSION_MISMATCH",
+      "category": "team-broker",
+      "shortDescription": "Broker authorization was requested for a different resource dimension than the ticket actually grants.",
+      "commonCauses": [
+        "A task-id scoped approval was used for a file, branch, projection, or shared-surface write.",
+        "A broker ticket grants one resource dimension while the attempted operation mutates another.",
+        "Legacy broker-conflict resolution evidence omitted requested and granted resource dimensions."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json to inspect current broker tickets and ownership.",
+        "Re-arbitrate with the requested resource dimension and granted resource dimension recorded in the recovery evidence.",
+        "Do not replace resource-dimension checks with task-id allowlists."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs next --prompt \"<current goal>\" --json"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "status",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/ticket-authority"
+    },
+    {
+      "code": "ATM_SCOPE_AMENDMENT_REQUIRED",
+      "category": "task-ledger",
+      "shortDescription": "A task needs an explicit governed scope amendment before touching linked files outside its current contract.",
+      "commonCauses": [
+        "A validator or import graph revealed a cross-file dependency not listed in the task scope.",
+        "A generated projection or registry update requires a sibling source file to stay consistent.",
+        "A mechanical split card omitted a coupled file that must be reviewed before first delivery."
+      ],
+      "remediation": [
+        "Run node atm.mjs tasks status --task <task-id> --json to inspect the current scope.",
+        "Review the linked files, then run node atm.mjs tasks scope add --task <task-id> --add <paths> --actor <actor> --reason \"<why linked scope is required>\" --json.",
+        "Retry the claim, validator, checkpoint, or commit after the amended scope is recorded."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json",
+        "node atm.mjs tasks scope add --task <task-id> --add <paths> --actor <actor> --reason \"<why linked scope is required>\" --json"
+      ],
+      "statusCommand": "node atm.mjs tasks status --task <task-id> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "tasks",
+            "status",
+            "--task",
+            "<task-id>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks"
+    },
+    {
+      "code": "ATM_BROKER_REARBITRATION_REQUIRED",
+      "category": "team-broker",
+      "shortDescription": "Broker admission evidence is stale, incomplete, or dimension-mismatched and must be re-arbitrated before write continuation.",
+      "commonCauses": [
+        "A broker conflict or ticket was resolved against an older task, actor, generation, or file set.",
+        "The requested operation now touches a different shared surface than the original arbitration covered.",
+        "A terminal ticket or conflict artifact lacks the canonical decision metadata required for continuation."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json to inspect the current shared-surface state.",
+        "Rerun the admission or broker conflict resolution command for the current task, actor, and resource dimension.",
+        "Proceed only after the new broker ticket or conflict-resolution artifact matches the attempted write."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs team status --compact --json"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "status",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/ticket-authority"
+    },
+    {
+      "code": "ATM_RUNNER_SYNC_ORPHAN",
+      "category": "runner-mode",
+      "shortDescription": "Runner-sync state references a build, reservation, receipt, or release artifact that no active steward owns.",
+      "commonCauses": [
+        "A runner-sync reservation expired or was interrupted after writing partial runtime state.",
+        "A build receipt or release artifact was deleted, ignored, or never committed with its reservation.",
+        "A steward queue entry was superseded without reconciling the older runner-sync record."
+      ],
+      "remediation": [
+        "Read runnerMode.sourceDrift in the failing command output and inspect node atm.mjs broker status --json.",
+        "If the source is stale and you own release surfaces, run ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build.",
+        "If ownership is unclear, reconcile the orphan through the broker steward or task evidence before retrying writes."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "status",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/cli/src/commands/runner-mode"
+    },
+    {
+      "code": "ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE",
+      "category": "protected-governance-state",
+      "shortDescription": "A write would destructively change protected governance state instead of applying an allowed lifecycle or reconcile update.",
+      "commonCauses": [
+        "A command attempted to delete, truncate, overwrite, or reset protected ledger, evidence, registry, runtime, or task-event state.",
+        "A cleanup path treated generated governance state as disposable without an owner-authorized reconcile command.",
+        "A broad write matched protected governance paths beyond the current task's allowed lifecycle side effects."
+      ],
+      "remediation": [
+        "Run node atm.mjs taskflow diagnose --task <task-id> --json to inspect the protected-state blocker.",
+        "Use the command-designated reconcile or lifecycle command instead of deleting protected governance state directly.",
+        "Request human approval only when the diagnostic classifies the operation as an emergency destructive repair."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": true,
+      "relatedCommands": [
+        "node atm.mjs taskflow diagnose --task <task-id> --json",
+        "node atm.mjs doctor --json"
+      ],
+      "statusCommand": "node atm.mjs taskflow diagnose --task <task-id> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "taskflow",
+            "diagnose",
+            "--task",
+            "<task-id>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/cli/src/commands/git-governance/protected-governance-state.ts"
+    },
+    {
       "code": "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY",
       "category": "git-governance",
       "shortDescription": "Another governed commit is currently finalizing the same branch.",

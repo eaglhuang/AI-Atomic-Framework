@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T05-16-44-952Z-close-85807a83e066",
+  "taskId": "TASK-ERR-0003",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-01",
+  "sessionId": "session-20260721050957-codex-plan3-captain-20260721-01-TASK-ERR-0003-d8fc122425",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0003.json",
+  "taskSha256": "sha256:ffb1f5ed4bf58888932b8555483d2ecbabed0bb0e48cb515447a887bfd8c327f",
+  "createdAt": "2026-07-21T05:16:44.952Z",
+  "command": "node atm.mjs tasks close --task TASK-ERR-0003 --actor codex-plan3-captain-20260721-01 --status done --from-batch-checkpoint --batch batch-aadd6c7aefbd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-aadd6c7aefbd",
+    "sessionId": "session-20260721050957-codex-plan3-captain-20260721-01-TASK-ERR-0003-d8fc122425",
+    "closurePacketPath": ".atm/history/evidence/TASK-ERR-0003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "atm-3-error-contract",
+      "diff-check",
+      "generate:error-codes",
+      "git diff --check",
+      "node --strip-types tests/cli/atm-3-error-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T05:16:44.937Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-ERR-0003.*",
+        ".atm/history/task-events/TASK-ERR-0003/**",
+        ".atm/history/tasks/TASK-ERR-0003.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "tests/cli/atm-3-error-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "tests/cli/atm-3-error-contract.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

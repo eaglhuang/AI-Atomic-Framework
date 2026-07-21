@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0003",
   "title": "ATM 3.0 broker and recovery ErrorCode contracts",
-  "status": "planned",
+  "status": "done",
   "milestone": "ATM-3.0-A0",
   "dependencies": [],
   "acceptance": [
@@ -85,7 +85,72 @@
     }
   },
   "importedAt": "2026-07-21T05:04:11.516Z",
-  "lastTransitionId": "2026-07-21T05-04-11-651Z-import-a532df6916dc",
-  "lastTransitionAt": "2026-07-21T05:04:11.651Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-21T05-16-45-056Z-lock-cleanup-0be14da2de4e",
+  "lastTransitionAt": "2026-07-21T05:16:45.056Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-plan3-captain-20260721-01",
+  "reservedAt": "2026-07-21T05:09:57.839Z",
+  "promotedAt": "2026-07-21T05:09:57.841Z",
+  "claim": {
+    "actorId": "codex-plan3-captain-20260721-01",
+    "leaseId": "lease-a7e6a98d05f3",
+    "claimedAt": "2026-07-21T05:09:57.844Z",
+    "heartbeatAt": "2026-07-21T05:16:44.949Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-ERR-0003.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "tests/cli/atm-3-error-contract.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260721050957-codex-plan3-captain-20260721-01-295eb4056d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721050957-codex-plan3-captain-20260721-01-295eb4056d\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-21T05:09:57.844Z",
+  "startedByActor": "codex-plan3-captain-20260721-01",
+  "startedBySessionId": "session-20260721050957-codex-plan3-captain-20260721-01-TASK-ERR-0003-d8fc122425",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0003",
+    "batchId": null,
+    "scopeKey": "tasks-adf69c88fad6",
+    "queueId": "queue-4fd182a18382857f",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0003.*",
+      ".atm/history/task-events/TASK-ERR-0003/**",
+      ".atm/history/tasks/TASK-ERR-0003.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "tests/cli/atm-3-error-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "45460a8717bd9c294b599bf4019b5b12b4a6e2d31c6c2280138d6502bd565532",
+    "actorId": "codex-plan3-captain-20260721-01",
+    "sessionId": "session-20260721050957-codex-plan3-captain-20260721-01-TASK-ERR-0003-d8fc122425",
+    "laneSession": {
+      "laneSessionId": "lane-20260721050957-codex-plan3-captain-20260721-01-295eb4056d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721050957-codex-plan3-captain-20260721-01-295eb4056d\""
+    },
+    "createdAt": "2026-07-21T05:10:01.627Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-21T05:16:45.053Z",
+    "releasedBy": "codex-plan3-captain-20260721-01"
+  },
+  "closedAt": "2026-07-21T05:16:44.949Z",
+  "closedByActor": "codex-plan3-captain-20260721-01",
+  "closedBySessionId": "session-20260721050957-codex-plan3-captain-20260721-01-TASK-ERR-0003-d8fc122425",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0003.closure-packet.json"
 }
