@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T06-00-52-193Z-close-9bbada241f99",
+  "taskId": "ATM-GOV-0227",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-01",
+  "sessionId": "session-20260721054635-codex-plan3-captain-20260721-01-ATM-GOV-0227-420f153f26",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0227.json",
+  "taskSha256": "sha256:f638b00c1b4f570b7d0bdb822978286f1fdd3c2429b0c704177414ac9ea25320",
+  "createdAt": "2026-07-21T06:00:52.193Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0227 --actor codex-plan3-captain-20260721-01 --status done --historical-delivery 4caf97f9a115d7b725df02d33b0aaa2dd4684bb3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260721054635-codex-plan3-captain-20260721-01-ATM-GOV-0227-420f153f26",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0227.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/broker/authorization-resource-dimension.test.ts",
+      "node --strip-types tests/broker/canonical-arbitration-authority.test.ts",
+      "node --strip-types tests/broker/terminal-ticket-authorization.test.ts",
+      "node --strip-types tests/cli/legacy-bcr-fail-closed-authorization.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T06:00:52.181Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0227.*",
+        ".atm/history/task-events/ATM-GOV-0227/**",
+        ".atm/history/tasks/ATM-GOV-0227.json",
+        "packages/cli/src/commands/broker-conflict-resolution.ts",
+        "packages/core/src/broker/contracts/**",
+        "packages/core/src/broker/ticket-authority/**",
+        "packages/core/src/schemas/broker-ticket.ts",
+        "schemas/atm.broker-ticket.v1.schema.json",
+        "tests/broker/authorization-resource-dimension.test.ts",
+        "tests/broker/canonical-arbitration-authority.test.ts",
+        "tests/broker/terminal-ticket-authorization.test.ts",
+        "tests/cli/legacy-bcr-fail-closed-authorization.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker-conflict-resolution.ts",
+        "packages/core/src/broker/contracts/**",
+        "packages/core/src/broker/ticket-authority/**",
+        "packages/core/src/schemas/broker-ticket.ts",
+        "schemas/atm.broker-ticket.v1.schema.json",
+        "tests/broker/authorization-resource-dimension.test.ts",
+        "tests/broker/canonical-arbitration-authority.test.ts",
+        "tests/broker/terminal-ticket-authorization.test.ts",
+        "tests/cli/legacy-bcr-fail-closed-authorization.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0227",
   "title": "Canonical broker arbitration authority",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.0-B0",
   "dependencies": [
     "ATM-GOV-0226"
@@ -88,8 +88,8 @@
     }
   },
   "importedAt": "2026-07-21T05:04:33.490Z",
-  "lastTransitionId": "2026-07-21T05-46-39-844Z-claim-e274e6b61eb7",
-  "lastTransitionAt": "2026-07-21T05:46:39.844Z",
+  "lastTransitionId": "2026-07-21T06-00-52-193Z-close-9bbada241f99",
+  "lastTransitionAt": "2026-07-21T06:00:52.193Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-plan3-captain-20260721-01",
   "reservedAt": "2026-07-21T05:46:35.428Z",
@@ -98,7 +98,7 @@
     "actorId": "codex-plan3-captain-20260721-01",
     "leaseId": "lease-bb4ce023150c",
     "claimedAt": "2026-07-21T05:46:35.433Z",
-    "heartbeatAt": "2026-07-21T05:46:35.433Z",
+    "heartbeatAt": "2026-07-21T06:00:52.191Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0227.json",
@@ -112,14 +112,14 @@
       "tests/broker/terminal-ticket-authorization.test.ts",
       "tests/cli/legacy-bcr-fail-closed-authorization.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260721054635-codex-plan3-captain-20260721-01-bf9829b420",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721054635-codex-plan3-captain-20260721-01-bf9829b420\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-21T05:46:35.433Z",
   "startedByActor": "codex-plan3-captain-20260721-01",
@@ -160,5 +160,9 @@
     },
     "createdAt": "2026-07-21T05:46:39.843Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-21T06:00:52.191Z",
+  "closedByActor": "codex-plan3-captain-20260721-01",
+  "closedBySessionId": "session-20260721054635-codex-plan3-captain-20260721-01-ATM-GOV-0227-420f153f26",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0227.closure-packet.json"
 }
