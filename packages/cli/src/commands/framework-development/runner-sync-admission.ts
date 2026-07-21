@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { buildCommandManifest, buildOrderedCommandStep, renderCommandManifest, type OrderedCommandManifestStep } from '../shared/command-manifest.ts';
+import { mintFrameworkTempTaskId } from '../shared/identity-normalization.ts';
 
 export type RunnerSyncAdmissionReport = {
   readonly schemaId: 'atm.runnerSyncAdmission.v1';
@@ -31,6 +33,7 @@ export type RunnerSyncAdmissionReport = {
   readonly ordinaryTaskReleaseAutoStageAllowed: false;
   readonly brokerTicket: RunnerSyncAdmissionBrokerTicket | null;
   readonly requiredCommand: string | null;
+  readonly orderedCommandManifests?: readonly OrderedCommandManifestStep[];
 };
 
 export type RunnerSyncAdmissionBrokerTicket = {
@@ -92,6 +95,7 @@ export function inspectRunnerSyncAdmission(input: {
   const steward = normalizeInputRunnerSyncSteward(input.runnerSyncSteward) ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
   const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input, steward);
   const brokerTicket = buildAdmissionBrokerTicket(input, queueHeadOwnership);
+  const orderedCommandManifests = buildRunnerSyncRecoveryManifests(input);
   return {
     schemaId: 'atm.runnerSyncAdmission.v1',
     ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok,
@@ -104,6 +108,7 @@ export function inspectRunnerSyncAdmission(input: {
     releaseWip,
     ordinaryTaskReleaseAutoStageAllowed: false,
     brokerTicket,
+    orderedCommandManifests,
     requiredCommand: foreignNonReleaseWip.length > 0
       ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
       : queueHeadOwnership.ok
@@ -137,22 +142,70 @@ function buildAdmissionBrokerTicket(
 }
 
 function buildRunnerSyncEnqueueCommand(input: Parameters<typeof inspectRunnerSyncAdmission>[0]): string {
-  const taskId = inferRunnerSyncTaskId(input);
-  const surfaces = ['release/atm-onefile/atm.mjs', 'release/atm-root-drop']
-    .map((surface) => ` --surface ${quoteCliArg(surface)}`)
-    .join('');
-  const claimFiles = ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'].join(',');
-  const reason = `runner-sync steward reservation for ${input.sealedSourceSha ?? '<sha>'}`;
-  return `node atm.mjs framework-mode claim --actor ${quoteCliArg(input.stewardActorId)} --files ${quoteCliArg(claimFiles)} --reason ${quoteCliArg(reason)} --json && node atm.mjs broker runner-sync enqueue --task ${quoteCliArg(taskId)} --actor ${quoteCliArg(input.stewardActorId)} --sealed-source-sha ${quoteCliArg(input.sealedSourceSha ?? '<sha>')}${surfaces} --json`;
+  const enqueue = buildRunnerSyncRecoveryManifests(input).find((entry) => entry.id === 'runner-sync-enqueue');
+  return enqueue?.display ?? renderCommandManifest(buildRunnerSyncEnqueueManifest(input));
 }
 
-function inferRunnerSyncTaskId(input: Parameters<typeof inspectRunnerSyncAdmission>[0]): string {
-  const tempTaskId = `ATM-FRAMEWORK-TEMP-${input.stewardActorId}`;
-  return tempTaskId.replace(/[^A-Za-z0-9_-]/g, '-').replace(/^-+|-+$/g, '');
+function inferRunnerSyncTaskId(input: { readonly stewardActorId: string }): string {
+  return mintFrameworkTempTaskId(input.stewardActorId);
 }
 
 function quoteCliArg(value: string): string {
   return JSON.stringify(String(value ?? ''));
+}
+
+export function buildRunnerSyncRecoveryManifests(input: {
+  readonly stewardActorId: string;
+  readonly sealedSourceSha?: string | null;
+}): readonly OrderedCommandManifestStep[] {
+  return [
+    buildOrderedCommandStep('framework-temp-claim', buildCommandManifest({
+      executable: 'node',
+      argv: [
+        'atm.mjs', 'framework-mode', 'claim',
+        '--actor', input.stewardActorId,
+        '--files', 'release/atm-onefile/atm.mjs,release/atm-root-drop',
+        '--reason', `runner-sync steward reservation for ${input.sealedSourceSha ?? '<sha>'}`,
+        '--json'
+      ],
+      envRefs: ['PATH'],
+      timeoutMs: 120000,
+      notes: 'claim release surfaces before runner-sync enqueue'
+    })),
+    buildOrderedCommandStep('runner-sync-enqueue', buildRunnerSyncEnqueueManifest(input)),
+    buildOrderedCommandStep('runner-sync-build', buildCommandManifest({
+      executable: 'npm',
+      argv: ['run', 'build'],
+      env: {
+        ATM_ACTOR_ID: input.stewardActorId,
+        ATM_RETAIN_RELEASE_ARTIFACTS: '1'
+      },
+      envRefs: ['PATH'],
+      timeoutMs: 420000,
+      notes: 'preserve queue-head steward actor through sealed runner build'
+    }))
+  ];
+}
+
+function buildRunnerSyncEnqueueManifest(input: {
+  readonly stewardActorId: string;
+  readonly sealedSourceSha?: string | null;
+}) {
+  return buildCommandManifest({
+    executable: 'node',
+    argv: [
+      'atm.mjs', 'broker', 'runner-sync', 'enqueue',
+      '--task', inferRunnerSyncTaskId(input),
+      '--actor', input.stewardActorId,
+      '--sealed-source-sha', input.sealedSourceSha ?? '<sha>',
+      '--surface', 'release/atm-onefile/atm.mjs',
+      '--surface', 'release/atm-root-drop',
+      '--json'
+    ],
+    envRefs: ['PATH'],
+    timeoutMs: 120000,
+    notes: 'enqueue shellless runner-sync steward reservation'
+  });
 }
 
 export type RunnerSyncForeignClaimInput = {

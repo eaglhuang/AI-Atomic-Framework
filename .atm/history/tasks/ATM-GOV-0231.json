@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0231",
   "title": "Generalized command manifest and recovery emission",
-  "status": "planned",
+  "status": "running",
   "milestone": "ATM-3.0-B0.7",
   "dependencies": [
     "ATM-GOV-0230"
@@ -90,7 +90,83 @@
     }
   },
   "importedAt": "2026-07-21T05:04:41.886Z",
-  "lastTransitionId": "2026-07-21T05-04-42-009Z-import-7c945383d9bb",
-  "lastTransitionAt": "2026-07-21T05:04:42.009Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-21T06-43-59-940Z-claim-4584c4b6fed7",
+  "lastTransitionAt": "2026-07-21T06:43:59.940Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-plan3-captain-20260721-02",
+  "reservedAt": "2026-07-21T06:43:55.822Z",
+  "promotedAt": "2026-07-21T06:43:55.824Z",
+  "claim": {
+    "actorId": "codex-plan3-captain-20260721-02",
+    "leaseId": "lease-07ea7a79bfe1",
+    "claimedAt": "2026-07-21T06:43:55.827Z",
+    "heartbeatAt": "2026-07-21T06:43:55.827Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0231.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-208.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/shared/command-manifest.ts",
+      "packages/cli/src/commands/shared/identity-normalization.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/core/src/schemas/command-manifest.ts",
+      "schemas/atm.command-manifest.v1.schema.json",
+      "tests/cli/command-manifest-recovery-chain.test.ts",
+      "tests/cli/framework-temp-task-id-normalization.test.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260721064355-codex-plan3-captain-20260721-02-4d2664be38",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721064355-codex-plan3-captain-20260721-02-4d2664be38\""
+    }
+  },
+  "startedAt": "2026-07-21T06:43:55.827Z",
+  "startedByActor": "codex-plan3-captain-20260721-02",
+  "startedBySessionId": "session-20260721064355-codex-plan3-captain-20260721-02-ATM-GOV-0231-719ae6ecf7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0231",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0231.*",
+      ".atm/history/task-events/ATM-GOV-0231/**",
+      ".atm/history/tasks/ATM-GOV-0231.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-208.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/shared/command-manifest.ts",
+      "packages/cli/src/commands/shared/identity-normalization.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/core/src/schemas/command-manifest.ts",
+      "schemas/atm.command-manifest.v1.schema.json",
+      "tests/cli/command-manifest-recovery-chain.test.ts",
+      "tests/cli/framework-temp-task-id-normalization.test.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "65c77043362f7961cb0b967a4bc210af40689cc03f41b41b190d246326e449a1",
+    "actorId": "codex-plan3-captain-20260721-02",
+    "sessionId": "session-20260721064355-codex-plan3-captain-20260721-02-ATM-GOV-0231-719ae6ecf7",
+    "laneSession": {
+      "laneSessionId": "lane-20260721064355-codex-plan3-captain-20260721-02-4d2664be38",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721064355-codex-plan3-captain-20260721-02-4d2664be38\""
+    },
+    "createdAt": "2026-07-21T06:43:59.939Z",
+    "status": "active"
+  }
 }
