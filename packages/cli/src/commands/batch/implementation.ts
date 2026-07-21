@@ -92,7 +92,7 @@ const completed = releaseBatchRun(options.cwd, active, 'completed'); return make
 }
 const capturedHeadBeforeClose = readGitHead(options.cwd);
 const closeResult = await runTasks([ 'close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), '--json' ]); if (!closeResult.ok) {
-const closeCategory = categorizeCheckpointCloseFailure(closeResult, currentTaskId, resolvedActor.actorId); return makeResult({ ok: false, command: 'batch', cwd: options.cwd, messages: [message('error', 'ATM_BATCH_CHECKPOINT_CLOSE_FAILED', closeCategory.tldr ?? `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, { batchId: active.batchId, closedTaskId: currentTaskId,
+const closeCategory = categorizeCheckpointCloseFailure(closeResult, currentTaskId, resolvedActor.actorId, options.cwd); return makeResult({ ok: false, command: 'batch', cwd: options.cwd, messages: [message('error', 'ATM_BATCH_CHECKPOINT_CLOSE_FAILED', closeCategory.tldr ?? `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, { batchId: active.batchId, closedTaskId: currentTaskId,
 category: closeCategory.category, reason: closeCategory.reason, requiredCommand: closeCategory.requiredCommand, tldr: closeCategory.tldr, missingValidationPasses: closeCategory.missingValidationPasses, blockingFindings: closeCategory.blockingFindings })], evidence: { action: 'checkpoint', actorId: resolvedActor.actorId, closedTaskId: currentTaskId, held: holdNextClaim,
 historicalDeliveryRefs: batchHistoricalDeliveryRefs, historicalBatchRefs: batchHistoricalBatchRefs, closeHeadCapture: { schemaId: 'atm.batchCheckpointHeadCapture.v1', taskId: currentTaskId, batchId: active.batchId, headBeforeClose: capturedHeadBeforeClose, headAfterClose: readGitHead(options.cwd) }, closeResult: closeResult.evidence, failureCategory: closeCategory }
 });
@@ -573,13 +573,24 @@ const absolutePath = path.isAbsolute(taskPath) ? taskPath : path.resolve(cwd, ta
 const parsed = JSON.parse(readFileSync(absolutePath, 'utf8'));
 const validators = Array.isArray(parsed?.validators) ? parsed.validators : []; return validators.map(String).filter(Boolean); } catch { return []; }
 }
-function categorizeCheckpointCloseFailure( closeResult: { ok: boolean; messages?: readonly { code?: string; data?: Record<string, unknown> }[]; evidence?: unknown }, taskId: string, actorId: string ): { category: string; reason: string; requiredCommand: string | null; tldr: string | null; missingValidationPasses: readonly unknown[]; blockingFindings: readonly unknown[]; } {
-const errorMsg = Array.isArray(closeResult.messages) ? closeResult.messages.find((m) => typeof m.code === 'string' && m.code.startsWith('ATM_TASK_CLOSE')) : null;
+export function categorizeCheckpointCloseFailure( closeResult: { ok: boolean; messages?: readonly { code?: string; data?: Record<string, unknown> }[]; evidence?: unknown }, taskId: string, actorId: string, cwd: string = process.cwd() ): { category: string; reason: string; requiredCommand: string | null; tldr: string | null; missingValidationPasses: readonly unknown[]; blockingFindings: readonly unknown[]; } {
+const messages = Array.isArray(closeResult.messages) ? closeResult.messages : [];
+const errorMsg = messages.find((m) => typeof m.code === 'string' && m.code.startsWith('ATM_TASK_CLOSE')) ?? messages.find((m) => typeof m.code === 'string') ?? null;
 const code = errorMsg?.code ?? 'ATM_TASK_CLOSE_UNKNOWN';
 const tldr = typeof errorMsg?.data?.tldr === 'string' ? errorMsg.data.tldr : null;
 const missingValidationPasses = Array.isArray(errorMsg?.data?.missingValidationPasses) ? (errorMsg.data.missingValidationPasses as readonly unknown[]) : [];
 const blockingFindings = Array.isArray(errorMsg?.data?.blockingFindings) ? (errorMsg.data.blockingFindings as readonly unknown[]) : []; if (code === 'ATM_TASK_CLOSE_EVIDENCE_REQUIRED' || code === 'ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID') { return { category: 'missing-evidence', reason: tldr ?? `Task ${taskId} lacks required command-backed evidence or a valid closure packet.`,
 requiredCommand: `node atm.mjs evidence missing --task ${taskId} --actor ${actorId} --json`, tldr, missingValidationPasses, blockingFindings };
+}
+if (code === 'ATM_RUNNER_STALE_WRITE_REFUSED' || code === 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED') {
+const sealedSourceSha = readGitHead(cwd) ?? '<sealed-source-sha>';
+return { category: 'runner-sync-required', reason: tldr ?? `Task ${taskId} checkpoint needs a runner-sync steward ticket before frozen-runner write close can proceed.`, requiredCommand: `node atm.mjs broker runner-sync enqueue --task ${taskId} --actor ${actorId} --sealed-source-sha ${sealedSourceSha} --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json`, tldr, missingValidationPasses, blockingFindings };
+}
+if (code === 'ATM_SOURCE_FIRST_WRITE_REFUSED') {
+return { category: 'source-first-write-refused', reason: tldr ?? `Task ${taskId} checkpoint attempted source-first write semantics; rerun through frozen node atm.mjs after runner-sync is satisfied.`, requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --json`, tldr, missingValidationPasses, blockingFindings };
+}
+if (code === 'ATM_BROKER_SHARED_QUEUE_BLOCKED') {
+return { category: 'broker-shared-queue-blocked', reason: tldr ?? `Task ${taskId} checkpoint is blocked by a shared-surface broker queue; inspect the broker ticket/status before retrying.`, requiredCommand: `node atm.mjs broker status --task ${taskId} --json`, tldr, missingValidationPasses, blockingFindings };
 }
 if (code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED') { return { category: 'missing-deliverable', reason: `Task ${taskId} has no real non-.atm deliverable diff; implement the required files first.`, requiredCommand: null, tldr, missingValidationPasses, blockingFindings };
 }
