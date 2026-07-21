@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0226",
+  "title": "ATM 3.0 divergence census and replay contract",
+  "status": "planned",
+  "milestone": "ATM-3.0-A",
+  "dependencies": [
+    "TASK-ERR-0003",
+    "TASK-TMP-0004"
+  ],
+  "acceptance": [
+    "Coverage matrix 對所有 shared-write producer/consumer 有唯一 authority 判定，沒有 unknown owner。",
+    "三張歷史 BCR、兩張 task terminal state 與實際 delivery order 被封成 compact digest。",
+    "0014 closure packet 的 changed-files/tree/parent/command-run mismatch 有獨立 compact digest、重現命令與唯一 owner card。",
+    "`ATM-BUG-2026-07-20-213` 的 decision coherence probe 在 frozen/source 皆有 compact receipt；若一致則正式 closeback，若不一致則記錄 contradiction 與 0227 owner，不先寫特例修補。",
+    "canonical backlog census 以 item shards 為 authority，projection-only item count = 0；同 ID 不得因日期省略而對錯 item。",
+    "current-source discrimination matrix 對每個候選記錄 exact backlog ID、probe command、source/frozen result、owner/disposition；`Fixed`、`Open` 與 `inconclusive` 不以聊天判斷。",
+    "不可取得的歷史 timing 欄位有 explicit unavailable receipt，不得填 0 或推測值。",
+    "replay schema 不含固定 task/actor/path/date 分支。",
+    "frozen 紅色 baseline 至少重現一項已知 failure class；若意外全綠，scenario 為 invalid/inconclusive 且不得解鎖 0227 implementation。",
+    "`starvationThresholdMs`、threshold source、`minimumParallelOverlapRatio`、`maximumSerializedAdmissionRatio` 與 runner entrypoint 都在 scenario digest 中於 run 前 sealed。",
+    "0227–0234 的新增路徑在平行施工前已有 atom-map owner；預配置由 task metadata 推導，不維護人工 incident 清單。",
+    "每個 Open backlog row 有可重現 probe、owner card 與 recovery；已修 row 只在 probe 通過後關閉。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/census/**",
+    "packages/core/src/broker/replay/**",
+    "schemas/atm.parallel-replay-scenario.v1.schema.json",
+    "tests/cli/atm-3-divergence-census.test.ts",
+    "tests/cli/parallel-replay-scenario-contract.test.ts",
+    "tests/cli/atm-3-red-baseline-discrimination.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/census/**",
+    "packages/core/src/broker/replay/**",
+    "packages/core/src/schemas/parallel-replay-scenario.ts",
+    "schemas/atm.parallel-replay-scenario.v1.schema.json",
+    "packages/cli/src/commands/broker/census/**",
+    "tests/cli/atm-3-divergence-census.test.ts",
+    "tests/cli/parallel-replay-scenario-contract.test.ts",
+    "tests/cli/atm-3-red-baseline-discrimination.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/atm-3-divergence-census.test.ts",
+    "node --strip-types tests/cli/parallel-replay-scenario-contract.test.ts",
+    "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No broker state mutation or legacy migration in this card.",
+    "No performance verdict from historical evidence alone."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert source/schema changes; retain the immutable evidence digest and never delete runtime history manually.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.census",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.atom-map-owner-registration",
+        "pattern": "Metadata-derived ownership registration in an existing shard",
+        "source": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "disposition": "inline",
+        "inlineReason": "This card only registers Plan 3.0 ownership derived from task metadata; restructuring the canonical shard would expand scope without reducing the census implementation complexity."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0226-atm-3-0-divergence-census-and-replay-contract.task.md",
+    "sectionTitle": "ATM-GOV-0226",
+    "headingLine": 93,
+    "hash": "f684941dda3ea9a6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0226-atm-3-0-divergence-census-and-replay-contract.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:f684941dda3ea9a6adc88e772218add00b28aad3223ab1a848e32fecf23874cf",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:13.823Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:13.823Z",
+  "lastTransitionId": "2026-07-21T05-04-13-952Z-import-82446c2d1338",
+  "lastTransitionAt": "2026-07-21T05:04:13.952Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
