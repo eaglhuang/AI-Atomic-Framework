@@ -582,16 +582,9 @@ const missingValidationPasses = Array.isArray(errorMsg?.data?.missingValidationP
 const blockingFindings = Array.isArray(errorMsg?.data?.blockingFindings) ? (errorMsg.data.blockingFindings as readonly unknown[]) : []; if (code === 'ATM_TASK_CLOSE_EVIDENCE_REQUIRED' || code === 'ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID') { return { category: 'missing-evidence', reason: tldr ?? `Task ${taskId} lacks required command-backed evidence or a valid closure packet.`,
 requiredCommand: `node atm.mjs evidence missing --task ${taskId} --actor ${actorId} --json`, tldr, missingValidationPasses, blockingFindings };
 }
-if (code === 'ATM_RUNNER_STALE_WRITE_REFUSED' || code === 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED') {
-const sealedSourceSha = readGitHead(cwd) ?? '<sealed-source-sha>';
-return { category: 'runner-sync-required', reason: tldr ?? `Task ${taskId} checkpoint needs a runner-sync steward ticket before frozen-runner write close can proceed.`, requiredCommand: `node atm.mjs broker runner-sync enqueue --task ${taskId} --actor ${actorId} --sealed-source-sha ${sealedSourceSha} --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json`, tldr, missingValidationPasses, blockingFindings };
-}
-if (code === 'ATM_SOURCE_FIRST_WRITE_REFUSED') {
-return { category: 'source-first-write-refused', reason: tldr ?? `Task ${taskId} checkpoint attempted source-first write semantics; rerun through frozen node atm.mjs after runner-sync is satisfied.`, requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --json`, tldr, missingValidationPasses, blockingFindings };
-}
-if (code === 'ATM_BROKER_SHARED_QUEUE_BLOCKED') {
-return { category: 'broker-shared-queue-blocked', reason: tldr ?? `Task ${taskId} checkpoint is blocked by a shared-surface broker queue; inspect the broker ticket/status before retrying.`, requiredCommand: `node atm.mjs broker status --task ${taskId} --json`, tldr, missingValidationPasses, blockingFindings };
-}
+if (code === 'ATM_RUNNER_STALE_WRITE_REFUSED' || code === 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED') { const sealedSourceSha = readGitHead(cwd) ?? '<sealed-source-sha>'; return { category: 'runner-sync-required', reason: tldr ?? `Task ${taskId} checkpoint needs a runner-sync steward ticket before frozen-runner write close can proceed.`, requiredCommand: `node atm.mjs broker runner-sync enqueue --task ${taskId} --actor ${actorId} --sealed-source-sha ${sealedSourceSha} --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json`, tldr, missingValidationPasses, blockingFindings }; }
+if (code === 'ATM_SOURCE_FIRST_WRITE_REFUSED') { return { category: 'source-first-write-refused', reason: tldr ?? `Task ${taskId} checkpoint attempted source-first write semantics; rerun through frozen node atm.mjs after runner-sync is satisfied.`, requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --json`, tldr, missingValidationPasses, blockingFindings }; }
+if (code === 'ATM_BROKER_SHARED_QUEUE_BLOCKED') { return { category: 'broker-shared-queue-blocked', reason: tldr ?? `Task ${taskId} checkpoint is blocked by a shared-surface broker queue; inspect the broker ticket/status before retrying.`, requiredCommand: `node atm.mjs broker status --task ${taskId} --json`, tldr, missingValidationPasses, blockingFindings }; }
 if (code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED') { return { category: 'missing-deliverable', reason: `Task ${taskId} has no real non-.atm deliverable diff; implement the required files first.`, requiredCommand: null, tldr, missingValidationPasses, blockingFindings };
 }
 if (code === 'ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE' || code === 'ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED') {
