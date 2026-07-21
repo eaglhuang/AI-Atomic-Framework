@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0228",
+  "title": "Atomic broker projection and reconciliation",
+  "status": "planned",
+  "milestone": "ATM-3.0-B1",
+  "dependencies": [
+    "ATM-GOV-0231"
+  ],
+  "acceptance": [
+    "破壞測試涵蓋寫到一半中止、CAS race、重複 reconcile、Windows sharing violation。",
+    "不可能同時出現兩個有效 publisher generation。",
+    "stale projection 不能授權，reconcile 後 canonical state 與全部 views 一致。",
+    "queue-only trip 保留 ticket/proposal/evidence，沒有 silent loss。",
+    "source 與 frozen `node atm.mjs` 對相同 projection/reconcile probe 的 canonical behavior projection digest 一致，runner digest 已封存。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/projections/**",
+    "packages/core/src/broker/reconcile/**",
+    "packages/cli/src/commands/broker/reconcile/**",
+    "schemas/atm.broker-projection.v1.schema.json",
+    "tests/broker/atomic-projection-reconcile.test.ts",
+    "tests/cli/broker-projection-reconcile.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/ticket-store/**",
+    "packages/core/src/broker/projections/**",
+    "packages/core/src/broker/reconcile/**",
+    "packages/cli/src/commands/broker/reconcile/**",
+    "schemas/atm.broker-projection.v1.schema.json",
+    "tests/broker/atomic-projection-reconcile.test.ts",
+    "tests/cli/broker-projection-reconcile.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/broker/atomic-projection-reconcile.test.ts",
+    "node --strip-types tests/cli/broker-projection-reconcile.test.ts",
+    "npm run validate:cli",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No scope inference or runner-sync lifecycle.",
+    "No deletion of legacy BCR files in this card."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "multiprocess-command-backed",
+  "rollbackStrategy": "circuit-breaker-and-revert",
+  "rollbackNotes": "Trip to queue-only, preserve canonical tickets, then revert projection writers; readers remain fail closed on digest mismatch.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.projection-reconcile",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0228-atomic-broker-projection-and-reconciliation.task.md",
+    "sectionTitle": "ATM-GOV-0228",
+    "headingLine": 66,
+    "hash": "8f1fe7d1731278e2",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0228-atomic-broker-projection-and-reconciliation.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:8f1fe7d1731278e241dc02ea262d3eff7bc4091c3305832021c1c0137269e6ca",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:35.086Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:35.086Z",
+  "lastTransitionId": "2026-07-21T05-04-35-255Z-import-f9f34ea8b576",
+  "lastTransitionAt": "2026-07-21T05:04:35.255Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
