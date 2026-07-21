@@ -16,19 +16,23 @@
     ]
   },
   "targetCommit": "4f7677c14e1653c59df6ce87327a4319857967a8",
-  "governedTreeSha": "fd79a7358ccd42d764ae73553c164fa512948b5c",
+  "governedTreeSha": "7d00dff9a90ef18dcdb332e1e72071e5cc1bb9b0",
   "targetCommitDelta": {
-    "currentCommitSha": "4f7677c14e1653c59df6ce87327a4319857967a8",
+    "currentCommitSha": "8385b4757a5faee33a9df9911c0291457c57dccf",
     "parentCommitShas": [
       "4f7677c14e1653c59df6ce87327a4319857967a8"
     ],
-    "governedTreeSha": "fd79a7358ccd42d764ae73553c164fa512948b5c",
+    "governedTreeSha": "7d00dff9a90ef18dcdb332e1e72071e5cc1bb9b0",
     "changedFiles": [
       ".atm/history/evidence/ATM-GOV-0235.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0235.closure-packet.json",
       ".atm/history/evidence/ATM-GOV-0235.json",
+      ".atm/history/evidence/git-head.jsonl",
       ".atm/history/task-events/ATM-GOV-0235/2026-07-21T08-02-28-979Z-reserve-fba59f2bd6ed.json",
       ".atm/history/task-events/ATM-GOV-0235/2026-07-21T08-02-28-981Z-promote-61345e4f036f.json",
       ".atm/history/task-events/ATM-GOV-0235/2026-07-21T08-02-31-209Z-claim-439e0cc094e7.json",
+      ".atm/history/task-events/ATM-GOV-0235/2026-07-21T08-08-27-697Z-close-d13a1dffd525.json",
+      ".atm/history/task-events/ATM-GOV-0235/2026-07-21T08-08-27-825Z-lock-cleanup-f84580c3c87e.json",
       ".atm/history/tasks/ATM-GOV-0235.json",
       "docs/governance/atm-3-replay-evidence.md",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-222.json",
@@ -164,5 +168,13 @@
   "sessionId": "session-20260721080228-codex-plan3-captain-20260721-02-ATM-GOV-0235-4b6e8a6da0",
   "attestation": null,
   "historicalDeliveryProvenance": null,
-  "teamSummary": null
+  "teamSummary": null,
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-07-21T09:54:50.781Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "8385b4757a5faee33a9df9911c0291457c57dccf",
+    "repairedTargetCommitSha": "4f7677c14e1653c59df6ce87327a4319857967a8",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
+  }
 }
