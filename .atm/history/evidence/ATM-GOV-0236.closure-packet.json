@@ -1,0 +1,204 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0236",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4cc69b792e2e3c9e6cf4687f4d235daf851ca293",
+  "governedTreeSha": "9f8e28fc4be5f1bd3cc402945181ce7ed60c2913",
+  "targetCommitDelta": {
+    "currentCommitSha": "4cc69b792e2e3c9e6cf4687f4d235daf851ca293",
+    "parentCommitShas": [
+      "4cc69b792e2e3c9e6cf4687f4d235daf851ca293"
+    ],
+    "governedTreeSha": "9f8e28fc4be5f1bd3cc402945181ce7ed60c2913",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-045.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/commands/git-governance/implementation.js",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-045.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+      "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/protected-ledger-destructive-guard.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da188c94558d46458b020a73937f0b0ee77a4f6f351b9381435e040e77fb9622",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d98119250970eb542719742efa0a6189eaee60e3cdeb05cfdba30c75000bb783",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan3-shared-governance-state-readiness.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:84288bdf2acfb444ec7191053709294a8db72e6de9d671027fd8d4083d5a6131",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2e64da8d3d82e75154ce30741771cf751988fa5c235be46aff6451da559a73a7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:cec564f440315f75606419d9776fa124845c57d5dea000b68703365d798e8f2f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/plan3-shared-governance-state-readiness.test.ts",
+    "node --strip-types tests/cli/protected-ledger-destructive-guard.test.ts",
+    "node --strip-types tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-21T06:17:32.869Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0236.*",
+      ".atm/history/task-events/ATM-GOV-0236/**",
+      ".atm/history/tasks/ATM-GOV-0236.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-045.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+      "tests/cli/protected-ledger-destructive-guard.test.ts",
+      "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+      "tests/cli/protected-ledger-destructive-guard.test.ts",
+      "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0236.json",
+  "closedAt": "2026-07-21T06:17:32.869Z",
+  "closedByActor": "codex-plan3-captain-20260721-01",
+  "sessionId": "session-20260721060558-codex-plan3-captain-20260721-01-ATM-GOV-0236-f42008a0aa",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "4cc69b792e2e3c9e6cf4687f4d235daf851ca293",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-045.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+      "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0236.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0236/2026-07-21T06-05-58-234Z-reserve-c58311d8616b.json",
+      ".atm/history/task-events/ATM-GOV-0236/2026-07-21T06-05-58-236Z-promote-1d92d2c63796.json",
+      ".atm/history/task-events/ATM-GOV-0236/2026-07-21T06-06-02-866Z-claim-cdad89e8ec2c.json",
+      ".atm/history/tasks/ATM-GOV-0236.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

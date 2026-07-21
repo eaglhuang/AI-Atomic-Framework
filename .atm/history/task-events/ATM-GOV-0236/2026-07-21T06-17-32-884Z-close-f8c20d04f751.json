@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T06-17-32-884Z-close-f8c20d04f751",
+  "taskId": "ATM-GOV-0236",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-01",
+  "sessionId": "session-20260721060558-codex-plan3-captain-20260721-01-ATM-GOV-0236-f42008a0aa",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0236.json",
+  "taskSha256": "sha256:66d488b381ed5d8fc78fed91aafa54fe219cc5cb8e20ba9e4a7e203723ff0851",
+  "createdAt": "2026-07-21T06:17:32.884Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0236 --actor codex-plan3-captain-20260721-01 --status done --historical-delivery 4cc69b792e2e3c9e6cf4687f4d235daf851ca293",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260721060558-codex-plan3-captain-20260721-01-ATM-GOV-0236-f42008a0aa",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0236.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/plan3-shared-governance-state-readiness.test.ts",
+      "node --strip-types tests/cli/protected-ledger-destructive-guard.test.ts",
+      "node --strip-types tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T06:17:32.869Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0236.*",
+        ".atm/history/task-events/ATM-GOV-0236/**",
+        ".atm/history/tasks/ATM-GOV-0236.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-015.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-045.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+        "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+        "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+        "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+        "tests/cli/protected-ledger-destructive-guard.test.ts",
+        "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+        "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+        "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+        "tests/cli/plan3-shared-governance-state-readiness.test.ts",
+        "tests/cli/protected-ledger-destructive-guard.test.ts",
+        "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

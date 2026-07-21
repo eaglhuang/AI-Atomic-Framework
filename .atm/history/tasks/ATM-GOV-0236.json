@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0236",
   "title": "Plan 3.0 shared governance state readiness gate",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.0-B0.5",
   "dependencies": [
     "ATM-GOV-0227"
@@ -128,8 +128,8 @@
     }
   },
   "importedAt": "2026-07-21T05:04:53.226Z",
-  "lastTransitionId": "2026-07-21T06-06-02-866Z-claim-cdad89e8ec2c",
-  "lastTransitionAt": "2026-07-21T06:06:02.866Z",
+  "lastTransitionId": "2026-07-21T06-17-32-884Z-close-f8c20d04f751",
+  "lastTransitionAt": "2026-07-21T06:17:32.884Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-plan3-captain-20260721-01",
   "reservedAt": "2026-07-21T06:05:58.233Z",
@@ -138,7 +138,7 @@
     "actorId": "codex-plan3-captain-20260721-01",
     "leaseId": "lease-72f02ad7c31e",
     "claimedAt": "2026-07-21T06:05:58.239Z",
-    "heartbeatAt": "2026-07-21T06:05:58.239Z",
+    "heartbeatAt": "2026-07-21T06:17:32.880Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0236.json",
@@ -155,14 +155,14 @@
       "tests/cli/protected-ledger-destructive-guard.test.ts",
       "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260721060558-codex-plan3-captain-20260721-01-b0b725ac96",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721060558-codex-plan3-captain-20260721-01-b0b725ac96\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-21T06:05:58.239Z",
   "startedByActor": "codex-plan3-captain-20260721-01",
@@ -206,5 +206,9 @@
     },
     "createdAt": "2026-07-21T06:06:02.865Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-21T06:17:32.880Z",
+  "closedByActor": "codex-plan3-captain-20260721-01",
+  "closedBySessionId": "session-20260721060558-codex-plan3-captain-20260721-01-ATM-GOV-0236-f42008a0aa",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0236.closure-packet.json"
 }
