@@ -1,0 +1,233 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0233",
+  "updatedAt": "2026-07-21T07:41:04.888Z",
+  "updatedBy": "codex-plan3-captain-20260721-02",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/broker-authorization-consumer-migration.test.ts",
+    "node --strip-types tests/cli/legacy-bcr-migration-rollback.test.ts",
+    "node --strip-types tests/cli/legacy-bcr-migration.test.ts",
+    "node --strip-types tests/cli/single-successor-wakeup.test.ts",
+    "node --strip-types tests/cli/taskflow-close-exactly-once-result.test.ts",
+    "node --strip-types tests/cli/taskflow-close-index-isolation.test.ts",
+    "node --strip-types tests/cli/transactional-ticket-completion.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections",
+    "validate:schemas"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/transactional-ticket-completion.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8b30e0303e9a7352344347cbac9d5325f82ee1f171e2e9bee5d6a6dbd0da8a9c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/transactional-ticket-completion.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:38:50.852Z",
+      "startedAt": "2026-07-21T07:38:50.558Z",
+      "finishedAt": "2026-07-21T07:38:50.852Z",
+      "durationMs": 294,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/legacy-bcr-migration.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e2f36df2dbc6f2793a823532d7449572447af93442f06502c24d03832d32e91",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/legacy-bcr-migration.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:38:53.211Z",
+      "startedAt": "2026-07-21T07:38:52.916Z",
+      "finishedAt": "2026-07-21T07:38:53.211Z",
+      "durationMs": 295,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/legacy-bcr-migration-rollback.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8935649121a63b0391882a4196911dc85ea238fcfbe7cd14dfb55871f7f96f08",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/legacy-bcr-migration-rollback.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:38:56.136Z",
+      "startedAt": "2026-07-21T07:38:55.837Z",
+      "finishedAt": "2026-07-21T07:38:56.136Z",
+      "durationMs": 299,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/single-successor-wakeup.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5aa76e110f46533439d25ae728c1a9499b1c87a4e809b69be0f522de9d59e15c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/single-successor-wakeup.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:38:58.707Z",
+      "startedAt": "2026-07-21T07:38:58.354Z",
+      "finishedAt": "2026-07-21T07:38:58.707Z",
+      "durationMs": 353,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/broker-authorization-consumer-migration.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bf0e3cbdc8ffbfcbc4707b897c0f1a01ac6d3bad21bf59a996d2947d00c871eb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/broker-authorization-consumer-migration.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:39:01.425Z",
+      "startedAt": "2026-07-21T07:39:01.081Z",
+      "finishedAt": "2026-07-21T07:39:01.425Z",
+      "durationMs": 344,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-index-isolation.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:897a010ae4544659636722bb8c777e579ef328ce6db66424e99147e54d8354de",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-close-index-isolation.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:39:04.383Z",
+      "startedAt": "2026-07-21T07:39:04.089Z",
+      "finishedAt": "2026-07-21T07:39:04.383Z",
+      "durationMs": 294,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-exactly-once-result.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cf3db454a7ca92379b172f386555a0ffede398a1241161d1cfc00ec8ab400c66",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-close-exactly-once-result.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:39:07.322Z",
+      "startedAt": "2026-07-21T07:39:07.013Z",
+      "finishedAt": "2026-07-21T07:39:07.322Z",
+      "durationMs": 309,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3302b7203a8da0112461a61a9427dd9d765a607288b3feea8d8124c93f3b75d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:governance-projections"
+      ],
+      "generatedAt": "2026-07-21T07:39:10.193Z",
+      "startedAt": "2026-07-21T07:39:09.879Z",
+      "finishedAt": "2026-07-21T07:39:10.193Z",
+      "durationMs": 314,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f320d2d889fd75b1d015db4be8cf4fe67a94047bc51204d17df677b691dad22c",
+      "stderrSha256": "sha256:0361a56aab81fef5d89df2102c2f11aa1528db9bf6a4da423f5f2af60ca8af48",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-21T07:39:30.319Z",
+      "startedAt": "2026-07-21T07:39:12.740Z",
+      "finishedAt": "2026-07-21T07:39:30.319Z",
+      "durationMs": 17579,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:schemas",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:schemas"
+      ],
+      "generatedAt": "2026-07-21T07:39:34.480Z",
+      "startedAt": "2026-07-21T07:39:32.745Z",
+      "finishedAt": "2026-07-21T07:39:34.480Z",
+      "durationMs": 1735,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-21T07:39:47.062Z",
+      "startedAt": "2026-07-21T07:39:37.358Z",
+      "finishedAt": "2026-07-21T07:39:47.062Z",
+      "durationMs": 9704,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-21T07:39:49.468Z",
+      "startedAt": "2026-07-21T07:39:49.192Z",
+      "finishedAt": "2026-07-21T07:39:49.468Z",
+      "durationMs": 276,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-21T07:41:04.887Z",
+      "startedAt": "2026-07-21T07:40:16.180Z",
+      "finishedAt": "2026-07-21T07:41:04.887Z",
+      "durationMs": 48707,
+      "runnerKind": "dev-source",
+      "sourceCommit": "240ee642ef62f8aa2ae31f50f45e100be28cc2a5",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
