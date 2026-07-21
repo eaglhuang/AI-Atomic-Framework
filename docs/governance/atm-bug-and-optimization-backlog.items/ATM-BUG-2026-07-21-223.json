@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-21-223",
+  "date": "2026-07-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Validator scheduler / resource-aware parallelism",
+  "finding": "`validate:standard` currently offers all-or-nothing serial/parallel execution. Running the full standard profile with `--parallel --validator-timeout-ms 180000` produced 7 apparent failures/timeouts, but the same resource-heavy validators passed when run in isolation or serial lanes. This creates false red gates and hides the real distinction between functional failure, timeout, and resource contention.",
+  "expectedBehavior": "The validator runner should use declared scheduler metadata such as `parallelSafe`, `resourceLocks`, `expectedDurationMs`, and per-validator timeout. Parallel-safe validators should run concurrently, while validators sharing global resources such as `.atm/runtime`, git hooks, git index, emergency audit, temp worktree bootstrap, runner cache, or release artifacts should be serialized into compatible lanes. Summaries should classify functional failure, timeout, scheduler/resource contention, and flaky isolation needs separately.",
+  "evidenceOrRepro": "`node --strip-types scripts/run-validators.ts standard --parallel --validator-timeout-ms 180000 --json --run-id plan3-final-standard-diagnostic` produced total=86, passed=79, failed=7 in 188303ms. Failed/timeboxed validators included validate-task-import, validate-task-ledger-governance, validate-git-head-evidence, validate-git-hooks-enforcement, pre-team-foundation-gate, validate-examples, and validate-test-facade. Follow-up isolated runs passed: validate-task-import 99.2s, validate-task-ledger-governance 124.2s, validate-git-head-evidence 88.4s, pre-team-foundation-gate 54.7s, validate-test-facade 133.1s, validate-git-hooks-enforcement 269.6s, validate-examples 71.7s.",
+  "followUp": "Open a focused ATM task to add resource-aware validator scheduling metadata and lane execution to `scripts/run-validators.ts` / `scripts/validators.config.json`, then make `npm run validate:standard` use that scheduler by default. Until then, push readiness should run parallel-safe validators separately from heavyweight resource-sensitive validators and cite this backlog item when treating parallel false reds as scheduler contention rather than product failure."
+}
