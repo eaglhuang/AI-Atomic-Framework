@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T07-20-48-343Z-close-e76d9b32bcb4",
+  "taskId": "ATM-GOV-0229",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721071208-codex-plan3-captain-20260721-02-ATM-GOV-0229-ccb5204819",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0229.json",
+  "taskSha256": "sha256:3a03e2b37ac2bd14649bd88b9fae7f63ccaaf8347c1c27d7d3cb17c3a8451f4b",
+  "createdAt": "2026-07-21T07:20:48.343Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0229 --actor codex-plan3-captain-20260721-02 --status done --historical-delivery 3683b8090296e46c44b6a45247038a36ee3c7fd7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260721071208-codex-plan3-captain-20260721-02-ATM-GOV-0229-ccb5204819",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0229.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/linked-surface-scope-preflight.test.ts",
+      "node --strip-types tests/cli/scope-amendment-rearbitration.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T07:20:48.335Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0229.*",
+        ".atm/history/task-events/ATM-GOV-0229/**",
+        ".atm/history/tasks/ATM-GOV-0229.json",
+        "packages/cli/src/commands/tasks/scope-amendment/**",
+        "packages/cli/src/commands/tasks/scope-preflight/**",
+        "packages/core/src/schemas/linked-surface-closure.ts",
+        "packages/core/src/scope/linked-surface/**",
+        "schemas/atm.linked-surface-closure.v1.schema.json",
+        "tests/cli/linked-surface-scope-preflight.test.ts",
+        "tests/cli/scope-amendment-rearbitration.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/scope-amendment/**",
+        "packages/cli/src/commands/tasks/scope-preflight/**",
+        "packages/core/src/schemas/linked-surface-closure.ts",
+        "packages/core/src/scope/linked-surface/**",
+        "schemas/atm.linked-surface-closure.v1.schema.json",
+        "tests/cli/linked-surface-scope-preflight.test.ts",
+        "tests/cli/scope-amendment-rearbitration.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

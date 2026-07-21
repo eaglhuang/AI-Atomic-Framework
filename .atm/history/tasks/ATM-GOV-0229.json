@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0229",
   "title": "Linked surface scope closure inference",
-  "status": "planned",
+  "status": "done",
   "milestone": "ATM-3.0-B1",
   "dependencies": [
     "ATM-GOV-0231"
@@ -79,7 +79,77 @@
     }
   },
   "importedAt": "2026-07-21T05:04:37.473Z",
-  "lastTransitionId": "2026-07-21T05-04-37-618Z-import-148b8e9fc1b2",
-  "lastTransitionAt": "2026-07-21T05:04:37.618Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-21T07-20-48-343Z-close-e76d9b32bcb4",
+  "lastTransitionAt": "2026-07-21T07:20:48.343Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-plan3-captain-20260721-02",
+  "reservedAt": "2026-07-21T07:12:08.856Z",
+  "promotedAt": "2026-07-21T07:12:08.859Z",
+  "claim": {
+    "actorId": "codex-plan3-captain-20260721-02",
+    "leaseId": "lease-2f98541193ec",
+    "claimedAt": "2026-07-21T07:12:08.862Z",
+    "heartbeatAt": "2026-07-21T07:20:48.341Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0229.json",
+      "packages/cli/src/commands/tasks/scope-amendment/**",
+      "packages/cli/src/commands/tasks/scope-preflight/**",
+      "packages/core/src/schemas/linked-surface-closure.ts",
+      "packages/core/src/scope/linked-surface/**",
+      "schemas/atm.linked-surface-closure.v1.schema.json",
+      "tests/cli/linked-surface-scope-preflight.test.ts",
+      "tests/cli/scope-amendment-rearbitration.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260721071208-codex-plan3-captain-20260721-02-5cacc62f34",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721071208-codex-plan3-captain-20260721-02-5cacc62f34\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-21T07:12:08.862Z",
+  "startedByActor": "codex-plan3-captain-20260721-02",
+  "startedBySessionId": "session-20260721071208-codex-plan3-captain-20260721-02-ATM-GOV-0229-ccb5204819",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0229",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0229.*",
+      ".atm/history/task-events/ATM-GOV-0229/**",
+      ".atm/history/tasks/ATM-GOV-0229.json",
+      "packages/cli/src/commands/tasks/scope-amendment/**",
+      "packages/cli/src/commands/tasks/scope-preflight/**",
+      "packages/core/src/schemas/linked-surface-closure.ts",
+      "packages/core/src/scope/linked-surface/**",
+      "schemas/atm.linked-surface-closure.v1.schema.json",
+      "tests/cli/linked-surface-scope-preflight.test.ts",
+      "tests/cli/scope-amendment-rearbitration.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "62b8c162fd4b36faeb024ea9edd2dd7b184c909b01e08a793ef2fda231e443ef",
+    "actorId": "codex-plan3-captain-20260721-02",
+    "sessionId": "session-20260721071208-codex-plan3-captain-20260721-02-ATM-GOV-0229-ccb5204819",
+    "laneSession": {
+      "laneSessionId": "lane-20260721071208-codex-plan3-captain-20260721-02-5cacc62f34",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721071208-codex-plan3-captain-20260721-02-5cacc62f34\""
+    },
+    "createdAt": "2026-07-21T07:12:12.821Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-21T07:20:48.341Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "closedBySessionId": "session-20260721071208-codex-plan3-captain-20260721-02-ATM-GOV-0229-ccb5204819",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0229.closure-packet.json"
 }
