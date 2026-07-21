@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T05-39-00-270Z-close-f258e3f52917",
+  "taskId": "ATM-GOV-0226",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-01",
+  "sessionId": "session-20260721052904-codex-plan3-captain-20260721-01-ATM-GOV-0226-2cf83e903e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0226.json",
+  "taskSha256": "sha256:fd18b11614dd43819efba6ccdf9789037eebe65d1e110fbd6be1203dc936b884",
+  "createdAt": "2026-07-21T05:39:00.270Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0226 --actor codex-plan3-captain-20260721-01 --status done --historical-delivery 3c9bbb60c121e182a74e1f54f52f8c52e75d2c49",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260721052904-codex-plan3-captain-20260721-01-ATM-GOV-0226-2cf83e903e",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0226.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/atm-3-divergence-census.test.ts",
+      "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+      "node --strip-types tests/cli/parallel-replay-scenario-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T05:39:00.254Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0226.*",
+        ".atm/history/task-events/ATM-GOV-0226/**",
+        ".atm/history/tasks/ATM-GOV-0226.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/**",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/broker/census/**",
+        "packages/core/src/broker/census/**",
+        "packages/core/src/broker/replay/**",
+        "packages/core/src/schemas/parallel-replay-scenario.ts",
+        "schemas/atm.parallel-replay-scenario.v1.schema.json",
+        "tests/cli/atm-3-divergence-census.test.ts",
+        "tests/cli/atm-3-red-baseline-discrimination.test.ts",
+        "tests/cli/parallel-replay-scenario-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/census/**",
+        "packages/core/src/broker/census/**",
+        "packages/core/src/broker/replay/**",
+        "packages/core/src/schemas/parallel-replay-scenario.ts",
+        "schemas/atm.parallel-replay-scenario.v1.schema.json",
+        "tests/cli/atm-3-divergence-census.test.ts",
+        "tests/cli/atm-3-red-baseline-discrimination.test.ts",
+        "tests/cli/parallel-replay-scenario-contract.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
