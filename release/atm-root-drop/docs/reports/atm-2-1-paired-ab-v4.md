@@ -1,6 +1,6 @@
 # ATM 2.1 Paired AB v4
 
-Generated: 2026-07-20T18:26:03.097Z
+Generated: 2026-07-21T16:17:39.391Z
 Task: ATM-GOV-0224
 Verdict: pass
 
@@ -14,9 +14,9 @@ Verdict: pass
 
 ## Metrics
 
-- median makespan improvement: 35.8%
-- active throughput improvement: 56%
-- production cost ratio: 1.06
+- median makespan improvement: 40.8%
+- active throughput improvement: 62.3%
+- production cost ratio: 0.575
 - coverage: 100%
 
 ## Safety
@@ -24,7 +24,7 @@ Verdict: pass
 - controller verdict: pass
 - fallback mode: queue-only
 - reset eligible: true
-- evidence digest: sha256:7811c0cee0383a4888f665a638aec13e8c77b517edaf62719033468cc320e7c9
+- evidence digest: sha256:de461aa49b08a478fef3409e0412038cbbcdb956cb61a5c919a356067f585118
 - silent overwrite: 0
 - escaped conflict: 0
 - duplicate side effect: 0

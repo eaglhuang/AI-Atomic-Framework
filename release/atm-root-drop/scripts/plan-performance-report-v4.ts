@@ -11,12 +11,23 @@ export type PairedAbV4Cell = {
   readonly makespanMs: number;
   readonly activeThroughput: number;
   readonly productionCostUnits: number;
+  readonly workloadReceipts?: readonly PairedAbV4CommandReceipt[];
   readonly sideEffectCounts: {
     readonly silentOverwrite: number;
     readonly escapedConflict: number;
     readonly duplicateSideEffect: number;
     readonly unresolvedStarvation: number;
   };
+};
+
+export type PairedAbV4CommandReceipt = {
+  readonly command: string;
+  readonly startedAtMs: number;
+  readonly finishedAtMs: number;
+  readonly durationMs: number;
+  readonly exitCode: number;
+  readonly stdoutDigest: string;
+  readonly stderrDigest: string;
 };
 
 export type PairedAbV4Summary = {
