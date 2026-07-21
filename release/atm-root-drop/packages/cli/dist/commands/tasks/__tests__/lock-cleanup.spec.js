@@ -108,4 +108,80 @@ assert.equal(activeTaskAfter.taskDirectionLock.status, 'released', 'canonical di
 assert.ok(activeTaskAfter.lastTransitionId, 'active lock cleanup must write a governed transition');
 assert.ok(existsSync(path.join(activeLockRepo, '.atm/history/task-events', activeTaskId, `${activeTaskAfter.lastTransitionId}.json`)), 'active lock cleanup must create a matching task-event file');
 assert.equal(existsSync(activeSidecarPath), false, 'direction sidecar must be removed');
+const brokerCleanupRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-lock-cleanup-broker-spec-'));
+const brokerTaskId = 'TASK-SCOPE-CLEANUP-0003';
+const brokerActorId = 'coordinator';
+writeJson(path.join(brokerCleanupRepo, '.atm/history/tasks', `${brokerTaskId}.json`), {
+    workItemId: brokerTaskId,
+    title: brokerTaskId,
+    status: 'done',
+    claim: { state: 'active', actorId: brokerActorId, heartbeatAt: new Date().toISOString() }
+});
+writeJson(path.join(brokerCleanupRepo, '.atm/runtime/locks', `${brokerTaskId}.lock.json`), {
+    schemaId: 'atm.governanceScopeLock',
+    workItemId: brokerTaskId,
+    status: 'active',
+    lockedBy: brokerActorId
+});
+writeJson(path.join(brokerCleanupRepo, '.atm/runtime/write-broker.registry.json'), {
+    schemaId: 'atm.writeBrokerRegistry.v1',
+    specVersion: '0.1.0',
+    repoId: 'fixture',
+    workspaceId: 'main',
+    currentEpoch: 1,
+    activeIntents: [{
+            intentId: 'intent-terminal',
+            taskId: brokerTaskId,
+            actorId: brokerActorId,
+            baseCommit: 'base',
+            resourceKeys: { files: ['release/atm-onefile/atm.mjs'], atomIds: [], atomCids: [], generators: [], projections: [], registries: [], validators: [], artifacts: [] },
+            leaseEpoch: 1,
+            leaseSeconds: 1800,
+            leaseMaxSeconds: 1800,
+            heartbeatAt: '2026-07-21T00:00:00.000Z',
+            lane: 'direct-brokered',
+            expiresAt: '2099-01-01T00:00:00.000Z'
+        }]
+});
+writeJson(path.join(brokerCleanupRepo, '.atm/runtime/runner-sync-steward-queue.json'), {
+    schemaId: 'atm.runnerSyncStewardQueue.v1',
+    specVersion: '0.1.0',
+    stewardKey: 'atm.runner-sync.coalescing-steward',
+    updatedAt: '2026-07-21T00:00:00.000Z',
+    groups: [{
+            stewardWorkId: 'runner-sync-terminal',
+            sealedSourceSha: '0123456789abcdef0123456789abcdef01234567',
+            waveId: null,
+            surfaceFamily: 'runner-sync',
+            queuePosition: 1,
+            status: 'queue-head',
+            createdAt: '2026-07-21T00:00:00.000Z',
+            updatedAt: '2026-07-21T00:00:00.000Z',
+            requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+            waitingTasks: [brokerTaskId],
+            suggestedNextAction: 'run runner sync',
+            requests: [{
+                    taskId: brokerTaskId,
+                    actorId: brokerActorId,
+                    sealedSourceSha: '0123456789abcdef0123456789abcdef01234567',
+                    requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+                    waveId: null,
+                    surfaceFamily: 'runner-sync',
+                    validators: [],
+                    createdAt: '2026-07-21T00:00:00.000Z',
+                    heartbeatAt: '2026-07-21T00:00:00.000Z',
+                    expiresAt: '2099-01-01T00:00:00.000Z',
+                    ttlSeconds: 1800,
+                    queuePosition: 1,
+                    suggestedNextAction: 'run runner sync'
+                }]
+        }]
+});
+const brokerCleanup = await runTasks(['lock', 'cleanup', '--cwd', brokerCleanupRepo, '--task', brokerTaskId, '--actor', brokerActorId, '--json']);
+assert.equal(brokerCleanup.ok, true, 'terminal lock cleanup should succeed with broker residue');
+assert.ok(brokerCleanup.evidence.cleanupActions.includes('released-terminal-broker-intents'), 'terminal cleanup must release broker write intents');
+const brokerRegistryAfter = readJson(path.join(brokerCleanupRepo, '.atm/runtime/write-broker.registry.json'));
+assert.equal(brokerRegistryAfter.activeIntents.length, 0, 'terminal cleanup must remove broker active intent for the task');
+const runnerSyncQueueAfter = readJson(path.join(brokerCleanupRepo, '.atm/runtime/runner-sync-steward-queue.json'));
+assert.equal(runnerSyncQueueAfter.groups.length, 0, 'terminal cleanup must remove runner-sync steward requests for the task');
 console.log('[lock-cleanup.spec] ok');

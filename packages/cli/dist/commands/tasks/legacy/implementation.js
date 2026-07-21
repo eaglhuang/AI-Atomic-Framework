@@ -285,7 +285,17 @@ async function cleanupTaskLock(input) { const { cwd, taskId, actorId } = input; 
 } if (existsSync(sidecarPath)) {
     rmSync(sidecarPath, { force: true });
     cleanupActions.push('removed-direction-sidecar');
-} const reportPath = writeLockCleanupReport({ cwd, taskId, actorId, staleReasons, cleanupActions, reason: input.reason }); return { action: 'lock-cleanup', taskId, actorId, staleReasons, cleanupActions, reportPath, transitionPath: taskLedgerTransitionPath }; }
+} let terminalBrokerCleanupResult = null; if (currentStatus === 'done' || currentStatus === 'abandoned' || currentStatus === 'blocked') {
+    try {
+        terminalBrokerCleanupResult = await cleanupTerminalBrokerIntents({ cwd, taskId, actorId });
+        cleanupActions.push('released-terminal-broker-intents');
+    }
+    catch (error) {
+        terminalBrokerCleanupResult = { ok: false, code: error?.code ?? null, message: error instanceof Error ? error.message : String(error) };
+        cleanupActions.push('terminal-broker-intent-cleanup-failed');
+    }
+} const reportPath = writeLockCleanupReport({ cwd, taskId, actorId, staleReasons, cleanupActions, reason: input.reason }); return { action: 'lock-cleanup', taskId, actorId, staleReasons, cleanupActions, reportPath, transitionPath: taskLedgerTransitionPath, terminalBrokerCleanupResult }; }
+async function cleanupTerminalBrokerIntents(input) { const { runBroker } = await import('../../broker/implementation.js'); return await runBroker(['release', '--cwd', input.cwd, '--task', input.taskId, '--actor', input.actorId]); }
 function runTasksQueue(argv) { const action = (argv[0] ?? 'status').toLowerCase(); const options = parseQueueOptions(argv.slice(action === 'status' || action === 'abandon' ? 1 : 0)); if (action === 'status') {
     const activeQueue = findActiveTaskQueue(options.cwd);
     return makeResult({ ok: true, command: 'tasks', cwd: options.cwd, messages: [message('info', activeQueue ? 'ATM_TASK_QUEUE_ACTIVE' : 'ATM_TASK_QUEUE_EMPTY', activeQueue ? `Active task queue ${activeQueue.queueId} is at index ${activeQueue.currentIndex}.` : 'No active task queue is recorded.', { queueId: activeQueue?.queueId ?? null, queueHeadTaskId: activeQueue ? activeQueue.taskIds[activeQueue.currentIndex] ?? null : null })], evidence: { action: 'queue status', activeQueue } });
