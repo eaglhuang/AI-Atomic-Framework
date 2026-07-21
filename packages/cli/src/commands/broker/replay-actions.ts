@@ -1,7 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
 import { makeResult, message } from '../shared.ts';
 import type { ParsedBrokerOptions } from './parser.ts';
+import { inspectCommandBackedMatrix } from './replay/command-backed-matrix.ts';
 import {
   runFrozenParallelReplay,
   runRuntimeDogfoodLifecycle,
@@ -145,29 +144,4 @@ async function brokerReplayDogfood(options: ParsedBrokerOptions) {
 function requiredReplayIntersection(options: ParsedBrokerOptions): readonly string[] {
   const surfaces = options.surfaces.map((entry) => String(entry).trim()).filter(Boolean);
   return surfaces.length > 0 ? surfaces : defaultIntersection;
-}
-
-function inspectCommandBackedMatrix(cwd: string) {
-  const cellsPath = path.join(cwd, 'artifacts/generated/atm-ab-v4/cells.json');
-  if (!existsSync(cellsPath)) {
-    return {
-      cellsPath: 'artifacts/generated/atm-ab-v4/cells.json',
-      cellCount: 0,
-      commandBackedCount: 0,
-      missing: true
-    };
-  }
-  const cells = JSON.parse(readFileSync(cellsPath, 'utf8'));
-  const cellArray = Array.isArray(cells) ? cells : [];
-  const commandBackedCount = cellArray.filter((cell) =>
-    Array.isArray(cell?.commandReceipts) ||
-    Array.isArray(cell?.workloadReceipts) ||
-    typeof cell?.commandDigest === 'string'
-  ).length;
-  return {
-    cellsPath: 'artifacts/generated/atm-ab-v4/cells.json',
-    cellCount: cellArray.length,
-    commandBackedCount,
-    missing: false
-  };
 }

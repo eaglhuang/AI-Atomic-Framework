@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { hasCommandBackedCellEvidence } from '../../packages/cli/src/commands/broker/replay/command-backed-matrix.ts';
 
 const root = process.cwd();
 const script = path.join(root, 'scripts/diagnose-plan3-evidence-closure.ts');
@@ -25,6 +26,25 @@ assert.equal(
   blockedReport.checks.find((entry: any) => entry.name === 'formula-generated-matrix-disclosed')?.ok,
   true,
   'diagnostic must explicitly disclose formula-generated matrix source'
+);
+assert.equal(
+  hasCommandBackedCellEvidence({ commandDigest: 'sha256:'.padEnd(71, 'a') }),
+  false,
+  'digest-only replay cells must not satisfy the command-backed closure contract'
+);
+assert.equal(
+  hasCommandBackedCellEvidence({
+    workloadReceipts: [{
+      command: 'node atm.mjs --version',
+      exitCode: 0,
+      startedAtMs: 1,
+      finishedAtMs: 2,
+      stdoutDigest: `sha256:${'a'.repeat(64)}`,
+      stderrDigest: `sha256:${'b'.repeat(64)}`
+    }]
+  }),
+  true,
+  'a successful command receipt with timing and output digests must satisfy the command-backed closure contract'
 );
 
 const allowed = spawnSync(process.execPath, ['--strip-types', script, '--json', '--allow-inconclusive'], {

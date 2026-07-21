@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { inspectCommandBackedMatrix } from '../packages/cli/src/commands/broker/replay/command-backed-matrix.ts';
 import { selectRuntimeDogfoodTasks } from '../packages/cli/src/commands/broker/replay/implementation.ts';
 
 interface DiagnosticCheck {
@@ -95,32 +96,15 @@ function replayCliSurfaceCheck(root: string): DiagnosticCheck {
 }
 
 function commandBackedMatrixCheck(root: string): DiagnosticCheck {
-  const cellsPath = path.join(root, 'artifacts/generated/atm-ab-v4/cells.json');
-  if (!existsSync(cellsPath)) {
-    return {
-      name: 'command-backed-420-cell-matrix',
-      ok: false,
-      detail: 'artifacts/generated/atm-ab-v4/cells.json is missing',
-      evidence: { cellsPath: relative(root, cellsPath) }
-    };
-  }
-  const cells = JSON.parse(readFileSync(cellsPath, 'utf8'));
-  const cellArray = Array.isArray(cells) ? cells : [];
-  const commandBackedCount = cellArray.filter((cell) =>
-    Array.isArray(cell?.commandReceipts) ||
-    Array.isArray(cell?.workloadReceipts) ||
-    typeof cell?.commandDigest === 'string'
-  ).length;
+  const matrix = inspectCommandBackedMatrix(root);
   return {
     name: 'command-backed-420-cell-matrix',
-    ok: cellArray.length === 420 && commandBackedCount === 420,
-    detail: cellArray.length === 420 && commandBackedCount === 420
+    ok: matrix.cellCount === 420 && matrix.commandBackedCount === 420,
+    detail: matrix.cellCount === 420 && matrix.commandBackedCount === 420
       ? 'all 420 cells include command/workload receipt evidence'
-      : `${cellArray.length} cells found, ${commandBackedCount}/420 include command/workload receipt evidence`,
+      : `${matrix.cellCount} cells found, ${matrix.commandBackedCount}/420 include command/workload receipt evidence`,
     evidence: {
-      cellsPath: relative(root, cellsPath),
-      cellCount: cellArray.length,
-      commandBackedCount
+      ...matrix
     }
   };
 }
