@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T07-30-16-964Z-close-214a85dbb536",
+  "taskId": "ATM-GOV-0232",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721072209-codex-plan3-captain-20260721-02-ATM-GOV-0232-b7d84e1f56",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0232.json",
+  "taskSha256": "sha256:50ac5298bbe3e635a95e1457cab49f35ca2e42de828a8e4f803b04880a152159",
+  "createdAt": "2026-07-21T07:30:16.964Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0232 --actor codex-plan3-captain-20260721-02 --status done --historical-delivery 4a7f3796479c9204c150e736b936459e23edf750",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260721072209-codex-plan3-captain-20260721-02-ATM-GOV-0232-b7d84e1f56",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0232.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/next-claim-orphaned-in-progress.test.ts",
+      "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+      "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T07:30:16.953Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0232.*",
+        ".atm/history/task-events/ATM-GOV-0232/**",
+        ".atm/history/tasks/ATM-GOV-0232.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/**",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/tasks/task-import-diagnostics.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "tests/cli/next-claim-orphaned-in-progress.test.ts",
+        "tests/cli/task-import-canonical-id-boundary.test.ts",
+        "tests/cli/task-import-diagnostic-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/task-import-diagnostics.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "tests/cli/next-claim-orphaned-in-progress.test.ts",
+        "tests/cli/task-import-canonical-id-boundary.test.ts",
+        "tests/cli/task-import-diagnostic-contract.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

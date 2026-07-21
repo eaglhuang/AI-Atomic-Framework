@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0232",
   "title": "Task import parser and recovery boundary reconciliation",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.0-B1",
   "dependencies": [
     "ATM-GOV-0231"
@@ -82,8 +82,8 @@
     }
   },
   "importedAt": "2026-07-21T05:04:44.338Z",
-  "lastTransitionId": "2026-07-21T07-22-10-983Z-claim-0d4cd9b4493a",
-  "lastTransitionAt": "2026-07-21T07:22:10.983Z",
+  "lastTransitionId": "2026-07-21T07-30-16-964Z-close-214a85dbb536",
+  "lastTransitionAt": "2026-07-21T07:30:16.964Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-plan3-captain-20260721-02",
   "reservedAt": "2026-07-21T07:22:09.842Z",
@@ -92,7 +92,7 @@
     "actorId": "codex-plan3-captain-20260721-02",
     "leaseId": "lease-2f102966f58d",
     "claimedAt": "2026-07-21T07:22:09.848Z",
-    "heartbeatAt": "2026-07-21T07:22:09.848Z",
+    "heartbeatAt": "2026-07-21T07:30:16.962Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0232.json",
@@ -104,14 +104,14 @@
       "tests/cli/task-import-canonical-id-boundary.test.ts",
       "tests/cli/task-import-diagnostic-contract.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260721072209-codex-plan3-captain-20260721-02-9e34dc5418",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260721072209-codex-plan3-captain-20260721-02-9e34dc5418\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-21T07:22:09.848Z",
   "startedByActor": "codex-plan3-captain-20260721-02",
@@ -150,5 +150,9 @@
     },
     "createdAt": "2026-07-21T07:22:10.982Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-21T07:30:16.962Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "closedBySessionId": "session-20260721072209-codex-plan3-captain-20260721-02-ATM-GOV-0232-b7d84e1f56",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0232.closure-packet.json"
 }

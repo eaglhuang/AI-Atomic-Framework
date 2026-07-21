@@ -1,0 +1,191 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0232",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4a7f3796479c9204c150e736b936459e23edf750",
+  "governedTreeSha": "e46d9a8098550e3093010a8420f349e1edfaf96e",
+  "targetCommitDelta": {
+    "currentCommitSha": "4a7f3796479c9204c150e736b936459e23edf750",
+    "parentCommitShas": [
+      "4a7f3796479c9204c150e736b936459e23edf750"
+    ],
+    "governedTreeSha": "e46d9a8098550e3093010a8420f349e1edfaf96e",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0232.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0232.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-012.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-014.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-216.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-217.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/task-import-diagnostics.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-012.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-014.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/task-import-diagnostic-contract.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7411aed3ff22b939d0a9f917861f803fcbeb297d5f814f6863ce78fa5c1f064e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:52c1a420134fbe3f7dafa810713a1209caa1eb0f911ff86af4747689eac7a1b0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/next-claim-orphaned-in-progress.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:131dfbc71948d2bad8171bc3a5dc0b54f53702e55e516ae3d9b3cf5d8c9b6ca1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3302b7203a8da0112461a61a9427dd9d765a607288b3feea8d8124c93f3b75d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:961dcf3eef1d1d28686fa387fb385789b9d23c153765a66485c88fd9fbffd87b",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/next-claim-orphaned-in-progress.test.ts",
+    "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+    "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-21T07:30:16.953Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0232.*",
+      ".atm/history/task-events/ATM-GOV-0232/**",
+      ".atm/history/tasks/ATM-GOV-0232.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/task-import-diagnostics.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/next-claim-orphaned-in-progress.test.ts",
+      "tests/cli/task-import-canonical-id-boundary.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/task-import-diagnostics.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/next-claim-orphaned-in-progress.test.ts",
+      "tests/cli/task-import-canonical-id-boundary.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0232.json",
+  "closedAt": "2026-07-21T07:30:16.954Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721072209-codex-plan3-captain-20260721-02-ATM-GOV-0232-b7d84e1f56",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "4a7f3796479c9204c150e736b936459e23edf750",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-012.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-014.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-216.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-217.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/task-import-diagnostics.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0232.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0232/2026-07-21T07-22-09-842Z-reserve-1eb904c95a47.json",
+      ".atm/history/task-events/ATM-GOV-0232/2026-07-21T07-22-09-844Z-promote-4aee28d74028.json",
+      ".atm/history/task-events/ATM-GOV-0232/2026-07-21T07-22-10-983Z-claim-0d4cd9b4493a.json",
+      ".atm/history/tasks/ATM-GOV-0232.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
