@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0230",
+  "title": "Runner sync stale reservation lifecycle",
+  "status": "planned",
+  "milestone": "ATM-3.0-B0.6",
+  "dependencies": [
+    "ATM-GOV-0236"
+  ],
+  "acceptance": [
+    "同 task claim 保持 active 時，過期 reservation 仍可合法 cancel/expire。",
+    "不可達 SHA 不要求 build receipt；已完成 build 的 release 仍要求真 receipt。",
+    "position 2 reservation 在 head 處置後被 single-flight 喚醒且不 starvation。",
+    "重複 cancel/revalidate/release 無 duplicate side effect。",
+    "cleanup receipt 的 reported released count、`staleReleases` entries 與實際 state mutations 數量及 ids 完全一致；不允許訊息成功但明細為空。",
+    "runner build 前後所有 foreign dirty non-release file digest 一致；故障注入與 Windows rename retry 都不造成 silent overwrite 或 WIP loss。",
+    "source/frozen 對 terminal/open task queue view 一致；terminal ghost queue-head count = 0。",
+    "live `ATM-FRAMEWORK-TEMP-*` claim 可合法 enqueue/build/release，missing/terminal owner 不可；same-task sequential source 可自動 advance 或輸出 digest-ready command。",
+    "`ATM-BUG-2026-07-14-183`、`-184`、`ATM-BUG-2026-07-19-011`、`-046`、`ATM-BUG-2026-07-20-209` 各有 current source/frozen disposition 與 canonical item closeback；已修不得重寫，仍壞才由本卡修復。",
+    "source 與 frozen `node atm.mjs` 對相同 stale-reservation lifecycle probe 的 canonical behavior projection digest 一致，runner digest 已封存。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-sync/**",
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/cli/src/commands/broker/runner-sync/**",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "scripts/assert-runner-sync-admission.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/runner-sync-incremental-build.ts",
+    "tests/cli/runner-sync-stale-reservation-lifecycle.test.ts",
+    "tests/cli/runner-sync-head-movement.test.ts",
+    "tests/cli/runner-sync-terminal-task-parity.test.ts",
+    "tests/cli/runner-sync-build-source-preservation.test.ts",
+    "tests/cli/runner-sync-framework-temp-hotfix.test.ts",
+    "tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-sync/**",
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/cli/src/commands/broker/runner-sync/**",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "scripts/assert-runner-sync-admission.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/runner-sync-incremental-build.ts",
+    "tests/cli/runner-sync-stale-reservation-lifecycle.test.ts",
+    "tests/cli/runner-sync-head-movement.test.ts",
+    "tests/cli/runner-sync-terminal-task-parity.test.ts",
+    "tests/cli/runner-sync-build-source-preservation.test.ts",
+    "tests/cli/runner-sync-framework-temp-hotfix.test.ts",
+    "tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-sync-stale-reservation-lifecycle.test.ts",
+    "node --strip-types tests/cli/runner-sync-head-movement.test.ts",
+    "node --strip-types tests/cli/runner-sync-terminal-task-parity.test.ts",
+    "node --strip-types tests/cli/runner-sync-build-source-preservation.test.ts",
+    "node --strip-types tests/cli/runner-sync-framework-temp-hotfix.test.ts",
+    "node --strip-types tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+    "npm run validate:cli",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No command-rendering normalizer work; ATM-GOV-0231 owns it.",
+    "No direct deletion of queue JSON."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "multiprocess-command-backed",
+  "rollbackStrategy": "queue-only-and-revert",
+  "rollbackNotes": "Disable compose publishing, preserve queue entries, and revert lifecycle code; use formal cancel/reconcile for created test entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync.steward",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0230-runner-sync-stale-reservation-lifecycle.task.md",
+    "sectionTitle": "ATM-GOV-0230",
+    "headingLine": 86,
+    "hash": "b26c92190d390b55",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0230-runner-sync-stale-reservation-lifecycle.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:b26c92190d390b553b9b6b2a545544a1c3ca517368edcf4e0b9e1cc9329c8464",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:39.528Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:39.528Z",
+  "lastTransitionId": "2026-07-21T05-04-39-659Z-import-bcc66350f738",
+  "lastTransitionAt": "2026-07-21T05:04:39.659Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
