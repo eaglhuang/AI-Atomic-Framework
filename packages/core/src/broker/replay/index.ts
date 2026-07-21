@@ -69,6 +69,18 @@ export interface ParallelReplayWorkerReceipt {
   readonly exitCode: number;
   readonly stdoutDigest: string;
   readonly stderrDigest: string;
+  readonly commandReceipts?: readonly ParallelReplayCommandReceipt[];
+}
+
+export interface ParallelReplayCommandReceipt {
+  readonly command: string;
+  readonly startedAtMs: number;
+  readonly finishedAtMs: number;
+  readonly exitCode: number;
+  readonly stdoutDigest: string;
+  readonly stderrDigest: string;
+  readonly brokerTicketState?: string | null;
+  readonly waitedMs?: number | null;
 }
 
 export interface ParallelReplayFaultCounters {
@@ -174,7 +186,7 @@ export function buildParallelReplayEvidence(input: {
   const unavailableReceipts = input.unavailableReceipts ?? [];
   const throughputGainRatio = input.serialMakespanMs && input.parallelMakespanMs
     ? roundRatio(input.serialMakespanMs / Math.max(1, input.parallelMakespanMs))
-    : roundRatio(workerCount >= 2 ? 1.25 : 1);
+    : 0;
   const costRatio = roundRatio(input.costRatio ?? 1);
   const withoutDigest = {
     schemaId: 'atm.parallelReplayEvidence.v1' as const,
@@ -195,6 +207,7 @@ export function buildParallelReplayEvidence(input: {
     verdict: faultTotal > 0 || timeInQueueOnlyRatio > 0
       ? 'queue-only' as const
       : unavailableReceipts.length > 0
+        || throughputGainRatio <= 0
         || parallelOverlapRatio < thresholds.minimumParallelOverlapRatio
         || serializedAdmissionRatio > thresholds.maximumSerializedAdmissionRatio
           ? 'inconclusive' as const

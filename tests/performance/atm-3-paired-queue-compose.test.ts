@@ -31,4 +31,11 @@ assert.equal(evidence.verdict, 'pass');
 assert.equal(evidence.throughputGainRatio >= 1.25, true);
 assert.equal(evidence.costRatio <= 1.1, true);
 
+const missingTimingEvidence = buildParallelReplayEvidence({
+  scenario,
+  workerReceipts: evidence.workerReceipts
+});
+assert.equal(missingTimingEvidence.throughputGainRatio, 0);
+assert.equal(missingTimingEvidence.verdict, 'inconclusive');
+
 console.log('[atm-3-paired-queue-compose.test] ok');

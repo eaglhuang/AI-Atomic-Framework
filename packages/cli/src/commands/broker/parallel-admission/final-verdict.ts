@@ -8,6 +8,7 @@ import type {
   ParallelAdmissionPolicy,
   ParallelAdmissionSafetyMetrics
 } from '../../../../../core/src/broker/parallel-admission-policy.ts';
+import type { ParallelReplayEvidence } from '../../../../../core/src/broker/replay/index.ts';
 
 export interface Atm3FinalClosureInput {
   readonly actorId: string | null;
@@ -34,6 +35,39 @@ export interface Atm3FinalClosureVerdict {
   readonly blockerBacklogIds: readonly string[];
   readonly readinessProbeFailures: readonly string[];
   readonly policyAfterDecision: ParallelAdmissionPolicy;
+}
+
+export interface Atm3FinalClosureEvidenceInput {
+  readonly actorId: string | null;
+  readonly replayEvidence: ParallelReplayEvidence;
+  readonly inheritedAcceptanceOpenCount: number;
+  readonly blockerBacklogIds: readonly string[];
+  readonly readinessProbeFailures: readonly string[];
+  readonly realTaskDogfoodIntersection: readonly string[];
+  readonly rollbackExercised: boolean;
+  readonly sourceFrozenReleaseParity: boolean;
+  readonly requiredCellCount?: number;
+  readonly now?: string;
+}
+
+export function buildAtm3FinalClosureVerdictFromEvidence(input: Atm3FinalClosureEvidenceInput): Atm3FinalClosureVerdict {
+  return buildAtm3FinalClosureVerdict({
+    actorId: input.actorId,
+    metrics: metricsFromReplayEvidence(input.replayEvidence, input.requiredCellCount ?? 420),
+    inheritedAcceptanceOpenCount: input.inheritedAcceptanceOpenCount,
+    blockerBacklogIds: input.blockerBacklogIds,
+    readinessProbeFailures: input.readinessProbeFailures,
+    realMultiprocessReplay: input.replayEvidence.workerCount >= 2
+      && input.replayEvidence.maxConcurrentWorkers >= 2
+      && input.replayEvidence.workerReceipts.every((worker) => worker.runner.entrypoint === 'atm.mjs')
+      && input.replayEvidence.workerReceipts.every((worker) => (worker.commandReceipts?.length ?? 0) > 0),
+    realTaskDogfoodIntersection: input.realTaskDogfoodIntersection,
+    rollbackExercised: input.rollbackExercised,
+    sourceFrozenReleaseParity: input.sourceFrozenReleaseParity,
+    observedBreakerTripCount: input.replayEvidence.faultCounters.unexpectedBreakerTripCount,
+    timeInQueueOnlyRatio: input.replayEvidence.timeInQueueOnlyRatio,
+    now: input.now
+  });
 }
 
 export function buildAtm3FinalClosureVerdict(input: Atm3FinalClosureInput): Atm3FinalClosureVerdict {
@@ -115,4 +149,28 @@ function digestFinalClosureInput(input: Atm3FinalClosureInput): string {
     timeInQueueOnlyRatio: input.timeInQueueOnlyRatio
   };
   return `sha256:${createHash('sha256').update(JSON.stringify(stable)).digest('hex')}`;
+}
+
+function metricsFromReplayEvidence(evidence: ParallelReplayEvidence, requiredCellCount: number): ParallelAdmissionSafetyMetrics {
+  return {
+    schemaId: 'atm.parallelAdmissionSafetyMetrics.v1',
+    taskId: 'ATM-GOV-0235',
+    cellCount: evidence.workerReceipts.reduce((count, worker) => count + (worker.commandReceipts?.length ?? 0), 0),
+    requiredCellCount,
+    medianMakespanImprovementPct: Math.max(0, Math.round((evidence.throughputGainRatio - 1) * 100)),
+    activeThroughputImprovementPct: Math.max(0, Math.round((evidence.throughputGainRatio - 1) * 100)),
+    productionCostRatio: evidence.costRatio,
+    coveragePct: evidence.unavailableReceipts.length === 0 ? 100 : 0,
+    sideEffectCounts: {
+      silentOverwrite: evidence.faultCounters.silentOverwriteCount,
+      escapedConflict: evidence.faultCounters.escapedConflictCount,
+      duplicateSideEffect: evidence.faultCounters.duplicateSideEffectCount,
+      unresolvedStarvation: evidence.faultCounters.unresolvedStarvationCount
+    },
+    taskSummary: {
+      window: 'ATM-3.0 replay evidence',
+      watermark: `${evidence.scenarioDigest}/${evidence.runnerDigest}`,
+      sealedDigest: evidence.digest
+    }
+  };
 }

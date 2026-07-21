@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   buildParallelReplayEvidence,
@@ -24,6 +24,7 @@ export async function runFrozenParallelReplay(input: {
 }): Promise<ParallelReplayEvidence> {
   const runnerPath = input.runnerPath ?? 'atm.mjs';
   const runner = sealRunner(path.resolve(input.cwd, runnerPath));
+  const baseCommit = await resolveGitHead(input.cwd);
   const scenario = buildParallelReplayScenario({
     scenarioId: 'atm-3-real-frozen-parallel-replay',
     generatedAt: '2026-07-21T00:00:00.000Z',
@@ -44,12 +45,18 @@ export async function runFrozenParallelReplay(input: {
       runner,
       workerId: `worker-${index + 1}`,
       actorId: `atm-replay-worker-${index + 1}`,
-      admission: index === 0 ? 'serialized' : 'parallel'
+      admission: 'parallel',
+      sharedSurface: 'docs/governance/atm-3-replay-evidence.md',
+      baseCommit
     }))
   );
   return buildParallelReplayEvidence({
     scenario,
     workerReceipts,
+    unavailableReceipts: workerReceipts
+      .flatMap((worker) => worker.commandReceipts ?? [])
+      .filter((receipt) => receipt.exitCode !== 0)
+      .map((receipt) => `${receipt.command}:exit-${receipt.exitCode}`),
     serialMakespanMs: workerReceipts.reduce((sum, worker) => sum + Math.max(1, worker.finishedAtMs - worker.startedAtMs), 0),
     parallelMakespanMs: Math.max(...workerReceipts.map((worker) => worker.finishedAtMs)) - Math.min(...workerReceipts.map((worker) => worker.startedAtMs)),
     costRatio: 1.02
@@ -79,10 +86,37 @@ function runFrozenAtmWorker(input: {
   readonly workerId: string;
   readonly actorId: string;
   readonly admission: ParallelReplayWorkerReceipt['admission'];
+  readonly sharedSurface: string;
+  readonly baseCommit: string;
 }): Promise<ParallelReplayWorkerReceipt> {
   return new Promise((resolve, reject) => {
     const startedAtMs = Date.now();
-    const child = spawn(process.execPath, [input.runner.entrypoint, '--version'], {
+    const tmpDir = path.join(input.cwd, '.atm', 'runtime', 'parallel-replay-dogfood');
+    mkdirSync(tmpDir, { recursive: true });
+    const intentPath = path.join(tmpDir, `${input.workerId}.intent.json`);
+    writeFileSync(intentPath, JSON.stringify({
+      schemaId: 'atm.writeIntent.v1',
+      specVersion: '0.1.0',
+      migration: {
+        strategy: 'none',
+        fromVersion: null,
+        notes: 'ATM 3.0 real dogfood replay intent'
+      },
+      taskId: `ATM-REAL-DOGFOOD-${input.workerId}`,
+      actorId: input.actorId,
+      baseCommit: input.baseCommit,
+      targetFiles: [input.sharedSurface],
+      atomRefs: [],
+      sharedSurfaces: {
+        generators: [],
+        projections: ['atm-3-replay-evidence'],
+        registries: [],
+        validators: ['validate:cli'],
+        artifacts: [input.sharedSurface]
+      },
+      requestedLane: 'auto'
+    }, null, 2));
+    const child = spawn(process.execPath, [input.runner.entrypoint, 'broker', 'decision', '--intent-file', intentPath, '--json'], {
       cwd: input.cwd,
       env: {
         ...process.env,
@@ -97,6 +131,19 @@ function runFrozenAtmWorker(input: {
     child.on('error', reject);
     child.on('close', (exitCode) => {
       const finishedAtMs = Date.now();
+      const stdoutBuffer = Buffer.concat(stdout);
+      const stderrBuffer = Buffer.concat(stderr);
+      const commandReceipt = {
+        command: `node ${input.runner.entrypoint} broker decision --intent-file ${path.basename(intentPath)} --json`,
+        startedAtMs,
+        finishedAtMs,
+        exitCode: exitCode ?? 0,
+        stdoutDigest: digestBuffer(stdoutBuffer),
+        stderrDigest: digestBuffer(stderrBuffer),
+        brokerTicketState: readAdmissionState(stdoutBuffer),
+        waitedMs: readWaitedMs(stdoutBuffer)
+      };
+      rmSync(intentPath, { force: true });
       resolve({
         workerId: input.workerId,
         actorId: input.actorId,
@@ -104,11 +151,16 @@ function runFrozenAtmWorker(input: {
         startedAtMs,
         finishedAtMs,
         runner: input.runner,
-        admission: input.admission,
-        sideEffects: [],
+        admission: commandReceipt.brokerTicketState === 'queue-head' || commandReceipt.brokerTicketState === 'execute-now'
+          ? input.admission
+          : commandReceipt.brokerTicketState === 'waiting'
+            ? 'serialized'
+            : input.admission,
+        sideEffects: [`broker-decision:${commandReceipt.brokerTicketState ?? 'none'}`],
         exitCode: exitCode ?? 0,
-        stdoutDigest: digestBuffer(Buffer.concat(stdout)),
-        stderrDigest: digestBuffer(Buffer.concat(stderr))
+        stdoutDigest: commandReceipt.stdoutDigest,
+        stderrDigest: commandReceipt.stderrDigest,
+        commandReceipts: [commandReceipt]
       });
     });
   });
@@ -144,6 +196,44 @@ function digestJson(value: unknown): string {
 
 function digestBuffer(value: Buffer): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function readAdmissionState(stdout: Buffer): string | null {
+  try {
+    const parsed = JSON.parse(stdout.toString('utf8'));
+    const state = parsed?.evidence?.decision?.admission?.state ?? parsed?.evidence?.brokerTicket?.state;
+    return typeof state === 'string' ? state : null;
+  } catch {
+    return null;
+  }
+}
+
+function readWaitedMs(stdout: Buffer): number | null {
+  try {
+    const parsed = JSON.parse(stdout.toString('utf8'));
+    const waitedMs = parsed?.evidence?.decision?.brokerTicket?.waitedMs ?? parsed?.evidence?.brokerTicket?.waitedMs;
+    return typeof waitedMs === 'number' ? waitedMs : null;
+  } catch {
+    return null;
+  }
+}
+
+function resolveGitHead(cwd: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const child = spawn('git', ['rev-parse', 'HEAD'], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    const stdout: Buffer[] = [];
+    const stderr: Buffer[] = [];
+    child.stdout.on('data', (chunk) => stdout.push(Buffer.from(chunk)));
+    child.stderr.on('data', (chunk) => stderr.push(Buffer.from(chunk)));
+    child.on('error', reject);
+    child.on('close', (exitCode) => {
+      if (exitCode !== 0) {
+        reject(new Error(Buffer.concat(stderr).toString('utf8') || `git rev-parse failed with ${exitCode}`));
+        return;
+      }
+      resolve(Buffer.concat(stdout).toString('utf8').trim());
+    });
+  });
 }
 
 function normalizePath(value: string): string {
