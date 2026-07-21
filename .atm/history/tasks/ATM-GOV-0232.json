@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0232",
+  "title": "Task import parser and recovery boundary reconciliation",
+  "status": "planned",
+  "milestone": "ATM-3.0-B1",
+  "dependencies": [
+    "ATM-GOV-0231"
+  ],
+  "acceptance": [
+    "fenced 內容不會重置 task declaration context。",
+    "診斷 code、source line、work item id 與 recovery hint 一致。",
+    "source 與 frozen `node atm.mjs` 對相同 parser/closeback probe 的 canonical behavior projection digest 一致，runner digest 已封存；若 stale，走正式 runner-sync，不以 source-only 綠燈關卡。",
+    "已完成 projection 可由 integration verify 證實，沒有重複修改或重複 backlog row。",
+    "`done + released` 任務可冪等修復 planning mirror，無須重新 claim、偽造 transition 或手改 `.atm`。",
+    "reconcile 的 success receipt 包含 planning path、before/after digest 與 mutation/no-op 結果；未更新宣告 mirror 時 fail closed。",
+    "orphan imported task 可由 normal claim preparation 合法 adopt/rebind，source/frozen 結果一致；`-012/-014` 有 terminal item disposition且不需要 emergency reset。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/task-import-diagnostics.ts",
+    "tests/cli/task-import-diagnostic-contract.test.ts",
+    "tests/cli/task-import-canonical-id-boundary.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**",
+    "tests/cli/next-claim-orphaned-in-progress.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/task-import-diagnostics.ts",
+    "tests/cli/task-import-diagnostic-contract.test.ts",
+    "tests/cli/task-import-canonical-id-boundary.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**",
+    "tests/cli/next-claim-orphaned-in-progress.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+    "node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts",
+    "node --strip-types tests/cli/next-claim-orphaned-in-progress.test.ts",
+    "npm run validate:cli",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No new ErrorCode family or rename.",
+    "No unrelated task-import grammar refactor."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "frozen-and-source-command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert parser changes if needed; backlog disposition must continue to reflect the latest reproducible probe.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks.import-boundary",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0232-task-import-parser-and-recovery-boundary-reconciliation.task.md",
+    "sectionTitle": "ATM-GOV-0232",
+    "headingLine": 67,
+    "hash": "646996b434621c6f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0232-task-import-parser-and-recovery-boundary-reconciliation.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:646996b434621c6fe934ead0b40540aeeb2f225beaded3ed4116b59ca60c3536",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:44.338Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:44.338Z",
+  "lastTransitionId": "2026-07-21T05-04-44-499Z-import-f61d4a555962",
+  "lastTransitionAt": "2026-07-21T05:04:44.499Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
