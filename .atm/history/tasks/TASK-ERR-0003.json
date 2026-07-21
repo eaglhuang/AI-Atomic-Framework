@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0003",
+  "title": "ATM 3.0 broker and recovery ErrorCode contracts",
+  "status": "planned",
+  "milestone": "ATM-3.0-A0",
+  "dependencies": [],
+  "acceptance": [
+    "八個列名 code 都有 exact contract，或有證據證明由既有 exact/prefix contract 完整涵蓋並同步改用既有名稱。",
+    "recovery 使用 `atm.commandManifest.v1` 或 ordered manifests，預設 `shell=false`。",
+    "每個 GOV consumer 只引用已註冊名稱。",
+    "generated docs 與 registry digest 一致。"
+  ],
+  "deliverables": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "tests/cli/atm-3-error-contract.test.ts"
+  ],
+  "scopePaths": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "tests/cli/atm-3-error-contract.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/atm-3-error-contract.test.ts",
+    "npm run generate:error-codes",
+    "npm run validate:cli",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No broker, parser, runner-sync or projection product implementation.",
+    "No registry relocation or second ErrorCode catalog."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert registry and generated documentation together; consumers must not land before this contract.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.error-code-registry",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.error-code-registry.canonical-document",
+        "pattern": "Single canonical machine-readable ErrorCode registry",
+        "source": "docs/governance/error-code-registry.json",
+        "disposition": "inline",
+        "inlineReason": "Keep one schema-validated canonical registry; splitting would create multiple authorities and violate the registered catalog contract."
+      },
+      {
+        "atom": "atm.error-code-registry.generated-index",
+        "pattern": "Generator-owned public ErrorCode index",
+        "source": "docs/ERROR_CODES.md",
+        "disposition": "inline",
+        "inlineReason": "This file is generated from the canonical registry and must not be manually extracted or edited as a second source."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0003-atm-3-0-broker-and-recovery-errorcode-contracts.task.md",
+    "sectionTitle": "TASK-ERR-0003",
+    "headingLine": 80,
+    "hash": "b9dac4c920a70180",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0003-atm-3-0-broker-and-recovery-errorcode-contracts.task.md",
+      "planningCommitSha": "bf920d5dc0db2c0e6c41df8ce3012a834ee9f4ee",
+      "contentDigest": "sha256:b9dac4c920a701802f66447ba72540d3df13751bb8c2127843b9ab74ed76235f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-21T05:04:11.516Z"
+    }
+  },
+  "importedAt": "2026-07-21T05:04:11.516Z",
+  "lastTransitionId": "2026-07-21T05-04-11-651Z-import-a532df6916dc",
+  "lastTransitionAt": "2026-07-21T05:04:11.651Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
