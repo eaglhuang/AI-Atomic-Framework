@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-215",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Runner-sync / Operator UX",
+  "finding": "The sealed-runner-build blocker emits a requiredCommand that is not runnable as printed. It renders the framework temp task id with dots (ATM-FRAMEWORK-TEMP-codex-gpt-5.4-mini) while the id actually minted by framework-mode claim normalizes dots to dashes (ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini), so copy-pasting returns task-missing. The command also assumes an active framework claim exists but does not mention that framework-mode claim must run first, nor that it requires --files.",
+  "expectedBehavior": "requiredCommand should be copy-paste runnable: emit the normalized task id, and either include the prerequisite framework-mode claim step or state it explicitly as a precondition.",
+  "evidenceOrRepro": "Build at 43c6d07af emitted requiredCommand with --task \"ATM-FRAMEWORK-TEMP-codex-gpt-5.4-mini\"; running it verbatim returned \"task ATM-FRAMEWORK-TEMP-codex-gpt-5.4-mini is task-missing; runner-sync steward enqueue requires an active task\". framework-mode claim --actor codex-gpt-5.4-mini minted taskId ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini; enqueue succeeded only with the dashed id. framework-mode claim also failed first with ATM_CLI_USAGE requiring --files.",
+  "followUp": "Consumer: ATM-GOV-0218 (runner-sync self-hosting closed loop) and TASK-ERR-0002 (error and recovery contract) will address the requiredCommand-must-be-runnable and prerequisite-declaration surface. Still supplies TASK-SKL-0014 with concrete dogfood evidence for the tool-first framework temp claim route. Do not open a standalone card."
+}

@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-21T05-24-24-911Z-close-732f831a7633",
+  "taskId": "TASK-TMP-0004",
+  "action": "close",
+  "actorId": "codex-plan3-captain-20260721-01",
+  "sessionId": "session-20260721051649-codex-plan3-captain-20260721-01-TASK-TMP-0004-91541f31ab",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0004.json",
+  "taskSha256": "sha256:ae6c6eaeacd99890899ef187ef98a077c76e9e5cd5e43ba9c3bb1806e5804421",
+  "createdAt": "2026-07-21T05:24:24.911Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0004 --actor codex-plan3-captain-20260721-01 --status done --from-batch-checkpoint --batch batch-aadd6c7aefbd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-aadd6c7aefbd",
+    "sessionId": "session-20260721051649-codex-plan3-captain-20260721-01-TASK-TMP-0004-91541f31ab",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0004.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-21T05:24:24.894Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0004.*",
+        ".atm/history/task-events/TASK-TMP-0004/**",
+        ".atm/history/tasks/TASK-TMP-0004.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-213.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-214.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-215.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-216.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-217.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-218.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-213",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Broker / Conflict detection",
+  "finding": "ATM-GOV-0206 made resource overlap pattern-aware in conflict-matrix.ts hasResourceOverlap, but evaluatePhysicalOverlap in packages/core/src/broker/decision/physical-overlap.ts:32 still gates on activeIntent.resourceKeys.files.includes(newFile), an exact string match. That is the call site that actually emits the `Physical file overlap` file-range conflict, so the originally reported glob-vs-literal false negative is still live after 0206 closed.",
+  "expectedBehavior": "A write intent declaring a glob (packages/cli/src/commands/**) against an active intent holding a literal path it contains (packages/cli/src/commands/telemetry.ts) must produce a file-range conflict, not verdict parallel-safe with zero conflicts. All overlap call sites should share the 0206 matcher rather than each re-implementing exact equality.",
+  "evidenceOrRepro": "Verified end-to-end on rebuilt runner at ccc215b71 (full sealed-runner-build 2026-07-20 21:21, ATM_RETAIN_RELEASE_ARTIFACTS=1). Registered holder intent PROBE-HOLDER-0002 on packages/cli/src/commands/telemetry.ts, then broker decision: glob commands/** -> parallel-safe conflicts:0 (WRONG); literal telemetry.ts -> needs-physical-split conflicts:1; disjoint templates/skills/** -> parallel-safe conflicts:0 (correct). Compiled matcher tested in isolation is correct (packages/core/dist/broker/resource-overlap.js resourceListsOverlap returns true for glob-vs-literal), confirming the defect is the uncovered call site, not the matcher. physical-overlap.ts was added 7b7998331 on 2026-07-16, predating the 0206 fix 667dc4cc5 on 2026-07-20; this is an incomplete fix, not a regression. Full context: 3KLife docs/ai_atomic_framework/governance-optimization/findings/broker-correctness-sample-0001-glob-false-negative.md",
+  "followUp": "Open a follow-up card to route every overlap call site through the shared 0206 matcher and add a call-site inventory test so a new decision module cannot reintroduce exact-match. Re-open or supersede ATM-GOV-0206 acceptance, which was closed without covering this path. Feed both the false-negative and the corrected case to ATM-GOV-0199 as paired correctness samples."
+}

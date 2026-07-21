@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-21-218",
+  "date": "2026-07-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Framework temp claim / CLI emitter",
+  "finding": "packages/cli/src/commands/framework-development/runner-sync-admission.ts inferRunnerSyncTaskId at line 148 normalizes the actor-derived framework temp task id with regex /[^A-Za-z0-9._-]/g which preserves the dot character, but the minting path frameworkTempTaskId in packages/cli/src/commands/git-governance/implementation.ts uses /[^A-Za-z0-9_-]+/g which strips dots. For actor id codex-gpt-5.4-mini the two normalizers produce ATM-FRAMEWORK-TEMP-codex-gpt-5.4-mini vs ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini respectively. A build blocker emits the dotted form as requiredCommand; copy-pasting returns task-missing because the lookup id does not match the minted id. Related friction: framework-mode claim requires --files but this is not surfaced in the emitted blocker.",
+  "expectedBehavior": "The two normalizers must be a single shared helper. buildRunnerSyncEnqueueCommand in taskflow/implementation.ts must additionally include the prerequisite framework-mode claim step (with --files) in the emitted action chain, not only the enqueue step.",
+  "evidenceOrRepro": "Encountered during SKL-0014 dogfood at 2026-07-20; also filed as ATM-BUG-2026-07-20-215.",
+  "followUp": "Follow-up card TASK-SKL-0014-FU-CLI-EMISSION is planned in 3KLife SKL series. Blocked out of SKL-0014 because both target files are under atom-cli-router which is atom-held by active ATM-GOV-0216."
+}
