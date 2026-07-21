@@ -5,10 +5,14 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P0",
-  "status": "Open",
+  "status": "Closed",
   "area": "Validator cleanup / protected task ledger",
   "finding": "A validator or cleanup lane could remove the live imported task ledger file `.atm/history/tasks/ATM-GOV-0196.json` before the governed checkpoint/commit boundary, causing the task lifecycle to lose its canonical JSON state and risking `ATM_TASK_NOT_FOUND` or broken batch checkpoint recovery.",
   "expectedBehavior": "Cleanup, validator, and integration command guards must treat `.atm/history/tasks/**`, `.atm/history/task-events/**`, and task evidence files as protected governance ledger state. They may stage or inspect those paths through governed ATM lifecycle commands, but must not delete, raw-clean, or raw-restore live ledger files unless an explicit governed recovery/disposition command owns the exact task scope.",
   "evidenceOrRepro": "Observed during the ATM-GOV-0196 batch lane on 2026-07-20 Asia/Taipei after import/claim/validator work: `.atm/history/tasks/ATM-GOV-0196.json` had to be re-imported/re-added before checkpoint, and the current staged recovery bundle includes the restored task JSON plus task-events.",
-  "followUp": "Add a generic protected-ledger destructive-command guard and regression coverage proving cleanup-style raw commands cannot target `.atm/history/tasks/<task>.json`; keep task-specific recovery for ATM-GOV-0196 separate from the product-level guard."
+  "followUp": "Closed by ATM-GOV-0236: `packages/cli/src/commands/git-governance/protected-governance-state.ts` adds schema/policy-driven protected governance state classification, `resolveTaskScopedCommitBundle` fail-closes with ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE on task ledger/event/evidence deletions, and `node --strip-types tests/cli/protected-ledger-destructive-guard.test.ts` is the passing receipt.",
+  "terminalDisposition": "closed-by-ATM-GOV-0236",
+  "closedByTask": "ATM-GOV-0236",
+  "closedAt": "2026-07-21T06:15:00.000Z",
+  "passingReceipt": "node --strip-types tests/cli/protected-ledger-destructive-guard.test.ts"
 }
