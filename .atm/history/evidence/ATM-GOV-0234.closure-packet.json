@@ -1,0 +1,170 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0234",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+  "governedTreeSha": "b8113b9f10f14b3fadc8c5d27778004b74b7bada",
+  "targetCommitDelta": {
+    "currentCommitSha": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+    "parentCommitShas": [
+      "56b1ebd6c49385b317bb1e119768f6b02317714f"
+    ],
+    "governedTreeSha": "b8113b9f10f14b3fadc8c5d27778004b74b7bada",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0234.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0234.json",
+      ".atm/history/task-events/ATM-GOV-0234/2026-07-21T07-45-29-881Z-reserve-9ea18ddacbe1.json",
+      ".atm/history/task-events/ATM-GOV-0234/2026-07-21T07-45-29-883Z-promote-2aca0a942bc4.json",
+      ".atm/history/task-events/ATM-GOV-0234/2026-07-21T07-45-34-697Z-claim-a2eccb8f6eda.json",
+      ".atm/history/tasks/ATM-GOV-0234.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay/implementation.ts",
+      "packages/core/src/broker/replay/index.ts",
+      "packages/core/src/telemetry/parallel-replay/index.ts",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "tests/e2e/atm-3-real-task-dogfood.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b52907ae895cc600fe310a8a3a738bf9fa957a69ca4342366d30343c048f78be",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e39a76f05a9d7b2e1b75e20dcdd387bff6887d1b70d20626701ef9efe68576a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74d54297e8029d14aef45fce81edc05fd58c182bc6908446b639dd0cd11d3df5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:35cfa767934b3f9af931745c59cda547e648eb2019d3f55707d117037b911e79",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:4bc355ed557376311445d63f8ca24cb806df37dc583ae66f2ca707d71084d821",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+    "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+    "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts",
+    "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-21T07:54:06.654Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0234.*",
+      ".atm/history/task-events/ATM-GOV-0234/**",
+      ".atm/history/tasks/ATM-GOV-0234.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay/**",
+      "packages/core/src/broker/replay/**",
+      "packages/core/src/telemetry/parallel-replay/**",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "tests/e2e/atm-3-real-task-dogfood.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/replay/**",
+      "packages/core/src/broker/replay/**",
+      "packages/core/src/telemetry/parallel-replay/**",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "tests/e2e/atm-3-real-task-dogfood.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0234.json",
+  "closedAt": "2026-07-21T07:54:06.654Z",
+  "closedByActor": "codex-plan3-captain-20260721-02",
+  "sessionId": "session-20260721074529-codex-plan3-captain-20260721-02-ATM-GOV-0234-b4c22dd604",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

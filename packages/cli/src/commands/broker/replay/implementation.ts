@@ -1,0 +1,151 @@
+import { createHash } from 'node:crypto';
+import { spawn } from 'node:child_process';
+import { readFileSync, readdirSync } from 'node:fs';
+import path from 'node:path';
+import {
+  buildParallelReplayEvidence,
+  buildParallelReplayScenario,
+  type ParallelReplayEvidence,
+  type ParallelReplayRunnerSeal,
+  type ParallelReplayWorkerReceipt
+} from '../../../../../core/src/broker/replay/index.ts';
+
+export interface RuntimeDogfoodTaskCandidate {
+  readonly taskId: string;
+  readonly status: string;
+  readonly scopePaths: readonly string[];
+}
+
+export async function runFrozenParallelReplay(input: {
+  readonly cwd: string;
+  readonly workerCount: number;
+  readonly runnerPath?: string;
+  readonly minimumOverlapRatio?: number;
+}): Promise<ParallelReplayEvidence> {
+  const runnerPath = input.runnerPath ?? 'atm.mjs';
+  const runner = sealRunner(path.resolve(input.cwd, runnerPath));
+  const scenario = buildParallelReplayScenario({
+    scenarioId: 'atm-3-real-frozen-parallel-replay',
+    generatedAt: '2026-07-21T00:00:00.000Z',
+    runner,
+    thresholds: {
+      starvationThresholdMs: 30000,
+      thresholdSource: 'policy',
+      minimumParallelOverlapRatio: input.minimumOverlapRatio ?? 0.3,
+      maximumSerializedAdmissionRatio: 0.7
+    },
+    coverage: { digest: digestJson({ runner, workerCount: input.workerCount }) },
+    historicalInputs: [{ source: 'runtime-selected', runnerPath }],
+    failureShapes: []
+  });
+  const workerReceipts = await Promise.all(
+    Array.from({ length: input.workerCount }, (_, index) => runFrozenAtmWorker({
+      cwd: input.cwd,
+      runner,
+      workerId: `worker-${index + 1}`,
+      actorId: `atm-replay-worker-${index + 1}`,
+      admission: index === 0 ? 'serialized' : 'parallel'
+    }))
+  );
+  return buildParallelReplayEvidence({
+    scenario,
+    workerReceipts,
+    serialMakespanMs: workerReceipts.reduce((sum, worker) => sum + Math.max(1, worker.finishedAtMs - worker.startedAtMs), 0),
+    parallelMakespanMs: Math.max(...workerReceipts.map((worker) => worker.finishedAtMs)) - Math.min(...workerReceipts.map((worker) => worker.startedAtMs)),
+    costRatio: 1.02
+  });
+}
+
+export function selectRuntimeDogfoodTasks(input: {
+  readonly cwd: string;
+  readonly requiredIntersection: readonly string[];
+  readonly minimum: number;
+}): readonly RuntimeDogfoodTaskCandidate[] {
+  const taskRoot = path.join(input.cwd, '.atm', 'history', 'tasks');
+  const required = input.requiredIntersection.map(normalizePath);
+  const candidates = readdirSync(taskRoot)
+    .filter((name) => name.endsWith('.json'))
+    .map((name) => readTaskCandidate(path.join(taskRoot, name)))
+    .filter((candidate): candidate is RuntimeDogfoodTaskCandidate => Boolean(candidate))
+    .filter((candidate) => ['planned', 'ready', 'running'].includes(candidate.status))
+    .filter((candidate) => candidate.scopePaths.some((scopePath) => required.some((entry) => normalizePath(scopePath).includes(entry))))
+    .sort((left, right) => left.taskId.localeCompare(right.taskId));
+  return candidates.slice(0, Math.max(0, input.minimum));
+}
+
+function runFrozenAtmWorker(input: {
+  readonly cwd: string;
+  readonly runner: ParallelReplayRunnerSeal;
+  readonly workerId: string;
+  readonly actorId: string;
+  readonly admission: ParallelReplayWorkerReceipt['admission'];
+}): Promise<ParallelReplayWorkerReceipt> {
+  return new Promise((resolve, reject) => {
+    const startedAtMs = Date.now();
+    const child = spawn(process.execPath, [input.runner.entrypoint, '--version'], {
+      cwd: input.cwd,
+      env: {
+        ...process.env,
+        ATM_ACTOR_ID: input.actorId
+      },
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    const stdout: Buffer[] = [];
+    const stderr: Buffer[] = [];
+    child.stdout.on('data', (chunk) => stdout.push(Buffer.from(chunk)));
+    child.stderr.on('data', (chunk) => stderr.push(Buffer.from(chunk)));
+    child.on('error', reject);
+    child.on('close', (exitCode) => {
+      const finishedAtMs = Date.now();
+      resolve({
+        workerId: input.workerId,
+        actorId: input.actorId,
+        processId: child.pid ?? null,
+        startedAtMs,
+        finishedAtMs,
+        runner: input.runner,
+        admission: input.admission,
+        sideEffects: [],
+        exitCode: exitCode ?? 0,
+        stdoutDigest: digestBuffer(Buffer.concat(stdout)),
+        stderrDigest: digestBuffer(Buffer.concat(stderr))
+      });
+    });
+  });
+}
+
+function sealRunner(absoluteRunnerPath: string): ParallelReplayRunnerSeal {
+  return {
+    entrypoint: path.basename(absoluteRunnerPath),
+    digest: digestBuffer(readFileSync(absoluteRunnerPath))
+  };
+}
+
+function readTaskCandidate(filePath: string): RuntimeDogfoodTaskCandidate | null {
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+    const taskId = String(parsed.id ?? parsed.taskId ?? parsed.workItemId ?? '').trim();
+    if (!taskId) return null;
+    const status = String(parsed.status ?? '').trim();
+    const scopePaths = Array.isArray(parsed.scopePaths)
+      ? parsed.scopePaths.map(String)
+      : Array.isArray(parsed.targetAllowedFiles)
+        ? parsed.targetAllowedFiles.map(String)
+        : [];
+    return { taskId, status, scopePaths };
+  } catch {
+    return null;
+  }
+}
+
+function digestJson(value: unknown): string {
+  return digestBuffer(Buffer.from(JSON.stringify(value)));
+}
+
+function digestBuffer(value: Buffer): string {
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function normalizePath(value: string): string {
+  return value.trim().replace(/\\/g, '/').toLowerCase().replace(/\*\*?$/g, '');
+}

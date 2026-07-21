@@ -1,0 +1,148 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0234",
+  "updatedAt": "2026-07-21T07:53:47.071Z",
+  "updatedBy": "codex-plan3-captain-20260721-02",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+    "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+    "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts",
+    "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b52907ae895cc600fe310a8a3a738bf9fa957a69ca4342366d30343c048f78be",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:50:02.292Z",
+      "startedAt": "2026-07-21T07:50:00.509Z",
+      "finishedAt": "2026-07-21T07:50:02.292Z",
+      "durationMs": 1783,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e39a76f05a9d7b2e1b75e20dcdd387bff6887d1b70d20626701ef9efe68576a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:50:04.699Z",
+      "startedAt": "2026-07-21T07:50:04.377Z",
+      "finishedAt": "2026-07-21T07:50:04.699Z",
+      "durationMs": 322,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74d54297e8029d14aef45fce81edc05fd58c182bc6908446b639dd0cd11d3df5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:50:07.775Z",
+      "startedAt": "2026-07-21T07:50:07.402Z",
+      "finishedAt": "2026-07-21T07:50:07.775Z",
+      "durationMs": 373,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:35cfa767934b3f9af931745c59cda547e648eb2019d3f55707d117037b911e79",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts"
+      ],
+      "generatedAt": "2026-07-21T07:50:10.757Z",
+      "startedAt": "2026-07-21T07:50:10.426Z",
+      "finishedAt": "2026-07-21T07:50:10.757Z",
+      "durationMs": 331,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:4bc355ed557376311445d63f8ca24cb806df37dc583ae66f2ca707d71084d821",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-21T07:50:30.537Z",
+      "startedAt": "2026-07-21T07:50:13.628Z",
+      "finishedAt": "2026-07-21T07:50:30.537Z",
+      "durationMs": 16909,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-21T07:50:41.849Z",
+      "startedAt": "2026-07-21T07:50:32.768Z",
+      "finishedAt": "2026-07-21T07:50:41.849Z",
+      "durationMs": 9081,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-21T07:50:44.471Z",
+      "startedAt": "2026-07-21T07:50:44.218Z",
+      "finishedAt": "2026-07-21T07:50:44.471Z",
+      "durationMs": 253,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-21T07:53:47.070Z",
+      "startedAt": "2026-07-21T07:52:59.550Z",
+      "finishedAt": "2026-07-21T07:53:47.070Z",
+      "durationMs": 47520,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56b1ebd6c49385b317bb1e119768f6b02317714f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
