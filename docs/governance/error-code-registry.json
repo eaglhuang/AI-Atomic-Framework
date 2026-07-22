@@ -729,6 +729,52 @@
       "sourceOwner": "packages/cli/src/commands/git-governance/protected-governance-state.ts"
     },
     {
+      "code": "ATM_GIT_COMMIT_FAILED",
+      "category": "git-governance",
+      "shortDescription": "The governed git commit wrapper failed while preparing or finalizing a commit.",
+      "commonCauses": [
+        "A nested git hook or commit admission gate failed after the wrapper started the commit attempt.",
+        "The branch commit queue, scope policy, line-budget policy, or protected-state policy rejected the candidate.",
+        "The underlying git command failed and ATM recorded a commit-attempt status file."
+      ],
+      "remediation": [
+        "Inspect the top-level JSON details for nestedErrorCode, attemptPath, affected files, and nextSafeAction.",
+        "Run node atm.mjs git commit-status --actor <actor> --task <task-id> --json to inspect the latest attempt and branch queue state.",
+        "Do not retry the same command blindly when the nested error says the candidate must be reduced, split, or revalidated."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs git commit-status --actor <actor> --task <task-id> --json",
+        "node atm.mjs git commit --actor <actor> --task <task-id> --message \"<message>\" --json"
+      ],
+      "statusCommand": "node atm.mjs git commit-status --actor <actor> --task <task-id> --json",
+      "sourceOwner": "packages/cli/src/commands/git-governance/implementation.ts"
+    },
+    {
+      "code": "ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED",
+      "category": "git-governance",
+      "shortDescription": "The staged commit candidate or explicit touched-file candidate exceeds the configured physical line budget.",
+      "commonCauses": [
+        "A formatter or bulk rewrite made the submitted candidate too large for safe review.",
+        "The staged diff itself exceeds the hard physical line budget.",
+        "No staged diff was available, so ATM fell back to the explicit touched file set."
+      ],
+      "remediation": [
+        "Inspect the returned hardViolations and topFile fields to identify the candidate that exceeds the budget.",
+        "Reduce the staged candidate, split the work, or rebuild a minimal semantic patch before retrying.",
+        "Unrelated unstaged dirty files should be handled by dirty-WIP gates and must not be used to inflate this candidate budget."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node --strip-types scripts/validate-physical-line-budget.ts --json --touched <paths>",
+        "node atm.mjs git commit-status --actor <actor> --task <task-id> --json"
+      ],
+      "statusCommand": "node atm.mjs git commit-status --actor <actor> --task <task-id> --json",
+      "sourceOwner": "packages/cli/src/commands/git-governance/commit-scope-policy.ts"
+    },
+    {
       "code": "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY",
       "category": "git-governance",
       "shortDescription": "Another governed commit is currently finalizing the same branch.",
