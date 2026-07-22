@@ -1,3 +1,13 @@
+import { createBrokerTicket, transitionBrokerTicket } from '../broker/ticket-state.ts';
+import {
+  attachBrokerTicketAuthorizationGrants,
+  authorizeBrokerTicket,
+  type BrokerTicketAuthorizationResourceKind,
+  type BrokerTicketGate,
+  type BrokerTicketOperation,
+  type BrokerTicketWithAuthority
+} from '../broker/ticket-authority/index.ts';
+
 export type TeamPermissionPolicy = {
   readonly schemaId: 'atm.teamPermissionPolicy.v1';
   readonly repoPolicyId: string;
@@ -34,7 +44,22 @@ export type BrokerConflictViolationStatus =
   | 'resolution-issued'
   | 'resolved';
 
-export type BrokerConflictResolutionArtifact = {
+/**
+ * ATM-GOV-0255: the authority envelope a `broker-conflict-blocked` resolution
+ * must carry so `readResolutionAuthorizedForeignTaskIds` can admit a retry
+ * without a manual `.atm/runtime` edit or a generic emergency override.
+ */
+export type BrokerConflictResolutionAuthority = {
+  readonly brokerTicket: BrokerTicketWithAuthority;
+  readonly authorityGeneration: number;
+  readonly authorityDigest: string;
+  readonly conflictFiles: readonly string[];
+  readonly authorizationResourceKind: BrokerTicketAuthorizationResourceKind;
+  readonly authorizationOperation: BrokerTicketOperation;
+  readonly authorizationGate: BrokerTicketGate;
+};
+
+export type BrokerConflictResolutionArtifact = BrokerConflictResolutionAuthority & {
   readonly schemaId: 'atm.brokerConflictResolution.v1';
   readonly specVersion: '0.1.0';
   readonly migration: {
@@ -56,6 +81,29 @@ export type BrokerConflictResolutionArtifact = {
   readonly artifactType: 'atm.brokerConflictResolution.v1';
   readonly statusCode: 'broker-conflict-blocked';
 };
+
+export type BrokerConflictResolutionAuthorizationReason =
+  | 'authorized'
+  | 'missing-broker-ticket'
+  | 'no-bounded-resource-keys'
+  | 'task-mismatch'
+  | 'terminal-ticket'
+  | 'stale-generation'
+  | 'authority-digest-mismatch'
+  | 'resource-dimension-mismatch'
+  | 'resource-key-mismatch'
+  | 'operation-mismatch'
+  | 'gate-mismatch';
+
+export type BrokerConflictResolutionAuthorizationCheck = {
+  readonly authorized: boolean;
+  readonly reason: BrokerConflictResolutionAuthorizationReason;
+};
+
+const DEFAULT_BROKER_CONFLICT_RESOLUTION_ACTOR_ID = 'atm-team-broker';
+const DEFAULT_AUTHORIZATION_RESOURCE_KIND: BrokerTicketAuthorizationResourceKind = 'path';
+const DEFAULT_AUTHORIZATION_OPERATION: BrokerTicketOperation = 'write';
+const DEFAULT_AUTHORIZATION_GATE: BrokerTicketGate = 'git';
 
 export type BrokerConflictAdmissionDecision = {
   readonly ok: boolean;
@@ -98,6 +146,61 @@ export function createDefaultTeamPermissionPolicy(): TeamPermissionPolicy {
   };
 }
 
+/**
+ * Producer-side authority builder. Issues a canonical `atm.brokerTicket.v1`,
+ * transitions it to an executable state, and attaches bounded authorization
+ * grants covering exactly the declared resource keys. This is the single
+ * source of truth for what a resolution artifact's authority envelope
+ * contains; `evaluateBrokerConflictResolutionAuthority` below is the matching
+ * consumer-side check over the same shape.
+ */
+function buildBrokerConflictResolutionAuthority(input: {
+  readonly primaryTaskId: string;
+  readonly actorId: string;
+  readonly conflictFiles: readonly string[];
+  readonly resourceKind: BrokerTicketAuthorizationResourceKind;
+  readonly operation: BrokerTicketOperation;
+  readonly gate: BrokerTicketGate;
+  readonly createdAt: string;
+}): BrokerConflictResolutionAuthority {
+  const conflictFiles = uniqueNonEmpty(input.conflictFiles);
+  if (conflictFiles.length === 0) {
+    throw new Error('Broker conflict resolution requires at least one bounded resource key (conflictFiles).');
+  }
+  const resourceKey = conflictFiles.slice().sort().join('|');
+  const createdTicket = createBrokerTicket({
+    taskId: input.primaryTaskId,
+    actorId: input.actorId,
+    resourceKey,
+    now: input.createdAt
+  });
+  const { ticket: readyTicket } = transitionBrokerTicket({
+    ticket: createdTicket,
+    to: 'ready',
+    actorId: input.actorId,
+    reason: 'broker-conflict-resolution-authority-issued',
+    idempotencyKey: `bcr-ready-${createdTicket.ticketId}`,
+    now: input.createdAt
+  });
+  const brokerTicket = attachBrokerTicketAuthorizationGrants(readyTicket, [
+    {
+      resourceKind: input.resourceKind,
+      resourceKeys: conflictFiles,
+      operations: [input.operation],
+      gates: [input.gate]
+    }
+  ]);
+  return {
+    brokerTicket,
+    authorityGeneration: brokerTicket.authorityGeneration,
+    authorityDigest: brokerTicket.authorityDigest,
+    conflictFiles,
+    authorizationResourceKind: input.resourceKind,
+    authorizationOperation: input.operation,
+    authorizationGate: input.gate
+  };
+}
+
 export function createBrokerConflictResolutionArtifact(input: {
   readonly primaryTaskId: string;
   readonly conflictingTaskIds: readonly string[];
@@ -107,6 +210,11 @@ export function createBrokerConflictResolutionArtifact(input: {
   readonly violationStatus?: BrokerConflictViolationStatus;
   readonly releaseOrder?: readonly string[];
   readonly createdAt?: string;
+  readonly actorId?: string;
+  readonly conflictFiles?: readonly string[];
+  readonly authorizationResourceKind?: BrokerTicketAuthorizationResourceKind;
+  readonly authorizationOperation?: BrokerTicketOperation;
+  readonly authorizationGate?: BrokerTicketGate;
 }): BrokerConflictResolutionArtifact {
   const primaryTaskId = normalizeRequiredId(input.primaryTaskId, 'primaryTaskId');
   const conflictingTaskIds = uniqueNonEmpty(input.conflictingTaskIds);
@@ -118,6 +226,17 @@ export function createBrokerConflictResolutionArtifact(input: {
   const createdAt = input.createdAt?.trim() || new Date().toISOString();
   const decisionClass = input.decisionClass ?? 'serial-release';
   const violationStatus = input.violationStatus ?? 'broker-conflict-blocked';
+  const actorId = input.actorId?.trim() || DEFAULT_BROKER_CONFLICT_RESOLUTION_ACTOR_ID;
+  const conflictFilesInput = input.conflictFiles?.length ? input.conflictFiles : sharedPaths;
+  const authority = buildBrokerConflictResolutionAuthority({
+    primaryTaskId,
+    actorId,
+    conflictFiles: conflictFilesInput,
+    resourceKind: input.authorizationResourceKind ?? DEFAULT_AUTHORIZATION_RESOURCE_KIND,
+    operation: input.authorizationOperation ?? DEFAULT_AUTHORIZATION_OPERATION,
+    gate: input.authorizationGate ?? DEFAULT_AUTHORIZATION_GATE,
+    createdAt
+  });
 
   return {
     schemaId: 'atm.brokerConflictResolution.v1',
@@ -135,8 +254,74 @@ export function createBrokerConflictResolutionArtifact(input: {
     currentAllowedTaskId,
     blockedTaskIds,
     artifactType: 'atm.brokerConflictResolution.v1',
-    statusCode: 'broker-conflict-blocked'
+    statusCode: 'broker-conflict-blocked',
+    ...authority
   };
+}
+
+/**
+ * Canonical consumer-side authority check. This is the single validator
+ * shared by claim admission (`readResolutionAuthorizedForeignTaskIds`) and
+ * any other consumer of `atm.brokerConflictResolution.v1`; it must never be
+ * reimplemented against a divergent contract. Fails closed (returns a
+ * specific non-`authorized` reason, never a silent permissive default) for
+ * missing, stale, over-broad, differently ordered, or resource-mismatched
+ * artifacts, including pre-ATM-GOV-0255 legacy artifacts that carry no
+ * `brokerTicket` at all.
+ */
+export function evaluateBrokerConflictResolutionAuthority(
+  artifact: Record<string, unknown>,
+  taskId: string
+): BrokerConflictResolutionAuthorizationCheck {
+  const ticket = (artifact as { brokerTicket?: unknown }).brokerTicket;
+  if (!isBrokerTicketWithAuthority(ticket)) {
+    return { authorized: false, reason: 'missing-broker-ticket' };
+  }
+  if (ticket.taskId.toUpperCase() !== taskId.toUpperCase()) {
+    return { authorized: false, reason: 'task-mismatch' };
+  }
+  const authorityGeneration = Number((artifact as { authorityGeneration?: unknown }).authorityGeneration ?? ticket.authorityGeneration);
+  const authorityDigest = String((artifact as { authorityDigest?: unknown }).authorityDigest ?? ticket.authorityDigest);
+  const resourceKind = String(
+    (artifact as { authorizationResourceKind?: unknown }).authorizationResourceKind ?? DEFAULT_AUTHORIZATION_RESOURCE_KIND
+  ) as BrokerTicketAuthorizationResourceKind;
+  const operation = String((artifact as { authorizationOperation?: unknown }).authorizationOperation ?? DEFAULT_AUTHORIZATION_OPERATION);
+  const gate = String((artifact as { authorizationGate?: unknown }).authorizationGate ?? DEFAULT_AUTHORIZATION_GATE);
+  const conflictFilesRaw = (artifact as { conflictFiles?: unknown }).conflictFiles;
+  const resourceKeys = Array.isArray(conflictFilesRaw)
+    ? conflictFilesRaw.map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean)
+    : [];
+  if (resourceKeys.length === 0) {
+    return { authorized: false, reason: 'no-bounded-resource-keys' };
+  }
+  for (const resourceKey of resourceKeys) {
+    const decision = authorizeBrokerTicket(ticket, {
+      resourceKind,
+      resourceKey,
+      operation,
+      gate,
+      expectedAuthorityGeneration: authorityGeneration,
+      expectedAuthorityDigest: authorityDigest
+    });
+    if (!decision.authorized) {
+      return { authorized: false, reason: decision.statusCode as BrokerConflictResolutionAuthorizationReason };
+    }
+  }
+  return { authorized: true, reason: 'authorized' };
+}
+
+function isBrokerTicketWithAuthority(value: unknown): value is BrokerTicketWithAuthority {
+  return Boolean(
+    value
+    && typeof value === 'object'
+    && !Array.isArray(value)
+    && (value as { schemaId?: unknown }).schemaId === 'atm.brokerTicket.v1'
+    && typeof (value as { ticketId?: unknown }).ticketId === 'string'
+    && typeof (value as { taskId?: unknown }).taskId === 'string'
+    && typeof (value as { authorityGeneration?: unknown }).authorityGeneration === 'number'
+    && typeof (value as { authorityDigest?: unknown }).authorityDigest === 'string'
+    && Array.isArray((value as { authorizationGrants?: unknown }).authorizationGrants)
+  );
 }
 
 export function decideBrokerConflictResolutionAdmission(

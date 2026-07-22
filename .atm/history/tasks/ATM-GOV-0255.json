@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0255",
+  "title": "Broker resolution authority parity and claim-admission proof",
+  "status": "running",
+  "milestone": "ATM-3.1-R0.7",
+  "dependencies": [
+    "ATM-GOV-0227",
+    "ATM-GOV-0233",
+    "ATM-GOV-0247"
+  ],
+  "acceptance": [
+    "`atm.brokerConflictResolution.v1` emitted by the official command carries a canonical `atm.brokerTicket.v1`, authority generation/digest, bounded authorization grants, task pair, and resource keys.",
+    "The producer and `readResolutionAuthorizedForeignTaskIds` share one validator/normalizer rather than maintaining different artifact contracts.",
+    "A regression reproduces `ATM-GOV-0239` versus `ATM-GOV-0249`: `sharedPaths=[]`, logical overlap `atom-core-registry`, first claim freezes, official resolve emits the artifact, and the retry is admitted only for the authorized pair/resource.",
+    "Missing, stale, over-broad, differently ordered, or resource-mismatched artifacts remain fail closed.",
+    "Existing valid legacy artifacts have an explicit migration or rejection receipt; no silent permissive fallback is allowed.",
+    "Backlog item `ATM-BUG-2026-07-22-224` is linked in delivery evidence."
+  ],
+  "deliverables": [
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "packages/cli/src/commands/broker-conflict-resolution.ts",
+    "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+    "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+    "scripts/validators/team-agents/broker-conflict-resolution.ts",
+    "scripts/validators/team-agents/broker-conflict-resolution-replay.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "packages/cli/src/commands/team/legacy/broker-observability.ts",
+    "packages/cli/src/commands/broker-conflict-resolution.ts",
+    "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+    "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+    "scripts/validators/team-agents/broker-conflict-resolution.ts",
+    "scripts/validators/team-agents/broker-conflict-resolution-replay.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+    "node --strip-types scripts/validate-team-agents.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-produced-bcr-to-claim-admission-red-green",
+  "rollbackStrategy": "revert-commit-and-freeze-conflicting-claim",
+  "rollbackNotes": "Retain fail-closed claim behavior whenever the resolution artifact lacks a canonical ticket, authority digest, authorization grant, or matching resource key.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-broker-conflict-resolution",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-broker-resolution-authority-envelope",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/team-runtime/permission-broker.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0255-broker-resolution-authority-parity-and-claim-admission-proof.task.md",
+    "sectionTitle": "ATM-GOV-0255",
+    "headingLine": 54,
+    "hash": "bf9bd40290bc67b0",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0255-broker-resolution-authority-parity-and-claim-admission-proof.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:bf9bd40290bc67b075da464f9362955f2307e6d3a215b6d0399e165f5c3cc236",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-22T09:50:20.676Z"
+    }
+  },
+  "importedAt": "2026-07-22T09:50:20.676Z",
+  "lastTransitionId": "2026-07-22T10-08-25-401Z-scope-amendment-d5404a371328",
+  "lastTransitionAt": "2026-07-22T10:08:25.401Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-plan31-captain",
+  "reservedAt": "2026-07-22T09:50:35.499Z",
+  "promotedAt": "2026-07-22T09:50:35.501Z",
+  "claim": {
+    "actorId": "claude-plan31-captain",
+    "leaseId": "lease-aaf36151cdbf",
+    "claimedAt": "2026-07-22T09:50:35.504Z",
+    "heartbeatAt": "2026-07-22T09:50:35.504Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0255.*",
+      ".atm/history/task-events/ATM-GOV-0255/**",
+      ".atm/history/tasks/ATM-GOV-0255.json",
+      "packages/cli/src/commands/broker-conflict-resolution.ts",
+      "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/team/legacy/broker-observability.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "schemas/governance/broker-conflict-resolution.schema.json",
+      "scripts/validators/team-agents/broker-conflict-resolution-replay.ts",
+      "scripts/validators/team-agents/broker-conflict-resolution.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260722095035-claude-plan31-captain-1060206c77",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722095035-claude-plan31-captain-1060206c77\""
+    }
+  },
+  "startedAt": "2026-07-22T09:50:35.504Z",
+  "startedByActor": "claude-plan31-captain",
+  "startedBySessionId": "session-20260722095035-claude-plan31-captain-ATM-GOV-0255-36d6f86cbb",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0255",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0255.*",
+      ".atm/history/task-events/ATM-GOV-0255/**",
+      ".atm/history/tasks/ATM-GOV-0255.json",
+      "packages/cli/src/commands/broker-conflict-resolution.ts",
+      "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/team/legacy/broker-observability.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "schemas/governance/broker-conflict-resolution.schema.json",
+      "scripts/validators/team-agents/broker-conflict-resolution-replay.ts",
+      "scripts/validators/team-agents/broker-conflict-resolution.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0255-broker-resolution-authority-parity-and-claim-admission-proof.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0255-broker-resolution-authority-parity-and-claim-admission-proof.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "9aab33e97628ba21dc4f61d81966a938e89e701cf5175ebecb346d8d376b82a2",
+    "actorId": "claude-plan31-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260722095035-claude-plan31-captain-1060206c77",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722095035-claude-plan31-captain-1060206c77\""
+    },
+    "createdAt": "2026-07-22T09:50:42.744Z",
+    "status": "active"
+  }
+}
