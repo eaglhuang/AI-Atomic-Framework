@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-226",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Actor identity / Captain shared-write continuity",
+  "finding": "The active Plan 3.1 task and runner-sync ticket belonged to `codex-plan31-captain-2`, while generic routing and the first build attempt resolved ambient `AGENT_IDENTITY=codex-gpt-5.4-mini`. The operator had to inject `ATM_ACTOR_ID` manually to reach the queue head, showing that actor continuity is not reliably carried across next, claim, Broker, build, and closeout surfaces.",
+  "expectedBehavior": "An explicit active actor should remain authoritative across child commands and shared-write tickets. Ambient legacy editor identity may be reported as provenance but must not silently replace the lane owner; insufficient continuity should fail before mutation with a copyable actor-scoped recovery command.",
+  "evidenceOrRepro": "Plan 3.1 dogfood on 2026-07-22: `ATM-GOV-0249` was active as `codex-plan31-captain-2`, but `next` integration metadata exposed `currentEditorRawValue: codex-gpt-5.4-mini` and plain retained build admission treated that stale actor as the steward. Re-running with `ATM_ACTOR_ID=codex-plan31-captain-2` changed the outcome to queue-head execution.",
+  "followUp": "Implement and close ATM-GOV-0257. Extend actor-resolution and command-manifest regressions across Codex/Claude handoff plus runner-sync enqueue/build/release, without hard-coding editor, model, task, or actor names."
+}

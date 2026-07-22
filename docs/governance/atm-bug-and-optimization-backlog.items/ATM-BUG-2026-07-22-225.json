@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-225",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Runner sync / sealed source freshness",
+  "finding": "After a valid runner-sync queue-head reservation, the retained build reported `cacheHitSkip` from an older committed source while newer framework source remained in the worktree. The frozen runner continued to report `ATM_RUNNER_SYNC_REQUIRED`, so the successful build message and receipt did not establish synchronization of the current source.",
+  "expectedBehavior": "Runner-sync enqueue, cache decision, build receipt, release, and drift clearance must bind to one immutable sealed source/config/output digest. A cache hit from another source must not claim success for current source, and a true no-op cache hit must not dirty tracked release manifests with telemetry-only changes.",
+  "evidenceOrRepro": "Plan 3.1 `ATM-GOV-0249` dogfood on 2026-07-22: runner-sync work `runner-sync-c5739d03` reached queue head, `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` printed `[sealed-runner-build] cacheHitSkip full from d7dbf215a25d601858472540b9ddcceb62cc82cc`, then `node atm.mjs tasks status --task ATM-GOV-0249 --json` still reported runner source drift and `ATM_RUNNER_SYNC_REQUIRED`. Release manifests and receipts changed even though the new source was not sealed into the runner.",
+  "followUp": "Implement and close ATM-GOV-0256. Add stale-source cache-hit red/green coverage, require snapshot-equivalent output proof before drift clearance, and keep telemetry-only cache hits out of tracked release manifests."
+}
