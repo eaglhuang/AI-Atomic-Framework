@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-231",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Task scope amendment / Windows CLI parsing",
+  "finding": "On Windows/PowerShell, `tasks scope add --add \"path1,path2\"` normalized the live allowedFiles list but persisted quote-contaminated paths in amendmentHistory, leaving audit history with entries like `\"packages/...` and `...test.ts\"`.",
+  "expectedBehavior": "Scope amendment parsing should canonicalize paths once and persist the same clean path list to allowedFiles and amendmentHistory. The CLI should reject or repair malformed quoted path fragments and expose a supported status/preflight command for scope audit.",
+  "evidenceOrRepro": "Plan 3.1 ATM-GOV-0258 scope amendment report: allowedFiles was clean, but amendmentHistory transition 2026-07-22T15-11-19-606Z contained quote-contaminated first/last addedPaths; `tasks scope status/preflight` returned ATM_CLI_USAGE and only listed add/remove/repair/repair-deliverables.",
+  "followUp": "Implement malformed scope-amendment path regression coverage in ATM-GOV-0259; add parser-level quote-fragment rejection/repair and a discoverable scope audit/status command."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-233",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Source-first validation / frozen hook bootstrap",
+  "finding": "`node atm.dev.mjs tasks release --wip-commit` can reach an inner `git commit`, but Git still invokes the installed pre-commit hook through frozen `node atm.mjs hook pre-commit`. When the frozen runner lacks the new WIP bypass or candidate-line policy, source-first recovery deadlocks on stale hook behavior.",
+  "expectedBehavior": "Source-first governed commands that perform commits should either route hooks through the same source-first runner, pass a sealed hook runner override, or fail early with an executable recoveryCommand that updates the frozen runner without requiring the blocked commit.",
+  "evidenceOrRepro": "ATM-GOV-0258 WIP park attempts: frozen `tasks release --wip-commit` returned ATM_CLI_USAGE; source-first release after lane adopt failed inside git commit because frozen pre-commit emitted ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED.",
+  "followUp": "Add a source-first hook bridge or bootstrap-safe WIP commit lane. Ensure the recovery does not require publishing release/** while foreign non-release WIP is still present."
+}

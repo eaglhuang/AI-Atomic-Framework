@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-236",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Actor identity / git author continuity",
+  "finding": "Native emergency commits can easily preserve ATM-Actor trailers while still using a stale Git author/committer from the host repo. ATM diagnostics also surfaced safeModeActor/ambient identity values that did not match the active captain actor.",
+  "expectedBehavior": "Emergency commit guidance should set and verify Git author/committer identity atomically from the actor identity, and ATM post-commit/pre-push diagnostics should elevate mismatches into an actionable recoveryCommand rather than advisory-only drift.",
+  "evidenceOrRepro": "Codex emergency commit for ATM-GOV-0260 initially landed with Author/Committer `codex-gpt-5.4-mini` while trailers said `ATM-Actor: codex-plan31-captain`; it required an amend to repair actor continuity. Pre-push later reported safeModeActor `codex-gpt-5.4-mini`.",
+  "followUp": "Add identity continuity checks for emergency/native fallback paths and a generated copyable command that sets GIT_AUTHOR_NAME/GIT_AUTHOR_EMAIL/GIT_COMMITTER_* before commit."
+}

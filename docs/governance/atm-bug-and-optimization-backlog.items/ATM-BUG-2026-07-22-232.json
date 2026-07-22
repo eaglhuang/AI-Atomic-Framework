@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-232",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Editor integration / write-ticket enforcement",
+  "finding": "An AI worker could edit files outside its task scope before ATM commit/claim gates noticed. Gemini 0258 produced broad dirty WIP and formatter spillover beyond the intended keep-list, and ATM only surfaced the problem after the shared worktree was already polluted.",
+  "expectedBehavior": "ATM should provide a write-ticket or editor adapter pre-write guard that checks the current task allowedFiles before filesystem mutation, with post-write fallback evidence for tools that cannot intercept writes. Normal out-of-scope needs should route through governed scope amendment, not silent dirty spillover.",
+  "evidenceOrRepro": "Plan 3.1 Gemini 0258 counterexample: worktree included out-of-scope/formatter changes such as actor-registry, identity, bootstrap, command-manifest, identity-normalization, and commit-bundle-assembly while the intended task focused on dirty-release/WIP recovery.",
+  "followUp": "Prioritize ATM-GOV-0259 write-ticket/scope amendment guard. Require adapter pre-write checks, post-write violation records, actor mismatch diagnostics, and no second permission model."
+}
