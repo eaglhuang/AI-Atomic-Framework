@@ -1,0 +1,20 @@
+{
+  "parallel-run-is-real": {
+    "id": "parallel-run-is-real",
+    "claim": "Two distinct workers completed governed work in parallel.",
+    "authoritativeSources": ["broker-events", "task-events"],
+    "derivationRule": "distinct-task-actor-process-tuples-overlap",
+    "requiredRealness": "real-dogfood",
+    "verifier": {
+      "mode": "separate-actor"
+    },
+    "negativeControls": [
+      {
+        "id": "same-process-replay",
+        "expectedFailureReason": "process-identity-not-distinct"
+      }
+    ],
+    "missingDataVerdict": "inconclusive",
+    "closureCritical": true
+  }
+}

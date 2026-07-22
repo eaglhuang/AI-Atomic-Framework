@@ -15,6 +15,7 @@
 import type { ContextMap } from './task-import-validators.ts';
 import type { TaskDispatchPattern } from './task-markdown-helpers.ts';
 import type { TaskHistoricalDeliveryReport } from './historical-delivery.ts';
+import type { AcceptanceEvidenceMap } from '@ai-atomic-framework/core';
 
 // ---------------------------------------------------------------------------
 // tasks import contracts
@@ -58,6 +59,7 @@ export interface TaskImportRecord {
   readonly waveId?: string | null;
   readonly dependencies: readonly string[];
   readonly acceptance: readonly string[];
+  readonly acceptanceEvidence?: AcceptanceEvidenceMap;
   readonly deliverables: readonly string[];
   readonly scopePaths?: readonly string[];
   readonly validators?: readonly string[];

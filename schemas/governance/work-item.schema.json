@@ -92,6 +92,9 @@
           }
         }
       }
+    },
+    "acceptanceEvidence": {
+      "$ref": "#/$defs/acceptanceEvidenceMap"
     }
   },
   "$defs": {
@@ -144,6 +147,72 @@
           "type": "string",
           "minLength": 1
         }
+      }
+    },
+    "acceptanceEvidenceMap": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/acceptanceEvidencePredicate"
+      }
+    },
+    "acceptanceEvidencePredicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "claim", "authoritativeSources", "derivationRule", "requiredRealness", "verifier", "negativeControls", "missingDataVerdict", "closureCritical"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "claim": { "type": "string", "minLength": 1 },
+        "authoritativeSources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "derivationRule": { "type": "string", "minLength": 1 },
+        "requiredRealness": {
+          "enum": ["fixture", "unit", "command-smoke", "integration", "sealed-replay", "real-dogfood", "production-ledger"]
+        },
+        "verifier": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mode"],
+              "properties": {
+                "mode": { "const": "separate-actor" },
+                "actorId": { "type": "string", "minLength": 1 }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mode", "policyDigest"],
+              "properties": {
+                "mode": { "const": "locked-policy" },
+                "policyDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+              }
+            }
+          ]
+        },
+        "negativeControls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "expectedFailureReason"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+              "expectedFailureReason": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "missingDataVerdict": { "const": "inconclusive" },
+        "closureCritical": { "type": "boolean" }
       }
     }
   }
