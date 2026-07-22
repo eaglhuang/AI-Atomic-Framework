@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-230",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Git governance / line-budget recovery",
+  "finding": "When a governed commit is blocked by `ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED`, ATM reports only the wrapper-level `ATM_GIT_COMMIT_FAILED` in the operator flow and leaves the captain to inspect `.atm/runtime/git-commit-attempts/*` plus manually reconstruct a minimal patch from a formatter-contaminated file.",
+  "expectedBehavior": "The governed commit path should surface the nested line-budget error, affected files, numstat, and a copyable recovery path. For formatter or bulk-rewrite contamination, ATM should offer a first-class minimal-patch rebuild or split-policy recovery that preserves intended semantic hunks without requiring each captain to rediscover the same procedure.",
+  "evidenceOrRepro": "During ATM-GOV-0258, `node atm.mjs git commit --actor antigravity-gemini35-plan31-captain --task ATM-GOV-0258 --message \"fix(tasks): preserve dirty release wip safely\" --json` failed as `ATM_GIT_COMMIT_FAILED` with empty stdout/stderr. The attempt file `.atm/runtime/git-commit-attempts/antigravity-gemini35-plan31-captain__ATM-GOV-0258.json` revealed `errorCode: \"ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED\"`. `git diff --numstat -- packages/cli/src/commands/git-governance/implementation.ts` showed `5404 insertions / 5 deletions`, caused by formatter-style full-file expansion. A manual captain pass rebuilt the file from `HEAD:path` and reapplied only the `--wip` semantic hunks, reducing that file to `1 insertion / 1 deletion` while focused validators still passed.",
+  "followUp": "Add an ATM recovery surface for nested commit failure diagnosis and formatter-contaminated minimal-patch rebuild guidance. Register exact error-code entries for `ATM_GIT_COMMIT_FAILED` and `ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED`, and link the behavior to Plan 3.1 evidence so future captains get deterministic recovery instead of manual forensic work."
+}
