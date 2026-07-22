@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-229",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Task release / dirty WIP ownership / claim recovery",
+  "finding": "Plan 3.1 dogfood showed that `tasks release` can release a task claim while leaving that task's in-scope source edits in the worktree as unowned unstaged WIP. A later task that legitimately needs one of the same files is then blocked by `ATM_CLAIM_FOREIGN_UNSTAGED_WIP`; the blocker reports the dirty file but provides only prose guidance and no `recoveryCommand`. This turns a governed broker conflict into an ownerless manual arbitration problem.",
+  "expectedBehavior": "When a claimed task is released with dirty in-scope files, ATM should either prevent release until the lane commits, shelves, checkpoints, or explicitly abandons its WIP through a governed command, or it should preserve an ownership receipt that lets the next claim produce a safe recovery route. The later claim blocker should return machine-actionable options such as re-adopt owning lane, request owner checkpoint, create governed WIP shelf, attach WIP to the original task, or perform an explicit owner-approved discard. It should not leave external captains to choose between unsafe stash/restore/manual cleanup.",
+  "evidenceOrRepro": "On 2026-07-22, `cursor-grok45-plan31-captain` released `ATM-GOV-0257` for captain arbitration. Release succeeded with `ATM_TASKS_CLAIM_RELEASED`, broker status then showed `activeIntents: []`, `sharedSurfaceQueues: []`, and `sharedSurfaceFreezes: []`, but the worktree still contained modified ATM-GOV-0257 source files including `packages/cli/src/commands/framework-development/runner-sync-admission.ts` and `tests/cli/runner-sync-build-actor-continuity.test.ts`. Claude then retried `ATM-GOV-0256` and claim failed with `ATM_CLAIM_FOREIGN_UNSTAGED_WIP` on `packages/cli/src/commands/framework-development/runner-sync-admission.ts`, `ownership: \"unowned\"`, `changeKinds: [\"unstaged\"]`, and no `recoveryCommand`. The file diff was non-trivial (`144 insertions(+), 14 deletions(-)`), so blindly restoring or stashing would risk losing another lane's implementation progress.",
+  "followUp": "Add a Plan 3.1 insertion card or Plan 3.2 task for governed WIP handoff/shelving on task release and claim recovery. Acceptance should include: release with dirty in-scope files fails or produces a first-class WIP receipt; released dirty WIP retains owner/task/lane attribution; a later overlapping claim receives deterministic recoveryCommand options; no manual stash/restore is required; and metrics report count of dirty-release attempts, WIP shelves, recovered claims, ownerless WIP blockers, and manual interventions."
+}
