@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-22T11-31-15-239Z-close-6940fa414608",
+  "taskId": "ATM-GOV-0255",
+  "action": "close",
+  "actorId": "claude-plan31-captain",
+  "sessionId": "session-20260722095035-claude-plan31-captain-ATM-GOV-0255-36d6f86cbb",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0255.json",
+  "taskSha256": "sha256:22c66f473787cec2a0d9afe6a78be1e3f07580fcad81a3afa9f369dcb7d3a3ff",
+  "createdAt": "2026-07-22T11:31:15.239Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0255 --actor claude-plan31-captain --status done --historical-delivery 6a89ed0d2f0c6f61ee0cb6d5dc7f27026716d5f3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260722095035-claude-plan31-captain-ATM-GOV-0255-36d6f86cbb",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0255.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-22T11:31:15.225Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0255.*",
+        ".atm/history/task-events/ATM-GOV-0255/**",
+        ".atm/history/tasks/ATM-GOV-0255.json",
+        "packages/cli/src/commands/broker-conflict-resolution.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/cli/src/commands/team/legacy/broker-observability.ts",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "schemas/governance/broker-conflict-resolution.schema.json",
+        "scripts/validators/team-agents/broker-conflict-resolution-replay.ts",
+        "scripts/validators/team-agents/broker-conflict-resolution.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker-conflict-resolution.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/cli/src/commands/team/legacy/broker-observability.ts",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "schemas/governance/broker-conflict-resolution.schema.json",
+        "scripts/validators/team-agents/broker-conflict-resolution-replay.ts",
+        "scripts/validators/team-agents/broker-conflict-resolution.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
