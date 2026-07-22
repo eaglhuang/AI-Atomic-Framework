@@ -29,4 +29,5 @@ export * from './wave-generated-executor.ts';
 export * from './parallel-admission-policy.ts';
 export * from './adapters/index.ts';
 export * from './cross-task-mutation-guard.ts';
+export * from './workspace-topology-policy.ts';
 export * from './boundaries/index.ts';

@@ -4,12 +4,12 @@
   "specVersion": "0.1.0",
   "migration": {
     "strategy": "none",
-    "fromVersion": null,
-    "notes": "Initial release."
+    "fromVersion": "2.3.0",
+    "notes": "Add single canonical worktree and compose-first shared writes as INV-ATM-010."
   },
-  "charterVersion": "2.3.0",
+  "charterVersion": "2.4.0",
   "projectName": "sample-project",
-  "lastAmendedAt": "2026-05-17T00:00:00.000Z",
+  "lastAmendedAt": "2026-07-22T03:10:00.000Z",
   "charterHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
   "firstPrinciplesHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
   "scheduleA": {
@@ -168,6 +168,21 @@
         "governance"
       ],
       "rationale": "Hard-coded fixes make governance brittle and hide repeatable failure classes. A generalized, evidence-bounded repair keeps ATM extensible, while data-driven boundaries prevent changing policy or domain facts from being buried inside code logic."
+    },
+    {
+      "id": "INV-ATM-010",
+      "title": "Single canonical worktree and compose-first shared writes",
+      "rule": "Normal governed parallel development uses one canonical worktree, base, and HEAD. A shared physical file is compose-eligible rather than a file lock: workers declare bounded atom/CID/content-anchor/source-range intents and submit proposals, while the broker, format adapter, and transactional composer decide compose, revalidation, escalation, or queue. A neutral steward is the only shared-file writer and shared delivery records member attribution. Queueing or revalidation is a fallback for a true logical conflict, stale base/CAS failure, unsupported adapter, or fairness bound. AI workers must not use Git branches, detached worktrees, alternate indexes, merges, or rebases as normal concurrency/isolation mechanisms. The closed exceptions are emergency/anomaly recovery, historical read-only discrimination, and non-development sealed packaging; each requires a named receipt and cannot perform normal governed contribution writes.",
+      "enforcement": "doctor",
+      "breakingChange": false,
+      "tags": [
+        "parallel",
+        "compose-first",
+        "canonical-worktree",
+        "steward",
+        "governance"
+      ],
+      "rationale": "Logical intent and compose evidence, not Git topology or path-only locking, are the basis for safe parallel work. A single canonical worktree preserves comparable code state while a neutral steward prevents concurrent physical writes from losing attribution or updates."
     }
   ]
 }

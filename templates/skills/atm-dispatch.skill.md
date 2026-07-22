@@ -59,6 +59,20 @@ work. Before blocking parallel progress, identify the concrete Tier 2 shared
 surface and the intersecting task, actor, or file set that requires
 broker/steward coordination.
 
+`INV-ATM-010` requires one canonical worktree, base, and HEAD for normal
+governed parallel development. The same physical file is compose-eligible, not a
+file lock: workers declare bounded atom/CID/content-anchor/source-range intents
+and submit proposals. The broker, format adapter, and transactional composer
+select compatible proposals; the neutral steward is the only shared-file writer
+and shared delivery records every member's attribution.
+
+Do not create or use a Git branch, detached worktree, alternate index, merge, or
+rebase as a normal concurrency/isolation mechanism. Queue or revalidate only for
+a true logical conflict, stale base/CAS failure, unsupported adapter, or fairness
+bound. The closed exceptions are emergency/anomaly recovery, historical
+read-only discrimination, and non-development sealed packaging, each with a
+named receipt. A safe same-file compose may have zero queue residency.
+
 {{ACTOR_IDENTITY_HANDOFF_GATE}}
 
 ## Dispatch Identity Rule

@@ -5,11 +5,11 @@
 > resolved through a governed charter waiver proposal (`behavior.evolve` +
 > `charterWaiver` + `HumanReviewDecision`), not by silent override.
 
-**Charter version**: 2.3.0
-**Last amended**: 2026-07-20T00:00:00.000Z
+**Charter version**: 2.4.0
+**Last amended**: 2026-07-22T03:10:00.000Z
 **Machine-readable invariants**: `.atm/charter/charter-invariants.json`
 **Normative design schedule**: `.atm/charter/atm-first-principles.md` (version 1.0.0)
-**Schedule SHA-256**: `sha256:488d193397ed56b89f6f526aa882ebcb4fd8e9f81d2c4a5c8b30e5a3d5487f5c`
+**Schedule SHA-256**: `sha256:4936539324d5c04a3275eda735a75f9af6bf8bdce83cb5584420fdf43d33f7e2`
 
 ---
 
@@ -54,6 +54,7 @@ See `charter-invariants.json` for the machine-readable form used by ATM guards.
 | INV-ATM-007 | Public framework docs remain English-only | doctor |
 | INV-ATM-008 | Broker tickets, not refusals | doctor |
 | INV-ATM-009 | Generalized repair and data-driven policy | doctor |
+| INV-ATM-010 | Single canonical worktree and compose-first shared writes | doctor |
 
 ### INV-ATM-008 — Broker tickets, not refusals (parallel governance principle)
 
@@ -82,6 +83,25 @@ logic. Prefer schemas, registries, configuration, observed counters, or compact
 digest evidence over embedding changeable numbers or strings in control flow.
 The rule is not a license for speculative abstraction: the generalized solution
 must be observable, testable, and no broader than the evidence supports.
+
+### INV-ATM-010 — Single canonical worktree and compose-first shared writes
+
+Normal governed parallel development uses one canonical worktree, base, and
+HEAD. A shared physical file is not a file lock: workers declare bounded
+atom/CID/content-anchor/source-range intents and produce proposals; the broker,
+format adapter, and transactional composer decide whether proposals can compose.
+When they can, a neutral steward is the only writer that applies the composed
+result to the canonical worktree and the shared-delivery adapter records member
+attribution in one delivery.
+
+Queueing or revalidation is a fallback for a true logical conflict, stale
+base/CAS failure, unsupported adapter, or fairness bound. An AI worker must not
+use a Git branch, detached worktree, alternate index, merge, or rebase as a
+normal concurrency or isolation mechanism. Git remains an outer delivery
+substrate after steward apply. The closed exceptions are emergency/anomaly
+recovery, historical read-only discrimination, and non-development sealed
+packaging; each exception requires a named receipt and cannot perform normal
+governed contribution writes.
 
 ---
 

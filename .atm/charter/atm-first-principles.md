@@ -48,9 +48,11 @@ a new scope epoch, check current assignments and contributions for overlap, and
 record the reason. If another contribution owns the file, work MUST queue or move
 to the composer/closer. In-flight ownership transfer is forbidden.
 
-ATM SHOULD use shadow-first contributions. Workers write in ephemeral isolated
-workspaces and deliver file blobs plus hashes. Shared live-worktree writes are not
-a canonical Team Agents transport.
+ATM MUST use proposal-first contributions on one canonical worktree/base/HEAD.
+Workers may use ephemeral non-Git proposal carriers, but they do not create a
+second development worktree or branch. A worker submits bounded file/atom/anchor
+intents and proposals; a neutral steward is the only writer that applies an
+accepted shared-file composition to the canonical worktree.
 
 ### FP-002: Necessary validation only
 
@@ -93,15 +95,17 @@ delivery without a third ambiguous state.
 ATM MUST prefer the smallest mechanism that preserves Section 3:
 
 1. Route work as Single Agent unless independent contribution groups justify Team.
-2. Use ephemeral shadow workspaces for Team writes and focused validation.
+2. Use bounded non-Git proposal carriers for Team contributions and focused
+   validation; keep the canonical worktree as the single development substrate.
 3. Let an ATM wrapper create content-addressed receipts.
 4. Assemble all accepted contributions at one barrier.
 5. Derive final validation obligations from the assembled payload.
 6. Let one closer seal, commit, publish, and queue the push.
 
-File leases are scheduling hints in a shadow-first design. They prevent duplicate
-effort but are not a reason to build a second content-merging system. Content
-identity and overlap are rechecked at assembly.
+File leases are scheduling hints in a proposal-first design. They prevent
+duplicate effort but are not a reason to treat a shared physical file as a lock
+or build a second content-merging system. Content identity, bounded logical
+overlap, and adapter mergeability are rechecked at assembly.
 
 Batch mode is a parent delivery queue, not a second task lifecycle. It MUST reuse
 the same contribution, receipt, validation, and closer contracts. Only the queue
@@ -177,10 +181,12 @@ product inputs and MUST feed future routing decisions.
 
 ## 9. Progressive Enforcement
 
-New governance behavior MUST first run in shadow mode against the current canonical
-path. Promotion requires artifact parity, crash consistency, no weaker validation,
-and compliance with the applicable cost budgets. Rollback MUST select the last
-known canonical path without rewriting user work.
+New governance behavior MUST first run in proposal/shadow mode against the
+current canonical path. This shadow mode is a non-Git comparison or proposal
+carrier, not a detached development worktree. Promotion requires artifact parity,
+crash consistency, no weaker validation, and compliance with the applicable cost
+budgets. Rollback MUST select the last known canonical path without rewriting
+user work.
 
 When a first principle is not yet machine-enforced, documentation and telemetry
 MUST say so plainly. Design intent MUST NOT be represented as implemented safety.
