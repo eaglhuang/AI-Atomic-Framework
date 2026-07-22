@@ -5,13 +5,22 @@ import { spawnSync } from 'node:child_process';
 import { buildStewardApplyEvidence, type StewardApplyEvidence } from './apply-evidence.ts';
 import { sortProposalsForCompose } from './merge-plan.ts';
 import { validateBrokerProposal } from './proposal.ts';
+import {
+  applyTransactionalStewardPlan,
+  buildPatchProposalComposition,
+  buildStewardSemanticValidationReceipt
+} from './steward-transactional-apply.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
-import type { BrokerOperationRunRecordEnvelope, DecompositionRequest, MergePlan, MergeVerdict, PatchProposal } from './types.ts';
-// ---------------------------------------------------------------------------
+import type {
+  BrokerOperationRunRecordEnvelope,
+  DecompositionRequest,
+  MergePlan,
+  MergeVerdict,
+  PatchProposal
+} from './types.ts';
 // Steward arbitration verdict ??the four possible outcomes per implementation
 // contract (TASK-MAO-0009).
-// ---------------------------------------------------------------------------
 export type StewardArbitrationVerdict =
   | 'apply'
   | 'merge-required'
@@ -54,9 +63,7 @@ export interface StewardApplyResult {
   readonly ok: boolean;
   readonly evidence: StewardApplyEvidence;
 }
-// ---------------------------------------------------------------------------
 // Steward identity & permission check.
-// ---------------------------------------------------------------------------
 export interface StewardIdentity {
   /** The steward's identifier (e.g. 'neutral-write-steward', 'runner-broker'). */
   readonly stewardId: string;
@@ -182,20 +189,28 @@ export function applyStewardPlan(input: {
     if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
     return { ok: false, evidence };
   }
-  const sorted = sortProposalsForCompose(input.proposals);
-  const fileBeforeHashes: Record<string, string> = {};
-  const fileAfterHashes: Record<string, string> = {};
-  const appliedFiles: string[] = [];
-  for (const proposal of sorted) {
-    const targetPath = path.resolve(input.cwd, proposal.targetFile);
-    const before = readFileSync(targetPath, 'utf8');
-    fileBeforeHashes[proposal.targetFile] = hashText(before);
-    const after = applyUnifiedPatch(before, proposal.patch);
-    mkdirSync(path.dirname(targetPath), { recursive: true });
-    writeFileSync(targetPath, after, 'utf8');
-    fileAfterHashes[proposal.targetFile] = hashText(after);
-    if (!appliedFiles.includes(proposal.targetFile)) appliedFiles.push(proposal.targetFile);
-  }
+  const transactional = buildPatchProposalComposition({
+    cwd: input.cwd,
+    mergePlan: input.mergePlan,
+    proposals: input.proposals
+  });
+  const semanticValidation = buildStewardSemanticValidationReceipt({
+    plan: transactional.plan,
+    outputFiles: transactional.outputFiles
+  });
+  const apply = applyTransactionalStewardPlan({
+    cwd: input.cwd,
+    stewardId: input.stewardId,
+    writerRole: 'neutral-steward',
+    plan: transactional.plan,
+    outputFiles: transactional.outputFiles,
+    scopeFiles: input.scopeFiles,
+    semanticValidation,
+    baseHead: readGitHeadCommit(input.cwd)
+  });
+  const fileBeforeHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.beforeHash)]));
+  const fileAfterHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.afterHash)]));
+  const appliedFiles = apply.ok ? apply.receipt.files.map((file) => file.filePath).sort((left, right) => left.localeCompare(right)) : [];
   appliedFiles.sort((left, right) => left.localeCompare(right));
   const brokerOperationRun = buildStewardBrokerOperationRun({
     mergePlan: input.mergePlan,
@@ -211,11 +226,12 @@ export function applyStewardPlan(input: {
     appliedFiles,
     fileBeforeHashes,
     fileAfterHashes,
-    verdict: 'applied',
+    verdict: apply.ok ? 'applied' : 'blocked',
+    blockedReasons: apply.ok ? undefined : apply.receipt.blockedReasons,
     brokerOperationRun
   });
   if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
-  return { ok: true, evidence };
+  return { ok: apply.ok, evidence };
 }
 export function executeBrokerScopedWrite(input: {
   readonly cwd: string;
@@ -294,11 +310,9 @@ export function executeBrokerScopedWrite(input: {
     }
   };
 }
-// ---------------------------------------------------------------------------
 // Top-level steward arbitration entry point (TASK-MAO-0009).
 // Wraps planning, identity checks, and verdict production. Records
 // route/task/evidence links as required by the acceptance criteria.
-// ---------------------------------------------------------------------------
 export function arbitrateStewardRequest(input: {
   readonly cwd: string;
   readonly identity: StewardIdentity;
@@ -551,6 +565,9 @@ function mapStewardMergeVerdict(verdict: MergePlan['verdict']): MergeVerdict {
 }
 function hashText(value: string): string {
   return crypto.createHash('sha256').update(value).digest('hex');
+}
+function stripShaPrefix(value: string): string {
+  return value.replace(/^sha256:/, '');
 }
 function normalizeRepoPath(cwd: string, candidate: string): string {
   const normalized = path.normalize(candidate).replace(/\\/g, '/');

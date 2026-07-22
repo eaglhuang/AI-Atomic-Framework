@@ -1,10 +1,11 @@
 import crypto from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { buildStewardApplyEvidence } from './apply-evidence.js';
 import { sortProposalsForCompose } from './merge-plan.js';
 import { validateBrokerProposal } from './proposal.js';
+import { applyTransactionalStewardPlan, buildPatchProposalComposition, buildStewardSemanticValidationReceipt } from './steward-transactional-apply.js';
 /**
  * Validates that a steward identity is well-formed and authorised.
  * Derived-artifact writers must declare a route or task authorisation.
@@ -71,21 +72,28 @@ export function applyStewardPlan(input) {
             writeEvidenceFile(input.evidenceOutPath, evidence);
         return { ok: false, evidence };
     }
-    const sorted = sortProposalsForCompose(input.proposals);
-    const fileBeforeHashes = {};
-    const fileAfterHashes = {};
-    const appliedFiles = [];
-    for (const proposal of sorted) {
-        const targetPath = path.resolve(input.cwd, proposal.targetFile);
-        const before = readFileSync(targetPath, 'utf8');
-        fileBeforeHashes[proposal.targetFile] = hashText(before);
-        const after = applyUnifiedPatch(before, proposal.patch);
-        mkdirSync(path.dirname(targetPath), { recursive: true });
-        writeFileSync(targetPath, after, 'utf8');
-        fileAfterHashes[proposal.targetFile] = hashText(after);
-        if (!appliedFiles.includes(proposal.targetFile))
-            appliedFiles.push(proposal.targetFile);
-    }
+    const transactional = buildPatchProposalComposition({
+        cwd: input.cwd,
+        mergePlan: input.mergePlan,
+        proposals: input.proposals
+    });
+    const semanticValidation = buildStewardSemanticValidationReceipt({
+        plan: transactional.plan,
+        outputFiles: transactional.outputFiles
+    });
+    const apply = applyTransactionalStewardPlan({
+        cwd: input.cwd,
+        stewardId: input.stewardId,
+        writerRole: 'neutral-steward',
+        plan: transactional.plan,
+        outputFiles: transactional.outputFiles,
+        scopeFiles: input.scopeFiles,
+        semanticValidation,
+        baseHead: readGitHeadCommit(input.cwd)
+    });
+    const fileBeforeHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.beforeHash)]));
+    const fileAfterHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.afterHash)]));
+    const appliedFiles = apply.ok ? apply.receipt.files.map((file) => file.filePath).sort((left, right) => left.localeCompare(right)) : [];
     appliedFiles.sort((left, right) => left.localeCompare(right));
     const brokerOperationRun = buildStewardBrokerOperationRun({
         mergePlan: input.mergePlan,
@@ -101,12 +109,13 @@ export function applyStewardPlan(input) {
         appliedFiles,
         fileBeforeHashes,
         fileAfterHashes,
-        verdict: 'applied',
+        verdict: apply.ok ? 'applied' : 'blocked',
+        blockedReasons: apply.ok ? undefined : apply.receipt.blockedReasons,
         brokerOperationRun
     });
     if (input.evidenceOutPath)
         writeEvidenceFile(input.evidenceOutPath, evidence);
-    return { ok: true, evidence };
+    return { ok: apply.ok, evidence };
 }
 export function executeBrokerScopedWrite(input) {
     const allowedFiles = [...new Set(input.handshake.scopedWriteExecution.allowedFiles.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
@@ -177,11 +186,9 @@ export function executeBrokerScopedWrite(input) {
         }
     };
 }
-// ---------------------------------------------------------------------------
 // Top-level steward arbitration entry point (TASK-MAO-0009).
 // Wraps planning, identity checks, and verdict production. Records
 // route/task/evidence links as required by the acceptance criteria.
-// ---------------------------------------------------------------------------
 export function arbitrateStewardRequest(input) {
     const owningRouteId = input.owningRouteId ?? input.identity.authorisedByRouteId ?? null;
     const owningTaskId = input.owningTaskId ?? input.identity.authorisedByTaskId ?? null;
@@ -418,6 +425,9 @@ function mapStewardMergeVerdict(verdict) {
 }
 function hashText(value) {
     return crypto.createHash('sha256').update(value).digest('hex');
+}
+function stripShaPrefix(value) {
+    return value.replace(/^sha256:/, '');
 }
 function normalizeRepoPath(cwd, candidate) {
     const normalized = path.normalize(candidate).replace(/\\/g, '/');

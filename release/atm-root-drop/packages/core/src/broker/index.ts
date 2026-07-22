@@ -9,6 +9,7 @@ export * from './merge-plan.ts';
 export * from './compose.ts';
 export * from './apply-evidence.ts';
 export * from './steward.ts';
+export * from './steward-transactional-apply.ts';
 export * from './team-lane.ts';
 export * from './lifecycle.ts';
 export * from './orphan-cleanup.ts';

@@ -9,6 +9,7 @@ export * from './merge-plan.js';
 export * from './compose.js';
 export * from './apply-evidence.js';
 export * from './steward.js';
+export * from './steward-transactional-apply.js';
 export * from './team-lane.js';
 export * from './lifecycle.js';
 export * from './orphan-cleanup.js';
