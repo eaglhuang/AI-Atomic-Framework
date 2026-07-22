@@ -72,17 +72,19 @@ function ensureDir(filePath: string): void {
 function copyDeclarations(packageDir: string): void {
   const typeRoot = path.join(root, '.types', packageDir, 'src');
   const distRoot = path.join(root, packageDir, 'dist');
-  if (!existsSync(typeRoot)) {
-    const fallback = path.join(distRoot, 'index.d.ts');
-    ensureDir(fallback);
-    writeFileSync(fallback, "export * from '../src/index.ts';\n", 'utf8');
-    return;
+  if (existsSync(typeRoot)) {
+    for (const filePath of listFiles(typeRoot)) {
+      if (!filePath.endsWith('.d.ts')) continue;
+      const target = path.join(distRoot, path.relative(typeRoot, filePath));
+      ensureDir(target);
+      copyFileSync(filePath, target);
+    }
   }
-  for (const filePath of listFiles(typeRoot)) {
-    if (!filePath.endsWith('.d.ts')) continue;
-    const target = path.join(distRoot, path.relative(typeRoot, filePath));
-    ensureDir(target);
-    copyFileSync(filePath, target);
+  const declarationEntrypoint = path.join(distRoot, 'index.d.ts');
+  if (!existsSync(declarationEntrypoint)) {
+    // Incremental caches may survive while a fresh sealed worktree has no hydrated .types output.
+    ensureDir(declarationEntrypoint);
+    writeFileSync(declarationEntrypoint, "export * from '../src/index.ts';\n", 'utf8');
   }
 }
 
