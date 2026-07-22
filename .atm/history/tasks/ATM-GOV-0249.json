@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0249",
+  "title": "Transactional compose output and single-write steward apply",
+  "status": "running",
+  "milestone": "ATM-3.1-R0",
+  "dependencies": [
+    "ATM-GOV-0247"
+  ],
+  "acceptance": [
+    "The apply API accepts `TransactionalCompositionPlan.outputFiles`; it does not replay proposals against the live file one by one.",
+    "The plan is derived from one immutable base snapshot and binds canonical root, base/HEAD, proposal digests, member task/actor attribution, serializability proof digest, and every file's before/after hash.",
+    "Before any canonical write, the steward verifies all CAS/base/HEAD and declared-output preconditions and materializes every candidate output in a non-canonical temporary area. A stale base, unsupported operation, undeclared output, or failed serializability proof causes zero canonical writes.",
+    "The apply boundary exposes one explicit semantic-validation admission seam: it accepts only the exact candidate/output digest authorized by a passing post-compose validation receipt. Validator selection and execution remain outside this card's transactional writer module.",
+    "The authenticated writer role is `neutral-steward`; no worker-facing API can invoke the live-file write primitive directly.",
+    "Each successful composed output file records `canonicalWriteCount: 1`. Two same-file disjoint proposals therefore produce one composed blob and one canonical write, not two sequential writes.",
+    "A steward apply receipt binds the composition-plan digest, serializability-proof digest, member attribution, writer identity/role, before/after hashes, and canonical write count for downstream admission and commit verification.",
+    "Multi-file failure handling is deterministic: either atomic replacement succeeds for the complete declared set or a durable journal/compensation receipt proves restoration before another attempt. Partial success cannot be reported as delivery.",
+    "`steward.ts` delegates to the new atom and contains no duplicate composition or per-file policy algorithm.",
+    "Short English comments explain immutable-base composition, the single-write invariant, and why only the neutral steward owns the canonical write primitive.",
+    "Short English comments also mark the seam between serializability, semantic validation, and side effects so future maintainers do not add validators or language policy to `steward.ts`.",
+    "Focused tests prove same-file disjoint composition, exact one-write instrumentation, stale-base zero-write rejection, true-conflict queue/revalidation, and rollback/compensation after an injected apply failure.",
+    "The steward safety path cannot close on source-only tests. The same single-write/stale-base behavior probe must pass through source and frozen `node atm.mjs`, bind source/frozen/build/projection digests, and retain a card-attributable parity receipt even when the runner-sync build receipt is shared."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/steward-transactional-apply.ts",
+    "packages/core/src/broker/steward.ts",
+    "packages/core/src/broker/index.ts",
+    "tests/core/transactional-steward-single-write.test.ts",
+    "tests/core/transactional-steward-rollback.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/transactional-composer.ts",
+    "packages/core/src/broker/steward-transactional-apply.ts",
+    "packages/core/src/broker/steward.ts",
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/index.ts",
+    "tests/core/transactional-steward-single-write.test.ts",
+    "tests/core/transactional-steward-rollback.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+    "node --strip-types tests/core/transactional-steward-rollback.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "transactional-composition-and-single-write-steward-receipts",
+  "rollbackStrategy": "revert-commit-and-trip-queue-only",
+  "rollbackNotes": "Retain immutable proposals and composition evidence; do not fall back to worker writes or per-proposal live-file mutation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.steward-transactional-apply",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker.steward-transactional-apply",
+        "pattern": "Transactional Apply",
+        "source": "packages/core/src/broker/steward-transactional-apply.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/transactional-composer.ts",
+        "packages/core/src/broker/steward-transactional-apply.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/types.ts",
+        "packages/core/src/broker/index.ts",
+        "tests/core/transactional-steward-single-write.test.ts",
+        "tests/core/transactional-steward-rollback.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0249-transactional-compose-output-and-single-write-steward-apply.task.md",
+    "sectionTitle": "ATM-GOV-0249",
+    "headingLine": 51,
+    "hash": "3d5a89aa6a153bd7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0249-transactional-compose-output-and-single-write-steward-apply.task.md",
+      "planningCommitSha": "10f4391127d4890cfd1a40a207efed6c7beeda52",
+      "contentDigest": "sha256:3d5a89aa6a153bd723e0c71055c2b54877d4a4397ebb6487eff28e9155a44157",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-22T08:33:05.815Z"
+    }
+  },
+  "importedAt": "2026-07-22T08:33:05.815Z",
+  "lastTransitionId": "2026-07-22T09-28-31-672Z-renew-488ce3122ecc",
+  "lastTransitionAt": "2026-07-22T09:28:31.672Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-plan31-captain-2",
+  "reservedAt": "2026-07-22T08:49:21.555Z",
+  "promotedAt": "2026-07-22T08:49:21.557Z",
+  "claim": {
+    "actorId": "codex-plan31-captain-2",
+    "leaseId": "lease-a60d1cccb13e",
+    "claimedAt": "2026-07-22T08:49:21.559Z",
+    "heartbeatAt": "2026-07-22T09:28:31.599Z",
+    "ttlSeconds": 3600,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0249.json",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/transactional-composer.ts",
+      "packages/core/src/broker/types.ts",
+      "tests/core/transactional-steward-rollback.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260722084921-codex-plan31-captain-2-0f04088bb2",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722084921-codex-plan31-captain-2-0f04088bb2\""
+    }
+  },
+  "startedAt": "2026-07-22T08:49:21.559Z",
+  "startedByActor": "codex-plan31-captain-2",
+  "startedBySessionId": "session-20260722084921-codex-plan31-captain-2-ATM-GOV-0249-b5c2840758",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0249",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.*",
+      ".atm/history/task-events/ATM-GOV-0249/**",
+      ".atm/history/tasks/ATM-GOV-0249.json",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/transactional-composer.ts",
+      "packages/core/src/broker/types.ts",
+      "tests/core/transactional-steward-rollback.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "32ae781a75138a155074d434561e76d385ba853440d0df4447498bdcae73e085",
+    "actorId": "codex-plan31-captain-2",
+    "sessionId": "session-20260722084921-codex-plan31-captain-2-ATM-GOV-0249-b5c2840758",
+    "laneSession": {
+      "laneSessionId": "lane-20260722084921-codex-plan31-captain-2-0f04088bb2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722084921-codex-plan31-captain-2-0f04088bb2\""
+    },
+    "createdAt": "2026-07-22T08:49:26.618Z",
+    "status": "active"
+  }
+}
