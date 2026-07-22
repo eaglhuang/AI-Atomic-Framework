@@ -1,0 +1,263 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0247",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "00d589116fe9460822da06363f7fa5ed864ac489",
+  "governedTreeSha": "e3f7062206d3be9753921613d6ac9d3e0e72ef74",
+  "targetCommitDelta": {
+    "currentCommitSha": "00d589116fe9460822da06363f7fa5ed864ac489",
+    "parentCommitShas": [
+      "00d589116fe9460822da06363f7fa5ed864ac489"
+    ],
+    "governedTreeSha": "e3f7062206d3be9753921613d6ac9d3e0e72ef74",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0247.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0247/2026-07-22T08-21-52-846Z-reserve-422821918d60.json",
+      ".atm/history/task-events/ATM-GOV-0247/2026-07-22T08-21-52-849Z-promote-2e22e80ed133.json",
+      ".atm/history/task-events/ATM-GOV-0247/2026-07-22T08-21-55-178Z-claim-3559bd709dab.json",
+      ".atm/history/tasks/ATM-GOV-0247.json",
+      "scripts/build-package-dist.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2647f9a3334e5591a2c4bfaf24b49a881b8e18136ced7c10d148b878bc68fa6f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/core/workspace-topology-policy.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:48c77d258ccb483b875b5941803da36de166c32cd442483eeb23f2f39ccbcb44",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs atm-chart verify",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bbf4eee58ca5e18ae148067858e12acc88b557f9e1caa2c69d9522d52bfa9f95",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify antigravity --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f7fc68184851653866671d96d3dfd94a8827c976cc42faee733768a7a004a63c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify claude-code --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f6c62f8371f92c76582afb1617fbd87d6db848b7f4e658cc9a1d041dddb01e3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify codex --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:22ccb5a467506282afba05d0aacc69dab215889e21247e3d2af8a7db4a32dc6f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify copilot --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2f02b3db7d5d3ae38ce08df47c8ac40d81acfffb531f3742bd4391e207739675",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify cursor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:283c8a0526563c7ea33b4e2512f46b60edde9001f2de35703abfda588bcc9b54",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs integration verify gemini --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da067ee3352077c4e305c0755ffd65204771e61ec6f1db084963daa509383486",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:c674f452aec8f9b428d43794b701592a0cb420bf5f9a99bb189ed528b1c662fc",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:integration-adapter",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19063ae4e9017f3439a6036376ae04f39f88e27233b4bfbda0a594b4f7348d3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "node --strip-types tests/core/workspace-topology-policy.test.ts",
+    "node atm.mjs atm-chart verify",
+    "node atm.mjs integration verify antigravity --json",
+    "node atm.mjs integration verify claude-code --json",
+    "node atm.mjs integration verify codex --json",
+    "node atm.mjs integration verify copilot --json",
+    "node atm.mjs integration verify cursor --json",
+    "node atm.mjs integration verify gemini --json",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:integration-adapter",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-22T08:27:41.449Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".agents/skills/**",
+      ".atm/charter/atm-first-principles.md",
+      ".atm/charter/atomic-charter.md",
+      ".atm/charter/charter-invariants.json",
+      ".atm/history/evidence/ATM-GOV-0247.*",
+      ".atm/history/task-events/ATM-GOV-0247/**",
+      ".atm/history/tasks/ATM-GOV-0247.json",
+      ".atm/integrations/**",
+      ".atm/memory/atm-chart.md",
+      ".claude/skills/**",
+      ".cursor/rules/skills/**",
+      ".gemini/commands/**",
+      ".github/instructions/**",
+      ".github/prompts/**",
+      "docs/governance/parallel-governance-charter.md",
+      "fixtures/charter/default-charter.json",
+      "GEMINI.md",
+      "integrations/codex-skills/**",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/workspace-topology-policy.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "templates/root-drop/.atm/charter/atm-first-principles.template.md",
+      "templates/root-drop/.atm/charter/atomic-charter.template.md",
+      "templates/root-drop/.atm/charter/charter-invariants.template.json",
+      "templates/skills/atm-dispatch.skill.md",
+      "tests/cli/root-drop-release-source-list.test.ts",
+      "tests/core/workspace-topology-policy.test.ts",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "criticalChangedFiles": [
+      "integrations/codex-skills/**",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/workspace-topology-policy.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "templates/root-drop/.atm/charter/charter-invariants.template.json",
+      "tests/cli/root-drop-release-source-list.test.ts",
+      "tests/core/workspace-topology-policy.test.ts",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0247.json",
+  "closedAt": "2026-07-22T08:27:41.449Z",
+  "closedByActor": "codex-plan31-captain-2",
+  "sessionId": "session-20260722082152-codex-plan31-captain-2-ATM-GOV-0247-a46a60629f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a4bd7602316b7583464b6eb78ea3e4ff0f5d4665",
+    "taskMatchedFiles": [
+      "scripts/build-package-dist.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
