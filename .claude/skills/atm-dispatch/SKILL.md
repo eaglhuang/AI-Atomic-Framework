@@ -158,6 +158,24 @@ On Windows, read, write, and compare Markdown, JSON, and text planning documents
 
 PowerShell may still launch `node`, `git`, and ATM CLI commands; the restriction is on document content IO and document content comparison.
 
+## Copy-paste Dispatch Packet Rule
+
+When preparing an external handoff for a human to paste into Claude, Cursor,
+Copilot, Gemini, Antigravity, another Codex thread, or any other worker, every
+instruction needed by that worker must live inside the copy-paste block itself.
+Treat the block as the worker's whole briefing packet.
+
+Do not leave required context, sequencing, scope, authority, stop conditions,
+validation commands, actor identity, source card paths, or report requirements
+only in surrounding prose. Surrounding prose may summarize why the packet was
+chosen, but it must not contain anything the worker must read in order to
+execute correctly.
+
+For multiple workers, emit one complete self-contained block per worker. The
+human should be able to copy any one block without selecting extra text,
+merging bullets from above or below, or inferring missing constraints from the
+captain's commentary. This is a high-priority dispatch quality rule.
+
 ## Dispatch Rules
 
 - Before drafting a plan or task cards, state `Planning authority`, `Target
