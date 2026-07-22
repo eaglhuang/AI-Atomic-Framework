@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { authorizeBrokerTicket } from '../../../core/dist/broker/ticket-authority/index.js';
+import { evaluateBrokerConflictResolutionAuthority } from '../../../core/dist/team-runtime/permission-broker.js';
 /**
  * Read foreign task ids authorized by a single broker conflict resolution
  * artifact for the given claiming task. Mirrors the governed commit lane.
@@ -62,36 +62,5 @@ export function isConflictAuthorizedByBrokerResolution(conflictingTaskId, resolu
     return resolutionAuthorizedForeignTaskIds.has(normalized);
 }
 function isCanonicalBrokerResolutionAuthorized(artifact, taskId) {
-    const ticket = artifact.brokerTicket;
-    if (!isBrokerTicket(ticket))
-        return false;
-    if (ticket.taskId.toUpperCase() !== taskId.toUpperCase())
-        return false;
-    const authorityGeneration = Number(artifact.authorityGeneration ?? ticket.authorityGeneration);
-    const authorityDigest = String(artifact.authorityDigest ?? ticket.authorityDigest);
-    const resourceKind = String(artifact.authorizationResourceKind ?? 'path');
-    const resourceKeys = Array.isArray(artifact.conflictFiles)
-        ? artifact.conflictFiles.map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean)
-        : [];
-    if (resourceKeys.length === 0)
-        return false;
-    return resourceKeys.every((resourceKey) => authorizeBrokerTicket(ticket, {
-        resourceKind: resourceKind,
-        resourceKey,
-        operation: String(artifact.authorizationOperation ?? 'write'),
-        gate: String(artifact.authorizationGate ?? 'git'),
-        expectedAuthorityGeneration: authorityGeneration,
-        expectedAuthorityDigest: authorityDigest
-    }).authorized);
-}
-function isBrokerTicket(value) {
-    return Boolean(value
-        && typeof value === 'object'
-        && !Array.isArray(value)
-        && value.schemaId === 'atm.brokerTicket.v1'
-        && typeof value.ticketId === 'string'
-        && typeof value.taskId === 'string'
-        && typeof value.authorityGeneration === 'number'
-        && typeof value.authorityDigest === 'string'
-        && Array.isArray(value.authorizationGrants));
+    return evaluateBrokerConflictResolutionAuthority(artifact, taskId).authorized;
 }

@@ -7,7 +7,11 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { createBrokerConflictResolutionArtifact } from '../../../../../core/src/team-runtime/permission-broker.ts';
+import {
+  createBrokerConflictResolutionArtifact,
+  evaluateBrokerConflictResolutionAuthority
+} from '../../../../../core/src/team-runtime/permission-broker.ts';
+import { runTeamBrokerConflictResolve } from '../../team/legacy/broker-observability.ts';
 import {
   collectResolutionAuthorizedForeignTaskIds,
   readResolutionAuthorizedForeignTaskIds
@@ -49,7 +53,13 @@ function evaluateCidFreezeAdmission(input: {
   readonly resolutionAuthorizedForeignTaskIds?: ReadonlySet<string>;
   readonly currentLaneSessionId?: string | null;
   readonly conflictingLaneSessionId?: string | null;
+  readonly candidateTaskId?: string;
+  readonly conflictingTaskId?: string;
+  readonly overlappingAtomIds?: readonly string[];
 }) {
+  const effectiveCandidateTaskId = input.candidateTaskId ?? candidateTaskId;
+  const effectiveConflictingTaskId = input.conflictingTaskId ?? conflictingTaskId;
+  const overlappingAtomIds = input.overlappingAtomIds ?? ['atm.next-command-atomic-map'];
   const ownerComparison = compareClaimLifecycleOwners({
     current: { actorId: 'codex-current', laneSessionId: input.currentLaneSessionId ?? null },
     conflicting: { actorId: 'codex-conflict', laneSessionId: input.conflictingLaneSessionId ?? null }
@@ -59,11 +69,11 @@ function evaluateCidFreezeAdmission(input: {
     activeWriteConflict: ownerComparison.sameOwner ? false : true,
     confirmedBrokerConflict: false,
     insufficientMutationIntent: true,
-    overlappingAtomIdCount: 1
+    overlappingAtomIdCount: overlappingAtomIds.length
   });
   const effectiveShouldBlockPerCid = resolveEffectiveShouldBlockPerCid({
     shouldBlockPerCid,
-    conflictingTaskId,
+    conflictingTaskId: effectiveConflictingTaskId,
     resolutionAuthorizedForeignTaskIds: input.resolutionAuthorizedForeignTaskIds
   });
   const brokerVerdict = deriveBrokerVerdict({
@@ -73,9 +83,9 @@ function evaluateCidFreezeAdmission(input: {
   return evaluateClaimAdmission({
     brokerVerdict,
     cidVerdict,
-    candidateTaskId,
-    conflictingTaskId,
-    overlappingAtomIds: ['atm.next-command-atomic-map'],
+    candidateTaskId: effectiveCandidateTaskId,
+    conflictingTaskId: effectiveConflictingTaskId,
+    overlappingAtomIds,
     ownerComparison
   });
 }
@@ -152,6 +162,116 @@ try {
     assert.equal(stillFrozen.blockCode, 'ATM_NEXT_CLAIM_BLOCKED');
   } finally {
     rmSync(wrongPairRepo, { recursive: true, force: true });
+  }
+
+  // --- ATM-GOV-0255 regression: ATM-GOV-0239 vs ATM-GOV-0249, sharedPaths=[],
+  // logical overlap atom-core-registry. First claim must freeze; the official
+  // `team broker resolve` command must emit an artifact whose authority
+  // envelope admits the retry for exactly this pair/resource, and only that
+  // pair/resource. ---
+  const primaryTaskId = 'ATM-GOV-0239';
+  const conflictTaskId = 'ATM-GOV-0249';
+  const foreignTaskId = 'ATM-GOV-9999';
+  const overlapAtomId = 'atom-core-registry';
+
+  const govRepo = createRepo();
+  try {
+    const noArtifactAuthorized = collectResolutionAuthorizedForeignTaskIds(govRepo, primaryTaskId);
+    assert.equal(noArtifactAuthorized.size, 0, 'sharedPaths=[] atom overlap must freeze with no resolution artifact');
+    const firstClaimFrozen = evaluateCidFreezeAdmission({
+      cwd: govRepo,
+      resolutionAuthorizedForeignTaskIds: noArtifactAuthorized,
+      candidateTaskId: primaryTaskId,
+      conflictingTaskId: conflictTaskId,
+      overlappingAtomIds: [overlapAtomId]
+    });
+    assert.equal(firstClaimFrozen.admitted, false, 'first claim over sharedPaths=[] atom overlap must freeze');
+    assert.equal(firstClaimFrozen.blockCode, 'ATM_NEXT_CLAIM_BLOCKED');
+
+    const resolveResult = await runTeamBrokerConflictResolve([
+      '--task', primaryTaskId,
+      '--conflict', conflictTaskId,
+      '--path', overlapAtomId,
+      '--resource-kind', 'atom',
+      '--decision-reason', 'broker-conflict-blocked until the release order grants the next task.',
+      '--created-at', '2026-07-22T00:00:00.000Z',
+      '--cwd', govRepo,
+      '--json'
+    ], govRepo);
+    assert.equal(resolveResult.ok, true);
+    const emittedArtifact = (resolveResult.evidence as any)?.artifact;
+    assert.equal(emittedArtifact?.schemaId, 'atm.brokerConflictResolution.v1');
+    assert.equal(emittedArtifact?.brokerTicket?.schemaId, 'atm.brokerTicket.v1');
+    assert.equal(emittedArtifact?.authorizationResourceKind, 'atom');
+    assert.deepEqual(emittedArtifact?.conflictFiles, [overlapAtomId]);
+    assert.equal(evaluateBrokerConflictResolutionAuthority(emittedArtifact, primaryTaskId).authorized, true);
+
+    const authorizedAfterResolve = collectResolutionAuthorizedForeignTaskIds(govRepo, primaryTaskId);
+    assert.ok(authorizedAfterResolve.has(conflictTaskId), 'retry must be admitted for the authorized pair');
+    assert.ok(!authorizedAfterResolve.has(foreignTaskId), 'retry must not be admitted for an unrelated task id');
+
+    const retryAdmitted = evaluateCidFreezeAdmission({
+      cwd: govRepo,
+      resolutionAuthorizedForeignTaskIds: authorizedAfterResolve,
+      currentLaneSessionId: 'lane-gov-0255-primary',
+      conflictingLaneSessionId: 'lane-gov-0255-conflict',
+      candidateTaskId: primaryTaskId,
+      conflictingTaskId: conflictTaskId,
+      overlappingAtomIds: [overlapAtomId]
+    });
+    assert.equal(retryAdmitted.admitted, true, 'retry must be admitted only after the official resolve artifact exists');
+  } finally {
+    rmSync(govRepo, { recursive: true, force: true });
+  }
+
+  // --- fail closed: legacy artifact with no brokerTicket (pre-ATM-GOV-0255
+  // shape) must be rejected with an explicit reason, not a silent pass. ---
+  {
+    const legacyArtifact = createBrokerConflictResolutionArtifact({
+      primaryTaskId,
+      conflictingTaskIds: [conflictTaskId],
+      sharedPaths: [],
+      conflictFiles: [overlapAtomId],
+      authorizationResourceKind: 'atom',
+      decisionReason: 'legacy shape without a canonical broker ticket.'
+    }) as Record<string, unknown>;
+    delete legacyArtifact.brokerTicket;
+    const legacyCheck = evaluateBrokerConflictResolutionAuthority(legacyArtifact, primaryTaskId);
+    assert.equal(legacyCheck.authorized, false);
+    assert.equal(legacyCheck.reason, 'missing-broker-ticket');
+  }
+
+  // --- fail closed: tampered/stale authority digest must be rejected. ---
+  {
+    const staleArtifact = createBrokerConflictResolutionArtifact({
+      primaryTaskId,
+      conflictingTaskIds: [conflictTaskId],
+      sharedPaths: [],
+      conflictFiles: [overlapAtomId],
+      authorizationResourceKind: 'atom',
+      decisionReason: 'stale authority digest must fail closed.'
+    }) as any;
+    staleArtifact.authorityDigest = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
+    const staleCheck = evaluateBrokerConflictResolutionAuthority(staleArtifact, primaryTaskId);
+    assert.equal(staleCheck.authorized, false);
+    assert.equal(staleCheck.reason, 'authority-digest-mismatch');
+  }
+
+  // --- fail closed: over-broad / resource-mismatched conflictFiles (claims a
+  // resource key the ticket grant does not cover) must be rejected. ---
+  {
+    const mismatchedArtifact = createBrokerConflictResolutionArtifact({
+      primaryTaskId,
+      conflictingTaskIds: [conflictTaskId],
+      sharedPaths: [],
+      conflictFiles: [overlapAtomId],
+      authorizationResourceKind: 'atom',
+      decisionReason: 'over-broad resource key must fail closed.'
+    }) as any;
+    mismatchedArtifact.conflictFiles = [overlapAtomId, 'atom-unrelated-surface'];
+    const mismatchedCheck = evaluateBrokerConflictResolutionAuthority(mismatchedArtifact, primaryTaskId);
+    assert.equal(mismatchedCheck.authorized, false);
+    assert.equal(mismatchedCheck.reason, 'resource-key-mismatch');
   }
 
   console.log('[claim-broker-resolution.spec] ok');

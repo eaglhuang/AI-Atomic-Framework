@@ -1,3 +1,9 @@
+import { createBrokerTicket, transitionBrokerTicket } from '../broker/ticket-state.js';
+import { attachBrokerTicketAuthorizationGrants, authorizeBrokerTicket } from '../broker/ticket-authority/index.js';
+const DEFAULT_BROKER_CONFLICT_RESOLUTION_ACTOR_ID = 'atm-team-broker';
+const DEFAULT_AUTHORIZATION_RESOURCE_KIND = 'path';
+const DEFAULT_AUTHORIZATION_OPERATION = 'write';
+const DEFAULT_AUTHORIZATION_GATE = 'git';
 const BROKER_CONFLICT_MIGRATION = Object.freeze({
     strategy: 'none',
     fromVersion: null,
@@ -28,6 +34,52 @@ export function createDefaultTeamPermissionPolicy() {
         defaultDecision: 'deny'
     };
 }
+/**
+ * Producer-side authority builder. Issues a canonical `atm.brokerTicket.v1`,
+ * transitions it to an executable state, and attaches bounded authorization
+ * grants covering exactly the declared resource keys. This is the single
+ * source of truth for what a resolution artifact's authority envelope
+ * contains; `evaluateBrokerConflictResolutionAuthority` below is the matching
+ * consumer-side check over the same shape.
+ */
+function buildBrokerConflictResolutionAuthority(input) {
+    const conflictFiles = uniqueNonEmpty(input.conflictFiles);
+    if (conflictFiles.length === 0) {
+        throw new Error('Broker conflict resolution requires at least one bounded resource key (conflictFiles).');
+    }
+    const resourceKey = conflictFiles.slice().sort().join('|');
+    const createdTicket = createBrokerTicket({
+        taskId: input.primaryTaskId,
+        actorId: input.actorId,
+        resourceKey,
+        now: input.createdAt
+    });
+    const { ticket: readyTicket } = transitionBrokerTicket({
+        ticket: createdTicket,
+        to: 'ready',
+        actorId: input.actorId,
+        reason: 'broker-conflict-resolution-authority-issued',
+        idempotencyKey: `bcr-ready-${createdTicket.ticketId}`,
+        now: input.createdAt
+    });
+    const brokerTicket = attachBrokerTicketAuthorizationGrants(readyTicket, [
+        {
+            resourceKind: input.resourceKind,
+            resourceKeys: conflictFiles,
+            operations: [input.operation],
+            gates: [input.gate]
+        }
+    ]);
+    return {
+        brokerTicket,
+        authorityGeneration: brokerTicket.authorityGeneration,
+        authorityDigest: brokerTicket.authorityDigest,
+        conflictFiles,
+        authorizationResourceKind: input.resourceKind,
+        authorizationOperation: input.operation,
+        authorizationGate: input.gate
+    };
+}
 export function createBrokerConflictResolutionArtifact(input) {
     const primaryTaskId = normalizeRequiredId(input.primaryTaskId, 'primaryTaskId');
     const conflictingTaskIds = uniqueNonEmpty(input.conflictingTaskIds);
@@ -39,6 +91,17 @@ export function createBrokerConflictResolutionArtifact(input) {
     const createdAt = input.createdAt?.trim() || new Date().toISOString();
     const decisionClass = input.decisionClass ?? 'serial-release';
     const violationStatus = input.violationStatus ?? 'broker-conflict-blocked';
+    const actorId = input.actorId?.trim() || DEFAULT_BROKER_CONFLICT_RESOLUTION_ACTOR_ID;
+    const conflictFilesInput = input.conflictFiles?.length ? input.conflictFiles : sharedPaths;
+    const authority = buildBrokerConflictResolutionAuthority({
+        primaryTaskId,
+        actorId,
+        conflictFiles: conflictFilesInput,
+        resourceKind: input.authorizationResourceKind ?? DEFAULT_AUTHORIZATION_RESOURCE_KIND,
+        operation: input.authorizationOperation ?? DEFAULT_AUTHORIZATION_OPERATION,
+        gate: input.authorizationGate ?? DEFAULT_AUTHORIZATION_GATE,
+        createdAt
+    });
     return {
         schemaId: 'atm.brokerConflictResolution.v1',
         specVersion: '0.1.0',
@@ -55,8 +118,65 @@ export function createBrokerConflictResolutionArtifact(input) {
         currentAllowedTaskId,
         blockedTaskIds,
         artifactType: 'atm.brokerConflictResolution.v1',
-        statusCode: 'broker-conflict-blocked'
+        statusCode: 'broker-conflict-blocked',
+        ...authority
     };
+}
+/**
+ * Canonical consumer-side authority check. This is the single validator
+ * shared by claim admission (`readResolutionAuthorizedForeignTaskIds`) and
+ * any other consumer of `atm.brokerConflictResolution.v1`; it must never be
+ * reimplemented against a divergent contract. Fails closed (returns a
+ * specific non-`authorized` reason, never a silent permissive default) for
+ * missing, stale, over-broad, differently ordered, or resource-mismatched
+ * artifacts, including pre-ATM-GOV-0255 legacy artifacts that carry no
+ * `brokerTicket` at all.
+ */
+export function evaluateBrokerConflictResolutionAuthority(artifact, taskId) {
+    const ticket = artifact.brokerTicket;
+    if (!isBrokerTicketWithAuthority(ticket)) {
+        return { authorized: false, reason: 'missing-broker-ticket' };
+    }
+    if (ticket.taskId.toUpperCase() !== taskId.toUpperCase()) {
+        return { authorized: false, reason: 'task-mismatch' };
+    }
+    const authorityGeneration = Number(artifact.authorityGeneration ?? ticket.authorityGeneration);
+    const authorityDigest = String(artifact.authorityDigest ?? ticket.authorityDigest);
+    const resourceKind = String(artifact.authorizationResourceKind ?? DEFAULT_AUTHORIZATION_RESOURCE_KIND);
+    const operation = String(artifact.authorizationOperation ?? DEFAULT_AUTHORIZATION_OPERATION);
+    const gate = String(artifact.authorizationGate ?? DEFAULT_AUTHORIZATION_GATE);
+    const conflictFilesRaw = artifact.conflictFiles;
+    const resourceKeys = Array.isArray(conflictFilesRaw)
+        ? conflictFilesRaw.map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean)
+        : [];
+    if (resourceKeys.length === 0) {
+        return { authorized: false, reason: 'no-bounded-resource-keys' };
+    }
+    for (const resourceKey of resourceKeys) {
+        const decision = authorizeBrokerTicket(ticket, {
+            resourceKind,
+            resourceKey,
+            operation,
+            gate,
+            expectedAuthorityGeneration: authorityGeneration,
+            expectedAuthorityDigest: authorityDigest
+        });
+        if (!decision.authorized) {
+            return { authorized: false, reason: decision.statusCode };
+        }
+    }
+    return { authorized: true, reason: 'authorized' };
+}
+function isBrokerTicketWithAuthority(value) {
+    return Boolean(value
+        && typeof value === 'object'
+        && !Array.isArray(value)
+        && value.schemaId === 'atm.brokerTicket.v1'
+        && typeof value.ticketId === 'string'
+        && typeof value.taskId === 'string'
+        && typeof value.authorityGeneration === 'number'
+        && typeof value.authorityDigest === 'string'
+        && Array.isArray(value.authorizationGrants));
 }
 export function decideBrokerConflictResolutionAdmission(artifact, taskId) {
     const normalizedTaskId = normalizeRequiredId(taskId, 'taskId');

@@ -221,6 +221,8 @@ export function runTeamBrokerConflictResolve(argv, defaultCwd) {
     const violationStatus = normalizeBrokerViolationStatus(readOptionValue(argv, '--violation-status'));
     const releaseOrder = readOptionValues(argv, '--release-order');
     const createdAt = readOptionValue(argv, '--created-at')?.trim();
+    const actorId = readOptionValue(argv, '--actor')?.trim();
+    const authorizationResourceKind = normalizeAuthorizationResourceKind(readOptionValue(argv, '--resource-kind'));
     const artifact = createBrokerConflictResolutionArtifact({
         primaryTaskId,
         conflictingTaskIds,
@@ -229,7 +231,9 @@ export function runTeamBrokerConflictResolve(argv, defaultCwd) {
         decisionReason,
         violationStatus,
         releaseOrder: releaseOrder.length ? releaseOrder : undefined,
-        createdAt
+        createdAt,
+        actorId,
+        authorizationResourceKind
     });
     const requestedOutput = readOptionValue(argv, '--output')?.trim();
     const artifactPath = requestedOutput
@@ -264,7 +268,11 @@ export function runTeamBrokerConflictResolve(argv, defaultCwd) {
                 sharedPaths: artifact.sharedPaths,
                 decisionReason: artifact.decisionReason,
                 requiredResolutionArtifact: conflictUx.requiredResolutionArtifact,
-                nextSafeResolutionCommand: conflictUx.nextSafeResolutionCommand
+                nextSafeResolutionCommand: conflictUx.nextSafeResolutionCommand,
+                ticketId: artifact.brokerTicket.ticketId,
+                authorityGeneration: artifact.authorityGeneration,
+                authorityDigest: artifact.authorityDigest,
+                conflictFiles: artifact.conflictFiles
             })
         ],
         evidence: {
@@ -280,6 +288,16 @@ export function runTeamBrokerConflictResolve(argv, defaultCwd) {
                 decisionReason: artifact.decisionReason,
                 violationStatus: artifact.violationStatus,
                 statusCode: artifact.statusCode
+            },
+            authorityEnvelope: {
+                ticketId: artifact.brokerTicket.ticketId,
+                ticketState: artifact.brokerTicket.state,
+                authorityGeneration: artifact.authorityGeneration,
+                authorityDigest: artifact.authorityDigest,
+                conflictFiles: artifact.conflictFiles,
+                authorizationResourceKind: artifact.authorizationResourceKind,
+                authorizationOperation: artifact.authorizationOperation,
+                authorizationGate: artifact.authorizationGate
             }
         }
     });
@@ -312,6 +330,13 @@ function normalizeBrokerDecisionClass(value) {
         return normalized;
     }
     return 'serial-release';
+}
+function normalizeAuthorizationResourceKind(value) {
+    const normalized = value?.trim();
+    if (normalized === 'path' || normalized === 'atom' || normalized === 'surface' || normalized === 'range') {
+        return normalized;
+    }
+    return undefined;
 }
 function normalizeBrokerViolationStatus(value) {
     const normalized = value?.trim();

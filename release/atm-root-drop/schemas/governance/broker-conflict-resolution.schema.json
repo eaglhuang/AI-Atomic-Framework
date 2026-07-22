@@ -20,7 +20,14 @@
     "currentAllowedTaskId",
     "blockedTaskIds",
     "artifactType",
-    "statusCode"
+    "statusCode",
+    "brokerTicket",
+    "authorityGeneration",
+    "authorityDigest",
+    "conflictFiles",
+    "authorizationResourceKind",
+    "authorizationOperation",
+    "authorizationGate"
   ],
   "properties": {
     "schemaId": {
@@ -97,6 +104,37 @@
     },
     "statusCode": {
       "const": "broker-conflict-blocked"
+    },
+    "brokerTicket": {
+      "$ref": "#/$defs/brokerTicket"
+    },
+    "authorityGeneration": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "authorityDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "conflictFiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "authorizationResourceKind": {
+      "enum": ["path", "atom", "surface", "range"]
+    },
+    "authorizationOperation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authorizationGate": {
+      "type": "string",
+      "minLength": 1
     }
   },
   "$defs": {
@@ -115,6 +153,86 @@
         "notes": {
           "type": "string"
         }
+      }
+    },
+    "brokerTicket": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "schemaId",
+        "specVersion",
+        "ticketId",
+        "taskId",
+        "actorId",
+        "state",
+        "generation",
+        "authorityGeneration",
+        "authorityDigest",
+        "authorizationGrants"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.brokerTicket.v1" },
+        "specVersion": { "const": "0.1.0" },
+        "ticketId": { "type": "string", "minLength": 1 },
+        "taskId": { "type": "string", "minLength": 1 },
+        "actorId": { "type": "string", "minLength": 1 },
+        "state": {
+          "enum": [
+            "created",
+            "collecting",
+            "ready",
+            "composing",
+            "revalidation-required",
+            "queued",
+            "wakeup-pending",
+            "executing",
+            "released",
+            "cancelled",
+            "adoptable",
+            "reconcile-required"
+          ]
+        },
+        "generation": { "type": "integer", "minimum": 0 },
+        "authorityGeneration": { "type": "integer", "minimum": 0 },
+        "authorityDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "authorizationGrants": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/authorizationGrant" }
+        }
+      }
+    },
+    "authorizationGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "grantId",
+        "resourceKind",
+        "resourceKeys",
+        "operations",
+        "gates",
+        "authorityGeneration",
+        "authorityDigest"
+      ],
+      "properties": {
+        "grantId": { "type": "string", "minLength": 1 },
+        "resourceKind": { "enum": ["path", "atom", "surface", "range"] },
+        "resourceKeys": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "authorityGeneration": { "type": "integer", "minimum": 0 },
+        "authorityDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
       }
     }
   }

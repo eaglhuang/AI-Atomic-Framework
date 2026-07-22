@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { authorizeBrokerTicket, type BrokerTicketWithAuthority } from '../../../core/src/broker/ticket-authority/index.ts';
+import { evaluateBrokerConflictResolutionAuthority } from '../../../core/src/team-runtime/permission-broker.ts';
 
 /**
  * Read foreign task ids authorized by a single broker conflict resolution
@@ -74,36 +74,5 @@ export function isConflictAuthorizedByBrokerResolution(
 }
 
 function isCanonicalBrokerResolutionAuthorized(artifact: Record<string, unknown>, taskId: string): boolean {
-  const ticket = artifact.brokerTicket;
-  if (!isBrokerTicket(ticket)) return false;
-  if (ticket.taskId.toUpperCase() !== taskId.toUpperCase()) return false;
-  const authorityGeneration = Number(artifact.authorityGeneration ?? ticket.authorityGeneration);
-  const authorityDigest = String(artifact.authorityDigest ?? ticket.authorityDigest);
-  const resourceKind = String(artifact.authorizationResourceKind ?? 'path');
-  const resourceKeys = Array.isArray(artifact.conflictFiles)
-    ? artifact.conflictFiles.map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean)
-    : [];
-  if (resourceKeys.length === 0) return false;
-  return resourceKeys.every((resourceKey) => authorizeBrokerTicket(ticket, {
-    resourceKind: resourceKind as never,
-    resourceKey,
-    operation: String(artifact.authorizationOperation ?? 'write'),
-    gate: String(artifact.authorizationGate ?? 'git'),
-    expectedAuthorityGeneration: authorityGeneration,
-    expectedAuthorityDigest: authorityDigest
-  }).authorized);
-}
-
-function isBrokerTicket(value: unknown): value is BrokerTicketWithAuthority {
-  return Boolean(
-    value
-    && typeof value === 'object'
-    && !Array.isArray(value)
-    && (value as { schemaId?: unknown }).schemaId === 'atm.brokerTicket.v1'
-    && typeof (value as { ticketId?: unknown }).ticketId === 'string'
-    && typeof (value as { taskId?: unknown }).taskId === 'string'
-    && typeof (value as { authorityGeneration?: unknown }).authorityGeneration === 'number'
-    && typeof (value as { authorityDigest?: unknown }).authorityDigest === 'string'
-    && Array.isArray((value as { authorizationGrants?: unknown }).authorizationGrants)
-  );
+  return evaluateBrokerConflictResolutionAuthority(artifact, taskId).authorized;
 }
