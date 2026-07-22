@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0005",
   "title": "Acceptance evidence and cross-authority closure ErrorCode contracts",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0",
   "dependencies": [
     "ATM-GOV-0251"
@@ -101,8 +101,8 @@
     }
   },
   "importedAt": "2026-07-22T08:33:07.944Z",
-  "lastTransitionId": "2026-07-22T08-34-46-031Z-scope-amendment-817aa40d145a",
-  "lastTransitionAt": "2026-07-22T08:34:46.031Z",
+  "lastTransitionId": "2026-07-22T08-46-41-024Z-close-37c13f44b1da",
+  "lastTransitionAt": "2026-07-22T08:46:41.024Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-plan31-captain-2",
   "reservedAt": "2026-07-22T08:33:43.157Z",
@@ -111,7 +111,7 @@
     "actorId": "codex-plan31-captain-2",
     "leaseId": "lease-b515cbbbb596",
     "claimedAt": "2026-07-22T08:33:43.163Z",
-    "heartbeatAt": "2026-07-22T08:33:43.163Z",
+    "heartbeatAt": "2026-07-22T08:46:41.022Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-ERR-0005.*",
@@ -123,14 +123,14 @@
       "scripts/generate-error-code-index.ts",
       "tests/cli/acceptance-closure-error-contract.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260722083343-codex-plan31-captain-2-e3c55c2cb0",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722083343-codex-plan31-captain-2-e3c55c2cb0\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-22T08:33:43.163Z",
   "startedByActor": "codex-plan31-captain-2",
@@ -174,5 +174,9 @@
     },
     "createdAt": "2026-07-22T08:33:49.040Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-22T08:46:41.022Z",
+  "closedByActor": "codex-plan31-captain-2",
+  "closedBySessionId": "session-20260722083343-codex-plan31-captain-2-TASK-ERR-0005-21e6bbfde0",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0005.closure-packet.json"
 }

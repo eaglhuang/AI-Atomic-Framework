@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-22T08-46-41-024Z-close-37c13f44b1da",
+  "taskId": "TASK-ERR-0005",
+  "action": "close",
+  "actorId": "codex-plan31-captain-2",
+  "sessionId": "session-20260722083343-codex-plan31-captain-2-TASK-ERR-0005-21e6bbfde0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0005.json",
+  "taskSha256": "sha256:05bf09c7fca1f6e49ad7453ac3e8e235bce70d0c2d9ad0e481ab8a48a90b773a",
+  "createdAt": "2026-07-22T08:46:41.024Z",
+  "command": "node atm.mjs tasks close --task TASK-ERR-0005 --actor codex-plan31-captain-2 --status done --historical-delivery 2cb296da9f3b95bb71b62b03035e105d582e82a7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260722083343-codex-plan31-captain-2-TASK-ERR-0005-21e6bbfde0",
+    "closurePacketPath": ".atm/history/evidence/TASK-ERR-0005.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "generate:error-codes",
+      "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-22T08:46:41.018Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-ERR-0005.*",
+        ".atm/history/task-events/TASK-ERR-0005/**",
+        ".atm/history/tasks/TASK-ERR-0005.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/core/src/error-code-registry.generated.ts",
+        "scripts/generate-error-code-index.ts",
+        "tests/cli/acceptance-closure-error-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/error-code-registry.generated.ts",
+        "scripts/generate-error-code-index.ts",
+        "tests/cli/acceptance-closure-error-contract.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

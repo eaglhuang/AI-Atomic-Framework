@@ -1,0 +1,156 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ERR-0005",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2cb296da9f3b95bb71b62b03035e105d582e82a7",
+  "governedTreeSha": "3ed145b9fd87ca0e2d874f7934fd33d351a77f3d",
+  "targetCommitDelta": {
+    "currentCommitSha": "2cb296da9f3b95bb71b62b03035e105d582e82a7",
+    "parentCommitShas": [
+      "2cb296da9f3b95bb71b62b03035e105d582e82a7"
+    ],
+    "governedTreeSha": "3ed145b9fd87ca0e2d874f7934fd33d351a77f3d",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/generate-error-code-index.ts",
+      "scripts/generate-error-code-index.ts",
+      "tests/cli/acceptance-closure-error-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run generate:error-codes",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:38c178541f613e145577670b3e907e40590e0e8fa3f565ec130d964533485f11",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:21bf5bcafedcb2cc2249198f372aaa71f2e7319a9f8016e6e414ba89acaaa1db",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:0ed7d278680827b68fe4c738369361510683ef96e3d041a071e0fd97e11829f3",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-22T08:46:41.018Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ERR-0005.*",
+      ".atm/history/task-events/TASK-ERR-0005/**",
+      ".atm/history/tasks/TASK-ERR-0005.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
+      "scripts/generate-error-code-index.ts",
+      "tests/cli/acceptance-closure-error-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/error-code-registry.generated.ts",
+      "scripts/generate-error-code-index.ts",
+      "tests/cli/acceptance-closure-error-contract.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ERR-0005.json",
+  "closedAt": "2026-07-22T08:46:41.018Z",
+  "closedByActor": "codex-plan31-captain-2",
+  "sessionId": "session-20260722083343-codex-plan31-captain-2-TASK-ERR-0005-21e6bbfde0",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "2cb296da9f3b95bb71b62b03035e105d582e82a7",
+    "taskMatchedFiles": [
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
+      "scripts/generate-error-code-index.ts",
+      "tests/cli/acceptance-closure-error-contract.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-ERR-0005.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-ERR-0005/2026-07-22T08-33-08-200Z-import-b559d0293fd7.json",
+      ".atm/history/task-events/TASK-ERR-0005/2026-07-22T08-33-43-157Z-reserve-aba5c7ebeb3c.json",
+      ".atm/history/task-events/TASK-ERR-0005/2026-07-22T08-33-43-160Z-promote-f2d4135fb7d8.json",
+      ".atm/history/task-events/TASK-ERR-0005/2026-07-22T08-33-49-029Z-claim-ea82682c5d9e.json",
+      ".atm/history/task-events/TASK-ERR-0005/2026-07-22T08-34-46-031Z-scope-amendment-817aa40d145a.json",
+      ".atm/history/tasks/TASK-ERR-0005.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
