@@ -188,6 +188,15 @@ human should be able to copy any one block without selecting extra text,
 merging bullets from above or below, or inferring missing constraints from the
 captain's commentary. This is a high-priority dispatch quality rule.
 
+Before sending any dispatch response, run this self-check: if the human copies
+only the fenced block for one worker, the worker must know the recipient,
+priority/order, whether to wait for another worker, exact commands, authority,
+scope, stop conditions, and report contract. If any of those facts appears only
+outside the fenced block, the dispatch is invalid and must be rewritten before
+sending. Outside-block prose may only say that the blocks below are ready to
+paste; it must not contain sequencing such as "paste this first" unless the
+same sequencing is repeated inside the affected block.
+
 ## Dispatch Rules
 
 - Before drafting a plan or task cards, state `Planning authority`, `Target
