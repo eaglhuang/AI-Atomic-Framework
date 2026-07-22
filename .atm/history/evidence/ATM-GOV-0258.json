@@ -1,0 +1,27 @@
+{
+  "schemaId": "atm.evidenceBundle.v1",
+  "taskId": "ATM-GOV-0258",
+  "actorId": "antigravity-gemini35-plan31-captain",
+  "status": "in_progress",
+  "timestamp": "2026-07-22T14:10:00Z",
+  "summary": "Implemented ATM-GOV-0258 MVP slice for non-delivery WIP commit and dirty-release recovery unblocking 0256 and 0257 (Ref: ATM-BUG-2026-07-22-229).",
+  "bugRef": "ATM-BUG-2026-07-22-229",
+  "mvpDeliverables": [
+    "tasks release fail-close with ATM_RELEASE_DIRTY_WIP_BLOCKED when in-scope source WIP is dirty",
+    "tasks release recoveryCommand choices: finish-and-close, non-delivery WIP commit-and-release, discard-and-release",
+    "tasks release --wip-commit / git commit --wip governed non-delivery WIP commit path with trailers (ATM-WIP: true, ATM-Delivery: false, ATM-Closeout-Eligible: false)",
+    "pre-commit hook WIP commit validator bypass (bypassing full repo typecheck while preserving scope, identity, lane, index, and protected-state checks)",
+    "historical-delivery exclusion for WIP commits",
+    "tasks release --discard-wip with auditable discard receipt (.atm/history/evidence/<task>.discard-wip-receipt.json)",
+    "assertClaimDirtyWipAdmission recoveryCommand details when blocked by foreign/unowned dirty WIP",
+    "tests/cli/dirty-release-wip-recovery-0258.test.ts MVP test suite"
+  ],
+  "validatorsRun": [
+    "node --strip-types tests/cli/dirty-release-wip-recovery-0258.test.ts",
+    "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts"
+  ],
+  "preservedWipState": {
+    "cursorWipPreserved": true,
+    "claudeWipPreserved": true
+  }
+}

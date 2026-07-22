@@ -249,6 +249,10 @@ function verifyScopedHistoricalDeliveryRef(input: {
   readonly declaredFiles: readonly string[];
 }): string | null {
   if (input.declaredFiles.length === 0) return null;
+  const commitMsg = readGitScalar(input.cwd, ['log', '-n', '1', '--format=%B', input.requestedRef]);
+  if (commitMsg && (commitMsg.includes('ATM-WIP: true') || commitMsg.includes('ATM-Delivery: false'))) {
+    return null;
+  }
   const report = inspectHistoricalDelivery({
     cwd: input.cwd,
     taskId: input.taskId,

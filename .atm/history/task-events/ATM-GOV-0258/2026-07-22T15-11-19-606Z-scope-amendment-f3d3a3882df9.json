@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-22T15-11-19-606Z-scope-amendment-f3d3a3882df9",
+  "taskId": "ATM-GOV-0258",
+  "action": "scope-amendment",
+  "actorId": "antigravity-gemini35-plan31-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0258.json",
+  "taskSha256": "sha256:315b3f2173ff73db468e8bcf3cfb494216838f35c32bd490c496d78e64332cd0",
+  "createdAt": "2026-07-22T15:11:19.606Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0258 --actor antigravity-gemini35-plan31-captain --add \"packages/cli/src/commands/tasks/claim-orchestrator.ts,packages/cli/src/commands/next/foreign-dirty-wip-admission.ts,packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts,packages/cli/src/commands/hook/pre-commit/implementation.ts,packages/cli/src/commands/tasks/historical-delivery.ts,packages/cli/src/commands/command-specs/tasks.spec.ts,tests/cli/dirty-release-wip-recovery-0258.test.ts\" --reason \"Plan 3.1 dirty-release/non-delivery WIP recovery MVP requires task release, claim admission, pre-commit WIP bypass, historical-delivery exclusion, CLI spec, and focused regression coverage.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Plan 3.1 dirty-release/non-delivery WIP recovery MVP requires task release, claim admission, pre-commit WIP bypass, historical-delivery exclusion, CLI spec, and focused regression coverage."
+  }
+}

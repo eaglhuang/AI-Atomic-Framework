@@ -243,7 +243,9 @@ export function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release'
     // deliverable already landed and only governed closeout work remains.
     claimIntent: 'write' as 'write' | 'closeout-only',
     autoIntent: false,
-    claimIntentExplicit: false
+    claimIntentExplicit: false,
+    wipCommit: false,
+    discardWip: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -308,6 +310,20 @@ export function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release'
       continue;
     }
 
+    if (arg === '--wip-commit') {
+      if (action !== 'release') {
+        throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option --wip-commit`, { exitCode: 2 });
+      }
+      options.wipCommit = true;
+      continue;
+    }
+    if (arg === '--discard-wip') {
+      if (action !== 'release') {
+        throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option --discard-wip`, { exitCode: 2 });
+      }
+      options.discardWip = true;
+      continue;
+    }
     if (arg === '--claim-intent') {
       if (action !== 'claim') {
         throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option --claim-intent`, { exitCode: 2 });
