@@ -1,0 +1,166 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0249",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "18cdc6076cb10be7d0fa156056aee60dff70a7c0",
+  "governedTreeSha": "be24a0a0c7fcf72df128eca002045f42bc70e366",
+  "targetCommitDelta": {
+    "currentCommitSha": "18cdc6076cb10be7d0fa156056aee60dff70a7c0",
+    "parentCommitShas": [
+      "18cdc6076cb10be7d0fa156056aee60dff70a7c0"
+    ],
+    "governedTreeSha": "be24a0a0c7fcf72df128eca002045f42bc70e366",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/steward.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/steward.js",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/steward.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/core/transactional-steward-rollback.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/transactional-steward-rollback.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7def7b2f8d81c0a8cbd6bd1901bd635f33b6f9a6ac3d6b9f04a97ecc275b5846",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a10f0b6b418b464ddb0b46a22283d5e3f5819e4e1f08c86653a55a09d9708add",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:aed8e5b70a2538a9f4b4173e1737aec8781cc9fdf2e8a0ee546a65876fd36b04",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/core/transactional-steward-rollback.test.ts",
+    "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-22T09:41:36.439Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.*",
+      ".atm/history/task-events/ATM-GOV-0249/**",
+      ".atm/history/tasks/ATM-GOV-0249.json",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/transactional-composer.ts",
+      "packages/core/src/broker/types.ts",
+      "tests/core/transactional-steward-rollback.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/transactional-composer.ts",
+      "packages/core/src/broker/types.ts",
+      "tests/core/transactional-steward-rollback.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0249.json",
+  "closedAt": "2026-07-22T09:41:36.439Z",
+  "closedByActor": "codex-plan31-captain-2",
+  "sessionId": "session-20260722084921-codex-plan31-captain-2-ATM-GOV-0249-b5c2840758",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "18cdc6076cb10be7d0fa156056aee60dff70a7c0",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/steward.ts",
+      "tests/core/transactional-steward-rollback.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0249/2026-07-22T08-33-06-021Z-import-5c213f4c2e56.json",
+      ".atm/history/task-events/ATM-GOV-0249/2026-07-22T08-49-21-555Z-reserve-c972a5f739b0.json",
+      ".atm/history/task-events/ATM-GOV-0249/2026-07-22T08-49-21-557Z-promote-2027fa65ed24.json",
+      ".atm/history/task-events/ATM-GOV-0249/2026-07-22T08-49-26-619Z-claim-4a661704804f.json",
+      ".atm/history/task-events/ATM-GOV-0249/2026-07-22T09-28-31-672Z-renew-488ce3122ecc.json",
+      ".atm/history/tasks/ATM-GOV-0249.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

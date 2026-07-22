@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0249",
   "title": "Transactional compose output and single-write steward apply",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0",
   "dependencies": [
     "ATM-GOV-0247"
@@ -105,8 +105,8 @@
     }
   },
   "importedAt": "2026-07-22T08:33:05.815Z",
-  "lastTransitionId": "2026-07-22T09-28-31-672Z-renew-488ce3122ecc",
-  "lastTransitionAt": "2026-07-22T09:28:31.672Z",
+  "lastTransitionId": "2026-07-22T09-41-36-444Z-close-016942bcc2fc",
+  "lastTransitionAt": "2026-07-22T09:41:36.444Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-plan31-captain-2",
   "reservedAt": "2026-07-22T08:49:21.555Z",
@@ -115,7 +115,7 @@
     "actorId": "codex-plan31-captain-2",
     "leaseId": "lease-a60d1cccb13e",
     "claimedAt": "2026-07-22T08:49:21.559Z",
-    "heartbeatAt": "2026-07-22T09:28:31.599Z",
+    "heartbeatAt": "2026-07-22T09:41:36.443Z",
     "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/ATM-GOV-0249.json",
@@ -127,13 +127,14 @@
       "tests/core/transactional-steward-rollback.test.ts",
       "tests/core/transactional-steward-single-write.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260722084921-codex-plan31-captain-2-0f04088bb2",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722084921-codex-plan31-captain-2-0f04088bb2\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-22T08:49:21.559Z",
   "startedByActor": "codex-plan31-captain-2",
@@ -172,5 +173,9 @@
     },
     "createdAt": "2026-07-22T08:49:26.618Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-22T09:41:36.443Z",
+  "closedByActor": "codex-plan31-captain-2",
+  "closedBySessionId": "session-20260722084921-codex-plan31-captain-2-ATM-GOV-0249-b5c2840758",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0249.closure-packet.json"
 }
