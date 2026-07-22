@@ -1,0 +1,145 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-ERR-0005",
+  "updatedAt": "2026-07-22T08:41:52.593Z",
+  "updatedBy": "codex-plan31-captain-2",
+  "freshValidationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run generate:error-codes",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:38c178541f613e145577670b3e907e40590e0e8fa3f565ec130d964533485f11",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "generate:error-codes"
+      ],
+      "generatedAt": "2026-07-22T08:38:55.544Z",
+      "startedAt": "2026-07-22T08:38:54.549Z",
+      "finishedAt": "2026-07-22T08:38:55.544Z",
+      "durationMs": 995,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3c77a13d3025de72c08a3d4f60da1aae0fc0d231",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:21bf5bcafedcb2cc2249198f372aaa71f2e7319a9f8016e6e414ba89acaaa1db",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts"
+      ],
+      "generatedAt": "2026-07-22T08:38:58.402Z",
+      "startedAt": "2026-07-22T08:38:58.011Z",
+      "finishedAt": "2026-07-22T08:38:58.402Z",
+      "durationMs": 391,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3c77a13d3025de72c08a3d4f60da1aae0fc0d231",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-22T08:39:11.503Z",
+      "startedAt": "2026-07-22T08:39:01.594Z",
+      "finishedAt": "2026-07-22T08:39:11.503Z",
+      "durationMs": 9909,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3c77a13d3025de72c08a3d4f60da1aae0fc0d231",
+      "cached": false
+    },
+    {
+      "command": "npm run generate:error-codes",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:38c178541f613e145577670b3e907e40590e0e8fa3f565ec130d964533485f11",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "generate:error-codes"
+      ],
+      "generatedAt": "2026-07-22T08:40:14.930Z",
+      "startedAt": "2026-07-22T08:40:13.848Z",
+      "finishedAt": "2026-07-22T08:40:14.930Z",
+      "durationMs": 1082,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3c77a13d3025de72c08a3d4f60da1aae0fc0d231",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:21bf5bcafedcb2cc2249198f372aaa71f2e7319a9f8016e6e414ba89acaaa1db",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts"
+      ],
+      "generatedAt": "2026-07-22T08:40:17.716Z",
+      "startedAt": "2026-07-22T08:40:17.313Z",
+      "finishedAt": "2026-07-22T08:40:17.716Z",
+      "durationMs": 403,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3c77a13d3025de72c08a3d4f60da1aae0fc0d231",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-22T08:40:31.159Z",
+      "startedAt": "2026-07-22T08:40:20.966Z",
+      "finishedAt": "2026-07-22T08:40:31.159Z",
+      "durationMs": 10193,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3c77a13d3025de72c08a3d4f60da1aae0fc0d231",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:0ed7d278680827b68fe4c738369361510683ef96e3d041a071e0fd97e11829f3",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-22T08:40:54.136Z",
+      "startedAt": "2026-07-22T08:40:33.686Z",
+      "finishedAt": "2026-07-22T08:40:54.136Z",
+      "durationMs": 20450,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3c77a13d3025de72c08a3d4f60da1aae0fc0d231",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-22T08:41:52.592Z",
+      "startedAt": "2026-07-22T08:40:56.834Z",
+      "finishedAt": "2026-07-22T08:41:52.592Z",
+      "durationMs": 55758,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3c77a13d3025de72c08a3d4f60da1aae0fc0d231",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

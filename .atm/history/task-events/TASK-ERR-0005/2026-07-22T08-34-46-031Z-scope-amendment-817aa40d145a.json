@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-22T08-34-46-031Z-scope-amendment-817aa40d145a",
+  "taskId": "TASK-ERR-0005",
+  "action": "scope-amendment",
+  "actorId": "codex-plan31-captain-2",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0005.json",
+  "taskSha256": "sha256:3e9bfbffae8a670fd53772329d0713e12984da502d1dd9f9fc38a32610ea69c0",
+  "createdAt": "2026-07-22T08:34:46.031Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0005 --actor codex-plan31-captain-2 --add scripts/generate-error-code-index.ts --reason \"The card requires generated TypeScript parity, but the canonical generator currently writes only docs/ERROR_CODES.md; extend the existing single registry generator instead of hand-authoring a second source.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The card requires generated TypeScript parity, but the canonical generator currently writes only docs/ERROR_CODES.md; extend the existing single registry generator instead of hand-authoring a second source."
+  }
+}

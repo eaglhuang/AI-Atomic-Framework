@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0005",
+  "title": "Acceptance evidence and cross-authority closure ErrorCode contracts",
+  "status": "running",
+  "milestone": "ATM-3.1-R0",
+  "dependencies": [
+    "ATM-GOV-0251"
+  ],
+  "acceptance": [
+    "Register `ATM_TASK_CLOSE_ACCEPTANCE_EVIDENCE_INSUFFICIENT` for a closure-critical predicate whose source is unavailable, derivation fails, evidence is below required realness, a negative control lacks discrimination, or the result remains unresolved. Category is `task-ledger`; retryable is `true`; human approval is `false`; recovery reruns the evidence/verification step named in the returned manifest before task pre-close.",
+    "Register `ATM_TASK_CLOSE_INDEPENDENT_VERIFIER_REQUIRED` when a closure-critical claim has neither a valid separate-actor verifier receipt nor a pre-sealed locked-policy verifier digest. Category is `task-ledger`; retryable is `true`; human approval is `false`; recovery executes the declared verifier before task pre-close.",
+    "Register `ATM_TASKFLOW_CROSS_AUTHORITY_CLOSEBACK_PENDING` when target and planning closeback are not both durably committed, or when a sealed root/HEAD/source-card CAS moves between prepare and commit. Category is `taskflow`; retryable is `true`; human approval is `false`; recovery diagnoses and reconciles the existing saga receipt rather than replaying completed side effects.",
+    "Every entry supplies exact trigger, source owner, registry owner `TASK-ERR-0005`, retryability, approval, required evidence, deterministic operator guidance, and executable/argv recovery manifest fields supported by the registry.",
+    "Source owners are respectively the acceptance-evidence gate and cross-authority closeback saga modules; generated docs and generated TypeScript match the registry digest.",
+    "Tests prove the three codes are distinct from the older generic `ATM_TASK_CLOSE_EVIDENCE_REQUIRED`, closure-packet-invalid, and planning-followup contracts.",
+    "GOV implementations import generated codes and cannot redefine spelling, retryability, or recovery text locally.",
+    "No task ID, plan name, repository path, actor, date, or provider is embedded in the trigger logic.",
+    "Before the first delivery commit, the implementer reviews registry generator/readers and sibling generated outputs; any required touched path is added once through governed scope amendment, while unchanged generator code remains out of the delivery."
+  ],
+  "deliverables": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "packages/core/src/error-code-registry.generated.ts",
+    "tests/cli/acceptance-closure-error-contract.test.ts"
+  ],
+  "scopePaths": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "packages/core/src/error-code-registry.generated.ts",
+    "tests/cli/acceptance-closure-error-contract.test.ts"
+  ],
+  "validators": [
+    "npm run generate:error-codes",
+    "node --strip-types tests/cli/acceptance-closure-error-contract.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "generated-errorcode-contract-parity",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Do not remove a code after any emitter ships; retire it through the registry lifecycle instead.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.error-code.registry",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.error-code.registry-data",
+        "pattern": "Canonical Registry",
+        "source": "docs/governance/error-code-registry.json",
+        "disposition": "inline",
+        "inlineReason": "The task adds three declarative rows to the existing single authority; splitting the registry would create a second writable source."
+      },
+      {
+        "atom": "atm.error-code.generated-docs",
+        "pattern": "Generated Projection",
+        "source": "docs/ERROR_CODES.md",
+        "disposition": "inline",
+        "inlineReason": "This file is generated from the registry and must not be manually extracted or edited as an independent authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "docs/governance/error-code-registry.json",
+        "docs/ERROR_CODES.md",
+        "packages/core/src/error-code-registry.generated.ts",
+        "tests/cli/acceptance-closure-error-contract.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0005-acceptance-evidence-and-cross-authority-closure-errorcode-contracts.task.md",
+    "sectionTitle": "TASK-ERR-0005",
+    "headingLine": 55,
+    "hash": "763a80b117d65cd6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0005-acceptance-evidence-and-cross-authority-closure-errorcode-contracts.task.md",
+      "planningCommitSha": "10f4391127d4890cfd1a40a207efed6c7beeda52",
+      "contentDigest": "sha256:763a80b117d65cd647833916fb4572ace2d25150eb59c71b27769e882ee3556b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-22T08:33:07.944Z"
+    }
+  },
+  "importedAt": "2026-07-22T08:33:07.944Z",
+  "lastTransitionId": "2026-07-22T08-34-46-031Z-scope-amendment-817aa40d145a",
+  "lastTransitionAt": "2026-07-22T08:34:46.031Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-plan31-captain-2",
+  "reservedAt": "2026-07-22T08:33:43.157Z",
+  "promotedAt": "2026-07-22T08:33:43.160Z",
+  "claim": {
+    "actorId": "codex-plan31-captain-2",
+    "leaseId": "lease-b515cbbbb596",
+    "claimedAt": "2026-07-22T08:33:43.163Z",
+    "heartbeatAt": "2026-07-22T08:33:43.163Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-ERR-0005.*",
+      ".atm/history/task-events/TASK-ERR-0005/**",
+      ".atm/history/tasks/TASK-ERR-0005.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
+      "scripts/generate-error-code-index.ts",
+      "tests/cli/acceptance-closure-error-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260722083343-codex-plan31-captain-2-e3c55c2cb0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722083343-codex-plan31-captain-2-e3c55c2cb0\""
+    }
+  },
+  "startedAt": "2026-07-22T08:33:43.163Z",
+  "startedByActor": "codex-plan31-captain-2",
+  "startedBySessionId": "session-20260722083343-codex-plan31-captain-2-TASK-ERR-0005-21e6bbfde0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0005",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0005.*",
+      ".atm/history/task-events/TASK-ERR-0005/**",
+      ".atm/history/tasks/TASK-ERR-0005.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
+      "scripts/generate-error-code-index.ts",
+      "tests/cli/acceptance-closure-error-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0005-acceptance-evidence-and-cross-authority-closure-errorcode-contracts.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/error-governance/",
+      "docs/ai_atomic_framework/error-governance/tasks/",
+      "docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0005-acceptance-evidence-and-cross-authority-closure-errorcode-contracts.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "b448b4df39984c47b77a6171200d4f90fc249c29c431e27d910b7f278fd7ed07",
+    "actorId": "codex-plan31-captain-2",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260722083343-codex-plan31-captain-2-e3c55c2cb0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722083343-codex-plan31-captain-2-e3c55c2cb0\""
+    },
+    "createdAt": "2026-07-22T08:33:49.040Z",
+    "status": "active"
+  }
+}

@@ -1427,6 +1427,147 @@
         "node atm.mjs taskflow diagnose --task <task-id> --json"
       ],
       "sourceOwner": "packages/cli/src/commands/broker/registry-actions.ts"
+    },
+    {
+      "code": "ATM_TASK_CLOSE_ACCEPTANCE_EVIDENCE_INSUFFICIENT",
+      "category": "task-ledger",
+      "shortDescription": "A closure-critical acceptance predicate is missing, unverifiable, below the required realness class, non-discriminating, failed, or inconclusive.",
+      "trigger": "The acceptance-evidence gate cannot derive a passing closure-critical predicate from available evidence at the required realness and negative-control discrimination levels.",
+      "commonCauses": [
+        "A required evidence source is unavailable or its derivation failed.",
+        "Evidence realness is below the task's declared minimum.",
+        "A negative control was accepted, rejected without a verifier, or otherwise failed to discriminate the claim.",
+        "The deterministic predicate result remains inconclusive."
+      ],
+      "remediation": [
+        "Read the acceptance-evidence manifest returned by the closure gate and run its named evidence or verification command.",
+        "Preserve a fresh command-backed receipt at the required realness class, then rerun taskflow pre-close.",
+        "Do not replace missing or inconclusive evidence with lifecycle labels, digest-only receipts, or human assertion."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs evidence missing --task <task-id> --actor <actor> --json",
+        "node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json"
+      ],
+      "statusCommand": "node atm.mjs evidence missing --task <task-id> --actor <actor> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "evidence",
+            "missing",
+            "--task",
+            "<task-id>",
+            "--actor",
+            "<actor>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "requiredEvidence": [
+        "The closure predicate derivation identifies its canonical evidence sources and required realness class.",
+        "All declared negative controls discriminate the claim and retain verifier-backed results.",
+        "The rerun produces a fresh deterministic pass before taskflow pre-close."
+      ],
+      "registryOwner": "TASK-ERR-0005",
+      "sourceOwner": "packages/cli/src/commands/tasks/close-orchestrator/acceptance-evidence-gate.ts"
+    },
+    {
+      "code": "ATM_TASK_CLOSE_INDEPENDENT_VERIFIER_REQUIRED",
+      "category": "task-ledger",
+      "shortDescription": "A closure-critical claim lacks both an independent verifier receipt and a pre-sealed locked-policy verifier digest.",
+      "trigger": "The acceptance-evidence gate finds neither a valid separate-actor verifier receipt nor a verifier derived from policy locked before the evidence was observed.",
+      "commonCauses": [
+        "The producer attempted to verify its own closure-critical claim.",
+        "A separate verifier did not execute the declared verification command.",
+        "The locked-policy digest is missing, stale, or was sealed after evidence observation."
+      ],
+      "remediation": [
+        "Execute the task's declared verifier with a distinct permitted actor, or supply the pre-sealed locked-policy verifier digest.",
+        "Record the verifier identity, command, input digest, output digest, and exit result in command-backed evidence.",
+        "Rerun taskflow pre-close only after the verifier evidence is fresh and bound to the same claim."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs evidence run --task <task-id> --actor <verifier-actor> --command \"<declared-verifier-command>\" --json",
+        "node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json"
+      ],
+      "statusCommand": "node atm.mjs evidence missing --task <task-id> --actor <actor> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "evidence",
+            "run",
+            "--task",
+            "<task-id>",
+            "--actor",
+            "<verifier-actor>",
+            "--command",
+            "<declared-verifier-command>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "requiredEvidence": [
+        "A separate-actor verifier receipt or a valid pre-sealed locked-policy verifier digest.",
+        "Verifier inputs and outputs bind to the same closure-critical claim digest.",
+        "The verifier command completes successfully before taskflow pre-close."
+      ],
+      "registryOwner": "TASK-ERR-0005",
+      "sourceOwner": "packages/cli/src/commands/tasks/close-orchestrator/acceptance-evidence-gate.ts"
+    },
+    {
+      "code": "ATM_TASKFLOW_CROSS_AUTHORITY_CLOSEBACK_PENDING",
+      "category": "taskflow",
+      "shortDescription": "Target and planning closeback have not both committed durably, or a sealed closeback CAS moved between prepare and commit.",
+      "trigger": "The cross-authority closeback saga is prepared or partially committed but cannot prove durable target and planning commits against the sealed roots, HEADs, and source-card CAS values.",
+      "commonCauses": [
+        "Only the target or planning authority commit completed.",
+        "A repository root, HEAD, or planning source-card digest moved after saga preparation.",
+        "A retry attempted to replay already completed side effects instead of reconciling the durable saga receipt."
+      ],
+      "remediation": [
+        "Run taskflow diagnose for the affected task and inspect the existing cross-authority saga receipt.",
+        "Execute only the returned reconcile action for the incomplete authority; do not replay completed commits or close side effects.",
+        "Retry closeback after both authority commit SHAs and sealed CAS values are durably recorded."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs taskflow diagnose --task <task-id> --json"
+      ],
+      "statusCommand": "node atm.mjs taskflow diagnose --task <task-id> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "taskflow",
+            "diagnose",
+            "--task",
+            "<task-id>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "requiredEvidence": [
+        "A durable saga receipt identifies the prepared target and planning authority roots, HEADs, and source-card CAS values.",
+        "Both authority commit SHAs are recorded or the receipt names exactly one incomplete reconcile step.",
+        "Reconciliation proves completed side effects were not replayed."
+      ],
+      "registryOwner": "TASK-ERR-0005",
+      "sourceOwner": "packages/cli/src/commands/taskflow/cross-authority-closeback.ts"
     }
   ],
   "prefixRules": [
