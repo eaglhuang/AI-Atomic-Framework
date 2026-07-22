@@ -1,0 +1,207 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0251",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "eb397c3d4801fae0baea7d7987c1fe64a1da2838",
+  "governedTreeSha": "e29171108ef27f1d7fdcba5c8c38be58755e5042",
+  "targetCommitDelta": {
+    "currentCommitSha": "eb397c3d4801fae0baea7d7987c1fe64a1da2838",
+    "parentCommitShas": [
+      "eb397c3d4801fae0baea7d7987c1fe64a1da2838"
+    ],
+    "governedTreeSha": "e29171108ef27f1d7fdcba5c8c38be58755e5042",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      "packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "packages/cli/dist/commands/tasks/task-import-validators.js",
+      "packages/cli/src/commands/tasks/acceptance-evidence-import.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/evidence/acceptance-predicate.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/realness.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-import-validators.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/result-contracts.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-import-validators.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/schemas/governance/work-item.schema.json",
+      "schemas/governance/acceptance-evidence-map.schema.json",
+      "schemas/governance/work-item.schema.json",
+      "tests/cli/task-import-acceptance-evidence.test.ts",
+      "tests/core/acceptance-evidence-predicate.test.ts",
+      "tests/schema-fixtures/acceptance-evidence/invalid-forged-realness.json",
+      "tests/schema-fixtures/acceptance-evidence/valid-real-dogfood.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/acceptance-evidence-predicate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/task-import-acceptance-evidence.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5e18b93d2d3dfaf537a7138ed43f1672e004975abc94d951197b09e23b3818fc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:8a445a6707e65652e11139d19cb1901ded2398e2df5339f09a27207ba4d80742",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/task-import-acceptance-evidence.test.ts",
+    "node --strip-types tests/core/acceptance-evidence-predicate.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-22T08:14:48.676Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0251.*",
+      ".atm/history/task-events/ATM-GOV-0251/**",
+      ".atm/history/tasks/ATM-GOV-0251.json",
+      "packages/cli/src/commands/tasks/acceptance-evidence-import.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/evidence/acceptance-predicate.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/realness.ts",
+      "schemas/governance/acceptance-evidence-map.schema.json",
+      "schemas/governance/work-item.schema.json",
+      "tests/cli/task-import-acceptance-evidence.test.ts",
+      "tests/core/acceptance-evidence-predicate.test.ts",
+      "tests/schema-fixtures/acceptance-evidence/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/acceptance-evidence-import.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/evidence/acceptance-predicate.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/realness.ts",
+      "schemas/governance/acceptance-evidence-map.schema.json",
+      "schemas/governance/work-item.schema.json",
+      "tests/cli/task-import-acceptance-evidence.test.ts",
+      "tests/core/acceptance-evidence-predicate.test.ts",
+      "tests/schema-fixtures/acceptance-evidence/**"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0251.json",
+  "closedAt": "2026-07-22T08:14:48.677Z",
+  "closedByActor": "codex-plan31-captain-2",
+  "sessionId": "session-20260722074941-codex-plan31-captain-2-ATM-GOV-0251-0176e7553d",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "eb397c3d4801fae0baea7d7987c1fe64a1da2838",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/tasks/acceptance-evidence-import.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/evidence/acceptance-predicate.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/realness.ts",
+      "schemas/governance/acceptance-evidence-map.schema.json",
+      "schemas/governance/work-item.schema.json",
+      "tests/cli/task-import-acceptance-evidence.test.ts",
+      "tests/core/acceptance-evidence-predicate.test.ts",
+      "tests/schema-fixtures/acceptance-evidence/invalid-forged-realness.json",
+      "tests/schema-fixtures/acceptance-evidence/valid-real-dogfood.json"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0251.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0251/2026-07-22T07-49-17-649Z-import-d7de07909db1.json",
+      ".atm/history/task-events/ATM-GOV-0251/2026-07-22T07-49-41-430Z-reserve-c301d9323e22.json",
+      ".atm/history/task-events/ATM-GOV-0251/2026-07-22T07-49-41-432Z-promote-f99aec156e61.json",
+      ".atm/history/task-events/ATM-GOV-0251/2026-07-22T07-49-47-323Z-claim-08708316d773.json",
+      ".atm/history/task-events/ATM-GOV-0251/2026-07-22T07-52-00-861Z-scope-amendment-bacd1e86ef31.json",
+      ".atm/history/task-events/ATM-GOV-0251/2026-07-22T08-04-21-212Z-scope-amendment-4a110c4e0d76.json",
+      ".atm/history/tasks/ATM-GOV-0251.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

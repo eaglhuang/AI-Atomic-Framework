@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-22T08-14-48-683Z-close-4ac3b5c76b72",
+  "taskId": "ATM-GOV-0251",
+  "action": "close",
+  "actorId": "codex-plan31-captain-2",
+  "sessionId": "session-20260722074941-codex-plan31-captain-2-ATM-GOV-0251-0176e7553d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0251.json",
+  "taskSha256": "sha256:a7681662525f66772945f4d19533a199397b4f4363a85d60e2baa98152431fe9",
+  "createdAt": "2026-07-22T08:14:48.683Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0251 --actor codex-plan31-captain-2 --status done --historical-delivery eb397c3d4801fae0baea7d7987c1fe64a1da2838",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260722074941-codex-plan31-captain-2-ATM-GOV-0251-0176e7553d",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0251.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/task-import-acceptance-evidence.test.ts",
+      "node --strip-types tests/core/acceptance-evidence-predicate.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-22T08:14:48.676Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0251.*",
+        ".atm/history/task-events/ATM-GOV-0251/**",
+        ".atm/history/tasks/ATM-GOV-0251.json",
+        "packages/cli/src/commands/tasks/acceptance-evidence-import.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-task.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/core/src/evidence/acceptance-predicate.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/realness.ts",
+        "schemas/governance/acceptance-evidence-map.schema.json",
+        "schemas/governance/work-item.schema.json",
+        "tests/cli/task-import-acceptance-evidence.test.ts",
+        "tests/core/acceptance-evidence-predicate.test.ts",
+        "tests/schema-fixtures/acceptance-evidence/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/acceptance-evidence-import.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-task.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/core/src/evidence/acceptance-predicate.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/realness.ts",
+        "schemas/governance/acceptance-evidence-map.schema.json",
+        "schemas/governance/work-item.schema.json",
+        "tests/cli/task-import-acceptance-evidence.test.ts",
+        "tests/core/acceptance-evidence-predicate.test.ts",
+        "tests/schema-fixtures/acceptance-evidence/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
