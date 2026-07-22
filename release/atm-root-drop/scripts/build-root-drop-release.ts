@@ -8,6 +8,7 @@ import {
   assertStableLauncherTemplatePresent,
   resolveStableLauncherTemplatePath
 } from './launcher-entrypoint-guards.ts';
+import { classifyAtmCorePath, type RunnerBuildScopeManifest } from '../packages/core/src/broker/atm-core-scope.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const defaultReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
@@ -114,6 +115,7 @@ export function buildRootDropRelease(options: any = {}) {
     entries: ['atm.mjs', ...releaseEntries],
     generatedFiles,
     copyReport,
+    runnerSourceSeal: buildRunnerSourceSeal(repositoryRoot, sourceFiles),
     stagingContract: {
       schemaId: 'atm.generatedArtifactStaging.v1',
       generatedFiles,
@@ -132,6 +134,27 @@ export function buildRootDropRelease(options: any = {}) {
     entrypointPath: path.join(releaseRoot, 'atm.mjs'),
     entryCount: releaseEntries.length,
     copyReport
+  };
+}
+
+export function buildRunnerSourceSeal(repositoryRoot: string, sourceFiles: readonly string[]) {
+  const scopeManifestPath = path.join(repositoryRoot, 'scripts', 'AtmCore', 'runner-build-scope.json');
+  const scopeManifest = JSON.parse(readFileSync(scopeManifestPath, 'utf8')) as RunnerBuildScopeManifest;
+  const files = sourceFiles
+    .filter((relativePath) => classifyAtmCorePath(scopeManifest, relativePath).kind === 'atm-core')
+    .sort();
+  const hash = createHash('sha256');
+  for (const relativePath of files) {
+    const content = readFileSync(path.join(repositoryRoot, relativePath));
+    // Length-prefix every field so different path/content boundaries cannot collide.
+    hash.update(String(Buffer.byteLength(relativePath))).update(':').update(relativePath);
+    hash.update(String(content.byteLength)).update(':').update(content);
+  }
+  return {
+    schemaId: 'atm.runnerSourceSeal.v1',
+    algorithm: 'sha256',
+    files,
+    digest: `sha256:${hash.digest('hex')}`
   };
 }
 

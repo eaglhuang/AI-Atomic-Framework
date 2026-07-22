@@ -29,4 +29,5 @@ export * from './wave-generated-executor.js';
 export * from './parallel-admission-policy.js';
 export * from './adapters/index.js';
 export * from './cross-task-mutation-guard.js';
+export * from './workspace-topology-policy.js';
 export * from './boundaries/index.js';

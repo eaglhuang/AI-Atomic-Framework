@@ -16,6 +16,11 @@ ATM governance exists to preserve delivery truth while keeping coordination cost
 5. Governance overhead must stay economically bounded.
 6. Team Agents must prove measured acceleration in actual money and end-to-end time.
 7. Raw token counts are mandatory diagnostics, but raw tokens are not a cross-model price proxy.
+8. Normal parallel development uses one canonical worktree/base/HEAD; a physical
+   file overlap is evaluated from bounded logical intent and can compose through
+   a neutral steward rather than becoming a path-only lock.
+9. Git branches, worktrees, indexes, merges, and rebases are outer delivery
+   mechanisms, not normal ATM concurrency or isolation mechanisms.
 
 ## Schedule A - Economic Thresholds
 

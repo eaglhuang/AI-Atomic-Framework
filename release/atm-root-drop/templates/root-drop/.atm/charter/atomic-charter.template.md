@@ -47,6 +47,7 @@ counts are mandatory diagnostics, not a cross-model price proxy.
 | INV-ATM-007 | Public framework docs remain English-only | doctor |
 | INV-ATM-008 | Broker tickets, not refusals | doctor |
 | INV-ATM-009 | Generalized repair and data-driven policy | doctor |
+| INV-ATM-010 | Single canonical worktree and compose-first shared writes | doctor |
 
 ---
 
@@ -61,6 +62,23 @@ node atm.mjs next --json
 This produces a `nextAction` that routes the agent to the correct governed step
 before any file edits. Skipping this step is detectable by `atm doctor` through
 the `lock-before-edit` guard and `git-head-evidence` check.
+
+### INV-ATM-010 — Single canonical worktree and compose-first shared writes
+
+Normal governed parallel development uses one canonical worktree, base, and
+HEAD. A shared physical file is compose-eligible rather than a file lock:
+workers declare bounded atom/CID/content-anchor/source-range intents and submit
+proposals, while the broker, format adapter, and transactional composer decide
+compose, revalidation, escalation, or queue. A neutral steward is the only
+shared-file writer and shared delivery records member attribution. Queueing or
+revalidation is a fallback for a true logical conflict, stale base/CAS failure,
+unsupported adapter, or fairness bound.
+
+AI workers must not use Git branches, detached worktrees, alternate indexes,
+merges, or rebases as normal concurrency/isolation mechanisms. The closed
+exceptions are emergency/anomaly recovery, historical read-only discrimination,
+and non-development sealed packaging; each requires a named receipt and cannot
+perform normal governed contribution writes.
 
 ---
 

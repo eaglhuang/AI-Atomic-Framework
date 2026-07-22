@@ -80,12 +80,33 @@ function copyDeclarations(packageDir: string): void {
       copyFileSync(filePath, target);
     }
   }
-  const declarationEntrypoint = path.join(distRoot, 'index.d.ts');
-  if (!existsSync(declarationEntrypoint)) {
+  for (const declarationEntrypoint of declaredDeclarationEntrypoints(packageDir)) {
+    const absoluteEntrypoint = path.join(root, packageDir, declarationEntrypoint);
+    if (existsSync(absoluteEntrypoint)) continue;
+    const sourceName = path.basename(declarationEntrypoint, '.d.ts');
     // Incremental caches may survive while a fresh sealed worktree has no hydrated .types output.
-    ensureDir(declarationEntrypoint);
-    writeFileSync(declarationEntrypoint, "export * from '../src/index.ts';\n", 'utf8');
+    ensureDir(absoluteEntrypoint);
+    writeFileSync(absoluteEntrypoint, `export * from '../src/${sourceName}.ts';\n`, 'utf8');
   }
+}
+
+function declaredDeclarationEntrypoints(packageDir: string): readonly string[] {
+  const packageJson = JSON.parse(readFileSync(path.join(root, packageDir, 'package.json'), 'utf8')) as {
+    types?: string;
+    exports?: Record<string, { types?: string }>;
+    bin?: Record<string, string> | string;
+  };
+  const declared = new Set<string>();
+  if (packageJson.types) declared.add(packageJson.types);
+  for (const value of Object.values(packageJson.exports ?? {})) {
+    if (value?.types) declared.add(value.types);
+  }
+  const bins = typeof packageJson.bin === 'string' ? [packageJson.bin] : Object.values(packageJson.bin ?? {});
+  for (const binPath of bins) {
+    declared.add(binPath.replace(/\.(?:m?js)$/, '.d.ts'));
+  }
+  if (declared.size === 0) declared.add('./dist/index.d.ts');
+  return [...declared].map((entry) => entry.replace(/^\.\//, ''));
 }
 
 function writeCliEntrypointWrapper(distRoot: string): void {

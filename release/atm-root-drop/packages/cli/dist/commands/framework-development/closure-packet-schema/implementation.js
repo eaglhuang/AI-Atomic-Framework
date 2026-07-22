@@ -493,6 +493,27 @@ function newestFrameworkSourceMtime(rootDir) { let newest = 0; for (const entryP
 } return newest; }
 function runnerAffectingMtimeRoots(rootDir) { const manifest = readRunnerBuildScopeManifest(rootDir); if (!manifest)
     return ['packages/cli/src', 'scripts']; const roots = runnerAffectingPatterns(manifest).filter((pattern) => !pattern.startsWith('release/')).map((pattern) => pattern.includes('*') ? pattern.slice(0, pattern.indexOf('*')) : pattern).map((pattern) => pattern.replace(/\/$/, '')).filter((pattern) => pattern.length > 0); return [...new Set(roots)]; }
+function verifyRunnerSourceSeal(rootDir) { const manifestPath = path.join(rootDir, 'release-manifest.json'); if (!existsSync(manifestPath))
+    return { present: false, valid: false, digest: null }; try {
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    const seal = manifest.runnerSourceSeal;
+    if (seal?.schemaId !== 'atm.runnerSourceSeal.v1' || seal.algorithm !== 'sha256' || !Array.isArray(seal.files) || !/^sha256:[a-f0-9]{64}$/i.test(String(seal.digest ?? '')))
+        return { present: false, valid: false, digest: null };
+    const files = seal.files.filter((entry) => typeof entry === 'string' && entry.length > 0);
+    if (files.length !== seal.files.length || files.some((entry) => !existsSync(path.join(rootDir, entry))))
+        return { present: true, valid: false, digest: null };
+    const hash = createHash('sha256');
+    for (const relativePath of files) {
+        const content = readFileSync(path.join(rootDir, relativePath));
+        hash.update(String(Buffer.byteLength(relativePath))).update(':').update(relativePath);
+        hash.update(String(content.byteLength)).update(':').update(content);
+    }
+    const digest = `sha256:${hash.digest('hex')}`;
+    return { present: true, valid: digest.toLowerCase() === String(seal.digest).toLowerCase(), digest };
+}
+catch {
+    return { present: false, valid: false, digest: null };
+} }
 function readRunnerBuildScopeManifest(rootDir) { const manifestPath = path.join(rootDir, 'scripts', 'AtmCore', 'runner-build-scope.json'); try {
     return JSON.parse(readFileSync(manifestPath, 'utf8'));
 }
@@ -517,7 +538,7 @@ function classifyCliEntrypoint(cwd) { const entrypointPath = process.argv[1] ? p
     return null; const relative = path.relative(path.resolve(cwd), entrypointPath).replace(/\\/g, '/'); if (relative && !relative.startsWith('..'))
     return relative; return entrypointPath.replace(/\\/g, '/'); }
 export function isRunnerSyncRequired(cwd) { return inspectRunnerSourceDrift(cwd).syncRequired; }
-export function inspectRunnerSourceDrift(cwd) { const rootDir = path.resolve(cwd); const entrypoint = classifyCliEntrypoint(rootDir); const releaseHygienePolicy = describeBuildReleaseHygienePolicy(); const nonFrozen = !entrypoint || !FROZEN_RUNNER_ENTRYPOINTS.has(entrypoint); const runnerPath = resolveFrozenRunnerPath(rootDir); const newestSourceMtimeMs = newestFrameworkSourceMtime(rootDir); const runnerMtimeMs = runnerPath ? statSync(runnerPath).mtimeMs : 0; const syncRequired = !nonFrozen && Boolean(runnerPath) && newestSourceMtimeMs > runnerMtimeMs; return { schemaId: 'atm.runnerSourceDrift.v1', entrypoint, frozenEntrypoint: !nonFrozen, runnerPath: runnerPath ? relativePathFrom(rootDir, runnerPath) : null, runnerMtime: runnerMtimeMs > 0 ? new Date(runnerMtimeMs).toISOString() : null, newestSourceMtime: newestSourceMtimeMs > 0 ? new Date(newestSourceMtimeMs).toISOString() : null, syncRequired, advisory: syncRequired ? 'Frozen runner is older than framework source files; live CLI behavior may lag source until the runner is rebuilt.' : nonFrozen ? 'Current entrypoint is not the frozen runner; source-first/source-import diagnostics may differ from node atm.mjs.' : 'Frozen runner is not older than framework source files.', syncCommand: releaseHygienePolicy.runnerSyncCommand }; }
+export function inspectRunnerSourceDrift(cwd) { const rootDir = path.resolve(cwd); const entrypoint = classifyCliEntrypoint(rootDir); const releaseHygienePolicy = describeBuildReleaseHygienePolicy(); const nonFrozen = !entrypoint || !FROZEN_RUNNER_ENTRYPOINTS.has(entrypoint); const runnerPath = resolveFrozenRunnerPath(rootDir); const newestSourceMtimeMs = newestFrameworkSourceMtime(rootDir); const runnerMtimeMs = runnerPath ? statSync(runnerPath).mtimeMs : 0; const sourceSeal = verifyRunnerSourceSeal(rootDir); const timestampRequiresSync = newestSourceMtimeMs > runnerMtimeMs; const syncRequired = !nonFrozen && Boolean(runnerPath) && (sourceSeal.present ? !sourceSeal.valid : timestampRequiresSync); return { schemaId: 'atm.runnerSourceDrift.v1', entrypoint, frozenEntrypoint: !nonFrozen, runnerPath: runnerPath ? relativePathFrom(rootDir, runnerPath) : null, runnerMtime: runnerMtimeMs > 0 ? new Date(runnerMtimeMs).toISOString() : null, newestSourceMtime: newestSourceMtimeMs > 0 ? new Date(newestSourceMtimeMs).toISOString() : null, sourceSeal, syncRequired, advisory: syncRequired ? sourceSeal.present ? 'Frozen release runner source seal does not match the packaged framework sources; rebuild the runner release.' : 'Frozen runner is older than framework source files; live CLI behavior may lag source until the runner is rebuilt.' : nonFrozen ? 'Current entrypoint is not the frozen runner; source-first/source-import diagnostics may differ from node atm.mjs.' : sourceSeal.valid ? 'Frozen release runner source seal matches the packaged framework sources.' : 'Frozen runner is not older than framework source files.', syncCommand: releaseHygienePolicy.runnerSyncCommand }; }
 export function runnerStaleWarningMessage() { const releaseHygienePolicy = describeBuildReleaseHygienePolicy(); return `ATM_RUNNER_SYNC_REQUIRED: stable atm.mjs is older than framework source files. Run \`${releaseHygienePolicy.runnerSyncCommand}\` before using the frozen runner, or use \`node atm.dev.mjs ...\` for source-first framework validation.`; }
 export function assertSourceFirstRunnerReadOnlyAction(input) { const entrypoint = classifyCliEntrypoint(path.resolve(input.cwd))?.toLowerCase().replace(/\\/g, '/'); if (entrypoint !== 'atm.dev.mjs' && !entrypoint?.endsWith('/atm.dev.mjs'))
     return; throw new CliError('ATM_SOURCE_FIRST_WRITE_REFUSED', `ATM refused ${input.action} through the source-first runner.`, { exitCode: 1, details: { action: input.action, sourceFirstOnly: true, guidance: 'Use node atm.dev.mjs only for explicit source-first validation; use node atm.mjs after rebuilding for governed lifecycle mutations.', sourceFirstCommand: 'node atm.dev.mjs ...', governedCommand: 'node atm.mjs ...' } }); }
