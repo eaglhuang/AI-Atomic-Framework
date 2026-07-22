@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.linked-surface-closure.v1.schema.json",
+  "title": "ATM Linked Surface Closure v1",
+  "type": "object",
+  "required": ["schemaId", "specVersion", "rootScope", "requiredSurfaces", "optionalSurfaces", "unavailableSurfaces", "traversalOrder", "closureDigest", "findings"],
+  "properties": {
+    "schemaId": { "const": "atm.linkedSurfaceClosure.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "rootScope": { "type": "array", "items": { "type": "string" } },
+    "requiredSurfaces": { "type": "array", "items": { "type": "string" } },
+    "optionalSurfaces": { "type": "array", "items": { "type": "string" } },
+    "unavailableSurfaces": { "type": "array", "items": { "type": "string" } },
+    "traversalOrder": { "type": "array", "items": { "type": "string" } },
+    "closureDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "surface", "edgeId", "producerId", "message"],
+        "properties": {
+          "code": {
+            "enum": ["ATM_SCOPE_AMENDMENT_REQUIRED", "ATM_LINKED_SURFACE_OPTIONAL", "ATM_LINKED_SURFACE_UNSUPPORTED", "ATM_LINKED_SURFACE_CYCLE"]
+          },
+          "surface": { "type": "string" },
+          "edgeId": { "type": ["string", "null"] },
+          "producerId": { "type": ["string", "null"] },
+          "message": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

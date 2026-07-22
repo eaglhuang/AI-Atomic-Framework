@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/atm.parallel-replay-scenario.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "scenarioId",
+    "generatedAt",
+    "runner",
+    "thresholds",
+    "coverageDigest",
+    "historicalInputDigest",
+    "failureShapes",
+    "disallowFixedTaskActorPathBranches",
+    "digest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.parallelReplayScenario.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "scenarioId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "runner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entrypoint", "digest"],
+      "properties": {
+        "entrypoint": { "type": "string", "minLength": 1 },
+        "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "starvationThresholdMs",
+        "thresholdSource",
+        "minimumParallelOverlapRatio",
+        "maximumSerializedAdmissionRatio"
+      ],
+      "properties": {
+        "starvationThresholdMs": { "type": "integer", "minimum": 1 },
+        "thresholdSource": { "enum": ["policy", "paired-baseline-evidence"] },
+        "minimumParallelOverlapRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "maximumSerializedAdmissionRatio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "coverageDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "historicalInputDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "failureShapes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "failureClass", "expectedCounter", "evidenceRef"],
+        "properties": {
+          "role": { "type": "string", "minLength": 1 },
+          "failureClass": {
+            "enum": [
+              "stale-current-allowed-task",
+              "dimension-mismatch",
+              "release-order-divergence",
+              "closure-packet-divergence"
+            ]
+          },
+          "expectedCounter": { "type": "string", "minLength": 1 },
+          "evidenceRef": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "disallowFixedTaskActorPathBranches": { "const": true },
+    "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

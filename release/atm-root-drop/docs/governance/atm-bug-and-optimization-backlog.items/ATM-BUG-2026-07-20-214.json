@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-214",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Broker / Runner-sync queue",
+  "finding": "A runner-sync steward reservation is pinned to a sealed-source-sha. Once HEAD advances past that sha the entry can no longer be satisfied: broker runner-sync release requires --receipt-ref from a completed build for that exact sha, which can never legitimately be produced again. The entry stays queue-head and blocks all later reservations with waiting-different-source. broker cleanup does not reap it while a framework temp claim with the same task id is active, because health resolves to task-active.",
+  "expectedBehavior": "A reservation whose sealed source sha is no longer reachable should be reapable without fabricating a receipt, via an explicit cancel/expire action or automatic orphan detection that does not depend on the transient framework temp claim being absent.",
+  "evidenceOrRepro": "Reserved runner-sync-4213eae7 at 43c6d07af; concurrent lane advanced HEAD to 7f017bb46 then ccc215b71. Re-enqueue at ccc215b71 returned waiting-different-source at position 2. broker runner-sync release returned \"release requires --receipt-ref pointing at an atm.runnerSyncReceipt.v1 evidence file\". broker cleanup reported success but reaped nothing while the claim was held. Only releasing the framework temp claim first and then running broker runner-sync cleanup reaped it.",
+  "followUp": "Consumer: ATM-GOV-0218 (runner-sync self-hosting closed loop) and TASK-ERR-0002 (error and recovery contract). 0218 owns the sha-reachability-aware orphan detection and cancel/expire path; TASK-ERR-0002 owns the recovery contract and the cleanup reporting/mutation disagreement (staleReleases empty while message reports \"released 1 stale request(s)\"). Do not open a standalone card."
+}

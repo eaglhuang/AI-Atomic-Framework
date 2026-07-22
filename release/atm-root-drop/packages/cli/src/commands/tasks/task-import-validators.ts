@@ -11,6 +11,7 @@
  */
 
 import { createHash } from 'node:crypto';
+export { parseAcceptanceEvidenceMap } from './acceptance-evidence-import.ts';
 
 // ─── 類型定義（共享自 tasks.ts 的 FrontMatter 介面） ─────────────────────────
 

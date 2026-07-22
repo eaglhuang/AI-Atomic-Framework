@@ -10,6 +10,7 @@
  * - 禁止從此模組反向 import tasks.ts
  */
 import { createHash } from 'node:crypto';
+export { parseAcceptanceEvidenceMap } from './acceptance-evidence-import.js';
 // ─── 搬移的 9 個純函式（behavior-preserving，簽章/行為完全不變） ──────────
 /**
  * 從 markdown 文字提取 YAML frontmatter。

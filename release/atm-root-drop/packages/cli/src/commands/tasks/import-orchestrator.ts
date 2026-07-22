@@ -8,7 +8,12 @@ import { readPluginRegistry } from '../../plugin-registry.ts';
 import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from '../planning-repo-root.ts';
 import { assertRunnerFreshForWriteAction } from '../framework-development.ts';
 import { assertEmergencyApproval } from '../emergency/gate.ts';
-import { buildExtractionFirstPatrolDiagnostics, validateDeliverablesList } from './task-import-validators.ts';
+import {
+  buildExtractionFirstPatrolDiagnostics,
+  extractFrontMatter,
+  parseAcceptanceEvidenceMap,
+  validateDeliverablesList
+} from './task-import-validators.ts';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.ts';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.ts';
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
@@ -115,6 +120,10 @@ export async function runTasksImport(argv: string[]) {
 
   const planText = readFileSync(planAbsolute, 'utf8');
   const generatedAt = new Date().toISOString();
+  let rawAcceptanceEvidence = (() => {
+    const frontmatter = extractFrontMatter(planText)?.data;
+    return frontmatter?.acceptanceEvidence ?? frontmatter?.acceptance_evidence;
+  })();
 
   let parsed: ParsedPlanResult | null = null;
   const plugins = await readPluginRegistry(options.cwd);
@@ -131,6 +140,9 @@ export async function runTasksImport(argv: string[]) {
       if (typeof plugin.parse === 'function') {
         const parsedTask = await plugin.parse(input);
         if (parsedTask) {
+          rawAcceptanceEvidence = parsedTask.frontmatter.acceptanceEvidence
+            ?? parsedTask.frontmatter.acceptance_evidence
+            ?? rawAcceptanceEvidence;
           const record = parseSingleCardFromPlugin(parsedTask, generatedAt);
           parsed = {
             tasks: [record],
@@ -153,6 +165,28 @@ export async function runTasksImport(argv: string[]) {
       planRelativePath: toStoredPlanningPath(options.cwd, planAbsolute),
       importedAt: generatedAt
     });
+  }
+
+  const acceptanceEvidence = parseAcceptanceEvidenceMap(rawAcceptanceEvidence);
+  if (acceptanceEvidence.errors.length > 0) {
+    parsed.diagnostics.push(...acceptanceEvidence.errors.map((text) => ({
+      level: 'error' as const,
+      code: 'ATM_TASK_IMPORT_ACCEPTANCE_EVIDENCE_INVALID',
+      text
+    })));
+  } else if (acceptanceEvidence.value) {
+    if (parsed.tasks.length !== 1) {
+      parsed.diagnostics.push({
+        level: 'error',
+        code: 'ATM_TASK_IMPORT_ACCEPTANCE_EVIDENCE_AMBIGUOUS',
+        text: 'Card-level acceptanceEvidence can only be attached when the source resolves to one task.'
+      });
+    } else {
+      parsed = {
+        ...parsed,
+        tasks: parsed.tasks.map((task) => ({ ...task, acceptanceEvidence: acceptanceEvidence.value }))
+      };
+    }
   }
 
   const enrichedParsed = enrichParsedTasksFromSiblingTaskCards({

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-20-216",
+  "date": "2026-07-20",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Resolved",
+  "area": "Tasks / Import parser",
+  "finding": "A shell comment line beginning with # inside a fenced code block is parsed as a markdown heading by the task import parser. It resets the task declaration context, so a well-formed card with valid front matter fails with ATM_TASKS_PLAN_EMPTY even though the parser separately reports having detected the correct heading. The emitted diagnostic is also misleading: it reports ATM_TASK_IMPORT_REFERENCE_ONLY_ID_FRAGMENT naming the card id at a source line where that id does not appear.",
+  "expectedBehavior": "Fence state must be tracked before heading detection: content inside a fenced block is never a heading and must not affect task declaration context. Diagnostics must cite a line that actually contains the referenced token.",
+  "evidenceOrRepro": "Resolved by ATM-GOV-0232 evidence: node --strip-types tests/cli/task-import-diagnostic-contract.test.ts covers backtick and tilde fenced shell comments, verifies no task import is created, and verifies diagnostics cite the fenced triggering source line. node --strip-types tests/cli/task-import-canonical-id-boundary.test.ts covers canonical id right-boundary fragments and fenced markdown/yaml examples.",
+  "followUp": "No standalone follow-up remains for the fence-before-heading parser boundary. Keep future parser work generic and do not special-case shell comments."
+}
