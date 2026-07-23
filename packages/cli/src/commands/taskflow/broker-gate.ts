@@ -3,6 +3,7 @@ import path from 'node:path';
 import { loadRegistry } from '../../../../core/src/broker/registry.ts';
 import { calculateBrokerDecision } from '../../../../core/src/broker/decision.ts';
 import type { ActiveWriteIntent, WriteIntent, WriteIntentAtomRef } from '../../../../core/src/broker/types.ts';
+import { resolveCanonicalDecisionClass } from '../broker/replay/closure-policy.ts';
 import { quoteCliValue, relativePathFrom } from '../shared.ts';
 
 export interface TaskflowBrokerConflictGate {
@@ -13,7 +14,7 @@ export interface TaskflowBrokerConflictGate {
   readonly summary: string;
   readonly requiredCommand: string | null;
   readonly brokerVerdict: string | null;
-  readonly decisionClass: 'serial-release' | 'blocked' | null;
+  readonly decisionClass: 'serial-release' | 'blocked' | 'composer-routed' | null;
   readonly decisionReason: string | null;
   readonly violationStatus: 'broker-conflict-blocked' | null;
   readonly statusCode: 'broker-conflict-blocked' | null;
@@ -251,6 +252,23 @@ export function evaluateTaskflowBrokerConflictGate(input: {
     };
   }
 
+  const canonicalDecisionClass = resolveCanonicalDecisionClass({
+    verdict: decision.verdict,
+    admissionState: decision.admission?.state ?? null
+  });
+
+  if (decision.verdict === 'needs-physical-split' && canonicalDecisionClass === 'composer-routed') {
+    return {
+      ...noConflictGate(
+        'Broker reports composer-routed disjoint same-file regions; path equality alone must not serialize this close.',
+        decision.verdict
+      ),
+      overlappingTaskIds: overlapping.map((entry) => entry.taskId),
+      decisionClass: 'composer-routed',
+      decisionReason: 'composer-routed admission remains authoritative even when the legacy top-level verdict is needs-physical-split.'
+    };
+  }
+
   if (decision.verdict === 'needs-physical-split' || decision.verdict === 'blocked-shared-surface') {
     return {
       schemaId: 'atm.taskflowBrokerConflictGate.v1',
@@ -260,7 +278,7 @@ export function evaluateTaskflowBrokerConflictGate(input: {
       summary: 'broker-conflict-blocked: Broker found overlapping write surfaces without a confirmed safe release artifact.',
       requiredCommand: buildBrokerConflictResolveCommand(input.taskId, overlapping.map((entry) => entry.taskId), currentFiles),
       brokerVerdict: decision.verdict,
-      decisionClass: 'blocked',
+      decisionClass: canonicalDecisionClass === 'must-serialize' ? 'serial-release' : 'blocked',
       decisionReason: 'broker-conflict-blocked because active write surfaces overlap without a resolution artifact.',
       violationStatus: 'broker-conflict-blocked',
       statusCode: 'broker-conflict-blocked',
@@ -270,7 +288,8 @@ export function evaluateTaskflowBrokerConflictGate(input: {
 
   return {
     ...noConflictGate('Broker re-check found no confirmed CID conflict for this close.', decision.verdict),
-    overlappingTaskIds: overlapping.map((entry) => entry.taskId)
+    overlappingTaskIds: overlapping.map((entry) => entry.taskId),
+    decisionClass: canonicalDecisionClass === 'composer-routed' ? 'composer-routed' : null
   };
 }
 

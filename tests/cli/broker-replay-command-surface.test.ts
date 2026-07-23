@@ -15,18 +15,31 @@ assert.equal(statusReport.command, 'broker');
 assert.equal(statusReport.evidence.schemaId, 'atm.brokerReplayStatus.v1');
 assert.equal(statusReport.evidence.verdict, 'remain-open');
 assert.deepEqual(statusReport.evidence.publicFrozenCliSurface.actions, ['status', 'run', 'dogfood']);
-assert.ok(statusReport.evidence.blockers.some((entry: string) => entry.includes('real-dogfood-registered-candidates')));
-assert.ok(statusReport.evidence.blockers.some((entry: string) => entry.includes('command-backed-420-cell-matrix')));
+assert.ok(
+  statusReport.evidence.blockers.some((entry: string) => entry.includes('missing-lifecycle-class:') || entry.includes('INV-ATM-') || entry.includes('real-dogfood-registered-candidates') || entry.includes('command-backed-420-cell-matrix')),
+  'status blockers must expose exact semantic or availability gaps'
+);
+assert.ok(Array.isArray(statusReport.evidence.missingLifecycleClasses));
+assert.ok(statusReport.evidence.status?.finalVerdict === 'remain-open');
 
 const dogfood = spawnSync(process.execPath, [atmDev, 'broker', 'replay', 'dogfood', '--json'], {
   cwd: root,
   encoding: 'utf8'
 });
-assert.equal(dogfood.status, 1, 'broker replay dogfood must fail closed without two registered candidates');
 const dogfoodReport = parseJsonOutput(dogfood.stdout, dogfood.stderr);
 assert.equal(dogfoodReport.evidence.action, 'replay-dogfood');
-assert.equal(dogfoodReport.evidence.verdict, 'remain-open');
-assert.ok(dogfoodReport.messages.some((entry: any) => entry.code === 'ATM_BROKER_REPLAY_DOGFOOD_BLOCKED'));
+if (dogfood.status === 0) {
+  // Candidate cards may exist, but dogfood success alone must not imply Plan 3 closure.
+  const statusAfter = spawnSync(process.execPath, [atmDev, 'broker', 'replay', 'status', '--json'], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  const statusAfterReport = parseJsonOutput(statusAfter.stdout, statusAfter.stderr);
+  assert.equal(statusAfterReport.evidence.verdict, 'remain-open');
+} else {
+  assert.equal(dogfoodReport.evidence.verdict, 'remain-open');
+  assert.ok(dogfoodReport.messages.some((entry: any) => entry.code === 'ATM_BROKER_REPLAY_DOGFOOD_BLOCKED'));
+}
 
 console.log('[broker-replay-command-surface.test] ok');
 

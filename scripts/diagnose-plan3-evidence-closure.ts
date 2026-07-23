@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { evaluatePlan3SemanticClosure } from '../packages/cli/src/commands/broker/replay/closure-policy.ts';
 import { inspectCommandBackedMatrix } from '../packages/cli/src/commands/broker/replay/command-backed-matrix.ts';
 import { selectRuntimeDogfoodTasks } from '../packages/cli/src/commands/broker/replay/implementation.ts';
 
@@ -19,28 +20,48 @@ interface DiagnosticReport {
   readonly verdict: 'ready-to-close' | 'remain-open';
   readonly blockers: readonly string[];
   readonly checks: readonly DiagnosticCheck[];
+  readonly semanticClosure?: unknown;
 }
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cwd = process.cwd() || repoRoot;
 const requiredIntersection = ['docs/governance/atm-3-replay-evidence.md'];
 
+const semantic = evaluatePlan3SemanticClosure({
+  cwd,
+  requiredIntersection,
+  useLiveEvidence: true
+});
+
 const checks: DiagnosticCheck[] = [
   dogfoodCandidateCheck(cwd),
   replayCliSurfaceCheck(cwd),
   commandBackedMatrixCheck(cwd),
-  formulaMatrixDisclosureCheck(cwd)
+  formulaMatrixDisclosureCheck(cwd),
+  {
+    name: 'semantic-closure-policy',
+    ok: semantic.verdict === 'ready-to-close',
+    detail: semantic.verdict === 'ready-to-close'
+      ? 'semantic closure predicates are satisfied'
+      : `remain-open; missing=${semantic.missingLifecycleClasses.join(',') || 'none'}; invariants=${semantic.invariantFindings.map((entry) => entry.code).join(',') || 'none'}`,
+    evidence: semantic
+  }
 ];
 
-const blockers = checks.filter((check) => !check.ok).map((check) => `${check.name}: ${check.detail}`);
+const blockers = [
+  ...checks.filter((check) => !check.ok).map((check) => `${check.name}: ${check.detail}`),
+  ...semantic.blockers
+];
+const uniqueBlockers = [...new Set(blockers)];
 const report: DiagnosticReport = {
   schemaId: 'atm.plan3EvidenceClosureDiagnostic.v1',
   generatedAt: new Date().toISOString(),
   cwd,
-  ok: blockers.length === 0,
-  verdict: blockers.length === 0 ? 'ready-to-close' : 'remain-open',
-  blockers,
-  checks
+  ok: uniqueBlockers.length === 0,
+  verdict: uniqueBlockers.length === 0 ? 'ready-to-close' : 'remain-open',
+  blockers: uniqueBlockers,
+  checks,
+  semanticClosure: semantic
 };
 
 const jsonRequested = process.argv.includes('--json');
@@ -68,15 +89,19 @@ function dogfoodCandidateCheck(root: string): DiagnosticCheck {
   } catch {
     selected = [];
   }
+  const present = selected.length >= 2;
   return {
     name: 'real-dogfood-registered-candidates',
-    ok: selected.length >= 2,
-    detail: selected.length >= 2
-      ? `found ${selected.length} registered task candidates with declared intersection`
+    // Missing candidates remain a hard blocker. Present candidates are only availability,
+    // so keep ok=true and let semantic-closure-policy own the fail-closed verdict.
+    ok: present,
+    detail: present
+      ? `found ${selected.length} registered task candidates with declared intersection (availability only; not closure proof)`
       : `found ${selected.length}/2 registered planned/ready/running task candidates with declared intersection`,
     evidence: {
       requiredIntersection,
-      selected
+      selected,
+      closureNote: 'candidate-availability-is-not-semantic-closure'
     }
   };
 }
@@ -102,14 +127,18 @@ function replayCliSurfaceCheck(root: string): DiagnosticCheck {
 
 function commandBackedMatrixCheck(root: string): DiagnosticCheck {
   const matrix = inspectCommandBackedMatrix(root);
+  const complete = matrix.cellCount === 420 && matrix.commandBackedCount === 420;
   return {
     name: 'command-backed-420-cell-matrix',
-    ok: matrix.cellCount === 420 && matrix.commandBackedCount === 420,
-    detail: matrix.cellCount === 420 && matrix.commandBackedCount === 420
-      ? 'all 420 cells include command/workload receipt evidence'
+    // Missing receipt shapes remain a hard blocker. Complete shapes alone still cannot close;
+    // semantic-closure-policy keeps the repository remain-open under fake-green inputs.
+    ok: complete,
+    detail: complete
+      ? 'all 420 cells include command/workload receipt shapes (shape only; not closure proof)'
       : `${matrix.cellCount} cells found, ${matrix.commandBackedCount}/420 include command/workload receipt evidence`,
     evidence: {
-      ...matrix
+      ...matrix,
+      closureNote: 'receipt-shape-is-not-semantic-closure'
     }
   };
 }
@@ -125,13 +154,14 @@ function formulaMatrixDisclosureCheck(root: string): DiagnosticCheck {
   ].filter((signal) => source.includes(signal));
   return {
     name: 'formula-generated-matrix-disclosed',
-    ok: formulaSignals.length > 0,
+    ok: true,
     detail: formulaSignals.length > 0
       ? 'current paired AB v4 matrix is visibly formula-generated and must not be treated as real workload proof'
       : 'formula-generation signals were not found; inspect whether the matrix source changed',
     evidence: {
       scriptPath: relative(root, scriptPath),
-      formulaSignals
+      formulaSignals,
+      informationalOnly: true
     }
   };
 }
