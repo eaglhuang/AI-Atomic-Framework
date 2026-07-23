@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'broker',
   summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, parallel admission policy, and inspect the local write-broker registry.',
   positional: [
-    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay', required: true },
+    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | post-compose-semantic-validation', required: true },
     { name: 'proposal-action', summary: 'create | list | show | validate', required: false },
     { name: 'steward-action', summary: 'plan | apply', required: false },
     { name: 'runtime-action', summary: 'activate', required: false },
@@ -44,6 +44,7 @@ export default defineCommandSpec({
     { flag: '--command-manifest', value: 'path', summary: 'atm.commandManifest.v1 JSON used for shellless generated build/projection execution.' },
     { flag: '--collection-timeout-ms', value: 'ms', summary: 'Broker schedule collection timeout before reseal or serial fallback.' },
     { flag: '--source-item', value: 'path', summary: 'Source item shard for broker projection enqueue. Repeatable.' },
+    { flag: '--candidate-file', value: 'path', summary: 'Exact composed candidate JSON for post-compose semantic validation.' },
     { flag: '--proposal-file', value: 'path', summary: 'Path to PatchProposal JSON payload. Repeatable for compose / steward.' },
     { flag: '--proposal-id', value: 'id', summary: 'Proposal id for compose / steward or proposal show / validate.' },
     { flag: '--merge-plan-file', value: 'path', summary: 'Path to MergePlan JSON payload for steward plan / apply.' },

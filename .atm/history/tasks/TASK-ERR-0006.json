@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0006",
+  "title": "Post-compose semantic validation ErrorCode contracts",
+  "status": "running",
+  "milestone": "ATM-3.1-R2",
+  "dependencies": [
+    "ATM-GOV-0241",
+    "ATM-GOV-0249"
+  ],
+  "acceptance": [
+    "Register `ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED` for a materialized candidate that ran one or more required validators and received a failing result.",
+    "Register `ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE` when a required language/project validator cannot be resolved or executed, or lacks a command-backed result.",
+    "Both codes use category `team-broker`, are retryable, require no human approval, prohibit canonical write, and route recovery back through candidate repair/materialization plus semantic revalidation on current base/HEAD.",
+    "The failed contract tells the operator to repair or recompute proposals and rerun the same sealed validator set; the unavailable contract tells the operator to restore/resolve the declared validator and rerun it. Neither authorizes skipping the validator or substituting a healthy boolean.",
+    "Registry metadata identifies `packages/core/src/broker/post-compose-semantic-validation-policy.ts` and `packages/cli/src/commands/broker/post-compose-semantic-validation.ts` as source owners and `TASK-ERR-0006` as registry owner.",
+    "Generated TypeScript, Markdown, operator guidance, and registry entries remain deterministic and parity-checked.",
+    "Focused tests lock exact code selection for pass, fail, unavailable, malformed receipt, and no-write recovery paths; GOV-0254 imports generated constants rather than string literals or a local fallback taxonomy."
+  ],
+  "deliverables": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "packages/generated/src/error-codes.ts",
+    "tests/cli/post-compose-semantic-validation-error-contract.test.ts"
+  ],
+  "scopePaths": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "packages/generated/src/error-codes.ts",
+    "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+    "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+    "tests/cli/post-compose-semantic-validation-error-contract.test.ts"
+  ],
+  "validators": [
+    "npm run generate:error-codes",
+    "node --strip-types tests/cli/post-compose-semantic-validation-error-contract.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "post-compose-semantic-validation-error-contract-receipts",
+  "rollbackStrategy": "revert-registry-and-generated-projections-together",
+  "rollbackNotes": "Unknown or missing semantic-validation contracts remain fail-closed; do not replace exact codes with a generic broker failure.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.error-governance.registry",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "docs/governance/error-code-registry.json",
+        "docs/ERROR_CODES.md",
+        "packages/generated/src/error-codes.ts",
+        "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+        "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+        "tests/cli/post-compose-semantic-validation-error-contract.test.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 2 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "docs/governance/error-code-registry.json (1809 lines)",
+        "docs/ERROR_CODES.md (1641 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0006-post-compose-semantic-validation-errorcode-contracts.task.md",
+    "sectionTitle": "TASK-ERR-0006",
+    "headingLine": 48,
+    "hash": "b64e568fa625800e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0006-post-compose-semantic-validation-errorcode-contracts.task.md",
+      "planningCommitSha": "10f4391127d4890cfd1a40a207efed6c7beeda52",
+      "contentDigest": "sha256:b64e568fa625800e062f367eb1ed4dd30ae2645f30d9f77c9d7836de85166378",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-23T09:04:23.562Z"
+    }
+  },
+  "importedAt": "2026-07-23T09:04:23.562Z",
+  "lastTransitionId": "2026-07-23T13-18-21-873Z-scope-amendment-aedff343adf8",
+  "lastTransitionAt": "2026-07-23T13:18:21.873Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-002-plan31-captain",
+  "reservedAt": "2026-07-23T13:10:43.039Z",
+  "promotedAt": "2026-07-23T13:10:43.041Z",
+  "claim": {
+    "actorId": "cursor-002-plan31-captain",
+    "leaseId": "lease-a6566e1a8fdf",
+    "claimedAt": "2026-07-23T13:10:43.044Z",
+    "heartbeatAt": "2026-07-23T13:10:43.044Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-ERR-0006.*",
+      ".atm/history/task-events/TASK-ERR-0006/**",
+      ".atm/history/tasks/TASK-ERR-0006.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/generated/src/error-codes.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/post-compose-semantic-validation-error-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260723131043-cursor-002-plan31-captain-7245904808",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723131043-cursor-002-plan31-captain-7245904808\""
+    }
+  },
+  "startedAt": "2026-07-23T13:10:43.044Z",
+  "startedByActor": "cursor-002-plan31-captain",
+  "startedBySessionId": "session-20260723131043-cursor-002-plan31-captain-TASK-ERR-0006-d1ff3e2883",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0006",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0006.*",
+      ".atm/history/task-events/TASK-ERR-0006/**",
+      ".atm/history/tasks/TASK-ERR-0006.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/generated/src/error-codes.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/post-compose-semantic-validation-error-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0006-post-compose-semantic-validation-errorcode-contracts.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/error-governance/",
+      "docs/ai_atomic_framework/error-governance/tasks/",
+      "docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0006-post-compose-semantic-validation-errorcode-contracts.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4bfd6748265c959c8a89ab37b78ccb2204e19b3bad9ac9027abc0982abe0f803",
+    "actorId": "cursor-002-plan31-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260723131043-cursor-002-plan31-captain-7245904808",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723131043-cursor-002-plan31-captain-7245904808\""
+    },
+    "createdAt": "2026-07-23T13:10:55.095Z",
+    "status": "active"
+  }
+}
