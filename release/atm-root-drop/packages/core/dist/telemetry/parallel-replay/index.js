@@ -1,4 +1,5 @@
 import { sha256Digest } from '../../broker/census/index.js';
+import { classifyTelemetryCoverageState, evaluateTelemetryObligationSeal, registryMembershipSatisfiesCoverage } from '../../broker/replay/lifecycle-receipts.js';
 export function buildParallelReplayTelemetryProof(evidence) {
     const withoutDigest = {
         schemaId: 'atm.parallelReplayTelemetryProof.v1',
@@ -35,4 +36,26 @@ export function buildParallelReplayTelemetryProof(evidence) {
         ...withoutDigest,
         digest: sha256Digest(withoutDigest)
     };
+}
+export function buildParallelReplayTelemetryCoverageReport(nodes) {
+    const enriched = nodes.map((node) => {
+        const coverageState = classifyTelemetryCoverageState(node);
+        return {
+            ...node,
+            coverageState,
+            registryAloneSatisfies: false,
+            coverageSatisfied: registryMembershipSatisfiesCoverage(node)
+        };
+    });
+    const withoutDigest = {
+        schemaId: 'atm.parallelReplayTelemetryCoverageReport.v1',
+        nodes: enriched
+    };
+    return {
+        ...withoutDigest,
+        digest: sha256Digest(withoutDigest)
+    };
+}
+export function sealParallelReplayTelemetryObligation(input) {
+    return evaluateTelemetryObligationSeal(input);
 }
