@@ -214,18 +214,6 @@ function intersects(left, right) {
 function detectFileRangeConflictClasses(newIntent, activeIntents) {
     const conflicts = [];
     const seen = new Set();
-    const activeRangesByFile = new Map();
-    for (const active of activeIntents) {
-        if (active.taskId === newIntent.taskId)
-            continue;
-        for (const atomRange of active.resourceKeys.atomRanges ?? []) {
-            if (!atomRange.filePath || atomRange.lineStart <= 0 || atomRange.lineEnd <= 0)
-                continue;
-            const existing = activeRangesByFile.get(atomRange.filePath) ?? [];
-            existing.push({ active, ref: { atomId: active.taskId, atomCid: atomRange.atomCid, operation: 'modify' }, range: atomRange });
-            activeRangesByFile.set(atomRange.filePath, existing);
-        }
-    }
     for (const targetFile of newIntent.targetFiles) {
         for (const active of activeIntents) {
             if (active.taskId === newIntent.taskId)
@@ -247,39 +235,54 @@ function detectFileRangeConflictClasses(newIntent, activeIntents) {
                 seen.add(key);
             }
         }
-        const sourceRanges = newIntent.atomRefs
-            .map((entry) => ({ entry, range: entry.sourceRange }))
-            .filter((candidate) => {
-            const range = candidate.range;
-            return !!range && range.filePath === targetFile && range.lineStart > 0 && range.lineEnd > 0;
-        });
-        if (sourceRanges.length === 0)
+    }
+    // Range-level evidence lives on concrete literal filePaths in atomRefs[].sourceRange
+    // and active.resourceKeys.atomRanges. Compare every declared source range against every
+    // active range through the same canonical resource-key matcher used above, instead of an
+    // exact-string Map lookup keyed by the (possibly glob) targetFile — a glob-declared
+    // targetFile never equals a concrete atomRange.filePath, which previously dropped
+    // range-level evidence for glob-intent/literal-candidate and literal-intent/glob-candidate
+    // pairings even though the coarse file-surface conflict above already caught them.
+    const newSourceRanges = newIntent.atomRefs
+        .map((entry) => ({ entry, range: entry.sourceRange }))
+        .filter((candidate) => {
+        const range = candidate.range;
+        return !!range && range.lineStart > 0 && range.lineEnd > 0;
+    });
+    if (newSourceRanges.length === 0)
+        return conflicts;
+    for (const active of activeIntents) {
+        if (active.taskId === newIntent.taskId)
             continue;
-        const activeEntries = activeRangesByFile.get(targetFile) ?? [];
-        if (activeEntries.length === 0)
+        const activeRanges = (active.resourceKeys.atomRanges ?? [])
+            .filter((atomRange) => atomRange.filePath && atomRange.lineStart > 0 && atomRange.lineEnd > 0);
+        if (activeRanges.length === 0)
             continue;
-        for (const source of sourceRanges) {
-            for (const active of activeEntries) {
-                if (source.range.lineStart <= active.range.lineEnd && source.range.lineEnd >= active.range.lineStart) {
-                    const overlapKey = `overlap:${targetFile}:${active.active.taskId}:${source.entry.atomCid}:${active.ref.atomCid}`;
+        for (const source of newSourceRanges) {
+            for (const activeRange of activeRanges) {
+                const fact = compareResourceKeys('file', source.range.filePath, activeRange.filePath);
+                if (fact.verdict === 'clear')
+                    continue;
+                if (source.range.lineStart <= activeRange.lineEnd && source.range.lineEnd >= activeRange.lineStart) {
+                    const overlapKey = `overlap:${source.range.filePath}:${active.taskId}:${source.entry.atomCid}:${activeRange.atomCid}`;
                     if (!seen.has(overlapKey)) {
                         conflicts.push({
                             kind: 'file-range',
-                            detail: `File overlap on '${targetFile}' between '${source.entry.atomCid}' and '${active.ref.atomCid}'.`,
-                            blockingTask: active.active.taskId
+                            detail: `File overlap on '${source.range.filePath}' between '${source.entry.atomCid}' and '${activeRange.atomCid}'.`,
+                            blockingTask: active.taskId
                         });
                         seen.add(overlapKey);
                     }
                 }
                 else {
-                    const watchKey = `disjoint:${targetFile}:${active.active.taskId}:${source.entry.atomCid}:${active.ref.atomCid}`;
+                    const watchKey = `disjoint:${source.range.filePath}:${active.taskId}:${source.entry.atomCid}:${activeRange.atomCid}`;
                     if (!seen.has(watchKey)) {
                         conflicts.push({
                             kind: 'file-range',
-                            detail: `Syntactically disjoint on '${targetFile}' with active task '${active.active.taskId}'.`,
-                            blockingTask: active.active.taskId
+                            detail: `Syntactically disjoint on '${source.range.filePath}' with active task '${active.taskId}'.`,
+                            blockingTask: active.taskId
                         });
-                        seen.has(watchKey) || seen.add(watchKey);
+                        seen.add(watchKey);
                     }
                 }
             }

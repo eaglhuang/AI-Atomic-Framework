@@ -210,8 +210,28 @@ function buildAdmissionBrokerTicket(
 }
 
 function buildRunnerSyncEnqueueCommand(input: Parameters<typeof inspectRunnerSyncAdmission>[0]): string {
-  const enqueue = buildRunnerSyncRecoveryManifests(input).find((entry) => entry.id === 'runner-sync-enqueue');
-  return enqueue?.display ?? renderCommandManifest(buildRunnerSyncEnqueueManifest(input));
+  const manifests = buildRunnerSyncRecoveryManifests(input);
+  const claim = manifests.find((entry) => entry.id === 'framework-temp-claim');
+  const enqueue = manifests.find((entry) => entry.id === 'runner-sync-enqueue');
+  const claimDisplay = claim?.display ?? renderCommandManifest(buildCommandManifest({
+    executable: 'node',
+    argv: [
+      'atm.mjs', 'framework-mode', 'claim',
+      '--actor', input.stewardActorId,
+      '--files', 'release/atm-onefile/atm.mjs,release/atm-root-drop',
+      '--reason', `runner-sync steward reservation for ${input.sealedSourceSha ?? '<sha>'}`,
+      '--json'
+    ],
+    envRefs: ['PATH'],
+    timeoutMs: 120000,
+    notes: 'claim release surfaces before runner-sync enqueue'
+  }));
+  const enqueueDisplay = enqueue?.display ?? renderCommandManifest(buildRunnerSyncEnqueueManifest(input));
+  // A first-time (bootstrap) steward has no queue-head reservation yet, so the
+  // guidance must chain both steps: claiming the release surfaces before enqueuing.
+  // Otherwise the emitted command silently skips straight to enqueue, which fails
+  // admission for a source-first/frozen self-hosting bootstrap with no prior claim.
+  return `${claimDisplay} && ${enqueueDisplay}`;
 }
 
 function inferRunnerSyncTaskId(input: { readonly stewardActorId: string }): string {
