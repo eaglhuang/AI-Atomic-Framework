@@ -1,0 +1,202 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0256",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "137e9cd846ce184ee1b30bfdb6d66ecc761d4697",
+  "governedTreeSha": "d5b7be4e2c31ffac4aaa3b28735cf2f7894c53ca",
+  "targetCommitDelta": {
+    "currentCommitSha": "137e9cd846ce184ee1b30bfdb6d66ecc761d4697",
+    "parentCommitShas": [
+      "137e9cd846ce184ee1b30bfdb6d66ecc761d4697"
+    ],
+    "governedTreeSha": "d5b7be4e2c31ffac4aaa3b28735cf2f7894c53ca",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      "packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/runner-sync-manifest-atomic-write.test.ts",
+      "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/runner-sync-build-source-preservation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e129f96675ea3f449c71a1fcfdd50bb74b258461da721c3b9addb023a18cdf0c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9ccc97be99e991fc87e80ecbe4081488877d0408a0bd03f5cdd08f159a6d8288",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-self-hosting-loop.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f8dcc207495aa6ee8f9fdede1c271664240e29a64d897480ded5b6e24b84be6b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-stale-sha-recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e9810ffca5b36ecb608a18dd111b98f9f181cc40e9fbe9622a0e7ae4fe99221c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-manifest-atomic-write.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:086b897bb1fcc29d5c64a89fb4cda271ac72ec53a99bdfc0c8e7f7a11a8cd4d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-post-close-receipt-publication.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:63b4a646dc3a897ebb97462656611221b8bc809014e0064a7987b92232d44da4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ec28dbdd63dac80be7dbcfab374dbbeab64865b131f3a777ceba90d42fe096a",
+      "stderrSha256": "sha256:1feafa426cfc603fb5fb03e82e1080b19debe6bdc3c9b3463886a1c9279c9762",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/runner-sync-build-actor-continuity.test.ts",
+    "node --strip-types tests/cli/runner-sync-build-source-preservation.test.ts",
+    "node --strip-types tests/cli/runner-sync-manifest-atomic-write.test.ts",
+    "node --strip-types tests/cli/runner-sync-post-close-receipt-publication.test.ts",
+    "node --strip-types tests/cli/runner-sync-self-hosting-loop.test.ts",
+    "node --strip-types tests/cli/runner-sync-stale-sha-recovery.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-23T06:01:03.631Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0256.*",
+      ".atm/history/task-events/ATM-GOV-0256/**",
+      ".atm/history/tasks/ATM-GOV-0256.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "tests/cli/runner-sync-build-source-preservation.test.ts",
+      "tests/cli/runner-sync-manifest-atomic-write.test.ts",
+      "tests/cli/runner-sync-post-close-receipt-publication.test.ts",
+      "tests/cli/runner-sync-self-hosting-loop.test.ts",
+      "tests/cli/runner-sync-stale-sha-recovery.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "tests/cli/runner-sync-build-source-preservation.test.ts",
+      "tests/cli/runner-sync-manifest-atomic-write.test.ts",
+      "tests/cli/runner-sync-post-close-receipt-publication.test.ts",
+      "tests/cli/runner-sync-self-hosting-loop.test.ts",
+      "tests/cli/runner-sync-stale-sha-recovery.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0256.json",
+  "closedAt": "2026-07-23T06:01:03.631Z",
+  "closedByActor": "claude-plan31-captain",
+  "sessionId": "session-20260723052333-claude-plan31-captain-ATM-GOV-0256-61b09848a2",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "137e9cd846ce184ee1b30bfdb6d66ecc761d4697",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/runner-sync-manifest-atomic-write.test.ts",
+      "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0256.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0256/2026-07-22T12-15-38-474Z-import-d5bb61201ba5.json",
+      ".atm/history/task-events/ATM-GOV-0256/2026-07-23T05-23-15-824Z-import-7b93ac66ef58.json",
+      ".atm/history/task-events/ATM-GOV-0256/2026-07-23T05-23-33-567Z-reserve-d7765bcfd31e.json",
+      ".atm/history/task-events/ATM-GOV-0256/2026-07-23T05-23-33-572Z-promote-c768afb29d19.json",
+      ".atm/history/task-events/ATM-GOV-0256/2026-07-23T05-23-41-716Z-claim-3313bd9636b0.json",
+      ".atm/history/tasks/ATM-GOV-0256.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

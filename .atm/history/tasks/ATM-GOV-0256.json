@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0256",
   "title": "Runner-sync source snapshot and cache-hit freshness gate",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0.8",
   "dependencies": [
     "ATM-GOV-0230",
@@ -95,8 +95,8 @@
     }
   },
   "importedAt": "2026-07-23T05:23:15.717Z",
-  "lastTransitionId": "2026-07-23T05-23-41-716Z-claim-3313bd9636b0",
-  "lastTransitionAt": "2026-07-23T05:23:41.716Z",
+  "lastTransitionId": "2026-07-23T06-01-03-647Z-close-1066f0a697cc",
+  "lastTransitionAt": "2026-07-23T06:01:03.647Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-plan31-captain",
   "reservedAt": "2026-07-23T05:23:33.567Z",
@@ -105,7 +105,7 @@
     "actorId": "claude-plan31-captain",
     "leaseId": "lease-773176f2d86f",
     "claimedAt": "2026-07-23T05:23:33.576Z",
-    "heartbeatAt": "2026-07-23T05:23:33.576Z",
+    "heartbeatAt": "2026-07-23T06:01:03.644Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0256.json",
@@ -119,14 +119,14 @@
       "tests/cli/runner-sync-self-hosting-loop.test.ts",
       "tests/cli/runner-sync-stale-sha-recovery.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260723052333-claude-plan31-captain-a2dfe36c0a",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723052333-claude-plan31-captain-a2dfe36c0a\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-23T05:23:33.576Z",
   "startedByActor": "claude-plan31-captain",
@@ -167,5 +167,9 @@
     },
     "createdAt": "2026-07-23T05:23:41.715Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-23T06:01:03.644Z",
+  "closedByActor": "claude-plan31-captain",
+  "closedBySessionId": "session-20260723052333-claude-plan31-captain-ATM-GOV-0256-61b09848a2",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0256.closure-packet.json"
 }
