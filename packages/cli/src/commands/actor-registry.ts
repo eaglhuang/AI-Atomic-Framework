@@ -267,11 +267,19 @@ export function describeActorResolution(inputActorId?: string | null, cwd?: stri
       || (envActor !== null && envActor !== legacyEnvActor)
     )
   );
-  const warning = !explicit && resolved && resolved.source !== 'repo-default' && repoDefaultActor && repoDefaultActor !== resolved.actorId
-    ? `${actorResolutionSourceLabel(resolved.source)} actor ${resolved.actorId} overrides repo default actor ${repoDefaultActor}. Pass --actor ${repoDefaultActor} to claim as the repo default actor, or clear/update the environment identity before claiming.`
-    : legacyIsDiagnosticOnly && legacyEnvActor && resolved && resolved.actorId !== legacyEnvActor
-      ? `${legacyActorIdEnvVar}=${legacyEnvActor} is diagnostic-only and must not replace authoritative actor ${resolved.actorId}. Prefer --actor or ${actorIdEnvVar}=${resolved.actorId}.`
-    : null;
+  // Prefer the continuity diagnostic when AGENT_IDENTITY disagrees with an
+  // authoritative actor; only then surface repo-default override guidance.
+  // When repo-default already won, stale AGENT_IDENTITY stays silent provenance.
+  const warning = legacyIsDiagnosticOnly
+      && legacyEnvActor
+      && resolved
+      && resolved.actorId !== legacyEnvActor
+      && resolved.source !== 'repo-default'
+      && resolved.source !== 'legacy-env'
+    ? `${legacyActorIdEnvVar}=${legacyEnvActor} is diagnostic-only and must not replace authoritative actor ${resolved.actorId}. Prefer --actor or ${actorIdEnvVar}=${resolved.actorId}.`
+    : !explicit && resolved && resolved.source !== 'repo-default' && repoDefaultActor && repoDefaultActor !== resolved.actorId
+      ? `${actorResolutionSourceLabel(resolved.source)} actor ${resolved.actorId} overrides repo default actor ${repoDefaultActor}. Pass --actor ${repoDefaultActor} to claim as the repo default actor, or clear/update the environment identity before claiming.`
+      : null;
   return {
     resolved,
     precedence: ['option', 'env', 'repo-default', 'legacy-env'],
