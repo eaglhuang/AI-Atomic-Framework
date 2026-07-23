@@ -1,5 +1,6 @@
 import { makeResult, message } from '../shared.js';
 import { inspectCommandBackedMatrix } from './replay/command-backed-matrix.js';
+import { evaluatePlan3SemanticClosure } from './replay/closure-policy.js';
 import { runFrozenParallelReplay, runRuntimeDogfoodLifecycle, selectRuntimeDogfoodTasks } from './replay/implementation.js';
 const defaultIntersection = ['docs/governance/atm-3-replay-evidence.md'];
 export async function handleBrokerReplayActions(options) {
@@ -32,26 +33,36 @@ function brokerReplayStatus(options) {
         minimum: 2
     });
     const matrix = inspectCommandBackedMatrix(options.cwd);
-    const blockers = [
+    const semantic = evaluatePlan3SemanticClosure({
+        cwd: options.cwd,
+        requiredIntersection,
+        useLiveEvidence: true
+    });
+    const availabilityBlockers = [
         ...(dogfoodCandidates.length >= 2 ? [] : [`real-dogfood-registered-candidates: found ${dogfoodCandidates.length}/2 registered planned/ready/running task candidates with declared intersection`]),
         ...(matrix.cellCount === 420 && matrix.commandBackedCount === 420 ? [] : [`command-backed-420-cell-matrix: ${matrix.cellCount} cells found, ${matrix.commandBackedCount}/420 include command/workload receipt evidence`])
     ];
+    const blockers = [...new Set([...availabilityBlockers, ...semantic.blockers])];
+    const remainOpen = blockers.length > 0 || semantic.verdict === 'remain-open';
     return makeResult({
-        ok: blockers.length === 0,
+        ok: !remainOpen,
         command: 'broker',
         cwd: options.cwd,
         messages: [
-            message(blockers.length === 0 ? 'info' : 'warn', blockers.length === 0 ? 'ATM_BROKER_REPLAY_STATUS_READY' : 'ATM_BROKER_REPLAY_STATUS_REMAIN_OPEN', blockers.length === 0
-                ? 'Broker replay closure prerequisites are present.'
-                : 'Broker replay closure prerequisites are incomplete; Plan 3 remains open.', {
+            message(remainOpen ? 'warn' : 'info', remainOpen ? 'ATM_BROKER_REPLAY_STATUS_REMAIN_OPEN' : 'ATM_BROKER_REPLAY_STATUS_READY', remainOpen
+                ? 'Broker replay closure prerequisites are incomplete; Plan 3 remains open.'
+                : 'Broker replay closure prerequisites are present.', {
                 blockerCount: blockers.length
             })
         ],
         evidence: {
             schemaId: 'atm.brokerReplayStatus.v1',
             action: 'replay-status',
-            verdict: blockers.length === 0 ? 'ready-to-close' : 'remain-open',
+            verdict: remainOpen ? 'remain-open' : 'ready-to-close',
             blockers,
+            missingLifecycleClasses: semantic.missingLifecycleClasses,
+            invariantFindings: semantic.invariantFindings,
+            status: semantic.status,
             requiredIntersection,
             realDogfood: {
                 requiredTaskCount: 2,
@@ -62,7 +73,8 @@ function brokerReplayStatus(options) {
                 command: 'node atm.mjs broker replay status --json',
                 actions: ['status', 'run', 'dogfood']
             },
-            commandBackedMatrix: matrix
+            commandBackedMatrix: matrix,
+            semanticClosure: semantic
         }
     });
 }
