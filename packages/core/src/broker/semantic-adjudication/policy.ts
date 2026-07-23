@@ -8,6 +8,13 @@ import type {
 } from '../semantic-contract.ts';
 import type { MigrationRecord } from '../types.ts';
 
+/**
+ * Pure semantic revalidation adjudicator.
+ * Targeted validator availability/failure signals here remain advisory algebra
+ * for publish intent; exact post-compose ErrorCode selection for composed
+ * candidates is owned by post-compose-semantic-validation-policy.ts.
+ */
+
 const MIGRATION: MigrationRecord = Object.freeze({
   strategy: 'none',
   fromVersion: null,

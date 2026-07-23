@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0254",
+  "title": "Transactional patch materialization and post-compose semantic validation",
+  "status": "running",
+  "milestone": "ATM-3.1-R2",
+  "dependencies": [
+    "ATM-GOV-0241",
+    "ATM-GOV-0249",
+    "TASK-ERR-0006"
+  ],
+  "acceptance": [
+    "Patch proposals and transactional output are materialized from one immutable base into a non-canonical candidate tree/blob; materialization never mutates the live worktree.",
+    "Candidate construction verifies proposal digests, anchors/ranges, legal order/permutation, base/HEAD, member attribution, and the exact candidate output digest before validation begins.",
+    "Validator selection is the sealed union of card/proposal validators, the resolved language adapter's fast static checks, and catalog-selected targeted tests. Selection is capability-driven; core policy contains no TypeScript-, task-, path-, date-, or provider-specific branch.",
+    "Seal ordering is auditable: validator-policy/union and selection-input digests are committed before participating producers can read the locked semantic-break fixture payload. Revealing or executing the negative control records a later event; any post-reveal union change invalidates the cell instead of weakening the oracle.",
+    "The exact candidate output is validated after composition and before canonical write. A serializability proof alone can never authorize steward apply or shared commit.",
+    "The validation receipt binds canonical root, base/HEAD, composition plan and proposal digests, candidate-output digest, selected validator references, executable/argv/cwd, runner/build digest, timestamps, exit status, and derived `pass`/`fail`/`inconclusive` result.",
+    "All required validators must pass. A command-backed failure returns `ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED`; a missing, unsupported, unresolved, or unexecuted required validator returns `ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE`. Both paths produce zero canonical writes.",
+    "A locked negative control uses disjoint, individually applicable patches whose combined candidate breaks a static check or targeted test; it must be rejected before steward apply. A positive control proves the same generic path can validate and deliver a safe combined candidate.",
+    "Steward admission consumes the exact passing candidate/receipt digest and rechecks base/HEAD CAS immediately before apply; changed candidate bytes, stale HEAD, or receipt replay cannot pass through a time-of-check/time-of-use gap.",
+    "Existing semantic adjudication and language-adapter contracts are reused. This card does not introduce a second merge engine, test runner, task model, or validator registry.",
+    "Core modules remain side-effect free; command execution and temporary candidate lifecycle stay in CLI adapters. Short English comments explain the post-compose/pre-write boundary and why serializability is not semantic correctness.",
+    "The semantic safety gate cannot close on source-only tests. The same safe-candidate, semantic-break, and unavailable-validator behavior projection must pass through source and frozen `node atm.mjs`, with source/frozen/build digests and a card-attributable parity receipt. One shared runner-sync build may serve several cards."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/patch-candidate-materializer.ts",
+    "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+    "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+    "schemas/governance/post-compose-semantic-validation.schema.json",
+    "tests/core/patch-candidate-materializer.test.ts",
+    "tests/core/post-compose-semantic-validation-policy.test.ts",
+    "tests/cli/post-compose-semantic-validation.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/patch-candidate-materializer.ts",
+    "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+    "packages/core/src/broker/semantic-contract.ts",
+    "packages/core/src/broker/semantic-adjudication/policy.ts",
+    "packages/core/src/broker/compose.ts",
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+    "schemas/governance/post-compose-semantic-validation.schema.json",
+    "tests/core/patch-candidate-materializer.test.ts",
+    "tests/core/post-compose-semantic-validation-policy.test.ts",
+    "tests/cli/post-compose-semantic-validation.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/core/patch-candidate-materializer.test.ts",
+    "node --strip-types tests/core/post-compose-semantic-validation-policy.test.ts",
+    "node --strip-types tests/cli/post-compose-semantic-validation.test.ts",
+    "npm run validate:schemas",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "post-compose-semantic-validation-red-green-receipts",
+  "rollbackStrategy": "revert-commit-and-trip-shared-compose-to-queue-only",
+  "rollbackNotes": "Retain immutable proposals and candidate evidence; no failed or unverified candidate may reach the canonical writer.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.post-compose-semantic-validation",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker.patch-candidate-materializer",
+        "pattern": "Pure Materializer",
+        "source": "packages/core/src/broker/patch-candidate-materializer.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.broker.post-compose-semantic-validation",
+        "pattern": "Pure Policy",
+        "source": "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/patch-candidate-materializer.ts",
+        "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+        "packages/core/src/broker/semantic-contract.ts",
+        "packages/core/src/broker/semantic-adjudication/policy.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/types.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+        "schemas/governance/post-compose-semantic-validation.schema.json",
+        "tests/core/patch-candidate-materializer.test.ts",
+        "tests/core/post-compose-semantic-validation-policy.test.ts",
+        "tests/cli/post-compose-semantic-validation.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0254-transactional-patch-materialization-and-post-compose-semantic-validation.task.md",
+    "sectionTitle": "ATM-GOV-0254",
+    "headingLine": 68,
+    "hash": "19f78913624f5b28",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0254-transactional-patch-materialization-and-post-compose-semantic-validation.task.md",
+      "planningCommitSha": "10f4391127d4890cfd1a40a207efed6c7beeda52",
+      "contentDigest": "sha256:19f78913624f5b2898cab8dd6920f67a39b817e97a8bc737e54a7afab3f4fc71",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-23T13:59:33.464Z"
+    }
+  },
+  "importedAt": "2026-07-23T13:59:33.464Z",
+  "lastTransitionId": "2026-07-23T14-00-03-603Z-claim-b333e1c1fec2",
+  "lastTransitionAt": "2026-07-23T14:00:03.603Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-002-plan31-captain",
+  "reservedAt": "2026-07-23T13:59:50.503Z",
+  "promotedAt": "2026-07-23T13:59:50.506Z",
+  "claim": {
+    "actorId": "cursor-002-plan31-captain",
+    "leaseId": "lease-28f0e7fb4fe1",
+    "claimedAt": "2026-07-23T13:59:50.509Z",
+    "heartbeatAt": "2026-07-23T13:59:50.509Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0254.json",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/patch-candidate-materializer.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/broker/semantic-adjudication/policy.ts",
+      "packages/core/src/broker/semantic-contract.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/post-compose-semantic-validation.schema.json",
+      "tests/cli/post-compose-semantic-validation.test.ts",
+      "tests/core/patch-candidate-materializer.test.ts",
+      "tests/core/post-compose-semantic-validation-policy.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260723135950-cursor-002-plan31-captain-264ac4fb22",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723135950-cursor-002-plan31-captain-264ac4fb22\""
+    }
+  },
+  "startedAt": "2026-07-23T13:59:50.509Z",
+  "startedByActor": "cursor-002-plan31-captain",
+  "startedBySessionId": "session-20260723135950-cursor-002-plan31-captain-ATM-GOV-0254-8a169af6ec",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0254",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0254.*",
+      ".atm/history/task-events/ATM-GOV-0254/**",
+      ".atm/history/tasks/ATM-GOV-0254.json",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/patch-candidate-materializer.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/broker/semantic-adjudication/policy.ts",
+      "packages/core/src/broker/semantic-contract.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/post-compose-semantic-validation.schema.json",
+      "tests/cli/post-compose-semantic-validation.test.ts",
+      "tests/core/patch-candidate-materializer.test.ts",
+      "tests/core/post-compose-semantic-validation-policy.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a1c236ee7cad8cd7077bcf4be92ebc743ca3f9dab85f120d36226f21b35dc3eb",
+    "actorId": "cursor-002-plan31-captain",
+    "sessionId": "session-20260723135950-cursor-002-plan31-captain-ATM-GOV-0254-8a169af6ec",
+    "laneSession": {
+      "laneSessionId": "lane-20260723135950-cursor-002-plan31-captain-264ac4fb22",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723135950-cursor-002-plan31-captain-264ac4fb22\""
+    },
+    "createdAt": "2026-07-23T14:00:03.602Z",
+    "status": "active"
+  }
+}

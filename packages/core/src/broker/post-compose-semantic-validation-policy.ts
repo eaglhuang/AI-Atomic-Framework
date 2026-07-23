@@ -1,3 +1,6 @@
+import type { PatchCandidateMaterialization, SealedValidatorSelection } from './patch-candidate-materializer.ts';
+import { sealValidatorSelection } from './patch-candidate-materializer.ts';
+
 /**
  * Exact ErrorCode constants owned by TASK-ERR-0006.
  * packages/generated/src/error-codes.ts re-exports these for downstream cards
@@ -33,10 +36,21 @@ export interface PostComposeSemanticCandidate {
   readonly candidateDigest: string;
   readonly baseHeadSha: string;
   readonly sealedSelectionSourceDigest: string;
+  readonly selectionInputDigest?: string;
   readonly requiredValidatorIds: readonly string[];
   readonly validatorReceipts: readonly SemanticValidatorReceipt[];
   readonly serializabilityProofPresent?: boolean;
   readonly canonicalWriteAttempted?: boolean;
+  /** When set, must match the sealed union; drift invalidates the cell. */
+  readonly observedSelection?: SealedValidatorSelection;
+}
+
+export interface StewardSemanticAuthorizationReceipt {
+  readonly schemaId: 'atm.stewardSemanticValidationReceipt.v1';
+  readonly candidateDigest: string;
+  readonly outputDigest: string;
+  readonly decisionVerdict: PostComposeSemanticValidationDecision['verdict'];
+  readonly ok: boolean;
 }
 
 export type PostComposeSemanticCode =
@@ -58,6 +72,47 @@ export interface PostComposeSemanticValidationDecision {
 const RECOVERY_COMMAND = 'node atm.mjs broker post-compose-semantic-validation --candidate-file <path> --json';
 
 /**
+ * Build the policy candidate envelope from an immutable materialization.
+ * Serializability on the materialization is recorded but never authorizes write.
+ */
+export function buildPostComposeSemanticCandidateFromMaterialization(
+  materialization: PatchCandidateMaterialization,
+  validatorReceipts: readonly SemanticValidatorReceipt[] = [],
+  options?: { readonly canonicalWriteAttempted?: boolean }
+): PostComposeSemanticCandidate {
+  return {
+    schemaId: 'atm.postComposeSemanticCandidate.v1',
+    candidateDigest: materialization.candidateDigest,
+    baseHeadSha: materialization.baseHeadSha,
+    sealedSelectionSourceDigest: materialization.sealedSelection.sealedSelectionSourceDigest,
+    selectionInputDigest: materialization.sealedSelection.selectionInputDigest,
+    requiredValidatorIds: materialization.sealedSelection.requiredValidatorIds,
+    validatorReceipts,
+    serializabilityProofPresent: materialization.serializabilityProofPresent,
+    canonicalWriteAttempted: options?.canonicalWriteAttempted === true,
+    observedSelection: materialization.sealedSelection
+  };
+}
+
+/**
+ * Bind a steward-facing authorization receipt to an exact candidate digest.
+ * Serializability alone never yields ok:true.
+ */
+export function toStewardSemanticAuthorizationReceipt(input: {
+  readonly candidateDigest: string;
+  readonly decision: PostComposeSemanticValidationDecision;
+}): StewardSemanticAuthorizationReceipt {
+  const ok = input.decision.verdict === 'pass' && input.decision.canonicalWriteAuthorized === true;
+  return {
+    schemaId: 'atm.stewardSemanticValidationReceipt.v1',
+    candidateDigest: input.candidateDigest,
+    outputDigest: input.candidateDigest,
+    decisionVerdict: input.decision.verdict,
+    ok
+  };
+}
+
+/**
  * Pure policy for post-compose semantic validation ErrorCode selection.
  * Serializability is necessary but never authorizes a canonical write alone.
  */
@@ -74,8 +129,23 @@ export function evaluatePostComposeSemanticValidation(
   if (!candidate.sealedSelectionSourceDigest) {
     reasons.push('missing-sealed-selection-source');
   }
-  if (!Array.isArray(candidate.requiredValidatorIds) || candidate.requiredValidatorIds.length === 0) {
+  if (!Array.isArray(candidate.requiredValidatorIds)) {
     reasons.push('missing-required-validator-set');
+  }
+
+  if (candidate.observedSelection) {
+    const resealed = sealValidatorSelection({
+      cardValidators: candidate.observedSelection.cardValidators,
+      adapterStaticChecks: candidate.observedSelection.adapterStaticChecks,
+      catalogTargetedTests: candidate.observedSelection.catalogTargetedTests
+    });
+    if (
+      resealed.sealedSelectionSourceDigest !== candidate.sealedSelectionSourceDigest ||
+      resealed.selectionInputDigest !== (candidate.selectionInputDigest ?? resealed.selectionInputDigest) ||
+      JSON.stringify(resealed.requiredValidatorIds) !== JSON.stringify(candidate.requiredValidatorIds)
+    ) {
+      reasons.push('post-reveal-validator-union-drift');
+    }
   }
 
   const receiptsById = new Map<string, SemanticValidatorReceipt>();
@@ -155,8 +225,8 @@ export function evaluatePostComposeSemanticValidation(
     });
   }
 
-  // Serializability alone never substitutes for semantic validation; by this
-  // point every required validator has a command-backed pass.
+  // Empty sealed validator union is intentional and auditable. Serializability
+  // alone still never authorizes a write — authorization requires this gate pass.
   return {
     schemaId: 'atm.postComposeSemanticValidationDecision.v1',
     verdict: 'pass',
@@ -166,7 +236,9 @@ export function evaluatePostComposeSemanticValidation(
     unavailableValidatorIds: [],
     malformedValidatorIds: [],
     recoveryCommand: null,
-    reasons: candidate.serializabilityProofPresent ? ['semantic-pass-with-serializability'] : ['semantic-pass']
+    reasons: candidate.serializabilityProofPresent
+      ? ['semantic-pass-with-serializability', 'serializability-insufficient-alone']
+      : ['semantic-pass']
   };
 }
 
