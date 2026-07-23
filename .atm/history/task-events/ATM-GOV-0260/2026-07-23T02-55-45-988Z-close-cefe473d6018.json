@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T02-55-45-988Z-close-cefe473d6018",
+  "taskId": "ATM-GOV-0260",
+  "action": "close",
+  "actorId": "cursor-002-plan31-captain",
+  "sessionId": "session-20260722171127-cursor-002-plan31-captain-ATM-GOV-0260-1a59db5c13",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0260.json",
+  "taskSha256": "sha256:4acf3d42cea41e7963faa47f730b089a88c34883281e1bfb139b0080c733416e",
+  "createdAt": "2026-07-23T02:55:45.988Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0260 --actor cursor-002-plan31-captain --status done --historical-delivery 37c752f44aaee0e819c70975aa4f5d83e71ea676 --historical-delivery 957a333fbc51085ee9968f437401d7527612c199",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260722171127-cursor-002-plan31-captain-ATM-GOV-0260-1a59db5c13",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0260.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "node --strip-types tests/cli/dirty-release-wip-recovery-0258.test.ts",
+      "node --strip-types tests/cli/git-commit-nested-failure-recovery.test.ts",
+      "node --strip-types tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-23T02:55:45.973Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0260.*",
+        ".atm/history/task-events/ATM-GOV-0260/**",
+        ".atm/history/tasks/ATM-GOV-0260.json",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "tests/cli/dirty-release-wip-recovery-0258.test.ts",
+        "tests/cli/git-commit-nested-failure-recovery.test.ts",
+        "tests/cli/git-commit-staged-line-budget-isolation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "tests/cli/dirty-release-wip-recovery-0258.test.ts",
+        "tests/cli/git-commit-nested-failure-recovery.test.ts",
+        "tests/cli/git-commit-staged-line-budget-isolation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

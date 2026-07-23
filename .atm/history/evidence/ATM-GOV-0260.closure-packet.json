@@ -1,0 +1,258 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0260",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "37c752f44aaee0e819c70975aa4f5d83e71ea676",
+  "governedTreeSha": "53fdd04da4ae64f22baa5dde7e7bdb254cfd97ba",
+  "targetCommitDelta": {
+    "currentCommitSha": "37c752f44aaee0e819c70975aa4f5d83e71ea676",
+    "parentCommitShas": [
+      "37c752f44aaee0e819c70975aa4f5d83e71ea676"
+    ],
+    "governedTreeSha": "53fdd04da4ae64f22baa5dde7e7bdb254cfd97ba",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0260.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/task-events/ATM-GOV-0260/2026-07-22T17-09-39-795Z-import-69eb7d8579d5.json",
+      ".atm/history/task-events/ATM-GOV-0260/2026-07-22T17-11-27-124Z-reserve-42f52cdf74b2.json",
+      ".atm/history/task-events/ATM-GOV-0260/2026-07-22T17-11-27-127Z-promote-4a6fd051c7ad.json",
+      ".atm/history/task-events/ATM-GOV-0260/2026-07-22T17-11-35-955Z-claim-ce6048ae0a68.json",
+      ".atm/history/task-events/ATM-GOV-0260/2026-07-22T17-11-35-964Z-scope-amendment.claim-first-resolved-0123370de0c2.json",
+      ".atm/history/task-events/ATM-GOV-0260/2026-07-22T17-11-35-965Z-scope-amendment-e604cc94b8b9.json",
+      ".atm/history/task-events/ATM-GOV-0260/2026-07-23T02-31-53-433Z-import-0ecfae4d82b4.json",
+      ".atm/history/tasks/ATM-GOV-0260.json",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/dist/commands/actor-registry.js",
+      "packages/cli/dist/commands/command-specs/git.spec.js",
+      "packages/cli/dist/commands/command-specs/tasks.spec.js",
+      "packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "packages/cli/dist/commands/git-governance/implementation.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "packages/cli/dist/commands/identity.js",
+      "packages/cli/dist/commands/integration/bootstrap.js",
+      "packages/cli/dist/commands/next/foreign-dirty-wip-admission.js",
+      "packages/cli/dist/commands/taskflow/close-preflight.js",
+      "packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "packages/cli/dist/commands/tasks/historical-delivery.js",
+      "packages/cli/dist/commands/tasks/task-option-parsers/misc-claim-options.js",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/integrations/codex-skills/atm-dispatch/SKILL.md",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/actor-registry.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/git.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/tasks.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/identity.js",
+      "release/atm-root-drop/packages/cli/dist/commands/integration/bootstrap.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/foreign-dirty-wip-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared/command-manifest.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared/identity-normalization.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers/misc-claim-options.js",
+      "release/atm-root-drop/packages/cli/src/commands/actor-registry.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/git.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/identity.ts",
+      "release/atm-root-drop/packages/cli/src/commands/integration/bootstrap.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared/command-manifest.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared/identity-normalization.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/historical-delivery.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+      "release/atm-root-drop/tests/cli/command-manifest-recovery-chain.test.ts",
+      "release/atm-root-drop/tests/cli/identity-per-actor-routing.test.ts",
+      "release/atm-root-drop/tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "release/atm-root-drop/tests/cli/runner-sync-clean-close-pathway.test.ts",
+      "release/atm-root-drop/tests/cli/runner-sync-self-hosting-loop.test.ts",
+      "tests/cli/git-commit-nested-failure-recovery.test.ts",
+      "tests/cli/git-commit-staged-line-budget-isolation.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1739dabf3c1ccead1096287a119be68a4fc90670d5df346b92f0db663588946",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/dirty-release-wip-recovery-0258.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0677b13a94a5774c22fa37872d81c3bdc9cf452f4c3f5b1a216333bc7267cce7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:140430092f1720f25b18e0e17aea8ed271b4dddbb1e93b167ca3a1133daf11e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ada1ce547f0010fe8c58acc6416da75f034d90bc693d6d81970433209b9d7bb5",
+      "stderrSha256": "sha256:c621a4d227caf977a45b7c584188d1f3b22768e5a27a2eb524bcdcdb087b5a8f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1ad3962e05a1cbf3df00da39cb065926c70ed6ff343565ad77347ab06a29c7db",
+      "stderrSha256": "sha256:0aaa6652b3a112d85aefe3723235a4c98e941bda42098893333fc80d91536892",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-nested-failure-recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a754727b56dc40cc315f502e3a2d2d028cb416c475a83a883b162b4a9085f94e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a2e31458d17df80919780f26beb752f8e398d27b11023c6de7c9b7ea4129b074",
+      "stderrSha256": "sha256:316d5233a1e0ec4d9dac46a60b83d76dd3b6e82832d79d470e027e9c4f625684",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+    "node --strip-types tests/cli/dirty-release-wip-recovery-0258.test.ts",
+    "node --strip-types tests/cli/git-commit-nested-failure-recovery.test.ts",
+    "node --strip-types tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-23T02:55:45.973Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0260.*",
+      ".atm/history/task-events/ATM-GOV-0260/**",
+      ".atm/history/tasks/ATM-GOV-0260.json",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "tests/cli/dirty-release-wip-recovery-0258.test.ts",
+      "tests/cli/git-commit-nested-failure-recovery.test.ts",
+      "tests/cli/git-commit-staged-line-budget-isolation.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "tests/cli/dirty-release-wip-recovery-0258.test.ts",
+      "tests/cli/git-commit-nested-failure-recovery.test.ts",
+      "tests/cli/git-commit-staged-line-budget-isolation.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0260.json",
+  "closedAt": "2026-07-23T02:55:45.974Z",
+  "closedByActor": "cursor-002-plan31-captain",
+  "sessionId": "session-20260722171127-cursor-002-plan31-captain-ATM-GOV-0260-1a59db5c13",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "37c752f44aaee0e819c70975aa4f5d83e71ea676",
+    "taskMatchedFiles": [
+      "tests/cli/git-commit-nested-failure-recovery.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
