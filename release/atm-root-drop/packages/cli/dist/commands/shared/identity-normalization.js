@@ -139,6 +139,67 @@ export function buildSharedWriteActorRecoveryCommand(input) {
     const buildCommand = sanitizeIdentityValue(input.buildCommand) ?? 'npm run build';
     return `${explicitActorIdEnvVar}=${quoteShellAssignmentValue(input.actorId)} ${buildCommand}`;
 }
+/**
+ * Emergency/native Git commit identity must come from the active actor profile.
+ * Host `user.name` / `user.email` must not silently survive when an actor is known.
+ */
+export function buildEmergencyGitAuthorEnv(input) {
+    const gitName = sanitizeIdentityValue(input.gitName);
+    const gitEmail = sanitizeIdentityValue(input.gitEmail);
+    if (!gitName || !gitEmail) {
+        throw new Error('Emergency Git author env requires both gitName and gitEmail from actor identity.');
+    }
+    const env = {
+        GIT_AUTHOR_NAME: gitName,
+        GIT_AUTHOR_EMAIL: gitEmail,
+        GIT_COMMITTER_NAME: gitName,
+        GIT_COMMITTER_EMAIL: gitEmail
+    };
+    const actorId = sanitizeIdentityValue(input.actorId);
+    if (actorId) {
+        env[explicitActorIdEnvVar] = actorId;
+    }
+    return env;
+}
+export function verifyEmergencyGitAuthorContinuity(input) {
+    const expectedName = sanitizeIdentityValue(input.expectedGitName);
+    const expectedEmail = sanitizeIdentityValue(input.expectedGitEmail);
+    const authorName = sanitizeIdentityValue(input.observedAuthorName);
+    const authorEmail = sanitizeIdentityValue(input.observedAuthorEmail);
+    const committerName = sanitizeIdentityValue(input.observedCommitterName) ?? authorName;
+    const committerEmail = sanitizeIdentityValue(input.observedCommitterEmail) ?? authorEmail;
+    const expectedActorId = sanitizeIdentityValue(input.expectedActorId);
+    const trailerActor = sanitizeIdentityValue(input.atmActorTrailer);
+    if (!expectedName || !expectedEmail) {
+        return {
+            ok: false,
+            recoveryCommand: null,
+            reason: 'Expected emergency actor git identity is incomplete.'
+        };
+    }
+    if (authorName !== expectedName || authorEmail !== expectedEmail
+        || committerName !== expectedName || committerEmail !== expectedEmail) {
+        return {
+            ok: false,
+            recoveryCommand: [
+                `GIT_AUTHOR_NAME=${quoteShellAssignmentValue(expectedName)}`,
+                `GIT_AUTHOR_EMAIL=${quoteShellAssignmentValue(expectedEmail)}`,
+                `GIT_COMMITTER_NAME=${quoteShellAssignmentValue(expectedName)}`,
+                `GIT_COMMITTER_EMAIL=${quoteShellAssignmentValue(expectedEmail)}`,
+                'git commit --amend --no-edit --reset-author'
+            ].join(' '),
+            reason: `Stale host Git author/committer (${authorName} <${authorEmail}>) does not match actor identity (${expectedName} <${expectedEmail}>).`
+        };
+    }
+    if (expectedActorId && trailerActor && trailerActor !== expectedActorId) {
+        return {
+            ok: false,
+            recoveryCommand: `Ensure ATM-Actor trailer equals ${expectedActorId} before amending the emergency commit.`,
+            reason: `ATM-Actor trailer ${trailerActor} does not match active actor ${expectedActorId}.`
+        };
+    }
+    return { ok: true, recoveryCommand: null, reason: null };
+}
 export function quoteShellAssignmentValue(value) {
     return /^[A-Za-z0-9_./:=@-]+$/.test(value) ? value : JSON.stringify(String(value));
 }
