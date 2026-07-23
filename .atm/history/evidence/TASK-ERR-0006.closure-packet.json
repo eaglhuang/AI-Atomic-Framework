@@ -1,0 +1,176 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ERR-0006",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "3e0ec78ab804cacc2997d1f2d629992a4a4d1f94",
+  "governedTreeSha": "be2f98b3b39c3b7c13df147d7e2632c3b5525afe",
+  "targetCommitDelta": {
+    "currentCommitSha": "3e0ec78ab804cacc2997d1f2d629992a4a4d1f94",
+    "parentCommitShas": [
+      "3e0ec78ab804cacc2997d1f2d629992a4a4d1f94"
+    ],
+    "governedTreeSha": "be2f98b3b39c3b7c13df147d7e2632c3b5525afe",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/tasks/ATM-GOV-0258.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/dist/commands/broker/implementation.js",
+      "packages/cli/dist/commands/broker/parser.js",
+      "packages/cli/dist/commands/command-specs/broker.spec.js",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/generated/src/error-codes.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/parser.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/broker.spec.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/parser.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/broker.spec.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/post-compose-semantic-validation-error-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run generate:error-codes",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cae8b273ff088e69ddf3a8cd26b45fbca82ef646164a5582738ce61b030d6dcf",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/post-compose-semantic-validation-error-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dc59c68c029fb36b3511e54a83593bfe36df4cc69510944a0c11649c5b10ae65",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:f5530a389209e6e6f85fa45057da26e62bad1d497aa7c723b6c072589bbedb6b",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/post-compose-semantic-validation-error-contract.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-23T13:47:04.472Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ERR-0006.*",
+      ".atm/history/task-events/TASK-ERR-0006/**",
+      ".atm/history/tasks/TASK-ERR-0006.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/generated/src/error-codes.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/post-compose-semantic-validation-error-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/generated/src/error-codes.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli/post-compose-semantic-validation-error-contract.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ERR-0006.json",
+  "closedAt": "2026-07-23T13:47:04.473Z",
+  "closedByActor": "cursor-002-plan31-captain",
+  "sessionId": "session-20260723131043-cursor-002-plan31-captain-TASK-ERR-0006-d1ff3e2883",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "3e0ec78ab804cacc2997d1f2d629992a4a4d1f94",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/generated/src/error-codes.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
