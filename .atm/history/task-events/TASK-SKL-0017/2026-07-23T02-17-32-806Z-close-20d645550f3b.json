@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T02-17-32-806Z-close-20d645550f3b",
+  "taskId": "TASK-SKL-0017",
+  "action": "close",
+  "actorId": "cursor-grok45-plan31-captain",
+  "sessionId": "session-20260722171423-cursor-grok45-plan31-captain-TASK-SKL-0017-e972314701",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0017.json",
+  "taskSha256": "sha256:9121b000ab94053cddeac5d8ef78cdb4b7685b69be4fd4ef33a73d0a06d5a952",
+  "createdAt": "2026-07-23T02:17:32.806Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0017 --actor cursor-grok45-plan31-captain --status done --historical-delivery 2f093fde15bf9200578871af18757d82fc0b1a56",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260722171423-cursor-grok45-plan31-captain-TASK-SKL-0017-e972314701",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0017.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/git-pathspec-emergency-skill-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-23T02:17:32.793Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md",
+        ".atm/history/evidence/TASK-SKL-0017.*",
+        ".atm/history/task-events/TASK-SKL-0017/**",
+        ".atm/history/tasks/TASK-SKL-0017.json",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+        "tests/cli/close-preflight-foreign-line-budget.test.ts",
+        "tests/cli/git-pathspec-emergency-skill-contract.test.ts",
+        "tests/cli/runner-sync-clean-close-pathway.test.ts",
+        "tests/cli/runner-sync-self-hosting-loop.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "scripts/validate-skill-templates.ts",
+        "tests/cli/close-preflight-foreign-line-budget.test.ts",
+        "tests/cli/git-pathspec-emergency-skill-contract.test.ts",
+        "tests/cli/runner-sync-clean-close-pathway.test.ts",
+        "tests/cli/runner-sync-self-hosting-loop.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

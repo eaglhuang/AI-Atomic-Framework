@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-SKL-0017",
   "title": "Git pathspec emergency commit repair skill",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-SKL-R0.1",
   "dependencies": [],
   "acceptance": [
@@ -75,8 +75,8 @@
     }
   },
   "importedAt": "2026-07-22T17:05:16.117Z",
-  "lastTransitionId": "2026-07-23T01-48-17-302Z-scope-amendment-0d7b39bc41c8",
-  "lastTransitionAt": "2026-07-23T01:48:17.302Z",
+  "lastTransitionId": "2026-07-23T02-17-32-806Z-close-20d645550f3b",
+  "lastTransitionAt": "2026-07-23T02:17:32.806Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-grok45-plan31-captain",
   "reservedAt": "2026-07-22T17:14:23.022Z",
@@ -85,7 +85,7 @@
     "actorId": "cursor-grok45-plan31-captain",
     "leaseId": "lease-37c2cfb75fe5",
     "claimedAt": "2026-07-22T17:14:23.030Z",
-    "heartbeatAt": "2026-07-22T17:14:23.030Z",
+    "heartbeatAt": "2026-07-23T02:17:32.803Z",
     "ttlSeconds": 1800,
     "files": [
       ".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md",
@@ -96,16 +96,18 @@
       "scripts/validate-skill-templates.ts",
       "templates/skills/atm-git-pathspec-emergency-commit.skill.md",
       "tests/cli/close-preflight-foreign-line-budget.test.ts",
-      "tests/cli/git-pathspec-emergency-skill-contract.test.ts"
+      "tests/cli/git-pathspec-emergency-skill-contract.test.ts",
+      "tests/cli/runner-sync-clean-close-pathway.test.ts",
+      "tests/cli/runner-sync-self-hosting-loop.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260722171423-cursor-grok45-plan31-captain-0c7ca66751",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722171423-cursor-grok45-plan31-captain-0c7ca66751\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-22T17:05:33.503Z",
   "startedByActor": "cursor-002-plan31-captain",
@@ -127,7 +129,9 @@
       "scripts/validate-skill-templates.ts",
       "templates/skills/atm-git-pathspec-emergency-commit.skill.md",
       "tests/cli/close-preflight-foreign-line-budget.test.ts",
-      "tests/cli/git-pathspec-emergency-skill-contract.test.ts"
+      "tests/cli/git-pathspec-emergency-skill-contract.test.ts",
+      "tests/cli/runner-sync-clean-close-pathway.test.ts",
+      "tests/cli/runner-sync-self-hosting-loop.test.ts"
     ],
     "planningReadOnlyPaths": [
       "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0017-git-pathspec-emergency-commit-repair-skill.task.md",
@@ -151,5 +155,9 @@
     },
     "createdAt": "2026-07-22T17:14:30.614Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-23T02:17:32.803Z",
+  "closedByActor": "cursor-grok45-plan31-captain",
+  "closedBySessionId": "session-20260722171423-cursor-grok45-plan31-captain-TASK-SKL-0017-e972314701",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0017.closure-packet.json"
 }
