@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0262",
+  "title": "Canonical overlap matcher call-site parity",
+  "status": "running",
+  "milestone": "ATM-3.1-R0.14",
+  "dependencies": [
+    "ATM-GOV-0255"
+  ],
+  "acceptance": [
+    "One canonical resource-overlap matcher is used by conflict-matrix, physical-overlap, and proposal-overlap decision paths.",
+    "A call-site inventory regression fails if a Broker decision module reintroduces direct exact-match membership for governed resource overlap.",
+    "The `glob intent -> literal candidate` and `literal intent -> glob candidate` false-negative cases from `ATM-BUG-2026-07-20-213` produce the same conflict dimensions and resource keys through every call site.",
+    "Negative controls prove disjoint files, atoms, CIDs, anchors, and source ranges remain parallel-admissible; the fix must not collapse all same-file work into a file lock.",
+    "Normalization and matching policy is repository-neutral and contains no task id, actor, date, or incident-specific branch.",
+    "Source and frozen-runner evidence use the same fixture digest before this card closes.",
+    "Delivery evidence links `ATM-BUG-2026-07-20-213`; Plan 3.1 dogfood and final verdict remain blocked until the item has a terminal command-backed disposition."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/resource-overlap.ts",
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/core/src/broker/decision/physical-overlap.ts",
+    "tests/core/broker-overlap-callsite-parity.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/resource-overlap.ts",
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/core/src/broker/decision/physical-overlap.ts",
+    "packages/core/src/broker/decision/proposal-overlap.ts",
+    "tests/core/broker-resource-overlap.test.ts",
+    "tests/core/broker-overlap-callsite-parity.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/core/broker-resource-overlap.test.ts",
+    "node --strip-types tests/core/broker-overlap-callsite-parity.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "canonical-overlap-matcher-callsite-red-green",
+  "rollbackStrategy": "revert-commit-and-trip-queue-only",
+  "rollbackNotes": "Any call-site disagreement or unsupported pattern remains fail closed and prevents Plan 3.1 dogfood.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.resource-overlap",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker.resource-overlap-matcher",
+        "pattern": "Policy Function",
+        "source": "packages/core/src/broker/resource-overlap.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/resource-overlap.ts",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/decision/physical-overlap.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "tests/core/broker-resource-overlap.test.ts",
+        "tests/core/broker-overlap-callsite-parity.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0262-canonical-overlap-matcher-call-site-parity.task.md",
+    "sectionTitle": "ATM-GOV-0262",
+    "headingLine": 49,
+    "hash": "8c2550e3b25c7774",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0262-canonical-overlap-matcher-call-site-parity.task.md",
+      "planningCommitSha": "cb7db1b5225a7151109d10e74da68dd1a9338e02",
+      "contentDigest": "sha256:8c2550e3b25c777418c94302d1954f9756de2588aebf0ac9c991593476d281cc",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-23T04:00:12.115Z"
+    }
+  },
+  "importedAt": "2026-07-23T04:00:12.115Z",
+  "lastTransitionId": "2026-07-23T04-00-44-299Z-claim-034f81f775fa",
+  "lastTransitionAt": "2026-07-23T04:00:44.299Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-plan31-captain",
+  "reservedAt": "2026-07-23T04:00:30.676Z",
+  "promotedAt": "2026-07-23T04:00:30.680Z",
+  "claim": {
+    "actorId": "claude-plan31-captain",
+    "leaseId": "lease-748f5edaee46",
+    "claimedAt": "2026-07-23T04:00:30.684Z",
+    "heartbeatAt": "2026-07-23T04:00:30.684Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0262.json",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/decision/physical-overlap.ts",
+      "packages/core/src/broker/decision/proposal-overlap.ts",
+      "packages/core/src/broker/resource-overlap.ts",
+      "tests/core/broker-overlap-callsite-parity.test.ts",
+      "tests/core/broker-resource-overlap.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260723040030-claude-plan31-captain-9cc9d19e3d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723040030-claude-plan31-captain-9cc9d19e3d\""
+    }
+  },
+  "startedAt": "2026-07-23T04:00:30.684Z",
+  "startedByActor": "claude-plan31-captain",
+  "startedBySessionId": "session-20260723040030-claude-plan31-captain-ATM-GOV-0262-ded63281b1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0262",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0262.*",
+      ".atm/history/task-events/ATM-GOV-0262/**",
+      ".atm/history/tasks/ATM-GOV-0262.json",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/decision/physical-overlap.ts",
+      "packages/core/src/broker/decision/proposal-overlap.ts",
+      "packages/core/src/broker/resource-overlap.ts",
+      "tests/core/broker-overlap-callsite-parity.test.ts",
+      "tests/core/broker-resource-overlap.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "8d35a282900c338c8ae43b96af6480adbb0bfd0ad63e511dafca8b24f2337393",
+    "actorId": "claude-plan31-captain",
+    "sessionId": "session-20260723040030-claude-plan31-captain-ATM-GOV-0262-ded63281b1",
+    "laneSession": {
+      "laneSessionId": "lane-20260723040030-claude-plan31-captain-9cc9d19e3d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723040030-claude-plan31-captain-9cc9d19e3d\""
+    },
+    "createdAt": "2026-07-23T04:00:44.298Z",
+    "status": "active"
+  }
+}
