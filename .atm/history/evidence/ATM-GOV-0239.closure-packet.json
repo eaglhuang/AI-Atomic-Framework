@@ -1,0 +1,206 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0239",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a9d23e64c3e17729e401bd331744ae785bf7f90a",
+  "governedTreeSha": "3db33661d1fd6c2ac4a626b74134a2cf66eb4e6a",
+  "targetCommitDelta": {
+    "currentCommitSha": "a9d23e64c3e17729e401bd331744ae785bf7f90a",
+    "parentCommitShas": [
+      "a9d23e64c3e17729e401bd331744ae785bf7f90a"
+    ],
+    "governedTreeSha": "3db33661d1fd6c2ac4a626b74134a2cf66eb4e6a",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0239.json",
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/task-events/ATM-GOV-0239/2026-07-22T08-57-41-145Z-import-a69aa77d4f12.json",
+      ".atm/history/task-events/ATM-GOV-0239/2026-07-23T09-09-23-415Z-reserve-7f5e01d3ada7.json",
+      ".atm/history/task-events/ATM-GOV-0239/2026-07-23T09-09-23-418Z-promote-c48663d32b89.json",
+      ".atm/history/task-events/ATM-GOV-0239/2026-07-23T09-13-53-449Z-import-642a95b928fb.json",
+      ".atm/history/task-events/ATM-GOV-0239/2026-07-23T09-14-17-868Z-reserve-28f9815722ec.json",
+      ".atm/history/task-events/ATM-GOV-0239/2026-07-23T09-14-17-871Z-promote-578b5baf0ff9.json",
+      ".atm/history/task-events/ATM-GOV-0239/2026-07-23T09-14-34-432Z-claim-8261dac07746.json",
+      ".atm/history/task-events/ATM-GOV-0239/2026-07-23T09-32-53-942Z-scope-amendment-11dafafacc6b.json",
+      ".atm/history/tasks/ATM-GOV-0239.json",
+      ".atm/history/tasks/ATM-GOV-0258.json",
+      "packages/cli/dist/commands/taskflow/broker-gate.js",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/closure-policy.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/atm-markdown-task-source/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/replay-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/broker-gate.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker/replay-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/broker-gate.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/diagnose-plan3-evidence-closure.ts",
+      "release/atm-root-drop/tests/cli/broker-replay-command-surface.test.ts",
+      "release/atm-root-drop/tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/broker-decision-consumer-coherence.test.ts",
+      "tests/cli/broker-replay-command-surface.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "tests/fixtures/plan3-fake-green/current-protected-closure.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a784c7fa4699e4598a0a6af26f5457be9b239f9a6b5b5a8f34c20701bc9aa436",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/broker-decision-consumer-coherence.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cd4272197c4868c8b02988719014645d9fb06fdfdb9297e354c4be6afa893042",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/broker-replay-command-surface.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2635dbe1a0368b05794bd19907797493979544655cb91d9d8ef5f792f4d74759",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ba7195e6e9574bc6b3cab85a28dc05da13d86522e0077a77c3823abbcf1663cd",
+      "stderrSha256": "sha256:3f9cb4a5ac610229aea80be5acdf0ce3a39300cbd4b838c4558b0488f3c69109",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs broker replay status --json",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:4a7ae892854ffd519463a74b418b4caff4674b1bd8d16fe1b961dc5c824c9e1b",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/broker-decision-consumer-coherence.test.ts",
+    "node --strip-types tests/cli/broker-replay-command-surface.test.ts",
+    "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-23T11:32:12.058Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0239.*",
+      ".atm/history/task-events/ATM-GOV-0239/**",
+      ".atm/history/tasks/ATM-GOV-0239.json",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/closure-policy.ts",
+      "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/core/src/broker/decision/proposal-overlap.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/broker-decision-consumer-coherence.test.ts",
+      "tests/cli/broker-replay-command-surface.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "tests/fixtures/plan3-fake-green/**",
+      "tests/fixtures/plan3-fake-green/current-protected-closure.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/closure-policy.ts",
+      "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/core/src/broker/decision/proposal-overlap.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/broker-decision-consumer-coherence.test.ts",
+      "tests/cli/broker-replay-command-surface.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "tests/fixtures/plan3-fake-green/**",
+      "tests/fixtures/plan3-fake-green/current-protected-closure.json"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0239.json",
+  "closedAt": "2026-07-23T11:32:12.059Z",
+  "closedByActor": "cursor-002-plan31-captain",
+  "sessionId": "session-20260723091417-cursor-002-plan31-captain-ATM-GOV-0239-600950bb7d",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a9d23e64c3e17729e401bd331744ae785bf7f90a",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/closure-policy.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/broker-decision-consumer-coherence.test.ts",
+      "tests/cli/broker-replay-command-surface.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "tests/fixtures/plan3-fake-green/current-protected-closure.json"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

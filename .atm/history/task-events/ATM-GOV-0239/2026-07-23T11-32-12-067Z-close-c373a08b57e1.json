@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T11-32-12-067Z-close-c373a08b57e1",
+  "taskId": "ATM-GOV-0239",
+  "action": "close",
+  "actorId": "cursor-002-plan31-captain",
+  "sessionId": "session-20260723091417-cursor-002-plan31-captain-ATM-GOV-0239-600950bb7d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0239.json",
+  "taskSha256": "sha256:21fa4f8aef2d4b3b9ef9bdf3b22497eec35f72ad76fb244971575dece57381e3",
+  "createdAt": "2026-07-23T11:32:12.067Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0239 --actor cursor-002-plan31-captain --status done --historical-delivery a9d23e64c3e17729e401bd331744ae785bf7f90a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260723091417-cursor-002-plan31-captain-ATM-GOV-0239-600950bb7d",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0239.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/broker-decision-consumer-coherence.test.ts",
+      "node --strip-types tests/cli/broker-replay-command-surface.test.ts",
+      "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-23T11:32:12.058Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0239.*",
+        ".atm/history/task-events/ATM-GOV-0239/**",
+        ".atm/history/tasks/ATM-GOV-0239.json",
+        "packages/cli/src/commands/broker/replay-actions.ts",
+        "packages/cli/src/commands/broker/replay/closure-policy.ts",
+        "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "scripts/diagnose-plan3-evidence-closure.ts",
+        "tests/cli/broker-decision-consumer-coherence.test.ts",
+        "tests/cli/broker-replay-command-surface.test.ts",
+        "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+        "tests/fixtures/plan3-fake-green/**",
+        "tests/fixtures/plan3-fake-green/current-protected-closure.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/replay-actions.ts",
+        "packages/cli/src/commands/broker/replay/closure-policy.ts",
+        "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "scripts/diagnose-plan3-evidence-closure.ts",
+        "tests/cli/broker-decision-consumer-coherence.test.ts",
+        "tests/cli/broker-replay-command-surface.test.ts",
+        "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+        "tests/fixtures/plan3-fake-green/**",
+        "tests/fixtures/plan3-fake-green/current-protected-closure.json"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

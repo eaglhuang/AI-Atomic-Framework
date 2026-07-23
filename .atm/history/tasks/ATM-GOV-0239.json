@@ -1,0 +1,194 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0239",
+  "title": "Fail-closed closure truth and authority reconciliation",
+  "status": "done",
+  "milestone": "ATM-3.1-R1",
+  "dependencies": [
+    "ATM-GOV-0234",
+    "ATM-GOV-0235",
+    "ATM-GOV-0247",
+    "ATM-GOV-0251",
+    "ATM-GOV-0255",
+    "ATM-GOV-0262"
+  ],
+  "acceptance": [
+    "Current weak repository evidence returns `remain-open` with exact missing lifecycle classes.",
+    "A locked regression feeds the repaired checker 420 synthetic receipts, `not-required` dogfood, and hardcoded/fixed cost input from the current fake-green closure; the only accepted verdict is `remain-open`.",
+    "`node atm.mjs --version`, sleep-only workloads, digest-only receipts, and self-reported lifecycle labels are rejected as closure evidence.",
+    "Deliberate-intersection dogfood with `not-required` is classified as `INV-ATM-008`; arm-specific delay, fixed task id/cost, or result-shaping control flow is classified as `INV-ATM-009`.",
+    "A same-file scenario with disjoint bounded intents is rejected if evidence shows path-only locking, separate-worktree isolation, missing compose batch membership, or no neutral-steward apply; these violate `INV-ATM-010` and cannot be counted as parallel success.",
+    "Decision semantics distinguish `composer-routed` from `must-serialize`. A consumer must not turn a composer-routed admission into serialization merely because a legacy top-level verdict says `needs-physical-split`; the canonical decision class is coherent across every field and locked call-site tests cover taskflow/replay consumers.",
+    "Queue/wakeup is required only for a sealed true-conflict/stale fallback cell. The primary safe-compose cell may have zero queue residency and must not be failed for that reason.",
+    "`formula-generated-matrix-disclosed` is informational and can never convert invalid performance evidence into a passing check.",
+    "Status distinguishes candidate availability, executed dogfood, matched performance, rollback/parity, backlog, and final verdict.",
+    "A predecessor's terminal `done` status is historical lifecycle truth, not proof that a successor plan's semantic evidence predicates passed. Evidence that no longer satisfies the active closure contract is classified generically as `superseded-for-plan-closure` and forces `remain-open`.",
+    "Reconciliation preserves immutable predecessor task/event/evidence history; it must not reopen, rewrite, or delete a terminal predecessor merely to express that continuation repair is still required.",
+    "This runtime closure gate cannot close on source-only evidence. The same card-defined behavior probe must pass through source and frozen `node atm.mjs`, bind source/frozen/build/projection digests, and use a runner-sync receipt whose build may be shared with other cards but whose parity result is attributable to this card.",
+    "Closure consumes `ATM-GOV-0262` call-site parity evidence; a conflict-matrix/physical-overlap/proposal-overlap disagreement is `remain-open`, never a valid no-conflict observation.",
+    "No task id, actor id, local path, date, or incident string is hardcoded into control flow."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/broker/replay-actions.ts",
+    "packages/cli/src/commands/broker/replay/closure-policy.ts",
+    "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
+    "packages/core/src/broker/decision/proposal-overlap.ts",
+    "packages/cli/src/commands/taskflow/broker-gate.ts",
+    "scripts/diagnose-plan3-evidence-closure.ts",
+    "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+    "tests/cli/broker-decision-consumer-coherence.test.ts",
+    "tests/fixtures/plan3-fake-green/current-protected-closure.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/replay-actions.ts",
+    "packages/cli/src/commands/broker/replay/closure-policy.ts",
+    "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
+    "packages/core/src/broker/decision/proposal-overlap.ts",
+    "packages/cli/src/commands/taskflow/broker-gate.ts",
+    "scripts/diagnose-plan3-evidence-closure.ts",
+    "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+    "tests/cli/broker-replay-command-surface.test.ts",
+    "tests/cli/broker-decision-consumer-coherence.test.ts",
+    "tests/fixtures/plan3-fake-green/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+    "node --strip-types tests/cli/broker-replay-command-surface.test.ts",
+    "node --strip-types tests/cli/broker-decision-consumer-coherence.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "semantic-closure-red-green-receipts",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Fail-closed remain-open is the safe fallback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.parallel-replay",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.replay.closure-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/broker/replay/closure-policy.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0239-fail-closed-closure-truth-and-authority-reconciliation.task.md",
+    "sectionTitle": "ATM-GOV-0239",
+    "headingLine": 62,
+    "hash": "d5b5b8661c049f2d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0239-fail-closed-closure-truth-and-authority-reconciliation.task.md",
+      "planningCommitSha": "cb7db1b5225a7151109d10e74da68dd1a9338e02",
+      "contentDigest": "sha256:d5b5b8661c049f2d4712d716f176269a927841f850630898e502ec7de9b9c0c6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-23T09:13:53.145Z"
+    }
+  },
+  "importedAt": "2026-07-23T09:13:53.145Z",
+  "lastTransitionId": "2026-07-23T11-32-12-067Z-close-c373a08b57e1",
+  "lastTransitionAt": "2026-07-23T11:32:12.067Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-002-plan31-captain",
+  "reservedAt": "2026-07-23T09:14:17.868Z",
+  "promotedAt": "2026-07-23T09:14:17.871Z",
+  "claim": {
+    "actorId": "cursor-002-plan31-captain",
+    "leaseId": "lease-4c0f5a46aeec",
+    "claimedAt": "2026-07-23T09:14:17.876Z",
+    "heartbeatAt": "2026-07-23T11:32:12.065Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0239.*",
+      ".atm/history/task-events/ATM-GOV-0239/**",
+      ".atm/history/tasks/ATM-GOV-0239.json",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/closure-policy.ts",
+      "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/core/src/broker/decision/proposal-overlap.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/broker-decision-consumer-coherence.test.ts",
+      "tests/cli/broker-replay-command-surface.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "tests/fixtures/plan3-fake-green/**"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260723091417-cursor-002-plan31-captain-dcdd7be2ac",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723091417-cursor-002-plan31-captain-dcdd7be2ac\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-23T09:14:17.876Z",
+  "startedByActor": "cursor-002-plan31-captain",
+  "startedBySessionId": "session-20260723091417-cursor-002-plan31-captain-ATM-GOV-0239-600950bb7d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0239",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0239.*",
+      ".atm/history/task-events/ATM-GOV-0239/**",
+      ".atm/history/tasks/ATM-GOV-0239.json",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/closure-policy.ts",
+      "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/core/src/broker/decision/proposal-overlap.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/broker-decision-consumer-coherence.test.ts",
+      "tests/cli/broker-replay-command-surface.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "tests/fixtures/plan3-fake-green/**"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0239-fail-closed-closure-truth-and-authority-reconciliation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0239-fail-closed-closure-truth-and-authority-reconciliation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "f7decc9c3b6eab83f7796ee44385c0d844e2382e26b47e410eb3a9bf8f15b6ab",
+    "actorId": "cursor-002-plan31-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260723091417-cursor-002-plan31-captain-dcdd7be2ac",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723091417-cursor-002-plan31-captain-dcdd7be2ac\""
+    },
+    "createdAt": "2026-07-23T09:14:34.472Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-23T11:32:12.065Z",
+  "closedByActor": "cursor-002-plan31-captain",
+  "closedBySessionId": "session-20260723091417-cursor-002-plan31-captain-ATM-GOV-0239-600950bb7d",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0239.closure-packet.json"
+}
