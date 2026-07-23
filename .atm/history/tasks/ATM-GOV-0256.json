@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0256",
+  "title": "Runner-sync source snapshot and cache-hit freshness gate",
+  "status": "running",
+  "milestone": "ATM-3.1-R0.8",
+  "dependencies": [
+    "ATM-GOV-0230",
+    "ATM-GOV-0231"
+  ],
+  "acceptance": [
+    "Queue tickets record the exact sealed source, source inventory/config digest, required outputs, and actor/lane authority used by the build.",
+    "Dirty or newer framework source not represented by the sealed snapshot prevents `cacheHitSkip` from being treated as synchronization success.",
+    "A valid cache hit either clears runner drift with receipt-backed output equivalence or returns an explicit no-op/revalidation state that does not claim sync completion.",
+    "No-op cache hits do not dirty tracked release manifests solely with timing or decision metadata.",
+    "A regression reproduces the Plan 3.1 case: build prints `cacheHitSkip` from an older commit while source is newer; the runner remains stale and the command emits a safe next action instead of a false-green receipt.",
+    "Source-first/frozen self-hosting has a bootstrap-safe sealed-source route; newer source, adapter/template drift, or emergency-landed source cannot be declared synchronized by an older frozen hook/build (`ATM-BUG-2026-07-14-183`, `ATM-BUG-2026-07-22-234`).",
+    "Windows release-manifest writes are retryable and atomic; interruption cannot expose a partial root-drop manifest (`ATM-BUG-2026-07-20-212`).",
+    "Post-close runner-sync receipts and release outputs have one governed publication/runtime-only disposition with a runnable recovery command and no protected-evidence manual-review residue (`ATM-BUG-2026-07-21-220`).",
+    "Backlog item `ATM-BUG-2026-07-22-225` is linked in delivery evidence."
+  ],
+  "deliverables": [
+    "scripts/run-sealed-runner-build.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "tests/cli/runner-sync-build-source-preservation.test.ts",
+    "tests/cli/runner-sync-self-hosting-loop.test.ts",
+    "tests/cli/runner-sync-stale-sha-recovery.test.ts",
+    "tests/cli/runner-sync-manifest-atomic-write.test.ts",
+    "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/run-sealed-runner-build.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "tests/cli/runner-sync-build-source-preservation.test.ts",
+    "tests/cli/runner-sync-build-actor-continuity.test.ts",
+    "tests/cli/runner-sync-self-hosting-loop.test.ts",
+    "tests/cli/runner-sync-stale-sha-recovery.test.ts",
+    "tests/cli/runner-sync-manifest-atomic-write.test.ts",
+    "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-sync-build-source-preservation.test.ts",
+    "node --strip-types tests/cli/runner-sync-build-actor-continuity.test.ts",
+    "node --strip-types tests/cli/runner-sync-self-hosting-loop.test.ts",
+    "node --strip-types tests/cli/runner-sync-stale-sha-recovery.test.ts",
+    "node --strip-types tests/cli/runner-sync-manifest-atomic-write.test.ts",
+    "node --strip-types tests/cli/runner-sync-post-close-receipt-publication.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "sealed-source-freshness-and-cache-hit-red-green",
+  "rollbackStrategy": "revert-commit-and-force-full-rebuild",
+  "rollbackNotes": "A rollback may disable cache-hit reuse, but must not mark a stale frozen runner synchronized or publish release artifacts from an unsealed dirty source snapshot.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync-steward",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-sync-source-freshness-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0256-runner-sync-source-snapshot-and-cache-hit-freshness-gate.task.md",
+    "sectionTitle": "ATM-GOV-0256",
+    "headingLine": 61,
+    "hash": "bed525a2b805bfa1",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0256-runner-sync-source-snapshot-and-cache-hit-freshness-gate.task.md",
+      "planningCommitSha": "cb7db1b5225a7151109d10e74da68dd1a9338e02",
+      "contentDigest": "sha256:bed525a2b805bfa1339cfa408f999237e4cee53c56c49758b914f325561c1e8e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-23T05:23:15.717Z"
+    }
+  },
+  "importedAt": "2026-07-23T05:23:15.717Z",
+  "lastTransitionId": "2026-07-23T05-23-41-716Z-claim-3313bd9636b0",
+  "lastTransitionAt": "2026-07-23T05:23:41.716Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-plan31-captain",
+  "reservedAt": "2026-07-23T05:23:33.567Z",
+  "promotedAt": "2026-07-23T05:23:33.572Z",
+  "claim": {
+    "actorId": "claude-plan31-captain",
+    "leaseId": "lease-773176f2d86f",
+    "claimedAt": "2026-07-23T05:23:33.576Z",
+    "heartbeatAt": "2026-07-23T05:23:33.576Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0256.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "tests/cli/runner-sync-build-source-preservation.test.ts",
+      "tests/cli/runner-sync-manifest-atomic-write.test.ts",
+      "tests/cli/runner-sync-post-close-receipt-publication.test.ts",
+      "tests/cli/runner-sync-self-hosting-loop.test.ts",
+      "tests/cli/runner-sync-stale-sha-recovery.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260723052333-claude-plan31-captain-a2dfe36c0a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723052333-claude-plan31-captain-a2dfe36c0a\""
+    }
+  },
+  "startedAt": "2026-07-23T05:23:33.576Z",
+  "startedByActor": "claude-plan31-captain",
+  "startedBySessionId": "session-20260723052333-claude-plan31-captain-ATM-GOV-0256-61b09848a2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0256",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0256.*",
+      ".atm/history/task-events/ATM-GOV-0256/**",
+      ".atm/history/tasks/ATM-GOV-0256.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "tests/cli/runner-sync-build-source-preservation.test.ts",
+      "tests/cli/runner-sync-manifest-atomic-write.test.ts",
+      "tests/cli/runner-sync-post-close-receipt-publication.test.ts",
+      "tests/cli/runner-sync-self-hosting-loop.test.ts",
+      "tests/cli/runner-sync-stale-sha-recovery.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "05a5e5ef5893e3ab7d461f01f73e4e51dff68a1c3e9edaff7ff81831d3f30acb",
+    "actorId": "claude-plan31-captain",
+    "sessionId": "session-20260723052333-claude-plan31-captain-ATM-GOV-0256-61b09848a2",
+    "laneSession": {
+      "laneSessionId": "lane-20260723052333-claude-plan31-captain-a2dfe36c0a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723052333-claude-plan31-captain-a2dfe36c0a\""
+    },
+    "createdAt": "2026-07-23T05:23:41.715Z",
+    "status": "active"
+  }
+}
