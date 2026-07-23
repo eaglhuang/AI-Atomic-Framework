@@ -18,6 +18,7 @@ import { CliError, quoteCliValue, relativePathFrom } from '../../shared.ts';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns } from '../../work-channels.ts';
 import { readBrokerLifecycleState } from '../../../../../core/src/broker/lifecycle.ts';
+import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID, evaluateSharedWriteAdmission } from '../../../../../core/src/broker/shared-write-provenance-policy.ts';
 import { buildPendingCheckpointCommitWindow } from '../../batch.ts';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.ts';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../../tasks/task-import-validators.ts';
@@ -52,6 +53,7 @@ const stewardCoveredFiles = collectStewardBrokerCoveredFiles(input.cwd);
 const stewardCoveredSet = new Set(stewardCoveredFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
 const findings = [];
 const multiClaimFiles = [];
+const sharedObservations = [];
 for (const stagedFile of input.stagedFiles) { const normalized = normalizeRelativePath(stagedFile);
 if (!normalized || normalized.startsWith('.atm/')) continue;
 if (isTaskDirectionPreCommitExempt(normalized)) continue;
@@ -61,13 +63,34 @@ if (coveringWriteLocks.length === 0) { if (committingClaimIntent === 'closeout-o
 } continue;
 } const writeClaimTaskIds = uniqueSorted(coveringWriteLocks.map((lock) => lock.taskId));
 if (writeClaimTaskIds.length > 1) { multiClaimFiles.push({ file: normalized, writeClaimTaskIds });
+// Shared canonical write: owning one claim proves nothing. Admission is
+// decided by the shared verifier from consumed steward receipts only.
+sharedObservations.push({ path: normalized, writeClaimTaskIds, stagedBlobDigest: readStagedBlobDigest(input.cwd, normalized) });
+continue;
 } const committingOwnsFile = Boolean(committingTaskId) && writeClaimTaskIds.includes(committingTaskId);
 if (committingOwnsFile) continue;
 const ambiguous = committingTaskId ? writeClaimTaskIds.length >= 1 : writeClaimTaskIds.length >= 2;
 if (!ambiguous) continue;
 if (stewardCoveredSet.has(normalized.toLowerCase())) continue;
 findings.push({ code: 'ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS', file: normalized, committingTaskId, writeClaimTaskIds, detail: committingTaskId ? `Staged file ${normalized} belongs to active write claim(s) ${writeClaimTaskIds.join(', ')} but the committing task ${committingTaskId} does not own it, and no steward/broker evidence covers it. Remove it from this commit or route it through the steward lane.` : `Staged file ${normalized} is covered by multiple active write claims (${writeClaimTaskIds.join(', ')}) and ATM cannot prove which task owns this commit. Commit through node atm.mjs git commit --task <id> or provide steward/broker evidence.`, requiredCommand: 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json' });
-} return { ok: findings.length === 0, committingTaskId, committingClaimIntent, multiClaimFiles, stewardCoveredFiles, findings };
+} // Evidence-local adapter boundary: gather digests/receipts only; all
+// admission rules live in the shared policy core.
+const headSha = runGitScalar(input.cwd, ['rev-parse', 'HEAD']) ?? '';
+const sharedWriteAdmission = sharedObservations.length > 0 ? evaluateSharedWriteAdmission({ canonicalRoot: normalizeRelativePath(input.cwd) || input.cwd, baseSha: headSha, headSha, committingTaskId, files: sharedObservations, receipts: collectSharedWriteProvenanceReceipts(input.cwd) }) : null;
+for (const finding of sharedWriteAdmission?.findings ?? []) { findings.push({ code: finding.code, file: finding.file, committingTaskId, writeClaimTaskIds: finding.writeClaimTaskIds, detail: finding.detail, requiredCommand: finding.requiredCommand });
+} return { ok: findings.length === 0, committingTaskId, committingClaimIntent, multiClaimFiles, stewardCoveredFiles, sharedWriteAdmission, findings };
+} function readStagedBlobDigest(cwd, file) { const staged = runGitScalar(cwd, ['rev-parse', `:${file}`]);
+return staged ? `git-blob:${staged}` : null;
+} function collectSharedWriteProvenanceReceipts(cwd) { const evidenceDir = path.join(cwd, '.atm', 'history', 'evidence');
+if (!existsSync(evidenceDir)) return [];
+const receipts = [];
+let entries = [];
+try { entries = readdirSync(evidenceDir);
+} catch { return [];
+} for (const entry of entries) { if (!entry.toLowerCase().endsWith('.shared-write-provenance.json')) continue;
+const document = readJsonFile(path.join(evidenceDir, entry));
+if (document && document.schemaId === SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID) receipts.push(document);
+} return receipts;
 } export function selectRelevantDirectionLocksForCommit(input) { const currentTaskAllowedFiles = uniqueSorted([ ...input.taskGovernedCommitAllowedFiles, ...input.closeCommitWindowAllowedFiles, ...input.closeCommitWindowPlanningMirrorFiles ]);
 return input.activeDirectionLocks.filter((lock) => { if (input.committingTaskId && taskIdsEqual(lock.taskId, input.committingTaskId)) { return true;
 } return input.stagedFiles.some((entry) => { if (isTaskDirectionPreCommitExempt(entry)) return false;

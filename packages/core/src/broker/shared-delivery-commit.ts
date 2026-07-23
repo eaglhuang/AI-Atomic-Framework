@@ -1,5 +1,25 @@
 import { createHash } from 'node:crypto';
 import type { WaveBrokerBatchDecision, WaveBrokerSchedulerDocument, WaveBrokerTicket } from './wave-broker-scheduler.ts';
+import {
+  evaluateSharedWriteAdmission,
+  type SharedWriteAdmissionDecision,
+  type SharedWriteObservedFile
+} from './shared-write-provenance-policy.ts';
+
+/**
+ * Evidence-local input for shared-write admission. The broker adapter only
+ * gathers it; the admission rules themselves live in the shared pure verifier.
+ */
+export interface SharedDeliveryProvenanceInput {
+  readonly canonicalRoot: string;
+  readonly baseSha: string;
+  readonly headSha: string;
+  readonly observedFiles: readonly SharedWriteObservedFile[];
+  readonly receipts: readonly unknown[];
+  readonly expectedCompositionPlanDigest?: string | null;
+  readonly expectedSealedSelectionSourceDigest?: string | null;
+  readonly expectedRunnerBuildDigest?: string | null;
+}
 
 export interface SharedDeliveryCommitInput {
   readonly decision: WaveBrokerBatchDecision;
@@ -15,6 +35,7 @@ export interface SharedDeliveryCommitInput {
   readonly fileSlices?: Readonly<Record<string, readonly string[]>>;
   readonly commitSha?: string | null;
   readonly temporaryIndexPath?: string | null;
+  readonly provenance?: SharedDeliveryProvenanceInput | null;
   readonly now?: string;
 }
 
@@ -64,6 +85,7 @@ export interface SharedDeliveryCommitPlan {
   readonly reason: string;
   readonly blockers: readonly string[];
   readonly receipt: SharedWriteReceipt | null;
+  readonly sharedWriteAdmission: SharedWriteAdmissionDecision | null;
 }
 
 function uniqueSorted(values: readonly string[]): readonly string[] {
@@ -118,6 +140,34 @@ export function planSharedDeliveryCommit(input: SharedDeliveryCommitInput): Shar
   const unrelatedSlices = Object.keys(fileSlices).filter((taskId) => !taskIds.includes(taskId));
   if (unrelatedSlices.length > 0) blockers.push(`unrelated task slices are not batch eligible: ${unrelatedSlices.sort().join(', ')}`);
 
+  // Shared delivery uses the exact same verifier as the pre-commit/git commit
+  // route; this adapter only forwards locally gathered evidence to it.
+  const admission = input.provenance
+    ? evaluateSharedWriteAdmission({
+      canonicalRoot: input.provenance.canonicalRoot,
+      baseSha: input.provenance.baseSha,
+      headSha: input.provenance.headSha,
+      files: input.provenance.observedFiles,
+      receipts: input.provenance.receipts,
+      expectedCompositionPlanDigest: input.provenance.expectedCompositionPlanDigest ?? null,
+      expectedSealedSelectionSourceDigest: input.provenance.expectedSealedSelectionSourceDigest ?? null,
+      expectedRunnerBuildDigest: input.provenance.expectedRunnerBuildDigest ?? null
+    })
+    : null;
+  if (admission) {
+    for (const finding of admission.findings) {
+      blockers.push(`${finding.code}: ${finding.file}`);
+    }
+    // Attribution for shared files is derived from validated receipts only;
+    // caller-supplied task ids never establish membership on their own.
+    if (admission.sharedFiles.length > 0) {
+      const unattributed = taskIds.filter((taskId) => !admission.attributedTaskIds.includes(taskId));
+      if (admission.findings.length === 0 && unattributed.length > 0) {
+        blockers.push(`shared delivery attribution is not receipt-backed for: ${unattributed.join(', ')}`);
+      }
+    }
+  }
+
   if (blockers.length > 0) {
     return {
       schemaId: 'atm.sharedDeliveryCommitPlan.v1',
@@ -125,7 +175,8 @@ export function planSharedDeliveryCommit(input: SharedDeliveryCommitInput): Shar
       verdict: decision.verdict === 'serial-fallback' ? 'serial-fallback' : 'blocked',
       reason: blockers[0],
       blockers,
-      receipt: null
+      receipt: null,
+      sharedWriteAdmission: admission
     };
   }
 
@@ -175,6 +226,7 @@ export function planSharedDeliveryCommit(input: SharedDeliveryCommitInput): Shar
     verdict: 'receipt-ready',
     reason: 'same-wave compatible commit receipt ready',
     blockers: [],
-    receipt
+    receipt,
+    sharedWriteAdmission: admission
   };
 }
