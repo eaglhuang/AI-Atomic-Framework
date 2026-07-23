@@ -54,6 +54,8 @@ export function inspectIntegrationBootstrap(repositoryRoot) {
         currentEditorId: detectedEditor.id,
         currentEditorDetectedFrom: detectedEditor.source,
         currentEditorRawValue: detectedEditor.rawValue,
+        editorIdentityIsProvenanceOnly: true,
+        actorAuthorityNote: 'currentEditorRawValue is editor provenance only; it must not replace ATM_ACTOR_ID, --actor, or an active claim/lane/queue-head owner.',
         currentEditorAdapter,
         currentEditorAdapterMissing,
         needsInstallHint: reason !== null,

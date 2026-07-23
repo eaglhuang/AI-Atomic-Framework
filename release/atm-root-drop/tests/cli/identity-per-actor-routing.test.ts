@@ -182,6 +182,25 @@ try {
     assert.equal(readFileSync(defaultIdentityPath, 'utf8').includes('actor-b@example.com'), false, 'per-actor identity writes must not overwrite default.json');
   }
 
+  const staleLegacyVsExplicit = JSON.parse(runAtm(tempDir, ['identity', 'show', '--json'], {
+    AGENT_IDENTITY: 'editor-b.ambient',
+    ATM_ACTOR_ID: 'actor-a'
+  })) as Record<string, any>;
+  assert.equal(staleLegacyVsExplicit.evidence.actorResolution.resolved.actorId, 'actor-a');
+  assert.equal(staleLegacyVsExplicit.evidence.actorResolution.resolved.source, 'env');
+  assert.equal(staleLegacyVsExplicit.evidence.actorResolution.legacyEnvActorId, 'editor-b.ambient');
+  assert.match(String(staleLegacyVsExplicit.evidence.actorResolution.warning ?? ''), /diagnostic-only/);
+  assert.equal(staleLegacyVsExplicit.evidence.sharedWriteAuthority.ok, true);
+  assert.equal(staleLegacyVsExplicit.evidence.sharedWriteAuthority.legacyEnvDisagrees, true);
+
+  const handoffRepoDefault = JSON.parse(runAtm(tempDir, ['identity', 'show', '--json'], {
+    AGENT_IDENTITY: 'editor-a.handoff',
+    ATM_ACTOR_ID: ''
+  })) as Record<string, any>;
+  assert.equal(handoffRepoDefault.evidence.actorResolution.resolved.actorId, 'repo-default-actor');
+  assert.equal(handoffRepoDefault.evidence.actorResolution.resolved.source, 'repo-default');
+  assert.notEqual(handoffRepoDefault.evidence.actorResolution.resolved.actorId, 'editor-a.handoff');
+
   console.log('identity-per-actor-routing: ok');
 } finally {
   rmSync(tempDir, { recursive: true, force: true });

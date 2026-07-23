@@ -75,6 +75,14 @@ export function assertClaimDirtyWipAdmission(input: {
 }): ClaimDirtyWipAdmission {
   const admission = inspectClaimDirtyWipAdmission(input);
   if (admission.ok) return admission;
+  const firstBlocker = admission.blockers[0] ?? null;
+  const ownerTaskId = firstBlocker?.ownerTaskId ?? input.task.workItemId;
+  const ownerActorId = firstBlocker?.ownerActorId ?? input.actorId;
+  const recoveryCommands = {
+    finishAndClose: `node atm.mjs taskflow close --task ${ownerTaskId} --actor ${ownerActorId} --json`,
+    nonDeliveryWipCommitAndRelease: `node atm.mjs tasks release --task ${ownerTaskId} --actor ${ownerActorId} --wip-commit --reason "preserve dirty WIP" --json`,
+    discardAndRelease: `node atm.mjs tasks release --task ${ownerTaskId} --actor ${ownerActorId} --discard-wip --reason "discard WIP" --json`
+  };
   throw new CliError('ATM_CLAIM_FOREIGN_UNSTAGED_WIP', `Claim blocked: ${input.task.workItemId} intersects foreign or unowned dirty WIP.`, {
     exitCode: 1,
     details: {
@@ -82,6 +90,8 @@ export function assertClaimDirtyWipAdmission(input: {
       intersectingFiles: admission.intersectingFiles,
       ownership: admission.blockers.some((entry) => entry.ownership === 'foreign') ? 'foreign' : 'unowned',
       blockers: admission.blockers,
+      recoveryCommands,
+      recoveryCommand: recoveryCommands.nonDeliveryWipCommitAndRelease,
       requiredAction: 'Ask the owning lane to commit/close/release, or clear unowned WIP before claiming this code scope.'
     }
   });

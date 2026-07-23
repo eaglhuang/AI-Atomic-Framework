@@ -1,14 +1,29 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { buildCommandManifest, buildOrderedCommandStep, renderCommandManifest, type OrderedCommandManifestStep } from '../shared/command-manifest.ts';
-import { mintFrameworkTempTaskId } from '../shared/identity-normalization.ts';
+import {
+  attachSharedWriteActorAuthority,
+  buildCommandManifest,
+  buildOrderedCommandStep,
+  renderCommandManifest,
+  type OrderedCommandManifestStep
+} from '../shared/command-manifest.ts';
+import {
+  buildSharedWriteActorRecoveryCommand,
+  explicitActorIdEnvVar,
+  legacyActorIdEnvVar,
+  mintFrameworkTempTaskId,
+  resolveSharedWriteActorAuthority,
+  sanitizeIdentityValue,
+  type SharedWriteActorAuthority
+} from '../shared/identity-normalization.ts';
 
 export type RunnerSyncAdmissionReport = {
   readonly schemaId: 'atm.runnerSyncAdmission.v1';
   readonly ok: boolean;
   readonly stewardActorId: string;
   readonly sealedSourceSha: string | null;
+  readonly actorAuthority: SharedWriteActorAuthority;
   readonly runnerSyncSteward: {
     readonly stewardWorkId: string;
     readonly queuePosition: number;
@@ -70,6 +85,10 @@ export function inspectRunnerSyncAdmission(input: {
   readonly cwd: string;
   readonly stewardActorId: string;
   readonly sealedSourceSha?: string | null;
+  readonly laneSessionId?: string | null;
+  readonly actorIdentitySource?: string | null;
+  readonly envActorId?: string | null;
+  readonly legacyEnvActorId?: string | null;
   readonly runnerSyncSteward?: {
     readonly stewardWorkId: string;
     readonly queuePosition: number;
@@ -94,13 +113,68 @@ export function inspectRunnerSyncAdmission(input: {
   const foreignNonReleaseWip = uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
   const steward = normalizeInputRunnerSyncSteward(input.runnerSyncSteward) ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
   const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input, steward);
+  const activeClaimOwnerActorId = resolveActiveClaimOwnerActorId(input.cwd);
+  const laneSessionId = sanitizeIdentityValue(input.laneSessionId)
+    ?? resolveActiveLaneSessionId(input.cwd, input.stewardActorId);
+  const envActorId = sanitizeIdentityValue(input.envActorId)
+    ?? sanitizeIdentityValue(process.env[explicitActorIdEnvVar]);
+  const legacyEnvActorId = sanitizeIdentityValue(input.legacyEnvActorId)
+    ?? sanitizeIdentityValue(process.env[legacyActorIdEnvVar]);
+  const actorAuthority = resolveSharedWriteActorAuthority({
+    explicitActorId: input.stewardActorId,
+    envActorId,
+    legacyEnvActorId,
+    queueHeadOwnerActorIds: queueHeadOwnership.ownerActorIds,
+    activeClaimOwnerActorId,
+    laneSessionId,
+    buildCommand: 'npm run build'
+  });
+  const continuityActorId = actorAuthority.ok
+    ? (actorAuthority.actorId ?? input.stewardActorId)
+    : (queueHeadOwnership.ownerActorIds[0] ?? actorAuthority.actorId ?? input.stewardActorId);
+  const recoveryInput = {
+    ...input,
+    stewardActorId: continuityActorId,
+    laneSessionId,
+    actorAuthority
+  };
   const brokerTicket = buildAdmissionBrokerTicket(input, queueHeadOwnership);
-  const orderedCommandManifests = buildRunnerSyncRecoveryManifests(input);
+  const orderedCommandManifests = buildRunnerSyncRecoveryManifests(recoveryInput);
+  const actorMismatch = Boolean(
+    queueHeadOwnership.stewardWorkId
+    && queueHeadOwnership.ownerActorIds.length > 0
+    && !queueHeadOwnership.ownerActorIds.includes(input.stewardActorId)
+  );
+  const legacyHijack = Boolean(
+    legacyEnvActorId
+    && legacyEnvActorId === input.stewardActorId
+    && envActorId
+    && envActorId !== input.stewardActorId
+  );
+  const continuityBlocked = actorMismatch
+    || legacyHijack
+    || (actorAuthority.legacyEnvDisagrees
+      && queueHeadOwnership.ownerActorIds.length > 0
+      && !queueHeadOwnership.ownerActorIds.includes(input.stewardActorId));
+  const requiredCommand = foreignNonReleaseWip.length > 0
+    ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
+    : continuityBlocked
+      ? (actorAuthority.recoveryCommand
+        ?? buildSharedWriteActorRecoveryCommand({
+          actorId: queueHeadOwnership.ownerActorIds[0] ?? envActorId ?? continuityActorId,
+          buildCommand: 'npm run build'
+        }))
+      : queueHeadOwnership.ok
+        ? null
+        : queueHeadOwnership.stewardWorkId
+          ? (queueHeadOwnership.cleanupCommand ?? queueHeadOwnership.reason)
+          : buildRunnerSyncEnqueueCommand(recoveryInput);
   return {
     schemaId: 'atm.runnerSyncAdmission.v1',
-    ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok,
+    ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok && !continuityBlocked,
     stewardActorId: input.stewardActorId,
     sealedSourceSha: input.sealedSourceSha ?? null,
+    actorAuthority,
     runnerSyncSteward: steward,
     queueHeadOwnership,
     foreignNonReleaseWip,
@@ -109,13 +183,7 @@ export function inspectRunnerSyncAdmission(input: {
     ordinaryTaskReleaseAutoStageAllowed: false,
     brokerTicket,
     orderedCommandManifests,
-    requiredCommand: foreignNonReleaseWip.length > 0
-      ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
-      : queueHeadOwnership.ok
-        ? null
-        : queueHeadOwnership.stewardWorkId
-          ? queueHeadOwnership.reason
-          : buildRunnerSyncEnqueueCommand(input)
+    requiredCommand
   };
 }
 
@@ -157,8 +225,14 @@ function quoteCliArg(value: string): string {
 export function buildRunnerSyncRecoveryManifests(input: {
   readonly stewardActorId: string;
   readonly sealedSourceSha?: string | null;
+  readonly laneSessionId?: string | null;
+  readonly actorAuthority?: SharedWriteActorAuthority | null;
 }): readonly OrderedCommandManifestStep[] {
-  return [
+  const resolutionSource = input.actorAuthority?.resolutionSource ?? 'steward-input';
+  const laneSessionId = sanitizeIdentityValue(input.laneSessionId)
+    ?? input.actorAuthority?.laneSessionId
+    ?? null;
+  const steps = [
     buildOrderedCommandStep('framework-temp-claim', buildCommandManifest({
       executable: 'node',
       argv: [
@@ -185,6 +259,12 @@ export function buildRunnerSyncRecoveryManifests(input: {
       notes: 'preserve queue-head steward actor through sealed runner build'
     }))
   ];
+  return steps.map((step) => attachSharedWriteActorAuthority(step, {
+    actorId: input.stewardActorId,
+    resolutionSource: resolutionSource === 'insufficient' ? 'steward-input' : resolutionSource,
+    laneSessionId,
+    copyableCommand: step.display
+  }));
 }
 
 function buildRunnerSyncEnqueueManifest(input: {
@@ -221,15 +301,25 @@ export function assertRunnerSyncAdmission(report: RunnerSyncAdmissionReport): vo
   if (!report.ok) {
     const reason = report.foreignNonReleaseWip.length > 0
       ? `Runner sync refused foreign non-release WIP: ${report.foreignNonReleaseWip.join(', ')}`
+      : report.actorAuthority.ok === false && report.actorAuthority.reason
+        ? report.actorAuthority.reason
       : report.queueHeadOwnership.reason ?? 'Runner sync requires steward queue-head ownership.';
-    const error = new Error(reason);
+    const recoveryCommand = report.requiredCommand
+      ?? report.actorAuthority.recoveryCommand
+      ?? null;
+    const error = new Error(recoveryCommand ? `${reason} Recovery: ${recoveryCommand}` : reason);
     Object.assign(error, {
       code: report.foreignNonReleaseWip.length > 0
         ? 'ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED'
+        : report.actorAuthority.ok === false && report.queueHeadOwnership.ownerActorIds.length > 0
+          ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED'
         : report.queueHeadOwnership.queueHeadHealth !== 'task-active'
           ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_ORPHANED'
         : 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED',
-      details: report
+      details: {
+        ...report,
+        recoveryCommand
+      }
     });
     throw error;
   }
@@ -481,6 +571,46 @@ function normalizeStewardRequests(value: unknown): readonly RunnerSyncAdmissionS
       requestedSurfaces: normalizeStringArray(record.requestedSurfaces)
     }];
   });
+}
+
+function resolveActiveClaimOwnerActorId(cwd: string): string | null {
+  const tasksDir = path.join(cwd, '.atm', 'history', 'tasks');
+  if (!existsSync(tasksDir)) return null;
+  for (const entry of readdirSync(tasksDir)) {
+    if (!entry.endsWith('.json')) continue;
+    try {
+      const task = JSON.parse(readFileSync(path.join(tasksDir, entry), 'utf8')) as Record<string, unknown>;
+      const claim = task.claim && typeof task.claim === 'object' ? task.claim as Record<string, unknown> : null;
+      if (!claim || claim.state !== 'active') continue;
+      const actorId = sanitizeIdentityValue(claim.actorId);
+      if (actorId) return actorId;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+function resolveActiveLaneSessionId(cwd: string, stewardActorId: string): string | null {
+  const tasksDir = path.join(cwd, '.atm', 'history', 'tasks');
+  if (!existsSync(tasksDir)) return null;
+  for (const entry of readdirSync(tasksDir)) {
+    if (!entry.endsWith('.json')) continue;
+    try {
+      const task = JSON.parse(readFileSync(path.join(tasksDir, entry), 'utf8')) as Record<string, unknown>;
+      const claim = task.claim && typeof task.claim === 'object' ? task.claim as Record<string, unknown> : null;
+      if (!claim || claim.state !== 'active') continue;
+      if (sanitizeIdentityValue(claim.actorId) !== stewardActorId) continue;
+      const laneSession = claim.laneSession && typeof claim.laneSession === 'object'
+        ? claim.laneSession as Record<string, unknown>
+        : null;
+      const laneSessionId = sanitizeIdentityValue(laneSession?.laneSessionId);
+      if (laneSessionId) return laneSessionId;
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }
 
 function resolveQueueHeadHealth(

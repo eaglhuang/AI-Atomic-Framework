@@ -33,6 +33,7 @@ export default defineCommandSpec({
     { flag: '--defer-foreign-staged', summary: 'Snapshot and unstage foreign task governance files already in the index before resolving the bundle; never silent.' },
     { flag: '--dry-run', summary: 'Resolve the task-scoped commit bundle without staging or committing; for record-commit, validate the staged record-only scope without mutating HEAD.' },
     { flag: '--no-verify', summary: 'Emergency-only pass-through to git commit; requires --emergency-approval with backend.gitHookBypass permission and cannot override Team Broker conflicts by itself.' },
+    { flag: '--wip', summary: 'For git commit: commit staged files with non-delivery ATM-WIP trailers and bypass full repository-wide typecheck.' },
     { flag: '--emergency-approval', value: 'leaseId', summary: 'Required when --no-verify is used; must authorize backend.gitHookBypass.' },
     { flag: '--broker-conflict-override', value: 'leaseId', summary: 'High-authority override for Team Broker cross-task conflicts; must authorize backend.brokerConflictOverride and be paired with --broker-conflict-resolution.' },
     { flag: '--broker-conflict-resolution', value: 'path', summary: 'Paper-style Team Broker conflict-resolution artifact proving conflict task id, shared paths, resolution order, and validator plan.' },

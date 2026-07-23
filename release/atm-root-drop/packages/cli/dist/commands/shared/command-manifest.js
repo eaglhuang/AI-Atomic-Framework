@@ -1,4 +1,15 @@
 import { createHash } from 'node:crypto';
+export function attachSharedWriteActorAuthority(step, authority) {
+    return {
+        ...step,
+        actorAuthority: {
+            actorId: authority.actorId,
+            resolutionSource: authority.resolutionSource,
+            laneSessionId: authority.laneSessionId,
+            copyableCommand: authority.copyableCommand || step.display
+        }
+    };
+}
 export function buildCommandManifest(input) {
     const manifest = {
         schemaId: 'atm.commandManifest.v1',

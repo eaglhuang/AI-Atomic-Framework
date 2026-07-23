@@ -158,6 +158,65 @@ On Windows, read, write, and compare Markdown, JSON, and text planning documents
 
 PowerShell may still launch `node`, `git`, and ATM CLI commands; the restriction is on document content IO and document content comparison.
 
+## Copy-paste Dispatch Packet Rule
+
+When preparing an external handoff for a human to paste into Claude, Cursor,
+Copilot, Gemini, Antigravity, another Codex thread, or any other worker, every
+instruction needed by that worker must live inside the copy-paste block itself.
+Treat the block as the worker's whole briefing packet.
+
+Do not leave required context, sequencing, scope, authority, stop conditions,
+validation commands, actor identity, source card paths, or report requirements
+only in surrounding prose. Surrounding prose may summarize why the packet was
+chosen, but it must not contain anything the worker must read in order to
+execute correctly.
+
+For multiple workers, emit one complete self-contained block per worker. The
+human should be able to copy any one block without selecting extra text,
+merging bullets from above or below, or inferring missing constraints from the
+captain's commentary. This is a high-priority dispatch quality rule.
+
+Before sending any dispatch response, run this self-check: if the human copies
+only the fenced block for one worker, the worker must know the recipient,
+priority/order, whether to wait for another worker, exact commands, authority,
+scope, stop conditions, and report contract. If any of those facts appears only
+outside the fenced block, the dispatch is invalid and must be rewritten before
+sending. Outside-block prose may only say that the blocks below are ready to
+paste; it must not contain sequencing such as "paste this first" unless the
+same sequencing is repeated inside the affected block.
+
+## Dispatch Token Economy Rule
+
+Prefer task-card-referenced dispatch over reprinting the task card. Treat the
+task card as the full specification for scope, deliverables, acceptance, and
+validators; treat the dispatch packet as a concise navigation note for the
+current lane state.
+
+A good dispatch packet should normally contain only:
+
+- recipient and actor identity;
+- source task card path and instruction to read it first;
+- this turn's objective and next safe stop point;
+- current worktree/broker/claim constraints that the task card cannot know;
+- allowed commands and forbidden actions;
+- hard stop conditions;
+- compact report contract.
+
+Do not paste long acceptance criteria, design rationale, historical narrative,
+or validator lists into every dispatch packet when the worker can read them from
+the task card. If the task card is missing essential instructions, amend the task
+card or explicitly mark a short temporary override; do not hide durable
+requirements in a long one-off handoff. Aim for "directly pasteable and
+self-contained" without becoming a duplicate spec. A useful default shape is:
+`Goal / Card / Constraints / Commands / Stop / Report`.
+
+Do not over-compress the packet either. Include enough concrete commands,
+current-state constraints, authority boundaries, and report fields for the
+worker to reach the next safe stop without asking follow-up questions. If
+removing a line would make the worker infer actor identity, sequencing,
+permission, stop conditions, or validation from chat history, keep the line.
+Optimize for the smallest packet that is still independently executable.
+
 ## Dispatch Rules
 
 - Before drafting a plan or task cards, state `Planning authority`, `Target

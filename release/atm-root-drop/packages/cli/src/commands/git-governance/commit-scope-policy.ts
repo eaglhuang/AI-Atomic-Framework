@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -41,7 +42,7 @@ export function inspectTouchedPhysicalLineBudget(
     .filter((file) => existsSync(path.join(cwd, file)));
   const maxLines = readConfiguredPhysicalLineBudget(cwd, 'maxLines', DEFAULT_PHYSICAL_LINE_BUDGET_MAX);
   const softLines = readConfiguredPhysicalLineBudget(cwd, 'softLines', DEFAULT_PHYSICAL_LINE_BUDGET_SOFT);
-  const rows = files.map((file) => ({ file, lines: countPhysicalLines(path.join(cwd, file)) }))
+  const rows = files.map((file) => ({ file, lines: countCandidatePhysicalLines(cwd, file) }))
     .sort((left, right) => right.lines - left.lines || left.file.localeCompare(right.file));
   const hardViolations = rows.filter((entry) => entry.lines > maxLines);
   const softWarnings = rows.filter((entry) => entry.lines > softLines && entry.lines <= maxLines);
@@ -91,6 +92,30 @@ function countPhysicalLines(filePath: string): number {
   const content = readFileSync(filePath, 'utf8');
   if (content.length === 0) return 0;
   return content.split(/\r?\n/).length - (content.endsWith('\n') ? 1 : 0);
+}
+
+function countCandidatePhysicalLines(cwd: string, file: string): number {
+  const stagedLines = countStagedDiffPhysicalLines(cwd, file);
+  if (stagedLines !== null) return stagedLines;
+  return countPhysicalLines(path.join(cwd, file));
+}
+
+function countStagedDiffPhysicalLines(cwd: string, file: string): number | null {
+  try {
+    const output = execFileSync('git', ['diff', '--cached', '--numstat', '--', file], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+    if (!output) return null;
+    const [addedRaw, deletedRaw] = output.split(/\s+/);
+    const added = Number.parseInt(addedRaw ?? '', 10);
+    const deleted = Number.parseInt(deletedRaw ?? '', 10);
+    if (!Number.isFinite(added) || !Number.isFinite(deleted)) return null;
+    return added + deleted;
+  } catch {
+    return null;
+  }
 }
 
 function buildTouchedPhysicalLineBudgetReproduceCommand(files: readonly string[], context: PhysicalLineBudgetContext): string {

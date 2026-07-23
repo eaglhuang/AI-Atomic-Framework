@@ -258,7 +258,8 @@ export function runPreCommitHook(cwd: string) {
   // entering the expensive framework-validator lane. In particular, a mixed
   // historical-restore packet plus source files must fail closed without
   // recursively invoking validators through the same hook surface.
-  const canRunFrameworkValidators = commitAttributionReport.ok && protectedStateReport.ok;
+  const isWipCommit = process.env.ATM_COMMIT_WIP === '1' || process.env.ATM_COMMIT_WIP === 'true';
+  const canRunFrameworkValidators = commitAttributionReport.ok && protectedStateReport.ok && !isWipCommit;
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0 && canRunFrameworkValidators
     ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
     : [];

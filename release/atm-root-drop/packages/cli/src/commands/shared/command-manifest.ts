@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import type { SharedWriteActorAuthoritySource } from './identity-normalization.ts';
 
 export type AtmCommandManifestV1 = {
   readonly schemaId: 'atm.commandManifest.v1';
@@ -18,11 +19,34 @@ export type AtmCommandManifestV1 = {
   readonly ioDigest?: string | null;
 };
 
+export type SharedWriteRecoveryActorAuthority = {
+  readonly actorId: string;
+  readonly resolutionSource: SharedWriteActorAuthoritySource | 'steward-input';
+  readonly laneSessionId: string | null;
+  readonly copyableCommand: string;
+};
+
 export type OrderedCommandManifestStep = {
   readonly id: string;
   readonly manifest: AtmCommandManifestV1;
   readonly display: string;
+  readonly actorAuthority?: SharedWriteRecoveryActorAuthority;
 };
+
+export function attachSharedWriteActorAuthority(
+  step: OrderedCommandManifestStep,
+  authority: SharedWriteRecoveryActorAuthority
+): OrderedCommandManifestStep {
+  return {
+    ...step,
+    actorAuthority: {
+      actorId: authority.actorId,
+      resolutionSource: authority.resolutionSource,
+      laneSessionId: authority.laneSessionId,
+      copyableCommand: authority.copyableCommand || step.display
+    }
+  };
+}
 
 export function buildCommandManifest(input: {
   readonly executable?: string;

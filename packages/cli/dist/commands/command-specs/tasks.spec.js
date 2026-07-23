@@ -22,6 +22,8 @@ export default defineCommandSpec({
         { flag: '--apply', summary: 'Apply tasks migrate-legacy-ledger changes instead of reporting a dry-run.' },
         { flag: '--all-stale', summary: 'Clean every stale runtime task lock candidate for tasks lock cleanup.' },
         { flag: '--reserved-ok', summary: 'Allow tasks release to return a reserved task with no active claim back to open.' },
+        { flag: '--wip-commit', summary: 'For tasks release: commit dirty in-scope WIP files as a non-delivery preservation commit before releasing.' },
+        { flag: '--discard-wip', summary: 'For tasks release: discard dirty in-scope WIP files with an auditable discard receipt before releasing.' },
         { flag: '--staged', summary: 'Run tasks audit in staged/pre-commit mode.' },
         { flag: '--queue', value: 'id', summary: 'Task queue id for tasks queue abandon.' },
         { flag: '--task', value: 'id', summary: 'Task id for claim/renew/release/handoff/takeover/close/reconcile/repair-closure/repair-claim/status/finalize diagnose/scope add/scope repair.' },

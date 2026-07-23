@@ -140,7 +140,20 @@ function makeAdmission(): RunnerSyncAdmissionReport {
     releaseWip: [],
     ordinaryTaskReleaseAutoStageAllowed: false,
     brokerTicket: null,
-    requiredCommand: null
+    requiredCommand: null,
+    actorAuthority: {
+      schemaId: 'atm.sharedWriteActorAuthority.v1',
+      ok: true,
+      actorId: 'captain-a',
+      resolutionSource: 'option',
+      legacyEnvActorId: null,
+      legacyEnvDisagrees: false,
+      laneSessionId: null,
+      queueHeadOwnerActorIds: ['captain-a', 'captain-b'],
+      activeClaimOwnerActorId: 'captain-a',
+      recoveryCommand: null,
+      reason: null
+    }
   };
 }
 

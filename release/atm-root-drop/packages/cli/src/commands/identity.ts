@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { clearRuntimeIdentityDefault, clearRuntimeIdentityForActor, describeActorResolution, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, type RuntimeIdentityDefaultDocument, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.ts';
 import { listActorWorkSessions, resolveActorWorkSession } from './actor-session.ts';
+import { resolveSharedWriteActorAuthority } from './shared/identity-normalization.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
 export async function runIdentity(argv: string[]) {
@@ -11,6 +12,15 @@ export async function runIdentity(argv: string[]) {
       : readRuntimeIdentityDefault(options.cwd);
     const session = current?.activeSessionId ? resolveActorWorkSession(options.cwd, { sessionId: current.activeSessionId, includeNonActive: true }) : null;
     const actorResolution = describeActorResolution(options.actorId, options.cwd);
+    const sharedWriteAuthority = resolveSharedWriteActorAuthority({
+      explicitActorId: options.actorId,
+      envActorId: actorResolution.envActorId,
+      legacyEnvActorId: actorResolution.legacyEnvActorId,
+      repoDefaultActorId: actorResolution.repoDefaultActorId,
+      activeClaimOwnerActorId: null,
+      laneSessionId: current?.activeSessionId ?? null,
+      buildCommand: 'npm run build'
+    });
     return makeResult({
       ok: true,
       command: 'identity',
@@ -22,7 +32,8 @@ export async function runIdentity(argv: string[]) {
         : options.actorId
           ? `No actor identity is configured yet for ${options.actorId}.`
           : 'No repo default identity is configured yet.', {
-        actorResolution
+        actorResolution,
+        sharedWriteAuthority
       })],
       evidence: {
         identity: current,
@@ -32,6 +43,7 @@ export async function runIdentity(argv: string[]) {
             : runtimeIdentityRelativePath
           : null,
         actorResolution,
+        sharedWriteAuthority,
         activeSession: session,
         recentSessions: listActorWorkSessions(options.cwd).slice(0, 5)
       }

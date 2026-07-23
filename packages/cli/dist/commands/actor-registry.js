@@ -202,9 +202,16 @@ export function describeActorResolution(inputActorId, cwd) {
     const legacyEnvActor = sanitizeOptional(process.env[legacyActorIdEnvVar]) ?? null;
     const repoDefaultActor = cwd ? readRuntimeIdentityDefault(cwd)?.actorId ?? null : null;
     const resolved = resolveActorId(inputActorId, cwd);
+    const legacyIsDiagnosticOnly = Boolean(legacyEnvActor
+        && resolved
+        && (resolved.source !== 'legacy-env'
+            || (repoDefaultActor !== null && repoDefaultActor !== legacyEnvActor)
+            || (envActor !== null && envActor !== legacyEnvActor)));
     const warning = !explicit && resolved && resolved.source !== 'repo-default' && repoDefaultActor && repoDefaultActor !== resolved.actorId
         ? `${actorResolutionSourceLabel(resolved.source)} actor ${resolved.actorId} overrides repo default actor ${repoDefaultActor}. Pass --actor ${repoDefaultActor} to claim as the repo default actor, or clear/update the environment identity before claiming.`
-        : null;
+        : legacyIsDiagnosticOnly && legacyEnvActor && resolved && resolved.actorId !== legacyEnvActor
+            ? `${legacyActorIdEnvVar}=${legacyEnvActor} is diagnostic-only and must not replace authoritative actor ${resolved.actorId}. Prefer --actor or ${actorIdEnvVar}=${resolved.actorId}.`
+            : null;
     return {
         resolved,
         precedence: ['option', 'env', 'repo-default', 'legacy-env'],
@@ -213,9 +220,13 @@ export function describeActorResolution(inputActorId, cwd) {
         repoDefaultActorId: repoDefaultActor,
         repoDefaultPath: runtimeIdentityRelativePath,
         warning,
-        requiredCommand: warning && repoDefaultActor
-            ? `node atm.mjs next --claim --actor ${repoDefaultActor} --prompt "<task-or-prompt>" --json`
-            : null
+        requiredCommand: warning && resolved?.actorId
+            ? resolved.source === 'repo-default' && repoDefaultActor
+                ? `node atm.mjs next --claim --actor ${repoDefaultActor} --prompt "<task-or-prompt>" --json`
+                : `${actorIdEnvVar}=${resolved.actorId} <shared-write-command>`
+            : warning && repoDefaultActor
+                ? `node atm.mjs next --claim --actor ${repoDefaultActor} --prompt "<task-or-prompt>" --json`
+                : null
     };
 }
 export function findActorByResolvedId(cwd, resolved) {

@@ -1,4 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
 import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../../../core/dist/broker/lifecycle.js';
 import { resolveActorId } from '../actor-registry.js';
@@ -18,6 +20,7 @@ import { writeTakeoverEvidence } from './takeover-evidence.js';
 import { assertPlanningSourceSealValid } from './import-task.js';
 import { resolveLaneSession } from '../lane-session/resolve.js';
 import { readClaimLaneSessionId, throwIfForeignSameTaskClaim, assertCurrentClaimOwnerForAction } from './claim-ownership.js';
+import { runAtmGit } from '../git-governance.js';
 function normalizeTaskStatus(value) {
     return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
 }
@@ -357,6 +360,81 @@ export async function runTasksClaimLifecycle(action, argv) {
             action: 'release',
             currentClaim
         });
+        const dirtyIntent = resolveTaskClaimIntent({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            taskDocument,
+            requestedClaimIntent: 'write',
+            autoIntent: true,
+            explicitClaimIntent: false
+        });
+        const dirtyInScopeFiles = dirtyIntent.dirtyInScopeFiles;
+        let wipCommitReceipt = null;
+        let discardWipReceipt = null;
+        if (dirtyInScopeFiles.length > 0) {
+            if (options.discardWip) {
+                const discardReceiptPath = relativePathFrom(options.cwd, path.join(options.cwd, `.atm/history/evidence/${options.taskId}.discard-wip-receipt.json`));
+                discardWipReceipt = {
+                    schemaId: 'atm.discardWipReceipt.v1',
+                    specVersion: '0.1.0',
+                    taskId: options.taskId,
+                    actorId,
+                    timestamp: nowIso,
+                    discardedFiles: dirtyInScopeFiles,
+                    reason: options.reason ?? 'discard WIP on claim release'
+                };
+                const absoluteDiscardPath = path.resolve(options.cwd, discardReceiptPath);
+                mkdirSync(path.dirname(absoluteDiscardPath), { recursive: true });
+                writeFileSync(absoluteDiscardPath, `${JSON.stringify(discardWipReceipt, null, 2)}\n`, 'utf8');
+                for (const file of dirtyInScopeFiles) {
+                    const relPath = file.replace(/\\/g, '/');
+                    try {
+                        execFileSync('git', ['-C', options.cwd, 'checkout', 'HEAD', '--', relPath], { stdio: 'pipe', encoding: 'utf8' });
+                    }
+                    catch (e) {
+                        console.error('git checkout error:', e.stderr?.toString() || e.message);
+                        rmSync(path.resolve(options.cwd, relPath), { force: true });
+                    }
+                }
+            }
+            else if (options.wipCommit) {
+                const gitResult = await runAtmGit([
+                    'commit',
+                    '--cwd', options.cwd,
+                    '--actor', actorId,
+                    '--task', options.taskId,
+                    '--message', `wip: ${options.taskId} non-delivery WIP commit`,
+                    '--wip',
+                    '--auto-stage',
+                    '--json'
+                ]);
+                wipCommitReceipt = {
+                    schemaId: 'atm.wipCommitReceipt.v1',
+                    taskId: options.taskId,
+                    actorId,
+                    timestamp: nowIso,
+                    committedFiles: dirtyInScopeFiles,
+                    gitResult: gitResult.evidence
+                };
+            }
+            else {
+                const recoveryCommands = {
+                    finishAndClose: `node atm.mjs taskflow close --task ${options.taskId} --actor ${actorId} --json`,
+                    nonDeliveryWipCommitAndRelease: `node atm.mjs tasks release --task ${options.taskId} --actor ${actorId} --wip-commit --reason "${options.reason ?? 'WIP preservation'}" --json`,
+                    discardAndRelease: `node atm.mjs tasks release --task ${options.taskId} --actor ${actorId} --discard-wip --reason "${options.reason ?? 'discard WIP'}" --json`
+                };
+                throw new CliError('ATM_RELEASE_DIRTY_WIP_BLOCKED', `tasks release for ${options.taskId} blocked because ${dirtyInScopeFiles.length} in-scope source file(s) are dirty: ${dirtyInScopeFiles.join(', ')}. Clean or preserve WIP before releasing.`, {
+                    exitCode: 1,
+                    details: {
+                        taskId: options.taskId,
+                        actorId,
+                        dirtyInScopeFiles,
+                        recoveryCommands,
+                        requiredCommand: recoveryCommands.nonDeliveryWipCommitAndRelease
+                    }
+                });
+            }
+        }
         const releasedClaim = {
             ...currentClaim,
             heartbeatAt: nowIso,
@@ -405,7 +483,9 @@ export async function runTasksClaimLifecycle(action, argv) {
                 claim: releasedClaim,
                 transitionPath,
                 sessionId: sessionRecord?.session.sessionId ?? null,
-                session: sessionRecord?.session ?? null
+                session: sessionRecord?.session ?? null,
+                ...(wipCommitReceipt ? { wipCommitReceipt } : {}),
+                ...(discardWipReceipt ? { discardWipReceipt } : {})
             }
         });
     }

@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { clearRuntimeIdentityDefault, clearRuntimeIdentityForActor, describeActorResolution, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.js';
 import { listActorWorkSessions, resolveActorWorkSession } from './actor-session.js';
+import { resolveSharedWriteActorAuthority } from './shared/identity-normalization.js';
 import { CliError, makeResult, message } from './shared.js';
 export async function runIdentity(argv) {
     const options = parseIdentityOptions(argv);
@@ -10,6 +11,15 @@ export async function runIdentity(argv) {
             : readRuntimeIdentityDefault(options.cwd);
         const session = current?.activeSessionId ? resolveActorWorkSession(options.cwd, { sessionId: current.activeSessionId, includeNonActive: true }) : null;
         const actorResolution = describeActorResolution(options.actorId, options.cwd);
+        const sharedWriteAuthority = resolveSharedWriteActorAuthority({
+            explicitActorId: options.actorId,
+            envActorId: actorResolution.envActorId,
+            legacyEnvActorId: actorResolution.legacyEnvActorId,
+            repoDefaultActorId: actorResolution.repoDefaultActorId,
+            activeClaimOwnerActorId: null,
+            laneSessionId: current?.activeSessionId ?? null,
+            buildCommand: 'npm run build'
+        });
         return makeResult({
             ok: true,
             command: 'identity',
@@ -21,7 +31,8 @@ export async function runIdentity(argv) {
                     : options.actorId
                         ? `No actor identity is configured yet for ${options.actorId}.`
                         : 'No repo default identity is configured yet.', {
-                    actorResolution
+                    actorResolution,
+                    sharedWriteAuthority
                 })],
             evidence: {
                 identity: current,
@@ -31,6 +42,7 @@ export async function runIdentity(argv) {
                         : runtimeIdentityRelativePath
                     : null,
                 actorResolution,
+                sharedWriteAuthority,
                 activeSession: session,
                 recentSessions: listActorWorkSessions(options.cwd).slice(0, 5)
             }

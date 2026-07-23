@@ -154,7 +154,14 @@ export function buildTaskflowClosePreflight(input) {
             ]
         };
     }
-    const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, readTouchedFiles(input.cwd), {
+    // Pre-close must not fail closed on another active task's oversized dirty WIP.
+    // Foreign active dirty files stay advisory; line-budget admission only scans the
+    // current task's touched source set (worktree porcelain minus foreign-active).
+    const lineBudgetTouchedFiles = selectPreCloseLineBudgetTouchedFiles({
+        cwd: input.cwd,
+        foreignActiveDirtyFiles: summary.dirtyGuard.foreignActiveDirtyFiles ?? []
+    });
+    const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, lineBudgetTouchedFiles, {
         taskId: input.taskId,
         actorId: input.actorId,
         gate: 'pre-close'
@@ -203,6 +210,15 @@ function readTouchedFiles(cwd) {
         .filter(Boolean)
         .map((file) => file.includes(' -> ') ? file.split(' -> ').pop() ?? file : file)
         .map((file) => file.replace(/\\/g, '/'));
+}
+export function selectPreCloseLineBudgetTouchedFiles(input) {
+    const foreign = new Set((input.foreignActiveDirtyFiles ?? [])
+        .map((file) => file.replace(/\\/g, '/').replace(/^\.\//, ''))
+        .filter(Boolean));
+    const readTouched = input.readTouched ?? readTouchedFiles;
+    return readTouched(input.cwd)
+        .map((file) => file.replace(/\\/g, '/').replace(/^\.\//, ''))
+        .filter((file) => file.length > 0 && !foreign.has(file));
 }
 export function buildPlanningDeliveryRequiredCommand(taskId, actorId) {
     return `node atm.mjs taskflow close --task ${taskId} --actor ${quoteCliValue(actorId || '<actor>')} --historical-delivery <commit> --write --json`;
