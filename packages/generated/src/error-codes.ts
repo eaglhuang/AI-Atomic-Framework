@@ -8,15 +8,11 @@
  * instead of inventing string literals or a local fallback taxonomy.
  */
 
-export const ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED =
-  'ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED' as const;
-
-export const ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE =
-  'ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE' as const;
-
-export type PostComposeSemanticValidationErrorCode =
-  | typeof ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED
-  | typeof ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE;
+export {
+  ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED,
+  ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE,
+  type PostComposeSemanticCode as PostComposeSemanticValidationErrorCode
+} from '../../core/src/broker/post-compose-semantic-validation-policy.ts';
 
 export {
   ATM_ERROR_CODE_REGISTRY,

@@ -1,12 +1,13 @@
-import {
-  ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED,
-  ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE
-} from '../../../generated/src/error-codes.ts';
+/**
+ * Exact ErrorCode constants owned by TASK-ERR-0006.
+ * packages/generated/src/error-codes.ts re-exports these for downstream cards
+ * (for example ATM-GOV-0254); do not invent parallel string literals.
+ */
+export const ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED =
+  'ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED' as const;
 
-export {
-  ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED,
-  ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE
-};
+export const ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE =
+  'ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE' as const;
 
 export type SemanticValidatorOutcome =
   | 'pass'
