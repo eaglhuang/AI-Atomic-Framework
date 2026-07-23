@@ -140,6 +140,19 @@ function makeAdmission(stewardWorkId: string): RunnerSyncAdmissionReport {
     releaseWip: [],
     ordinaryTaskReleaseAutoStageAllowed: false,
     brokerTicket: null,
-    requiredCommand: null
+    requiredCommand: null,
+    actorAuthority: {
+      schemaId: 'atm.sharedWriteActorAuthority.v1',
+      ok: true,
+      actorId: 'codex.gpt/5:mini',
+      resolutionSource: 'option',
+      legacyEnvActorId: null,
+      legacyEnvDisagrees: false,
+      laneSessionId: null,
+      queueHeadOwnerActorIds: ['codex.gpt/5:mini'],
+      activeClaimOwnerActorId: 'codex.gpt/5:mini',
+      recoveryCommand: null,
+      reason: null
+    }
   };
 }

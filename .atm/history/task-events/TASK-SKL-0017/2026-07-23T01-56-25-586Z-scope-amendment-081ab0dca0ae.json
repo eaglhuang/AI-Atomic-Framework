@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T01-56-25-586Z-scope-amendment-081ab0dca0ae",
+  "taskId": "TASK-SKL-0017",
+  "action": "scope-amendment",
+  "actorId": "cursor-grok45-plan31-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0017.json",
+  "taskSha256": "sha256:377cca074eeaddcfa1cabd9eaaabf7c6c0cfd2306a5f01fe39a98426d82df1d6",
+  "createdAt": "2026-07-23T01:56:25.586Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0017 --actor cursor-grok45-plan31-captain --add \"tests/cli/runner-sync-clean-close-pathway.test.ts,tests/cli/runner-sync-self-hosting-loop.test.ts\" --class test-alignment --phase closeout --reason \"Unblock pre-commit typecheck for SKL-0017 delivery: RunnerSyncAdmissionReport fixtures missing required actorAuthority from ATM-GOV-0257 WIP.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "test-alignment",
+    "amendmentPhase": "closeout",
+    "amendmentMode": "normal",
+    "reason": "Unblock pre-commit typecheck for SKL-0017 delivery: RunnerSyncAdmissionReport fixtures missing required actorAuthority from ATM-GOV-0257 WIP."
+  }
+}

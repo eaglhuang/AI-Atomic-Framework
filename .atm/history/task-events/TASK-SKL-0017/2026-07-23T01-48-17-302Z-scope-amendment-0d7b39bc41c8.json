@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T01-48-17-302Z-scope-amendment-0d7b39bc41c8",
+  "taskId": "TASK-SKL-0017",
+  "action": "scope-amendment",
+  "actorId": "cursor-grok45-plan31-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0017.json",
+  "taskSha256": "sha256:8e27a8fc7a5a4561153c4258c4bad8701ed8f459a66a1b7afcde5079a57cf22a",
+  "createdAt": "2026-07-23T01:48:17.302Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0017 --actor cursor-grok45-plan31-captain --add \"packages/cli/src/commands/taskflow/close-preflight.ts,tests/cli/close-preflight-foreign-line-budget.test.ts\" --class linked-surface --phase during-implementation --reason \"Pre-close line-budget must ignore foreign active dirty files so SKL-0017 close dry-run is not blocked by ATM-GOV-0260 oversized WIP.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Pre-close line-budget must ignore foreign active dirty files so SKL-0017 close dry-run is not blocked by ATM-GOV-0260 oversized WIP."
+  }
+}
