@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T09-36-58-764Z-scope-amendment-42431cff8238",
+  "taskId": "TASK-ERR-0004",
+  "action": "scope-amendment",
+  "actorId": "claude-002-plan31-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0004.json",
+  "taskSha256": "sha256:5f4bdac651804ded53dbe046445bde15420bdb2269fda299ea63e0c581034fcf",
+  "createdAt": "2026-07-23T09:36:58.764Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0004 --actor claude-002-plan31-captain --add packages/core/src/error-code-registry.generated.ts --reason \"generated error-code index must accompany registry entry\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "generated error-code index must accompany registry entry"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-ERR-0004",
+  "updatedAt": "2026-07-23T09:20:29.916Z",
+  "updatedBy": "claude-002-plan31-captain",
+  "freshValidationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/steward-receipt-error-contract.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run generate:error-codes",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:96d7f551eb9291b8c204cdb823a5c484aab456b17f67a7eed8ce5e0e8bae327d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "generate:error-codes"
+      ],
+      "generatedAt": "2026-07-23T09:16:40.323Z",
+      "startedAt": "2026-07-23T09:16:39.116Z",
+      "finishedAt": "2026-07-23T09:16:40.323Z",
+      "durationMs": 1207,
+      "runnerKind": "dev-source",
+      "sourceCommit": "276aac356665b101775a2419b31c5c316862f054",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/steward-receipt-error-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2d3315b26cf2fb7476d2718216eb8ca752e3bae4562f03d0171cea8b7916d33d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/steward-receipt-error-contract.test.ts"
+      ],
+      "generatedAt": "2026-07-23T09:16:59.164Z",
+      "startedAt": "2026-07-23T09:16:58.628Z",
+      "finishedAt": "2026-07-23T09:16:59.164Z",
+      "durationMs": 536,
+      "runnerKind": "dev-source",
+      "sourceCommit": "276aac356665b101775a2419b31c5c316862f054",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-23T09:17:56.516Z",
+      "startedAt": "2026-07-23T09:17:42.081Z",
+      "finishedAt": "2026-07-23T09:17:56.516Z",
+      "durationMs": 14435,
+      "runnerKind": "dev-source",
+      "sourceCommit": "276aac356665b101775a2419b31c5c316862f054",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1ad3962e05a1cbf3df00da39cb065926c70ed6ff343565ad77347ab06a29c7db",
+      "stderrSha256": "sha256:520084ce1c8dccc67437f13d57eaecff2df4142b6c10623ab6c0227da4eab98c",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-23T09:19:01.798Z",
+      "startedAt": "2026-07-23T09:18:34.071Z",
+      "finishedAt": "2026-07-23T09:19:01.798Z",
+      "durationMs": 27727,
+      "runnerKind": "dev-source",
+      "sourceCommit": "276aac356665b101775a2419b31c5c316862f054",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-23T09:20:29.915Z",
+      "startedAt": "2026-07-23T09:19:37.980Z",
+      "finishedAt": "2026-07-23T09:20:29.915Z",
+      "durationMs": 51935,
+      "runnerKind": "dev-source",
+      "sourceCommit": "276aac356665b101775a2419b31c5c316862f054",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

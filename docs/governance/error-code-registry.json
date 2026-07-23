@@ -581,6 +581,94 @@
       "sourceOwner": "packages/core/src/broker/ticket-authority"
     },
     {
+      "code": "ATM_BROKER_STEWARD_RECEIPT_REQUIRED",
+      "category": "team-broker",
+      "shortDescription": "A multi-claim shared mutation reached a side-effect boundary without a steward composition/apply receipt.",
+      "trigger": "The shared-write provenance policy observes active write-claim cardinality of two or more for a file at stage, apply, or commit time, but no consumed steward receipt binds that file's staged/commit-tree blob digest.",
+      "commonCauses": [
+        "A shared file was edited and staged directly instead of routed through broker compose and steward delivery.",
+        "The committing actor owns one of the active claims but treated single-claim ownership as sufficient proof for a shared file.",
+        "A neutral-steward lane was active but never produced or consumed a receipt for the file."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json to inspect active write-claim cardinality and existing proposals for the file.",
+        "Route the change through node atm.mjs broker compose --proposal-file <proposal> --json to build a composed candidate.",
+        "Obtain a steward apply receipt with node atm.mjs broker steward apply --merge-plan-file <plan> --proposal-file <proposal> --scope-file <path> --evidence-out <receipt> --json before staging or committing the file."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs broker compose --proposal-file <proposal> --json",
+        "node atm.mjs broker steward apply --merge-plan-file <plan> --proposal-file <proposal> --scope-file <path> --evidence-out <receipt> --json"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "status",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "requiredEvidence": [
+        "A consumed steward composition/apply receipt whose output digest equals the staged or commit-tree blob digest for the shared file.",
+        "canonicalWriteCount: 1 proven for the composed candidate.",
+        "Attribution for every member claim owning the shared file."
+      ],
+      "registryOwner": "TASK-ERR-0004",
+      "sourceOwner": "packages/core/src/broker/shared-write-provenance-policy.ts"
+    },
+    {
+      "code": "ATM_BROKER_STEWARD_RECEIPT_INVALID",
+      "category": "team-broker",
+      "shortDescription": "A steward receipt for a shared mutation is malformed, unsupported, stale, already consumed, mismatched, or does not prove canonicalWriteCount: 1.",
+      "trigger": "The shared-write provenance policy finds a steward receipt for the shared file but it fails schema validation, references an unsupported version, references a base/HEAD other than the current one, mismatches proposal/task/actor/member attribution, mismatches the file's before/after digest or exact staged/commit-tree blob digest, was already consumed, or does not prove canonicalWriteCount: 1.",
+      "commonCauses": [
+        "The receipt was generated against a prior base or HEAD and never refreshed after the branch moved.",
+        "A receipt was replayed after its output was already consumed by an earlier commit.",
+        "The receipt's attribution, digest, or version fields were hand-edited or copied from an unrelated composition."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker status --json to inspect the current base/HEAD and existing proposal/receipt state.",
+        "Rebuild the composition with node atm.mjs broker compose --proposal-file <proposal> --json against the current base/HEAD.",
+        "Obtain a fresh steward apply receipt with node atm.mjs broker steward apply --merge-plan-file <plan> --proposal-file <proposal> --scope-file <path> --evidence-out <receipt> --json; do not reuse or hand-edit the prior receipt."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs broker compose --proposal-file <proposal> --json",
+        "node atm.mjs broker steward apply --merge-plan-file <plan> --proposal-file <proposal> --scope-file <path> --evidence-out <receipt> --json"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "status",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "requiredEvidence": [
+        "A rebuilt, unconsumed steward receipt bound to the current base/HEAD, composition-plan digest, and serializability-proof digest.",
+        "Exact file before/after digest and staged/commit-tree blob digest parity with the receipt.",
+        "canonicalWriteCount: 1 proven for the rebuilt composed candidate."
+      ],
+      "registryOwner": "TASK-ERR-0004",
+      "sourceOwner": "packages/core/src/broker/shared-write-provenance-policy.ts"
+    },
+    {
       "code": "ATM_SCOPE_AMENDMENT_REQUIRED",
       "category": "task-ledger",
       "shortDescription": "A task needs an explicit governed scope amendment before touching linked files outside its current contract.",

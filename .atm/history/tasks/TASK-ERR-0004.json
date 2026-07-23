@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0004",
+  "title": "Steward receipt required and invalid shared-write error contracts",
+  "status": "running",
+  "milestone": "ATM-3.1-R0",
+  "dependencies": [
+    "ATM-GOV-0249"
+  ],
+  "acceptance": [
+    "`ATM_BROKER_STEWARD_RECEIPT_REQUIRED` triggers only when a multi-claim shared mutation reaches a side-effect boundary without a steward composition/apply receipt.",
+    "`ATM_BROKER_STEWARD_RECEIPT_INVALID` triggers when the receipt is malformed, unsupported, stale, already consumed, base/HEAD mismatched, attribution mismatched, file/blob digest mismatched, or does not prove `canonicalWriteCount: 1`.",
+    "Both codes use category `team-broker`, are retryable, require no human approval, and provide a deterministic required command/guidance that reruns broker composition/steward delivery rather than permitting direct write.",
+    "Registry records identify `packages/core/src/broker/shared-write-provenance-policy.ts` as source owner and `TASK-ERR-0004` as registry owner.",
+    "Generated `docs/ERROR_CODES.md` is refreshed from the canonical registry; no hand-edited mirror contract is introduced.",
+    "Focused tests prove exact code selection, `retryable: true`, `requiresHumanApproval: false`, required-command presence, source/registry owner parity, and generated-doc parity.",
+    "Unknown receipt versions and ambiguous evidence fail as `ATM_BROKER_STEWARD_RECEIPT_INVALID`; callers do not collapse these failures into a generic hook or Git error."
+  ],
+  "deliverables": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "tests/cli/steward-receipt-error-contract.test.ts"
+  ],
+  "scopePaths": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "tests/cli/steward-receipt-error-contract.test.ts"
+  ],
+  "validators": [
+    "npm run generate:error-codes",
+    "node --strip-types tests/cli/steward-receipt-error-contract.test.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "canonical-error-registry-and-runtime-contract-proof",
+  "rollbackStrategy": "revert-code-registration-with-dependent-gate",
+  "rollbackNotes": "Do not ship GOV-0250 with unregistered or generic fallback errors; dependent shared-write admission remains blocked.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.error-code-registry",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.error-code-registry.steward-receipt-contracts",
+        "pattern": "Canonical Registry Entry",
+        "source": "docs/governance/error-code-registry.json",
+        "disposition": "inline",
+        "inlineReason": "Owner-approved canonical registry and generated index must remain unified; splitting two entries into another registry would create competing authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0004-steward-receipt-required-and-invalid-shared-write-error-contracts.task.md",
+    "sectionTitle": "TASK-ERR-0004",
+    "headingLine": 47,
+    "hash": "509f0a7a93043dfa",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0004-steward-receipt-required-and-invalid-shared-write-error-contracts.task.md",
+      "planningCommitSha": "10f4391127d4890cfd1a40a207efed6c7beeda52",
+      "contentDigest": "sha256:509f0a7a93043dfa1e4faf357fc69bf0f252338e47f692cc7780e1293eac4e55",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-23T09:01:45.369Z"
+    }
+  },
+  "importedAt": "2026-07-23T09:01:45.369Z",
+  "lastTransitionId": "2026-07-23T09-02-16-293Z-claim-851ba9118b2d",
+  "lastTransitionAt": "2026-07-23T09:02:16.293Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-002-plan31-captain",
+  "reservedAt": "2026-07-23T09:02:03.042Z",
+  "promotedAt": "2026-07-23T09:02:03.048Z",
+  "claim": {
+    "actorId": "claude-002-plan31-captain",
+    "leaseId": "lease-1e21c07cc1b5",
+    "claimedAt": "2026-07-23T09:02:03.058Z",
+    "heartbeatAt": "2026-07-23T09:02:03.058Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-ERR-0004.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "tests/cli/steward-receipt-error-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260723090203-claude-002-plan31-captain-913f9f0702",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723090203-claude-002-plan31-captain-913f9f0702\""
+    }
+  },
+  "startedAt": "2026-07-23T09:02:03.058Z",
+  "startedByActor": "claude-002-plan31-captain",
+  "startedBySessionId": "session-20260723090203-claude-002-plan31-captain-TASK-ERR-0004-7407c17894",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0004",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0004.*",
+      ".atm/history/task-events/TASK-ERR-0004/**",
+      ".atm/history/tasks/TASK-ERR-0004.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "tests/cli/steward-receipt-error-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9319b82429d4b29cc786a48d9ad373bb23c4a4b80f1f46039325a87a1cdd9d87",
+    "actorId": "claude-002-plan31-captain",
+    "sessionId": "session-20260723090203-claude-002-plan31-captain-TASK-ERR-0004-7407c17894",
+    "laneSession": {
+      "laneSessionId": "lane-20260723090203-claude-002-plan31-captain-913f9f0702",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723090203-claude-002-plan31-captain-913f9f0702\""
+    },
+    "createdAt": "2026-07-23T09:02:16.291Z",
+    "status": "active"
+  }
+}
