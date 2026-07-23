@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T11-00-51-532Z-close-9751efb16f76",
+  "taskId": "TASK-ERR-0004",
+  "action": "close",
+  "actorId": "claude-002-plan31-captain",
+  "sessionId": "session-20260723090203-claude-002-plan31-captain-TASK-ERR-0004-7407c17894",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0004.json",
+  "taskSha256": "sha256:9ea6a97b9da8d73db5d38d35564c3745d63b456becd1551f59fad42d5a574607",
+  "createdAt": "2026-07-23T11:00:51.532Z",
+  "command": "node atm.mjs tasks close --task TASK-ERR-0004 --actor claude-002-plan31-captain --status done --historical-delivery 92d005a1ba26dcd4bb0aebc225e76c60694786b8",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260723090203-claude-002-plan31-captain-TASK-ERR-0004-7407c17894",
+    "closurePacketPath": ".atm/history/evidence/TASK-ERR-0004.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "generate:error-codes",
+      "node --strip-types tests/cli/steward-receipt-error-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-23T11:00:51.518Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-ERR-0004.*",
+        ".atm/history/task-events/TASK-ERR-0004/**",
+        ".atm/history/tasks/TASK-ERR-0004.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/core/src/error-code-registry.generated.ts",
+        "tests/cli/steward-receipt-error-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/error-code-registry.generated.ts",
+        "tests/cli/steward-receipt-error-contract.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

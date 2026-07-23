@@ -1,0 +1,160 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ERR-0004",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "92d005a1ba26dcd4bb0aebc225e76c60694786b8",
+  "governedTreeSha": "25dbc4e87813ee05829834edae378a7c0b06ab8e",
+  "targetCommitDelta": {
+    "currentCommitSha": "92d005a1ba26dcd4bb0aebc225e76c60694786b8",
+    "parentCommitShas": [
+      "92d005a1ba26dcd4bb0aebc225e76c60694786b8"
+    ],
+    "governedTreeSha": "25dbc4e87813ee05829834edae378a7c0b06ab8e",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/tasks/ATM-GOV-0258.json",
+      ".atm/history/tasks/TASK-ERR-0004.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/broker-replay-command-surface.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "tests/cli/steward-receipt-error-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run generate:error-codes",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:96d7f551eb9291b8c204cdb823a5c484aab456b17f67a7eed8ce5e0e8bae327d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/steward-receipt-error-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2d3315b26cf2fb7476d2718216eb8ca752e3bae4562f03d0171cea8b7916d33d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1ad3962e05a1cbf3df00da39cb065926c70ed6ff343565ad77347ab06a29c7db",
+      "stderrSha256": "sha256:520084ce1c8dccc67437f13d57eaecff2df4142b6c10623ab6c0227da4eab98c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/steward-receipt-error-contract.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-23T11:00:51.518Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ERR-0004.*",
+      ".atm/history/task-events/TASK-ERR-0004/**",
+      ".atm/history/tasks/TASK-ERR-0004.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
+      "tests/cli/steward-receipt-error-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/error-code-registry.generated.ts",
+      "tests/cli/steward-receipt-error-contract.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ERR-0004.json",
+  "closedAt": "2026-07-23T11:00:51.518Z",
+  "closedByActor": "claude-002-plan31-captain",
+  "sessionId": "session-20260723090203-claude-002-plan31-captain-TASK-ERR-0004-7407c17894",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "92d005a1ba26dcd4bb0aebc225e76c60694786b8",
+    "taskMatchedFiles": [
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
+      "tests/cli/steward-receipt-error-contract.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-ERR-0004.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-ERR-0004/2026-07-23T09-01-45-585Z-import-5deab10e58e4.json",
+      ".atm/history/task-events/TASK-ERR-0004/2026-07-23T09-02-03-043Z-reserve-73c86e464038.json",
+      ".atm/history/task-events/TASK-ERR-0004/2026-07-23T09-02-03-048Z-promote-18806bd0f778.json",
+      ".atm/history/task-events/TASK-ERR-0004/2026-07-23T09-02-16-293Z-claim-851ba9118b2d.json",
+      ".atm/history/task-events/TASK-ERR-0004/2026-07-23T09-36-58-764Z-scope-amendment-42431cff8238.json",
+      ".atm/history/tasks/TASK-ERR-0004.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

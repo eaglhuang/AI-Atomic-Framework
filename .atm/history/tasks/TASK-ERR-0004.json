@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0004",
   "title": "Steward receipt required and invalid shared-write error contracts",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0",
   "dependencies": [
     "ATM-GOV-0249"
@@ -76,8 +76,8 @@
     }
   },
   "importedAt": "2026-07-23T09:01:45.369Z",
-  "lastTransitionId": "2026-07-23T09-02-16-293Z-claim-851ba9118b2d",
-  "lastTransitionAt": "2026-07-23T09:02:16.293Z",
+  "lastTransitionId": "2026-07-23T11-00-51-532Z-close-9751efb16f76",
+  "lastTransitionAt": "2026-07-23T11:00:51.532Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-002-plan31-captain",
   "reservedAt": "2026-07-23T09:02:03.042Z",
@@ -86,22 +86,25 @@
     "actorId": "claude-002-plan31-captain",
     "leaseId": "lease-1e21c07cc1b5",
     "claimedAt": "2026-07-23T09:02:03.058Z",
-    "heartbeatAt": "2026-07-23T09:02:03.058Z",
+    "heartbeatAt": "2026-07-23T11:00:51.530Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-ERR-0004.*",
+      ".atm/history/task-events/TASK-ERR-0004/**",
       ".atm/history/tasks/TASK-ERR-0004.json",
       "docs/ERROR_CODES.md",
       "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
       "tests/cli/steward-receipt-error-contract.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260723090203-claude-002-plan31-captain-913f9f0702",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723090203-claude-002-plan31-captain-913f9f0702\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-23T09:02:03.058Z",
   "startedByActor": "claude-002-plan31-captain",
@@ -120,21 +123,33 @@
       ".atm/history/tasks/TASK-ERR-0004.json",
       "docs/ERROR_CODES.md",
       "docs/governance/error-code-registry.json",
+      "packages/core/src/error-code-registry.generated.ts",
       "tests/cli/steward-receipt-error-contract.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0004-steward-receipt-required-and-invalid-shared-write-error-contracts.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/error-governance/",
+      "docs/ai_atomic_framework/error-governance/tasks/",
+      "docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0004-steward-receipt-required-and-invalid-shared-write-error-contracts.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "9319b82429d4b29cc786a48d9ad373bb23c4a4b80f1f46039325a87a1cdd9d87",
     "actorId": "claude-002-plan31-captain",
-    "sessionId": "session-20260723090203-claude-002-plan31-captain-TASK-ERR-0004-7407c17894",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260723090203-claude-002-plan31-captain-913f9f0702",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723090203-claude-002-plan31-captain-913f9f0702\""
     },
-    "createdAt": "2026-07-23T09:02:16.291Z",
+    "createdAt": "2026-07-23T09:02:16.328Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-23T11:00:51.530Z",
+  "closedByActor": "claude-002-plan31-captain",
+  "closedBySessionId": "session-20260723090203-claude-002-plan31-captain-TASK-ERR-0004-7407c17894",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0004.closure-packet.json"
 }
