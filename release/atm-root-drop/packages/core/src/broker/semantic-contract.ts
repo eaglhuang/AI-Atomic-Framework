@@ -1,3 +1,9 @@
+/**
+ * Semantic revalidation contracts for publish-intent read/write algebra.
+ * Post-compose / pre-steward command-backed validation lives in
+ * `post-compose-semantic-validation-policy.ts` and reuses these validator ref
+ * shapes without introducing a second merge engine or validator registry.
+ */
 import type { MigrationRecord } from './types.ts';
 
 export type SemanticOperationKind = 'create' | 'modify' | 'delete' | 'rename' | 'scalar';

@@ -6,10 +6,29 @@ import {
   patchHunkRangesOverlap,
   sortProposalsForCompose
 } from './merge-plan.ts';
+import { sealValidatorSelection, type SealedValidatorSelection } from './patch-candidate-materializer.ts';
 
 export interface BrokerComposeResult {
   readonly ok: boolean;
   readonly mergePlan: MergePlan;
+}
+
+/**
+ * Capability-driven validator union for a compose result.
+ * No task id, path, language, or date branch — only declared proposal refs plus
+ * optional adapter/catalog capability lists supplied by the caller.
+ */
+export function sealPostComposeValidatorsForProposals(input: {
+  readonly proposals: readonly PatchProposal[];
+  readonly adapterStaticChecks?: readonly string[];
+  readonly catalogTargetedTests?: readonly string[];
+}): SealedValidatorSelection {
+  const cardValidators = input.proposals.flatMap((proposal) => proposal.validators ?? []);
+  return sealValidatorSelection({
+    cardValidators,
+    adapterStaticChecks: input.adapterStaticChecks ?? [],
+    catalogTargetedTests: input.catalogTargetedTests ?? []
+  });
 }
 
 export function composeBrokerProposals(proposals: readonly PatchProposal[]): BrokerComposeResult {

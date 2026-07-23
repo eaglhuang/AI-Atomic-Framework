@@ -152,6 +152,7 @@ export interface PatchProposal {
   readonly resourceOverlaps?: readonly ResourceOverlap[];
   readonly intent: string;
   readonly patch: string;
+  /** Declared validator refs sealed into the post-compose semantic gate union. */
   readonly validators: readonly string[];
   readonly rollback: string;
 }

@@ -1,4 +1,18 @@
 import { anchorKey, buildMergePlan, parsePatchHunkRanges, patchHunkRangesOverlap, sortProposalsForCompose } from './merge-plan.js';
+import { sealValidatorSelection } from './patch-candidate-materializer.js';
+/**
+ * Capability-driven validator union for a compose result.
+ * No task id, path, language, or date branch — only declared proposal refs plus
+ * optional adapter/catalog capability lists supplied by the caller.
+ */
+export function sealPostComposeValidatorsForProposals(input) {
+    const cardValidators = input.proposals.flatMap((proposal) => proposal.validators ?? []);
+    return sealValidatorSelection({
+        cardValidators,
+        adapterStaticChecks: input.adapterStaticChecks ?? [],
+        catalogTargetedTests: input.catalogTargetedTests ?? []
+    });
+}
 export function composeBrokerProposals(proposals) {
     if (proposals.length === 0) {
         throw new Error('compose requires at least one proposal');

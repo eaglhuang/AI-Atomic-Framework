@@ -1,3 +1,9 @@
+/**
+ * Pure semantic revalidation adjudicator.
+ * Targeted validator availability/failure signals here remain advisory algebra
+ * for publish intent; exact post-compose ErrorCode selection for composed
+ * candidates is owned by post-compose-semantic-validation-policy.ts.
+ */
 const MIGRATION = Object.freeze({
     strategy: 'none',
     fromVersion: null,
