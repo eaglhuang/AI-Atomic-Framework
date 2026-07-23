@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0241",
+  "title": "Event-derived replay lifecycle receipt contract",
+  "status": "running",
+  "milestone": "ATM-3.1-R2",
+  "dependencies": [
+    "ATM-GOV-0239"
+  ],
+  "acceptance": [
+    "Every accepted lifecycle step references a successful command or canonical event receipt with task, actor, generation, digest, and time window.",
+    "Every semantic receipt binds command purpose, task/card, actor, ticket generation, shared surface, digest, and time window; unrelated successful commands do not count.",
+    "Admission is derived from canonical ticket state; caller-provided `parallel` cannot override `not-required`, missing, or contradictory decisions. A deliberate non-empty intersection with `not-required` is scenario-invalid and fails under `INV-ATM-008`.",
+    "Same-file intent evidence includes atom/content anchors or bounded source ranges, adapter identity/decision, selected and queued request ids, compose batch membership, legal-order/permutation serializability proof, steward before/after hashes, and shared-commit member attribution.",
+    "Post-compose validation evidence binds the exact candidate-output digest, validator references and sealed selection source, executable/argv/cwd, runner/build digest, timestamps, exit status, and derived result. Serializability is necessary but cannot substitute for semantic validation.",
+    "Semantic validation occurs after candidate composition and before any canonical write. Failed, unavailable, unresolved, or unexecuted required validation is observable as fail/inconclusive and authorizes zero canonical writes.",
+    "The contract distinguishes `compose-selected`, `revalidation-required`, and `queued`; a safe same-file compose may have `waitedMs = 0`, while `waitedMs`, wakeup, queue residency, and starvation are required only when canonical events show a queue transition.",
+    "Missing intent detail, a path-only file lock result, worker direct-write, detached-worktree isolation, or shared output without steward attribution fails closed under `INV-ATM-010`.",
+    "Correctness counters default to unavailable/inconclusive, never zero, when required observations are absent.",
+    "Receipt schema is workload-neutral and rejects unrelated commands that merely match a generic command shape.",
+    "Producer labels are outside the trust boundary: canonical events and command receipts are the authority consumed by independent closure readers.",
+    "Concurrent task-scoped evidence writers use append-only or leased writes and preserve both records; `ATM-BUG-2026-07-19-018` race replay has zero lost updates.",
+    "Telemetry distinguishes registered, code-wired, observed, and sealed/read-back states with event counts and last-observed timestamps; registry membership alone cannot satisfy coverage (`ATM-BUG-2026-07-19-027`).",
+    "Broker decision/outcome pairs include decision class, conflict axes, compose/queue result, wait, rework, override, and delayed correctness outcome, joined by an immutable outcome reference (`ATM-BUG-2026-07-19-036`).",
+    "Declared telemetry obligations are checked before close and expose a command-backed seal/recovery route; raw detail stays runtime-local while compact digest or unavailable receipt enters evidence (`ATM-BUG-2026-07-19-044`)."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/replay/lifecycle-receipts.ts",
+    "packages/core/src/telemetry/parallel-replay/index.ts",
+    "schemas/atm.parallel-replay-evidence.v1.schema.json",
+    "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+    "tests/cli/plan3-telemetry-obligation-seal.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/replay/**",
+    "packages/core/src/telemetry/parallel-replay/**",
+    "packages/cli/src/commands/broker/replay/**",
+    "packages/cli/src/commands/telemetry/**",
+    "schemas/atm.parallel-replay-evidence.v1.schema.json",
+    "tests/e2e/atm-3-real-parallel-replay.test.ts",
+    "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+    "tests/cli/plan3-telemetry-obligation-seal.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+    "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "event-derived-lifecycle-contract-receipts",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert schema and consumers together; unknown receipt versions remain inconclusive.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.parallel-replay",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.replay.lifecycle-receipt-validator",
+        "pattern": "Contract Module",
+        "source": "packages/core/src/broker/replay/lifecycle-receipts.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0241-event-derived-replay-lifecycle-receipt-contract.task.md",
+    "sectionTitle": "ATM-GOV-0241",
+    "headingLine": 50,
+    "hash": "8779341b6e9b0fae",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0241-event-derived-replay-lifecycle-receipt-contract.task.md",
+      "planningCommitSha": "cb7db1b5225a7151109d10e74da68dd1a9338e02",
+      "contentDigest": "sha256:8779341b6e9b0fae1fe1aaf788f6fd146b88877bbcd5014b7b63af42947b9988",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-23T11:40:27.743Z"
+    }
+  },
+  "importedAt": "2026-07-23T11:40:27.743Z",
+  "lastTransitionId": "2026-07-23T11-40-57-312Z-claim-425e26224892",
+  "lastTransitionAt": "2026-07-23T11:40:57.312Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-002-plan31-captain",
+  "reservedAt": "2026-07-23T11:40:45.678Z",
+  "promotedAt": "2026-07-23T11:40:45.680Z",
+  "claim": {
+    "actorId": "cursor-002-plan31-captain",
+    "leaseId": "lease-a00e49a85297",
+    "claimedAt": "2026-07-23T11:40:45.683Z",
+    "heartbeatAt": "2026-07-23T11:40:45.683Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0241.json",
+      "packages/cli/src/commands/broker/replay/**",
+      "packages/cli/src/commands/telemetry/**",
+      "packages/core/src/broker/replay/**",
+      "packages/core/src/telemetry/parallel-replay/**",
+      "schemas/atm.parallel-replay-evidence.v1.schema.json",
+      "tests/cli/plan3-telemetry-obligation-seal.test.ts",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260723114045-cursor-002-plan31-captain-f4b3ebcdeb",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723114045-cursor-002-plan31-captain-f4b3ebcdeb\""
+    }
+  },
+  "startedAt": "2026-07-23T11:40:45.683Z",
+  "startedByActor": "cursor-002-plan31-captain",
+  "startedBySessionId": "session-20260723114045-cursor-002-plan31-captain-ATM-GOV-0241-d2a69853d9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0241",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0241.*",
+      ".atm/history/task-events/ATM-GOV-0241/**",
+      ".atm/history/tasks/ATM-GOV-0241.json",
+      "packages/cli/src/commands/broker/replay/**",
+      "packages/cli/src/commands/telemetry/**",
+      "packages/core/src/broker/replay/**",
+      "packages/core/src/telemetry/parallel-replay/**",
+      "schemas/atm.parallel-replay-evidence.v1.schema.json",
+      "tests/cli/plan3-telemetry-obligation-seal.test.ts",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "96902300e98d940a0fb62458597a02e3de0ac45d3f54e139f35404a29f06163b",
+    "actorId": "cursor-002-plan31-captain",
+    "sessionId": "session-20260723114045-cursor-002-plan31-captain-ATM-GOV-0241-d2a69853d9",
+    "laneSession": {
+      "laneSessionId": "lane-20260723114045-cursor-002-plan31-captain-f4b3ebcdeb",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723114045-cursor-002-plan31-captain-f4b3ebcdeb\""
+    },
+    "createdAt": "2026-07-23T11:40:57.311Z",
+    "status": "active"
+  }
+}

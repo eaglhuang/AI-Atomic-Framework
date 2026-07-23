@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0241",
+  "updatedAt": "2026-07-23T11:48:33.199Z",
+  "updatedBy": "cursor-002-plan31-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+    "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e39a76f05a9d7b2e1b75e20dcdd387bff6887d1b70d20626701ef9efe68576a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts"
+      ],
+      "generatedAt": "2026-07-23T11:48:05.911Z",
+      "startedAt": "2026-07-23T11:48:05.513Z",
+      "finishedAt": "2026-07-23T11:48:05.911Z",
+      "durationMs": 398,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d4df87c2321f761f171943e7713951d5976c4f98",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/plan3-telemetry-obligation-seal.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c62ff23cf4d37e44eddca4d4d8a76e95fb7a9b282df2b0eb8692575d3daea18e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-23T11:48:08.307Z",
+      "startedAt": "2026-07-23T11:48:07.929Z",
+      "finishedAt": "2026-07-23T11:48:08.307Z",
+      "durationMs": 378,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d4df87c2321f761f171943e7713951d5976c4f98",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b52907ae895cc600fe310a8a3a738bf9fa957a69ca4342366d30343c048f78be",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts"
+      ],
+      "generatedAt": "2026-07-23T11:48:15.817Z",
+      "startedAt": "2026-07-23T11:48:11.675Z",
+      "finishedAt": "2026-07-23T11:48:15.817Z",
+      "durationMs": 4142,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d4df87c2321f761f171943e7713951d5976c4f98",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-23T11:48:33.198Z",
+      "startedAt": "2026-07-23T11:48:18.479Z",
+      "finishedAt": "2026-07-23T11:48:33.198Z",
+      "durationMs": 14719,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d4df87c2321f761f171943e7713951d5976c4f98",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
