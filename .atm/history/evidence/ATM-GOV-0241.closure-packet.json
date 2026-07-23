@@ -1,0 +1,190 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0241",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6b44ce89e89183d1a904ab5b7494d25cf9b01e05",
+  "governedTreeSha": "8ed1189cdd2c1bd3e681bfe7b55196b120b9ef7e",
+  "targetCommitDelta": {
+    "currentCommitSha": "6b44ce89e89183d1a904ab5b7494d25cf9b01e05",
+    "parentCommitShas": [
+      "6b44ce89e89183d1a904ab5b7494d25cf9b01e05"
+    ],
+    "governedTreeSha": "8ed1189cdd2c1bd3e681bfe7b55196b120b9ef7e",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0241.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0241.json",
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/tasks/ATM-GOV-0258.json",
+      "packages/core/src/broker/replay/index.ts",
+      "packages/core/src/broker/replay/lifecycle-receipt-observability.ts",
+      "packages/core/src/broker/replay/lifecycle-receipt-types.ts",
+      "packages/core/src/broker/replay/lifecycle-receipt-validation.ts",
+      "packages/core/src/broker/replay/lifecycle-receipts.ts",
+      "packages/core/src/telemetry/parallel-replay/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/broker/replay/index.js",
+      "release/atm-root-drop/packages/core/dist/telemetry/parallel-replay/index.js",
+      "release/atm-root-drop/packages/core/src/broker/replay/index.ts",
+      "release/atm-root-drop/packages/core/src/telemetry/parallel-replay/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "schemas/atm.parallel-replay-evidence.v1.schema.json",
+      "tests/cli/plan3-telemetry-obligation-seal.test.ts",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e39a76f05a9d7b2e1b75e20dcdd387bff6887d1b70d20626701ef9efe68576a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan3-telemetry-obligation-seal.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c62ff23cf4d37e44eddca4d4d8a76e95fb7a9b282df2b0eb8692575d3daea18e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b52907ae895cc600fe310a8a3a738bf9fa957a69ca4342366d30343c048f78be",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:49e13d60853b892dc99e9bf625869d842e558f23ee12c845b9d24e6bc2c0db70",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+    "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-23T13:04:38.620Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0241.*",
+      ".atm/history/task-events/ATM-GOV-0241/**",
+      ".atm/history/tasks/ATM-GOV-0241.json",
+      "packages/cli/src/commands/broker/replay/**",
+      "packages/cli/src/commands/telemetry/**",
+      "packages/core/src/broker/replay/**",
+      "packages/core/src/broker/replay/lifecycle-receipts.ts",
+      "packages/core/src/telemetry/parallel-replay/**",
+      "packages/core/src/telemetry/parallel-replay/index.ts",
+      "schemas/atm.parallel-replay-evidence.v1.schema.json",
+      "tests/cli/plan3-telemetry-obligation-seal.test.ts",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/replay/**",
+      "packages/cli/src/commands/telemetry/**",
+      "packages/core/src/broker/replay/**",
+      "packages/core/src/broker/replay/lifecycle-receipts.ts",
+      "packages/core/src/telemetry/parallel-replay/**",
+      "packages/core/src/telemetry/parallel-replay/index.ts",
+      "schemas/atm.parallel-replay-evidence.v1.schema.json",
+      "tests/cli/plan3-telemetry-obligation-seal.test.ts",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0241.json",
+  "closedAt": "2026-07-23T13:04:38.621Z",
+  "closedByActor": "cursor-002-plan31-captain",
+  "sessionId": "session-20260723114045-cursor-002-plan31-captain-ATM-GOV-0241-d2a69853d9",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6b44ce89e89183d1a904ab5b7494d25cf9b01e05",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/replay/index.ts",
+      "packages/core/src/broker/replay/lifecycle-receipt-observability.ts",
+      "packages/core/src/broker/replay/lifecycle-receipt-types.ts",
+      "packages/core/src/broker/replay/lifecycle-receipt-validation.ts",
+      "packages/core/src/broker/replay/lifecycle-receipts.ts",
+      "packages/core/src/telemetry/parallel-replay/index.ts",
+      "schemas/atm.parallel-replay-evidence.v1.schema.json",
+      "tests/cli/plan3-telemetry-obligation-seal.test.ts",
+      "tests/e2e/atm-3-parallel-replay-faults.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0241.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0241/2026-07-23T11-40-27-934Z-import-88631bb25321.json",
+      ".atm/history/task-events/ATM-GOV-0241/2026-07-23T11-40-45-678Z-reserve-b98f45bde4cb.json",
+      ".atm/history/task-events/ATM-GOV-0241/2026-07-23T11-40-45-680Z-promote-4f424f4f9c19.json",
+      ".atm/history/task-events/ATM-GOV-0241/2026-07-23T11-40-57-312Z-claim-425e26224892.json",
+      ".atm/history/tasks/ATM-GOV-0241.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

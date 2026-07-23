@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T13-04-38-631Z-close-8001e080b9f0",
+  "taskId": "ATM-GOV-0241",
+  "action": "close",
+  "actorId": "cursor-002-plan31-captain",
+  "sessionId": "session-20260723114045-cursor-002-plan31-captain-ATM-GOV-0241-d2a69853d9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0241.json",
+  "taskSha256": "sha256:818698c1ebb115c1395d6874aa79a9af4a0ef23a703b92d3ecd2f01d1efd944a",
+  "createdAt": "2026-07-23T13:04:38.631Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0241 --actor cursor-002-plan31-captain --status done --historical-delivery 6b44ce89e89183d1a904ab5b7494d25cf9b01e05",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260723114045-cursor-002-plan31-captain-ATM-GOV-0241-d2a69853d9",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0241.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/e2e/atm-3-parallel-replay-faults.test.ts",
+      "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-23T13:04:38.620Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0241.*",
+        ".atm/history/task-events/ATM-GOV-0241/**",
+        ".atm/history/tasks/ATM-GOV-0241.json",
+        "packages/cli/src/commands/broker/replay/**",
+        "packages/cli/src/commands/telemetry/**",
+        "packages/core/src/broker/replay/**",
+        "packages/core/src/broker/replay/lifecycle-receipts.ts",
+        "packages/core/src/telemetry/parallel-replay/**",
+        "packages/core/src/telemetry/parallel-replay/index.ts",
+        "schemas/atm.parallel-replay-evidence.v1.schema.json",
+        "tests/cli/plan3-telemetry-obligation-seal.test.ts",
+        "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+        "tests/e2e/atm-3-real-parallel-replay.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/replay/**",
+        "packages/cli/src/commands/telemetry/**",
+        "packages/core/src/broker/replay/**",
+        "packages/core/src/broker/replay/lifecycle-receipts.ts",
+        "packages/core/src/telemetry/parallel-replay/**",
+        "packages/core/src/telemetry/parallel-replay/index.ts",
+        "schemas/atm.parallel-replay-evidence.v1.schema.json",
+        "tests/cli/plan3-telemetry-obligation-seal.test.ts",
+        "tests/e2e/atm-3-parallel-replay-faults.test.ts",
+        "tests/e2e/atm-3-real-parallel-replay.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
