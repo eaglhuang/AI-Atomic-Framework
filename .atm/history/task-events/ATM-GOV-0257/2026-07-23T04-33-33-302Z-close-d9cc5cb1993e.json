@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T04-33-33-302Z-close-d9cc5cb1993e",
+  "taskId": "ATM-GOV-0257",
+  "action": "close",
+  "actorId": "cursor-grok45-plan31-captain",
+  "sessionId": "session-20260723035031-cursor-grok45-plan31-captain-ATM-GOV-0257-4a1b2146dd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0257.json",
+  "taskSha256": "sha256:89efa9f42d2d27cf08a9c8013847f9ef16d3f1206b48431f1d1d59f6dbb31816",
+  "createdAt": "2026-07-23T04:33:33.302Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0257 --actor cursor-grok45-plan31-captain --status done --historical-delivery b7b2d429b363cd55c73b4b588b34e7920fc6aa17",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260723035031-cursor-grok45-plan31-captain-ATM-GOV-0257-4a1b2146dd",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0257.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/command-manifest-recovery-chain.test.ts",
+      "node --strip-types tests/cli/emergency-git-author-continuity.test.ts",
+      "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+      "node --strip-types tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-23T04:33:33.291Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0257.*",
+        ".atm/history/task-events/ATM-GOV-0257/**",
+        ".atm/history/tasks/ATM-GOV-0257.json",
+        "packages/cli/src/commands/actor-registry.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/identity.ts",
+        "packages/cli/src/commands/integration/bootstrap.ts",
+        "packages/cli/src/commands/shared/command-manifest.ts",
+        "packages/cli/src/commands/shared/identity-normalization.ts",
+        "tests/cli/command-manifest-recovery-chain.test.ts",
+        "tests/cli/emergency-git-author-continuity.test.ts",
+        "tests/cli/identity-per-actor-routing.test.ts",
+        "tests/cli/runner-sync-build-actor-continuity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/actor-registry.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/identity.ts",
+        "packages/cli/src/commands/integration/bootstrap.ts",
+        "packages/cli/src/commands/shared/command-manifest.ts",
+        "packages/cli/src/commands/shared/identity-normalization.ts",
+        "tests/cli/command-manifest-recovery-chain.test.ts",
+        "tests/cli/emergency-git-author-continuity.test.ts",
+        "tests/cli/identity-per-actor-routing.test.ts",
+        "tests/cli/runner-sync-build-actor-continuity.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

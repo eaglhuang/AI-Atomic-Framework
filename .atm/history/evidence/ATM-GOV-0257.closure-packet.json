@@ -1,0 +1,191 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0257",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0163b2be9f3e6a01fb38351de850639854d15931",
+  "governedTreeSha": "c47c2c2189f31db868f569386c6655923e060a11",
+  "targetCommitDelta": {
+    "currentCommitSha": "0163b2be9f3e6a01fb38351de850639854d15931",
+    "parentCommitShas": [
+      "0163b2be9f3e6a01fb38351de850639854d15931"
+    ],
+    "governedTreeSha": "c47c2c2189f31db868f569386c6655923e060a11",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0257.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/task-events/ATM-GOV-0257/2026-07-23T03-38-53-129Z-reserve-1cf9bb9c1fe1.json",
+      ".atm/history/task-events/ATM-GOV-0257/2026-07-23T03-38-53-131Z-promote-ee289c1a4138.json",
+      ".atm/history/task-events/ATM-GOV-0257/2026-07-23T03-50-14-010Z-import-8c5fcf6721f9.json",
+      ".atm/history/task-events/ATM-GOV-0257/2026-07-23T03-50-31-865Z-reserve-ea27f9b69da0.json",
+      ".atm/history/task-events/ATM-GOV-0257/2026-07-23T03-50-31-867Z-promote-6c11916daca3.json",
+      ".atm/history/task-events/ATM-GOV-0257/2026-07-23T03-50-42-045Z-claim-ba41bac5a15b.json",
+      ".atm/history/tasks/ATM-GOV-0257.json",
+      "packages/cli/dist/commands/actor-registry.js",
+      "packages/cli/src/commands/actor-registry.ts",
+      "packages/cli/src/commands/shared/identity-normalization.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/actor-registry.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared/identity-normalization.js",
+      "release/atm-root-drop/packages/cli/src/commands/actor-registry.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared/identity-normalization.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "tests/cli/emergency-git-author-continuity.test.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:675b7d3044987517e27b960abe2bc50634fbe0491649312eb32e7bfd771ebbe7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-build-actor-continuity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9ccc97be99e991fc87e80ecbe4081488877d0408a0bd03f5cdd08f159a6d8288",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/command-manifest-recovery-chain.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:eeca639f9cd919c4c52bd0669dff82e283c0d86fc89e512cf68a7c8d6d02fda4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/emergency-git-author-continuity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:67646cd9e2155190d705fe99773d8d556f3f09ca723c9337ecc55ba1ae775453",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:f39825c9355bf45886b03f596cb9feaceef432b4978a21a2462ab45fa458f4ca",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/command-manifest-recovery-chain.test.ts",
+    "node --strip-types tests/cli/emergency-git-author-continuity.test.ts",
+    "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+    "node --strip-types tests/cli/runner-sync-build-actor-continuity.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-23T04:33:33.291Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0257.*",
+      ".atm/history/task-events/ATM-GOV-0257/**",
+      ".atm/history/tasks/ATM-GOV-0257.json",
+      "packages/cli/src/commands/actor-registry.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/identity.ts",
+      "packages/cli/src/commands/integration/bootstrap.ts",
+      "packages/cli/src/commands/shared/command-manifest.ts",
+      "packages/cli/src/commands/shared/identity-normalization.ts",
+      "tests/cli/command-manifest-recovery-chain.test.ts",
+      "tests/cli/emergency-git-author-continuity.test.ts",
+      "tests/cli/identity-per-actor-routing.test.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/actor-registry.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/identity.ts",
+      "packages/cli/src/commands/integration/bootstrap.ts",
+      "packages/cli/src/commands/shared/command-manifest.ts",
+      "packages/cli/src/commands/shared/identity-normalization.ts",
+      "tests/cli/command-manifest-recovery-chain.test.ts",
+      "tests/cli/emergency-git-author-continuity.test.ts",
+      "tests/cli/identity-per-actor-routing.test.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0257.json",
+  "closedAt": "2026-07-23T04:33:33.291Z",
+  "closedByActor": "cursor-grok45-plan31-captain",
+  "sessionId": "session-20260723035031-cursor-grok45-plan31-captain-ATM-GOV-0257-4a1b2146dd",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "b7b2d429b363cd55c73b4b588b34e7920fc6aa17",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/actor-registry.ts",
+      "packages/cli/src/commands/shared/identity-normalization.ts",
+      "tests/cli/emergency-git-author-continuity.test.ts",
+      "tests/cli/runner-sync-build-actor-continuity.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

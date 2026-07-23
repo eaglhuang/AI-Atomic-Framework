@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0257",
   "title": "Actor identity continuity across captain and shared-write lanes",
-  "status": "open",
+  "status": "done",
   "milestone": "ATM-3.1-R0.9",
   "dependencies": [
     "ATM-GOV-0231"
@@ -12,6 +12,8 @@
     "`ATM_ACTOR_ID` or an explicit CLI actor remains authoritative across child build commands; stale `AGENT_IDENTITY` is diagnostic-only when it disagrees.",
     "Commands without sufficient actor continuity fail before mutation and identify the active claim/ticket owner plus the exact recovery command.",
     "Regressions cover Codex and Claude actor handoff, stale repo defaults, stale legacy environment identity, and queue-head actor mismatch.",
+    "Identity provenance distinguishes verified active actor/lane authority from editor/model/ambient hints across Codex, Claude, Cursor, Gemini/Antigravity, and other adapters (`ATM-BUG-2026-07-12-115`).",
+    "Emergency/native fallback manifests, when explicitly authorized, set Git author and committer identity from the active actor authority and verify trailers plus commit metadata; stale host author cannot silently survive (`ATM-BUG-2026-07-22-236`).",
     "No task id, actor slug, editor, or model name is hard-coded into the policy.",
     "Backlog item `ATM-BUG-2026-07-22-226` is linked in delivery evidence."
   ],
@@ -23,7 +25,8 @@
     "packages/cli/src/commands/integration/bootstrap.ts",
     "tests/cli/identity-per-actor-routing.test.ts",
     "tests/cli/runner-sync-build-actor-continuity.test.ts",
-    "tests/cli/command-manifest-recovery-chain.test.ts"
+    "tests/cli/command-manifest-recovery-chain.test.ts",
+    "tests/cli/emergency-git-author-continuity.test.ts"
   ],
   "scopePaths": [
     "packages/cli/src/commands/actor-registry.ts",
@@ -34,12 +37,14 @@
     "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
     "tests/cli/identity-per-actor-routing.test.ts",
     "tests/cli/runner-sync-build-actor-continuity.test.ts",
-    "tests/cli/command-manifest-recovery-chain.test.ts"
+    "tests/cli/command-manifest-recovery-chain.test.ts",
+    "tests/cli/emergency-git-author-continuity.test.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
     "node --strip-types tests/cli/runner-sync-build-actor-continuity.test.ts",
     "node --strip-types tests/cli/command-manifest-recovery-chain.test.ts",
+    "node --strip-types tests/cli/emergency-git-author-continuity.test.ts",
     "npm run typecheck"
   ],
   "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
@@ -74,31 +79,31 @@
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0257-actor-identity-continuity-across-captain-and-shared-write-lanes.task.md",
     "sectionTitle": "ATM-GOV-0257",
-    "headingLine": 57,
-    "hash": "5c90f8d61cca89fa",
+    "headingLine": 60,
+    "hash": "f911d86c96fdae7a",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0257-actor-identity-continuity-across-captain-and-shared-write-lanes.task.md",
-      "planningCommitSha": "72ae22bcfbc04804caec123a4e89b2c979d65b78",
-      "contentDigest": "sha256:5c90f8d61cca89fac37f47da3bdb7e353640b252e9035d808e0a285e1764efa0",
+      "planningCommitSha": "cb7db1b5225a7151109d10e74da68dd1a9338e02",
+      "contentDigest": "sha256:f911d86c96fdae7a1064df4589991ef8e6a4edbe81ec5711ca1c051202bcdad7",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-22T12:15:53.364Z"
+      "sealedAt": "2026-07-23T03:50:13.821Z"
     }
   },
-  "importedAt": "2026-07-22T12:15:53.364Z",
-  "lastTransitionId": "2026-07-22T12-24-25-779Z-release-453c6c2c7e66",
-  "lastTransitionAt": "2026-07-22T12:24:25.779Z",
+  "importedAt": "2026-07-23T03:50:13.821Z",
+  "lastTransitionId": "2026-07-23T04-33-33-302Z-close-d9cc5cb1993e",
+  "lastTransitionAt": "2026-07-23T04:33:33.302Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-grok45-plan31-captain",
-  "reservedAt": "2026-07-22T12:16:02.975Z",
-  "promotedAt": "2026-07-22T12:16:02.979Z",
+  "reservedAt": "2026-07-23T03:50:31.864Z",
+  "promotedAt": "2026-07-23T03:50:31.867Z",
   "claim": {
     "actorId": "cursor-grok45-plan31-captain",
-    "leaseId": "lease-78310794ebd8",
-    "claimedAt": "2026-07-22T12:16:02.981Z",
-    "heartbeatAt": "2026-07-22T12:24:25.689Z",
+    "leaseId": "lease-266cc0cebfc9",
+    "claimedAt": "2026-07-23T03:50:31.870Z",
+    "heartbeatAt": "2026-07-23T04:33:33.299Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0257.json",
@@ -109,21 +114,22 @@
       "packages/cli/src/commands/shared/command-manifest.ts",
       "packages/cli/src/commands/shared/identity-normalization.ts",
       "tests/cli/command-manifest-recovery-chain.test.ts",
+      "tests/cli/emergency-git-author-continuity.test.ts",
       "tests/cli/identity-per-actor-routing.test.ts",
       "tests/cli/runner-sync-build-actor-continuity.test.ts"
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260722121603-cursor-grok45-plan31-captain-059b0787a7",
+      "laneSessionId": "lane-20260723035031-cursor-grok45-plan31-captain-d25fda7a63",
       "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722121603-cursor-grok45-plan31-captain-059b0787a7\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723035031-cursor-grok45-plan31-captain-d25fda7a63\""
     },
-    "reason": "Captain arbitration: release ATM-GOV-0257 so ATM-GOV-0256 runner-sync freshness foundation can proceed first."
+    "reason": "closed"
   },
-  "startedAt": "2026-07-22T12:16:02.981Z",
+  "startedAt": "2026-07-23T03:50:31.870Z",
   "startedByActor": "cursor-grok45-plan31-captain",
-  "startedBySessionId": "session-20260722121602-cursor-grok45-plan31-captain-ATM-GOV-0257-05a3a4ad13",
+  "startedBySessionId": "session-20260723035031-cursor-grok45-plan31-captain-ATM-GOV-0257-4a1b2146dd",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -143,6 +149,7 @@
       "packages/cli/src/commands/shared/command-manifest.ts",
       "packages/cli/src/commands/shared/identity-normalization.ts",
       "tests/cli/command-manifest-recovery-chain.test.ts",
+      "tests/cli/emergency-git-author-continuity.test.ts",
       "tests/cli/identity-per-actor-routing.test.ts",
       "tests/cli/runner-sync-build-actor-continuity.test.ts"
     ],
@@ -151,14 +158,18 @@
     "allowPlanningMirror": false,
     "promptHash": "08bc882b3e194c2b3fb45ee725e2a2c4cb542141d8e804aef46662e1e974a69e",
     "actorId": "cursor-grok45-plan31-captain",
-    "sessionId": "session-20260722121602-cursor-grok45-plan31-captain-ATM-GOV-0257-05a3a4ad13",
+    "sessionId": "session-20260723035031-cursor-grok45-plan31-captain-ATM-GOV-0257-4a1b2146dd",
     "laneSession": {
-      "laneSessionId": "lane-20260722121603-cursor-grok45-plan31-captain-059b0787a7",
+      "laneSessionId": "lane-20260723035031-cursor-grok45-plan31-captain-d25fda7a63",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260722121603-cursor-grok45-plan31-captain-059b0787a7\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723035031-cursor-grok45-plan31-captain-d25fda7a63\""
     },
-    "createdAt": "2026-07-22T12:16:09.596Z",
+    "createdAt": "2026-07-23T03:50:42.044Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-23T04:33:33.299Z",
+  "closedByActor": "cursor-grok45-plan31-captain",
+  "closedBySessionId": "session-20260723035031-cursor-grok45-plan31-captain-ATM-GOV-0257-4a1b2146dd",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0257.closure-packet.json"
 }
