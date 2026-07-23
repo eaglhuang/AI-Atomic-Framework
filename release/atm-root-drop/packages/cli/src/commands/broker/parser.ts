@@ -39,7 +39,8 @@ const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
 
 export interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | 'parallel-admission' | 'replay' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | 'parallel-admission' | 'replay' | 'post-compose-semantic-validation' | null;
+  readonly candidateFile: string | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
@@ -106,6 +107,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     batchAction: null as ParsedBrokerOptions['batchAction'],
     parallelAdmissionAction: null as ParsedBrokerOptions['parallelAdmissionAction'],
     replayAction: null as ParsedBrokerOptions['replayAction'],
+    candidateFile: null as string | null,
     policyMode: null as ParsedBrokerOptions['policyMode'],
     policyFallbackMode: null as ParsedBrokerOptions['policyFallbackMode'],
     policyCircuitBreaker: null as boolean | null,
@@ -386,6 +388,11 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       state.apply = true;
       continue;
     }
+    if (arg === '--candidate-file') {
+      state.candidateFile = requireValue(argv, index, '--candidate-file');
+      index += 1;
+      continue;
+    }
     if (arg.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `broker does not support option ${arg}`, { exitCode: 2 });
     }
@@ -427,6 +434,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
   return {
     cwd: path.resolve(state.cwd),
     action: state.action,
+    candidateFile: state.candidateFile,
     proposalAction: state.proposalAction,
     stewardAction: state.stewardAction,
     runtimeAction: state.runtimeAction,

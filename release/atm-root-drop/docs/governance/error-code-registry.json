@@ -669,6 +669,98 @@
       "sourceOwner": "packages/core/src/broker/shared-write-provenance-policy.ts"
     },
     {
+      "code": "ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED",
+      "category": "team-broker",
+      "shortDescription": "An exact composed candidate executed required semantic validators and at least one command-backed result failed.",
+      "trigger": "A materialized compose candidate ran one or more required sealed validators and received a failing command-backed exit result before any canonical write.",
+      "commonCauses": [
+        "Two otherwise serializable proposals compose into a candidate that breaks a sealed static check or targeted behavior test.",
+        "A required validator was executed against the exact candidate and returned a non-zero exit code.",
+        "A caller attempted to treat serializability proof as a substitute for semantic validation."
+      ],
+      "remediation": [
+        "Repair or recompute the conflicting proposals against the current base/HEAD.",
+        "Rematerialize the exact composed candidate and rerun the same sealed validator set with node atm.mjs broker post-compose-semantic-validation --candidate-file <path> --json.",
+        "Do not authorize a canonical write, skip the failing validator, or substitute a healthy boolean for the failed command-backed result."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs broker compose --proposal-file <proposal> --json",
+        "node atm.mjs broker post-compose-semantic-validation --candidate-file <path> --json"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "post-compose-semantic-validation",
+            "--candidate-file",
+            "<path>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "requiredEvidence": [
+        "Exact composed candidate digest bound to the current base/HEAD.",
+        "Command-backed validator receipts for the sealed validator set, including the failing exit result.",
+        "Proof that zero canonical writes occurred after the failed validation."
+      ],
+      "registryOwner": "TASK-ERR-0006",
+      "sourceOwner": "packages/core/src/broker/post-compose-semantic-validation-policy.ts"
+    },
+    {
+      "code": "ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE",
+      "category": "team-broker",
+      "shortDescription": "A required language or project validator could not be resolved, executed, or proven with a command-backed result.",
+      "trigger": "A required sealed validator for a materialized compose candidate is missing, unresolved, unexecuted, malformed, or lacks a command-backed result before any canonical write.",
+      "commonCauses": [
+        "The declared language/project validator binary or adapter is missing from the environment.",
+        "A validator receipt is digest-only, label-only, or otherwise not command-backed.",
+        "A required validator was skipped or marked healthy without an executable argv/cwd/exit receipt."
+      ],
+      "remediation": [
+        "Restore or resolve the declared language/project validator named by the sealed selection source.",
+        "Rematerialize the exact composed candidate and rerun semantic validation with node atm.mjs broker post-compose-semantic-validation --candidate-file <path> --json.",
+        "Do not skip the unavailable validator, invent a healthy boolean, or authorize a canonical write while validation remains unavailable."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs broker compose --proposal-file <proposal> --json",
+        "node atm.mjs broker post-compose-semantic-validation --candidate-file <path> --json"
+      ],
+      "statusCommand": "node atm.mjs broker status --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "broker",
+            "post-compose-semantic-validation",
+            "--candidate-file",
+            "<path>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "requiredEvidence": [
+        "Exact composed candidate digest bound to the current base/HEAD.",
+        "Resolved validator identity plus command-backed executable/argv/cwd/exit receipts for every required sealed validator.",
+        "Proof that zero canonical writes occurred while validation was unavailable."
+      ],
+      "registryOwner": "TASK-ERR-0006",
+      "sourceOwner": "packages/core/src/broker/post-compose-semantic-validation-policy.ts"
+    },
+    {
       "code": "ATM_SCOPE_AMENDMENT_REQUIRED",
       "category": "task-ledger",
       "shortDescription": "A task needs an explicit governed scope amendment before touching linked files outside its current contract.",

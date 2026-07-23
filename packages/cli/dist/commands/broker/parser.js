@@ -17,6 +17,7 @@ export function parseBrokerArgs(argv) {
         batchAction: null,
         parallelAdmissionAction: null,
         replayAction: null,
+        candidateFile: null,
         policyMode: null,
         policyFallbackMode: null,
         policyCircuitBreaker: null,
@@ -296,6 +297,11 @@ export function parseBrokerArgs(argv) {
             state.apply = true;
             continue;
         }
+        if (arg === '--candidate-file') {
+            state.candidateFile = requireValue(argv, index, '--candidate-file');
+            index += 1;
+            continue;
+        }
         if (arg.startsWith('--')) {
             throw new CliError('ATM_CLI_USAGE', `broker does not support option ${arg}`, { exitCode: 2 });
         }
@@ -347,6 +353,7 @@ export function parseBrokerArgs(argv) {
     return {
         cwd: path.resolve(state.cwd),
         action: state.action,
+        candidateFile: state.candidateFile,
         proposalAction: state.proposalAction,
         stewardAction: state.stewardAction,
         runtimeAction: state.runtimeAction,

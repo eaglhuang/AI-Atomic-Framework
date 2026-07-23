@@ -11,6 +11,7 @@ import { handleBrokerWaveScheduler } from './wave-scheduler-actions.ts';
 import { handleBrokerBatchExecute } from './batch-execute-actions.ts';
 import { handleBrokerParallelAdmissionPolicy } from './policy-actions.ts';
 import { handleBrokerReplayActions } from './replay-actions.ts';
+import { runPostComposeSemanticValidation } from './post-compose-semantic-validation.ts';
 
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);
@@ -22,6 +23,13 @@ export async function runBroker(argv: string[]) {
     projectionStewardPath: path.join(options.cwd, '.atm', 'runtime', 'generated-projection-steward.json'),
     waveSchedulerPath: path.join(options.cwd, '.atm', 'runtime', 'wave-broker-scheduler.json')
   };
+
+  if (options.action === 'post-compose-semantic-validation') {
+    return runPostComposeSemanticValidation({
+      cwd: options.cwd,
+      candidateFile: options.candidateFile
+    });
+  }
 
   const stewardQueueResult = handleBrokerStewardQueues(options, context);
   if (stewardQueueResult) return stewardQueueResult;
@@ -42,5 +50,5 @@ export async function runBroker(argv: string[]) {
   const replayResult = await handleBrokerReplayActions(options);
   if (replayResult) return replayResult;
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch, parallel-admission, replay', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch, parallel-admission, replay, post-compose-semantic-validation', { exitCode: 2 });
 }

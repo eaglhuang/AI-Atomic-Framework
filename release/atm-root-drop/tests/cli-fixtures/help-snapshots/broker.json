@@ -4,7 +4,7 @@
   "positional": [
     {
       "name": "action",
-      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay",
+      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | post-compose-semantic-validation",
       "required": true
     },
     {
@@ -163,6 +163,11 @@
       "flag": "--source-item",
       "value": "path",
       "summary": "Source item shard for broker projection enqueue. Repeatable."
+    },
+    {
+      "flag": "--candidate-file",
+      "value": "path",
+      "summary": "Exact composed candidate JSON for post-compose semantic validation."
     },
     {
       "flag": "--proposal-file",
