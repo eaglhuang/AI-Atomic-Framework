@@ -1,0 +1,213 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0254",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "35a08fc6b243f6a4a6410211825afddedf9e53c5",
+  "governedTreeSha": "01b6547f1d8693a358d1b082109b082891b45cdd",
+  "targetCommitDelta": {
+    "currentCommitSha": "35a08fc6b243f6a4a6410211825afddedf9e53c5",
+    "parentCommitShas": [
+      "35a08fc6b243f6a4a6410211825afddedf9e53c5"
+    ],
+    "governedTreeSha": "01b6547f1d8693a358d1b082109b082891b45cdd",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/tasks/ATM-GOV-0258.json",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/patch-candidate-materializer.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/broker/semantic-adjudication/policy.ts",
+      "packages/core/src/broker/semantic-contract.ts",
+      "packages/core/src/broker/types.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/compose.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/semantic-adjudication/policy.js",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/src/broker/compose.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/semantic-adjudication/policy.ts",
+      "release/atm-root-drop/packages/core/src/broker/semantic-contract.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/governance/post-compose-semantic-validation.schema.json",
+      "tests/cli/post-compose-semantic-validation.test.ts",
+      "tests/core/patch-candidate-materializer.test.ts",
+      "tests/core/post-compose-semantic-validation-policy.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/patch-candidate-materializer.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a32886b41660036395191222b799c24c04f17f60c21b4fe11e7c8fdec479194c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/core/post-compose-semantic-validation-policy.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c4c410a8b489cf4103a23dc20905489b45d7065802d916c29ca68366d00d4f19",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/post-compose-semantic-validation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c631fbf7a309dac8899b0ef4fbe037bb8e844e837b101f328f17cb44230efd4e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:139557ec24c24c19030794134ad913ada3a500b23d7cb3ab0ffe832bae6f3285",
+      "stderrSha256": "sha256:40afd20ce6768b66980285d4135bd9cab38be310403e9aa45b5a1efa49e8b687",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/post-compose-semantic-validation.test.ts",
+    "node --strip-types tests/core/patch-candidate-materializer.test.ts",
+    "node --strip-types tests/core/post-compose-semantic-validation-policy.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-23T14:22:37.824Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0254.*",
+      ".atm/history/task-events/ATM-GOV-0254/**",
+      ".atm/history/tasks/ATM-GOV-0254.json",
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/patch-candidate-materializer.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/broker/semantic-adjudication/policy.ts",
+      "packages/core/src/broker/semantic-contract.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/post-compose-semantic-validation.schema.json",
+      "tests/cli/post-compose-semantic-validation.test.ts",
+      "tests/core/patch-candidate-materializer.test.ts",
+      "tests/core/post-compose-semantic-validation-policy.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/patch-candidate-materializer.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/broker/semantic-adjudication/policy.ts",
+      "packages/core/src/broker/semantic-contract.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/post-compose-semantic-validation.schema.json",
+      "tests/cli/post-compose-semantic-validation.test.ts",
+      "tests/core/patch-candidate-materializer.test.ts",
+      "tests/core/post-compose-semantic-validation-policy.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0254.json",
+  "closedAt": "2026-07-23T14:22:37.824Z",
+  "closedByActor": "cursor-002-plan31-captain",
+  "sessionId": "session-20260723135950-cursor-002-plan31-captain-ATM-GOV-0254-8a169af6ec",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "35a08fc6b243f6a4a6410211825afddedf9e53c5",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/patch-candidate-materializer.ts",
+      "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+      "packages/core/src/broker/semantic-adjudication/policy.ts",
+      "packages/core/src/broker/semantic-contract.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/governance/post-compose-semantic-validation.schema.json",
+      "tests/cli/post-compose-semantic-validation.test.ts",
+      "tests/core/patch-candidate-materializer.test.ts",
+      "tests/core/post-compose-semantic-validation-policy.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0254.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0254/2026-07-23T13-59-33-684Z-import-27305eae55be.json",
+      ".atm/history/task-events/ATM-GOV-0254/2026-07-23T13-59-50-503Z-reserve-e68f71a91d81.json",
+      ".atm/history/task-events/ATM-GOV-0254/2026-07-23T13-59-50-506Z-promote-4baa1167afa6.json",
+      ".atm/history/task-events/ATM-GOV-0254/2026-07-23T14-00-03-603Z-claim-b333e1c1fec2.json",
+      ".atm/history/tasks/ATM-GOV-0254.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

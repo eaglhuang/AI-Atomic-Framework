@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T14-22-37-833Z-close-47ea8e75647f",
+  "taskId": "ATM-GOV-0254",
+  "action": "close",
+  "actorId": "cursor-002-plan31-captain",
+  "sessionId": "session-20260723135950-cursor-002-plan31-captain-ATM-GOV-0254-8a169af6ec",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0254.json",
+  "taskSha256": "sha256:0305e0c500ac163580b58bceec6270211079763a28e7e7214fd6c361ff6fccfc",
+  "createdAt": "2026-07-23T14:22:37.833Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0254 --actor cursor-002-plan31-captain --status done --historical-delivery 35a08fc6b243f6a4a6410211825afddedf9e53c5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260723135950-cursor-002-plan31-captain-ATM-GOV-0254-8a169af6ec",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0254.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/post-compose-semantic-validation.test.ts",
+      "node --strip-types tests/core/patch-candidate-materializer.test.ts",
+      "node --strip-types tests/core/post-compose-semantic-validation-policy.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-23T14:22:37.824Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0254.*",
+        ".atm/history/task-events/ATM-GOV-0254/**",
+        ".atm/history/tasks/ATM-GOV-0254.json",
+        "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/patch-candidate-materializer.ts",
+        "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+        "packages/core/src/broker/semantic-adjudication/policy.ts",
+        "packages/core/src/broker/semantic-contract.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/governance/post-compose-semantic-validation.schema.json",
+        "tests/cli/post-compose-semantic-validation.test.ts",
+        "tests/core/patch-candidate-materializer.test.ts",
+        "tests/core/post-compose-semantic-validation-policy.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/post-compose-semantic-validation.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/patch-candidate-materializer.ts",
+        "packages/core/src/broker/post-compose-semantic-validation-policy.ts",
+        "packages/core/src/broker/semantic-adjudication/policy.ts",
+        "packages/core/src/broker/semantic-contract.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/governance/post-compose-semantic-validation.schema.json",
+        "tests/cli/post-compose-semantic-validation.test.ts",
+        "tests/core/patch-candidate-materializer.test.ts",
+        "tests/core/post-compose-semantic-validation-policy.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

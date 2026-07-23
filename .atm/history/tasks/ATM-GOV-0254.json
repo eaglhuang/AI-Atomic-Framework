@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0254",
   "title": "Transactional patch materialization and post-compose semantic validation",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R2",
   "dependencies": [
     "ATM-GOV-0241",
@@ -127,8 +127,8 @@
     }
   },
   "importedAt": "2026-07-23T13:59:33.464Z",
-  "lastTransitionId": "2026-07-23T14-00-03-603Z-claim-b333e1c1fec2",
-  "lastTransitionAt": "2026-07-23T14:00:03.603Z",
+  "lastTransitionId": "2026-07-23T14-22-37-833Z-close-47ea8e75647f",
+  "lastTransitionAt": "2026-07-23T14:22:37.833Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-002-plan31-captain",
   "reservedAt": "2026-07-23T13:59:50.503Z",
@@ -137,7 +137,7 @@
     "actorId": "cursor-002-plan31-captain",
     "leaseId": "lease-28f0e7fb4fe1",
     "claimedAt": "2026-07-23T13:59:50.509Z",
-    "heartbeatAt": "2026-07-23T13:59:50.509Z",
+    "heartbeatAt": "2026-07-23T14:22:37.831Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0254.json",
@@ -154,14 +154,14 @@
       "tests/core/patch-candidate-materializer.test.ts",
       "tests/core/post-compose-semantic-validation-policy.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260723135950-cursor-002-plan31-captain-264ac4fb22",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723135950-cursor-002-plan31-captain-264ac4fb22\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-23T13:59:50.509Z",
   "startedByActor": "cursor-002-plan31-captain",
@@ -205,5 +205,9 @@
     },
     "createdAt": "2026-07-23T14:00:03.602Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-23T14:22:37.831Z",
+  "closedByActor": "cursor-002-plan31-captain",
+  "closedBySessionId": "session-20260723135950-cursor-002-plan31-captain-ATM-GOV-0254-8a169af6ec",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0254.closure-packet.json"
 }
