@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0262",
   "title": "Canonical overlap matcher call-site parity",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0.14",
   "dependencies": [
     "ATM-GOV-0255"
@@ -96,8 +96,8 @@
     }
   },
   "importedAt": "2026-07-23T04:00:12.115Z",
-  "lastTransitionId": "2026-07-23T04-00-44-299Z-claim-034f81f775fa",
-  "lastTransitionAt": "2026-07-23T04:00:44.299Z",
+  "lastTransitionId": "2026-07-23T04-22-53-998Z-close-ff569734ec54",
+  "lastTransitionAt": "2026-07-23T04:22:53.998Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-plan31-captain",
   "reservedAt": "2026-07-23T04:00:30.676Z",
@@ -106,7 +106,7 @@
     "actorId": "claude-plan31-captain",
     "leaseId": "lease-748f5edaee46",
     "claimedAt": "2026-07-23T04:00:30.684Z",
-    "heartbeatAt": "2026-07-23T04:00:30.684Z",
+    "heartbeatAt": "2026-07-23T04:22:53.995Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0262.json",
@@ -117,14 +117,14 @@
       "tests/core/broker-overlap-callsite-parity.test.ts",
       "tests/core/broker-resource-overlap.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260723040030-claude-plan31-captain-9cc9d19e3d",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723040030-claude-plan31-captain-9cc9d19e3d\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-23T04:00:30.684Z",
   "startedByActor": "claude-plan31-captain",
@@ -162,5 +162,9 @@
     },
     "createdAt": "2026-07-23T04:00:44.298Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-23T04:22:53.995Z",
+  "closedByActor": "claude-plan31-captain",
+  "closedBySessionId": "session-20260723040030-claude-plan31-captain-ATM-GOV-0262-ded63281b1",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0262.closure-packet.json"
 }

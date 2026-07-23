@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-23T04-22-53-998Z-close-ff569734ec54",
+  "taskId": "ATM-GOV-0262",
+  "action": "close",
+  "actorId": "claude-plan31-captain",
+  "sessionId": "session-20260723040030-claude-plan31-captain-ATM-GOV-0262-ded63281b1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0262.json",
+  "taskSha256": "sha256:b18be8628fc38ce4b3839216e917ab95920025ccfbbbd01e3d0037e1b84b85db",
+  "createdAt": "2026-07-23T04:22:53.998Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0262 --actor claude-plan31-captain --status done --historical-delivery 36083cee102d9c7fb793931332de81a2ea7ab93e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260723040030-claude-plan31-captain-ATM-GOV-0262-ded63281b1",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0262.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/core/broker-overlap-callsite-parity.test.ts",
+      "node --strip-types tests/core/broker-resource-overlap.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-23T04:22:53.984Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0262.*",
+        ".atm/history/task-events/ATM-GOV-0262/**",
+        ".atm/history/tasks/ATM-GOV-0262.json",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/decision/physical-overlap.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "packages/core/src/broker/resource-overlap.ts",
+        "tests/core/broker-overlap-callsite-parity.test.ts",
+        "tests/core/broker-resource-overlap.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/decision/physical-overlap.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "packages/core/src/broker/resource-overlap.ts",
+        "tests/core/broker-overlap-callsite-parity.test.ts",
+        "tests/core/broker-resource-overlap.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
