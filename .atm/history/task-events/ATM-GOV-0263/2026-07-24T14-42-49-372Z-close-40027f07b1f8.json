@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T14-42-49-372Z-close-40027f07b1f8",
+  "taskId": "ATM-GOV-0263",
+  "action": "close",
+  "actorId": "claude-002-plan31-captain",
+  "sessionId": "session-20260724141215-claude-002-plan31-captain-ATM-GOV-0263-38bbae71de",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0263.json",
+  "taskSha256": "sha256:2b819e6bd4d5dca93e09494de81fc95e6458d709376170bf19402cb4a993bb2c",
+  "createdAt": "2026-07-24T14:42:49.372Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0263 --actor claude-002-plan31-captain --status done --historical-delivery 7e6af41561f0f6ea8790a0c2f8c2526e77b3122f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724141215-claude-002-plan31-captain-ATM-GOV-0263-38bbae71de",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0263.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/autonomous-task-continuation.test.ts",
+      "node --strip-types tests/cli/batch-done-task-pruning.test.ts",
+      "node --strip-types tests/cli/next-emitted-command-executability.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T14:42:49.362Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0263.*",
+        ".atm/history/task-events/ATM-GOV-0263/**",
+        ".atm/history/tasks/ATM-GOV-0263.json",
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+        "packages/cli/src/commands/next/route-resolution/**",
+        "packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+        "packages/cli/src/commands/shared/command-manifest.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "tests/cli/autonomous-task-continuation.test.ts",
+        "tests/cli/batch-done-task-pruning.test.ts",
+        "tests/cli/next-emitted-command-executability.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+        "packages/cli/src/commands/next/route-resolution/**",
+        "packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+        "packages/cli/src/commands/shared/command-manifest.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "tests/cli/autonomous-task-continuation.test.ts",
+        "tests/cli/batch-done-task-pruning.test.ts",
+        "tests/cli/next-emitted-command-executability.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0263",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "7e6af41561f0f6ea8790a0c2f8c2526e77b3122f",
+  "governedTreeSha": "df00a5e10d3699a7cd4d07cb611d9194b74d7d67",
+  "targetCommitDelta": {
+    "currentCommitSha": "7e6af41561f0f6ea8790a0c2f8c2526e77b3122f",
+    "parentCommitShas": [
+      "7e6af41561f0f6ea8790a0c2f8c2526e77b3122f"
+    ],
+    "governedTreeSha": "df00a5e10d3699a7cd4d07cb611d9194b74d7d67",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0259.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0263.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      "packages/cli/dist/commands/next/playbook-projection/active-work-summary.js",
+      "packages/cli/dist/commands/next/route-resolution/intent.js",
+      "packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/route-resolution/intent.ts",
+      "packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+      "packages/cli/src/commands/shared/command-manifest.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection/active-work-summary.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-resolution/intent.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared/command-manifest.js",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-resolution/intent.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared/command-manifest.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/autonomous-task-continuation.test.ts",
+      "tests/cli/batch-done-task-pruning.test.ts",
+      "tests/cli/next-emitted-command-executability.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/next-emitted-command-executability.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a60a0b6b0e24dc05e890dc590f25f327a4d2d2380ecdd3d5fc03bece044c96c8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/batch-done-task-pruning.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:742da267c0429823370e12c19c7ed0f1456dbde9fa6c58fbed70f8b44028a443",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/autonomous-task-continuation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ac01830df59f0e9f69faa20bb260c04cded44c4c6fc507dee85e64ac40305aba",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6b85b34caec4dd9c9141003810eba937b373d719a04e206ddb85d637b362bf3",
+      "stderrSha256": "sha256:66811d21f4d7fc9902e693af32602f88dbd3ae9f84849bf3474478ea9f6a386f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/autonomous-task-continuation.test.ts",
+    "node --strip-types tests/cli/batch-done-task-pruning.test.ts",
+    "node --strip-types tests/cli/next-emitted-command-executability.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-24T14:42:49.362Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0263.*",
+      ".atm/history/task-events/ATM-GOV-0263/**",
+      ".atm/history/tasks/ATM-GOV-0263.json",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/route-resolution/**",
+      "packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+      "packages/cli/src/commands/shared/command-manifest.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/work-channels.ts",
+      "tests/cli/autonomous-task-continuation.test.ts",
+      "tests/cli/batch-done-task-pruning.test.ts",
+      "tests/cli/next-emitted-command-executability.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/route-resolution/**",
+      "packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+      "packages/cli/src/commands/shared/command-manifest.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/work-channels.ts",
+      "tests/cli/autonomous-task-continuation.test.ts",
+      "tests/cli/batch-done-task-pruning.test.ts",
+      "tests/cli/next-emitted-command-executability.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0263.json",
+  "closedAt": "2026-07-24T14:42:49.362Z",
+  "closedByActor": "claude-002-plan31-captain",
+  "sessionId": "session-20260724141215-claude-002-plan31-captain-ATM-GOV-0263-38bbae71de",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "7e6af41561f0f6ea8790a0c2f8c2526e77b3122f",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/route-resolution/intent.ts",
+      "packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+      "packages/cli/src/commands/shared/command-manifest.ts",
+      "tests/cli/autonomous-task-continuation.test.ts",
+      "tests/cli/batch-done-task-pruning.test.ts",
+      "tests/cli/next-emitted-command-executability.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0263/2026-07-24T14-11-58-746Z-import-d2d605156244.json",
+      ".atm/history/task-events/ATM-GOV-0263/2026-07-24T14-12-15-231Z-reserve-de19a475fb08.json",
+      ".atm/history/task-events/ATM-GOV-0263/2026-07-24T14-12-15-234Z-promote-1f5e1f89382a.json",
+      ".atm/history/task-events/ATM-GOV-0263/2026-07-24T14-12-25-975Z-claim-bc305ea25056.json",
+      ".atm/history/tasks/ATM-GOV-0263.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

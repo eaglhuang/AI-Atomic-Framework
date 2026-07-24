@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0263",
   "title": "Autonomous continuation and executable recovery parity",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0.15",
   "dependencies": [
     "ATM-GOV-0257",
@@ -102,8 +102,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-24T14-12-25-975Z-claim-bc305ea25056",
-  "lastTransitionAt": "2026-07-24T14:12:25.975Z",
+  "lastTransitionId": "2026-07-24T14-42-49-372Z-close-40027f07b1f8",
+  "lastTransitionAt": "2026-07-24T14:42:49.372Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-002-plan31-captain",
   "reservedAt": "2026-07-24T14:12:15.231Z",
@@ -112,7 +112,7 @@
     "actorId": "claude-002-plan31-captain",
     "leaseId": "lease-1cc97df447a4",
     "claimedAt": "2026-07-24T14:12:15.238Z",
-    "heartbeatAt": "2026-07-24T14:12:15.238Z",
+    "heartbeatAt": "2026-07-24T14:42:49.370Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0263.json",
@@ -126,14 +126,14 @@
       "tests/cli/batch-done-task-pruning.test.ts",
       "tests/cli/next-emitted-command-executability.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260724141215-claude-002-plan31-captain-e1cdabf7d8",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724141215-claude-002-plan31-captain-e1cdabf7d8\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-24T14:12:15.238Z",
   "startedByActor": "claude-002-plan31-captain",
@@ -174,5 +174,9 @@
     },
     "createdAt": "2026-07-24T14:12:25.975Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-24T14:42:49.370Z",
+  "closedByActor": "claude-002-plan31-captain",
+  "closedBySessionId": "session-20260724141215-claude-002-plan31-captain-ATM-GOV-0263-38bbae71de",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0263.closure-packet.json"
 }
