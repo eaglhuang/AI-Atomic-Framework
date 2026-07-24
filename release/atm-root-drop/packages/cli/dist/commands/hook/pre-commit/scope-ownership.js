@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { readBrokerLifecycleState } from '../../../../../core/dist/broker/lifecycle.js';
+import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID, evaluateSharedWriteAdmission } from '../../../../../core/dist/broker/shared-write-provenance-policy.js';
 import { inspectTrackedActorRegistryState } from '../../actor-registry.js';
 import { readActiveCloseCommitWindows } from '../../framework-development.js';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.js';
@@ -8,7 +9,7 @@ import { relativePathFrom } from '../../shared.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate } from '../../task-direction.js';
 import { taskIdsEqual } from '../../tasks/task-import-validators.js';
 import { normalizeOptionalText, readJsonText } from '../commit-range-guard.js';
-import { normalizeRelativePath } from '../git-index-diagnostics.js';
+import { normalizeRelativePath, runGitScalar } from '../git-index-diagnostics.js';
 function readJsonFile(filePath) {
     try {
         return readJsonText(readFileSync(filePath, 'utf8'));
@@ -72,6 +73,7 @@ export function inspectSameFileClaimOwnership(input) {
     const stewardCoveredSet = new Set(stewardCoveredFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
     const findings = [];
     const multiClaimFiles = [];
+    const sharedObservations = [];
     for (const stagedFile of input.stagedFiles) {
         const normalized = normalizeRelativePath(stagedFile);
         if (!normalized || normalized.startsWith('.atm/'))
@@ -103,6 +105,14 @@ export function inspectSameFileClaimOwnership(input) {
         const writeClaimTaskIds = uniqueSorted(coveringWriteLocks.map((lock) => lock.taskId));
         if (writeClaimTaskIds.length > 1) {
             multiClaimFiles.push({ file: normalized, writeClaimTaskIds });
+            // Shared canonical write: owning one of the claims proves nothing. The
+            // shared verifier decides admission from consumed steward receipts only.
+            sharedObservations.push({
+                path: normalized,
+                writeClaimTaskIds,
+                stagedBlobDigest: readStagedBlobDigest(input.cwd, normalized)
+            });
+            continue;
         }
         const committingOwnsFile = Boolean(committingTaskId) && writeClaimTaskIds.includes(committingTaskId);
         if (committingOwnsFile)
@@ -123,14 +133,71 @@ export function inspectSameFileClaimOwnership(input) {
             requiredCommand: 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json'
         });
     }
+    // Evidence-local adapter boundary: this hook only gathers staged digests and
+    // candidate receipts; every admission rule lives in the shared policy core.
+    const sharedWriteAdmission = sharedObservations.length > 0
+        ? evaluateSharedWriteAdmission({
+            canonicalRoot: normalizeRelativePath(input.cwd) || input.cwd,
+            baseSha: readGitScalar(input.cwd, ['rev-parse', 'HEAD']) ?? '',
+            headSha: readGitScalar(input.cwd, ['rev-parse', 'HEAD']) ?? '',
+            committingTaskId,
+            files: sharedObservations,
+            receipts: collectSharedWriteProvenanceReceipts(input.cwd)
+        })
+        : null;
+    for (const finding of sharedWriteAdmission?.findings ?? []) {
+        findings.push({
+            code: finding.code,
+            file: finding.file,
+            committingTaskId,
+            writeClaimTaskIds: finding.writeClaimTaskIds,
+            detail: finding.detail,
+            requiredCommand: finding.requiredCommand
+        });
+    }
     return {
         ok: findings.length === 0,
         committingTaskId,
         committingClaimIntent,
         multiClaimFiles,
         stewardCoveredFiles,
+        sharedWriteAdmission,
         findings
     };
+}
+function readGitScalar(cwd, args) {
+    return runGitScalar(cwd, args);
+}
+/** Exact digest of the bytes staged for this path, or null when unreadable. */
+function readStagedBlobDigest(cwd, file) {
+    const staged = runGitScalar(cwd, ['rev-parse', `:${file}`]);
+    return staged ? `git-blob:${staged}` : null;
+}
+/**
+ * Durable steward receipts published under the evidence directory. Only their
+ * bytes are read here; trust decisions belong to the shared policy core.
+ */
+function collectSharedWriteProvenanceReceipts(cwd) {
+    const evidenceDir = path.join(cwd, '.atm', 'history', 'evidence');
+    if (!existsSync(evidenceDir))
+        return [];
+    const receipts = [];
+    let entries = [];
+    try {
+        entries = readdirSync(evidenceDir);
+    }
+    catch {
+        return [];
+    }
+    for (const entry of entries) {
+        if (!entry.toLowerCase().endsWith('.shared-write-provenance.json'))
+            continue;
+        const document = readJsonFile(path.join(evidenceDir, entry));
+        if (document && document.schemaId === SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID) {
+            receipts.push(document);
+        }
+    }
+    return receipts;
 }
 export function selectRelevantDirectionLocksForCommit(input) {
     const currentTaskAllowedFiles = uniqueSorted([

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { CliError, makeResult, message } from '../shared.js';
 import { planWaveBrokerBatch } from '../../../../core/dist/broker/wave-broker-scheduler.js';
 import { planSharedDeliveryCommit } from '../../../../core/dist/broker/shared-delivery-commit.js';
+import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID } from '../../../../core/dist/broker/shared-write-provenance-policy.js';
 import { planSharedDeliverySaga } from '../../../../core/dist/broker/shared-delivery-saga.js';
 import { planWaveGeneratedWrite } from '../../../../core/dist/broker/wave-generated-executor.js';
 import { assertRecordCommitPayloadPresent } from '../git-governance/record-commit-payload-assertion.js';
@@ -15,6 +16,63 @@ function readJson(pathName) {
         throw new CliError('ATM_BROKER_SCHEDULER_MISSING', `Wave broker scheduler document does not exist: ${pathName}`, { exitCode: 2 });
     }
     return JSON.parse(readFileSync(pathName, 'utf8'));
+}
+/**
+ * A batch file is a shared canonical write when two or more member tasks claim
+ * it. Cardinality is the only rule; no task, actor, or path is special-cased.
+ */
+function buildSharedDeliveryProvenance(input) {
+    const claimsByFile = new Map();
+    for (const [taskId, files] of Object.entries(input.fileSlices)) {
+        for (const file of files) {
+            const existing = claimsByFile.get(file) ?? new Set();
+            existing.add(taskId);
+            claimsByFile.set(file, existing);
+        }
+    }
+    const observedFiles = [];
+    for (const [file, taskIds] of claimsByFile) {
+        if (taskIds.size < 2)
+            continue;
+        observedFiles.push({
+            path: file,
+            writeClaimTaskIds: [...taskIds].sort(),
+            stagedBlobDigest: readStagedBlobDigest(input.cwd, file)
+        });
+    }
+    if (observedFiles.length === 0)
+        return null;
+    return {
+        canonicalRoot: input.cwd,
+        baseSha: input.sealedBaseSha,
+        headSha: input.headSha,
+        observedFiles,
+        receipts: readSharedWriteProvenanceReceipts(input.cwd)
+    };
+}
+function readStagedBlobDigest(cwd, file) {
+    const result = spawnSync('git', ['rev-parse', `:${file}`], { cwd, encoding: 'utf8' });
+    const value = result.status === 0 ? result.stdout.trim() : '';
+    return value.length > 0 ? `git-blob:${value}` : null;
+}
+function readSharedWriteProvenanceReceipts(cwd) {
+    const evidenceDir = path.join(cwd, '.atm', 'history', 'evidence');
+    if (!existsSync(evidenceDir))
+        return [];
+    const receipts = [];
+    for (const entry of readdirSync(evidenceDir)) {
+        if (!entry.toLowerCase().endsWith('.shared-write-provenance.json'))
+            continue;
+        try {
+            const document = JSON.parse(readFileSync(path.join(evidenceDir, entry), 'utf8'));
+            if (document?.schemaId === SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID)
+                receipts.push(document);
+        }
+        catch {
+            // Unreadable evidence is not admission proof; the verifier fails closed.
+        }
+    }
+    return receipts;
 }
 function currentHead(cwd) {
     const result = spawnSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' });
@@ -367,7 +425,18 @@ export function handleBrokerBatchExecute(options, context) {
             files: payloadFiles
         })
         : null;
+    // Adapter boundary: gather local shared-write evidence only. The admission
+    // rules are the same ones the pre-commit / git commit route runs.
+    // Only explicitly declared per-task slices carry ownership evidence; a
+    // defaulted fan-out slice declares no split and is not a shared-write claim.
+    const provenance = buildSharedDeliveryProvenance({
+        cwd: options.cwd,
+        fileSlices: options.fileSlices.length > 0 ? fileSlices : {},
+        sealedBaseSha: options.sealedSourceSha,
+        headSha: applied?.commitSha ?? options.currentHeadSha ?? currentHead(options.cwd)
+    });
     const plan = planSharedDeliveryCommit({
+        provenance,
         decision,
         scheduler,
         actorId: options.actorId,

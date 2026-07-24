@@ -169,7 +169,7 @@ export function runPreCommitHook(cwd) {
     // claims covering one staged file must not block by themselves; only
     // ambiguous staged ownership without steward/broker evidence blocks.
     const sameFileClaimReport = allowAdopterInfrastructureSync
-        ? { ok: true, committingTaskId: null, committingClaimIntent: null, multiClaimFiles: [], stewardCoveredFiles: [], findings: [] }
+        ? { ok: true, committingTaskId: null, committingClaimIntent: null, multiClaimFiles: [], stewardCoveredFiles: [], sharedWriteAdmission: null, findings: [] }
         : inspectSameFileClaimOwnership({
             cwd: root,
             stagedFiles,

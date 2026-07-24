@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { evaluateSharedWriteAdmission } from './shared-write-provenance-policy.js';
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
@@ -62,6 +63,33 @@ export function planSharedDeliveryCommit(input) {
     const unrelatedSlices = Object.keys(fileSlices).filter((taskId) => !taskIds.includes(taskId));
     if (unrelatedSlices.length > 0)
         blockers.push(`unrelated task slices are not batch eligible: ${unrelatedSlices.sort().join(', ')}`);
+    // Shared delivery uses the exact same verifier as the pre-commit/git commit
+    // route; this adapter only forwards locally gathered evidence to it.
+    const admission = input.provenance
+        ? evaluateSharedWriteAdmission({
+            canonicalRoot: input.provenance.canonicalRoot,
+            baseSha: input.provenance.baseSha,
+            headSha: input.provenance.headSha,
+            files: input.provenance.observedFiles,
+            receipts: input.provenance.receipts,
+            expectedCompositionPlanDigest: input.provenance.expectedCompositionPlanDigest ?? null,
+            expectedSealedSelectionSourceDigest: input.provenance.expectedSealedSelectionSourceDigest ?? null,
+            expectedRunnerBuildDigest: input.provenance.expectedRunnerBuildDigest ?? null
+        })
+        : null;
+    if (admission) {
+        for (const finding of admission.findings) {
+            blockers.push(`${finding.code}: ${finding.file}`);
+        }
+        // Attribution for shared files is derived from validated receipts only;
+        // caller-supplied task ids never establish membership on their own.
+        if (admission.sharedFiles.length > 0) {
+            const unattributed = taskIds.filter((taskId) => !admission.attributedTaskIds.includes(taskId));
+            if (admission.findings.length === 0 && unattributed.length > 0) {
+                blockers.push(`shared delivery attribution is not receipt-backed for: ${unattributed.join(', ')}`);
+            }
+        }
+    }
     if (blockers.length > 0) {
         return {
             schemaId: 'atm.sharedDeliveryCommitPlan.v1',
@@ -69,7 +97,8 @@ export function planSharedDeliveryCommit(input) {
             verdict: decision.verdict === 'serial-fallback' ? 'serial-fallback' : 'blocked',
             reason: blockers[0],
             blockers,
-            receipt: null
+            receipt: null,
+            sharedWriteAdmission: admission
         };
     }
     const normalizedSlices = Object.fromEntries(taskIds.map((taskId) => [taskId, uniqueSorted(fileSlices[taskId] ?? [])]));
@@ -118,6 +147,7 @@ export function planSharedDeliveryCommit(input) {
         verdict: 'receipt-ready',
         reason: 'same-wave compatible commit receipt ready',
         blockers: [],
-        receipt
+        receipt,
+        sharedWriteAdmission: admission
     };
 }

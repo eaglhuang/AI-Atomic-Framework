@@ -118,9 +118,13 @@ const sameFileHookEnv = {
 };
 runGit(closureRepo, ['add', 'docs/same-file-shared.md']);
 const sameFileOwnedHook = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], { allowFailure: true, env: sameFileHookEnv });
-assert(sameFileOwnedHook.status === 0, `pre-commit hook must not fail purely because the staged file has multiple active same-file claims\nstdout:\n${sameFileOwnedHook.stdout}\nstderr:\n${sameFileOwnedHook.stderr}`);
+// ATM-GOV-0250 supersedes the TASK-CID-0024 allowance: a multi-claim shared
+// write fails closed until a consumed steward receipt binds its blob digest,
+// even when the committing task owns one of the claims.
+assert(sameFileOwnedHook.status === 1, `pre-commit hook must fail closed on a multi-claim shared write without a steward receipt\nstdout:\n${sameFileOwnedHook.stdout}\nstderr:\n${sameFileOwnedHook.stderr}`);
 const sameFileOwnedPayload = parsePayload(sameFileOwnedHook);
 assert((sameFileOwnedPayload.evidence?.sameFileClaimReport?.multiClaimFiles ?? []).some((entry: any) => entry.file === 'docs/same-file-shared.md'), 'pre-commit evidence must record the same-file multi-claim coverage');
+assert((sameFileOwnedPayload.evidence?.sameFileClaimReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_BROKER_STEWARD_RECEIPT_REQUIRED' && entry.file === 'docs/same-file-shared.md'), 'multi-claim shared write without a receipt must emit ATM_BROKER_STEWARD_RECEIPT_REQUIRED');
 runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
 
 runGit(closureRepo, ['add', 'docs/same-file-b-only.md']);
@@ -295,5 +299,20 @@ assert(repairedPacket.repair?.originalPacketCommitSha === mismatchedClosureCommi
 runGit(closureRepo, ['commit', '--no-verify', '-m', 'repair mismatched closure packet']);
 const repairedClosureRange = runCli(closureRepo, ['guard', 'commit-range', '--base', 'HEAD~2', '--head', 'HEAD', '--json'], { allowFailure: true });
 assert(repairedClosureRange.status === 0, `commit-range guard must accept an explicit closure packet repair follow-up\nstdout:\n${repairedClosureRange.stdout}\nstderr:\n${repairedClosureRange.stderr}`);
+
+// ATM-GOV-0250: every shared-write entry point must admit through the one
+// shared verifier; adapters may gather evidence but never re-implement policy.
+const sharedWriteVerifierModule = 'shared-write-provenance-policy.ts';
+const sharedWriteCallSites = [
+  'packages/core/src/broker/shared-delivery-commit.ts',
+  'packages/cli/src/commands/hook/pre-commit/scope-ownership.ts',
+  'packages/cli/src/commands/hook/pre-commit/support.ts',
+  'packages/cli/src/commands/broker/batch-execute-actions.ts'
+];
+for (const callSite of sharedWriteCallSites) {
+  const source = readFileSync(path.join(root, callSite), 'utf8');
+  assert(source.includes(sharedWriteVerifierModule), `${callSite} must import the shared shared-write admission verifier`);
+  assert(!/ATM_BROKER_STEWARD_RECEIPT_(REQUIRED|INVALID)\s*=/.test(source), `${callSite} must not redefine steward receipt error codes locally`);
+}
 
 }
