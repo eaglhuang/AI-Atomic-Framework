@@ -1,0 +1,86 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T05-15-55-727Z-close-30cbc99e7be7",
+  "taskId": "ATM-GOV-0258",
+  "action": "close",
+  "actorId": "antigravity-gemini35-plan31-captain",
+  "sessionId": "session-20260724044350-antigravity-gemini35-plan31-captain-ATM-GOV-0258-8e02156999",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0258.json",
+  "taskSha256": "sha256:9ba6609e14921effe63b5b56b42df09caf694ee2dace43e7ae941f99b55da689",
+  "createdAt": "2026-07-24T05:15:55.727Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0258 --actor antigravity-gemini35-plan31-captain --status done --historical-delivery be91f583ab1f823ac714690a8f9eac619396eb1b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724044350-antigravity-gemini35-plan31-captain-ATM-GOV-0258-8e02156999",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0258.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "node --strip-types tests/cli/shared-delivery-commit-executor.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T05:15:55.712Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0258.*",
+        ".atm/history/task-events/ATM-GOV-0258/**",
+        ".atm/history/tasks/ATM-GOV-0258.json",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/framework-development/build-release-hygiene-hints.ts",
+        "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-surface-queue.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts",
+        "tests/cli/runner-sync-steward-release.test.ts",
+        "tests/cli/shared-delivery-commit-executor.test.ts",
+        "tests/cli/transactional-commit-queue-isolation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/framework-development/build-release-hygiene-hints.ts",
+        "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-surface-queue.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts",
+        "tests/cli/runner-sync-steward-release.test.ts",
+        "tests/cli/shared-delivery-commit-executor.test.ts",
+        "tests/cli/transactional-commit-queue-isolation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0258",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "567be40ab3ff7193f2fea778fe8604a2fa499373",
+  "governedTreeSha": "a3c93c67d0c80f7e1ece7e57e3af04f206fcd574",
+  "targetCommitDelta": {
+    "currentCommitSha": "567be40ab3ff7193f2fea778fe8604a2fa499373",
+    "parentCommitShas": [
+      "567be40ab3ff7193f2fea778fe8604a2fa499373"
+    ],
+    "governedTreeSha": "a3c93c67d0c80f7e1ece7e57e3af04f206fcd574",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0258.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-23T08-05-04-841Z-reserve-7ae54fec9923.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-23T08-05-04-844Z-promote-1fc8005851b4.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-23T08-33-43-964Z-import-352194827474.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-24T04-43-43-722Z-import-2706a6adf29a.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-24T04-43-50-290Z-reserve-a386001a4929.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-24T04-43-50-293Z-promote-a16a58e84f73.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-24T04-43-58-115Z-claim-79673e0a9034.json",
+      ".atm/history/tasks/ATM-GOV-0258.json",
+      "packages/cli/src/commands/command-specs/git.spec.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1d1d7a9fbb09bd6aca59834ca58e712d21b4e96f3ea9bd73a804fd708e6d1b19",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/shared-delivery-commit-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:365bd593d95740bb63102b7f77a7a4c9a4e3a3dfb8673dcda8d00be0212350c1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1739dabf3c1ccead1096287a119be68a4fc90670d5df346b92f0db663588946",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:b60c1ef40ed8ee8c4b1f0308de9980f4058e85cebd69c4033b3b5889ae571185",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+    "node --strip-types tests/cli/shared-delivery-commit-executor.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-24T05:15:55.712Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0258.*",
+      ".atm/history/task-events/ATM-GOV-0258/**",
+      ".atm/history/tasks/ATM-GOV-0258.json",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/framework-development/build-release-hygiene-hints.ts",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/git.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts",
+      "tests/cli/shared-delivery-commit-executor.test.ts",
+      "tests/cli/transactional-commit-queue-isolation.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/framework-development/build-release-hygiene-hints.ts",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/git.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts",
+      "tests/cli/shared-delivery-commit-executor.test.ts",
+      "tests/cli/transactional-commit-queue-isolation.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0258.json",
+  "closedAt": "2026-07-24T05:15:55.713Z",
+  "closedByActor": "antigravity-gemini35-plan31-captain",
+  "sessionId": "session-20260724044350-antigravity-gemini35-plan31-captain-ATM-GOV-0258-8e02156999",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "be91f583ab1f823ac714690a8f9eac619396eb1b",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/command-specs/git.spec.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0258.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-22T13-55-49-003Z-import-d8d09732c6a6.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-22T13-59-23-293Z-reserve-d3d8685ff990.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-22T13-59-23-296Z-promote-0474a51e3642.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-22T13-59-28-827Z-claim-69eff8700a63.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-22T13-59-28-831Z-scope-amendment-2a219971a1e8.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-22T13-59-28-831Z-scope-amendment.claim-first-resolved-2c4c453ec287.json",
+      ".atm/history/task-events/ATM-GOV-0258/2026-07-22T15-11-19-606Z-scope-amendment-f3d3a3882df9.json",
+      ".atm/history/tasks/ATM-GOV-0258.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "tests/cli/dirty-release-wip-recovery-0258.test.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "tests/cli/dirty-release-wip-recovery-0258.test.ts"
+    ],
+    "waiverReason": "Plan3.1 captain authorized historical delivery waiver for commit be91f583a containing WIP recovery helper paths"
+  },
+  "teamSummary": null
+}
