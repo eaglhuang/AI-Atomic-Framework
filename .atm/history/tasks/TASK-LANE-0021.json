@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-LANE-0021",
   "title": "Lane capability secrecy and proxy execution gate",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-LANE-0017",
@@ -120,8 +120,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-24T15-48-35-029Z-scope-amendment-c6d43477acc6",
-  "lastTransitionAt": "2026-07-24T15:48:35.029Z",
+  "lastTransitionId": "2026-07-24T16-00-31-708Z-close-eafd0ffdd91a",
+  "lastTransitionAt": "2026-07-24T16:00:31.708Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-003-plan31-captain",
   "reservedAt": "2026-07-24T15:11:14.945Z",
@@ -130,7 +130,7 @@
     "actorId": "claude-003-plan31-captain",
     "leaseId": "lease-a2cadf4e835b",
     "claimedAt": "2026-07-24T15:11:14.954Z",
-    "heartbeatAt": "2026-07-24T15:11:14.954Z",
+    "heartbeatAt": "2026-07-24T16:00:31.704Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-LANE-0021.*",
@@ -149,14 +149,14 @@
       "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
       "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260724151115-claude-003-plan31-captain-1dd0fc7d1e",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724151115-claude-003-plan31-captain-1dd0fc7d1e\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-24T15:11:14.954Z",
   "startedByActor": "claude-003-plan31-captain",
@@ -207,5 +207,9 @@
     },
     "createdAt": "2026-07-24T15:11:21.188Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-24T16:00:31.704Z",
+  "closedByActor": "claude-003-plan31-captain",
+  "closedBySessionId": "session-20260724151114-claude-003-plan31-captain-TASK-LANE-0021-a63e663c2c",
+  "closurePacket": ".atm/history/evidence/TASK-LANE-0021.closure-packet.json"
 }

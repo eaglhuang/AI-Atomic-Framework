@@ -1,0 +1,187 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-LANE-0021",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8e0666e6b867603975ff137c1657e4a457da3d17",
+  "governedTreeSha": "1e8bcc1ac9ff2b2306226cc65ef197d2d4a25eba",
+  "targetCommitDelta": {
+    "currentCommitSha": "8e0666e6b867603975ff137c1657e4a457da3d17",
+    "parentCommitShas": [
+      "8e0666e6b867603975ff137c1657e4a457da3d17"
+    ],
+    "governedTreeSha": "1e8bcc1ac9ff2b2306226cc65ef197d2d4a25eba",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0259.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-LANE-0021.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      "packages/cli/dist/commands/lane.js",
+      "packages/cli/dist/commands/taskflow/implementation.js",
+      "packages/cli/src/commands/lane-session/capability-authority.ts",
+      "packages/cli/src/commands/lane-session/proxy-receipt.ts",
+      "packages/cli/src/commands/lane-session/redaction.ts",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/lane.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/lane.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-root-drop/packages/plugin-review-advisory/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-review-advisory/dist/index.js",
+      "release/atm-root-drop/packages/plugin-review-advisory/src/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2090e99b17cf51781909ed09ed30e150fd6a3dd312941ab41952e1d9aba5f92a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0c81eb62ee07b4ab55557dc846b9b6905c1b23315e0a3021c4fb2ad68f31396b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6b85b34caec4dd9c9141003810eba937b373d719a04e206ddb85d637b362bf3",
+      "stderrSha256": "sha256:c8f3f24f41d8229e8f21df1ff768bace4a058d5d59201d2250cb71541c6059e4",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+    "node --strip-types tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-24T16:00:31.688Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-LANE-0021.*",
+      ".atm/history/task-events/TASK-LANE-0021/**",
+      ".atm/history/tasks/TASK-LANE-0021.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/framework-development/temp-claim.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/lane-session/**",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/close/**",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/core/src/broker/**",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/framework-development/temp-claim.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/lane-session/**",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/close/**",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/core/src/broker/**",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-LANE-0021.json",
+  "closedAt": "2026-07-24T16:00:31.688Z",
+  "closedByActor": "claude-003-plan31-captain",
+  "sessionId": "session-20260724151114-claude-003-plan31-captain-TASK-LANE-0021-a63e663c2c",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "8e0666e6b867603975ff137c1657e4a457da3d17",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/lane-session/capability-authority.ts",
+      "packages/cli/src/commands/lane-session/proxy-receipt.ts",
+      "packages/cli/src/commands/lane-session/redaction.ts",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-LANE-0021.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-LANE-0021/2026-07-24T15-10-36-118Z-import-6a202b76763f.json",
+      ".atm/history/task-events/TASK-LANE-0021/2026-07-24T15-11-14-945Z-reserve-10f7d00d40f3.json",
+      ".atm/history/task-events/TASK-LANE-0021/2026-07-24T15-11-14-949Z-promote-d9352a7e43ff.json",
+      ".atm/history/task-events/TASK-LANE-0021/2026-07-24T15-11-21-158Z-claim-7f9c61f66ccb.json",
+      ".atm/history/task-events/TASK-LANE-0021/2026-07-24T15-48-35-029Z-scope-amendment-c6d43477acc6.json",
+      ".atm/history/tasks/TASK-LANE-0021.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

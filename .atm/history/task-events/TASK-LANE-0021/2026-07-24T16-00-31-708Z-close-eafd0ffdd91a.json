@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T16-00-31-708Z-close-eafd0ffdd91a",
+  "taskId": "TASK-LANE-0021",
+  "action": "close",
+  "actorId": "claude-003-plan31-captain",
+  "sessionId": "session-20260724151114-claude-003-plan31-captain-TASK-LANE-0021-a63e663c2c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0021.json",
+  "taskSha256": "sha256:4020ce6ff8e1e7138831989e5613906cdd1333abeb2f0e889a069917d689ab7f",
+  "createdAt": "2026-07-24T16:00:31.708Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0021 --actor claude-003-plan31-captain --status done --historical-delivery 8e0666e6b867603975ff137c1657e4a457da3d17",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724151114-claude-003-plan31-captain-TASK-LANE-0021-a63e663c2c",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0021.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "node --strip-types tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T16:00:31.688Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0021.*",
+        ".atm/history/task-events/TASK-LANE-0021/**",
+        ".atm/history/tasks/TASK-LANE-0021.json",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/framework-development/temp-claim.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/lane-session/**",
+        "packages/cli/src/commands/lane.ts",
+        "packages/cli/src/commands/taskflow/close/**",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/core/src/broker/**",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+        "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/framework-development/temp-claim.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/lane-session/**",
+        "packages/cli/src/commands/lane.ts",
+        "packages/cli/src/commands/taskflow/close/**",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/core/src/broker/**",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+        "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
