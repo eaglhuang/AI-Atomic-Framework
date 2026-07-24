@@ -71,6 +71,7 @@ import taskflowSpec from './command-specs/taskflow.spec.ts';
 import taskViewSpec from './command-specs/task-view.spec.ts';
 import brokerSpec from './command-specs/broker.spec.ts';
 import routeSpec from './command-specs/route.spec.ts';
+import writeTicketSpec from './command-specs/write-ticket.spec.ts';
 
 function withVisibility<T extends Record<string, unknown>>(spec: T, visibility: 'public' | 'internal' = 'public') {
   return Object.freeze({
@@ -145,6 +146,7 @@ export const commandSpecs = Object.freeze({
   'task-view': taskViewSpec,
   broker: brokerSpec,
   route: routeSpec,
+  'write-ticket': writeTicketSpec,
 });
 
 export function getCommandSpec(commandName: string) {

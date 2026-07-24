@@ -21,6 +21,8 @@ Batch requests must stay in batch: claim the original prompt, deliver only the c
 
 Do not manually loop over `tasks reserve`, `tasks promote`, `tasks claim`, or `tasks close`; do not commit before `batch checkpoint` during an active batch.
 
+Before a governed write, acquire or check task-scoped authority with `node atm.mjs write-ticket acquire ...` and `node atm.mjs write-ticket check ...`. If the editor cannot block before writing, immediately run `node atm.mjs write-ticket record-touch ... --observed post-write --json` so ATM can classify scope-amendment-required, unattached-WIP, or true violation evidence through the broker/task-scope model.
+
 ## Skill Directory
 
 - `.agents/skills/atm-next/SKILL.md`

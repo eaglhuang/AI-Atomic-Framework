@@ -1794,6 +1794,208 @@
       ],
       "registryOwner": "TASK-ERR-0005",
       "sourceOwner": "packages/cli/src/commands/taskflow/cross-authority-closeback.ts"
+    },
+    {
+      "code": "ATM_WRITE_SCOPE_AMENDMENT_REQUIRED",
+      "category": "write-ticket",
+      "shortDescription": "A requested pre-write file is outside the current task write-ticket scope and must be added through a governed scope amendment before mutation.",
+      "commonCauses": [
+        "The task card omitted a linked source, test, generated adapter, registry, or protected governance surface.",
+        "An editor pre-write hook checked files before the worker widened the task scope.",
+        "A worker attempted to modify a protected history path outside the governed lifecycle command surface."
+      ],
+      "remediation": [
+        "Inspect the current task scope with node atm.mjs tasks status --task <task-id> --json.",
+        "If the path is legitimately linked, run node atm.mjs tasks scope add --task <task-id> --actor <actor> --add <paths> --reason \"<why linked scope is required>\" --json.",
+        "Retry write-ticket acquire/check after the scope amendment is recorded."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json",
+        "node atm.mjs tasks scope add --task <task-id> --actor <actor> --add <paths> --reason \"<why linked scope is required>\" --json",
+        "node atm.mjs write-ticket check --task <task-id> --actor <actor> --files <paths> --json"
+      ],
+      "statusCommand": "node atm.mjs write-ticket status --task <task-id> --actor <actor> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "write-ticket",
+            "status",
+            "--task",
+            "<task-id>",
+            "--actor",
+            "<actor>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/write-scope-policy.ts"
+    },
+    {
+      "code": "ATM_WRITE_SCOPE_UNATTACHED_WIP",
+      "category": "write-ticket",
+      "shortDescription": "Out-of-scope dirty WIP already exists and must be attached, preserved, discarded with a receipt, or split before delivery continues.",
+      "commonCauses": [
+        "An editor or agent lacked a pre-write hook and wrote outside the ticket scope.",
+        "A task claim was released while scoped source changes remained dirty in the shared worktree.",
+        "A protected ledger or source file was modified before ATM could record the scope amendment."
+      ],
+      "remediation": [
+        "Run node atm.mjs write-ticket status --task <task-id> --actor <actor> --json to inspect touched-path classification.",
+        "Choose one governed recovery: scope-amend-and-attach, non-delivery WIP commit, discard receipt, or split-to-new-task.",
+        "Do not commit, close, push, stash, restore, or hand-edit .atm state while unattached WIP remains unresolved."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs write-ticket status --task <task-id> --actor <actor> --json",
+        "node atm.mjs tasks scope add --task <task-id> --actor <actor> --add <paths> --reason \"attach out-of-scope WIP\" --json",
+        "node atm.mjs tasks release --task <task-id> --actor <actor> --wip-commit --reason \"preserve unattached WIP\" --json"
+      ],
+      "statusCommand": "node atm.mjs write-ticket status --task <task-id> --actor <actor> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "write-ticket",
+            "status",
+            "--task",
+            "<task-id>",
+            "--actor",
+            "<actor>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/write-scope-policy.ts"
+    },
+    {
+      "code": "ATM_WRITE_TICKET_SCOPE_VIOLATION",
+      "category": "write-ticket",
+      "shortDescription": "A write-ticket scope problem reached commit, close, push, or an explicit bypass after the amendment or unattached-WIP recovery path was available.",
+      "commonCauses": [
+        "A worker ignored the amendment-required result and attempted a delivery boundary anyway.",
+        "Unattached dirty WIP remained unresolved during commit, close, or push.",
+        "The write-ticket evidence was bypassed or contradicted by touched-path evidence."
+      ],
+      "remediation": [
+        "Stop delivery and inspect node atm.mjs write-ticket status --task <task-id> --actor <actor> --json.",
+        "Resolve amendment-required or unattached-WIP recovery first, then rerun the delivery gate.",
+        "Escalate to captain arbitration only when no governed recovery command is available."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs write-ticket status --task <task-id> --actor <actor> --json",
+        "node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json"
+      ],
+      "statusCommand": "node atm.mjs write-ticket status --task <task-id> --actor <actor> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "write-ticket",
+            "status",
+            "--task",
+            "<task-id>",
+            "--actor",
+            "<actor>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/write-scope-policy.ts"
+    },
+    {
+      "code": "ATM_WRITE_TICKET_MISSING",
+      "category": "write-ticket",
+      "shortDescription": "A governed write-ticket check or delivery boundary did not receive ticket authority for the requested task and actor.",
+      "commonCauses": [
+        "The worker skipped write-ticket acquire before a write/check operation.",
+        "The editor hook did not pass the ticket file to the check command.",
+        "A delivery gate attempted to consume write-ticket evidence that was never produced."
+      ],
+      "remediation": [
+        "Run node atm.mjs write-ticket acquire --task <task-id> --actor <actor> --files <paths> --intent write --json.",
+        "Pass the ticket evidence to the editor pre-write hook or delivery gate.",
+        "Retry write-ticket check before modifying files."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs write-ticket acquire --task <task-id> --actor <actor> --files <paths> --intent write --json",
+        "node atm.mjs write-ticket check --task <task-id> --actor <actor> --ticket <ticket.json> --files <paths> --json"
+      ],
+      "statusCommand": "node atm.mjs write-ticket status --task <task-id> --actor <actor> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "write-ticket",
+            "status",
+            "--task",
+            "<task-id>",
+            "--actor",
+            "<actor>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/write-ticket.ts"
+    },
+    {
+      "code": "ATM_WRITE_TICKET_STALE",
+      "category": "write-ticket",
+      "shortDescription": "The supplied write ticket no longer matches task, actor, lane, scope digest, or expiry requirements.",
+      "commonCauses": [
+        "The active claim actor or lane changed after the ticket was acquired.",
+        "The ticket expired before the write or delivery boundary ran.",
+        "The ticket was acquired for a different task, actor, or scope digest."
+      ],
+      "remediation": [
+        "Run node atm.mjs tasks status --task <task-id> --json and compare the active claim actor/lane.",
+        "Acquire a fresh write ticket for the current actor, lane, and file set.",
+        "Do not reuse stale ticket evidence across handoff, lane adoption, or scope amendment boundaries."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json",
+        "node atm.mjs write-ticket acquire --task <task-id> --actor <actor> --files <paths> --intent write --json"
+      ],
+      "statusCommand": "node atm.mjs write-ticket status --task <task-id> --actor <actor> --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "write-ticket",
+            "status",
+            "--task",
+            "<task-id>",
+            "--actor",
+            "<actor>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/broker/write-ticket.ts"
     }
   ],
   "prefixRules": [
