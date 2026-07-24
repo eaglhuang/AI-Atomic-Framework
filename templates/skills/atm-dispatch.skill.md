@@ -73,6 +73,20 @@ bound. The closed exceptions are emergency/anomaly recovery, historical
 read-only discrimination, and non-development sealed packaging, each with a
 named receipt. A safe same-file compose may have zero queue residency.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: dispatch by cohesive ownership before dispatching by ticket count.
+Each card or sidecar should own one behavior, interface, evidence contract, or
+rollback boundary. If the proposed split would scatter one behavior across
+several actors merely to shrink claims, keep one owner and use reviewers,
+sidecars, or provider-neutral receipts for confidence.
+
+For skill-template or integration projection dispatch, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 {{ACTOR_IDENTITY_HANDOFF_GATE}}
 
 ## Dispatch Identity Rule

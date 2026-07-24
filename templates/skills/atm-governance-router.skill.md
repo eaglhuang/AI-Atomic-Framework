@@ -68,6 +68,20 @@ Use this model before widening a blocker. A natural-language request for
 inspection, planning, evidence, or private ledger work should remain parallel
 unless ATM identifies a concrete Tier 2 shared surface intersection.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: split work by cohesion before splitting by ticket count. A proposed
+"to-tickets" breakdown is healthy only when each card owns one behavior,
+interface, evidence contract, or rollback boundary. If a split would scatter
+one behavior across several cards merely to reduce file count or make smaller
+claims, keep it as one card or create a provider-neutral review receipt first.
+
+For skill-template or integration projection work, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 ## Delivery Principle
 
 The objective is to deliver the task content, not to close task cards. A task

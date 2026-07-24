@@ -1,0 +1,327 @@
+{
+  "schemaId": "atm.skillCorpusAudit.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0028",
+  "generatedAt": "1970-01-01T00:00:00.000Z",
+  "sourceSnapshot": {
+    "schemaId": "atm.skillCorpusSourceSnapshot.v1",
+    "compilerVersion": "0.1.0",
+    "templateCount": 21,
+    "sourceDigest": "sha256:cb9c594b2e9720f31ad2a54ac85a4bead84ec718f14006d98b77b13b6c0d71c3",
+    "ignoredSourceTemplatePaths": []
+  },
+  "canaryOrder": [
+    "atm-governance-router",
+    "atm-dispatch",
+    "atm-task-card-authoring",
+    "atm-plan-authoring",
+    "atm-next",
+    "atm-framework-temp-claim"
+  ],
+  "classifications": [
+    {
+      "id": "atm-atom-map-refactor",
+      "sourcePath": "templates/skills/atm-atom-map-refactor.skill.md",
+      "sourceDigest": "sha256:24b8bcae497661ddd4d15e5102a7530aeceb698fd0b531977b694acc3874e73b",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": true
+    },
+    {
+      "id": "atm-create",
+      "sourcePath": "templates/skills/atm-create.skill.md",
+      "sourceDigest": "sha256:d32ccd131fed9850bbd20592d2a2b91a68fcb54759d709000f15c9f97401e90c",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-deep-module-refactor",
+      "sourcePath": "templates/skills/atm-deep-module-refactor.skill.md",
+      "sourceDigest": "sha256:9007f495040b7a5d3229d8f2cd47ff87157c6f295bcfe39b9f94fdca64c84d54",
+      "class": "provider-reference",
+      "action": "keep",
+      "progressiveDisclosure": true
+    },
+    {
+      "id": "atm-dispatch",
+      "sourcePath": "templates/skills/atm-dispatch.skill.md",
+      "sourceDigest": "sha256:be4edfa8f175589385d0444eefe8a67de0e1409a217dea1b5b4e5eddcc39e4bb",
+      "class": "rewrite-canary",
+      "action": "canary-rewritten",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-error-code-resolver",
+      "sourcePath": "templates/skills/atm-error-code-resolver.skill.md",
+      "sourceDigest": "sha256:9a64bc5c0277477e0cef4c08b4dbb64b398e0a320ad682f7d5b0386988002504",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-evidence",
+      "sourcePath": "templates/skills/atm-evidence.skill.md",
+      "sourceDigest": "sha256:1286be866bfb003c9fd841f1d42df66be445912fcb5a70b2143c3b38961323f5",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-framework-temp-claim",
+      "sourcePath": "templates/skills/atm-framework-temp-claim.skill.md",
+      "sourceDigest": "sha256:a6997c599811ad82d19667ddbe3ebcf9f3c25032eff95be411669fed094108d7",
+      "class": "rewrite-canary",
+      "action": "canary-rewritten",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-git-pathspec-emergency-commit",
+      "sourcePath": "templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+      "sourceDigest": "sha256:729a1c4c46bf82f02e323bc68a69105cf7f9327be135bcba1e415bd672334636",
+      "class": "emergency-specialist",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-governance-router",
+      "sourcePath": "templates/skills/atm-governance-router.skill.md",
+      "sourceDigest": "sha256:90551d6370536ad97b209aa7d52c192df4ea4da8e73a9b16eb564c88a44dc0b7",
+      "class": "rewrite-canary",
+      "action": "canary-rewritten",
+      "progressiveDisclosure": true
+    },
+    {
+      "id": "atm-handoff",
+      "sourcePath": "templates/skills/atm-handoff.skill.md",
+      "sourceDigest": "sha256:a0bebea2ca36230148bc3c0dd06289249de91e279e9e170f09a983a19fa3a962",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-internal-build-sync",
+      "sourcePath": "templates/skills/atm-internal-build-sync.skill.md",
+      "sourceDigest": "sha256:759b673e36339d452e7aedb8e4f86068c93f0f0da19eb65c006c9950af5610e1",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-lock",
+      "sourcePath": "templates/skills/atm-lock.skill.md",
+      "sourceDigest": "sha256:0daa18b24fec9ba477a09a77af4189663cf2b7eb95de55e18f06e1f82334fb2c",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-memory-consolidate",
+      "sourcePath": "templates/skills/atm-memory-consolidate.skill.md",
+      "sourceDigest": "sha256:9a824c95c3aa267399ad73fbf072171b6ce457e8230de0004bd1dbe3e17266b4",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "sourcePath": "templates/skills/atm-minimal-patch-rebuilder.skill.md",
+      "sourceDigest": "sha256:c55323b7a5074754054e8aae9004dd18343dc459489d83cab555fa0212a95624",
+      "class": "specialist",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-next",
+      "sourcePath": "templates/skills/atm-next.skill.md",
+      "sourceDigest": "sha256:1fd469dbf0a6e1c3f968710641ab72fcc188731ce278534e874705af8178284a",
+      "class": "rewrite-canary",
+      "action": "canary-rewritten",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-orient",
+      "sourcePath": "templates/skills/atm-orient.skill.md",
+      "sourceDigest": "sha256:5868de112d9ce3186c1ced956c24c49e84897c079d7d5f33d0977d4577a13de3",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-plan-authoring",
+      "sourcePath": "templates/skills/atm-plan-authoring.skill.md",
+      "sourceDigest": "sha256:cd35478b3753577700912be8196cb405b540695bdaf2b0d14b886945f7cd8512",
+      "class": "rewrite-canary",
+      "action": "canary-rewritten",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-task-card-authoring",
+      "sourcePath": "templates/skills/atm-task-card-authoring.skill.md",
+      "sourceDigest": "sha256:cdf094ec8d9cc406b8a21dc5ffd87e61302e83c56e01b2a8f40fe928a6866d9b",
+      "class": "rewrite-canary",
+      "action": "canary-rewritten",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-task-intent-resolver",
+      "sourcePath": "templates/skills/atm-task-intent-resolver.skill.md",
+      "sourceDigest": "sha256:5ab4ed6a046e58e062b67c64772e4ea68efd4cb72f673cfeb78f2cb2d65608be",
+      "class": "entry-support",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-upgrade-scan",
+      "sourcePath": "templates/skills/atm-upgrade-scan.skill.md",
+      "sourceDigest": "sha256:5a8124e679891daa715d9bc74489a2c1d2263f637cb9c47d97ae81f1b65ab3d4",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "mailbox-worker-execution",
+      "sourcePath": "templates/skills/mailbox-worker-execution.skill.md",
+      "sourceDigest": "sha256:270b56aca0097d04d2d707aa5605571a9af748ae59f37c584beaed367927da37",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    }
+  ],
+  "ignoredTemplateRegression": {
+    "incidentTaskId": "TASK-SKL-0027",
+    "sourceCommit": "d8fee0a3e21b609b449d3e703b9cb2123ba248ae",
+    "locked": true,
+    "verdict": "no-current-local-ignore-for-skill-templates"
+  },
+  "deepModuleReviews": [
+    {
+      "schemaId": "atm.deepModuleReviewReport.v1",
+      "providerContract": "atm.deepModuleRefactorProvider.v1",
+      "providerId": "matt-pocock-deep-module-reference",
+      "providerVersion": "2026-07-24.ed37663",
+      "generatedAt": "1970-01-01T00:00:00.000Z",
+      "taskId": "TASK-SKL-0028",
+      "status": "pass",
+      "candidate": {
+        "moduleId": "skill-corpus-source-snapshot",
+        "sourcePaths": [
+          "packages/integrations-core/src/compiler/skill-templates.ts",
+          "scripts/audit-skill-corpus.ts"
+        ],
+        "ownerAtomOrMap": "atom-skill-template-compiler",
+        "publicInterface": "loadSkillCorpusSourceSnapshot(templateDirectory)",
+        "rollback": "revert TASK-SKL-0028 corpus snapshot and audit changes",
+        "causalValidators": [
+          "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+          "npm run validate:skill-templates"
+        ]
+      },
+      "triggerVerdict": {
+        "actionableTriggers": [
+          "duplicated-policy",
+          "caller-complexity",
+          "missing-test-seam"
+        ],
+        "fileLengthAdvisoryOnly": true
+      },
+      "seam": {
+        "proposedInterface": "loadSkillCorpusSourceSnapshot(templateDirectory)",
+        "requiresTwoAdapters": true,
+        "proposedAdapters": [
+          "filesystem-template-corpus",
+          "in-memory-test-corpus"
+        ],
+        "deletionTest": "If this module is deleted, the policy and caller complexity must reappear across callers; otherwise the module is too shallow.",
+        "interfaceTest": "Replace internals through the proposed interface and assert observable behavior through that interface only."
+      },
+      "hiddenComplexity": {
+        "depth": "high",
+        "leverage": "Concentrate repeated policy behind one interface so callers gain more behavior per fact learned.",
+        "locality": "Keep fixes, rollback, and causal validator updates inside the owner atom or map."
+      },
+      "dependencyClass": [
+        "in-process",
+        "local-substitutable"
+      ],
+      "replaceDontLayerTest": "Replace old private-internal tests with tests through the proposed interface once the adapters exist; do not layer tests over old shallow modules.",
+      "rollback": "revert TASK-SKL-0028 corpus snapshot and audit changes",
+      "causalValidators": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+        "npm run validate:skill-templates"
+      ],
+      "confidence": "high",
+      "receiptFingerprint": "deep-module-review:1c8317d2",
+      "baselineLabel": "source-snapshot-boundary",
+      "baselineFingerprint": "deep-module-review:52470e9f"
+    },
+    {
+      "schemaId": "atm.deepModuleReviewReport.v1",
+      "providerContract": "atm.deepModuleRefactorProvider.v1",
+      "providerId": "matt-pocock-deep-module-reference",
+      "providerVersion": "2026-07-24.ed37663",
+      "generatedAt": "1970-01-01T00:00:00.000Z",
+      "taskId": "TASK-SKL-0028",
+      "status": "pass",
+      "candidate": {
+        "moduleId": "skill-corpus-projection",
+        "sourcePaths": [
+          "packages/integrations-core/src/compiler/skill-templates.ts"
+        ],
+        "ownerAtomOrMap": "atom-skill-template-compiler",
+        "publicInterface": "compileSkillCorpus({ sourceSnapshot, adapterDescriptor })",
+        "rollback": "revert TASK-SKL-0028 projection wrapper changes",
+        "causalValidators": [
+          "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+          "npm run typecheck"
+        ]
+      },
+      "triggerVerdict": {
+        "actionableTriggers": [
+          "shotgun-changes",
+          "duplicated-policy",
+          "missing-test-seam"
+        ],
+        "fileLengthAdvisoryOnly": true
+      },
+      "seam": {
+        "proposedInterface": "compileSkillCorpus({ sourceSnapshot, adapterDescriptor })",
+        "requiresTwoAdapters": true,
+        "proposedAdapters": [
+          "codex-skill-projection",
+          "claude-skill-projection"
+        ],
+        "deletionTest": "If this module is deleted, the policy and caller complexity must reappear across callers; otherwise the module is too shallow.",
+        "interfaceTest": "Replace internals through the proposed interface and assert observable behavior through that interface only."
+      },
+      "hiddenComplexity": {
+        "depth": "high",
+        "leverage": "Concentrate repeated policy behind one interface so callers gain more behavior per fact learned.",
+        "locality": "Keep fixes, rollback, and causal validator updates inside the owner atom or map."
+      },
+      "dependencyClass": [
+        "in-process",
+        "local-substitutable"
+      ],
+      "replaceDontLayerTest": "Replace old private-internal tests with tests through the proposed interface once the adapters exist; do not layer tests over old shallow modules.",
+      "rollback": "revert TASK-SKL-0028 projection wrapper changes",
+      "causalValidators": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+        "npm run typecheck"
+      ],
+      "confidence": "high",
+      "receiptFingerprint": "deep-module-review:30cecbd9",
+      "baselineLabel": "projection-boundary",
+      "baselineFingerprint": "deep-module-review:52b3cbe6"
+    }
+  ],
+  "adapterProjectionContract": {
+    "interface": "compileSkillCorpus({ sourceSnapshot, adapterDescriptor })",
+    "sourceAuthority": "sealed corpus source snapshot",
+    "requiredFields": [
+      "sourceDigest",
+      "compilerVersion",
+      "degradationDiagnostics",
+      "manifestDigest"
+    ]
+  }
+}

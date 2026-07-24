@@ -30,14 +30,20 @@ export type {
   SkillTemplateAdapterTarget,
   AtmSkillTemplateFrontmatter,
   AtmSkillTemplate,
-  CompileSkillTemplateOptions
+  CompileSkillTemplateOptions,
+  SkillCorpusSourceFile,
+  SkillCorpusSourceSnapshot,
+  SkillCorpusAdapterDescriptor,
+  SkillCorpusProjection
 } from './compiler/skill-templates.ts';
 export {
   minimumAtmEntrySkillDefinitions,
   defaultSkillTemplateDirectory,
   parseSkillTemplate,
   loadSkillTemplates,
-  loadMinimumAtmSkillTemplates
+  loadMinimumAtmSkillTemplates,
+  loadSkillCorpusSourceSnapshot,
+  compileSkillCorpus
 } from './compiler/skill-templates.ts';
 
 export type { RenderedCharterInvariants } from './compiler/compile.ts';

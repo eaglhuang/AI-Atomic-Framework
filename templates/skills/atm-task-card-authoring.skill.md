@@ -110,6 +110,20 @@ Installed skill copies under agent or integration directories are derived
 artifacts; direct-only edits to those copies are not sufficient and must fail
 review because reinstalling or refreshing adapters can overwrite them.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: create follow-up cards by cohesive ownership before counting files
+or estimating smallness. A card should own one behavior, interface, evidence
+contract, or rollback boundary. If a "to-tickets" split would scatter one
+behavior across several cards, keep the card whole or require a provider-neutral
+review receipt that names the replaceable boundary.
+
+For skill-template or integration projection cards, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 ## Task Series Governance
 
 Never invent a new task-series prefix (a new TASK-XXX family) on your own.

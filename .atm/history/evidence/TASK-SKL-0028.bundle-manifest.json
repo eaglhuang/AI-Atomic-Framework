@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-SKL-0028",
+  "updatedAt": "2026-07-24T17:20:33.709Z",
+  "updatedBy": "codex-matt-skills-initiative-captain-20260724",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:skill-templates"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run validate:skill-templates",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5322a7d3facf564ad1b27dfac7095c34fc93931178fe355dd3b9111eb09f0b15",
+      "stderrSha256": "sha256:5a0bc7cac8a2dc14c973de7c1fedbabca549cc1c671ede9ee490ffd77a701a58",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-07-24T17:17:51.586Z",
+      "startedAt": null,
+      "finishedAt": null,
+      "durationMs": null,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10e1f152f4f5ba6dda1965b297c6a2affd1894655ccb3935f945d7d5d3546bf3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "generatedAt": "2026-07-24T17:17:51.588Z",
+      "startedAt": null,
+      "finishedAt": null,
+      "durationMs": null,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-24T17:17:51.716Z",
+      "startedAt": null,
+      "finishedAt": null,
+      "durationMs": null,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed3191a4c1f1fab9439f3a0e8acb4476288e5a83f736ef41e730857cb8dc43d6",
+      "stderrSha256": "sha256:07ae2f26ade32c83abdea19a76dccb915a8296b7c86ab6891c1f384b9d951a23",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-24T17:18:59.471Z",
+      "startedAt": "2026-07-24T17:18:22.390Z",
+      "finishedAt": "2026-07-24T17:18:59.471Z",
+      "durationMs": 37081,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f71c2a8ce6661d71dbc33a0dd9c21e7bcf8f35f6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-24T17:20:33.707Z",
+      "startedAt": "2026-07-24T17:18:22.632Z",
+      "finishedAt": "2026-07-24T17:20:33.707Z",
+      "durationMs": 131075,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f71c2a8ce6661d71dbc33a0dd9c21e7bcf8f35f6",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
