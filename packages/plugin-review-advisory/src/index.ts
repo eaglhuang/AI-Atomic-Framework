@@ -1,9 +1,21 @@
 import type { ConversationPatchDraftReport } from '@ai-atomic-framework/plugin-sdk';
 import { mapConversationPatchDraftsToMachineFindings } from './conversation-machine-findings.ts';
+import {
+  createDeepModuleReviewFingerprint,
+  createDeepModuleReviewReport,
+  deepModuleProviderInfo,
+  deepModuleProviderVocabulary
+} from './deep-module-provider.ts';
 
 export {
   checkPromotionSafetyGates
 } from './promotion-gates.ts';
+export {
+  createDeepModuleReviewFingerprint,
+  createDeepModuleReviewReport,
+  deepModuleProviderInfo,
+  deepModuleProviderVocabulary
+} from './deep-module-provider.ts';
 export type {
   PromotionSafetyGateName,
   PromotionSafetyFinding,
@@ -11,6 +23,15 @@ export type {
   PromotionSafetyContext,
   ProposalForSafetyCheck
 } from './promotion-gates.ts';
+export type {
+  DeepModuleDependencyClass,
+  DeepModuleObservedFriction,
+  DeepModuleRefactorCandidate,
+  DeepModuleReviewProviderInput,
+  DeepModuleReviewReport,
+  DeepModuleReviewStatus,
+  DeepModuleTrigger
+} from './deep-module-provider.ts';
 export {
   mapConversationPatchDraftsToMachineFindings
 };
@@ -452,5 +473,9 @@ export default {
   attachStandardsSpecReviewReceipt,
   inspectStandardsSpecReviewReceipt,
   mapConversationPatchDraftsToMachineFindings,
-  normalizeProviderPayload
+  normalizeProviderPayload,
+  createDeepModuleReviewReport,
+  createDeepModuleReviewFingerprint,
+  deepModuleProviderInfo,
+  deepModuleProviderVocabulary
 };
