@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T08-09-24-702Z-close-166e7915a04f",
+  "taskId": "TASK-SKL-0021",
+  "action": "close",
+  "actorId": "codex-matt-skills-initiative-captain-20260724",
+  "sessionId": "session-20260724074446-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0021-152cece283",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0021.json",
+  "taskSha256": "sha256:a4780a765647d72ee13ff2a1a77e2c4b76c44b66f5539320bd39b79d2a183675",
+  "createdAt": "2026-07-24T08:09:24.702Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0021 --actor codex-matt-skills-initiative-captain-20260724 --status done --historical-delivery 2cc221956081947a06e9f9e79bd522b49b5ce535",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724074446-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0021-152cece283",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0021.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/standards-spec-review-receipt.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:review-advisory"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T08:09:24.686Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0021.*",
+        ".atm/history/task-events/TASK-SKL-0021/**",
+        ".atm/history/tasks/TASK-SKL-0021.json",
+        "packages/cli/src/commands/review-advisory.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/plugin-review-advisory/src/index.ts",
+        "packages/plugin-review-advisory/src/promotion-gates.ts",
+        "schemas/review-advisory/review-advisory-report.schema.json",
+        "tests/cli/standards-spec-review-receipt.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/review-advisory.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/plugin-review-advisory/src/index.ts",
+        "packages/plugin-review-advisory/src/promotion-gates.ts",
+        "schemas/review-advisory/review-advisory-report.schema.json",
+        "tests/cli/standards-spec-review-receipt.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
