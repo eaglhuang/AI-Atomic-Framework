@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0018",
+  "title": "Provider-neutral skill capability and provenance foundation",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.1",
+  "dependencies": [],
+  "acceptance": [
+    "`atm.skillDefinition.vNext` can identify provider, version, provenance, capability, compatibility range, fallback and rollback without naming a particular vendor in ATM core control flow.",
+    "Provider replacement is fixture-tested and does not migrate task cards, test IDs, receipts, claims or close semantics.",
+    "Unsupported adapter capabilities emit explicit degradation evidence.",
+    "Existing skill definitions remain readable during migration.",
+    "No second skill registry, task lifecycle or approval model is introduced."
+  ],
+  "deliverables": [
+    "templates/skills/skill.schema.json",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "packages/core/src/team-runtime/provider-registry.ts",
+    "tests/cli/skill-provider-capability-contract.test.ts"
+  ],
+  "scopePaths": [
+    "templates/skills/skill.schema.json",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "packages/core/src/team-runtime/provider-registry.ts",
+    "packages/plugin-experience-loop/schemas/skill-candidate.schema.json",
+    "packages/plugin-experience-loop/schemas/skill-amendment.schema.json",
+    "scripts/validate-skill-templates.ts",
+    "tests/cli/skill-provider-capability-contract.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/skill-provider-capability-contract.test.ts",
+    "npm run validate:skill-templates",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "provider-capability-manifest-conformance",
+  "rollbackStrategy": "revert-commit-and-restore-current-skill-schema",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.agent-skills",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.skill-provider-capability-contract",
+        "pattern": "Provider Capability Contract",
+        "source": "templates/skills/skill.schema.json",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0018-provider-neutral-skill-capability-and-provenance-foundation.task.md",
+    "sectionTitle": "TASK-SKL-0018",
+    "headingLine": 46,
+    "hash": "332637fc46dcee77",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0018-provider-neutral-skill-capability-and-provenance-foundation.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:332637fc46dcee7740a6a557fc4e41ef7860c47d9e6fc02809ca823b58d649dc",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-24T05:59:02.101Z"
+    }
+  },
+  "importedAt": "2026-07-24T05:59:02.101Z",
+  "lastTransitionId": "2026-07-24T06-14-38-802Z-scope-amendment-924021b09c4c",
+  "lastTransitionAt": "2026-07-24T06:14:38.802Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-matt-skills-initiative-captain-20260724",
+  "reservedAt": "2026-07-24T05:59:11.604Z",
+  "promotedAt": "2026-07-24T05:59:11.607Z",
+  "claim": {
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "leaseId": "lease-65e1a5c41818",
+    "claimedAt": "2026-07-24T05:59:11.611Z",
+    "heartbeatAt": "2026-07-24T05:59:11.611Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0018.*",
+      ".atm/history/task-events/TASK-SKL-0018/**",
+      ".atm/history/tasks/TASK-SKL-0018.json",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "packages/core/src/team-runtime/provider-registry.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "packages/plugin-experience-loop/schemas/skill-amendment.schema.json",
+      "packages/plugin-experience-loop/schemas/skill-candidate.schema.json",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/skill.schema.json",
+      "tests/cli/skill-provider-capability-contract.test.ts",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260724055911-codex-matt-skills-initiative-captain-20260724-b9bbba107c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724055911-codex-matt-skills-initiative-captain-20260724-b9bbba107c\""
+    }
+  },
+  "startedAt": "2026-07-24T05:59:11.611Z",
+  "startedByActor": "codex-matt-skills-initiative-captain-20260724",
+  "startedBySessionId": "session-20260724055911-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0018-740ec1ea31",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0018",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0018.*",
+      ".atm/history/task-events/TASK-SKL-0018/**",
+      ".atm/history/tasks/TASK-SKL-0018.json",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "packages/core/src/team-runtime/provider-registry.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "packages/plugin-experience-loop/schemas/skill-amendment.schema.json",
+      "packages/plugin-experience-loop/schemas/skill-candidate.schema.json",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/skill.schema.json",
+      "tests/cli/skill-provider-capability-contract.test.ts",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0018-provider-neutral-skill-capability-and-provenance-foundation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0018-provider-neutral-skill-capability-and-provenance-foundation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "47504aef416ec6a24312616ad4cae741c2792e609ff7e9080395929f78d3b278",
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260724055911-codex-matt-skills-initiative-captain-20260724-b9bbba107c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724055911-codex-matt-skills-initiative-captain-20260724-b9bbba107c\""
+    },
+    "createdAt": "2026-07-24T05:59:17.360Z",
+    "status": "active"
+  }
+}

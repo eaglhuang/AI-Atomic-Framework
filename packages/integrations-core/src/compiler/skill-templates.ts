@@ -28,6 +28,68 @@ export interface AtmSkillTemplateFrontmatter {
   readonly handoffs: string;
 }
 
+export interface SkillProviderProvenance {
+  readonly providerId: string;
+  readonly version: string;
+  readonly provenance: {
+    readonly upstreamUrl: string;
+    readonly upstreamCommit: string;
+    readonly sourceDigest: `sha256:${string}`;
+  };
+  readonly license: string;
+}
+
+export interface AtmSkillDefinitionVNext {
+  readonly schemaId: 'atm.skillDefinition.vNext';
+  readonly specVersion: '0.1.0';
+  readonly provider: SkillProviderProvenance;
+  readonly capabilities: readonly string[];
+  readonly compatibility: { readonly atmContractVersions: readonly string[] };
+  readonly fallbackPolicy: 'deny' | 'degrade-with-evidence' | 'legacy-compatible';
+  readonly rollbackPolicy: 'provider-only' | 'manifest-only' | 'full-revert';
+  readonly shadowRun?: boolean;
+  readonly promotion?: 'manual-review' | 'measured-promotion' | 'disabled';
+}
+
+export interface SkillCapabilityManifestInput {
+  readonly provider: SkillProviderProvenance;
+  readonly capabilities: readonly string[];
+  readonly atmContractVersions: readonly string[];
+  readonly fallbackPolicy?: AtmSkillDefinitionVNext['fallbackPolicy'];
+  readonly rollbackPolicy?: AtmSkillDefinitionVNext['rollbackPolicy'];
+  readonly shadowRun?: boolean;
+  readonly promotion?: AtmSkillDefinitionVNext['promotion'];
+}
+
+export function createSkillDefinitionVNext(input: SkillCapabilityManifestInput): AtmSkillDefinitionVNext {
+  const capabilities = [...new Set(input.capabilities.map((value) => value.trim()).filter(Boolean))].sort();
+  const atmContractVersions = [...new Set(input.atmContractVersions.map((value) => value.trim()).filter(Boolean))].sort();
+  if (capabilities.length === 0) throw new Error('skill definition requires at least one capability');
+  if (atmContractVersions.length === 0) throw new Error('skill definition requires an ATM contract version');
+  return {
+    schemaId: 'atm.skillDefinition.vNext',
+    specVersion: '0.1.0',
+    provider: input.provider,
+    capabilities,
+    compatibility: { atmContractVersions },
+    fallbackPolicy: input.fallbackPolicy ?? 'degrade-with-evidence',
+    rollbackPolicy: input.rollbackPolicy ?? 'provider-only',
+    shadowRun: input.shadowRun ?? true,
+    promotion: input.promotion ?? 'manual-review'
+  };
+}
+
+export function projectSkillDefinition(
+  template: AtmSkillTemplate,
+  manifest: SkillCapabilityManifestInput
+): AtmSkillDefinitionVNext & { readonly skillId: string; readonly legacyReadable: true } {
+  return {
+    ...createSkillDefinitionVNext(manifest),
+    skillId: template.frontmatter.id,
+    legacyReadable: true
+  };
+}
+
 export interface AtmSkillTemplate {
   readonly frontmatter: AtmSkillTemplateFrontmatter;
   readonly body: string;

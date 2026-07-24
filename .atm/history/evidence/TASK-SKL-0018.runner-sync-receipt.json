@@ -1,0 +1,140 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0018",
+  "actorId": "codex-matt-skills-initiative-captain-20260724",
+  "actorIdentity": {
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "source": "ATM_ACTOR_ID"
+  },
+  "stewardWorkId": "runner-sync-3ebcf8f6",
+  "sealedSourceSha": "f1ea5870c30d989be0233c972e49e4fd222d0455",
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:86d6e43ec8cd9ef5c69c1d4e5a7ec9fabb09d6227ae81e0442f157236670833c",
+  "buildDecision": "fullRebuild",
+  "decisionReason": "release artifacts are dirty or missing",
+  "incrementalPlan": {
+    "schemaId": "atm.runnerIncrementalBuildPlan.v1",
+    "specVersion": "0.1.0",
+    "previousSealedSourceSha": "366c359688f47e8c1b15b8f530e1a8bcfb7ce43b",
+    "currentSealedSourceSha": "f1ea5870c30d989be0233c972e49e4fd222d0455",
+    "changedPaths": [],
+    "affectedPackages": [],
+    "affectedGroups": {
+      "packages": [],
+      "scripts": [],
+      "templates": [],
+      "schemas": [],
+      "atomicWorkbench": [],
+      "rootConfig": [],
+      "unknown": []
+    },
+    "incrementalEligible": false,
+    "unsafeReasons": []
+  },
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-07-24T06-04-56-276Z-runner-sync.jsonl",
+  "tsBuildCache": {
+    "schemaId": "atm.runnerTsBuildCacheSummary.v1",
+    "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
+    "tsBuildInfoPath": ".atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo",
+    "existedBefore": true,
+    "existsAfter": true,
+    "digestBefore": "sha256:b753f8cc2ca0a184e301edac4278c85f7f1044938a35ca312411b4649e1e6db7",
+    "digestAfter": "sha256:b753f8cc2ca0a184e301edac4278c85f7f1044938a35ca312411b4649e1e6db7",
+    "restoredBeforeBuild": true,
+    "persistedAfterBuild": true,
+    "gitPolicy": {
+      "rawCacheCommitted": false,
+      "storage": ".atm/runtime/runner-sync-build-cache/typescript/**"
+    }
+  },
+  "brokerTicket": {
+    "ticketId": "runner-sync-3ebcf8f6:f1ea5870c30d989be0233c972e49e4fd222d0455",
+    "waitedMs": 0,
+    "position": 1,
+    "headOwner": "TASK-SKL-0018"
+  },
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "worktreeSetup",
+    "dominantPhaseMs": 15450,
+    "totalElapsedMs": 50293,
+    "dominanceRatio": 0.3072,
+    "phaseMedianMs": 1258,
+    "phaseP95Ms": 15450,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
+  },
+  "buildObservation": {
+    "schemaId": "atm.runnerSyncBuildObservation.v1",
+    "buildDecision": "fullRebuild",
+    "decisionReason": "release artifacts are dirty or missing",
+    "brokerTicket": {
+      "ticketId": "runner-sync-3ebcf8f6:f1ea5870c30d989be0233c972e49e4fd222d0455",
+      "waitedMs": 0,
+      "position": 1,
+      "headOwner": "TASK-SKL-0018"
+    },
+    "changedPathCount": 0,
+    "affectedPackageCount": 0,
+    "unsafeReasons": [],
+    "dominantPhaseSummary": {
+      "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+      "dominantPhase": "worktreeSetup",
+      "dominantPhaseMs": 15450,
+      "totalElapsedMs": 50293,
+      "dominanceRatio": 0.3072,
+      "phaseMedianMs": 1258,
+      "phaseP95Ms": 15450,
+      "measuredPhaseCount": 8,
+      "optimizationVerdict": "inconclusive",
+      "basis": "single-run"
+    }
+  },
+  "phaseTimingsMs": {
+    "inputHashCalculation": 42,
+    "skipDecision": 170,
+    "worktreeSetup": 15450,
+    "typescriptBuild": 12853,
+    "rootDropReleaseAssembly": 10059,
+    "onefileReleaseAssembly": 1258,
+    "artifactSync": 9840,
+    "cleanup": 0,
+    "totalElapsed": 50293
+  },
+  "atomicWrite": {
+    "schemaId": "atm.runnerSyncAtomicWrite.v1",
+    "strategy": "temp-file-rename-with-retry",
+    "platform": "win32",
+    "maxAttempts": 4
+  },
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"TASK-SKL-0018\" --steward-work-id \"runner-sync-3ebcf8f6\" --receipt-ref \".atm/history/evidence/TASK-SKL-0018.runner-sync-receipt.json\" --json",
+  "treatmentTelemetry": {
+    "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
+    "executionMode": "command-executed",
+    "commandExecuted": true,
+    "outputObserved": true,
+    "receiptValidity": "valid",
+    "buildDecision": "fullRebuild",
+    "phaseTimingsMs": {
+      "inputHashCalculation": 42,
+      "skipDecision": 170,
+      "worktreeSetup": 15450,
+      "typescriptBuild": 12853,
+      "rootDropReleaseAssembly": 10059,
+      "onefileReleaseAssembly": 1258,
+      "artifactSync": 9840,
+      "cleanup": 0,
+      "totalElapsed": 50293
+    },
+    "rawTelemetryPolicy": "gitignored-runtime-only",
+    "tsBuildCacheDigest": "sha256:bcab6369ec969317516c35e5c1c046b3da73006aade1dced755b0590e7ab8aac"
+  },
+  "publishedAt": "2026-07-24T06:04:56.278Z"
+}
