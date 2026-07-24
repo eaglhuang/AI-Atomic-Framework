@@ -11,6 +11,7 @@
  */
 
 import type { BrokerArbitrationVerdict } from '../../../../core/src/broker/conflict-matrix.ts';
+import type { BrokerAdmissionResult } from '../../../../core/src/broker/admission/contracts.ts';
 import type { ClaimAdmissionCidVerdict, ClaimAdmissionDecision, ClaimOwnerComparison } from './claim-admission.ts';
 import type { BrokerQueueAdmission } from './broker-queue-admission.ts';
 
@@ -70,6 +71,7 @@ export const CLAIM_ADMISSION_GATE_NAMES = [
 ] as const;
 
 export interface ClaimAdmissionDecisionLogInput {
+  readonly canonicalResult?: BrokerAdmissionResult;
   readonly taskId: string;
   readonly conflictTaskId: string | null;
   readonly claimIntent: string;
@@ -98,7 +100,7 @@ export function buildClaimAdmissionDecisionLog(input: ClaimAdmissionDecisionLogI
     : (queueStatus === 'queue-head' ? 1 : null);
   const privateGranted = queueStatus === 'queued-private-work';
   const ownerComparison = input.ownerComparison ?? input.decision.ownerComparison ?? null;
-  const gates: readonly ClaimAdmissionGateOutcome[] = [
+  const legacyGates: readonly ClaimAdmissionGateOutcome[] = [
     {
       gate: 'claim-intent',
       outcome: input.claimIntent,
@@ -145,6 +147,13 @@ export function buildClaimAdmissionDecisionLog(input: ClaimAdmissionDecisionLogI
         : 'broker arbitration freezes the claim until the conflict is resolved'
     }
   ];
+  const gates: readonly ClaimAdmissionGateOutcome[] = input.canonicalResult
+    ? input.canonicalResult.trace.gates.map((gate) => ({
+      gate: gate.gate,
+      outcome: gate.status,
+      detail: gate.detail
+    }))
+    : legacyGates;
   return {
     schemaId: 'atm.nextClaimAdmissionDecisionLog.v1',
     taskId: input.taskId,

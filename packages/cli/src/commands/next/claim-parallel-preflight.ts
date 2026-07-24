@@ -1,9 +1,12 @@
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { collectResolutionAuthorizedForeignTaskIds } from '../broker-conflict-resolution.ts';
 import { buildBrokerConflictUxProjection } from '../team.ts';
 import { runTasks } from '../tasks/public-surface.ts';
 import { CliError } from '../shared.ts';
-import { compareClaimLifecycleOwners, deriveActiveWriteConflictFromOwnerComparison, deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission, resolveEffectiveShouldBlockPerCid } from './claim-admission.ts';
+import { compareClaimLifecycleOwners, deriveActiveWriteConflictFromOwnerComparison, deriveCidVerdict, evaluateNextClaimAdmissionAdapter } from './claim-admission.ts';
+import { buildPreClaimWriteIntent } from './claim-helpers.ts';
 import { evaluateBrokerQueueAdmission, type BrokerQueueAdmission } from './broker-queue-admission.ts';
 import { buildClaimAdmissionDecisionLog } from './claim-conflict-log.ts';
 import { createProposalLaneAdmission, readActiveProposalLane, writeProposalLane, type ProposalLaneAdmission } from './proposal-lane.ts';
@@ -95,11 +98,6 @@ export async function runClaimParallelPreflight(input: {
               input.cwd,
               input.claimableTask.workItemId
             );
-            const effectiveShouldBlockPerCid = resolveEffectiveShouldBlockPerCid({
-              shouldBlockPerCid,
-              conflictingTaskId: candidate.taskId,
-              resolutionAuthorizedForeignTaskIds
-            });
             const queueAdmission = evaluateBrokerQueueAdmission({
               cwd: input.cwd,
               taskId: input.claimableTask.workItemId,
@@ -163,24 +161,50 @@ export async function runClaimParallelPreflight(input: {
               blockedTaskIds: [candidate.taskId],
               requiredCommand
             });
-            // Broker verdict derivation: the parallel-preflight is itself the
-            // broker-authoritative arbitration for this claim path. `blocked`
-            // maps to broker `freeze`; anything else the CID gate would admit
-            // maps to broker `allow`. When broker's separate authoritative
-            // registry adds a distinct verdict feed here in a follow-up, the
-            // divergence detector will start firing.
-            const brokerVerdict = deriveBrokerVerdict({
-              queuedPrivateWork: queueAdmission.status === 'queued-private-work' || proposalLaneAdmission?.status === 'proposal-lane-opened',
-              shouldBlockPerCid: proposalLaneAdmission?.status === 'proposal-lane-opened' ? false : effectiveShouldBlockPerCid
+            const baseIntent = buildPreClaimWriteIntent({
+              taskId: input.claimableTask.workItemId,
+              actorId: input.actorId,
+              baseCommit: readGitHeadDigest(input.cwd),
+              targetFiles: claimAllowedFiles
             });
-            const admission = evaluateClaimAdmission({
-              brokerVerdict,
-              cidVerdict,
-              candidateTaskId: input.claimableTask.workItemId,
-              conflictingTaskId: candidate.taskId,
+            const candidateBoundedRegions = readTaskBoundedRegions(input.cwd, input.claimableTask.workItemId);
+            const conflictBoundedRegions = readTaskBoundedRegions(input.cwd, candidate.taskId);
+            const canonicalAdapter = evaluateNextClaimAdmissionAdapter({
+              candidateIntent: {
+                ...baseIntent,
+                ...(candidateBoundedRegions.length > 0
+                  ? {
+                    proposalAdmission: {
+                      trigger: 'same-file-overlap-risk' as const,
+                      summarySubmitted: true,
+                      boundedRegions: candidateBoundedRegions
+                    }
+                  }
+                  : {}),
+                atomRefs: overlappingAtomIds.map((atomId: string) => ({
+                  atomId,
+                  atomCid: `claim-observation:${atomId}`,
+                  operation: 'modify' as const
+                }))
+              },
+              conflictTaskId: candidate.taskId,
+              conflictActorId,
+              conflictFiles: overlappingFiles,
               overlappingAtomIds,
-              ownerComparison
+              conflictBoundedRegions,
+              resolutionAuthorizedForeignTaskIds
             });
+            const brokerVerdict = canonicalAdapter.canonical.trace.arbitrationVerdict;
+            const admission = {
+              admitted: canonicalAdapter.admitted,
+              blockCode: canonicalAdapter.blockCode,
+              blockReason: canonicalAdapter.blockReason,
+              divergence: null,
+              advisory: canonicalAdapter.admitted && overlappingAtomIds.length > 0
+                ? { kind: 'cid-overlap-advisory' as const, detail: canonicalAdapter.canonical.decisionReason }
+                : null,
+              ownerComparison
+            };
             const admissionReason = admission.admitted
               ? (queueAdmission.status === 'queued-private-work'
                 ? 'broker-shared-surface-queue-private-work'
@@ -193,6 +217,7 @@ export async function runClaimParallelPreflight(input: {
                 : 'cid-overlap-without-active-write-claim')
               : null;
             const claimAdmissionDecisionLog = buildClaimAdmissionDecisionLog({
+              canonicalResult: canonicalAdapter.canonical,
               taskId: input.claimableTask.workItemId,
               conflictTaskId: candidate.taskId,
               claimIntent: input.claimIntent,
@@ -254,6 +279,7 @@ export async function runClaimParallelPreflight(input: {
                 admissionReason,
                 brokerVerdict,
                 cidVerdict,
+                canonicalBrokerAdmission: canonicalAdapter.canonical,
                 claimAdmissionDecisionLog,
                 ...(proposalLaneAdmission ? { proposalLaneAdmission } : {}),
                 ...(admission.divergence ? { admissionDivergence: admission.divergence } : {})
@@ -308,4 +334,30 @@ function normalizeString(value: unknown): string | null {
 function readGitHeadDigest(cwd: string): string {
   const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd, encoding: 'utf8' });
   return result.status === 0 && result.stdout.trim() ? result.stdout.trim() : 'unresolved-head';
+}
+
+function readTaskBoundedRegions(
+  cwd: string,
+  taskId: string
+): readonly { readonly filePath: string; readonly lineStart: number; readonly lineEnd: number }[] {
+  try {
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    const proposal = task.proposalAdmission && typeof task.proposalAdmission === 'object'
+      ? task.proposalAdmission as Record<string, unknown>
+      : null;
+    const source = Array.isArray(proposal?.boundedRegions) ? proposal.boundedRegions : [];
+    return source.flatMap((entry) => {
+      if (!entry || typeof entry !== 'object') return [];
+      const record = entry as Record<string, unknown>;
+      const filePath = typeof record.filePath === 'string' ? record.filePath.replace(/\\/g, '/').trim() : '';
+      const lineStart = Number(record.lineStart);
+      const lineEnd = Number(record.lineEnd);
+      return filePath && Number.isInteger(lineStart) && Number.isInteger(lineEnd) && lineStart > 0 && lineEnd >= lineStart
+        ? [{ filePath, lineStart, lineEnd }]
+        : [];
+    });
+  } catch {
+    return [];
+  }
 }
