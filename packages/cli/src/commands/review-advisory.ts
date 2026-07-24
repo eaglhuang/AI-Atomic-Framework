@@ -41,10 +41,13 @@ interface ReviewAdvisoryOptions {
 export function runReviewAdvisory(argv: string[]) {
   const { options } = parseReviewAdvisoryOptions(argv);
   const reportId = options.reportId || `review-advisory.${Date.now()}`;
+  const effectiveSourcePaths = options.standardsSpecReceipt && options.sourcePaths.length === 0 && options.taskId
+    ? readTaskDeclaredFiles(options.cwd, options.taskId)
+    : options.sourcePaths;
   const target: ReviewAdvisoryTarget = {
     kind: options.targetKind,
     id: options.targetId || undefined,
-    sourcePaths: options.sourcePaths.length > 0 ? options.sourcePaths : undefined
+    sourcePaths: effectiveSourcePaths.length > 0 ? effectiveSourcePaths : undefined
   };
 
   let report: ReviewAdvisoryReport;
@@ -107,7 +110,7 @@ export function runReviewAdvisory(argv: string[]) {
       taskId: requireNonEmpty(options.taskId, '--task'),
       baseRef: options.baseRef || 'HEAD',
       candidateRef: options.candidateRef || 'worktree',
-      candidateDigest: digestSourcePaths(options.cwd, options.sourcePaths),
+      candidateDigest: digestSourcePaths(options.cwd, effectiveSourcePaths),
       standardsDigest: digestText(readOptionalFile(options.cwd, options.standardsSource)),
       specDigest: digestText(readOptionalFile(options.cwd, options.specSource)),
       provider: report.provider,
@@ -328,6 +331,31 @@ function digestSourcePaths(cwd: string, sourcePaths: string[]): string {
     hash.update('\0');
   }
   return `sha256:${hash.digest('hex')}`;
+}
+
+function readTaskDeclaredFiles(cwd: string, taskId: string): string[] {
+  const taskPath = path.resolve(cwd, '.atm/history/tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return [];
+  try {
+    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    return uniqueStrings([
+      ...readStringList(task.scopePaths),
+      ...readStringList(task.deliverables),
+      ...readStringList(task.targetAllowedFiles)
+    ].filter((file) => !file.startsWith('.atm/')));
+  } catch {
+    return [];
+  }
+}
+
+function readStringList(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.map((entry) => typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '').filter(Boolean)
+    : [];
+}
+
+function uniqueStrings(values: string[]): string[] {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }
 
 function readProviderPayloadFromFile(providerResponsePath: string) {
