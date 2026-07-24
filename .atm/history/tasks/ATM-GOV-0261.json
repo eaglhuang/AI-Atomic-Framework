@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0261",
+  "title": "VCS-neutral commit candidate isolation and Git adapter fallback",
+  "status": "running",
+  "milestone": "ATM-3.1-R0.13",
+  "dependencies": [
+    "ATM-GOV-0258",
+    "ATM-GOV-0259",
+    "ATM-GOV-0260"
+  ],
+  "acceptance": [
+    "A VCS-neutral `atm.commitCandidate.v1` envelope exists outside Git-specific control flow. It carries actor id, task id or framework-temp id, lane/session/lease when available, base seal, candidate files/resources, content digests, allowed resource keys, validation plan, evidence refs, expected trailers/metadata, and adapter target.",
+    "Commit candidates can be submitted without mutating the shared Git index. Two candidates for disjoint files can coexist while the physical index contains unrelated staged or dirty files.",
+    "Candidate admission reports one of: execute-now, queued, compose-eligible, revalidation-required, stale-base/CAS failure, adapter-required, or blocked with exact recoveryCommand. A bare shared-index refusal is not acceptable.",
+    "Existing Git-index, branch-commit, protected-bundle, runner-sync publication, and projection writes are projected into the same Broker/steward keyspace; no parallel global mutex or second queue decides commit authority (`ATM-BUG-2026-07-15-202`, `ATM-BUG-2026-07-15-205`).",
+    "The Git adapter may use pathspec/--only only after a candidate is admitted at queue head; evidence must record that pathspec was an adapter operation, not the authority model.",
+    "Direct native pathspec commits are documented and implemented only as emergency repair skill flow. They must set actor/task/WIP/delivery/emergency trailers and must never be presented as ordinary Plan3.1 success evidence.",
+    "The steward validates that the final persisted commit/revision contains exactly the admitted candidate payload plus allowed generated provenance, and does not consume unrelated staged files.",
+    "The queue/steward path preserves actor attribution for shared delivery commits and emits measurable counters: candidate count, queue residency, compose decisions, adapter fallback count, emergency pathspec count, false block count, and unrelated-index-residue isolation count.",
+    "A red-green replay covers the Plan3.1 backlog-writing case: unrelated staged WIP exists in the Git index, but a docs/backlog candidate is admitted and persisted without consuming the staged WIP. The green path must use ATM candidate/steward semantics; the pathspec command may appear only inside Git adapter evidence.",
+    "The same replay covers protected foreign staged provenance and release-order authorization without silent unstage, alternate index, or manual pathspec fallback (`ATM-BUG-2026-07-12-134`, `ATM-BUG-2026-07-22-235`).",
+    "A negative test proves ATM core tests can run without Git-specific pathspec semantics by using a fake repository adapter or in-memory candidate store.",
+    "Plan3.1 final verdict is blocked unless emergency pathspec count is either zero for normal delivery scenarios or explicitly classified as emergency/anomaly evidence outside the autonomous-parallel success metric."
+  ],
+  "deliverables": [
+    "packages/core/src/commit-candidate/commit-candidate.ts",
+    "packages/core/src/commit-candidate/commit-candidate-store.ts",
+    "packages/core/src/broker/shared-delivery-commit.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+    "packages/cli/src/commands/git.ts",
+    "templates/skills/atm-minimal-patch-rebuilder.skill.md",
+    "tests/cli/vcs-neutral-commit-candidate-isolation.test.ts",
+    "tests/cli/git-adapter-pathspec-fallback.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/commit-candidate/**",
+    "packages/core/src/broker/shared-delivery-commit.ts",
+    "packages/core/src/broker/shared-surface-queue.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+    "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+    "packages/cli/src/commands/git.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "templates/skills/atm-minimal-patch-rebuilder.skill.md",
+    ".agents/skills/atm-minimal-patch-rebuilder/SKILL.md",
+    "tests/cli/vcs-neutral-commit-candidate-isolation.test.ts",
+    "tests/cli/git-adapter-pathspec-fallback.test.ts",
+    "tests/cli/transactional-commit-queue-isolation.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/vcs-neutral-commit-candidate-isolation.test.ts",
+    "node --strip-types tests/cli/git-adapter-pathspec-fallback.test.ts",
+    "node --strip-types tests/cli/transactional-commit-queue-isolation.test.ts",
+    "npm run validate:cli",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "vcs-neutral-commit-candidate-isolation-red-green",
+  "rollbackStrategy": "revert-commit-and-retain-existing-git-adapter-commit-path",
+  "rollbackNotes": "Rollback may keep existing Git-specific governed commit behavior and emergency pathspec guidance, but Plan 3.1 final verdict must then remain blocked because ATM has not proven VCS-neutral commit-candidate isolation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.commit-candidate-isolation",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.commit-candidate-envelope",
+        "pattern": "Data Envelope",
+        "source": "packages/core/src/commit-candidate/commit-candidate.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.commit-candidate-store",
+        "pattern": "Repository Adapter Boundary",
+        "source": "packages/core/src/commit-candidate/commit-candidate-store.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.git-pathspec-emergency-adapter",
+        "pattern": "Adapter Facade",
+        "source": "packages/cli/src/commands/git-governance/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0261-vcs-neutral-commit-candidate-isolation-and-git-adapter-fallback.task.md",
+    "sectionTitle": "ATM-GOV-0261",
+    "headingLine": 92,
+    "hash": "31966a252e022741",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0261-vcs-neutral-commit-candidate-isolation-and-git-adapter-fallback.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:31966a252e022741dfa70de122b46dd1082935c51f755707bc747372d600d991",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-24T07:10:06.209Z"
+    }
+  },
+  "importedAt": "2026-07-24T07:10:06.209Z",
+  "lastTransitionId": "2026-07-24T09-08-05-811Z-claim-73060803547a",
+  "lastTransitionAt": "2026-07-24T09:08:05.811Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-002-plan31-captain",
+  "reservedAt": "2026-07-24T09:07:56.744Z",
+  "promotedAt": "2026-07-24T09:07:56.746Z",
+  "claim": {
+    "actorId": "claude-002-plan31-captain",
+    "leaseId": "lease-960d3006fc17",
+    "claimedAt": "2026-07-24T09:07:56.749Z",
+    "heartbeatAt": "2026-07-24T09:07:56.749Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0261.json",
+      ".agents/skills/atm-minimal-patch-rebuilder/SKILL.md",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "packages/core/src/commit-candidate/**",
+      "templates/skills/atm-minimal-patch-rebuilder.skill.md",
+      "tests/cli/git-adapter-pathspec-fallback.test.ts",
+      "tests/cli/transactional-commit-queue-isolation.test.ts",
+      "tests/cli/vcs-neutral-commit-candidate-isolation.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260724090756-claude-002-plan31-captain-eb6b56e404",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724090756-claude-002-plan31-captain-eb6b56e404\""
+    }
+  },
+  "startedAt": "2026-07-24T09:07:56.749Z",
+  "startedByActor": "claude-002-plan31-captain",
+  "startedBySessionId": "session-20260724090756-claude-002-plan31-captain-ATM-GOV-0261-78c8f67ed3",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0261",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".agents/skills/atm-minimal-patch-rebuilder/SKILL.md",
+      ".atm/history/evidence/ATM-GOV-0261.*",
+      ".atm/history/task-events/ATM-GOV-0261/**",
+      ".atm/history/tasks/ATM-GOV-0261.json",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "packages/core/src/commit-candidate/**",
+      "templates/skills/atm-minimal-patch-rebuilder.skill.md",
+      "tests/cli/git-adapter-pathspec-fallback.test.ts",
+      "tests/cli/transactional-commit-queue-isolation.test.ts",
+      "tests/cli/vcs-neutral-commit-candidate-isolation.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f2572a1eca14957d8300835ed834328c2636037e9413ec69431c992b01a5fa62",
+    "actorId": "claude-002-plan31-captain",
+    "sessionId": "session-20260724090756-claude-002-plan31-captain-ATM-GOV-0261-78c8f67ed3",
+    "laneSession": {
+      "laneSessionId": "lane-20260724090756-claude-002-plan31-captain-eb6b56e404",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724090756-claude-002-plan31-captain-eb6b56e404\""
+    },
+    "createdAt": "2026-07-24T09:08:05.810Z",
+    "status": "active"
+  }
+}

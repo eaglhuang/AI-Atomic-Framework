@@ -36,6 +36,8 @@ export interface SharedDeliveryCommitInput {
   readonly commitSha?: string | null;
   readonly temporaryIndexPath?: string | null;
   readonly provenance?: SharedDeliveryProvenanceInput | null;
+  /** VCS-neutral commit candidate this delivery persists (ATM-GOV-0261). */
+  readonly commitCandidateId?: string | null;
   readonly now?: string;
 }
 
@@ -55,6 +57,8 @@ export interface SharedWriteReceipt {
   readonly payloadDigest: string;
   readonly executorActor: string;
   readonly temporaryIndexIsolated: boolean;
+  /** VCS-neutral commit candidate id this receipt persists, when linked. */
+  readonly commitCandidateId: string | null;
   readonly payloadAssertion: {
     readonly status: 'pending' | 'passed';
     readonly expectedFileCount: number;
@@ -196,6 +200,7 @@ export function planSharedDeliveryCommit(input: SharedDeliveryCommitInput): Shar
     fileSlices: normalizedSlices,
     executorActor: input.actorId,
     temporaryIndexIsolated: true,
+    commitCandidateId: input.commitCandidateId ?? null,
     payloadAssertion: {
       status: input.commitSha ? 'passed' as const : 'pending' as const,
       expectedFileCount: uniqueSorted(Object.values(normalizedSlices).flat()).length,

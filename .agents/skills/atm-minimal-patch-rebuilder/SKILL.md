@@ -66,3 +66,24 @@ change, especially after `ATM_GIT_COMMIT_FAILED` with a nested
 - The file still exceeds the line budget after rebuild.
 - Focused validators fail.
 - Recovery requires hand-editing `.atm/runtime` or `.atm/history`.
+
+## VCS-neutral commit candidates and emergency pathspec (ATM-GOV-0261)
+
+This skill is an emergency repair lane, not a normal delivery path. ATM's normal
+commit isolation is VCS-neutral: a change is an `atm.commitCandidate.v1` envelope
+(actor, task/lane, base seal, candidate files, allowed resource keys, validation
+plan, evidence refs, expected trailers, adapter target) that the broker/steward
+admits before any repository adapter writes. Git pathspec / `git commit --only` /
+temporary-index staging is only the local Git adapter's final write operation.
+
+- Prefer the governed candidate path. If overlapping delivery can be completed by
+  submitting a commit candidate and letting the Git adapter persist it at queue
+  head, do that. The pathspec/temp-index detail then appears only inside
+  `atm.repositoryAdapterCommit.v1` evidence tied to the admitted candidate id.
+- Direct native pathspec / `--only` / `--no-verify` commits are emergency-only.
+  They must carry an emergency approval and set actor/task/WIP/delivery/emergency
+  trailers, and they surface `ATM_GIT_PATHSPEC_FALLBACK_REQUIRES_EMERGENCY`.
+- Emergency pathspec use is anomaly evidence. It must never be reported as
+  ordinary Plan 3.1 autonomous-parallel success; record it in the backlog and
+  keep it replayable as a counterexample until the candidate lane handles it
+  without emergency authority.
