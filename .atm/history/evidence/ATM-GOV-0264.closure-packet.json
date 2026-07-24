@@ -1,0 +1,223 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0264",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5be3b43ba08feef8dbad79331dfc08adc425a68b",
+  "governedTreeSha": "8992eb3e54aae5b813fa5d53718f1b5a17794c26",
+  "targetCommitDelta": {
+    "currentCommitSha": "5be3b43ba08feef8dbad79331dfc08adc425a68b",
+    "parentCommitShas": [
+      "5be3b43ba08feef8dbad79331dfc08adc425a68b"
+    ],
+    "governedTreeSha": "8992eb3e54aae5b813fa5d53718f1b5a17794c26",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0259.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-LANE-0021.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      "packages/cli/dist/commands/lane.js",
+      "packages/cli/dist/commands/next/claim-admission.js",
+      "packages/cli/dist/commands/next/claim-conflict-log.js",
+      "packages/cli/dist/commands/next/claim-parallel-preflight.js",
+      "packages/cli/dist/commands/taskflow/implementation.js",
+      "packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-conflict-log.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/core/src/broker/admission/contracts.ts",
+      "packages/core/src/broker/admission/evaluate-broker-admission.ts",
+      "packages/core/src/broker/decision.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/lane.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/claim-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/claim-conflict-log.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/claim-parallel-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/lane.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/claim-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/claim-conflict-log.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-root-drop/packages/core/dist/broker/decision.js",
+      "release/atm-root-drop/packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/packages/plugin-review-advisory/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-review-advisory/dist/index.js",
+      "release/atm-root-drop/packages/plugin-review-advisory/src/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/core/broker-admission-facade.test.ts",
+      "tests/core/same-atom-bounded-proposal-routing.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/broker-admission-facade.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:88f72ed52442046fc2829fcc43758c9c544fc4bce38a9b6645efe46daefc05c8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/core/same-atom-bounded-proposal-routing.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3f9057c9dea547c1979a46da346000dfb89aeee67309f58f0baae2ad979c8ce1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/core/broker-overlap-callsite-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:99b084c1942708ee91263d2e1233a9154e238034d2bc6549f91234369d5eed70",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aa4a3fbcdb02e6b6db1b091c4d243f72b32c30910466d20c7e35c9e8d4625f5a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:2f23a9a39f6f9cbf559a8e7d3689dc9f0b291dbae755ccbdebe98842db0e72c1",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+    "node --strip-types tests/core/broker-admission-facade.test.ts",
+    "node --strip-types tests/core/broker-overlap-callsite-parity.test.ts",
+    "node --strip-types tests/core/same-atom-bounded-proposal-routing.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-24T16:32:51.053Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0264.*",
+      ".atm/history/task-events/ATM-GOV-0264/**",
+      ".atm/history/tasks/ATM-GOV-0264.json",
+      "packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-conflict-log.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/core/src/broker/admission/**",
+      "packages/core/src/broker/admission/contracts.ts",
+      "packages/core/src/broker/admission/evaluate-broker-admission.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/decision/proposal-overlap.ts",
+      "packages/core/src/broker/proposal.ts",
+      "tests/core/broker-admission-facade.test.ts",
+      "tests/core/broker-overlap-callsite-parity.test.ts",
+      "tests/core/same-atom-bounded-proposal-routing.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-conflict-log.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/core/src/broker/admission/**",
+      "packages/core/src/broker/admission/contracts.ts",
+      "packages/core/src/broker/admission/evaluate-broker-admission.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/decision/proposal-overlap.ts",
+      "packages/core/src/broker/proposal.ts",
+      "tests/core/broker-admission-facade.test.ts",
+      "tests/core/broker-overlap-callsite-parity.test.ts",
+      "tests/core/same-atom-bounded-proposal-routing.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0264.json",
+  "closedAt": "2026-07-24T16:32:51.054Z",
+  "closedByActor": "codex-plan31-captain",
+  "sessionId": "session-20260724160723-codex-plan31-captain-ATM-GOV-0264-8592c74074",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "5be3b43ba08feef8dbad79331dfc08adc425a68b",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-conflict-log.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/core/src/broker/admission/contracts.ts",
+      "packages/core/src/broker/admission/evaluate-broker-admission.ts",
+      "packages/core/src/broker/decision.ts",
+      "tests/core/broker-admission-facade.test.ts",
+      "tests/core/same-atom-bounded-proposal-routing.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0264.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0264/2026-07-24T16-07-18-413Z-import-3555c4ec11cc.json",
+      ".atm/history/task-events/ATM-GOV-0264/2026-07-24T16-07-23-302Z-reserve-eb48bc0235de.json",
+      ".atm/history/task-events/ATM-GOV-0264/2026-07-24T16-07-23-305Z-promote-0622cb12c3ef.json",
+      ".atm/history/task-events/ATM-GOV-0264/2026-07-24T16-07-29-553Z-claim-96c68d95f45d.json",
+      ".atm/history/tasks/ATM-GOV-0264.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

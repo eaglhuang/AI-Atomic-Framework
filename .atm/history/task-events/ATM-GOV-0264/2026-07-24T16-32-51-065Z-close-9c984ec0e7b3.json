@@ -1,0 +1,84 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T16-32-51-065Z-close-9c984ec0e7b3",
+  "taskId": "ATM-GOV-0264",
+  "action": "close",
+  "actorId": "codex-plan31-captain",
+  "sessionId": "session-20260724160723-codex-plan31-captain-ATM-GOV-0264-8592c74074",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0264.json",
+  "taskSha256": "sha256:3cd101f88a430c962f7bd46edf49c3ef8a577622c85b58bf7646745df34d9a48",
+  "createdAt": "2026-07-24T16:32:51.065Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0264 --actor codex-plan31-captain --status done --historical-delivery 5be3b43ba08feef8dbad79331dfc08adc425a68b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724160723-codex-plan31-captain-ATM-GOV-0264-8592c74074",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0264.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+      "node --strip-types tests/core/broker-admission-facade.test.ts",
+      "node --strip-types tests/core/broker-overlap-callsite-parity.test.ts",
+      "node --strip-types tests/core/same-atom-bounded-proposal-routing.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T16:32:51.053Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0264.*",
+        ".atm/history/task-events/ATM-GOV-0264/**",
+        ".atm/history/tasks/ATM-GOV-0264.json",
+        "packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/claim-conflict-log.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/core/src/broker/admission/**",
+        "packages/core/src/broker/admission/contracts.ts",
+        "packages/core/src/broker/admission/evaluate-broker-admission.ts",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/decision.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "packages/core/src/broker/proposal.ts",
+        "tests/core/broker-admission-facade.test.ts",
+        "tests/core/broker-overlap-callsite-parity.test.ts",
+        "tests/core/same-atom-bounded-proposal-routing.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/__tests__/same-atom-proposal-admission.test.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/claim-conflict-log.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/core/src/broker/admission/**",
+        "packages/core/src/broker/admission/contracts.ts",
+        "packages/core/src/broker/admission/evaluate-broker-admission.ts",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/decision.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "packages/core/src/broker/proposal.ts",
+        "tests/core/broker-admission-facade.test.ts",
+        "tests/core/broker-overlap-callsite-parity.test.ts",
+        "tests/core/same-atom-bounded-proposal-routing.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
