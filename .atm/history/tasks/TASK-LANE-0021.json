@@ -1,0 +1,211 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0021",
+  "title": "Lane capability secrecy and proxy execution gate",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0017",
+    "TASK-LANE-0020"
+  ],
+  "acceptance": [
+    "Passing `--actor <other-worker>` from a different active lane is rejected for taskflow close/write, governed commit, framework-mode, runner-sync, and push unless a valid proxy/takeover receipt is supplied.",
+    "Owner lane execution remains allowed when actor metadata has drifted but the lane capability matches the live claim or adopted lane.",
+    "Human/captain approvals create non-replayable proxy/takeover receipts that name approver, executor lane, owner lane, task, command class, reason, TTL, and exact delegated surfaces.",
+    "Ordinary CLI JSON, status reports, dispatch summaries, and worker reports redact reusable lease/ticket/lane capability keys. They may show task id, actor id, lane fingerprint, ticket fingerprint, state, queue verdict, and recovery class.",
+    "A non-owner cannot learn a replayable ticket key through normal status, broker, runner-sync, taskflow, or framework-mode report output.",
+    "Regression tests replay the 2026-07-24 Plan captain overreach without task-specific control flow: borrowed actor close/write and release publish must fail closed; approved proxy execution must pass and write an audit artifact.",
+    "Diagnostics distinguish `owner-lane`, `approved-proxy`, `adopted-owner-lane`, `redacted-capability`, and `borrowed-actor-blocked`.",
+    "The fix is generalized under INV-ATM-009. Production code may not special-case Plan3.1, 0263, `claude-002`, `codex-plan31`, dates, or local paths."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/lane-session/**",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/taskflow/close/**",
+    "packages/cli/src/commands/git-governance/**",
+    "packages/cli/src/commands/framework-development/temp-claim.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "packages/core/src/broker/**",
+    "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
+    "tests/cli/borrowed-actor-authority-hard-gate.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/lane-session/**",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/taskflow/close/**",
+    "packages/cli/src/commands/git-governance/**",
+    "packages/cli/src/commands/framework-development/temp-claim.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "packages/core/src/broker/**",
+    "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
+    "tests/cli/borrowed-actor-authority-hard-gate.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
+    "node --strip-types tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Rewriting the seven-layer broker admission model.",
+    "Adding task-specific actor or ticket exceptions.",
+    "Making captains owner lanes by default."
+  ],
+  "nonGoals": [
+    "Do not remove human-readable actor ids from diagnostics.",
+    "Do not expose replayable lease, ticket, or lane capability keys in ordinary reports."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Restore legacy actor-string authority only if proxy/takeover gates over-block valid owner lanes.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane-session-authority",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane-capability-secrecy",
+        "pattern": "Capability Boundary",
+        "source": "packages/cli/src/commands/lane-session/**",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.borrowed-actor-execution-gate",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/taskflow/close/**",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0021-lane-capability-secrecy-and-proxy-execution-gate.task.md",
+    "sectionTitle": "TASK-LANE-0021",
+    "headingLine": 70,
+    "hash": "81c69bed1e0ab204",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0021-lane-capability-secrecy-and-proxy-execution-gate.task.md",
+      "planningCommitSha": "4489ef991880288c25d9bb54c6317b80a6f3b6df",
+      "contentDigest": "sha256:81c69bed1e0ab204863a83999c47a029e5f16635c9b6615196a66bfa0e5228da",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-24T15:10:35.991Z"
+    }
+  },
+  "importedAt": "2026-07-24T15:10:35.991Z",
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-24T15-48-35-029Z-scope-amendment-c6d43477acc6",
+  "lastTransitionAt": "2026-07-24T15:48:35.029Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-003-plan31-captain",
+  "reservedAt": "2026-07-24T15:11:14.945Z",
+  "promotedAt": "2026-07-24T15:11:14.949Z",
+  "claim": {
+    "actorId": "claude-003-plan31-captain",
+    "leaseId": "lease-a2cadf4e835b",
+    "claimedAt": "2026-07-24T15:11:14.954Z",
+    "heartbeatAt": "2026-07-24T15:11:14.954Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-LANE-0021.*",
+      ".atm/history/task-events/TASK-LANE-0021/**",
+      ".atm/history/tasks/TASK-LANE-0021.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/framework-development/temp-claim.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/lane-session/**",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/close/**",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/core/src/broker/**",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260724151115-claude-003-plan31-captain-1dd0fc7d1e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724151115-claude-003-plan31-captain-1dd0fc7d1e\""
+    }
+  },
+  "startedAt": "2026-07-24T15:11:14.954Z",
+  "startedByActor": "claude-003-plan31-captain",
+  "startedBySessionId": "session-20260724151114-claude-003-plan31-captain-TASK-LANE-0021-a63e663c2c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0021",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0021.*",
+      ".atm/history/task-events/TASK-LANE-0021/**",
+      ".atm/history/tasks/TASK-LANE-0021.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/framework-development/temp-claim.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/cli/src/commands/lane-session/**",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/close/**",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/core/src/broker/**",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0021-lane-capability-secrecy-and-proxy-execution-gate.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0021-lane-capability-secrecy-and-proxy-execution-gate.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "0810813eadbcad6ee98d385828f0c412668a122ca303d5950ad60bdd1b79ea60",
+    "actorId": "claude-003-plan31-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260724151115-claude-003-plan31-captain-1dd0fc7d1e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724151115-claude-003-plan31-captain-1dd0fc7d1e\""
+    },
+    "createdAt": "2026-07-24T15:11:21.188Z",
+    "status": "active"
+  }
+}

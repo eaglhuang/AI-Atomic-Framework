@@ -1,0 +1,150 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-LANE-0021",
+  "actorId": "claude-003-plan31-captain",
+  "actorIdentity": {
+    "actorId": "claude-003-plan31-captain",
+    "source": "ATM_ACTOR_ID"
+  },
+  "stewardWorkId": "runner-sync-680866dc",
+  "sealedSourceSha": "25629fecd438658336636c61b64d778e68d71961",
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:7b0fa0ea9d06de57636a64a07d61c3beb0ed4bd13b97db63f030f560b7bcd7ff",
+  "buildDecision": "incrementalBuild",
+  "decisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlan": {
+    "schemaId": "atm.runnerIncrementalBuildPlan.v1",
+    "specVersion": "0.1.0",
+    "previousSealedSourceSha": "7e6af41561f0f6ea8790a0c2f8c2526e77b3122f",
+    "currentSealedSourceSha": "25629fecd438658336636c61b64d778e68d71961",
+    "changedPaths": [
+      "packages/cli/dist/commands/next/playbook-projection/active-work-summary.js",
+      "packages/cli/dist/commands/next/route-resolution/intent.js",
+      "packages/cli/dist/commands/next/route-resolution/queue-inspection.js"
+    ],
+    "affectedPackages": [
+      "packages/cli"
+    ],
+    "affectedGroups": {
+      "packages": [
+        "packages/cli/dist/commands/next/playbook-projection/active-work-summary.js",
+        "packages/cli/dist/commands/next/route-resolution/intent.js",
+        "packages/cli/dist/commands/next/route-resolution/queue-inspection.js"
+      ],
+      "scripts": [],
+      "templates": [],
+      "schemas": [],
+      "atomicWorkbench": [],
+      "rootConfig": [],
+      "unknown": []
+    },
+    "incrementalEligible": true,
+    "unsafeReasons": []
+  },
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-07-24T15-38-20-113Z-runner-sync.jsonl",
+  "tsBuildCache": {
+    "schemaId": "atm.runnerTsBuildCacheSummary.v1",
+    "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
+    "tsBuildInfoPath": ".atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo",
+    "existedBefore": true,
+    "existsAfter": true,
+    "digestBefore": "sha256:8e1eaaa3350b27811b564f1032350ef138662fdc1bb07e7bc26711bdf44e1787",
+    "digestAfter": "sha256:8e1eaaa3350b27811b564f1032350ef138662fdc1bb07e7bc26711bdf44e1787",
+    "restoredBeforeBuild": true,
+    "persistedAfterBuild": true,
+    "gitPolicy": {
+      "rawCacheCommitted": false,
+      "storage": ".atm/runtime/runner-sync-build-cache/typescript/**"
+    }
+  },
+  "brokerTicket": {
+    "ticketId": "runner-sync-680866dc:25629fecd438658336636c61b64d778e68d71961",
+    "waitedMs": 0,
+    "position": 1,
+    "headOwner": "TASK-LANE-0021"
+  },
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "worktreeSetup",
+    "dominantPhaseMs": 15971,
+    "totalElapsedMs": 48518,
+    "dominanceRatio": 0.3292,
+    "phaseMedianMs": 1495,
+    "phaseP95Ms": 15971,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
+  },
+  "buildObservation": {
+    "schemaId": "atm.runnerSyncBuildObservation.v1",
+    "buildDecision": "incrementalBuild",
+    "decisionReason": "diff planner selected 1 affected package(s)",
+    "brokerTicket": {
+      "ticketId": "runner-sync-680866dc:25629fecd438658336636c61b64d778e68d71961",
+      "waitedMs": 0,
+      "position": 1,
+      "headOwner": "TASK-LANE-0021"
+    },
+    "changedPathCount": 3,
+    "affectedPackageCount": 1,
+    "unsafeReasons": [],
+    "dominantPhaseSummary": {
+      "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+      "dominantPhase": "worktreeSetup",
+      "dominantPhaseMs": 15971,
+      "totalElapsedMs": 48518,
+      "dominanceRatio": 0.3292,
+      "phaseMedianMs": 1495,
+      "phaseP95Ms": 15971,
+      "measuredPhaseCount": 8,
+      "optimizationVerdict": "inconclusive",
+      "basis": "single-run"
+    }
+  },
+  "phaseTimingsMs": {
+    "inputHashCalculation": 41,
+    "skipDecision": 45,
+    "worktreeSetup": 15971,
+    "typescriptBuild": 9086,
+    "rootDropReleaseAssembly": 8528,
+    "onefileReleaseAssembly": 1495,
+    "artifactSync": 10591,
+    "cleanup": 0,
+    "totalElapsed": 48518
+  },
+  "atomicWrite": {
+    "schemaId": "atm.runnerSyncAtomicWrite.v1",
+    "strategy": "temp-file-rename-with-retry",
+    "platform": "win32",
+    "maxAttempts": 4
+  },
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"TASK-LANE-0021\" --steward-work-id \"runner-sync-680866dc\" --receipt-ref \".atm/history/evidence/TASK-LANE-0021.runner-sync-receipt.json\" --json",
+  "treatmentTelemetry": {
+    "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
+    "executionMode": "command-executed",
+    "commandExecuted": true,
+    "outputObserved": true,
+    "receiptValidity": "valid",
+    "buildDecision": "incrementalBuild",
+    "phaseTimingsMs": {
+      "inputHashCalculation": 41,
+      "skipDecision": 45,
+      "worktreeSetup": 15971,
+      "typescriptBuild": 9086,
+      "rootDropReleaseAssembly": 8528,
+      "onefileReleaseAssembly": 1495,
+      "artifactSync": 10591,
+      "cleanup": 0,
+      "totalElapsed": 48518
+    },
+    "rawTelemetryPolicy": "gitignored-runtime-only",
+    "tsBuildCacheDigest": "sha256:dad9caeef30cfb5b1c8c12a7d6d4387b19aa226a0726110a3828b6c78ce76cf0"
+  },
+  "publishedAt": "2026-07-24T15:38:20.116Z"
+}
