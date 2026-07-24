@@ -1,0 +1,174 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0027",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d8fee0a3e21b609b449d3e703b9cb2123ba248ae",
+  "governedTreeSha": "58d04c9c6c0dcf3f03d8b8f8c5db0c634a728675",
+  "targetCommitDelta": {
+    "currentCommitSha": "d8fee0a3e21b609b449d3e703b9cb2123ba248ae",
+    "parentCommitShas": [
+      "d8fee0a3e21b609b449d3e703b9cb2123ba248ae"
+    ],
+    "governedTreeSha": "58d04c9c6c0dcf3f03d8b8f8c5db0c634a728675",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0259.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0027.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0027.json",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-39-03-329Z-import-c4decda6b022.json",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-39-03-332Z-claim-displaced-by-import-debd3e0c93b1.json",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-39-30-872Z-reserve-ab3e074a6748.json",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-39-30-874Z-promote-45e266f0cfc0.json",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-39-41-836Z-claim-fdfa60aacb53.json",
+      ".atm/history/tasks/TASK-SKL-0027.json",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/plugin-review-advisory/src/deep-module-provider.ts",
+      "packages/plugin-review-advisory/src/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/release-manifest.json",
+      "templates/skills/atm-deep-module-refactor.files/references/deepening.md",
+      "templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "tests/cli/deep-module-refactor-provider.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/deep-module-refactor-provider.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:77315ecb0f3fa698f3828b1ef879eac25c8000baea3957f020afd5e678a4ad5e",
+      "stderrSha256": "sha256:0b51aeb316f8a9f6dc90b2665ed059ea6c9ce2fe8604346b5ee6e52ed71a2ca4",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a82411efdc469a3dcc28ea711678579c7fcd669d1ca33c18f2a17f940b0280eb",
+      "stderrSha256": "sha256:6b54448714f0c0b894ba5cd655316707ef8780cd6e50498301e39823e47a88c8",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:7c30e4e790df970962a1963d72341ebb347fb1555c09a29df0d1d4cd73139dc4",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/deep-module-refactor-provider.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:skill-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-24T15:46:02.259Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0027.*",
+      ".atm/history/task-events/TASK-SKL-0027/**",
+      ".atm/history/tasks/TASK-SKL-0027.json",
+      "packages/plugin-review-advisory/src/deep-module-provider.ts",
+      "packages/plugin-review-advisory/src/index.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-atom-map-refactor.skill.md",
+      "templates/skills/atm-deep-module-refactor.files/references/**",
+      "templates/skills/atm-deep-module-refactor.files/references/deepening.md",
+      "templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "tests/cli/deep-module-refactor-provider.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/plugin-review-advisory/src/deep-module-provider.ts",
+      "packages/plugin-review-advisory/src/index.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-deep-module-refactor.files/references/**",
+      "tests/cli/deep-module-refactor-provider.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0027.json",
+  "closedAt": "2026-07-24T15:46:02.260Z",
+  "closedByActor": "codex-matt-skills-initiative-captain-20260724",
+  "sessionId": "session-20260724153930-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0027-44937bb37c",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d8fee0a3e21b609b449d3e703b9cb2123ba248ae",
+    "taskMatchedFiles": [
+      "packages/plugin-review-advisory/src/deep-module-provider.ts",
+      "packages/plugin-review-advisory/src/index.ts",
+      "templates/skills/atm-deep-module-refactor.files/references/deepening.md",
+      "templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "tests/cli/deep-module-refactor-provider.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0027.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-04-57-759Z-import-4b7f8c64c29c.json",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-05-23-058Z-reserve-bfae93f33a03.json",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-05-23-060Z-promote-9b5d44178c7d.json",
+      ".atm/history/task-events/TASK-SKL-0027/2026-07-24T15-05-31-432Z-claim-b743d311296a.json",
+      ".atm/history/tasks/TASK-SKL-0027.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

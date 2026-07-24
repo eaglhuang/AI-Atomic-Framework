@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-SKL-0027",
   "title": "Replaceable deep-module refactoring provider route",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-SKL-VG-R0.2",
   "dependencies": [
     "TASK-SKL-0018"
@@ -19,7 +19,9 @@
     "Provider recommendations preserve public interface, owner atom/map, rollback and causal validators.",
     "Provider can be replaced without changing ATM refactor evidence.",
     "A contract fixture pins the downloaded 2026-07-24 reference snapshot: upstream commit `ed37663cc5fbef691ddfecd080dff42f7e7e350d`; `codebase-design` bundle digest `sha256:c46b49303a81c7fc8934d0f4fbc44382cdecb73942d85d8d7db3523407fff8fa`; `improve-codebase-architecture` bundle digest `sha256:d3682058df92c259b47c36503baa02345d5811758621b5dc03081d5ba0f7b69b`. A future upstream version is an explicit provider upgrade, not an unreviewed text overwrite.",
-    "After this card closes, ATM-GOV-0264 consumes one sealed deep-module review receipt before implementation; TASK-SKL-0027 does not itself edit Broker production code."
+    "After this card closes, ATM-GOV-0264 consumes one sealed deep-module review receipt before implementation; TASK-SKL-0027 does not itself edit Broker production code.",
+    "This card remains the complete semantic unit for the deep-module provider: source template, progressive-disclosure references, provider route and sealed review receipt are all part of the same completion signal.",
+    "If local ignore rules hide required new `templates/**` deliverables, do not redefine the card or move essential deliverables merely to bypass the tool. Stop for an ATM-governed ignored-deliverable admission/recovery, or obtain a human card amendment that explicitly declares the hidden files nonessential. TASK-SKL-0028 may later audit or rewrite the broader skill corpus, but it must not become the hidden owner of 0027's required completion semantics."
   ],
   "deliverables": [
     "templates/skills/atm-atom-map-refactor.skill.md",
@@ -62,7 +64,7 @@
       {
         "atom": "atm.deep-module-refactor-provider",
         "pattern": "Refactoring Strategy Provider",
-        "source": "templates/skills/atm-deep-module-refactor.skill.md",
+        "source": "packages/plugin-review-advisory/src/deep-module-provider.ts",
         "disposition": "extract",
         "inlineReason": null
       }
@@ -76,19 +78,19 @@
     "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0027-replaceable-deep-module-refactoring-provider-route.task.md",
     "sectionTitle": "TASK-SKL-0027",
     "headingLine": 82,
-    "hash": "0a5f7ea6816c4397",
+    "hash": "42f5e304697f422c",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0027-replaceable-deep-module-refactoring-provider-route.task.md",
-      "planningCommitSha": "4489ef991880288c25d9bb54c6317b80a6f3b6df",
-      "contentDigest": "sha256:0a5f7ea6816c43974ef0efd79a6211dd30844ecd82c08d5e49dabf608b2fd81e",
+      "planningCommitSha": "68614a0fdd84c2c510a7effb39f14da6d67128fc",
+      "contentDigest": "sha256:42f5e304697f422cab21efae671f0c9787fec08efa0a5c3e6bdf892570730741",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-24T15:04:57.636Z"
+      "sealedAt": "2026-07-24T15:39:03.093Z"
     }
   },
-  "importedAt": "2026-07-24T15:04:57.636Z",
+  "importedAt": "2026-07-24T15:39:03.093Z",
   "causalGraph": {
     "causalDependencies": [],
     "startConditions": [],
@@ -99,17 +101,17 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-24T15-05-31-432Z-claim-b743d311296a",
-  "lastTransitionAt": "2026-07-24T15:05:31.432Z",
+  "lastTransitionId": "2026-07-24T15-46-02-273Z-close-750f79c1e141",
+  "lastTransitionAt": "2026-07-24T15:46:02.273Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-matt-skills-initiative-captain-20260724",
-  "reservedAt": "2026-07-24T15:05:23.058Z",
-  "promotedAt": "2026-07-24T15:05:23.060Z",
+  "reservedAt": "2026-07-24T15:39:30.872Z",
+  "promotedAt": "2026-07-24T15:39:30.874Z",
   "claim": {
     "actorId": "codex-matt-skills-initiative-captain-20260724",
-    "leaseId": "lease-220a435a63fd",
-    "claimedAt": "2026-07-24T15:05:23.064Z",
-    "heartbeatAt": "2026-07-24T15:05:23.064Z",
+    "leaseId": "lease-16517a6e7a14",
+    "claimedAt": "2026-07-24T15:39:30.879Z",
+    "heartbeatAt": "2026-07-24T15:46:02.270Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-SKL-0027.json",
@@ -121,18 +123,18 @@
       "templates/skills/atm-deep-module-refactor.skill.md",
       "tests/cli/deep-module-refactor-provider.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260724150523-codex-matt-skills-initiative-captain-20260724-e5c7918ef2",
+      "laneSessionId": "lane-20260724153930-codex-matt-skills-initiative-captain-20260724-e7fd5df3ea",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724150523-codex-matt-skills-initiative-captain-20260724-e5c7918ef2\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724153930-codex-matt-skills-initiative-captain-20260724-e7fd5df3ea\""
+    },
+    "reason": "closed"
   },
-  "startedAt": "2026-07-24T15:05:23.064Z",
+  "startedAt": "2026-07-24T15:39:30.879Z",
   "startedByActor": "codex-matt-skills-initiative-captain-20260724",
-  "startedBySessionId": "session-20260724150523-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0027-f107bd80cc",
+  "startedBySessionId": "session-20260724153930-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0027-44937bb37c",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -158,14 +160,18 @@
     "allowPlanningMirror": false,
     "promptHash": "21767164627dd5b66854179b7f8962e7ef9cc2eb17ec16dbf369c5a913b4573a",
     "actorId": "codex-matt-skills-initiative-captain-20260724",
-    "sessionId": "session-20260724150523-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0027-f107bd80cc",
+    "sessionId": "session-20260724153930-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0027-44937bb37c",
     "laneSession": {
-      "laneSessionId": "lane-20260724150523-codex-matt-skills-initiative-captain-20260724-e5c7918ef2",
+      "laneSessionId": "lane-20260724153930-codex-matt-skills-initiative-captain-20260724-e7fd5df3ea",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724150523-codex-matt-skills-initiative-captain-20260724-e5c7918ef2\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724153930-codex-matt-skills-initiative-captain-20260724-e7fd5df3ea\""
     },
-    "createdAt": "2026-07-24T15:05:31.431Z",
+    "createdAt": "2026-07-24T15:39:41.835Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-24T15:46:02.270Z",
+  "closedByActor": "codex-matt-skills-initiative-captain-20260724",
+  "closedBySessionId": "session-20260724153930-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0027-44937bb37c",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0027.closure-packet.json"
 }

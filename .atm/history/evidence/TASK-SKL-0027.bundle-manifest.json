@@ -1,11 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-SKL-0027",
-  "updatedAt": "2026-07-24T15:35:53.723Z",
+  "updatedAt": "2026-07-24T15:41:45.801Z",
   "updatedBy": "codex-matt-skills-initiative-captain-20260724",
   "freshValidationPasses": [
     "node --strip-types tests/cli/deep-module-refactor-provider.test.ts",
     "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:skill-templates"
   ],
   "staleValidationPasses": [],
@@ -104,6 +106,38 @@
       "durationMs": 10156,
       "runnerKind": "dev-source",
       "sourceCommit": "25629fecd438658336636c61b64d778e68d71961",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:7c30e4e790df970962a1963d72341ebb347fb1555c09a29df0d1d4cd73139dc4",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-24T15:40:27.163Z",
+      "startedAt": "2026-07-24T15:40:04.715Z",
+      "finishedAt": "2026-07-24T15:40:27.163Z",
+      "durationMs": 22448,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-24T15:41:45.800Z",
+      "startedAt": "2026-07-24T15:40:35.050Z",
+      "finishedAt": "2026-07-24T15:41:45.800Z",
+      "durationMs": 70750,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

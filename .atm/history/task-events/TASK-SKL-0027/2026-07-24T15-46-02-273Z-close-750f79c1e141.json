@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T15-46-02-273Z-close-750f79c1e141",
+  "taskId": "TASK-SKL-0027",
+  "action": "close",
+  "actorId": "codex-matt-skills-initiative-captain-20260724",
+  "sessionId": "session-20260724153930-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0027-44937bb37c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0027.json",
+  "taskSha256": "sha256:4d88f39e2636b2a9e2934372a01eb004b1ce272f650d88c74d050c6306178471",
+  "createdAt": "2026-07-24T15:46:02.273Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0027 --actor codex-matt-skills-initiative-captain-20260724 --status done --historical-delivery d8fee0a3e21b609b449d3e703b9cb2123ba248ae",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724153930-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0027-44937bb37c",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0027.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/deep-module-refactor-provider.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T15:46:02.259Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0027.*",
+        ".atm/history/task-events/TASK-SKL-0027/**",
+        ".atm/history/tasks/TASK-SKL-0027.json",
+        "packages/plugin-review-advisory/src/deep-module-provider.ts",
+        "packages/plugin-review-advisory/src/index.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-atom-map-refactor.skill.md",
+        "templates/skills/atm-deep-module-refactor.files/references/**",
+        "templates/skills/atm-deep-module-refactor.files/references/deepening.md",
+        "templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
+        "templates/skills/atm-deep-module-refactor.skill.md",
+        "tests/cli/deep-module-refactor-provider.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/plugin-review-advisory/src/deep-module-provider.ts",
+        "packages/plugin-review-advisory/src/index.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-deep-module-refactor.files/references/**",
+        "tests/cli/deep-module-refactor-provider.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
