@@ -47,8 +47,30 @@ export interface AtmSkillDefinitionVNext {
   readonly compatibility: { readonly atmContractVersions: readonly string[] };
   readonly fallbackPolicy: 'deny' | 'degrade-with-evidence' | 'legacy-compatible';
   readonly rollbackPolicy: 'provider-only' | 'manifest-only' | 'full-revert';
+  readonly invocationModes?: readonly ('model' | 'user' | 'router')[];
+  readonly progressiveDisclosure?: readonly SkillProgressiveDisclosureReference[];
+  readonly completionCriteria?: readonly SkillCompletionCriterion[];
+  readonly canaryMeasurements?: SkillCanaryMeasurements;
   readonly shadowRun?: boolean;
   readonly promotion?: 'manual-review' | 'measured-promotion' | 'disabled';
+}
+
+export interface SkillProgressiveDisclosureReference {
+  readonly id: string;
+  readonly path: string;
+  readonly purpose: string;
+  readonly maxTokens?: number;
+}
+
+export interface SkillCompletionCriterion {
+  readonly id: string;
+  readonly validator: string;
+  readonly required: boolean;
+}
+
+export interface SkillCanaryMeasurements {
+  readonly contextTokens: { readonly target: number; readonly max: number };
+  readonly falseInvocationRate: { readonly target: number; readonly max: number };
 }
 
 export interface SkillCapabilityManifestInput {
@@ -57,6 +79,10 @@ export interface SkillCapabilityManifestInput {
   readonly atmContractVersions: readonly string[];
   readonly fallbackPolicy?: AtmSkillDefinitionVNext['fallbackPolicy'];
   readonly rollbackPolicy?: AtmSkillDefinitionVNext['rollbackPolicy'];
+  readonly invocationModes?: readonly ('model' | 'user' | 'router')[];
+  readonly progressiveDisclosure?: readonly SkillProgressiveDisclosureReference[];
+  readonly completionCriteria?: readonly SkillCompletionCriterion[];
+  readonly canaryMeasurements?: SkillCanaryMeasurements;
   readonly shadowRun?: boolean;
   readonly promotion?: AtmSkillDefinitionVNext['promotion'];
 }
@@ -64,6 +90,8 @@ export interface SkillCapabilityManifestInput {
 export function createSkillDefinitionVNext(input: SkillCapabilityManifestInput): AtmSkillDefinitionVNext {
   const capabilities = [...new Set(input.capabilities.map((value) => value.trim()).filter(Boolean))].sort();
   const atmContractVersions = [...new Set(input.atmContractVersions.map((value) => value.trim()).filter(Boolean))].sort();
+  const defaultInvocationModes: readonly ('model' | 'user' | 'router')[] = ['model', 'user', 'router'];
+  const invocationModes: readonly ('model' | 'user' | 'router')[] = [...new Set(input.invocationModes ?? defaultInvocationModes)];
   if (capabilities.length === 0) throw new Error('skill definition requires at least one capability');
   if (atmContractVersions.length === 0) throw new Error('skill definition requires an ATM contract version');
   return {
@@ -72,11 +100,35 @@ export function createSkillDefinitionVNext(input: SkillCapabilityManifestInput):
     provider: input.provider,
     capabilities,
     compatibility: { atmContractVersions },
+    invocationModes,
+    progressiveDisclosure: normalizeDisclosureReferences(input.progressiveDisclosure),
+    completionCriteria: normalizeCompletionCriteria(input.completionCriteria),
+    canaryMeasurements: input.canaryMeasurements,
     fallbackPolicy: input.fallbackPolicy ?? 'degrade-with-evidence',
     rollbackPolicy: input.rollbackPolicy ?? 'provider-only',
     shadowRun: input.shadowRun ?? true,
     promotion: input.promotion ?? 'manual-review'
   };
+}
+
+function normalizeDisclosureReferences(
+  references: readonly SkillProgressiveDisclosureReference[] | undefined
+): readonly SkillProgressiveDisclosureReference[] | undefined {
+  if (!references) return undefined;
+  return [...references]
+    .map((reference) => ({ ...reference, id: reference.id.trim(), path: reference.path.trim(), purpose: reference.purpose.trim() }))
+    .filter((reference) => reference.id && reference.path && reference.purpose)
+    .sort((left, right) => left.id.localeCompare(right.id));
+}
+
+function normalizeCompletionCriteria(
+  criteria: readonly SkillCompletionCriterion[] | undefined
+): readonly SkillCompletionCriterion[] | undefined {
+  if (!criteria) return undefined;
+  return [...criteria]
+    .map((criterion) => ({ ...criterion, id: criterion.id.trim(), validator: criterion.validator.trim() }))
+    .filter((criterion) => criterion.id && criterion.validator)
+    .sort((left, right) => left.id.localeCompare(right.id));
 }
 
 export function projectSkillDefinition(

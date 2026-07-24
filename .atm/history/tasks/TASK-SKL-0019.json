@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0019",
+  "title": "Skill definition vNext and progressive disclosure compiler",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.2",
+  "dependencies": [
+    "TASK-SKL-0018"
+  ],
+  "acceptance": [
+    "Definition supports `model`, `user`, and `router` invocation modes.",
+    "Stable core rules remain in the main skill while optional context is addressable through progressive-disclosure references.",
+    "Completion criteria are typed and validator-addressable.",
+    "Compiler projections preserve semantics across Codex, Claude, Cursor, Copilot, Gemini and Antigravity or emit explicit degradation.",
+    "Context-token and false-invocation measurements are exposed for canaries."
+  ],
+  "deliverables": [
+    "templates/skills/skill.schema.json",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "tests/cli/skill-definition-vnext.test.ts"
+  ],
+  "scopePaths": [
+    "templates/skills/skill.schema.json",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "scripts/validate-skill-templates.ts",
+    "tests/cli/skill-definition-vnext.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+    "npm run validate:skill-templates",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "skill-definition-vnext-adapter-parity",
+  "rollbackStrategy": "revert-commit-and-use-v1-skill-projection",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.agent-skills",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.skill-definition-vnext",
+        "pattern": "Versioned Skill Definition",
+        "source": "templates/skills/skill.schema.json",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0019-skill-definition-vnext-and-progressive-disclosure-compiler.task.md",
+    "sectionTitle": "TASK-SKL-0019",
+    "headingLine": 43,
+    "hash": "d2e58a1020d787c7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0019-skill-definition-vnext-and-progressive-disclosure-compiler.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:d2e58a1020d787c74c9258f15a9192f8a5cd33ebb5bb4b00a6b7b91781a35a8a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-24T06:57:00.810Z"
+    }
+  },
+  "importedAt": "2026-07-24T06:57:00.810Z",
+  "lastTransitionId": "2026-07-24T06-57-15-773Z-claim-f530fa0d65c7",
+  "lastTransitionAt": "2026-07-24T06:57:15.773Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-matt-skills-initiative-captain-20260724",
+  "reservedAt": "2026-07-24T06:57:09.291Z",
+  "promotedAt": "2026-07-24T06:57:09.294Z",
+  "claim": {
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "leaseId": "lease-d7b83a22f735",
+    "claimedAt": "2026-07-24T06:57:09.297Z",
+    "heartbeatAt": "2026-07-24T06:57:09.297Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0019.json",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/skill.schema.json",
+      "tests/cli/skill-definition-vnext.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260724065709-codex-matt-skills-initiative-captain-20260724-2e7bcda17f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724065709-codex-matt-skills-initiative-captain-20260724-2e7bcda17f\""
+    }
+  },
+  "startedAt": "2026-07-24T06:57:09.297Z",
+  "startedByActor": "codex-matt-skills-initiative-captain-20260724",
+  "startedBySessionId": "session-20260724065709-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0019-9bdd4e1554",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0019",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0019.*",
+      ".atm/history/task-events/TASK-SKL-0019/**",
+      ".atm/history/tasks/TASK-SKL-0019.json",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/skill.schema.json",
+      "tests/cli/skill-definition-vnext.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "729c1d48300e580d26e20ab791a1f18527323fce18687704b247651aa195a820",
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "sessionId": "session-20260724065709-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0019-9bdd4e1554",
+    "laneSession": {
+      "laneSessionId": "lane-20260724065709-codex-matt-skills-initiative-captain-20260724-2e7bcda17f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724065709-codex-matt-skills-initiative-captain-20260724-2e7bcda17f\""
+    },
+    "createdAt": "2026-07-24T06:57:15.772Z",
+    "status": "active"
+  }
+}

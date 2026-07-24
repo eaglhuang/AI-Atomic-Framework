@@ -63,8 +63,51 @@
         },
         "fallbackPolicy": { "enum": ["deny", "degrade-with-evidence", "legacy-compatible"] },
         "rollbackPolicy": { "enum": ["provider-only", "manifest-only", "full-revert"] },
+        "invocationModes": { "type": "array", "items": { "enum": ["model", "user", "router"] }, "uniqueItems": true, "minItems": 1 },
+        "progressiveDisclosure": { "type": "array", "items": { "$ref": "#/$defs/progressiveDisclosureReference" }, "uniqueItems": true },
+        "completionCriteria": { "type": "array", "items": { "$ref": "#/$defs/completionCriterion" }, "uniqueItems": true },
+        "canaryMeasurements": { "$ref": "#/$defs/canaryMeasurements" },
         "shadowRun": { "type": "boolean" },
         "promotion": { "enum": ["manual-review", "measured-promotion", "disabled"] }
+      }
+    },
+    "progressiveDisclosureReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "purpose"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "purpose": { "type": "string", "minLength": 1 },
+        "maxTokens": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "completionCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "validator", "required"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "validator": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" }
+      }
+    },
+    "canaryMeasurements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contextTokens", "falseInvocationRate"],
+      "properties": {
+        "contextTokens": { "$ref": "#/$defs/measurementRange" },
+        "falseInvocationRate": { "$ref": "#/$defs/measurementRange" }
+      }
+    },
+    "measurementRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "max"],
+      "properties": {
+        "target": { "type": "number", "minimum": 0 },
+        "max": { "type": "number", "minimum": 0 }
       }
     },
     "providerProvenance": {

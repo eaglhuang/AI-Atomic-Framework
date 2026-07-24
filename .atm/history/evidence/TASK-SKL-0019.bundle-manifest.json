@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-SKL-0019",
+  "updatedAt": "2026-07-24T07:01:35.204Z",
+  "updatedBy": "codex-matt-skills-initiative-captain-20260724",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:integration-adapter",
+    "validate:skill-templates"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df20f8e8d56a808a02964714135c71c1da09ee0c69b30a4a9141a79ca7108829",
+      "stderrSha256": "sha256:0b51aeb316f8a9f6dc90b2665ed059ea6c9ce2fe8604346b5ee6e52ed71a2ca4",
+      "validators": [
+        "node --strip-types tests/cli/skill-definition-vnext.test.ts"
+      ],
+      "generatedAt": "2026-07-24T06:59:21.661Z",
+      "startedAt": "2026-07-24T06:59:21.237Z",
+      "finishedAt": "2026-07-24T06:59:21.661Z",
+      "durationMs": 424,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f1ca25559a4682fcf5cbd514102995dea7c1c11c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4b8596decb65c8305d54422ee67033ce625add648a0765f776fefe8c331a33a0",
+      "stderrSha256": "sha256:8cdc59d093ee972cb1f3563ed3485f7ae364cdab7dfb6de8ec7378f47e116100",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-07-24T06:59:28.515Z",
+      "startedAt": "2026-07-24T06:59:24.035Z",
+      "finishedAt": "2026-07-24T06:59:28.515Z",
+      "durationMs": 4480,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f1ca25559a4682fcf5cbd514102995dea7c1c11c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-24T06:59:38.793Z",
+      "startedAt": "2026-07-24T06:59:30.966Z",
+      "finishedAt": "2026-07-24T06:59:38.793Z",
+      "durationMs": 7827,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f1ca25559a4682fcf5cbd514102995dea7c1c11c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+      "stderrSha256": "sha256:d2c460fe9377615c28f878ff44c08d82a346735d3ae9cd6e762e3fb159f38441",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-24T07:00:20.025Z",
+      "startedAt": "2026-07-24T07:00:02.328Z",
+      "finishedAt": "2026-07-24T07:00:20.025Z",
+      "durationMs": 17697,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f1ca25559a4682fcf5cbd514102995dea7c1c11c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-24T07:01:17.642Z",
+      "startedAt": "2026-07-24T07:00:22.584Z",
+      "finishedAt": "2026-07-24T07:01:17.642Z",
+      "durationMs": 55058,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f1ca25559a4682fcf5cbd514102995dea7c1c11c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:integration-adapter",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19063ae4e9017f3439a6036376ae04f39f88e27233b4bfbda0a594b4f7348d3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:integration-adapter"
+      ],
+      "generatedAt": "2026-07-24T07:01:35.203Z",
+      "startedAt": "2026-07-24T07:01:20.230Z",
+      "finishedAt": "2026-07-24T07:01:35.203Z",
+      "durationMs": 14973,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f1ca25559a4682fcf5cbd514102995dea7c1c11c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
