@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0250",
   "title": "Receipt-bound shared-write admission and steward-only delivery",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0",
   "dependencies": [
     "ATM-GOV-0249",
@@ -53,7 +53,7 @@
     "node --strip-types tests/core/shared-write-provenance-policy.test.ts",
     "node --strip-types tests/cli/steward-receipt-pre-commit-gate.test.ts",
     "node --strip-types tests/cli/receipt-bound-shared-delivery-commit.test.ts",
-    "node --strip-types scripts/validate-git-hooks-enforcement/index.ts",
+    "node --strip-types scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
     "npm run typecheck"
   ],
   "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
@@ -109,30 +109,24 @@
     "planPath": "governance-optimization/tasks/ATM-GOV-0250-receipt-bound-shared-write-admission-and-steward-only-delivery.task.md",
     "sectionTitle": "ATM-GOV-0250",
     "headingLine": 66,
-    "hash": "f1909c5f2856b599",
+    "hash": "b45d1a1b8f08a508",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0250-receipt-bound-shared-write-admission-and-steward-only-delivery.task.md",
       "planningCommitSha": "10f4391127d4890cfd1a40a207efed6c7beeda52",
-      "contentDigest": "sha256:f1909c5f2856b5991ae5219194bf178ece5da67aa7f77dc604a675f6d395b5a9",
+      "contentDigest": "sha256:b45d1a1b8f08a508a668dd857984bc548828cb75dbd1889c686a88e8f721d308",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-23T08:34:48.268Z"
+      "sealedAt": "2026-07-24T00:22:31.275Z"
     }
   },
-  "importedAt": "2026-07-23T08:34:48.268Z",
-  "lastTransitionId": "2026-07-23T14-52-21-270Z-claim-9d7b3e77759d",
-  "lastTransitionAt": "2026-07-23T14:52:21.270Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-002-plan31-captain",
-  "reservedAt": "2026-07-23T14:52:10.789Z",
-  "promotedAt": "2026-07-23T14:52:10.791Z",
+  "importedAt": "2026-07-24T00:22:31.275Z",
   "claim": {
     "actorId": "claude-002-plan31-captain",
     "leaseId": "lease-421d60c12a17",
     "claimedAt": "2026-07-23T14:52:10.794Z",
-    "heartbeatAt": "2026-07-23T14:52:10.794Z",
+    "heartbeatAt": "2026-07-24T02:10:28.792Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0250.json",
@@ -148,17 +142,17 @@
       "tests/cli/steward-receipt-pre-commit-gate.test.ts",
       "tests/core/shared-write-provenance-policy.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260723145211-claude-002-plan31-captain-8db2d03868",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260723145211-claude-002-plan31-captain-8db2d03868\""
-    }
+    },
+    "reason": "closed"
   },
+  "owner": "claude-002-plan31-captain",
   "startedAt": "2026-07-23T14:52:10.794Z",
-  "startedByActor": "claude-002-plan31-captain",
   "startedBySessionId": "session-20260723145210-claude-002-plan31-captain-ATM-GOV-0250-0359a539c8",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
@@ -198,5 +192,12 @@
     },
     "createdAt": "2026-07-23T14:52:21.269Z",
     "status": "active"
-  }
+  },
+  "lastTransitionId": "2026-07-24T02-10-28-795Z-close-ec39928305c7",
+  "lastTransitionAt": "2026-07-24T02:10:28.795Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-07-24T02:10:28.792Z",
+  "closedByActor": "claude-002-plan31-captain",
+  "closedBySessionId": "session-20260723145210-claude-002-plan31-captain-ATM-GOV-0250-0359a539c8",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0250.closure-packet.json"
 }

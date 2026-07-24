@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T02-10-28-795Z-close-ec39928305c7",
+  "taskId": "ATM-GOV-0250",
+  "action": "close",
+  "actorId": "claude-002-plan31-captain",
+  "sessionId": "session-20260723145210-claude-002-plan31-captain-ATM-GOV-0250-0359a539c8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0250.json",
+  "taskSha256": "sha256:95bd8aeacc1d6a033fb316a2d390021e523b40a3eade65226fb02748d440491f",
+  "createdAt": "2026-07-24T02:10:28.795Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0250 --actor claude-002-plan31-captain --status done --historical-delivery c979427a2903b8dd10078830b822f2c5c238361d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260723145210-claude-002-plan31-captain-ATM-GOV-0250-0359a539c8",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0250.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "node --strip-types tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+      "node --strip-types tests/cli/steward-receipt-pre-commit-gate.test.ts",
+      "node --strip-types tests/core/shared-write-provenance-policy.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T02:10:28.778Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0250.*",
+        ".atm/history/task-events/ATM-GOV-0250/**",
+        ".atm/history/tasks/ATM-GOV-0250.json",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-write-provenance-policy.ts",
+        "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+        "tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+        "tests/cli/steward-receipt-pre-commit-gate.test.ts",
+        "tests/core/shared-write-provenance-policy.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-write-provenance-policy.ts",
+        "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+        "tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+        "tests/cli/steward-receipt-pre-commit-gate.test.ts",
+        "tests/core/shared-write-provenance-policy.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

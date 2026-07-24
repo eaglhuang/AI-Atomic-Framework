@@ -1,0 +1,229 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0250",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c979427a2903b8dd10078830b822f2c5c238361d",
+  "governedTreeSha": "eeef3fc616ff2707fa3ab1e0dc4d53d44ee9f958",
+  "targetCommitDelta": {
+    "currentCommitSha": "c979427a2903b8dd10078830b822f2c5c238361d",
+    "parentCommitShas": [
+      "c979427a2903b8dd10078830b822f2c5c238361d"
+    ],
+    "governedTreeSha": "eeef3fc616ff2707fa3ab1e0dc4d53d44ee9f958",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0250.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/task-events/ATM-GOV-0250/2026-07-24T00-22-31-399Z-import-21ca02f0c4d1.json",
+      ".atm/history/tasks/ATM-GOV-0250.json",
+      ".atm/history/tasks/ATM-GOV-0258.json",
+      "packages/cli/dist/commands/broker/batch-execute-actions.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "packages/cli/dist/commands/hook/pre-commit/scope-ownership.js",
+      "packages/cli/dist/commands/hook/pre-commit/support.js",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-write-provenance-policy.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/adapter-local-git/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/batch-execute-actions.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/scope-ownership.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.ts",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/shared-delivery-commit.js",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/shared-delivery-commit.ts",
+      "release/atm-root-drop/packages/language-csharp/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-behavior-pack/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-experience-loop/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-human-review/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-review-advisory/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-rule-guard/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+      "tests/cli/steward-receipt-pre-commit-gate.test.ts",
+      "tests/core/shared-write-provenance-policy.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/shared-write-provenance-policy.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d5c0afb27558225f5471a5f2581c897203790f2ab8565f8ebd4fb1cd72f85a7f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/steward-receipt-pre-commit-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c9254b63ed70e33a37ad21ca9f036137db9b1d89cc1f2273e0ca5b3922011bf4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0860c159ba07e6b1a5f7dede0cb3ebd82585c4f1ecd0455d3eee13d7cb027302",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5ed215659b6e7ef5130e1d059e38c4efeb511a4022bb79e76f978a39b73397c0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:8edb020321151093390d425a2afc7f7f2a56aa9f6172d3c69d856288b542b896",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+    "node --strip-types tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+    "node --strip-types tests/cli/steward-receipt-pre-commit-gate.test.ts",
+    "node --strip-types tests/core/shared-write-provenance-policy.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-24T02:10:28.778Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0250.*",
+      ".atm/history/task-events/ATM-GOV-0250/**",
+      ".atm/history/tasks/ATM-GOV-0250.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-write-provenance-policy.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+      "tests/cli/steward-receipt-pre-commit-gate.test.ts",
+      "tests/core/shared-write-provenance-policy.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-write-provenance-policy.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+      "tests/cli/steward-receipt-pre-commit-gate.test.ts",
+      "tests/core/shared-write-provenance-policy.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0250.json",
+  "closedAt": "2026-07-24T02:10:28.779Z",
+  "closedByActor": "claude-002-plan31-captain",
+  "sessionId": "session-20260723145210-claude-002-plan31-captain-ATM-GOV-0250-0359a539c8",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c979427a2903b8dd10078830b822f2c5c238361d",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/shared-delivery-commit.ts",
+      "packages/core/src/broker/shared-write-provenance-policy.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+      "tests/cli/steward-receipt-pre-commit-gate.test.ts",
+      "tests/core/shared-write-provenance-policy.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0250/2026-07-23T08-34-48-380Z-import-d2f820fbe157.json",
+      ".atm/history/task-events/ATM-GOV-0250/2026-07-23T14-52-10-789Z-reserve-fca1b5092c07.json",
+      ".atm/history/task-events/ATM-GOV-0250/2026-07-23T14-52-10-791Z-promote-f2dad3c88cf9.json",
+      ".atm/history/task-events/ATM-GOV-0250/2026-07-23T14-52-21-270Z-claim-9d7b3e77759d.json",
+      ".atm/history/tasks/ATM-GOV-0250.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
