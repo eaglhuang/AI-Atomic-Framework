@@ -181,7 +181,10 @@ export function buildActiveWorkSummary(cwd: string, currentActorId?: string | nu
     brokerRecommendation: {
       enabled: hasForeignActiveWork,
       reason: reasonParts.length > 0 ? reasonParts.join('; ') : null,
-      statusCommand: 'node atm.mjs tasks status --json',
+      // ATM-GOV-0263: active-work guidance must advertise an executable
+      // aggregate. `tasks status` without a --task returns ATM_CLI_USAGE, so
+      // active-work status routes through `broker status` instead.
+      statusCommand: 'node atm.mjs broker status --json',
       brokerStatusCommand: 'node atm.mjs broker status --json',
       teamStatusCommand: 'node atm.mjs team status --compact --json'
     }
