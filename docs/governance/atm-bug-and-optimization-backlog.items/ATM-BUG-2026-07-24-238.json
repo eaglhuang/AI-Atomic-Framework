@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-24-238",
+  "date": "2026-07-24",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Integration",
+  "finding": "validate:integration-adapter fails because the Codex skill fixture hash and byte-size metadata do not match the current projected Codex skill file.",
+  "expectedBehavior": "The generated or maintained Codex integration fixture must stay byte- and hash-consistent with its source projection, or the validator must report an explicitly governed stale-projection state.",
+  "evidenceOrRepro": "TASK-SKL-0018; npm run validate:integration-adapter; output: fixture hash must match current Codex skill file and fixture byte size must match current Codex skill file.",
+  "followUp": "Assign to integration/release hygiene owner; reconcile source-of-truth projection, fixture generation, and validator expectations before SKL close baseline requires this check again."
+}
