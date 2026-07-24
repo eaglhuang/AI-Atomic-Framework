@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0021",
+  "title": "Standards and Spec review receipt gate",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.2",
+  "dependencies": [
+    "TASK-SKL-0018"
+  ],
+  "acceptance": [
+    "Report binds task, base, candidate, standards digest, spec digest, provider/version, findings and dispositions.",
+    "Semantic review runs after focused red/green stabilization and before final task-required cases.",
+    "Candidate changes invalidate the receipt.",
+    "Pre-close checks freshness and unresolved findings without re-running the model review unnecessarily.",
+    "Deterministic validators and AtomicCharter remain higher authority."
+  ],
+  "deliverables": [
+    "schemas/review-advisory/review-advisory-report.schema.json",
+    "packages/plugin-review-advisory/src/index.ts",
+    "packages/plugin-review-advisory/src/promotion-gates.ts",
+    "tests/cli/standards-spec-review-receipt.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/review-advisory/review-advisory-report.schema.json",
+    "packages/plugin-review-advisory/src/index.ts",
+    "packages/plugin-review-advisory/src/promotion-gates.ts",
+    "packages/cli/src/commands/review-advisory.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "tests/cli/standards-spec-review-receipt.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/standards-spec-review-receipt.test.ts",
+    "npm run validate:review-advisory",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "standards-spec-review-candidate-seal",
+  "rollbackStrategy": "revert-commit-and-disable-review-preclose-requirement",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.review-advisory",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.standards-spec-review-receipt",
+        "pattern": "Review Receipt",
+        "source": "packages/plugin-review-advisory/src/promotion-gates.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0021-standards-and-spec-review-receipt-gate.task.md",
+    "sectionTitle": "TASK-SKL-0021",
+    "headingLine": 46,
+    "hash": "933f42790582822b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0021-standards-and-spec-review-receipt-gate.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:933f42790582822b4210cb3fa33daba9d03658acab5833956aced2b3b2febc3a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-24T07:44:36.871Z"
+    }
+  },
+  "importedAt": "2026-07-24T07:44:36.871Z",
+  "lastTransitionId": "2026-07-24T07-44-54-555Z-claim-6acd38223d37",
+  "lastTransitionAt": "2026-07-24T07:44:54.555Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-matt-skills-initiative-captain-20260724",
+  "reservedAt": "2026-07-24T07:44:46.824Z",
+  "promotedAt": "2026-07-24T07:44:46.827Z",
+  "claim": {
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "leaseId": "lease-5b0951fb6ce3",
+    "claimedAt": "2026-07-24T07:44:46.831Z",
+    "heartbeatAt": "2026-07-24T07:44:46.831Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0021.json",
+      "packages/cli/src/commands/review-advisory.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/plugin-review-advisory/src/index.ts",
+      "packages/plugin-review-advisory/src/promotion-gates.ts",
+      "schemas/review-advisory/review-advisory-report.schema.json",
+      "tests/cli/standards-spec-review-receipt.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260724074446-codex-matt-skills-initiative-captain-20260724-20a71a12c0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724074446-codex-matt-skills-initiative-captain-20260724-20a71a12c0\""
+    }
+  },
+  "startedAt": "2026-07-24T07:44:46.831Z",
+  "startedByActor": "codex-matt-skills-initiative-captain-20260724",
+  "startedBySessionId": "session-20260724074446-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0021-152cece283",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0021",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0021.*",
+      ".atm/history/task-events/TASK-SKL-0021/**",
+      ".atm/history/tasks/TASK-SKL-0021.json",
+      "packages/cli/src/commands/review-advisory.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/plugin-review-advisory/src/index.ts",
+      "packages/plugin-review-advisory/src/promotion-gates.ts",
+      "schemas/review-advisory/review-advisory-report.schema.json",
+      "tests/cli/standards-spec-review-receipt.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "75a79562091555b9981e1b9c293b02e5e2a76c47eb2a636fd6e018d5e860ecaa",
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "sessionId": "session-20260724074446-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0021-152cece283",
+    "laneSession": {
+      "laneSessionId": "lane-20260724074446-codex-matt-skills-initiative-captain-20260724-20a71a12c0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724074446-codex-matt-skills-initiative-captain-20260724-20a71a12c0\""
+    },
+    "createdAt": "2026-07-24T07:44:54.554Z",
+    "status": "active"
+  }
+}

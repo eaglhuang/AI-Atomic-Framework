@@ -67,9 +67,30 @@ export interface ReviewAdvisoryReport {
       queueRecordStatus?: string;
     };
   };
+  standardsSpecReceipt?: StandardsSpecReviewReceipt;
   advisoryUnavailable: boolean;
   needsReview: boolean;
   unavailableReasons?: string[];
+}
+
+export type StandardsSpecReviewDisposition = 'accepted' | 'resolved' | 'unresolved' | 'waived';
+
+export interface StandardsSpecReviewReceipt {
+  schemaId: 'atm.standardsSpecReviewReceipt.v1';
+  taskId: string;
+  baseRef: string;
+  candidateRef: string;
+  candidateDigest: string;
+  standardsDigest: string;
+  specDigest: string;
+  provider: AdvisoryProviderInfo;
+  reviewedAt: string;
+  dispositions: Array<{
+    findingId: string;
+    axis: 'standards' | 'spec';
+    disposition: StandardsSpecReviewDisposition;
+    reason?: string;
+  }>;
 }
 
 export interface ReviewAdvisoryReportInit {
@@ -80,6 +101,7 @@ export interface ReviewAdvisoryReportInit {
   target: ReviewAdvisoryTarget;
   findings?: ReviewAdvisoryFinding[];
   unavailableReasons?: string[];
+  standardsSpecReceipt?: StandardsSpecReviewReceipt;
 }
 
 export function createReviewAdvisoryReport(init: ReviewAdvisoryReportInit): ReviewAdvisoryReport {
@@ -112,6 +134,7 @@ export function createReviewAdvisoryReport(init: ReviewAdvisoryReportInit): Revi
         attachable: false
       }
     },
+    standardsSpecReceipt: init.standardsSpecReceipt,
     advisoryUnavailable,
     needsReview,
     unavailableReasons
@@ -283,6 +306,44 @@ export function appendMachineFindings(
   };
 }
 
+export function attachStandardsSpecReviewReceipt(
+  report: ReviewAdvisoryReport,
+  receipt: StandardsSpecReviewReceipt
+): ReviewAdvisoryReport {
+  return {
+    ...report,
+    standardsSpecReceipt: {
+      ...receipt,
+      provider: { ...receipt.provider },
+      dispositions: receipt.dispositions.map((entry) => ({ ...entry }))
+    }
+  };
+}
+
+export function inspectStandardsSpecReviewReceipt(input: {
+  report: ReviewAdvisoryReport | null | undefined;
+  taskId: string;
+  candidateDigest: string;
+}): { ok: true } | { ok: false; reason: string; unresolvedFindingIds: string[] } {
+  const receipt = input.report?.standardsSpecReceipt;
+  if (!receipt) {
+    return { ok: false, reason: 'standards-spec-review-receipt-missing', unresolvedFindingIds: [] };
+  }
+  if (receipt.taskId !== input.taskId) {
+    return { ok: false, reason: 'standards-spec-review-task-mismatch', unresolvedFindingIds: [] };
+  }
+  if (receipt.candidateDigest !== input.candidateDigest) {
+    return { ok: false, reason: 'standards-spec-review-candidate-stale', unresolvedFindingIds: [] };
+  }
+  const unresolvedFindingIds = receipt.dispositions
+    .filter((entry) => entry.disposition === 'unresolved')
+    .map((entry) => entry.findingId);
+  if (unresolvedFindingIds.length > 0) {
+    return { ok: false, reason: 'standards-spec-review-unresolved-findings', unresolvedFindingIds };
+  }
+  return { ok: true };
+}
+
 export function normalizeProviderPayload(
   payload: unknown,
   fallback: { reportId: string; provider: AdvisoryProviderInfo; target: ReviewAdvisoryTarget }
@@ -388,6 +449,8 @@ export default {
   createUnavailableAdvisoryReport,
   createStubReviewAdvisoryReport,
   appendMachineFindings,
+  attachStandardsSpecReviewReceipt,
+  inspectStandardsSpecReviewReceipt,
   mapConversationPatchDraftsToMachineFindings,
   normalizeProviderPayload
 };
