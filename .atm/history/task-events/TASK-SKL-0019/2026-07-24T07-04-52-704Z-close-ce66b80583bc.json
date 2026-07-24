@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T07-04-52-704Z-close-ce66b80583bc",
+  "taskId": "TASK-SKL-0019",
+  "action": "close",
+  "actorId": "codex-matt-skills-initiative-captain-20260724",
+  "sessionId": "session-20260724065709-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0019-9bdd4e1554",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0019.json",
+  "taskSha256": "sha256:85012899983984d5a7f9bbd675ea01e010716b60a8120b4a2dc20f950939b359",
+  "createdAt": "2026-07-24T07:04:52.704Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0019 --actor codex-matt-skills-initiative-captain-20260724 --status done --historical-delivery e8d9226a3137fbed702dfab3b1925f55103836ac",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724065709-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0019-9bdd4e1554",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0019.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T07:04:52.695Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0019.*",
+        ".atm/history/task-events/TASK-SKL-0019/**",
+        ".atm/history/tasks/TASK-SKL-0019.json",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/skill.schema.json",
+        "tests/cli/skill-definition-vnext.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/skill.schema.json",
+        "tests/cli/skill-definition-vnext.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:integration-adapter",
+        "validate:skill-templates"
+      ]
+    }
+  }
+}
