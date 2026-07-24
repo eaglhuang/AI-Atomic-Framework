@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0259",
   "title": "Write-ticket scope amendment guard and out-of-scope WIP recorder",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0.11",
   "dependencies": [
     "ATM-GOV-0247",
@@ -168,8 +168,8 @@
     }
   },
   "importedAt": "2026-07-24T05:21:57.170Z",
-  "lastTransitionId": "2026-07-24T05-36-36-665Z-scope-amendment-a0e682847559",
-  "lastTransitionAt": "2026-07-24T05:36:36.665Z",
+  "lastTransitionId": "2026-07-24T05-56-46-587Z-close-3739e13c44e0",
+  "lastTransitionAt": "2026-07-24T05:56:46.587Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-002-plan31-captain",
   "reservedAt": "2026-07-24T05:22:05.331Z",
@@ -178,7 +178,7 @@
     "actorId": "codex-002-plan31-captain",
     "leaseId": "lease-e424e9a19565",
     "claimedAt": "2026-07-24T05:22:05.337Z",
-    "heartbeatAt": "2026-07-24T05:22:05.337Z",
+    "heartbeatAt": "2026-07-24T05:56:46.585Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0259.*",
@@ -215,14 +215,14 @@
       "tests/cli/write-ticket-scope-amendment.test.ts",
       "tests/cli/write-ticket-scope-guard.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260724052205-codex-002-plan31-captain-46a83f108a",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724052205-codex-002-plan31-captain-46a83f108a\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-24T05:22:05.337Z",
   "startedByActor": "codex-002-plan31-captain",
@@ -291,5 +291,9 @@
     },
     "createdAt": "2026-07-24T05:22:13.288Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-24T05:56:46.585Z",
+  "closedByActor": "codex-002-plan31-captain",
+  "closedBySessionId": "session-20260724052205-codex-002-plan31-captain-ATM-GOV-0259-171185c170",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0259.closure-packet.json"
 }
