@@ -227,10 +227,10 @@ export function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write')
     const activeQueue = findActiveTaskQueueForIntent(cwd, taskIntent);
     profile.mark('find-active-task-queue');
     const activeQueueTasks = activeQueue
-        ? activeQueue.taskIds
+        ? pruneTerminalQueueTasks(activeQueue.taskIds
             .slice(activeQueue.currentIndex)
             .map((taskId) => allTasks.find((task) => task.workItemId === taskId))
-            .filter((task) => Boolean(task))
+            .filter((task) => Boolean(task)), taskIntent)
         : [];
     const promptScope = activeQueue && activeQueueTasks.length > 0
         ? {
@@ -356,6 +356,15 @@ function isTerminalImportedTask(task) {
         || status === 'abandoned'
         || Boolean(task.closedAt)
         || Boolean(task.closedByActor);
+}
+/**
+ * ATM-GOV-0263: drop completed/abandoned/terminal tasks from an active queue
+ * slice before queue-head selection so a full-plan prompt advances to the next
+ * unblocked DAG task instead of returning an already-done prerequisite. An
+ * explicitly named terminal task is kept so status/redo/reopen still resolve.
+ */
+export function pruneTerminalQueueTasks(tasks, taskIntent = null) {
+    return tasks.filter((task) => !isTerminalImportedTask(task) || isTaskExplicitlyMentioned(task, taskIntent));
 }
 export function selectImportedTaskForPromptScope(selectedTaskPool, isActiveQueue, explicitSingleTaskRoute, statusById, cwd) {
     if (isActiveQueue || explicitSingleTaskRoute) {

@@ -199,15 +199,35 @@ export function normalizeOptionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
+/**
+ * ATM-GOV-0263: multilingual task-action lexicon modeled as data (INV-ATM-009).
+ * Continuation/closeout routing consults this table instead of per-task lexical
+ * branches, so adding a language or synonym is a data edit, not new control
+ * flow. Order is significant: earlier entries win on overlap.
+ */
+export const TASK_ACTION_LEXICON: readonly { readonly action: RequestedTaskAction; readonly pattern: RegExp }[] = [
+  { action: 'redo', pattern: /\u91cd\u505a|redo/i },
+  { action: 'reopen', pattern: /\u91cd\u65b0\u6253\u958b|reopen/i },
+  { action: 'close', pattern: /\u95dc\u9589|\u6536\u53e3|\u5b8c\u6210|(?<![A-Za-z0-9-])close(?![A-Za-z0-9-])|(?<![A-Za-z0-9-])done(?![A-Za-z0-9-])/i },
+  { action: 'audit', pattern: /audit|\u7a3d\u6838|\u6aa2\u8a0e/i },
+  { action: 'cleanup', pattern: /cleanup|\u6e05\u7406/i },
+  { action: 'analyze', pattern: /\u5206\u6790|analy[sz]e/i },
+  { action: 'implement', pattern: /implement|\u5be6\u4f5c|\u958b\u767c/i }
+];
+
+/**
+ * Continuation/closeout verbs that, together with an explicit task id, route to
+ * task-scoped continuation. `\u7e7c\u7e8c` = continue, `\u6536\u53e3` = close out.
+ */
+export const TASK_CONTINUATION_VERB_PATTERN =
+  /\u7e7c\u7e8c|\u63a5\u8457|\u6536\u53e3|\u5b8c\u6210|continue|resume|carry\s*on|proceed|finish|close\s*out/i;
+
+export function matchesTaskContinuationVerb(prompt: string): boolean {
+  return TASK_CONTINUATION_VERB_PATTERN.test(prompt);
+}
+
 export function detectRequestedTaskAction(prompt: string): RequestedTaskAction | null {
-  if (/\u91cd\u505a|redo/i.test(prompt)) return 'redo';
-  if (/\u91cd\u65b0\u6253\u958b|reopen/i.test(prompt)) return 'reopen';
-  if (/\u95dc\u9589|\u5b8c\u6210|(?<![A-Za-z0-9-])close(?![A-Za-z0-9-])|(?<![A-Za-z0-9-])done(?![A-Za-z0-9-])/i.test(prompt)) return 'close';
-  if (/audit|\u7a3d\u6838|\u6aa2\u8a0e/i.test(prompt)) return 'audit';
-  if (/cleanup|\u6e05\u7406/i.test(prompt)) return 'cleanup';
-  if (/\u5206\u6790|analy[sz]e/i.test(prompt)) return 'analyze';
-  if (/implement|\u5be6\u4f5c|\u958b\u767c/i.test(prompt)) return 'implement';
-  return null;
+  return TASK_ACTION_LEXICON.find((entry) => entry.pattern.test(prompt))?.action ?? null;
 }
 
 export function extractPromptPathHints(prompt: string): readonly string[] {
