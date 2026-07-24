@@ -56,7 +56,8 @@ function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { 
 }
 
 export function extractTaskflowDeclaredFiles(cwd: string, taskId: string, taskDocument: Record<string, unknown>): string[] {
-  const runtimeResolved = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
+  const runtimeResolved = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)]
+    .filter((file) => !file.startsWith('.atm/'));
   const explicit = extractTaskStringList(taskDocument, 'deliverables');
   const deliverables = explicit.length > 0
     ? explicit
