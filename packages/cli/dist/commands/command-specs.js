@@ -63,6 +63,7 @@ import taskflowSpec from './command-specs/taskflow.spec.js';
 import taskViewSpec from './command-specs/task-view.spec.js';
 import brokerSpec from './command-specs/broker.spec.js';
 import routeSpec from './command-specs/route.spec.js';
+import writeTicketSpec from './command-specs/write-ticket.spec.js';
 function withVisibility(spec, visibility = 'public') {
     return Object.freeze({
         ...spec,
@@ -135,6 +136,7 @@ export const commandSpecs = Object.freeze({
     'task-view': taskViewSpec,
     broker: brokerSpec,
     route: routeSpec,
+    'write-ticket': writeTicketSpec,
 });
 export function getCommandSpec(commandName) {
     return commandName in commandSpecs

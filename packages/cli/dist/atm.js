@@ -62,6 +62,7 @@ import { runCache } from './commands/cache.js';
 import { runHealthReport } from './commands/health-report.js';
 import { runTaskflow } from './commands/taskflow.js';
 import { runTaskView } from './commands/task-view.js';
+import { runWriteTicket } from './commands/write-ticket.js';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.js';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.js';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.js';
@@ -136,7 +137,8 @@ export const cliCommandRunners = {
     taskflow: runTaskflow,
     'task-view': runTaskView,
     broker: runBroker,
-    route: runRoute
+    route: runRoute,
+    'write-ticket': runWriteTicket
 };
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
     applyOutputProjectionFlagsFromArgv(argv);

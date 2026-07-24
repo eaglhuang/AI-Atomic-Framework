@@ -12,6 +12,54 @@ import { fileURLToPath } from 'node:url';
 // Private: repo root is 4 levels above packages/integrations-core/src/compiler/
 const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 export const defaultSkillTemplateDirectory = path.join(integrationsCoreRepoRoot, 'templates', 'skills');
+export function createSkillDefinitionVNext(input) {
+    const capabilities = [...new Set(input.capabilities.map((value) => value.trim()).filter(Boolean))].sort();
+    const atmContractVersions = [...new Set(input.atmContractVersions.map((value) => value.trim()).filter(Boolean))].sort();
+    const defaultInvocationModes = ['model', 'user', 'router'];
+    const invocationModes = [...new Set(input.invocationModes ?? defaultInvocationModes)];
+    if (capabilities.length === 0)
+        throw new Error('skill definition requires at least one capability');
+    if (atmContractVersions.length === 0)
+        throw new Error('skill definition requires an ATM contract version');
+    return {
+        schemaId: 'atm.skillDefinition.vNext',
+        specVersion: '0.1.0',
+        provider: input.provider,
+        capabilities,
+        compatibility: { atmContractVersions },
+        invocationModes,
+        progressiveDisclosure: normalizeDisclosureReferences(input.progressiveDisclosure),
+        completionCriteria: normalizeCompletionCriteria(input.completionCriteria),
+        canaryMeasurements: input.canaryMeasurements,
+        fallbackPolicy: input.fallbackPolicy ?? 'degrade-with-evidence',
+        rollbackPolicy: input.rollbackPolicy ?? 'provider-only',
+        shadowRun: input.shadowRun ?? true,
+        promotion: input.promotion ?? 'manual-review'
+    };
+}
+function normalizeDisclosureReferences(references) {
+    if (!references)
+        return undefined;
+    return [...references]
+        .map((reference) => ({ ...reference, id: reference.id.trim(), path: reference.path.trim(), purpose: reference.purpose.trim() }))
+        .filter((reference) => reference.id && reference.path && reference.purpose)
+        .sort((left, right) => left.id.localeCompare(right.id));
+}
+function normalizeCompletionCriteria(criteria) {
+    if (!criteria)
+        return undefined;
+    return [...criteria]
+        .map((criterion) => ({ ...criterion, id: criterion.id.trim(), validator: criterion.validator.trim() }))
+        .filter((criterion) => criterion.id && criterion.validator)
+        .sort((left, right) => left.id.localeCompare(right.id));
+}
+export function projectSkillDefinition(template, manifest) {
+    return {
+        ...createSkillDefinitionVNext(manifest),
+        skillId: template.frontmatter.id,
+        legacyReadable: true
+    };
+}
 export const minimumAtmEntrySkillDefinitions = [
     {
         id: 'atm-next',

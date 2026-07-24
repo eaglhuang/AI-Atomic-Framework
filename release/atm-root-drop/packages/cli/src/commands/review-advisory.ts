@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -7,6 +8,7 @@ import {
   type AdvisoryStatus,
   type ReviewAdvisoryReport,
   type ReviewAdvisoryTarget,
+  attachStandardsSpecReviewReceipt,
   appendMachineFindings,
   createStubReviewAdvisoryReport,
   createUnavailableAdvisoryReport,
@@ -28,15 +30,24 @@ interface ReviewAdvisoryOptions {
   machineFindings: string;
   queuePath: string;
   proposalId: string;
+  taskId: string;
+  baseRef: string;
+  candidateRef: string;
+  standardsSource: string;
+  specSource: string;
+  standardsSpecReceipt: boolean;
 }
 
 export function runReviewAdvisory(argv: string[]) {
   const { options } = parseReviewAdvisoryOptions(argv);
   const reportId = options.reportId || `review-advisory.${Date.now()}`;
+  const effectiveSourcePaths = options.standardsSpecReceipt && options.sourcePaths.length === 0 && options.taskId
+    ? readTaskDeclaredFiles(options.cwd, options.taskId)
+    : options.sourcePaths;
   const target: ReviewAdvisoryTarget = {
     kind: options.targetKind,
     id: options.targetId || undefined,
-    sourcePaths: options.sourcePaths.length > 0 ? options.sourcePaths : undefined
+    sourcePaths: effectiveSourcePaths.length > 0 ? effectiveSourcePaths : undefined
   };
 
   let report: ReviewAdvisoryReport;
@@ -93,6 +104,25 @@ export function runReviewAdvisory(argv: string[]) {
   }
 
   report = attachQueueSupplemental(report, options);
+  if (options.standardsSpecReceipt) {
+    report = attachStandardsSpecReviewReceipt(report, {
+      schemaId: 'atm.standardsSpecReviewReceipt.v1',
+      taskId: requireNonEmpty(options.taskId, '--task'),
+      baseRef: options.baseRef || 'HEAD',
+      candidateRef: options.candidateRef || 'worktree',
+      candidateDigest: digestSourcePaths(options.cwd, effectiveSourcePaths),
+      standardsDigest: digestText(readOptionalFile(options.cwd, options.standardsSource)),
+      specDigest: digestText(readOptionalFile(options.cwd, options.specSource)),
+      provider: report.provider,
+      reviewedAt: report.generatedAt,
+      dispositions: report.findings.map((finding) => ({
+        findingId: finding.id,
+        axis: finding.trigger === 'policy-coverage-gap' || finding.scope === 'runtime' ? 'standards' : 'spec',
+        disposition: finding.action === 'request-human-review' || finding.action === 'needs-review' ? 'unresolved' : 'accepted',
+        reason: finding.routeHint
+      }))
+    });
+  }
 
   const outputPath = resolvePath(options.cwd, options.outputPath);
   writeJson(outputPath, report);
@@ -134,7 +164,13 @@ function parseReviewAdvisoryOptions(argv: string[]) {
     providerCommand: '',
     machineFindings: '',
     queuePath: '.atm/history/reports/upgrade-proposals.json',
-    proposalId: ''
+    proposalId: '',
+    taskId: '',
+    baseRef: '',
+    candidateRef: '',
+    standardsSource: '',
+    specSource: '',
+    standardsSpecReceipt: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -204,6 +240,35 @@ function parseReviewAdvisoryOptions(argv: string[]) {
       index += 1;
       continue;
     }
+    if (arg === '--task') {
+      options.taskId = requireOptionValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--base-ref') {
+      options.baseRef = requireOptionValue(argv, index, '--base-ref');
+      index += 1;
+      continue;
+    }
+    if (arg === '--candidate-ref') {
+      options.candidateRef = requireOptionValue(argv, index, '--candidate-ref');
+      index += 1;
+      continue;
+    }
+    if (arg === '--standards-source') {
+      options.standardsSource = requireOptionValue(argv, index, '--standards-source');
+      index += 1;
+      continue;
+    }
+    if (arg === '--spec-source') {
+      options.specSource = requireOptionValue(argv, index, '--spec-source');
+      index += 1;
+      continue;
+    }
+    if (arg === '--standards-spec-receipt') {
+      options.standardsSpecReceipt = true;
+      continue;
+    }
     if (arg === '--json') {
       continue;
     }
@@ -236,6 +301,61 @@ function requireOptionValue(argv: string[], optionIndex: number, optionName: str
     throw new CliError('ATM_CLI_USAGE', `review-advisory requires a value for ${optionName}`, { exitCode: 2 });
   }
   return value;
+}
+
+function requireNonEmpty(value: string, optionName: string): string {
+  if (!value.trim()) {
+    throw new CliError('ATM_CLI_USAGE', `review-advisory requires ${optionName} when --standards-spec-receipt is set`, { exitCode: 2 });
+  }
+  return value.trim();
+}
+
+function digestText(value: string): string {
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function readOptionalFile(cwd: string, maybePath: string): string {
+  if (!maybePath) return '';
+  const resolved = resolvePath(cwd, maybePath);
+  if (!existsSync(resolved)) return '';
+  return readFileSync(resolved, 'utf8');
+}
+
+function digestSourcePaths(cwd: string, sourcePaths: string[]): string {
+  const hash = createHash('sha256');
+  for (const sourcePath of [...sourcePaths].sort((a, b) => a.localeCompare(b))) {
+    const resolved = resolvePath(cwd, sourcePath);
+    hash.update(sourcePath.replace(/\\/g, '/'));
+    hash.update('\0');
+    hash.update(existsSync(resolved) ? readFileSync(resolved) : Buffer.from('missing'));
+    hash.update('\0');
+  }
+  return `sha256:${hash.digest('hex')}`;
+}
+
+function readTaskDeclaredFiles(cwd: string, taskId: string): string[] {
+  const taskPath = path.resolve(cwd, '.atm/history/tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return [];
+  try {
+    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    return uniqueStrings([
+      ...readStringList(task.scopePaths),
+      ...readStringList(task.deliverables),
+      ...readStringList(task.targetAllowedFiles)
+    ].filter((file) => !file.startsWith('.atm/')));
+  } catch {
+    return [];
+  }
+}
+
+function readStringList(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.map((entry) => typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '').filter(Boolean)
+    : [];
+}
+
+function uniqueStrings(values: string[]): string[] {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }
 
 function readProviderPayloadFromFile(providerResponsePath: string) {

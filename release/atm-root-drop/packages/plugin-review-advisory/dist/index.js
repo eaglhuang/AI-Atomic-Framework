@@ -35,6 +35,7 @@ export function createReviewAdvisoryReport(init) {
                 attachable: false
             }
         },
+        standardsSpecReceipt: init.standardsSpecReceipt,
         advisoryUnavailable,
         needsReview,
         unavailableReasons
@@ -172,6 +173,35 @@ export function appendMachineFindings(report, machineFindings) {
             || mergedFindings.some((finding) => finding.action === 'needs-review' || finding.action === 'request-human-review')
     };
 }
+export function attachStandardsSpecReviewReceipt(report, receipt) {
+    return {
+        ...report,
+        standardsSpecReceipt: {
+            ...receipt,
+            provider: { ...receipt.provider },
+            dispositions: receipt.dispositions.map((entry) => ({ ...entry }))
+        }
+    };
+}
+export function inspectStandardsSpecReviewReceipt(input) {
+    const receipt = input.report?.standardsSpecReceipt;
+    if (!receipt) {
+        return { ok: false, reason: 'standards-spec-review-receipt-missing', unresolvedFindingIds: [] };
+    }
+    if (receipt.taskId !== input.taskId) {
+        return { ok: false, reason: 'standards-spec-review-task-mismatch', unresolvedFindingIds: [] };
+    }
+    if (receipt.candidateDigest !== input.candidateDigest) {
+        return { ok: false, reason: 'standards-spec-review-candidate-stale', unresolvedFindingIds: [] };
+    }
+    const unresolvedFindingIds = receipt.dispositions
+        .filter((entry) => entry.disposition === 'unresolved')
+        .map((entry) => entry.findingId);
+    if (unresolvedFindingIds.length > 0) {
+        return { ok: false, reason: 'standards-spec-review-unresolved-findings', unresolvedFindingIds };
+    }
+    return { ok: true };
+}
 export function normalizeProviderPayload(payload, fallback) {
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
         return {
@@ -263,6 +293,8 @@ export default {
     createUnavailableAdvisoryReport,
     createStubReviewAdvisoryReport,
     appendMachineFindings,
+    attachStandardsSpecReviewReceipt,
+    inspectStandardsSpecReviewReceipt,
     mapConversationPatchDraftsToMachineFindings,
     normalizeProviderPayload
 };

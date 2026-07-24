@@ -13,6 +13,39 @@
 import { createHash } from 'node:crypto';
 export { parseAcceptanceEvidenceMap } from './acceptance-evidence-import.ts';
 
+export interface TaskCausalGraphContract {
+  readonly causalDependencies: readonly string[];
+  readonly startConditions: readonly string[];
+  readonly softRelations: readonly string[];
+  readonly changedPublicSeams: readonly string[];
+  readonly causalImpactEdges: readonly string[];
+  readonly parallelFrontierInputs: readonly string[];
+  readonly validatorReferences: readonly string[];
+  readonly phaseOwner: string | null;
+}
+
+export function normalizeTaskCausalGraphContract(value: unknown): TaskCausalGraphContract {
+  const record = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  const list = (...keys: string[]): readonly string[] => {
+    for (const key of keys) {
+      const candidate = record[key];
+      if (Array.isArray(candidate)) return [...new Set(candidate.filter((entry): entry is string => typeof entry === 'string').map(normalizeYamlScalar))];
+      if (typeof candidate === 'string' && candidate.trim()) return [...new Set(parseYamlList(candidate))];
+    }
+    return [];
+  };
+  return {
+    causalDependencies: list('causalDependencies', 'causal_dependencies', 'depends_on'),
+    startConditions: list('startConditions', 'start_conditions'),
+    softRelations: list('softRelations', 'soft_relations', 'related'),
+    changedPublicSeams: list('changedPublicSeams', 'changed_public_seams', 'publicSeams', 'public_seams'),
+    causalImpactEdges: list('causalImpactEdges', 'causal_impact_edges', 'impactEdges', 'impact_edges'),
+    parallelFrontierInputs: list('parallelFrontierInputs', 'parallel_frontier_inputs', 'frontierInputs', 'frontier_inputs'),
+    validatorReferences: list('validatorReferences', 'validator_references', 'validators'),
+    phaseOwner: normalizeOptionalString(record.phaseOwner ?? record.phase_owner)
+  };
+}
+
 // ─── 類型定義（共享自 tasks.ts 的 FrontMatter 介面） ─────────────────────────
 
 export interface FrontMatter {

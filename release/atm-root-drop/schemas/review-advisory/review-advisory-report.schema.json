@@ -162,6 +162,97 @@
         }
       }
     },
+    "standardsSpecReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "taskId",
+        "baseRef",
+        "candidateRef",
+        "candidateDigest",
+        "standardsDigest",
+        "specDigest",
+        "provider",
+        "reviewedAt",
+        "dispositions"
+      ],
+      "properties": {
+        "schemaId": {
+          "type": "string",
+          "const": "atm.standardsSpecReviewReceipt.v1"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidateRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidateDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "standardsDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "specDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "provider": {
+          "$ref": "#/properties/provider"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dispositions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "findingId",
+              "axis",
+              "disposition"
+            ],
+            "properties": {
+              "findingId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "axis": {
+                "type": "string",
+                "enum": [
+                  "standards",
+                  "spec"
+                ]
+              },
+              "disposition": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "resolved",
+                  "unresolved",
+                  "waived"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
     "advisoryUnavailable": {
       "type": "boolean"
     },

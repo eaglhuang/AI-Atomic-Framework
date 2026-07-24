@@ -188,6 +188,14 @@ task card as the full specification for scope, deliverables, acceptance, and
 validators; treat the dispatch packet as a concise navigation note for the
 current lane state.
 
+When a card contains `causalGraph`, dispatch references the sealed card and
+reports only the current phase owner, start-condition verdict, and frontier
+inputs. Do not restate causal edges or soft relations in the packet.
+
+When a card contains `causalGraph`, dispatch references the sealed card and
+reports only the current phase owner, start-condition verdict, and frontier
+inputs. Do not restate causal edges or soft relations in the packet.
+
 A good dispatch packet should normally contain only:
 
 - recipient and actor identity;

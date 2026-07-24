@@ -24,6 +24,7 @@ import { relativePathFrom } from '../shared.js';
 import { readTaskLedgerPolicy } from '../task-ledger.js';
 import { parseClaimRecord } from './task-ledger-readers.js';
 import { extractFrontMatter } from './task-import-validators.js';
+import { parseCsvPathList } from './task-option-parsers/helpers.js';
 import { buildResidueClassification } from './residue-diagnostics.js';
 export function resolvePlanningCardPath(cwd, taskDocument) {
     const source = taskDocument.source;
@@ -78,10 +79,7 @@ export function readScopeAmendmentEvents(cwd, taskId) {
                 continue;
             const meta = raw.amendmentMetadata;
             const command = typeof raw.command === 'string' ? raw.command : '';
-            const addMatch = /--add\s+([^\s]+)/.exec(command);
-            const addedPaths = addMatch
-                ? addMatch[1].split(',').map((p) => p.trim()).filter(Boolean)
-                : [];
+            const addedPaths = [...parseScopeAddCommandPaths(command)];
             snapshots.push({
                 transitionId: typeof raw.transitionId === 'string' ? raw.transitionId : f.replace('.json', ''),
                 actorId: typeof raw.actorId === 'string' ? raw.actorId : null,
@@ -100,6 +98,52 @@ export function readScopeAmendmentEvents(cwd, taskId) {
         }
     }
     return snapshots;
+}
+export function parseScopeAddCommandPaths(command) {
+    const tokens = tokenizeCommand(command);
+    const paths = [];
+    for (let index = 0; index < tokens.length; index += 1) {
+        if (tokens[index] !== '--add' && tokens[index] !== '--paths')
+            continue;
+        const value = tokens[index + 1];
+        if (!value)
+            continue;
+        paths.push(...parseCsvPathList(value));
+        index += 1;
+    }
+    return paths;
+}
+function tokenizeCommand(command) {
+    const tokens = [];
+    let current = '';
+    let quote = null;
+    for (let index = 0; index < command.length; index += 1) {
+        const char = command[index];
+        if (quote) {
+            if (char === quote) {
+                quote = null;
+            }
+            else {
+                current += char;
+            }
+            continue;
+        }
+        if (char === '"' || char === "'") {
+            quote = char;
+            continue;
+        }
+        if (/\s/.test(char)) {
+            if (current) {
+                tokens.push(current);
+                current = '';
+            }
+            continue;
+        }
+        current += char;
+    }
+    if (current)
+        tokens.push(current);
+    return tokens;
 }
 export function normalizeParityLifecycleValue(value) {
     const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');

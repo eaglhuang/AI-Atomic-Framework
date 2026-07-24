@@ -1,6 +1,8 @@
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { inspectStandardsSpecReviewReceipt, type ReviewAdvisoryReport } from '../../../../plugin-review-advisory/src/index.ts';
 import { detectHistoricalDeliveryCommit } from '../tasks/historical-delivery.ts';
 import { ATM_INDEX_FOREIGN_ACTIVE_STAGED } from '../git-index-ownership.ts';
 import { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers, type HistoricalClosePreflightSummary } from './historical-close-preflight.ts';
@@ -54,7 +56,8 @@ function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { 
 }
 
 export function extractTaskflowDeclaredFiles(cwd: string, taskId: string, taskDocument: Record<string, unknown>): string[] {
-  const runtimeResolved = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
+  const runtimeResolved = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)]
+    .filter((file) => !file.startsWith('.atm/'));
   const explicit = extractTaskStringList(taskDocument, 'deliverables');
   const deliverables = explicit.length > 0
     ? explicit
@@ -145,6 +148,19 @@ export function buildTaskflowClosePreflight(input: {
     waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
     waiverReason: input.waiverReason
   });
+  const standardsSpecBlocker = buildStandardsSpecReviewReceiptBlocker({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    taskDocument: input.taskDocument
+  });
+  if (standardsSpecBlocker) {
+    return {
+      ...summary,
+      ok: false,
+      blockers: [standardsSpecBlocker, ...summary.blockers],
+      operationalBlockers: [standardsSpecBlocker, ...summary.operationalBlockers]
+    };
+  }
   if (
     summary.unexpectedStagedTasks.length > 0
     && !summary.blockers.some((entry) => entry.id === 'unexpectedStagedTasks')
@@ -231,6 +247,66 @@ export function buildTaskflowClosePreflight(input: {
     };
   }
   return summary;
+}
+
+function buildStandardsSpecReviewReceiptBlocker(input: {
+  cwd: string;
+  taskId: string;
+  taskDocument: Record<string, unknown>;
+}) {
+  const nestedEvidence = input.taskDocument.evidence && typeof input.taskDocument.evidence === 'object' && !Array.isArray(input.taskDocument.evidence)
+    ? input.taskDocument.evidence as Record<string, unknown>
+    : {};
+  const required = String(input.taskDocument.evidenceRequired ?? nestedEvidence.required ?? '').trim();
+  if (required !== 'standards-spec-review-candidate-seal') {
+    return null;
+  }
+  const report = readStandardsSpecReviewReport(input.cwd, input.taskId);
+  const candidateDigest = digestTaskCandidate(input.cwd, extractTaskflowDeclaredFiles(input.cwd, input.taskId, input.taskDocument));
+  const verdict = inspectStandardsSpecReviewReceipt({ report, taskId: input.taskId, candidateDigest });
+  if (verdict.ok) {
+    return null;
+  }
+  return {
+    id: 'staleEvidence' as const,
+    code: 'ATM_STANDARDS_SPEC_REVIEW_RECEIPT_REQUIRED',
+    summary: `Standards/Spec review receipt is not close-ready: ${verdict.reason}.`,
+    files: [
+      `.atm/history/reports/review-advisory/${input.taskId}.json`,
+      '.atm/history/reports/review-advisory.json'
+    ],
+    taskIds: [input.taskId],
+    remediationChoices: [],
+    requiredCommand: `node atm.mjs review-advisory --task ${input.taskId} --standards-spec-receipt --target-kind scope --target-id ${input.taskId} --out .atm/history/reports/review-advisory/${input.taskId}.json --json`
+  };
+}
+
+function readStandardsSpecReviewReport(cwd: string, taskId: string): ReviewAdvisoryReport | null {
+  for (const relativePath of [
+    `.atm/history/reports/review-advisory/${taskId}.json`,
+    '.atm/history/reports/review-advisory.json'
+  ]) {
+    const absolutePath = path.resolve(cwd, relativePath);
+    if (!existsSync(absolutePath)) continue;
+    try {
+      return JSON.parse(readFileSync(absolutePath, 'utf8')) as ReviewAdvisoryReport;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function digestTaskCandidate(cwd: string, files: readonly string[]): string {
+  const hash = createHash('sha256');
+  for (const file of uniqueSorted(files)) {
+    const absolutePath = path.resolve(cwd, file);
+    hash.update(file.replace(/\\/g, '/'));
+    hash.update('\0');
+    hash.update(existsSync(absolutePath) ? readFileSync(absolutePath) : Buffer.from('missing'));
+    hash.update('\0');
+  }
+  return `sha256:${hash.digest('hex')}`;
 }
 
 function readTouchedFiles(cwd: string): string[] {

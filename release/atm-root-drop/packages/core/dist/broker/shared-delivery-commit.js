@@ -117,6 +117,7 @@ export function planSharedDeliveryCommit(input) {
         fileSlices: normalizedSlices,
         executorActor: input.actorId,
         temporaryIndexIsolated: true,
+        commitCandidateId: input.commitCandidateId ?? null,
         payloadAssertion: {
             status: input.commitSha ? 'passed' : 'pending',
             expectedFileCount: uniqueSorted(Object.values(normalizedSlices).flat()).length,

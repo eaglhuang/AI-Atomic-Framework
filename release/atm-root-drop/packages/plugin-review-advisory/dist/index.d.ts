@@ -50,9 +50,28 @@ export interface ReviewAdvisoryReport {
             queueRecordStatus?: string;
         };
     };
+    standardsSpecReceipt?: StandardsSpecReviewReceipt;
     advisoryUnavailable: boolean;
     needsReview: boolean;
     unavailableReasons?: string[];
+}
+export type StandardsSpecReviewDisposition = 'accepted' | 'resolved' | 'unresolved' | 'waived';
+export interface StandardsSpecReviewReceipt {
+    schemaId: 'atm.standardsSpecReviewReceipt.v1';
+    taskId: string;
+    baseRef: string;
+    candidateRef: string;
+    candidateDigest: string;
+    standardsDigest: string;
+    specDigest: string;
+    provider: AdvisoryProviderInfo;
+    reviewedAt: string;
+    dispositions: Array<{
+        findingId: string;
+        axis: 'standards' | 'spec';
+        disposition: StandardsSpecReviewDisposition;
+        reason?: string;
+    }>;
 }
 export interface ReviewAdvisoryReportInit {
     reportId: string;
@@ -62,6 +81,7 @@ export interface ReviewAdvisoryReportInit {
     target: ReviewAdvisoryTarget;
     findings?: ReviewAdvisoryFinding[];
     unavailableReasons?: string[];
+    standardsSpecReceipt?: StandardsSpecReviewReceipt;
 }
 export declare function createReviewAdvisoryReport(init: ReviewAdvisoryReportInit): ReviewAdvisoryReport;
 export declare function createConversationPatchDraftAdvisoryReport(input: {
@@ -90,6 +110,18 @@ export declare function appendMachineFindings(report: ReviewAdvisoryReport, mach
     evidenceRefs?: string[];
     metadata?: Record<string, unknown>;
 }>): ReviewAdvisoryReport;
+export declare function attachStandardsSpecReviewReceipt(report: ReviewAdvisoryReport, receipt: StandardsSpecReviewReceipt): ReviewAdvisoryReport;
+export declare function inspectStandardsSpecReviewReceipt(input: {
+    report: ReviewAdvisoryReport | null | undefined;
+    taskId: string;
+    candidateDigest: string;
+}): {
+    ok: true;
+} | {
+    ok: false;
+    reason: string;
+    unresolvedFindingIds: string[];
+};
 export declare function normalizeProviderPayload(payload: unknown, fallback: {
     reportId: string;
     provider: AdvisoryProviderInfo;
@@ -113,6 +145,8 @@ declare const _default: {
     createUnavailableAdvisoryReport: typeof createUnavailableAdvisoryReport;
     createStubReviewAdvisoryReport: typeof createStubReviewAdvisoryReport;
     appendMachineFindings: typeof appendMachineFindings;
+    attachStandardsSpecReviewReceipt: typeof attachStandardsSpecReviewReceipt;
+    inspectStandardsSpecReviewReceipt: typeof inspectStandardsSpecReviewReceipt;
     mapConversationPatchDraftsToMachineFindings: typeof mapConversationPatchDraftsToMachineFindings;
     normalizeProviderPayload: typeof normalizeProviderPayload;
 };
