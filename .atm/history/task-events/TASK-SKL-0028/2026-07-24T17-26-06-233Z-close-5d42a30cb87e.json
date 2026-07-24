@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T17-26-06-233Z-close-5d42a30cb87e",
+  "taskId": "TASK-SKL-0028",
+  "action": "close",
+  "actorId": "codex-matt-skills-initiative-captain-20260724",
+  "sessionId": "session-20260724170641-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0028-cc30e4cc55",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0028.json",
+  "taskSha256": "sha256:eb9ab6898a1256f35c2994e8be3c82efcb891b25fb9ee60f605493d18ef763f6",
+  "createdAt": "2026-07-24T17:26:06.233Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0028 --actor codex-matt-skills-initiative-captain-20260724 --status done --historical-delivery d5d9e791971bb262040984715c0f24f814fea798",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724170641-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0028-cc30e4cc55",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0028.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T17:26:06.213Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0028.*",
+        ".atm/history/task-events/TASK-SKL-0028/**",
+        ".atm/history/tasks/TASK-SKL-0028.json",
+        "artifacts/generated/skill-corpus-audit.json",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "packages/integrations-core/src/index.ts",
+        "scripts/audit-skill-corpus.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-dispatch.skill.md",
+        "templates/skills/atm-framework-temp-claim.skill.md",
+        "templates/skills/atm-governance-router.skill.md",
+        "templates/skills/atm-next.skill.md",
+        "templates/skills/atm-plan-authoring.skill.md",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "packages/integrations-core/src/index.ts",
+        "scripts/audit-skill-corpus.ts",
+        "scripts/validate-skill-templates.ts",
+        "tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
