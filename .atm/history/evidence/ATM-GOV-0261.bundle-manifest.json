@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0261",
+  "updatedAt": "2026-07-24T09:36:41.155Z",
+  "updatedBy": "claude-002-plan31-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/git-adapter-pathspec-fallback.test.ts",
+    "node --strip-types tests/cli/transactional-commit-queue-isolation.test.ts",
+    "node --strip-types tests/cli/vcs-neutral-commit-candidate-isolation.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/vcs-neutral-commit-candidate-isolation.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0bf114b55148ddb1805e0c4d59b2420f940a81de82b0924642a21ea1767d6bbd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/vcs-neutral-commit-candidate-isolation.test.ts"
+      ],
+      "generatedAt": "2026-07-24T09:34:22.426Z",
+      "startedAt": "2026-07-24T09:34:22.113Z",
+      "finishedAt": "2026-07-24T09:34:22.426Z",
+      "durationMs": 313,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-adapter-pathspec-fallback.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9f5bd31604fa29d10b7278b04440ea8cddf874675b26411f86e06b9fc7e7cbe1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-adapter-pathspec-fallback.test.ts"
+      ],
+      "generatedAt": "2026-07-24T09:34:25.228Z",
+      "startedAt": "2026-07-24T09:34:24.869Z",
+      "finishedAt": "2026-07-24T09:34:25.228Z",
+      "durationMs": 359,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/transactional-commit-queue-isolation.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:38c973af14c413edca94d61364dbc552209c58bd89ece61f99282895ee152533",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/transactional-commit-queue-isolation.test.ts"
+      ],
+      "generatedAt": "2026-07-24T09:34:30.879Z",
+      "startedAt": "2026-07-24T09:34:29.172Z",
+      "finishedAt": "2026-07-24T09:34:30.879Z",
+      "durationMs": 1707,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f320d2d889fd75b1d015db4be8cf4fe67a94047bc51204d17df677b691dad22c",
+      "stderrSha256": "sha256:51a6fb2b256f1274545a8e80054bd36b4563a4edeebde4af13955c50cbe29ea7",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-24T09:34:51.056Z",
+      "startedAt": "2026-07-24T09:34:34.359Z",
+      "finishedAt": "2026-07-24T09:34:51.056Z",
+      "durationMs": 16697,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-24T09:35:01.722Z",
+      "startedAt": "2026-07-24T09:34:53.340Z",
+      "finishedAt": "2026-07-24T09:35:01.722Z",
+      "durationMs": 8382,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-24T09:36:41.154Z",
+      "startedAt": "2026-07-24T09:35:56.503Z",
+      "finishedAt": "2026-07-24T09:36:41.154Z",
+      "durationMs": 44651,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

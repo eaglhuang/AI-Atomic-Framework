@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T13-45-28-636Z-close-515d03904f00",
+  "taskId": "ATM-GOV-0261",
+  "action": "close",
+  "actorId": "claude-002-plan31-captain",
+  "sessionId": "session-20260724090756-claude-002-plan31-captain-ATM-GOV-0261-78c8f67ed3",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0261.json",
+  "taskSha256": "sha256:630e826609d6679d470b990910e3b4772ba4d7c5f8ced375fab891a0a447df09",
+  "createdAt": "2026-07-24T13:45:28.636Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0261 --actor claude-002-plan31-captain --status done --historical-delivery 8d8e9533c50f10e25661ee0e6a59913fa36afdd9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724090756-claude-002-plan31-captain-ATM-GOV-0261-78c8f67ed3",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0261.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/git-adapter-pathspec-fallback.test.ts",
+      "node --strip-types tests/cli/transactional-commit-queue-isolation.test.ts",
+      "node --strip-types tests/cli/vcs-neutral-commit-candidate-isolation.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T13:45:28.619Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-minimal-patch-rebuilder/SKILL.md",
+        ".atm/history/evidence/ATM-GOV-0261.*",
+        ".atm/history/task-events/ATM-GOV-0261/**",
+        ".atm/history/tasks/ATM-GOV-0261.json",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-surface-queue.ts",
+        "packages/core/src/commit-candidate/**",
+        "packages/core/src/commit-candidate/commit-candidate-store.ts",
+        "packages/core/src/commit-candidate/commit-candidate.ts",
+        "templates/skills/atm-minimal-patch-rebuilder.skill.md",
+        "tests/cli/git-adapter-pathspec-fallback.test.ts",
+        "tests/cli/transactional-commit-queue-isolation.test.ts",
+        "tests/cli/vcs-neutral-commit-candidate-isolation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/core/src/broker/shared-delivery-commit.ts",
+        "packages/core/src/broker/shared-surface-queue.ts",
+        "packages/core/src/commit-candidate/**",
+        "packages/core/src/commit-candidate/commit-candidate-store.ts",
+        "packages/core/src/commit-candidate/commit-candidate.ts",
+        "tests/cli/git-adapter-pathspec-fallback.test.ts",
+        "tests/cli/transactional-commit-queue-isolation.test.ts",
+        "tests/cli/vcs-neutral-commit-candidate-isolation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
