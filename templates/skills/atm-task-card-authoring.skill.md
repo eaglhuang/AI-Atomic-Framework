@@ -143,6 +143,15 @@ status: planned
 owner: atm-release
 priority: P0
 depends_on: []
+causalGraph:
+  causalDependencies: []
+  startConditions: []
+  softRelations: []
+  changedPublicSeams: []
+  causalImpactEdges: []
+  parallelFrontierInputs: []
+  validatorReferences: []
+  phaseOwner: null
 related_plan: docs/path/to/work-record.md
 planning_repo: <adopter-planning-repo>
 target_repo: AI-Atomic-Framework
@@ -188,6 +197,10 @@ errorCodes:
   - `target_repo`, `scopePaths`, and `deliverables` are the files an agent may
     actually change.
 - Use explicit paths. Do not rely on prose acceptance text to define scope.
+- Keep `depends_on` causal-only. Put readiness gates in `causalGraph.startConditions`
+  and non-blocking links in `causalGraph.softRelations`.
+- Declare public seams, causal impact edges, parallel-frontier inputs, validator
+  references, and phase ownership under `causalGraph`, without duplicating prose.
 - Include real non-ATM deliverables for code, data, pipeline, script, report, or
   artifact tasks. `.atm/history/**` is ledger state, not the deliverable.
 - Include validators before the task is imported. If no validator exists yet,

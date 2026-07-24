@@ -16,6 +16,14 @@ Use this skill when creating or auditing ATM planning families, plan documents,
 or task cards under an external planning repository such as
 `docs/ai_atomic_framework`.
 
+## First-principles intake contract
+
+Resolve identity, authority, outcome, scope, and existing evidence before asking
+the human a question. Ask only currently unblocked decisions and show the
+default. Cards use `causalGraph` for typed dependencies, start conditions, soft
+relations, public seams, impact edges, frontier inputs, validators, and phase
+ownership.
+
 First command:
 
 ```bash

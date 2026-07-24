@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0020",
+  "title": "First-principles intake and causal task graph",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.2",
+  "dependencies": [
+    "TASK-SKL-0018"
+  ],
+  "acceptance": [
+    "Intake asks only currently unblocked human decisions and offers defaults.",
+    "`depends_on` contains only causal blockers; start conditions and soft relations are separately typed.",
+    "Cards declare changed public seams, causal impact edges, parallel frontier inputs, validator references and phase ownership without duplicated prose.",
+    "`deliverables` remain a subset of write scope.",
+    "Dispatch output stays concise by referencing the sealed card instead of repeating its full contents."
+  ],
+  "deliverables": [
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "templates/skills/atm-plan-authoring.skill.md",
+    "templates/skills/atm-dispatch.skill.md",
+    "packages/cli/src/commands/tasks/task-card-writer.ts",
+    "tests/cli/task-card-causal-graph-authoring.test.ts"
+  ],
+  "scopePaths": [
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "templates/skills/atm-plan-authoring.skill.md",
+    "templates/skills/atm-dispatch.skill.md",
+    "packages/cli/src/commands/plan.ts",
+    "packages/cli/src/commands/tasks/task-card-writer.ts",
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "tests/cli/task-card-causal-graph-authoring.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+    "npm run validate:skill-templates",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "first-principles-intake-and-dag-contract",
+  "rollbackStrategy": "revert-commit-and-retain-current-authoring-template",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-authoring",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.causal-task-intake",
+        "pattern": "Authoring Policy",
+        "source": "packages/cli/src/commands/tasks/task-card-writer.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0020-first-principles-intake-and-causal-task-graph.task.md",
+    "sectionTitle": "TASK-SKL-0020",
+    "headingLine": 48,
+    "hash": "97d1c4dfeb517aa0",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0020-first-principles-intake-and-causal-task-graph.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:97d1c4dfeb517aa06b9184d18f09ca00a42d89df9308500221eeb4f340cf9b3c",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-24T07:06:33.399Z"
+    }
+  },
+  "importedAt": "2026-07-24T07:06:33.399Z",
+  "lastTransitionId": "2026-07-24T07-06-45-274Z-claim-45556e7be22d",
+  "lastTransitionAt": "2026-07-24T07:06:45.274Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-matt-skills-initiative-captain-20260724",
+  "reservedAt": "2026-07-24T07:06:37.354Z",
+  "promotedAt": "2026-07-24T07:06:37.357Z",
+  "claim": {
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "leaseId": "lease-e15def3ece99",
+    "claimedAt": "2026-07-24T07:06:37.360Z",
+    "heartbeatAt": "2026-07-24T07:06:37.360Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0020.json",
+      "packages/cli/src/commands/plan.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-plan-authoring.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/task-card-causal-graph-authoring.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260724070637-codex-matt-skills-initiative-captain-20260724-14d9cd2fc0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724070637-codex-matt-skills-initiative-captain-20260724-14d9cd2fc0\""
+    }
+  },
+  "startedAt": "2026-07-24T07:06:37.360Z",
+  "startedByActor": "codex-matt-skills-initiative-captain-20260724",
+  "startedBySessionId": "session-20260724070637-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0020-310441d7c7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0020",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0020.*",
+      ".atm/history/task-events/TASK-SKL-0020/**",
+      ".atm/history/tasks/TASK-SKL-0020.json",
+      "packages/cli/src/commands/plan.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-plan-authoring.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/task-card-causal-graph-authoring.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b94269c651dabca2c95a85123b56facc160d36b2571d89a6d1912427184cce5b",
+    "actorId": "codex-matt-skills-initiative-captain-20260724",
+    "sessionId": "session-20260724070637-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0020-310441d7c7",
+    "laneSession": {
+      "laneSessionId": "lane-20260724070637-codex-matt-skills-initiative-captain-20260724-14d9cd2fc0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724070637-codex-matt-skills-initiative-captain-20260724-14d9cd2fc0\""
+    },
+    "createdAt": "2026-07-24T07:06:45.273Z",
+    "status": "active"
+  }
+}
