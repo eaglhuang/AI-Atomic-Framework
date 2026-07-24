@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T06-22-40-454Z-close-5f626301b7aa",
+  "taskId": "TASK-SKL-0018",
+  "action": "close",
+  "actorId": "codex-matt-skills-initiative-captain-20260724",
+  "sessionId": "session-20260724055911-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0018-740ec1ea31",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0018.json",
+  "taskSha256": "sha256:0f7bf7ce79b0d2687c1d565bf7bb8dff2abb10c6ed2eede772cc65541b66f633",
+  "createdAt": "2026-07-24T06:22:40.454Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0018 --actor codex-matt-skills-initiative-captain-20260724 --status done --historical-delivery bae58bbb390c91ebc6dd31246d3fd770279aa729",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724055911-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0018-740ec1ea31",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0018.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/skill-provider-capability-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T06:22:40.439Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0018.*",
+        ".atm/history/task-events/TASK-SKL-0018/**",
+        ".atm/history/tasks/TASK-SKL-0018.json",
+        "integrations/codex-skills/atm-governance-router/SKILL.md",
+        "packages/core/src/team-runtime/provider-registry.ts",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "packages/plugin-experience-loop/schemas/skill-amendment.schema.json",
+        "packages/plugin-experience-loop/schemas/skill-candidate.schema.json",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-governance-router.skill.md",
+        "templates/skills/skill.schema.json",
+        "tests/cli/skill-provider-capability-contract.test.ts",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/team-runtime/provider-registry.ts",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "packages/plugin-experience-loop/schemas/skill-amendment.schema.json",
+        "packages/plugin-experience-loop/schemas/skill-candidate.schema.json",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/skill.schema.json",
+        "tests/cli/skill-provider-capability-contract.test.ts",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:integration-adapter",
+        "validate:skill-templates"
+      ]
+    }
+  }
+}
