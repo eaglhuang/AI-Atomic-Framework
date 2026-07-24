@@ -1,0 +1,203 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0020",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d3312405e6c31caf11eb0d21f6c56854ed038024",
+  "governedTreeSha": "42f7e56ab2494d20dbeed90e7c4bf4370c29ee3a",
+  "targetCommitDelta": {
+    "currentCommitSha": "d3312405e6c31caf11eb0d21f6c56854ed038024",
+    "parentCommitShas": [
+      "d3312405e6c31caf11eb0d21f6c56854ed038024"
+    ],
+    "governedTreeSha": "42f7e56ab2494d20dbeed90e7c4bf4370c29ee3a",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0259.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0020.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0020.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/atm.js",
+      "packages/cli/dist/commands/command-specs.js",
+      "packages/cli/dist/commands/tasks/status-triangulation.js",
+      "packages/cli/src/commands/plan.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/integrations/codex-skills/atm-governance-router/SKILL.md",
+      "release/atm-root-drop/packages/adapter-local-git/dist/index.d.ts",
+      "release/atm-root-drop/packages/atm-markdown-task-source/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/cli/dist/atm.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/status-triangulation.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/atm.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/status-triangulation.ts",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/team-runtime/provider-registry.js",
+      "release/atm-root-drop/packages/core/src/team-runtime/provider-registry.ts",
+      "release/atm-root-drop/packages/integrations-core/dist/compiler/skill-templates.js",
+      "release/atm-root-drop/packages/integrations-core/dist/index.d.ts",
+      "release/atm-root-drop/packages/integrations-core/src/compiler/skill-templates.ts",
+      "release/atm-root-drop/packages/language-csharp/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-behavior-pack/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-experience-loop/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-experience-loop/schemas/skill-amendment.schema.json",
+      "release/atm-root-drop/packages/plugin-experience-loop/schemas/skill-candidate.schema.json",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-human-review/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-review-advisory/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-rule-guard/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-governance-router.skill.md",
+      "release/atm-root-drop/templates/skills/skill.schema.json",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/command-list.json",
+      "release/atm-root-drop/tests/schema-fixtures/positive/integration-install-manifest.json",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-plan-authoring.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/task-card-causal-graph-authoring.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a82411efdc469a3dcc28ea711678579c7fcd669d1ca33c18f2a17f940b0280eb",
+      "stderrSha256": "sha256:6b54448714f0c0b894ba5cd655316707ef8780cd6e50498301e39823e47a88c8",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:2f038bd6b65ebd29b6c9ad080ccdd7ea933ccd579e072b4e1f3091ac7bc074fa",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:skill-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-24T07:43:16.895Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0020.*",
+      ".atm/history/task-events/TASK-SKL-0020/**",
+      ".atm/history/tasks/TASK-SKL-0020.json",
+      "packages/cli/src/commands/plan.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-plan-authoring.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/task-card-causal-graph-authoring.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/plan.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/task-card-causal-graph-authoring.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0020.json",
+  "closedAt": "2026-07-24T07:43:16.895Z",
+  "closedByActor": "codex-matt-skills-initiative-captain-20260724",
+  "sessionId": "session-20260724070637-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0020-310441d7c7",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d3312405e6c31caf11eb0d21f6c56854ed038024",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/plan.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-plan-authoring.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/task-card-causal-graph-authoring.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0020.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0020/2026-07-24T07-06-33-496Z-import-678a998adaa0.json",
+      ".atm/history/task-events/TASK-SKL-0020/2026-07-24T07-06-37-355Z-reserve-7a0f3cf9e75a.json",
+      ".atm/history/task-events/TASK-SKL-0020/2026-07-24T07-06-37-357Z-promote-afc292601baf.json",
+      ".atm/history/task-events/TASK-SKL-0020/2026-07-24T07-06-45-274Z-claim-45556e7be22d.json",
+      ".atm/history/tasks/TASK-SKL-0020.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

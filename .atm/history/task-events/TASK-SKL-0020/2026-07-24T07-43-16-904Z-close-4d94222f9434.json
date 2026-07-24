@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-24T07-43-16-904Z-close-4d94222f9434",
+  "taskId": "TASK-SKL-0020",
+  "action": "close",
+  "actorId": "codex-matt-skills-initiative-captain-20260724",
+  "sessionId": "session-20260724070637-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0020-310441d7c7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0020.json",
+  "taskSha256": "sha256:3295d6c6b6ad6dbcbccde7d2a386e651cff4c30d8f0de7a2f2feb4a3cdef57fd",
+  "createdAt": "2026-07-24T07:43:16.904Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0020 --actor codex-matt-skills-initiative-captain-20260724 --status done --historical-delivery d3312405e6c31caf11eb0d21f6c56854ed038024",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724070637-codex-matt-skills-initiative-captain-20260724-TASK-SKL-0020-310441d7c7",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0020.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-24T07:43:16.895Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0020.*",
+        ".atm/history/task-events/TASK-SKL-0020/**",
+        ".atm/history/tasks/TASK-SKL-0020.json",
+        "packages/cli/src/commands/plan.ts",
+        "packages/cli/src/commands/tasks/task-card-writer.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "templates/skills/atm-dispatch.skill.md",
+        "templates/skills/atm-plan-authoring.skill.md",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "tests/cli/task-card-causal-graph-authoring.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/plan.ts",
+        "packages/cli/src/commands/tasks/task-card-writer.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "tests/cli/task-card-causal-graph-authoring.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

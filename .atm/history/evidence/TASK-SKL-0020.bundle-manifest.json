@@ -1,12 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-SKL-0020",
-  "updatedAt": "2026-07-24T07:33:44.809Z",
+  "updatedAt": "2026-07-24T07:37:03.332Z",
   "updatedBy": "codex-matt-skills-initiative-captain-20260724",
   "freshValidationPasses": [
     "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
     "typecheck",
     "validate:cli",
+    "validate:git-head-evidence",
     "validate:skill-templates"
   ],
   "staleValidationPasses": [],
@@ -73,6 +74,22 @@
       "durationMs": 21756,
       "runnerKind": "dev-source",
       "sourceCommit": "1a0cd6536c37a604a944f668b196611c7059d807",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-24T07:37:03.331Z",
+      "startedAt": "2026-07-24T07:36:08.151Z",
+      "finishedAt": "2026-07-24T07:37:03.331Z",
+      "durationMs": 55180,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
