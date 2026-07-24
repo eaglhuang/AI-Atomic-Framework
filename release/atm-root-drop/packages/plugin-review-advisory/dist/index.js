@@ -1,5 +1,7 @@
 import { mapConversationPatchDraftsToMachineFindings } from './conversation-machine-findings.js';
+import { createDeepModuleReviewFingerprint, createDeepModuleReviewReport, deepModuleProviderInfo, deepModuleProviderVocabulary } from './deep-module-provider.js';
 export { checkPromotionSafetyGates } from './promotion-gates.js';
+export { createDeepModuleReviewFingerprint, createDeepModuleReviewReport, deepModuleProviderInfo, deepModuleProviderVocabulary } from './deep-module-provider.js';
 export { mapConversationPatchDraftsToMachineFindings };
 export const pluginReviewAdvisoryPackage = {
     packageName: '@ai-atomic-framework/plugin-review-advisory',
@@ -296,5 +298,9 @@ export default {
     attachStandardsSpecReviewReceipt,
     inspectStandardsSpecReviewReceipt,
     mapConversationPatchDraftsToMachineFindings,
-    normalizeProviderPayload
+    normalizeProviderPayload,
+    createDeepModuleReviewReport,
+    createDeepModuleReviewFingerprint,
+    deepModuleProviderInfo,
+    deepModuleProviderVocabulary
 };

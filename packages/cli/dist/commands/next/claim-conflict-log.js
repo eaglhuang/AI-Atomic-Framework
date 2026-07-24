@@ -45,7 +45,7 @@ export function buildClaimAdmissionDecisionLog(input) {
         : (queueStatus === 'queue-head' ? 1 : null);
     const privateGranted = queueStatus === 'queued-private-work';
     const ownerComparison = input.ownerComparison ?? input.decision.ownerComparison ?? null;
-    const gates = [
+    const legacyGates = [
         {
             gate: 'claim-intent',
             outcome: input.claimIntent,
@@ -92,6 +92,13 @@ export function buildClaimAdmissionDecisionLog(input) {
                 : 'broker arbitration freezes the claim until the conflict is resolved'
         }
     ];
+    const gates = input.canonicalResult
+        ? input.canonicalResult.trace.gates.map((gate) => ({
+            gate: gate.gate,
+            outcome: gate.status,
+            detail: gate.detail
+        }))
+        : legacyGates;
     return {
         schemaId: 'atm.nextClaimAdmissionDecisionLog.v1',
         taskId: input.taskId,

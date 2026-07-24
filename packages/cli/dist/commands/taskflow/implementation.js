@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, wri
 import path from 'node:path';
 import { getCommandSpec } from '../command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from '../tasks/public-surface.js';
+import { authorizeLaneCapability } from '../lane-session/capability-authority.js';
 import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, resolveClosebackPlanningPath, resolveCloseWriteSupport, capturePlanningCardSnapshot, applyPlanningCardCloseback, resolvePlanningRosterPaths } from './closeback-orchestration.js';
 import { buildAutoEvidencePlan, executeAutoEvidencePlan } from '../evidence.js';
 import { mapAutoEvidenceCommand } from './auto-evidence-mapper.js';
@@ -335,6 +336,9 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         historicalDeliveryGateRequired: closebackPlan.historicalDeliveryGate.required && !hasUncommittedDeliverables, historicalDeliverySupplied: historicalDeliveryRefs.length > 0 || historicalBatchRef !== null });
     if (writeRequested && !writeSupport.allowed) {
         throw new CliError(closebackPlan.closeMode === 'ambiguous-manual-review' ? 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE' : 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED', writeSupport.reason, { exitCode: 1, details: { closeMode: closebackPlan.closeMode, writeSupport, diagnostics, closebackPlan, recommendedCommand: diagnosis.nextCommand } });
+    }
+    if (writeRequested && writeSupport.allowed) {
+        authorizeLaneCapability({ cwd, taskId, actorId, commandClass: 'taskflow-close-write' });
     }
     if (writeRequested) {
         assertCommitBundleReady(previewCommitBundle);

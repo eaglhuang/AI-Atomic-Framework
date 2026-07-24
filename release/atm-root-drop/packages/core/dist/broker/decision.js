@@ -111,7 +111,7 @@ export function calculateBrokerDecision(newIntent, registry) {
         const activeReadAtomIds = active.resourceKeys.readAtomIds ?? [];
         const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
         for (const refId of active.resourceKeys.atomIds) {
-            if (newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
+            if (materialCidWrite && newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
                 pushCidConflict('write', 'ID', refId, active.taskId);
             }
             if (newReadAtomIds.has(refId)) {

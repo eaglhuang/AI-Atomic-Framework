@@ -28,6 +28,9 @@
  */
 
 import type { BrokerArbitrationVerdict } from '../../../../core/src/broker/conflict-matrix.ts';
+import { evaluateBrokerAdmission } from '../../../../core/src/broker/admission/evaluate-broker-admission.ts';
+import type { BrokerAdmissionResult } from '../../../../core/src/broker/admission/contracts.ts';
+import type { ActiveWriteIntent, WriteBrokerRegistryDocument, WriteIntent } from '../../../../core/src/broker/types.ts';
 
 export type ClaimAdmissionCidVerdict =
   | 'parallel-safe'
@@ -268,5 +271,95 @@ export function evaluateClaimAdmission(input: ClaimAdmissionInput): ClaimAdmissi
     divergence,
     advisory,
     ...(input.ownerComparison ? { ownerComparison: input.ownerComparison } : {})
+  };
+}
+
+export interface NextClaimAdmissionAdapterInput {
+  readonly candidateIntent: WriteIntent;
+  readonly conflictTaskId: string;
+  readonly conflictActorId: string | null;
+  readonly conflictFiles: readonly string[];
+  readonly overlappingAtomIds: readonly string[];
+  readonly conflictBoundedRegions?: readonly { readonly filePath: string; readonly lineStart: number; readonly lineEnd: number }[];
+  readonly resolutionAuthorizedForeignTaskIds?: ReadonlySet<string>;
+}
+
+export interface NextClaimAdmissionAdapterResult {
+  readonly canonical: BrokerAdmissionResult;
+  readonly admitted: boolean;
+  readonly blockCode: 'ATM_NEXT_CLAIM_BLOCKED' | null;
+  readonly blockReason: string | null;
+}
+
+/**
+ * CLI transport adapter for the canonical Broker admission deep module.
+ * It normalizes claim observations into registry-shaped facts but never
+ * derives a second final verdict from atom/CID overlap.
+ */
+export function evaluateNextClaimAdmissionAdapter(input: NextClaimAdmissionAdapterInput): NextClaimAdmissionAdapterResult {
+  const activeIntent: ActiveWriteIntent = {
+    intentId: `claim-observation:${input.conflictTaskId}`,
+    taskId: input.conflictTaskId,
+    teamRunId: null,
+    actorId: input.conflictActorId ?? 'unknown-actor',
+    baseCommit: input.candidateIntent.baseCommit,
+    resourceKeys: {
+      files: [...input.conflictFiles],
+      atomIds: [...input.overlappingAtomIds],
+      atomCids: [],
+      atomRanges: (input.conflictBoundedRegions ?? []).map((region) => ({
+        ...region,
+        atomCid: `claim-observation:${input.conflictTaskId}`
+      })),
+      generators: [],
+      projections: [],
+      registries: [],
+      validators: [],
+      artifacts: []
+    },
+    leaseEpoch: 1,
+    leaseSeconds: 1800,
+    leaseMaxSeconds: 1800,
+    heartbeatAt: new Date(0).toISOString(),
+    lane: 'direct-brokered',
+    expiresAt: '2999-01-01T00:00:00.000Z'
+    ,
+    ...(input.conflictBoundedRegions && input.conflictBoundedRegions.length > 0
+      ? {
+        admission: {
+          trigger: 'same-file-overlap-risk' as const,
+          state: 'proposal-submitted' as const,
+          requiresProposal: true,
+          summarySubmitted: true,
+          hotFiles: [...input.conflictFiles],
+          boundedRegions: input.conflictBoundedRegions,
+          rearbitrationRequired: false,
+          reason: 'bounded proposal declared by conflicting task'
+        }
+      }
+      : {})
+  };
+  const registry: WriteBrokerRegistryDocument = {
+    schemaId: 'atm.writeBrokerRegistry.v1',
+    specVersion: '0.1.0',
+    repoId: 'next-claim-adapter',
+    workspaceId: 'next-claim-adapter',
+    activeIntents: [activeIntent]
+  };
+  const canonical = evaluateBrokerAdmission(
+    { intent: input.candidateIntent },
+    registry,
+    { resolutionAuthorizedTaskIds: input.resolutionAuthorizedForeignTaskIds }
+  );
+  const admitted = canonical.disposition === 'direct'
+    || canonical.disposition === 'proposal-required'
+    || canonical.disposition === 'compose';
+  return {
+    canonical,
+    admitted,
+    blockCode: admitted ? null : 'ATM_NEXT_CLAIM_BLOCKED',
+    blockReason: admitted
+      ? null
+      : `Canonical Broker admission returned '${canonical.disposition}' for conflict with ${input.conflictTaskId}.`
   };
 }

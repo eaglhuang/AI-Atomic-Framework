@@ -1,9 +1,12 @@
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { collectResolutionAuthorizedForeignTaskIds } from '../broker-conflict-resolution.js';
 import { buildBrokerConflictUxProjection } from '../team.js';
 import { runTasks } from '../tasks/public-surface.js';
 import { CliError } from '../shared.js';
-import { compareClaimLifecycleOwners, deriveActiveWriteConflictFromOwnerComparison, deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission, resolveEffectiveShouldBlockPerCid } from './claim-admission.js';
+import { compareClaimLifecycleOwners, deriveActiveWriteConflictFromOwnerComparison, deriveCidVerdict, evaluateNextClaimAdmissionAdapter } from './claim-admission.js';
+import { buildPreClaimWriteIntent } from './claim-helpers.js';
 import { evaluateBrokerQueueAdmission } from './broker-queue-admission.js';
 import { buildClaimAdmissionDecisionLog } from './claim-conflict-log.js';
 import { createProposalLaneAdmission, readActiveProposalLane, writeProposalLane } from './proposal-lane.js';
@@ -83,11 +86,6 @@ export async function runClaimParallelPreflight(input) {
                             overlappingAtomIdCount: overlappingAtomIds.length
                         });
                         const resolutionAuthorizedForeignTaskIds = collectResolutionAuthorizedForeignTaskIds(input.cwd, input.claimableTask.workItemId);
-                        const effectiveShouldBlockPerCid = resolveEffectiveShouldBlockPerCid({
-                            shouldBlockPerCid,
-                            conflictingTaskId: candidate.taskId,
-                            resolutionAuthorizedForeignTaskIds
-                        });
                         const queueAdmission = evaluateBrokerQueueAdmission({
                             cwd: input.cwd,
                             taskId: input.claimableTask.workItemId,
@@ -151,24 +149,50 @@ export async function runClaimParallelPreflight(input) {
                             blockedTaskIds: [candidate.taskId],
                             requiredCommand
                         });
-                        // Broker verdict derivation: the parallel-preflight is itself the
-                        // broker-authoritative arbitration for this claim path. `blocked`
-                        // maps to broker `freeze`; anything else the CID gate would admit
-                        // maps to broker `allow`. When broker's separate authoritative
-                        // registry adds a distinct verdict feed here in a follow-up, the
-                        // divergence detector will start firing.
-                        const brokerVerdict = deriveBrokerVerdict({
-                            queuedPrivateWork: queueAdmission.status === 'queued-private-work' || proposalLaneAdmission?.status === 'proposal-lane-opened',
-                            shouldBlockPerCid: proposalLaneAdmission?.status === 'proposal-lane-opened' ? false : effectiveShouldBlockPerCid
+                        const baseIntent = buildPreClaimWriteIntent({
+                            taskId: input.claimableTask.workItemId,
+                            actorId: input.actorId,
+                            baseCommit: readGitHeadDigest(input.cwd),
+                            targetFiles: claimAllowedFiles
                         });
-                        const admission = evaluateClaimAdmission({
-                            brokerVerdict,
-                            cidVerdict,
-                            candidateTaskId: input.claimableTask.workItemId,
-                            conflictingTaskId: candidate.taskId,
+                        const candidateBoundedRegions = readTaskBoundedRegions(input.cwd, input.claimableTask.workItemId);
+                        const conflictBoundedRegions = readTaskBoundedRegions(input.cwd, candidate.taskId);
+                        const canonicalAdapter = evaluateNextClaimAdmissionAdapter({
+                            candidateIntent: {
+                                ...baseIntent,
+                                ...(candidateBoundedRegions.length > 0
+                                    ? {
+                                        proposalAdmission: {
+                                            trigger: 'same-file-overlap-risk',
+                                            summarySubmitted: true,
+                                            boundedRegions: candidateBoundedRegions
+                                        }
+                                    }
+                                    : {}),
+                                atomRefs: overlappingAtomIds.map((atomId) => ({
+                                    atomId,
+                                    atomCid: `claim-observation:${atomId}`,
+                                    operation: 'modify'
+                                }))
+                            },
+                            conflictTaskId: candidate.taskId,
+                            conflictActorId,
+                            conflictFiles: overlappingFiles,
                             overlappingAtomIds,
-                            ownerComparison
+                            conflictBoundedRegions,
+                            resolutionAuthorizedForeignTaskIds
                         });
+                        const brokerVerdict = canonicalAdapter.canonical.trace.arbitrationVerdict;
+                        const admission = {
+                            admitted: canonicalAdapter.admitted,
+                            blockCode: canonicalAdapter.blockCode,
+                            blockReason: canonicalAdapter.blockReason,
+                            divergence: null,
+                            advisory: canonicalAdapter.admitted && overlappingAtomIds.length > 0
+                                ? { kind: 'cid-overlap-advisory', detail: canonicalAdapter.canonical.decisionReason }
+                                : null,
+                            ownerComparison
+                        };
                         const admissionReason = admission.admitted
                             ? (queueAdmission.status === 'queued-private-work'
                                 ? 'broker-shared-surface-queue-private-work'
@@ -181,6 +205,7 @@ export async function runClaimParallelPreflight(input) {
                                             : 'cid-overlap-without-active-write-claim')
                             : null;
                         const claimAdmissionDecisionLog = buildClaimAdmissionDecisionLog({
+                            canonicalResult: canonicalAdapter.canonical,
                             taskId: input.claimableTask.workItemId,
                             conflictTaskId: candidate.taskId,
                             claimIntent: input.claimIntent,
@@ -242,6 +267,7 @@ export async function runClaimParallelPreflight(input) {
                                 admissionReason,
                                 brokerVerdict,
                                 cidVerdict,
+                                canonicalBrokerAdmission: canonicalAdapter.canonical,
                                 claimAdmissionDecisionLog,
                                 ...(proposalLaneAdmission ? { proposalLaneAdmission } : {}),
                                 ...(admission.divergence ? { admissionDivergence: admission.divergence } : {})
@@ -295,4 +321,28 @@ function normalizeString(value) {
 function readGitHeadDigest(cwd) {
     const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd, encoding: 'utf8' });
     return result.status === 0 && result.stdout.trim() ? result.stdout.trim() : 'unresolved-head';
+}
+function readTaskBoundedRegions(cwd, taskId) {
+    try {
+        const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+        const task = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const proposal = task.proposalAdmission && typeof task.proposalAdmission === 'object'
+            ? task.proposalAdmission
+            : null;
+        const source = Array.isArray(proposal?.boundedRegions) ? proposal.boundedRegions : [];
+        return source.flatMap((entry) => {
+            if (!entry || typeof entry !== 'object')
+                return [];
+            const record = entry;
+            const filePath = typeof record.filePath === 'string' ? record.filePath.replace(/\\/g, '/').trim() : '';
+            const lineStart = Number(record.lineStart);
+            const lineEnd = Number(record.lineEnd);
+            return filePath && Number.isInteger(lineStart) && Number.isInteger(lineEnd) && lineStart > 0 && lineEnd >= lineStart
+                ? [{ filePath, lineStart, lineEnd }]
+                : [];
+        });
+    }
+    catch {
+        return [];
+    }
 }

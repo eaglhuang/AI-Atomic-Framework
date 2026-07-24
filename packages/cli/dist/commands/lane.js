@@ -3,7 +3,16 @@ import { appendLaneSessionEvent } from './lane-session/events.js';
 import { rebindLifecycleAfterLaneAdopt } from './lane-session/adopt-rebind.js';
 import { resolveLaneSession } from './lane-session/resolve.js';
 import { adoptLaneSession, inspectLaneSessionSweep, recordLaneSessionHeartbeat, sweepLaneSessions } from './lane-session/store.js';
+import { issueProxyReceipt, listProxyReceipts } from './lane-session/proxy-receipt.js';
+import { capabilityFingerprint } from './lane-session/redaction.js';
 import { CliError, makeResult, message } from './shared.js';
+const proxyReceiptCommandClasses = [
+    'taskflow-close-write',
+    'governed-commit',
+    'framework-mode',
+    'runner-sync',
+    'push'
+];
 export function runLane(argv) {
     const options = parseLaneOptions(argv);
     if (options.action === 'adopt') {
@@ -15,8 +24,14 @@ export function runLane(argv) {
     if (options.action === 'sweep') {
         return runLaneSweep(options);
     }
+    if (options.action === 'proxy-grant') {
+        return runLaneProxyGrant(options);
+    }
+    if (options.action === 'proxy-status') {
+        return runLaneProxyStatus(options);
+    }
     if (options.action !== 'status') {
-        throw new CliError('ATM_CLI_USAGE', 'lane supports: status, adopt <lane-id>, heartbeat [lane-id], sweep', { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', 'lane supports: status, adopt <lane-id>, heartbeat [lane-id], sweep, proxy-grant, proxy-status', { exitCode: 2 });
     }
     const lane = resolveLaneSession({
         cwd: options.cwd,
@@ -281,6 +296,96 @@ function runLaneSweep(options) {
         }
     });
 }
+function runLaneProxyGrant(options) {
+    const approver = options.approver ?? options.actorId ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? null;
+    if (!options.taskId || !options.ownerLaneId || !options.executorLaneId || !approver) {
+        throw new CliError('ATM_CLI_USAGE', 'lane proxy-grant requires --task, --owner-lane, --executor-lane, and --approver (or --actor).', { exitCode: 2 });
+    }
+    const commandClasses = normalizeProxyCommandClasses(options.commandClasses);
+    if (commandClasses.length === 0) {
+        throw new CliError('ATM_CLI_USAGE', `lane proxy-grant requires --command-class from: ${proxyReceiptCommandClasses.join(', ')}.`, { exitCode: 2 });
+    }
+    const grantKind = options.grantKind === 'takeover' ? 'takeover' : 'proxy';
+    const ttlMs = options.ttlMs ?? 30 * 60 * 1000;
+    const issued = issueProxyReceipt({
+        cwd: options.cwd,
+        grantKind,
+        approver,
+        executorLaneId: options.executorLaneId,
+        ownerLaneId: options.ownerLaneId,
+        taskId: options.taskId,
+        commandClasses,
+        reason: options.reason ?? 'proxy execution approved',
+        ttlMs
+    });
+    return makeResult({
+        ok: true,
+        command: 'lane',
+        cwd: options.cwd,
+        messages: [
+            message('info', 'ATM_LANE_PROXY_GRANTED', `Minted non-replayable ${grantKind} receipt for ${options.taskId}.`, {
+                receiptId: issued.receipt.receiptId,
+                grantKind,
+                taskId: issued.receipt.taskId,
+                commandClasses: issued.receipt.commandClasses,
+                expiresAt: issued.receipt.expiresAt,
+                // The one-time nonce is disclosed to the approver once; never re-derivable from stored state.
+                nonce: issued.nonce
+            })
+        ],
+        evidence: {
+            action: 'proxy-grant',
+            receiptPath: issued.receiptPath,
+            receipt: {
+                receiptId: issued.receipt.receiptId,
+                grantKind: issued.receipt.grantKind,
+                approver: issued.receipt.approver,
+                taskId: issued.receipt.taskId,
+                commandClasses: issued.receipt.commandClasses,
+                ownerLaneFingerprint: capabilityFingerprint(issued.receipt.ownerLaneId, 'lane'),
+                executorLaneFingerprint: capabilityFingerprint(issued.receipt.executorLaneId, 'lane'),
+                issuedAt: issued.receipt.issuedAt,
+                expiresAt: issued.receipt.expiresAt
+            }
+        }
+    });
+}
+function runLaneProxyStatus(options) {
+    const receipts = listProxyReceipts(options.cwd)
+        .filter((receipt) => !options.taskId || receipt.taskId === options.taskId)
+        .map((receipt) => ({
+        receiptId: receipt.receiptId,
+        grantKind: receipt.grantKind,
+        taskId: receipt.taskId,
+        approver: receipt.approver,
+        commandClasses: receipt.commandClasses,
+        // Redacted: lane capability keys are projected to fingerprints for readers.
+        ownerLaneFingerprint: capabilityFingerprint(receipt.ownerLaneId, 'lane'),
+        executorLaneFingerprint: capabilityFingerprint(receipt.executorLaneId, 'lane'),
+        issuedAt: receipt.issuedAt,
+        expiresAt: receipt.expiresAt,
+        consumedAt: receipt.consumedAt,
+        state: receipt.consumedAt ? 'consumed' : 'usable'
+    }));
+    return makeResult({
+        ok: true,
+        command: 'lane',
+        cwd: options.cwd,
+        messages: [
+            message('info', 'ATM_LANE_PROXY_STATUS', `Found ${receipts.length} proxy/takeover receipt(s).`, { count: receipts.length })
+        ],
+        evidence: { action: 'proxy-status', receipts }
+    });
+}
+function normalizeProxyCommandClasses(values) {
+    const out = new Set();
+    for (const value of values) {
+        const normalized = value.trim();
+        if (proxyReceiptCommandClasses.includes(normalized))
+            out.add(normalized);
+    }
+    return [...out];
+}
 function parseLaneOptions(argv) {
     const state = {
         cwd: process.cwd(),
@@ -292,10 +397,56 @@ function parseLaneOptions(argv) {
         confirm: false,
         handoffToken: null,
         graceMs: 0,
-        write: false
+        write: false,
+        taskId: null,
+        ownerLaneId: null,
+        executorLaneId: null,
+        commandClasses: [],
+        approver: null,
+        grantKind: null,
+        ttlMs: null
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
+        if (arg === '--task') {
+            state.taskId = requireValue(argv, index, '--task');
+            index += 1;
+            continue;
+        }
+        if (arg === '--owner-lane') {
+            state.ownerLaneId = requireValue(argv, index, '--owner-lane');
+            index += 1;
+            continue;
+        }
+        if (arg === '--executor-lane') {
+            state.executorLaneId = requireValue(argv, index, '--executor-lane');
+            index += 1;
+            continue;
+        }
+        if (arg === '--command-class') {
+            for (const entry of requireValue(argv, index, '--command-class').split(',')) {
+                const normalized = entry.trim();
+                if (normalized)
+                    state.commandClasses.push(normalized);
+            }
+            index += 1;
+            continue;
+        }
+        if (arg === '--approver') {
+            state.approver = requireValue(argv, index, '--approver');
+            index += 1;
+            continue;
+        }
+        if (arg === '--grant-kind') {
+            state.grantKind = requireValue(argv, index, '--grant-kind');
+            index += 1;
+            continue;
+        }
+        if (arg === '--ttl-ms') {
+            state.ttlMs = requireNonNegativeInteger(requireValue(argv, index, '--ttl-ms'), '--ttl-ms');
+            index += 1;
+            continue;
+        }
         if (arg === '--cwd') {
             state.cwd = requireValue(argv, index, '--cwd');
             index += 1;
@@ -359,7 +510,14 @@ function parseLaneOptions(argv) {
         confirm: state.confirm,
         handoffToken: state.handoffToken,
         graceMs: state.graceMs,
-        write: state.write
+        write: state.write,
+        taskId: state.taskId,
+        ownerLaneId: state.ownerLaneId,
+        executorLaneId: state.executorLaneId,
+        commandClasses: state.commandClasses,
+        approver: state.approver,
+        grantKind: state.grantKind,
+        ttlMs: state.ttlMs
     };
 }
 function buildExportHint(laneSessionId) {
