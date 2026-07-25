@@ -64,6 +64,29 @@ export interface TaskImportRecord {
   readonly scopePaths?: readonly string[];
   readonly validators?: readonly string[];
   readonly testPlan?: Record<string, unknown>;
+  readonly testContributions?: readonly {
+    readonly caseId: string;
+    readonly targetGroupId?: string | null;
+    readonly semanticKey?: string | null;
+    readonly coversAcceptance?: readonly string[];
+    readonly coversImpactEdges?: readonly string[];
+    readonly expectedRedPredicate?: string | null;
+    readonly contributionResourceKey?: string | null;
+    readonly responsibility?: 'task-required' | 'phase-suite' | 'advisory';
+    readonly dependencyEdge?: string | null;
+    readonly contractEdge?: string | null;
+    readonly resourceKey?: string | null;
+  }[];
+  readonly requiredTestCaseIds?: readonly string[];
+  readonly phaseTestCaseIds?: readonly string[];
+  readonly advisoryTestCaseIds?: readonly string[];
+  readonly legacyValidatorProjection?: readonly {
+    readonly schemaId: 'atm.validatorExecutionContract.v1';
+    readonly caseId: string;
+    readonly command: string;
+    readonly responsibility: 'advisory';
+    readonly legacyProjection: true;
+  }[];
   readonly planningRepo?: string | null;
   readonly targetRepo?: string | null;
   readonly closureAuthority?: string | null;

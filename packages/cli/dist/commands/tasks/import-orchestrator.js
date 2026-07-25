@@ -7,7 +7,7 @@ import { readPluginRegistry } from '../../plugin-registry.js';
 import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from '../planning-repo-root.js';
 import { assertRunnerFreshForWriteAction } from '../framework-development.js';
 import { assertEmergencyApproval } from '../emergency/gate.js';
-import { buildExtractionFirstPatrolDiagnostics, extractFrontMatter, parseAcceptanceEvidenceMap, validateDeliverablesList } from './task-import-validators.js';
+import { buildExtractionFirstPatrolDiagnostics, extractFrontMatter, normalizeTaskCausalGraphContract, parseAcceptanceEvidenceMap, validateCausalValidatorContractImport, validateDeliverablesList } from './task-import-validators.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
 import { classifyForceImportAdmission } from './import-validation.js';
@@ -158,6 +158,43 @@ export async function runTasksImport(argv) {
                 tasks: parsed.tasks.map((task) => ({ ...task, acceptanceEvidence: acceptanceEvidence.value }))
             };
         }
+    }
+    const causalFrontmatter = extractFrontMatter(planText)?.data ?? null;
+    if (parsed.tasks.length === 1) {
+        const task = parsed.tasks[0];
+        const causalValidation = validateCausalValidatorContractImport({
+            frontmatter: causalFrontmatter,
+            validators: task.validators ?? [],
+            acceptance: task.acceptance ?? [],
+            causalImpactEdges: normalizeTaskCausalGraphContract(causalFrontmatter?.causalGraph ?? causalFrontmatter?.causal_graph).causalImpactEdges
+        });
+        for (const diagnostic of causalValidation.diagnostics) {
+            if (diagnostic.severity === 'error') {
+                parsed.diagnostics.push({
+                    level: 'error',
+                    code: diagnostic.code,
+                    text: diagnostic.message,
+                    workItemId: task.workItemId
+                });
+            }
+        }
+        parsed = {
+            ...parsed,
+            tasks: parsed.tasks.map((entry) => ({
+                ...entry,
+                testContributions: causalValidation.fields.testContributions,
+                requiredTestCaseIds: causalValidation.fields.requiredTestCaseIds,
+                phaseTestCaseIds: causalValidation.fields.phaseTestCaseIds,
+                advisoryTestCaseIds: causalValidation.fields.advisoryTestCaseIds,
+                ...(causalValidation.fields.legacyProjection.length > 0
+                    ? { legacyValidatorProjection: causalValidation.fields.legacyProjection }
+                    : {}),
+                importDiagnostics: [
+                    ...(entry.importDiagnostics ?? []),
+                    ...causalValidation.diagnostics
+                ]
+            }))
+        };
     }
     const enrichedParsed = enrichParsedTasksFromSiblingTaskCards({
         cwd: options.cwd,

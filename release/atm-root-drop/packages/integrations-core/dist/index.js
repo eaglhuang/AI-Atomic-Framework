@@ -19,7 +19,7 @@ export const atmFirstCommand = 'node atm.mjs next --prompt "$ARGUMENTS" --json';
 export const atmPromptScopedFirstCommand = 'node atm.mjs next --prompt "$ARGUMENTS" --json';
 export const atmIntentScopedFirstCommand = 'node atm.mjs next --intent .atm/runtime/task-intent.json --json';
 export const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
-export { minimumAtmEntrySkillDefinitions, defaultSkillTemplateDirectory, parseSkillTemplate, loadSkillTemplates, loadMinimumAtmSkillTemplates } from './compiler/skill-templates.js';
+export { minimumAtmEntrySkillDefinitions, defaultSkillTemplateDirectory, parseSkillTemplate, loadSkillTemplates, loadMinimumAtmSkillTemplates, loadSkillCorpusSourceSnapshot, compileSkillCorpus } from './compiler/skill-templates.js';
 export { renderCharterInvariantsBlock, compileSkillTemplatesForAdapter, compileSkillTemplate } from './compiler/compile.js';
 export { installManifestSchemaVersion, sha256Bytes, sha256File, normalizeManifestPath, formatInstallManifest } from './manifest/schema.js';
 export { createInstallManifest, createManifestFileRecord, createCodexSkillsAdapter, createStaticIntegrationAdapter } from './manifest/construct.js';

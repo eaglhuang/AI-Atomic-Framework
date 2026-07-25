@@ -110,6 +110,20 @@ Installed skill copies under agent or integration directories are derived
 artifacts; direct-only edits to those copies are not sufficient and must fail
 review because reinstalling or refreshing adapters can overwrite them.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: create follow-up cards by cohesive ownership before counting files
+or estimating smallness. A card should own one behavior, interface, evidence
+contract, or rollback boundary. If a "to-tickets" split would scatter one
+behavior across several cards, keep the card whole or require a provider-neutral
+review receipt that names the replaceable boundary.
+
+For skill-template or integration projection cards, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 ## Task Series Governance
 
 Never invent a new task-series prefix (a new TASK-XXX family) on your own.
@@ -162,6 +176,24 @@ deliverables:
   - packages/cli/src/commands/example.ts
 validators:
   - npm run validate:cli
+# Causal validator contract (TASK-SKL-0022). Prefer these over bare command lists.
+# responsibility values: task-required | phase-suite | advisory
+testContributions:
+  - caseId: test_task_example_behavior_8f3a2c1d
+    targetGroupId: null
+    semanticKey: example_behavior
+    coversAcceptance: [ACC-1]
+    coversImpactEdges: [example-public-seam]
+    expectedRedPredicate: example failure is detected
+    contributionResourceKey: null
+    responsibility: task-required
+    dependencyEdge: null
+    contractEdge: example-contract
+    resourceKey: null
+requiredTestCaseIds:
+  - test_task_example_behavior_8f3a2c1d
+phaseTestCaseIds: []
+advisoryTestCaseIds: []
 evidence:
   required: command-backed
 rollback:
@@ -205,6 +237,19 @@ errorCodes:
   artifact tasks. `.atm/history/**` is ledger state, not the deliverable.
 - Include validators before the task is imported. If no validator exists yet,
   the task must say which validator must be created.
+- Prefer the causal validator contract fields over command-only lists:
+  - `testContributions` for shared/local case registration during the feature card;
+  - `requiredTestCaseIds` for task-close obligations;
+  - `phaseTestCaseIds` for batch/milestone/release suites;
+  - `advisoryTestCaseIds` for non-blocking diagnostics.
+- Contract responsibility must be one of `task-required`, `phase-suite`, or
+  `advisory`. Broad full suites (`typecheck`, `validate:cli`, `*.static.all`)
+  cannot be `task-required` unless the contribution declares a concrete
+  dependency, contract, or resource edge.
+- Every acceptance criterion and declared causal impact edge must resolve to at
+  least one required case. Command-only legacy cards remain importable through
+  an explicit advisory `legacy_cmd_*` projection plus
+  `ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION`.
 - Include rollback instructions. For framework tasks, prefer revertable commits
   plus any generated artifact cleanup.
 - If the behavior can emit an `ATM_*` code, use `atm-error-code-resolver` in

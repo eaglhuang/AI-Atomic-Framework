@@ -6,7 +6,8 @@
  * ATM skill template parser, loader, and minimum entry skill definitions.
  * No dependencies on manifest or verify submodules.
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -152,6 +153,46 @@ export interface CompileSkillTemplateOptions {
   readonly repositoryRoot?: string;
 }
 
+export interface SkillCorpusSourceFile {
+  readonly id: string;
+  readonly sourcePath: string;
+  readonly content: string;
+  readonly sourceDigest: `sha256:${string}`;
+}
+
+export interface SkillCorpusSourceSnapshot {
+  readonly schemaId: 'atm.skillCorpusSourceSnapshot.v1';
+  readonly compilerVersion: '0.1.0';
+  readonly generatedAt: string;
+  readonly sourceRoot: string;
+  readonly templateCount: number;
+  readonly templates: readonly AtmSkillTemplate[];
+  readonly sourceFiles: readonly SkillCorpusSourceFile[];
+  readonly sourceDigest: `sha256:${string}`;
+  readonly ignoredSourceTemplatePaths: readonly string[];
+}
+
+export interface SkillCorpusAdapterDescriptor<TProjectionFile = unknown> {
+  readonly adapterId: SkillTemplateAdapterTarget;
+  readonly manifestDigest?: `sha256:${string}`;
+  readonly diagnostics?: readonly string[];
+  readonly project: (input: {
+    readonly adapterId: SkillTemplateAdapterTarget;
+    readonly templates: readonly AtmSkillTemplate[];
+    readonly sourceSnapshot: SkillCorpusSourceSnapshot;
+  }) => readonly TProjectionFile[];
+}
+
+export interface SkillCorpusProjection<TProjectionFile = unknown> {
+  readonly schemaId: 'atm.skillCorpusProjection.v1';
+  readonly compilerVersion: '0.1.0';
+  readonly adapterId: SkillTemplateAdapterTarget;
+  readonly sourceDigest: `sha256:${string}`;
+  readonly manifestDigest: `sha256:${string}`;
+  readonly degradationDiagnostics: readonly string[];
+  readonly files: readonly TProjectionFile[];
+}
+
 export const minimumAtmEntrySkillDefinitions = [
   {
     id: 'atm-next',
@@ -291,6 +332,58 @@ export function loadMinimumAtmSkillTemplates(templateDirectory = defaultSkillTem
   });
 }
 
+export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTemplateDirectory): SkillCorpusSourceSnapshot {
+  const templates = loadSkillTemplates(templateDirectory);
+  const sourceFiles = templates.map((template) => {
+    const absolutePath = path.join(integrationsCoreRepoRoot, template.sourcePath);
+    const content = readFileSync(absolutePath, 'utf8');
+    return {
+      id: template.frontmatter.id,
+      sourcePath: template.sourcePath,
+      content,
+      sourceDigest: sha256Text(content)
+    };
+  });
+  const sourceDigest = sha256Text(JSON.stringify(sourceFiles.map((file) => ({
+    sourcePath: file.sourcePath,
+    sourceDigest: file.sourceDigest
+  }))));
+  return {
+    schemaId: 'atm.skillCorpusSourceSnapshot.v1',
+    compilerVersion: '0.1.0',
+    generatedAt: new Date(0).toISOString(),
+    sourceRoot: path.relative(integrationsCoreRepoRoot, templateDirectory).replace(/\\/g, '/'),
+    templateCount: templates.length,
+    templates,
+    sourceFiles,
+    sourceDigest,
+    ignoredSourceTemplatePaths: collectIgnoredSkillTemplatePaths(templateDirectory)
+  };
+}
+
+export function compileSkillCorpus<TProjectionFile>(
+  input: {
+    readonly sourceSnapshot: SkillCorpusSourceSnapshot;
+    readonly adapterDescriptor: SkillCorpusAdapterDescriptor<TProjectionFile>;
+  }
+): SkillCorpusProjection<TProjectionFile> {
+  const files = input.adapterDescriptor.project({
+    adapterId: input.adapterDescriptor.adapterId,
+    templates: input.sourceSnapshot.templates,
+    sourceSnapshot: input.sourceSnapshot
+  });
+  const degradationDiagnostics = [...(input.adapterDescriptor.diagnostics ?? [])].sort();
+  return {
+    schemaId: 'atm.skillCorpusProjection.v1',
+    compilerVersion: input.sourceSnapshot.compilerVersion,
+    adapterId: input.adapterDescriptor.adapterId,
+    sourceDigest: input.sourceSnapshot.sourceDigest,
+    manifestDigest: input.adapterDescriptor.manifestDigest ?? sha256Text(JSON.stringify(files)),
+    degradationDiagnostics,
+    files
+  };
+}
+
 // ─── Private helpers ───────────────────────────────────────────────────────
 
 function parseSkillTemplateFrontmatter(frontmatterSource: string, sourcePath: string): AtmSkillTemplateFrontmatter {
@@ -314,4 +407,27 @@ function parseFrontmatterScalar(value: string): string | boolean {
   if (value === 'true') return true;
   if (value === 'false') return false;
   return value.replace(/^['"]|['"]$/g, '');
+}
+
+function sha256Text(content: string): `sha256:${string}` {
+  return `sha256:${createHash('sha256').update(content).digest('hex')}`;
+}
+
+function collectIgnoredSkillTemplatePaths(templateDirectory: string): readonly string[] {
+  const ignoredPaths = new Set<string>();
+  const localExcludePath = path.join(integrationsCoreRepoRoot, '.git', 'info', 'exclude');
+  const localExclude = existsSync(localExcludePath) ? readFileSync(localExcludePath, 'utf8') : '';
+  for (const line of localExclude.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    if (!trimmed.includes('templates/skills')) continue;
+    const normalized = trimmed.replace(/^\/+/, '').replace(/\\/g, '/');
+    if (normalized.endsWith('.skill.md')) {
+      ignoredPaths.add(normalized);
+    }
+  }
+  const relativeDirectory = path.relative(integrationsCoreRepoRoot, templateDirectory).replace(/\\/g, '/');
+  return [...ignoredPaths]
+    .filter((entry) => entry.startsWith(relativeDirectory))
+    .sort((left, right) => left.localeCompare(right));
 }

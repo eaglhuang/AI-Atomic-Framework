@@ -14,7 +14,8 @@
       "pathTriggers": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
       "dedupeKeys": ["language:typescript:static:typecheck"],
       "costBudgetMs": 15000,
-      "performanceGate": "advisory"
+      "performanceGate": "advisory",
+      "responsibility": "task-required"
     },
     {
       "key": "language.typescript.static.default",
@@ -28,7 +29,8 @@
       "pathTriggers": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
       "dedupeKeys": ["language:typescript:static:typecheck", "language:typescript:static:lint"],
       "costBudgetMs": 30000,
-      "performanceGate": "advisory"
+      "performanceGate": "advisory",
+      "responsibility": "task-required"
     },
     {
       "key": "language.typescript.static.all",
@@ -42,7 +44,8 @@
       "pathTriggers": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
       "dedupeKeys": ["language:typescript:static:typecheck", "language:typescript:static:lint"],
       "costBudgetMs": 60000,
-      "performanceGate": "advisory"
+      "performanceGate": "advisory",
+      "responsibility": "phase-suite"
     },
     {
       "key": "language.python.static.fast",

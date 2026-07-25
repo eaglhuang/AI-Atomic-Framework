@@ -237,6 +237,7 @@ function formatErrors(errors: any) {
 }
 
 const packageModule = await import(pathToFileURL(path.join(root, 'packages/integrations-core/src/index.ts')).href);
+const auditModule = await import(pathToFileURL(path.join(root, 'scripts/audit-skill-corpus.ts')).href);
 const schemaPath = 'templates/skills/skill.schema.json';
 assert(existsSync(path.join(root, schemaPath)), `missing skill template schema: ${schemaPath}`);
 
@@ -250,8 +251,12 @@ const schema = readJson(schemaPath);
 assert(ajv.validateSchema(schema) === true, `skill template schema is invalid: ${formatErrors(ajv.errors)}`);
 const validateFrontmatter = ajv.compile(schema);
 const templates = packageModule.loadMinimumAtmSkillTemplates(path.join(root, 'templates', 'skills'));
+const corpusSnapshot = packageModule.loadSkillCorpusSourceSnapshot(path.join(root, 'templates', 'skills'));
 const renderedCharter = packageModule.renderCharterInvariantsBlock(root);
 assert(templates.length === requiredTemplateIds.length, 'minimum ATM skill template count mismatch');
+assert(corpusSnapshot.templateCount >= templates.length, 'full skill corpus must include at least every minimum entry template');
+assert(corpusSnapshot.sourceDigest.startsWith('sha256:'), 'full skill corpus snapshot must carry a source digest');
+assert(Array.isArray(corpusSnapshot.ignoredSourceTemplatePaths), 'full skill corpus snapshot must report ignored source template paths');
 assert(renderedCharter.fallbackReason === null, 'validator fixture repo must have readable charter invariants');
 assert(renderedCharter.text.includes('INV-ATM-001'), 'rendered charter invariants must include seeded invariant text');
 
@@ -304,9 +309,22 @@ const codexFiles = packageModule.compileSkillTemplatesForAdapter('codex', templa
 const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', templates, { repositoryRoot: root });
 const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates, { repositoryRoot: root });
 const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates, { repositoryRoot: root });
+const corpusProjection = packageModule.compileSkillCorpus({
+  sourceSnapshot: corpusSnapshot,
+  adapterDescriptor: {
+    adapterId: 'codex',
+    diagnostics: [],
+    project: ({ templates: corpusTemplates }: any) => packageModule.compileSkillTemplatesForAdapter('codex', corpusTemplates, { repositoryRoot: root })
+  }
+});
 const companionFileCount = requiredTemplateIds.reduce((total, templateId) => total + countCompanionFiles(path.join(root, 'templates', 'skills', `${templateId}.files`)), 0);
 const skillAdapterCompiledCount = templates.length + companionFileCount;
 
+assert(corpusProjection.schemaId === 'atm.skillCorpusProjection.v1', 'corpus projection must use the sealed projection schema');
+assert(corpusProjection.sourceDigest === corpusSnapshot.sourceDigest, 'corpus projection must carry the source snapshot digest');
+assert(corpusProjection.compilerVersion === corpusSnapshot.compilerVersion, 'corpus projection must carry compiler version parity');
+assert(corpusProjection.manifestDigest.startsWith('sha256:'), 'corpus projection must carry a manifest digest');
+assert(Array.isArray(corpusProjection.degradationDiagnostics), 'corpus projection must carry degradation diagnostics');
 assert(claudeFiles.length === skillAdapterCompiledCount, 'Claude compiler output must contain one primary file per template plus all companion files');
 assert(codexFiles.length === skillAdapterCompiledCount, 'Codex compiler output must contain one primary file per template plus all companion files');
 assert(copilotFiles.length === templates.length * 2, 'Copilot compiler output must contain one instruction and one prompt per template');
@@ -356,6 +374,11 @@ const installedSkillDriftFindings = collectInstalledSkillDriftFindings({
   installedSkillRoot: path.join(root, '.agents', 'skills'),
   renderedCharterText: renderedCharter.text
 });
+const corpusAudit = auditModule.buildSkillCorpusAudit();
+assert(corpusAudit.schemaId === 'atm.skillCorpusAudit.v1', 'skill corpus audit must use the expected schema');
+assert(corpusAudit.sourceSnapshot.sourceDigest === corpusSnapshot.sourceDigest, 'skill corpus audit must match current source snapshot digest');
+assert(corpusAudit.deepModuleReviews.map((review: any) => review.baselineFingerprint).includes('deep-module-review:52470e9f'), 'skill corpus audit must record source-snapshot deep-module baseline');
+assert(corpusAudit.deepModuleReviews.map((review: any) => review.baselineFingerprint).includes('deep-module-review:52b3cbe6'), 'skill corpus audit must record projection deep-module baseline');
 for (const finding of installedSkillDriftFindings) {
   console.warn(`[skill-templates:${mode}] advisory installed-copy drift: ${finding.templateId} (${path.relative(root, finding.installedPath).replace(/\\/g, '/')}) ${finding.summary}`);
 }

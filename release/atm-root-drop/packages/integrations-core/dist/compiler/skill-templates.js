@@ -6,7 +6,8 @@
  * ATM skill template parser, loader, and minimum entry skill definitions.
  * No dependencies on manifest or verify submodules.
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 // Private: repo root is 4 levels above packages/integrations-core/src/compiler/
@@ -195,6 +196,51 @@ export function loadMinimumAtmSkillTemplates(templateDirectory = defaultSkillTem
         return template;
     });
 }
+export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTemplateDirectory) {
+    const templates = loadSkillTemplates(templateDirectory);
+    const sourceFiles = templates.map((template) => {
+        const absolutePath = path.join(integrationsCoreRepoRoot, template.sourcePath);
+        const content = readFileSync(absolutePath, 'utf8');
+        return {
+            id: template.frontmatter.id,
+            sourcePath: template.sourcePath,
+            content,
+            sourceDigest: sha256Text(content)
+        };
+    });
+    const sourceDigest = sha256Text(JSON.stringify(sourceFiles.map((file) => ({
+        sourcePath: file.sourcePath,
+        sourceDigest: file.sourceDigest
+    }))));
+    return {
+        schemaId: 'atm.skillCorpusSourceSnapshot.v1',
+        compilerVersion: '0.1.0',
+        generatedAt: new Date(0).toISOString(),
+        sourceRoot: path.relative(integrationsCoreRepoRoot, templateDirectory).replace(/\\/g, '/'),
+        templateCount: templates.length,
+        templates,
+        sourceFiles,
+        sourceDigest,
+        ignoredSourceTemplatePaths: collectIgnoredSkillTemplatePaths(templateDirectory)
+    };
+}
+export function compileSkillCorpus(input) {
+    const files = input.adapterDescriptor.project({
+        adapterId: input.adapterDescriptor.adapterId,
+        templates: input.sourceSnapshot.templates,
+        sourceSnapshot: input.sourceSnapshot
+    });
+    const degradationDiagnostics = [...(input.adapterDescriptor.diagnostics ?? [])].sort();
+    return {
+        schemaId: 'atm.skillCorpusProjection.v1',
+        compilerVersion: input.sourceSnapshot.compilerVersion,
+        adapterId: input.adapterDescriptor.adapterId,
+        sourceDigest: input.sourceSnapshot.sourceDigest,
+        manifestDigest: input.adapterDescriptor.manifestDigest ?? sha256Text(JSON.stringify(files)),
+        degradationDiagnostics,
+        files
+    };
+}
 // ─── Private helpers ───────────────────────────────────────────────────────
 function parseSkillTemplateFrontmatter(frontmatterSource, sourcePath) {
     const frontmatter = Object.fromEntries(frontmatterSource
@@ -218,4 +264,27 @@ function parseFrontmatterScalar(value) {
     if (value === 'false')
         return false;
     return value.replace(/^['"]|['"]$/g, '');
+}
+function sha256Text(content) {
+    return `sha256:${createHash('sha256').update(content).digest('hex')}`;
+}
+function collectIgnoredSkillTemplatePaths(templateDirectory) {
+    const ignoredPaths = new Set();
+    const localExcludePath = path.join(integrationsCoreRepoRoot, '.git', 'info', 'exclude');
+    const localExclude = existsSync(localExcludePath) ? readFileSync(localExcludePath, 'utf8') : '';
+    for (const line of localExclude.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#'))
+            continue;
+        if (!trimmed.includes('templates/skills'))
+            continue;
+        const normalized = trimmed.replace(/^\/+/, '').replace(/\\/g, '/');
+        if (normalized.endsWith('.skill.md')) {
+            ignoredPaths.add(normalized);
+        }
+    }
+    const relativeDirectory = path.relative(integrationsCoreRepoRoot, templateDirectory).replace(/\\/g, '/');
+    return [...ignoredPaths]
+        .filter((entry) => entry.startsWith(relativeDirectory))
+        .sort((left, right) => left.localeCompare(right));
 }

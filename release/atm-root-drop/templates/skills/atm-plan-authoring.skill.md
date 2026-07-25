@@ -71,6 +71,20 @@ error-governance, temporary cleanup, quarantine, or one-off residue-disposition
 work. If such work was already drafted under GOV, stop and reclassify it
 through the registered planning family before implementation continues.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: plan follow-up cards by cohesive ownership before ticket count. A
+plan should split around one behavior, interface, evidence contract, or rollback
+boundary per card. If a split would scatter one behavior across several cards,
+keep the plan section whole or require a provider-neutral review receipt before
+the split is accepted.
+
+For skill-template or integration projection plans, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 ## Error Governance Boundary
 
 The canonical ErrorCode registry currently remains:

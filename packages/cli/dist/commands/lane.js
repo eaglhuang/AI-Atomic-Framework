@@ -5,6 +5,7 @@ import { resolveLaneSession } from './lane-session/resolve.js';
 import { adoptLaneSession, inspectLaneSessionSweep, recordLaneSessionHeartbeat, sweepLaneSessions } from './lane-session/store.js';
 import { issueProxyReceipt, listProxyReceipts } from './lane-session/proxy-receipt.js';
 import { capabilityFingerprint } from './lane-session/redaction.js';
+import { runLaneMutationStatus } from './lane-session/mutation-status-command.js';
 import { CliError, makeResult, message } from './shared.js';
 const proxyReceiptCommandClasses = [
     'taskflow-close-write',
@@ -30,8 +31,11 @@ export function runLane(argv) {
     if (options.action === 'proxy-status') {
         return runLaneProxyStatus(options);
     }
+    if (options.action === 'mutation-status') {
+        return runLaneMutationStatus(options);
+    }
     if (options.action !== 'status') {
-        throw new CliError('ATM_CLI_USAGE', 'lane supports: status, adopt <lane-id>, heartbeat [lane-id], sweep, proxy-grant, proxy-status', { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', 'lane supports: status, adopt <lane-id>, heartbeat [lane-id], sweep, proxy-grant, proxy-status, mutation-status', { exitCode: 2 });
     }
     const lane = resolveLaneSession({
         cwd: options.cwd,
@@ -404,7 +408,8 @@ function parseLaneOptions(argv) {
         commandClasses: [],
         approver: null,
         grantKind: null,
-        ttlMs: null
+        ttlMs: null,
+        operation: null
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -439,6 +444,11 @@ function parseLaneOptions(argv) {
         }
         if (arg === '--grant-kind') {
             state.grantKind = requireValue(argv, index, '--grant-kind');
+            index += 1;
+            continue;
+        }
+        if (arg === '--operation') {
+            state.operation = requireValue(argv, index, '--operation');
             index += 1;
             continue;
         }
@@ -517,7 +527,8 @@ function parseLaneOptions(argv) {
         commandClasses: state.commandClasses,
         approver: state.approver,
         grantKind: state.grantKind,
-        ttlMs: state.ttlMs
+        ttlMs: state.ttlMs,
+        operation: state.operation
     };
 }
 function buildExportHint(laneSessionId) {

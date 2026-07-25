@@ -1,5 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+export const VALIDATOR_RESPONSIBILITIES = [
+    'task-required',
+    'phase-suite',
+    'advisory'
+];
 const tierRank = {
     quick: 1,
     standard: 2,
@@ -160,6 +165,54 @@ export function normalizeTier(value) {
     const text = String(value ?? '').toLowerCase();
     return text === 'quick' || text === 'standard' || text === 'full' ? text : null;
 }
+export function normalizeValidatorResponsibility(value) {
+    const text = String(value ?? '').trim().toLowerCase();
+    return VALIDATOR_RESPONSIBILITIES.includes(text)
+        ? text
+        : null;
+}
+export function isBroadSuiteCommandOrKey(value) {
+    const normalized = String(value || '').trim().toLowerCase().replace(/\\/g, '/');
+    if (!normalized)
+        return false;
+    if (/^(npm run )?(typecheck|lint|validate:cli|validate:schemas|test|validate:all)\b/.test(normalized)) {
+        return true;
+    }
+    if (/\.static\.all\b/.test(normalized) || /\btier[:=]full\b/.test(normalized)) {
+        return true;
+    }
+    if (/^(language|integration)\.[a-z0-9_.-]+\.(all|full)$/.test(normalized)) {
+        return true;
+    }
+    return false;
+}
+export function projectLegacyCommandValidators(commands) {
+    return [...new Set(commands.map((entry) => String(entry ?? '').trim()).filter(Boolean))]
+        .map((command) => ({
+        schemaId: 'atm.validatorExecutionContract.v1',
+        specVersion: '0.1.0',
+        responsibility: 'advisory',
+        caseId: `legacy_cmd_${slugify(command)}`,
+        command,
+        legacyProjection: true,
+        acceptanceIds: [],
+        impactEdges: []
+    }));
+}
+export function catalogEntryResponsibility(entry) {
+    const fromField = normalizeValidatorResponsibility(entry.responsibility);
+    if (fromField)
+        return fromField;
+    const fromMeta = normalizeValidatorResponsibility(entry.metadata?.responsibility);
+    if (fromMeta)
+        return fromMeta;
+    if (entry.scope === 'release-blocking' || entry.tiers.includes('full'))
+        return 'phase-suite';
+    if (entry.performanceGate === 'advisory' || entry.scope === 'global-advisory' || entry.scope === 'diagnostic') {
+        return 'advisory';
+    }
+    return 'task-required';
+}
 function capabilityDefaultTier(capability, plan) {
     const selectedPlan = capabilityPlan(plan, capability);
     return normalizeTier(selectedPlan?.defaultTier) ?? 'standard';
@@ -199,6 +252,8 @@ function normalizeEntry(entry) {
             dedupeKeys: normalizeStringList(entry.dedupeKeys),
             costBudgetMs: Number.isFinite(entry.costBudgetMs) ? Number(entry.costBudgetMs) : null,
             performanceGate: entry.performanceGate === 'blocking' ? 'blocking' : 'advisory',
+            responsibility: normalizeValidatorResponsibility(entry.responsibility)
+                ?? normalizeValidatorResponsibility(isRecord(entry.metadata) ? entry.metadata.responsibility : null),
             metadata: isRecord(entry.metadata) ? entry.metadata : undefined
         }];
 }
