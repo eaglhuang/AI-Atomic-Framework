@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0025",
+  "title": "Test case ID bound TDD red-green lifecycle",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.5",
+  "dependencies": [
+    "TASK-SKL-0023",
+    "TASK-SKL-0024"
+  ],
+  "acceptance": [
+    "`tddMode` supports required, recommended and reasoned not-applicable.",
+    "Red and green bind the same case ID, test digest, acceptance, public seam and sealed baseline/candidate lineage.",
+    "Syntax, setup, environment and unrelated failures cannot count as red.",
+    "One task may contribute and prove multiple integration case IDs.",
+    "Mechanical/docs exemptions are typed, reviewed and excluded from TDD success-rate inflation."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/tdd-cycle.ts",
+    "packages/cli/src/commands/evidence/verbs/run.ts",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "tests/cli/tdd-case-id-red-green-lifecycle.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/tdd-cycle.ts",
+    "packages/core/src/evidence/index.ts",
+    "packages/cli/src/commands/evidence/verbs/run.ts",
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "tests/cli/tdd-case-id-red-green-lifecycle.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/tdd-case-id-red-green-lifecycle.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "same-case-red-green-candidate-binding",
+  "rollbackStrategy": "revert-commit-and-return-tdd-mode-to-advisory",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validation-evidence",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.tdd-cycle-receipt",
+        "pattern": "TDD Evidence Contract",
+        "source": "packages/core/src/evidence/tdd-cycle.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/tdd-cycle.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/cli/src/commands/evidence/verbs/run.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "tests/cli/tdd-case-id-red-green-lifecycle.test.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0025-test-case-id-bound-tdd-red-green-lifecycle.task.md",
+    "sectionTitle": "TASK-SKL-0025",
+    "headingLine": 46,
+    "hash": "bbe3aa9013f8b0ca",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0025-test-case-id-bound-tdd-red-green-lifecycle.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:bbe3aa9013f8b0ca0d0b917ce9ccbe9f8b6e75ee1d87f65dda400358f9c0e235",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-25T08:38:59.889Z"
+    }
+  },
+  "importedAt": "2026-07-25T08:38:59.889Z",
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.tdd.case.id.red.green.lifecycle.test.ts",
+      "command": "node --strip-types tests/cli/tdd-case-id-red-green-lifecycle.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-25T08-39-23-317Z-claim-647e3524852b",
+  "lastTransitionAt": "2026-07-25T08:39:23.317Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-skl-0025-captain",
+  "reservedAt": "2026-07-25T08:39:08.097Z",
+  "promotedAt": "2026-07-25T08:39:08.102Z",
+  "claim": {
+    "actorId": "cursor-skl-0025-captain",
+    "leaseId": "lease-b00be376db29",
+    "claimedAt": "2026-07-25T08:39:08.108Z",
+    "heartbeatAt": "2026-07-25T08:39:08.108Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0025.json",
+      "packages/cli/src/commands/evidence/verbs/run.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/tdd-cycle.ts",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/tdd-case-id-red-green-lifecycle.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260725083908-cursor-skl-0025-captain-7d62025fee",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725083908-cursor-skl-0025-captain-7d62025fee\""
+    }
+  },
+  "startedAt": "2026-07-25T08:39:08.108Z",
+  "startedByActor": "cursor-skl-0025-captain",
+  "startedBySessionId": "session-20260725083908-cursor-skl-0025-captain-TASK-SKL-0025-92c21c7afe",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0025",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0025.*",
+      ".atm/history/task-events/TASK-SKL-0025/**",
+      ".atm/history/tasks/TASK-SKL-0025.json",
+      "packages/cli/src/commands/evidence/verbs/run.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/tdd-cycle.ts",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/tdd-case-id-red-green-lifecycle.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "82b054d7508c125d229654ca675e2526fcadbffb694af66b4057eaea6972375b",
+    "actorId": "cursor-skl-0025-captain",
+    "sessionId": "session-20260725083908-cursor-skl-0025-captain-TASK-SKL-0025-92c21c7afe",
+    "laneSession": {
+      "laneSessionId": "lane-20260725083908-cursor-skl-0025-captain-7d62025fee",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725083908-cursor-skl-0025-captain-7d62025fee\""
+    },
+    "createdAt": "2026-07-25T08:39:23.315Z",
+    "status": "active"
+  }
+}

@@ -194,6 +194,12 @@ requiredTestCaseIds:
   - test_task_example_behavior_8f3a2c1d
 phaseTestCaseIds: []
 advisoryTestCaseIds: []
+# Case-ID-bound TDD lifecycle (TASK-SKL-0025).
+# tddMode: required | recommended | reasoned-not-applicable
+tddMode: required
+tddNotApplicableReason: null
+# mechanical/docs exemptions must be reviewed; they never inflate TDD success rate
+tddExemptions: []
 evidence:
   required: command-backed
 rollback:
@@ -250,6 +256,21 @@ errorCodes:
   least one required case. Command-only legacy cards remain importable through
   an explicit advisory `legacy_cmd_*` projection plus
   `ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION`.
+- For behavior changes, governance gates, and bug fixes, declare `tddMode`:
+  - `required` — red then green must bind the same `caseId`, `testDigest`,
+    acceptance IDs, public seam, and sealed baseline/candidate lineage;
+  - `recommended` — same binding contract when TDD pairs are present;
+  - `reasoned-not-applicable` — requires `tddNotApplicableReason` and does not
+    count as TDD success.
+- Syntax, setup, environment, unrelated, digest-mismatch, and case-mismatch
+  failures are not valid red. Only assertion failures on the bound case count.
+- One feature card may contribute and prove multiple integration case IDs.
+  Record reviewed `tddExemptions` with kind `mechanical` or `docs` when needed;
+  mechanical/docs/advisory/quarantined outcomes are excluded from TDD
+  success-rate inflation.
+- Record red/green through `evidence run` with `--tdd-phase`, `--tdd-case-id`,
+  `--tdd-test-digest`, `--tdd-acceptance`, `--tdd-public-seam`,
+  `--tdd-baseline-sha`, and green `--tdd-candidate-sha`.
 - Include rollback instructions. For framework tasks, prefer revertable commits
   plus any generated artifact cleanup.
 - If the behavior can emit an `ATM_*` code, use `atm-error-code-resolver` in
