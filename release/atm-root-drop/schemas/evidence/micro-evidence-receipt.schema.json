@@ -47,7 +47,20 @@
     "scopeDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
     "reuseKey": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
     "createdAt": { "type": "string" },
-    "result": { "type": "object" },
+    "result": {
+      "type": "object",
+      "required": ["caseCount", "assertionCount"],
+      "properties": {
+        "caseCount": { "type": "integer", "minimum": 0 },
+        "assertionCount": { "type": "integer", "minimum": 0 },
+        "quarantineStatus": { "type": ["string", "null"] },
+        "advisory": { "type": ["boolean", "null"] },
+        "failureReason": { "type": ["string", "null"] },
+        "recoveryRoute": { "type": ["string", "null"] },
+        "groupName": { "type": ["string", "null"] },
+        "runnerIdentity": { "type": ["string", "null"] }
+      }
+    },
     "scope": {
       "type": "object",
       "required": ["strategy", "files"],

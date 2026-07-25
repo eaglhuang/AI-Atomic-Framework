@@ -38,3 +38,4 @@ export * from './boundaries/index.js';
 export * from './semantic-contract.js';
 export * from './semantic-adjudication/index.js';
 export * from './transactional-composer.js';
+export * from './test-case-contribution.js';

@@ -20,6 +20,17 @@ export interface ValidationReceiptScope {
   readonly files: readonly ValidationReceiptScopeFile[];
 }
 
+export interface ValidationReceiptResultDetails extends Record<string, unknown> {
+  readonly caseCount: number;
+  readonly assertionCount: number;
+  readonly quarantineStatus?: string | null;
+  readonly advisory?: boolean | null;
+  readonly failureReason?: string | null;
+  readonly recoveryRoute?: string | null;
+  readonly groupName?: string | null;
+  readonly runnerIdentity?: string | null;
+}
+
 export interface MicroEvidenceReceipt {
   readonly schemaId: typeof MICRO_EVIDENCE_RECEIPT_SCHEMA_ID;
   readonly receiptId: string;
@@ -38,7 +49,7 @@ export interface MicroEvidenceReceipt {
   readonly scopeDigest: string;
   readonly reuseKey: string;
   readonly createdAt: string;
-  readonly result: Record<string, unknown>;
+  readonly result: ValidationReceiptResultDetails;
   readonly scope: ValidationReceiptScope;
 }
 
@@ -81,21 +92,81 @@ export function buildValidationReceiptInput(input: {
   result: Record<string, unknown>;
   scopePaths: readonly string[];
   createdAt?: string;
+  groupName?: string;
+  runnerIdentity?: string;
 }): MicroEvidenceReceipt {
+  const normalizedCmd = normalizeCommand(input.command);
+  const rawCaseCount = typeof input.result.caseCount === 'number' ? input.result.caseCount : 0;
+  const rawAssertionCount = typeof input.result.assertionCount === 'number' ? input.result.assertionCount : 0;
+  const rawQuarantine = typeof input.result.quarantineStatus === 'string' ? input.result.quarantineStatus : null;
+  const rawAdvisory = typeof input.result.advisory === 'boolean' ? input.result.advisory : false;
+  const groupName = input.groupName ?? (typeof input.result.groupName === 'string' ? input.result.groupName : null);
+  const runnerIdentity = input.runnerIdentity ?? (typeof input.result.runnerIdentity === 'string' ? input.result.runnerIdentity : null);
+
+  let failureReason: string | null = typeof input.result.failureReason === 'string' ? input.result.failureReason : null;
+  let recoveryRoute: string | null = typeof input.result.recoveryRoute === 'string' ? input.result.recoveryRoute : null;
+
+  let effectiveStatus = input.status;
+  let effectiveOk = input.ok;
+
+  // Hard gate: Zero-test / Zero-case or Zero-assertion success is rejected
+  if (effectiveStatus === 'passed' && (rawCaseCount <= 0 || rawAssertionCount <= 0)) {
+    effectiveStatus = 'failed';
+    effectiveOk = false;
+    if (!failureReason) {
+      failureReason = rawCaseCount <= 0
+        ? 'ATM_EVIDENCE_ZERO_CASE_SUCCESS_REJECTED: Validator reported zero cases passed'
+        : 'ATM_EVIDENCE_ZERO_ASSERTION_SUCCESS_REJECTED: Validator reported zero assertions evaluated';
+    }
+    if (!recoveryRoute) {
+      recoveryRoute = `Add executable test cases or assertions to ${input.validatorName} before recording evidence pass.`;
+    }
+  }
+
+  // Hard gate: Advisory or Quarantined results cannot satisfy required acceptance as ok:true
+  if (effectiveOk && (rawAdvisory || (rawQuarantine !== null && rawQuarantine !== 'active'))) {
+    effectiveStatus = 'failed';
+    effectiveOk = false;
+    if (!failureReason) {
+      failureReason = rawAdvisory
+        ? 'ATM_EVIDENCE_ADVISORY_CANNOT_SATISFY_REQUIRED: Advisory validator cannot satisfy required acceptance'
+        : `ATM_EVIDENCE_QUARANTINED_CANNOT_SATISFY_REQUIRED: Quarantined validator state (${rawQuarantine}) cannot satisfy required acceptance`;
+    }
+    if (!recoveryRoute) {
+      recoveryRoute = rawAdvisory
+        ? `Remove advisory flag or run required validator pass for ${input.validatorName}.`
+        : `Unquarantine validator ${input.validatorName} before using as required acceptance evidence.`;
+    }
+  }
+
+  const resultDetails: ValidationReceiptResultDetails = {
+    ...input.result,
+    caseCount: rawCaseCount,
+    assertionCount: rawAssertionCount,
+    quarantineStatus: rawQuarantine,
+    advisory: rawAdvisory,
+    failureReason,
+    recoveryRoute,
+    groupName,
+    runnerIdentity
+  };
+
   const scope = buildValidationReceiptScope(input.cwd, input.scopePaths);
   const payloadDigest = sha256Json({
     schemaId: 'atm.validationReceiptPayload.v1',
     validatorName: input.validatorName,
-    command: normalizeCommand(input.command),
-    status: input.status,
-    ok: input.ok,
-    result: input.result
+    command: normalizedCmd,
+    status: effectiveStatus,
+    ok: effectiveOk,
+    result: resultDetails
   });
   const scopeDigest = sha256Json(scope);
   const reuseKey = sha256Json({
     schemaId: 'atm.validationReceiptReuseKey.v1',
     validatorName: input.validatorName,
-    command: normalizeCommand(input.command),
+    command: normalizedCmd,
+    groupName: groupName ?? null,
+    runnerIdentity: runnerIdentity ?? null,
     environment: {
       platform: process.platform,
       nodeVersion: process.version
@@ -110,13 +181,14 @@ export function buildValidationReceiptInput(input: {
     reuseKey,
     payloadDigest
   });
+
   return {
     schemaId: MICRO_EVIDENCE_RECEIPT_SCHEMA_ID,
     receiptId,
     validatorName: input.validatorName,
-    command: normalizeCommand(input.command),
-    status: input.status,
-    ok: input.ok,
+    command: normalizedCmd,
+    status: effectiveStatus,
+    ok: effectiveOk,
     environment: {
       platform: process.platform,
       nodeVersion: process.version
@@ -128,7 +200,7 @@ export function buildValidationReceiptInput(input: {
     scopeDigest,
     reuseKey,
     createdAt: input.createdAt ?? new Date().toISOString(),
-    result: input.result,
+    result: resultDetails,
     scope
   };
 }
@@ -159,12 +231,17 @@ export function readReusableValidationReceipt(input: {
   command: string;
   gitHead: string | null;
   scopePaths: readonly string[];
+  groupName?: string | null;
+  runnerIdentity?: string | null;
 }): ValidationReceiptReuseResult {
   const scope = buildValidationReceiptScope(input.cwd, input.scopePaths);
+  const scopeDigest = sha256Json(scope);
   const reuseKey = sha256Json({
     schemaId: 'atm.validationReceiptReuseKey.v1',
     validatorName: input.validatorName,
     command: normalizeCommand(input.command),
+    groupName: input.groupName ?? null,
+    runnerIdentity: input.runnerIdentity ?? null,
     environment: {
       platform: process.platform,
       nodeVersion: process.version
@@ -172,7 +249,7 @@ export function readReusableValidationReceipt(input: {
     base: {
       gitHead: input.gitHead
     },
-    scopeDigest: sha256Json(scope)
+    scopeDigest
   });
   const indexPath = validationReceiptIndexPath(input.cwd, reuseKey);
   if (!existsSync(indexPath)) {
@@ -197,9 +274,21 @@ export function readReusableValidationReceipt(input: {
   if (receipt.validatorName !== input.validatorName || receipt.command !== normalizeCommand(input.command)) {
     return { reusable: false, receipt, reason: 'identity-mismatch', receiptPath };
   }
-  if (receipt.reuseKey !== reuseKey || receipt.scopeDigest !== sha256Json(scope)) {
+  if (receipt.reuseKey !== reuseKey || receipt.scopeDigest !== scopeDigest) {
     return { reusable: false, receipt, reason: 'scope-mismatch', receiptPath };
   }
+
+  // Hard gates check during reuse as well
+  const caseCount = typeof receipt.result.caseCount === 'number' ? receipt.result.caseCount : 0;
+  const assertionCount = typeof receipt.result.assertionCount === 'number' ? receipt.result.assertionCount : 0;
+  if (caseCount <= 0 || assertionCount <= 0) {
+    return { reusable: false, receipt, reason: 'zero-test-disqualified', receiptPath };
+  }
+
+  if (receipt.result.advisory === true || (typeof receipt.result.quarantineStatus === 'string' && receipt.result.quarantineStatus !== 'active')) {
+    return { reusable: false, receipt, reason: 'advisory-or-quarantined-disqualified', receiptPath };
+  }
+
   return { reusable: true, receipt, reason: null, receiptPath };
 }
 
