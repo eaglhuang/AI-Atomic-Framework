@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/validators/test-case-group.schema.json",
+  "title": "ATM Test Case Group Shard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "groupId",
+    "theme",
+    "resourceKey",
+    "maintainers",
+    "cases"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.testCaseGroup.v1"
+    },
+    "specVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "groupId": {
+      "type": "string",
+      "pattern": "^test_group_[A-Za-z0-9_-]+$"
+    },
+    "theme": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resourceKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "maintainers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "supportedSeams": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "dependencyEdges": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["caseId", "semanticKey"],
+        "properties": {
+          "caseId": {
+            "type": "string",
+            "pattern": "^(test_int_|test_task_)[A-Za-z0-9_.:-]+$"
+          },
+          "semanticKey": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+          },
+          "command": { "type": ["string", "null"] },
+          "responsibility": {
+            "type": "string",
+            "enum": ["task-required", "phase-suite", "advisory"]
+          },
+          "coversAcceptance": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "coversImpactEdges": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "dependsOnCaseIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^(test_int_|test_task_)[A-Za-z0-9_.:-]+$"
+            }
+          }
+        }
+      }
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["aliasId", "canonicalCaseId"],
+        "properties": {
+          "aliasId": {
+            "type": "string",
+            "pattern": "^(test_int_|test_task_)[A-Za-z0-9_.:-]+$"
+          },
+          "canonicalCaseId": {
+            "type": "string",
+            "pattern": "^(test_int_|test_task_)[A-Za-z0-9_.:-]+$"
+          }
+        }
+      }
+    },
+    "lineage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["caseId", "promotedTo"],
+        "properties": {
+          "caseId": {
+            "type": "string",
+            "pattern": "^(test_int_|test_task_)[A-Za-z0-9_.:-]+$"
+          },
+          "promotedTo": {
+            "type": "string",
+            "pattern": "^(test_int_|test_task_)[A-Za-z0-9_.:-]+$"
+          }
+        }
+      }
+    },
+    "costBudgetMs": { "type": ["integer", "null"], "minimum": 0 },
+    "timeoutMs": { "type": ["integer", "null"], "minimum": 0 },
+    "quarantine": { "type": "boolean" },
+    "checkpointPolicy": { "type": ["string", "null"] }
+  }
+}

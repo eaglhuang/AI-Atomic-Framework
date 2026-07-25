@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0023",
+  "title": "Decentralized test case shards and Broker contributions",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.4",
+  "dependencies": [
+    "TASK-SKL-0022"
+  ],
+  "acceptance": [
+    "IDs follow normalized `test_int_*` / `test_task_*` semantics with a collision digest and no mutable implementation content.",
+    "Group shards validate uniqueness, semantic duplicates, aliases, cycles, owners, orphans and unresolved references.",
+    "A feature card can contribute several integration cases through one bounded group resource intent without opening a separate test card.",
+    "Concurrent disjoint case contributions compose with member attribution; true same-case conflicts queue or revalidate.",
+    "Generated catalog is query authority only, not a mutable second registry."
+  ],
+  "deliverables": [
+    "schemas/validators/test-case-group.schema.json",
+    "tests/catalog/groups/**",
+    "packages/cli/src/commands/test-catalog.ts",
+    "packages/core/src/broker/test-case-contribution.ts",
+    "tests/cli/test-case-catalog-shards.test.ts",
+    "tests/core/test-case-contribution-broker.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/validators/test-case-group.schema.json",
+    "scripts/test-catalog.config.json",
+    "tests/catalog/groups/**",
+    "packages/cli/src/commands/test-catalog.ts",
+    "packages/core/src/broker/test-case-contribution.ts",
+    "packages/core/src/broker/index.ts",
+    "tests/cli/test-case-catalog-shards.test.ts",
+    "tests/core/test-case-contribution-broker.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+    "node --strip-types tests/core/test-case-contribution-broker.test.ts",
+    "npm run validate:schemas",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "sharded-case-catalog-and-broker-compose",
+  "rollbackStrategy": "revert-commit-and-read-v1-flat-test-catalog",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.test-catalog",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.test-case-contribution",
+        "pattern": "Brokered Shared Contribution",
+        "source": "packages/core/src/broker/test-case-contribution.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0023-decentralized-test-case-shards-and-broker-contributions.task.md",
+    "sectionTitle": "TASK-SKL-0023",
+    "headingLine": 51,
+    "hash": "7aa8543a95669497",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0023-decentralized-test-case-shards-and-broker-contributions.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:7aa8543a956694978073edd3a45f3c4029e1bade32d97d8b49319f00ee1cd5c1",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-25T07:12:12.465Z"
+    }
+  },
+  "importedAt": "2026-07-25T07:12:12.465Z",
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.test.case.catalog.shards.test.ts",
+      "command": "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.core.test.case.contribution.broker.test.ts",
+      "command": "node --strip-types tests/core/test-case-contribution-broker.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.schemas",
+      "command": "npm run validate:schemas",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-25T07-12-38-856Z-claim-ebf758b7fecf",
+  "lastTransitionAt": "2026-07-25T07:12:38.856Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-skl-0023-captain",
+  "reservedAt": "2026-07-25T07:12:29.380Z",
+  "promotedAt": "2026-07-25T07:12:29.384Z",
+  "claim": {
+    "actorId": "cursor-skl-0023-captain",
+    "leaseId": "lease-6f704d244100",
+    "claimedAt": "2026-07-25T07:12:29.390Z",
+    "heartbeatAt": "2026-07-25T07:12:29.390Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0023.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/test-case-contribution.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/**",
+      "tests/cli/test-case-catalog-shards.test.ts",
+      "tests/core/test-case-contribution-broker.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260725071229-cursor-skl-0023-captain-aebbcb2688",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725071229-cursor-skl-0023-captain-aebbcb2688\""
+    }
+  },
+  "startedAt": "2026-07-25T07:12:29.390Z",
+  "startedByActor": "cursor-skl-0023-captain",
+  "startedBySessionId": "session-20260725071229-cursor-skl-0023-captain-TASK-SKL-0023-83aafd9fa0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0023",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0023.*",
+      ".atm/history/task-events/TASK-SKL-0023/**",
+      ".atm/history/tasks/TASK-SKL-0023.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/test-case-contribution.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/**",
+      "tests/cli/test-case-catalog-shards.test.ts",
+      "tests/core/test-case-contribution-broker.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4c22e65d17147b89c6ea499d28b9f42a6f1981111b9d282965aadcfdf72fb70b",
+    "actorId": "cursor-skl-0023-captain",
+    "sessionId": "session-20260725071229-cursor-skl-0023-captain-TASK-SKL-0023-83aafd9fa0",
+    "laneSession": {
+      "laneSessionId": "lane-20260725071229-cursor-skl-0023-captain-aebbcb2688",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725071229-cursor-skl-0023-captain-aebbcb2688\""
+    },
+    "createdAt": "2026-07-25T07:12:38.855Z",
+    "status": "active"
+  }
+}

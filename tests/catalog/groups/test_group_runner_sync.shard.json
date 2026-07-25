@@ -1,0 +1,43 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_runner_sync",
+  "theme": "Runner sync actor continuity",
+  "resourceKey": "test-group:runner-sync",
+  "maintainers": ["atm-agent-skills"],
+  "supportedSeams": ["identity-to-runner-sync"],
+  "dependencyEdges": ["runner-sync-contract"],
+  "cases": [
+    {
+      "caseId": "test_int_runner_sync_actor_continuity_8f3a2c1d",
+      "semanticKey": "actor_continuity",
+      "responsibility": "task-required",
+      "command": "node --strip-types tests/cli/runner-sync-actor-continuity.test.ts",
+      "coversAcceptance": ["ACC-2"],
+      "coversImpactEdges": ["identity-to-runner-sync"]
+    },
+    {
+      "caseId": "test_int_runner_sync_seal_freshness_1b2c3d4e",
+      "semanticKey": "seal_freshness",
+      "responsibility": "phase-suite",
+      "coversImpactEdges": ["identity-to-runner-sync"],
+      "dependsOnCaseIds": ["test_int_runner_sync_actor_continuity_8f3a2c1d"]
+    }
+  ],
+  "aliases": [
+    {
+      "aliasId": "test_int_runner_sync_actor_continuity_legacy",
+      "canonicalCaseId": "test_int_runner_sync_actor_continuity_8f3a2c1d"
+    }
+  ],
+  "lineage": [
+    {
+      "caseId": "test_task_skl_0023_actor_continuity_aaaaaaaa",
+      "promotedTo": "test_int_runner_sync_actor_continuity_8f3a2c1d"
+    }
+  ],
+  "costBudgetMs": 30000,
+  "timeoutMs": 60000,
+  "quarantine": false,
+  "checkpointPolicy": "phase-suite"
+}
