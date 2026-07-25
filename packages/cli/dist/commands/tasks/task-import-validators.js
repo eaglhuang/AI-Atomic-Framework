@@ -50,6 +50,13 @@ export function extractFrontMatter(text) {
     let currentKey = null;
     let currentObjectKey = null;
     let currentObjectListKey = null;
+    // Tracks the nested object-list container key (for example
+    // `atomizationImpact.extractionCandidates`) independently of
+    // `currentObjectListKey`, which is cleared whenever an item field carries a
+    // value. Without this, the second `- key:` item of a multi-item object list
+    // is mis-routed to the top-level list branch and overwrites the parent
+    // object.
+    let currentObjectArrayKey = null;
     let currentObjectListItem = null;
     for (const rawLine of block.split(/\r?\n/)) {
         const line = rawLine;
@@ -60,6 +67,7 @@ export function extractFrontMatter(text) {
             currentKey = key;
             currentObjectKey = value.length === 0 ? key : null;
             currentObjectListKey = null;
+            currentObjectArrayKey = null;
             currentObjectListItem = null;
             data[key] = value;
             continue;
@@ -98,18 +106,21 @@ export function extractFrontMatter(text) {
             objectRecord[key] = value;
             data[currentObjectKey] = objectRecord;
             currentObjectListKey = value.length === 0 ? key : null;
+            currentObjectArrayKey = value.length === 0 ? key : null;
             currentObjectListItem = null;
             continue;
         }
         const objectListObjectMatch = /^ {4}-\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
-        if (currentObjectKey && currentObjectListKey && objectListObjectMatch) {
+        if (currentObjectKey && currentObjectArrayKey && objectListObjectMatch) {
             const objectRecord = data[currentObjectKey];
             const key = objectListObjectMatch[1];
             const value = normalizeYamlScalar(objectListObjectMatch[2]);
             const item = { [key]: value };
-            const existing = objectRecord[currentObjectListKey];
-            objectRecord[currentObjectListKey] = Array.isArray(existing) ? [...existing, item] : [item];
+            const existing = objectRecord[currentObjectArrayKey];
+            objectRecord[currentObjectArrayKey] = Array.isArray(existing) ? [...existing, item] : [item];
             data[currentObjectKey] = objectRecord;
+            // Opening a new object-list item; no nested scalar-list is active yet.
+            currentObjectListKey = null;
             currentObjectListItem = item;
             continue;
         }
