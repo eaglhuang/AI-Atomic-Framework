@@ -6,7 +6,7 @@ import {
   type MutationCapabilityPolicy,
   type MutationCapabilityToken,
   type MutationOperation
-} from '@ai-atomic-framework/core';
+} from '../../../../core/src/lane/lane-capability-provider.ts';
 import { evaluateLaneCapability, type LaneCapabilityDecision, type LaneCommandClass } from './capability-authority.ts';
 
 /**
