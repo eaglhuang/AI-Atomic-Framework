@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0024",
+  "title": "Structured execution receipt and zero-test hard gate",
+  "status": "done",
+  "milestone": "ATM-SKL-VG-R0.4",
+  "dependencies": [
+    "TASK-SKL-0022"
+  ],
+  "acceptance": [
+    "Receipt records case/assertion counts and rejects zero-case success.",
+    "No-op import, banner-only, broken fixture, wrong-red, timeout, unavailable runner, stale test and stale candidate fixtures fail closed.",
+    "Cache reuse requires exact candidate, scope, test, group, runner and environment identity.",
+    "Advisory or quarantined results cannot satisfy required acceptance.",
+    "Failure returns a structured reason and recovery route instead of a bare refusal."
+  ],
+  "deliverables": [
+    "schemas/evidence/micro-evidence-receipt.schema.json",
+    "packages/core/src/evidence/validation-receipt.ts",
+    "packages/cli/src/commands/evidence/verbs/run.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "tests/cli/validator-execution-receipt-hard-gate.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/evidence/micro-evidence-receipt.schema.json",
+    "packages/core/src/evidence/validation-receipt.ts",
+    "packages/core/src/evidence/index.ts",
+    "packages/cli/src/commands/evidence/verbs/run.ts",
+    "packages/cli/src/commands/evidence/verbs/verify.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "tests/cli/validator-execution-receipt-hard-gate.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validator-execution-receipt-hard-gate.test.ts",
+    "npm run validate:schemas",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "no-op-zero-test-and-freshness-negative-matrix",
+  "rollbackStrategy": "revert-commit-and-disable-vnext-receipt-admission",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validation-evidence",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-execution-receipt-gate",
+        "pattern": "Evidence Admission Policy",
+        "source": "packages/core/src/evidence/validation-receipt.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0024-structured-execution-receipt-and-zero-test-hard-gate.task.md",
+    "sectionTitle": "TASK-SKL-0024",
+    "headingLine": 49,
+    "hash": "c6d8f736da12bc10",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0024-structured-execution-receipt-and-zero-test-hard-gate.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:c6d8f736da12bc105c2ca11930fd6c9a07d66eb6f0026310a81fd55b3e869cd5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-25T07:11:35.976Z"
+    }
+  },
+  "importedAt": "2026-07-25T07:11:35.976Z",
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.validator.execution.receipt.hard.gate.test.ts",
+      "command": "node --strip-types tests/cli/validator-execution-receipt-hard-gate.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.schemas",
+      "command": "npm run validate:schemas",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-25T07-21-38-370Z-close-11802f11440f",
+  "lastTransitionAt": "2026-07-25T07:21:38.370Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "gemini36-skl-0024-captain",
+  "reservedAt": "2026-07-25T07:11:53.390Z",
+  "promotedAt": "2026-07-25T07:11:53.394Z",
+  "claim": {
+    "actorId": "gemini36-skl-0024-captain",
+    "leaseId": "lease-8270af4f2366",
+    "claimedAt": "2026-07-25T07:11:53.398Z",
+    "heartbeatAt": "2026-07-25T07:21:38.367Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0024.json",
+      "packages/cli/src/commands/evidence/verbs/run.ts",
+      "packages/cli/src/commands/evidence/verbs/verify.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/validation-receipt.ts",
+      "schemas/evidence/micro-evidence-receipt.schema.json",
+      "tests/cli/validator-execution-receipt-hard-gate.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260725071153-gemini36-skl-0024-captain-1dfed538fe",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725071153-gemini36-skl-0024-captain-1dfed538fe\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-25T07:11:53.398Z",
+  "startedByActor": "gemini36-skl-0024-captain",
+  "startedBySessionId": "session-20260725071153-gemini36-skl-0024-captain-TASK-SKL-0024-253a0a47c2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0024",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0024.*",
+      ".atm/history/task-events/TASK-SKL-0024/**",
+      ".atm/history/tasks/TASK-SKL-0024.json",
+      "packages/cli/src/commands/evidence/verbs/run.ts",
+      "packages/cli/src/commands/evidence/verbs/verify.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/validation-receipt.ts",
+      "schemas/evidence/micro-evidence-receipt.schema.json",
+      "tests/cli/validator-execution-receipt-hard-gate.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3038efb5c5a932c7e3d281dd1a985d3d28242ef6ea56dac350331d234ba7f7d7",
+    "actorId": "gemini36-skl-0024-captain",
+    "sessionId": "session-20260725071153-gemini36-skl-0024-captain-TASK-SKL-0024-253a0a47c2",
+    "laneSession": {
+      "laneSessionId": "lane-20260725071153-gemini36-skl-0024-captain-1dfed538fe",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725071153-gemini36-skl-0024-captain-1dfed538fe\""
+    },
+    "createdAt": "2026-07-25T07:12:04.828Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-25T07:21:38.367Z",
+  "closedByActor": "gemini36-skl-0024-captain",
+  "closedBySessionId": "session-20260725071153-gemini36-skl-0024-captain-TASK-SKL-0024-253a0a47c2",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0024.closure-packet.json"
+}
