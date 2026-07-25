@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0022",
+  "title": "Mutation capability parity and WIP ownership continuity",
+  "status": "done",
+  "milestone": "ATM-3.1-R0Q.2",
+  "dependencies": [
+    "TASK-LANE-0021"
+  ],
+  "acceptance": [
+    "Before implementation, invoke `atm-deep-module-refactor` against the lane mutation and WIP transition seams. Seal the review receipt, proposed narrow interfaces, adapter inventory, deletion test, and `deep-module-review:300bfd3e` baseline; the skill guides the refactor but does not replace this card's validators.",
+    "`authorizeMutationCapability(request, authoritySnapshot, policy)` is the only protected mutation authorization decision. Task renew/release/handoff/takeover, governed commit/push, framework-mode claim/release, runner-sync reservation/publication, and taskflow close consume it through thin adapters.",
+    "Actor id, task id, lane id, environment variables, disclosed lease ids, or possession of another captain's command text are not sufficient authority.",
+    "Capability tokens are audience-, operation-, task-, lane-, generation-, expiry-, and resource-bound; successful mutation consumes the token once and cross-command replay fails closed.",
+    "Status, diagnostics, dashboards, receipts, and recovery commands expose only fingerprints and safe metadata, never reusable capability, lease, ticket, or proxy secrets.",
+    "`planWipTransition(request, snapshot, policy)` owns release/handoff/reclaim/discard decisions and emits an append-only ownership journal plus exact executable recovery.",
+    "A task with in-scope dirty WIP cannot become ownerless on release. The original authorized lane can resume its recorded WIP, a sealed handoff can transfer it, and explicit discard requires a destructive-action receipt.",
+    "The ATM-BUG-2026-07-22-229 counterexample is replayed: release followed by same-task reclaim no longer produces unowned/foreign dirty with no recovery command.",
+    "Cross-command tests prove a capability issued for one mutation cannot authorize another, and that a second actor cannot borrow the original captain's lease, lane, command, environment, or ticket.",
+    "Deletion tests remove old actor-id-only allow branches and duplicate WIP ownership inference; no adapter retains a second authority or ownership policy.",
+    "Source and frozen runner behavior match before close. The receipt records authorized/blocked counts, replay attempts, ownerless-WIP count, recovery-command executability, and manual captain interventions."
+  ],
+  "deliverables": [
+    "packages/core/src/lane/lane-capability-provider.ts",
+    "packages/core/src/lane/wip-ownership-transition.ts",
+    "tests/cli/lane-mutation-capability-parity.test.ts",
+    "tests/cli/lane-wip-ownership-continuity.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/lane/lane-capability.ts",
+    "packages/core/src/lane/lane-capability-provider.ts",
+    "packages/core/src/lane/wip-ownership-transition.ts",
+    "packages/cli/src/commands/lane.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/tasks/release-orchestrator.ts",
+    "packages/cli/src/commands/tasks/handoff-orchestrator.ts",
+    "packages/cli/src/commands/framework-mode.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "tests/cli/lane-mutation-capability-parity.test.ts",
+    "tests/cli/lane-wip-ownership-continuity.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/lane-mutation-capability-parity.test.ts",
+    "node --strip-types tests/cli/lane-wip-ownership-continuity.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "lane-mutation-parity-and-wip-continuity-receipt",
+  "rollbackStrategy": "revert-adapters-and-fail-closed-on-unverified-mutation",
+  "rollbackNotes": "Preserve WIP journal records. Reverting adapters must never re-enable actor-id-only mutation authority or discard uncommitted content.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane.authority",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane.mutation-capability-provider",
+        "pattern": "Deep Module",
+        "source": "packages/core/src/lane/lane-capability-provider.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.lane.wip-ownership-transition",
+        "pattern": "State Transition Policy",
+        "source": "packages/core/src/lane/wip-ownership-transition.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/lane/lane-capability.ts",
+        "packages/core/src/lane/lane-capability-provider.ts",
+        "packages/core/src/lane/wip-ownership-transition.ts",
+        "packages/cli/src/commands/lane.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/release-orchestrator.ts",
+        "packages/cli/src/commands/tasks/handoff-orchestrator.ts",
+        "packages/cli/src/commands/framework-mode.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "tests/cli/lane-mutation-capability-parity.test.ts",
+        "tests/cli/lane-wip-ownership-continuity.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0022-mutation-capability-and-wip-continuity.task.md",
+    "sectionTitle": "TASK-LANE-0022",
+    "headingLine": 83,
+    "hash": "fbaeb726fe956c9f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0022-mutation-capability-and-wip-continuity.task.md",
+      "planningCommitSha": "10ef055c46c4d2b888417e7e3cd2b13b6f55fb51",
+      "contentDigest": "sha256:fbaeb726fe956c9f9fb2c228faf241feb19c1d0f0712f73045ae22f2270866e9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-24T17:09:54.968Z"
+    }
+  },
+  "importedAt": "2026-07-24T17:09:54.968Z",
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-25T02-20-35-776Z-close-69f00db2edbe",
+  "lastTransitionAt": "2026-07-25T02:20:35.776Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-07-24T17:10:35.346Z",
+  "promotedAt": "2026-07-24T17:10:35.350Z",
+  "claim": {
+    "actorId": "claude-003-plan31-captain",
+    "leaseId": "lease-7c40c4d6badf",
+    "claimedAt": "2026-07-24T17:10:35.353Z",
+    "heartbeatAt": "2026-07-25T02:19:52.133Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-LANE-0022.*",
+      ".atm/history/task-events/TASK-LANE-0022/**",
+      ".atm/history/tasks/TASK-LANE-0022.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/framework-mode.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/lane-session/mutation-authority-adapter.ts",
+      "packages/cli/src/commands/lane-session/mutation-status-command.ts",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/handoff-orchestrator.ts",
+      "packages/cli/src/commands/tasks/release-orchestrator.ts",
+      "packages/core/src/index.ts",
+      "packages/core/src/lane/lane-capability-provider.ts",
+      "packages/core/src/lane/lane-capability.ts",
+      "packages/core/src/lane/wip-ownership-transition.ts",
+      "tests/cli/lane-mutation-capability-parity.test.ts",
+      "tests/cli/lane-wip-ownership-continuity.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260724171035-codex-gpt-5.4-mini-40ec4c1a9d",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260724171035-codex-gpt-5.4-mini-40ec4c1a9d\""
+    },
+    "reason": "reconcile task owner field to adopted dispatched-captain actor after governed lane adopt (claim was mis-minted under ambient git user)"
+  },
+  "startedAt": "2026-07-24T17:10:35.353Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260724171035-codex-gpt-5.4-mini-TASK-LANE-0022-bfce83b996",
+  "owner": "claude-003-plan31-captain",
+  "closedAt": "2026-07-25T02:20:35.774Z",
+  "closedByActor": "claude-003-plan31-captain",
+  "closedBySessionId": "session-20260724171035-codex-gpt-5.4-mini-TASK-LANE-0022-bfce83b996",
+  "closurePacket": ".atm/history/evidence/TASK-LANE-0022.closure-packet.json"
+}

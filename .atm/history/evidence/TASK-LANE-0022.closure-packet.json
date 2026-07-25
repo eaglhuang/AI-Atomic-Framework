@@ -1,0 +1,179 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-LANE-0022",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2a0e30a8d5b1eb7df6b7616d77f545ee0c4e6cb9",
+  "governedTreeSha": "d7cd2f5f9e2c475f7d99d7301f1930cf6ef71e8c",
+  "targetCommitDelta": {
+    "currentCommitSha": "2a0e30a8d5b1eb7df6b7616d77f545ee0c4e6cb9",
+    "parentCommitShas": [
+      "2a0e30a8d5b1eb7df6b7616d77f545ee0c4e6cb9"
+    ],
+    "governedTreeSha": "d7cd2f5f9e2c475f7d99d7301f1930cf6ef71e8c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0259.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-LANE-0021.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-LANE-0022.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/task-events/TASK-LANE-0022/2026-07-24T17-09-55-224Z-import-9aa2f2042c06.json",
+      ".atm/history/task-events/TASK-LANE-0022/2026-07-24T17-10-35-346Z-reserve-04b15f150b8c.json",
+      ".atm/history/task-events/TASK-LANE-0022/2026-07-24T17-10-35-350Z-promote-099749c8dfa8.json",
+      ".atm/history/task-events/TASK-LANE-0022/2026-07-24T17-10-41-657Z-claim-5c4c3f19365a.json",
+      ".atm/history/task-events/TASK-LANE-0022/2026-07-25T01-07-45-329Z-scope-amendment-788432664b5b.json",
+      ".atm/history/task-events/TASK-LANE-0022/2026-07-25T01-18-57-341Z-scope-amendment-4ff12c42c1d8.json",
+      ".atm/history/task-events/TASK-LANE-0022/2026-07-25T02-19-52-167Z-repair-claim-d046d2a91651.json",
+      ".atm/history/tasks/TASK-LANE-0022.json",
+      "packages/cli/src/commands/lane-session/mutation-authority-adapter.ts",
+      "packages/cli/src/commands/lane-session/mutation-status-command.ts",
+      "packages/cli/src/commands/lane.ts",
+      "packages/core/src/index.ts",
+      "packages/core/src/lane/lane-capability-provider.ts",
+      "packages/core/src/lane/wip-ownership-transition.ts",
+      "tests/cli/lane-mutation-capability-parity.test.ts",
+      "tests/cli/lane-wip-ownership-continuity.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/lane-mutation-capability-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b368a86a3be7dcd80ed7d4ef6ff1c17d57c5679b40504426c3b3ee34d87c42dc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/lane-wip-ownership-continuity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0e2907317bb1c59812a0f82f5e1cd98be5864a00bfc21d5602bdf937af1a5c14",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+      "stderrSha256": "sha256:6c69a0c2910f964faf17580c3aa3f49e190b13d8052088cb6f7da84fbdaf2e94",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/lane-mutation-capability-parity.test.ts",
+    "node --strip-types tests/cli/lane-wip-ownership-continuity.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-25T02:20:35.769Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-LANE-0022.*",
+      ".atm/history/task-events/TASK-LANE-0022/**",
+      ".atm/history/tasks/TASK-LANE-0022.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/framework-mode.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/lane-session/mutation-authority-adapter.ts",
+      "packages/cli/src/commands/lane-session/mutation-status-command.ts",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/handoff-orchestrator.ts",
+      "packages/cli/src/commands/tasks/release-orchestrator.ts",
+      "packages/core/src/index.ts",
+      "packages/core/src/lane/lane-capability-provider.ts",
+      "packages/core/src/lane/lane-capability.ts",
+      "packages/core/src/lane/wip-ownership-transition.ts",
+      "tests/cli/lane-mutation-capability-parity.test.ts",
+      "tests/cli/lane-wip-ownership-continuity.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/framework-mode.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/lane-session/mutation-authority-adapter.ts",
+      "packages/cli/src/commands/lane-session/mutation-status-command.ts",
+      "packages/cli/src/commands/lane.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/handoff-orchestrator.ts",
+      "packages/cli/src/commands/tasks/release-orchestrator.ts",
+      "packages/core/src/index.ts",
+      "packages/core/src/lane/lane-capability-provider.ts",
+      "packages/core/src/lane/lane-capability.ts",
+      "packages/core/src/lane/wip-ownership-transition.ts",
+      "tests/cli/lane-mutation-capability-parity.test.ts",
+      "tests/cli/lane-wip-ownership-continuity.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-LANE-0022.json",
+  "closedAt": "2026-07-25T02:20:35.769Z",
+  "closedByActor": "claude-003-plan31-captain",
+  "sessionId": "session-20260724171035-codex-gpt-5.4-mini-TASK-LANE-0022-bfce83b996",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "8a112a863325e7427048f579b84e66bd4b3f1990",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/lane-session/mutation-authority-adapter.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

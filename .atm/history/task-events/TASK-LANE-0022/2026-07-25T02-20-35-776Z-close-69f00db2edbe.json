@@ -1,0 +1,86 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T02-20-35-776Z-close-69f00db2edbe",
+  "taskId": "TASK-LANE-0022",
+  "action": "close",
+  "actorId": "claude-003-plan31-captain",
+  "sessionId": "session-20260724171035-codex-gpt-5.4-mini-TASK-LANE-0022-bfce83b996",
+  "fromStatus": "ready",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0022.json",
+  "taskSha256": "sha256:b4020c1a8133f564203dc9f1667ab6eb807beb5591b3d137725a48f5c05db693",
+  "createdAt": "2026-07-25T02:20:35.776Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0022 --actor claude-003-plan31-captain --status done --historical-delivery 8a112a863325e7427048f579b84e66bd4b3f1990",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260724171035-codex-gpt-5.4-mini-TASK-LANE-0022-bfce83b996",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0022.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/lane-mutation-capability-parity.test.ts",
+      "node --strip-types tests/cli/lane-wip-ownership-continuity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-25T02:20:35.769Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0022.*",
+        ".atm/history/task-events/TASK-LANE-0022/**",
+        ".atm/history/tasks/TASK-LANE-0022.json",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/framework-mode.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/lane-session/mutation-authority-adapter.ts",
+        "packages/cli/src/commands/lane-session/mutation-status-command.ts",
+        "packages/cli/src/commands/lane.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/handoff-orchestrator.ts",
+        "packages/cli/src/commands/tasks/release-orchestrator.ts",
+        "packages/core/src/index.ts",
+        "packages/core/src/lane/lane-capability-provider.ts",
+        "packages/core/src/lane/lane-capability.ts",
+        "packages/core/src/lane/wip-ownership-transition.ts",
+        "tests/cli/lane-mutation-capability-parity.test.ts",
+        "tests/cli/lane-wip-ownership-continuity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/framework-mode.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/lane-session/mutation-authority-adapter.ts",
+        "packages/cli/src/commands/lane-session/mutation-status-command.ts",
+        "packages/cli/src/commands/lane.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/handoff-orchestrator.ts",
+        "packages/cli/src/commands/tasks/release-orchestrator.ts",
+        "packages/core/src/index.ts",
+        "packages/core/src/lane/lane-capability-provider.ts",
+        "packages/core/src/lane/lane-capability.ts",
+        "packages/core/src/lane/wip-ownership-transition.ts",
+        "tests/cli/lane-mutation-capability-parity.test.ts",
+        "tests/cli/lane-wip-ownership-continuity.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

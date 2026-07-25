@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T02-19-52-167Z-repair-claim-d046d2a91651",
+  "taskId": "TASK-LANE-0022",
+  "action": "repair-claim",
+  "actorId": "claude-003-plan31-captain",
+  "sessionId": "session-20260724171035-codex-gpt-5.4-mini-TASK-LANE-0022-bfce83b996",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0022.json",
+  "taskSha256": "sha256:b232374090814231df05057f7916e6e43fbf73e500f3f33c4faddc8d45ebb291",
+  "createdAt": "2026-07-25T02:19:52.167Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-LANE-0022 --actor claude-003-plan31-captain --write --reason \"reconcile task owner field to adopted dispatched-captain actor after governed lane adopt (claim was mis-minted under ambient git user)\" --json"
+}

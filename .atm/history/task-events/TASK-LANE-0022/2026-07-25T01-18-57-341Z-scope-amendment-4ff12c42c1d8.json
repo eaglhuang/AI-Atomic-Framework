@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T01-18-57-341Z-scope-amendment-4ff12c42c1d8",
+  "taskId": "TASK-LANE-0022",
+  "action": "scope-amendment",
+  "actorId": "claude-003-plan31-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0022.json",
+  "taskSha256": "sha256:5aa330d79fdeb69f73dc545e02e88bd0dae9aa5a99e2ff35f4c73a3df1e004cb",
+  "createdAt": "2026-07-25T01:18:57.341Z",
+  "command": "node atm.mjs tasks scope add --task TASK-LANE-0022 --actor claude-003-plan31-captain --add packages/core/src/index.ts --reason \"core barrel re-export of the new lane mutation capability provider and WIP ownership transition modules\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "core barrel re-export of the new lane mutation capability provider and WIP ownership transition modules"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T01-07-45-329Z-scope-amendment-788432664b5b",
+  "taskId": "TASK-LANE-0022",
+  "action": "scope-amendment",
+  "actorId": "claude-003-plan31-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0022.json",
+  "taskSha256": "sha256:fa6107a66435520df483dc289ca4d6672df0c3c0a92a355ef0e8606f0a03f61e",
+  "createdAt": "2026-07-25T01:07:45.329Z",
+  "command": "node atm.mjs tasks scope add --task TASK-LANE-0022 --actor claude-003-plan31-captain --add \"packages/cli/src/commands/lane-session/mutation-authority-adapter.ts,packages/cli/src/commands/lane-session/mutation-status-command.ts\" --reason \"linked lane-session adapter + read-only diagnostic that consume the new mutation capability verifier\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "linked lane-session adapter + read-only diagnostic that consume the new mutation capability verifier"
+  }
+}
