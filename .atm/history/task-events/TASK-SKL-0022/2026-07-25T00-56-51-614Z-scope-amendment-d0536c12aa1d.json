@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T00-56-51-614Z-scope-amendment-d0536c12aa1d",
+  "taskId": "TASK-SKL-0022",
+  "action": "scope-amendment",
+  "actorId": "cursor-skl-0022-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0022.json",
+  "taskSha256": "sha256:709c40ab37b09661d7e545465230ae2275bb7d2b0900304e9f3dcc0ceb681d22",
+  "createdAt": "2026-07-25T00:56:51.614Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0022 --actor cursor-skl-0022-captain --add \"packages/cli/src/commands/tasks/import-orchestrator.ts,packages/cli/src/commands/tasks/result-contracts.ts\" --class linked-surface --phase during-implementation --reason \"Wire causal validator contract import diagnostics and persist new card fields on TaskImportRecord for Import-rejects acceptance.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Wire causal validator contract import diagnostics and persist new card fields on TaskImportRecord for Import-rejects acceptance."
+  }
+}

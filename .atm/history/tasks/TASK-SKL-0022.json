@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0022",
+  "title": "Causal validator contract and task authoring migration",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.3",
+  "dependencies": [
+    "TASK-SKL-0020"
+  ],
+  "acceptance": [
+    "Contract distinguishes `task-required`, `phase-suite` and `advisory`.",
+    "Cards support `testContributions`, `requiredTestCaseIds`, `phaseTestCaseIds` and `advisoryTestCaseIds`.",
+    "Import rejects acceptance criteria or declared impact edges without resolvable required cases.",
+    "Unrelated full suites cannot be declared task-required without a concrete dependency/contract/resource edge.",
+    "Existing command-only cards remain importable through an explicit legacy projection and migration diagnostic."
+  ],
+  "deliverables": [
+    "schemas/validators/validator-execution-contract.schema.json",
+    "packages/cli/src/commands/test-catalog.ts",
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "tests/cli/causal-validator-contract-import.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/validators/validator-execution-contract.schema.json",
+    "scripts/test-catalog.config.json",
+    "packages/cli/src/commands/test-catalog.ts",
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "tests/cli/causal-validator-contract-import.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/causal-validator-contract-import.test.ts",
+    "npm run validate:schemas",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "causal-validator-contract-import-fixtures",
+  "rollbackStrategy": "revert-commit-and-project-legacy-validator-strings",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-contract",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.causal-validator-contract",
+        "pattern": "Versioned Verification Contract",
+        "source": "schemas/validators/validator-execution-contract.schema.json",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0022-causal-validator-contract-and-task-authoring-migration.task.md",
+    "sectionTitle": "TASK-SKL-0022",
+    "headingLine": 47,
+    "hash": "f00a0824ee9f5a5c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0022-causal-validator-contract-and-task-authoring-migration.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:f00a0824ee9f5a5c617ea6d3223341b6332545f1340702f9188943726a9b3c13",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-24T14:13:16.149Z"
+    }
+  },
+  "importedAt": "2026-07-24T14:13:16.149Z",
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-25T00-56-51-614Z-scope-amendment-d0536c12aa1d",
+  "lastTransitionAt": "2026-07-25T00:56:51.614Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-skl-0022-captain",
+  "reservedAt": "2026-07-25T00:54:07.900Z",
+  "promotedAt": "2026-07-25T00:54:07.903Z",
+  "claim": {
+    "actorId": "cursor-skl-0022-captain",
+    "leaseId": "lease-c96d0950eeef",
+    "claimedAt": "2026-07-25T00:54:07.908Z",
+    "heartbeatAt": "2026-07-25T00:54:07.908Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0022.*",
+      ".atm/history/task-events/TASK-SKL-0022/**",
+      ".atm/history/tasks/TASK-SKL-0022.json",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/cli/src/commands/test-catalog.ts",
+      "schemas/validators/validator-execution-contract.schema.json",
+      "scripts/test-catalog.config.json",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/causal-validator-contract-import.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260725005408-cursor-skl-0022-captain-5e55791b0d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725005408-cursor-skl-0022-captain-5e55791b0d\""
+    }
+  },
+  "startedAt": "2026-07-25T00:54:07.908Z",
+  "startedByActor": "cursor-skl-0022-captain",
+  "startedBySessionId": "session-20260725005407-cursor-skl-0022-captain-TASK-SKL-0022-3ff62742f4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0022",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0022.*",
+      ".atm/history/task-events/TASK-SKL-0022/**",
+      ".atm/history/tasks/TASK-SKL-0022.json",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/cli/src/commands/test-catalog.ts",
+      "schemas/validators/validator-execution-contract.schema.json",
+      "scripts/test-catalog.config.json",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/causal-validator-contract-import.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0022-causal-validator-contract-and-task-authoring-migration.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0022-causal-validator-contract-and-task-authoring-migration.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "a9b9016fb5052020e2c1ae59f90ef9eb69c53f679ce193c7dc06c1e3be75aded",
+    "actorId": "cursor-skl-0022-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260725005408-cursor-skl-0022-captain-5e55791b0d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725005408-cursor-skl-0022-captain-5e55791b0d\""
+    },
+    "createdAt": "2026-07-25T00:54:14.986Z",
+    "status": "active"
+  }
+}

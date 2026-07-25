@@ -176,6 +176,24 @@ deliverables:
   - packages/cli/src/commands/example.ts
 validators:
   - npm run validate:cli
+# Causal validator contract (TASK-SKL-0022). Prefer these over bare command lists.
+# responsibility values: task-required | phase-suite | advisory
+testContributions:
+  - caseId: test_task_example_behavior_8f3a2c1d
+    targetGroupId: null
+    semanticKey: example_behavior
+    coversAcceptance: [ACC-1]
+    coversImpactEdges: [example-public-seam]
+    expectedRedPredicate: example failure is detected
+    contributionResourceKey: null
+    responsibility: task-required
+    dependencyEdge: null
+    contractEdge: example-contract
+    resourceKey: null
+requiredTestCaseIds:
+  - test_task_example_behavior_8f3a2c1d
+phaseTestCaseIds: []
+advisoryTestCaseIds: []
 evidence:
   required: command-backed
 rollback:
@@ -219,6 +237,19 @@ errorCodes:
   artifact tasks. `.atm/history/**` is ledger state, not the deliverable.
 - Include validators before the task is imported. If no validator exists yet,
   the task must say which validator must be created.
+- Prefer the causal validator contract fields over command-only lists:
+  - `testContributions` for shared/local case registration during the feature card;
+  - `requiredTestCaseIds` for task-close obligations;
+  - `phaseTestCaseIds` for batch/milestone/release suites;
+  - `advisoryTestCaseIds` for non-blocking diagnostics.
+- Contract responsibility must be one of `task-required`, `phase-suite`, or
+  `advisory`. Broad full suites (`typecheck`, `validate:cli`, `*.static.all`)
+  cannot be `task-required` unless the contribution declares a concrete
+  dependency, contract, or resource edge.
+- Every acceptance criterion and declared causal impact edge must resolve to at
+  least one required case. Command-only legacy cards remain importable through
+  an explicit advisory `legacy_cmd_*` projection plus
+  `ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION`.
 - Include rollback instructions. For framework tasks, prefer revertable commits
   plus any generated artifact cleanup.
 - If the behavior can emit an `ATM_*` code, use `atm-error-code-resolver` in

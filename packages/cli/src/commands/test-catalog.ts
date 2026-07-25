@@ -4,6 +4,13 @@ import path from 'node:path';
 export type TestCapability = 'validator' | 'integration-test';
 export type TestTier = 'quick' | 'standard' | 'full';
 export type TestScope = 'task-local' | 'global-advisory' | 'release-blocking' | 'diagnostic';
+export type ValidatorResponsibility = 'task-required' | 'phase-suite' | 'advisory';
+
+export const VALIDATOR_RESPONSIBILITIES: readonly ValidatorResponsibility[] = [
+  'task-required',
+  'phase-suite',
+  'advisory'
+] as const;
 
 export interface TestCatalogEntry {
   key: string;
@@ -20,7 +27,19 @@ export interface TestCatalogEntry {
   dedupeKeys?: string[];
   costBudgetMs?: number | null;
   performanceGate?: 'advisory' | 'blocking' | null;
+  responsibility?: ValidatorResponsibility | null;
   metadata?: Record<string, unknown>;
+}
+
+export interface LegacyValidatorProjection {
+  readonly schemaId: 'atm.validatorExecutionContract.v1';
+  readonly specVersion: '0.1.0';
+  readonly responsibility: 'advisory';
+  readonly caseId: string;
+  readonly command: string;
+  readonly legacyProjection: true;
+  readonly acceptanceIds: readonly string[];
+  readonly impactEdges: readonly string[];
 }
 
 export interface TestCatalog {
@@ -256,6 +275,54 @@ export function normalizeTier(value: unknown): TestTier | null {
   return text === 'quick' || text === 'standard' || text === 'full' ? text : null;
 }
 
+export function normalizeValidatorResponsibility(value: unknown): ValidatorResponsibility | null {
+  const text = String(value ?? '').trim().toLowerCase();
+  return VALIDATOR_RESPONSIBILITIES.includes(text as ValidatorResponsibility)
+    ? text as ValidatorResponsibility
+    : null;
+}
+
+export function isBroadSuiteCommandOrKey(value: string): boolean {
+  const normalized = String(value || '').trim().toLowerCase().replace(/\\/g, '/');
+  if (!normalized) return false;
+  if (/^(npm run )?(typecheck|lint|validate:cli|validate:schemas|test|validate:all)\b/.test(normalized)) {
+    return true;
+  }
+  if (/\.static\.all\b/.test(normalized) || /\btier[:=]full\b/.test(normalized)) {
+    return true;
+  }
+  if (/^(language|integration)\.[a-z0-9_.-]+\.(all|full)$/.test(normalized)) {
+    return true;
+  }
+  return false;
+}
+
+export function projectLegacyCommandValidators(commands: readonly string[]): readonly LegacyValidatorProjection[] {
+  return [...new Set(commands.map((entry) => String(entry ?? '').trim()).filter(Boolean))]
+    .map((command) => ({
+      schemaId: 'atm.validatorExecutionContract.v1' as const,
+      specVersion: '0.1.0' as const,
+      responsibility: 'advisory' as const,
+      caseId: `legacy_cmd_${slugify(command)}`,
+      command,
+      legacyProjection: true as const,
+      acceptanceIds: [],
+      impactEdges: []
+    }));
+}
+
+export function catalogEntryResponsibility(entry: TestCatalogEntry): ValidatorResponsibility {
+  const fromField = normalizeValidatorResponsibility(entry.responsibility);
+  if (fromField) return fromField;
+  const fromMeta = normalizeValidatorResponsibility(entry.metadata?.responsibility);
+  if (fromMeta) return fromMeta;
+  if (entry.scope === 'release-blocking' || entry.tiers.includes('full')) return 'phase-suite';
+  if (entry.performanceGate === 'advisory' || entry.scope === 'global-advisory' || entry.scope === 'diagnostic') {
+    return 'advisory';
+  }
+  return 'task-required';
+}
+
 function capabilityDefaultTier(capability: TestCapability | undefined, plan: TaskTestPlan | null | undefined): TestTier {
   const selectedPlan = capabilityPlan(plan, capability);
   return normalizeTier(selectedPlan?.defaultTier) ?? 'standard';
@@ -293,6 +360,8 @@ function normalizeEntry(entry: unknown): TestCatalogEntry[] {
     dedupeKeys: normalizeStringList(entry.dedupeKeys),
     costBudgetMs: Number.isFinite(entry.costBudgetMs) ? Number(entry.costBudgetMs) : null,
     performanceGate: entry.performanceGate === 'blocking' ? 'blocking' : 'advisory',
+    responsibility: normalizeValidatorResponsibility(entry.responsibility)
+      ?? normalizeValidatorResponsibility(isRecord(entry.metadata) ? entry.metadata.responsibility : null),
     metadata: isRecord(entry.metadata) ? entry.metadata : undefined
   }];
 }

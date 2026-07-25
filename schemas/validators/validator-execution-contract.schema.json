@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/validators/validator-execution-contract.schema.json",
+  "title": "ATM Validator Execution Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "responsibility",
+    "caseId"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.validatorExecutionContract.v1"
+    },
+    "specVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "migration": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "responsibility": {
+      "type": "string",
+      "enum": ["task-required", "phase-suite", "advisory"]
+    },
+    "caseId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(test_int_|test_task_|legacy_cmd_)[A-Za-z0-9_.:-]+$"
+    },
+    "validatorId": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "groupId": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "acceptanceIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "impactEdges": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["red", "green", "candidate", "pre-close", "release"]
+    },
+    "command": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "minExecutedCases": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "minAssertions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "dependencyEdge": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "contractEdge": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "resourceKey": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "legacyProjection": {
+      "type": "boolean"
+    }
+  }
+}

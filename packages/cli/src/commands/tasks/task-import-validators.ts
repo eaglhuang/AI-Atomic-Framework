@@ -11,6 +11,11 @@
  */
 
 import { createHash } from 'node:crypto';
+import {
+  isBroadSuiteCommandOrKey,
+  projectLegacyCommandValidators,
+  type LegacyValidatorProjection
+} from '../test-catalog.ts';
 export { parseAcceptanceEvidenceMap } from './acceptance-evidence-import.ts';
 
 export interface TaskCausalGraphContract {
@@ -82,10 +87,33 @@ export function extractFrontMatter(text: string): FrontMatter | null {
       data[key] = value;
       continue;
     }
+    // Nested fields/lists on a top-level object-array item
+    // (for example testContributions[i].coversAcceptance).
+    const nestedObjectFieldMatch = /^\s{2,}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
+    if (currentObjectListItem && nestedObjectFieldMatch && !/^\s*-\s+/.test(line)) {
+      const key = nestedObjectFieldMatch[1];
+      const value = nestedObjectFieldMatch[2].trim();
+      currentObjectListItem[key] = value.length === 0 ? [] : normalizeYamlScalar(value);
+      currentObjectListKey = value.length === 0 ? key : null;
+      continue;
+    }
+    if (currentObjectListItem && currentObjectListKey && /^\s+-\s+/.test(line)) {
+      const value = line.replace(/^\s+-\s+/, '').trim();
+      const existing = currentObjectListItem[currentObjectListKey];
+      currentObjectListItem[currentObjectListKey] = Array.isArray(existing)
+        ? [...existing, normalizeYamlScalar(value)]
+        : [normalizeYamlScalar(value)];
+      continue;
+    }
     const objectFieldMatch = /^ {2}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
     if (currentObjectKey && objectFieldMatch) {
       const objectValue = data[currentObjectKey];
-      const objectRecord = objectValue && typeof objectValue === 'object' && !Array.isArray(objectValue)
+      if (Array.isArray(objectValue)) {
+        // Keep array-shaped top-level keys intact; nested item fields are
+        // handled above via currentObjectListItem.
+        continue;
+      }
+      const objectRecord = objectValue && typeof objectValue === 'object'
         ? objectValue as Record<string, unknown>
         : {};
       const key = objectFieldMatch[1];
@@ -117,6 +145,9 @@ export function extractFrontMatter(text: string): FrontMatter | null {
     }
     if (currentObjectKey && currentObjectListKey && /^ {4}-\s+/.test(line)) {
       const objectRecord = data[currentObjectKey] as Record<string, unknown>;
+      if (Array.isArray(objectRecord)) {
+        continue;
+      }
       const value = line.replace(/^ {4}-\s+/, '').trim();
       const existing = objectRecord[currentObjectListKey];
       objectRecord[currentObjectListKey] = Array.isArray(existing)
@@ -129,6 +160,24 @@ export function extractFrontMatter(text: string): FrontMatter | null {
       continue;
     }
     if (currentKey && /^\s*-\s+/.test(line)) {
+      const objectItemMatch = /^\s*-\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
+      if (objectItemMatch) {
+        const item: Record<string, unknown> = {
+          [objectItemMatch[1]]: normalizeYamlScalar(objectItemMatch[2])
+        };
+        const existing = data[currentKey];
+        data[currentKey] = Array.isArray(existing)
+          ? [...existing, item]
+          : typeof existing === 'string' && existing.length === 0
+            ? [item]
+            : typeof existing === 'string'
+              ? [existing, item]
+              : [item];
+        currentObjectKey = currentKey;
+        currentObjectListKey = null;
+        currentObjectListItem = item;
+        continue;
+      }
       const value = line.replace(/^\s*-\s+/, '').trim();
       const existing = data[currentKey];
       if (Array.isArray(existing)) {
@@ -549,4 +598,265 @@ export function buildExtractionFirstPatrolDiagnostics(input: {
     message: `Scope touches ${oversized.length} module(s) over ${EXTRACTION_FIRST_LINE_BUDGET} lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition "inline" with an inlineReason approved by a human.`,
     candidates: oversized.map((entry) => `${entry.path} (${entry.lines} lines)`)
   }];
+}
+
+// ─── TASK-SKL-0022：causal validator contract import ─────────────────────────
+
+export interface TaskTestContribution {
+  readonly caseId: string;
+  readonly targetGroupId: string | null;
+  readonly semanticKey: string | null;
+  readonly coversAcceptance: readonly string[];
+  readonly coversImpactEdges: readonly string[];
+  readonly expectedRedPredicate: string | null;
+  readonly contributionResourceKey: string | null;
+  readonly responsibility: 'task-required' | 'phase-suite' | 'advisory';
+  readonly dependencyEdge: string | null;
+  readonly contractEdge: string | null;
+  readonly resourceKey: string | null;
+}
+
+export interface CausalValidatorCardFields {
+  readonly testContributions: readonly TaskTestContribution[];
+  readonly requiredTestCaseIds: readonly string[];
+  readonly phaseTestCaseIds: readonly string[];
+  readonly advisoryTestCaseIds: readonly string[];
+  readonly legacyValidators: readonly string[];
+  readonly legacyProjection: readonly LegacyValidatorProjection[];
+  readonly usesCausalContract: boolean;
+}
+
+export interface CausalValidatorImportValidation {
+  readonly fields: CausalValidatorCardFields;
+  readonly diagnostics: TaskCardImportDiagnostic[];
+  readonly errors: readonly string[];
+}
+
+export function parseCausalValidatorCardFields(input: {
+  readonly frontmatter?: Record<string, unknown> | null;
+  readonly validators?: readonly string[];
+}): CausalValidatorCardFields {
+  const data = input.frontmatter && typeof input.frontmatter === 'object' ? input.frontmatter : {};
+  const testContributions = parseTestContributions(data.testContributions ?? data.test_contributions);
+  const requiredTestCaseIds = uniqueStrings(parseYamlList(data.requiredTestCaseIds ?? data.required_test_case_ids));
+  const phaseTestCaseIds = uniqueStrings(parseYamlList(data.phaseTestCaseIds ?? data.phase_test_case_ids));
+  const advisoryTestCaseIds = uniqueStrings(parseYamlList(data.advisoryTestCaseIds ?? data.advisory_test_case_ids));
+  const legacyValidators = uniqueStrings(input.validators ?? parseYamlList(data.validators));
+  const usesCausalContract = testContributions.length > 0
+    || requiredTestCaseIds.length > 0
+    || phaseTestCaseIds.length > 0
+    || advisoryTestCaseIds.length > 0;
+  return {
+    testContributions,
+    requiredTestCaseIds,
+    phaseTestCaseIds,
+    advisoryTestCaseIds,
+    legacyValidators,
+    legacyProjection: usesCausalContract ? [] : projectLegacyCommandValidators(legacyValidators),
+    usesCausalContract
+  };
+}
+
+export function validateCausalValidatorContractImport(input: {
+  readonly frontmatter?: Record<string, unknown> | null;
+  readonly validators?: readonly string[];
+  readonly acceptance?: readonly string[];
+  readonly causalImpactEdges?: readonly string[];
+}): CausalValidatorImportValidation {
+  const fields = parseCausalValidatorCardFields(input);
+  const diagnostics: TaskCardImportDiagnostic[] = [];
+  const errors: string[] = [];
+  const acceptance = uniqueStrings(input.acceptance ?? []);
+  const impactEdges = uniqueStrings(input.causalImpactEdges
+    ?? normalizeTaskCausalGraphContract(input.frontmatter?.causalGraph ?? input.frontmatter?.causal_graph).causalImpactEdges);
+
+  if (!fields.usesCausalContract) {
+    if (fields.legacyProjection.length > 0) {
+      diagnostics.push({
+        code: 'ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION',
+        severity: 'warning',
+        field: 'validators',
+        message: `Command-only validators were projected to ${fields.legacyProjection.length} advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards.`
+      });
+    }
+    return { fields, diagnostics, errors };
+  }
+
+  const contributionCaseIds = new Set(fields.testContributions.map((entry) => entry.caseId));
+  const resolvableRequired = new Set([
+    ...contributionCaseIds,
+    ...fields.requiredTestCaseIds
+  ]);
+
+  for (const caseId of fields.requiredTestCaseIds) {
+    if (!contributionCaseIds.has(caseId) && !looksLikeCaseId(caseId)) {
+      const text = `requiredTestCaseIds entry "${caseId}" is not a resolvable case id`;
+      errors.push(text);
+      diagnostics.push({
+        code: 'ATM_TASK_IMPORT_REQUIRED_CASE_UNRESOLVED',
+        severity: 'error',
+        field: 'requiredTestCaseIds',
+        message: text
+      });
+    }
+  }
+
+  if (acceptance.length > 0 || impactEdges.length > 0) {
+    if (fields.requiredTestCaseIds.length === 0 && fields.testContributions.length === 0) {
+      const text = 'Acceptance criteria or causal impact edges require resolvable required test cases';
+      errors.push(text);
+      diagnostics.push({
+        code: 'ATM_TASK_IMPORT_REQUIRED_CASE_MISSING',
+        severity: 'error',
+        field: 'requiredTestCaseIds',
+        message: text
+      });
+    }
+  }
+
+  for (const [index, criterion] of acceptance.entries()) {
+    const aliases = acceptanceAliases(criterion, index);
+    const covered = fields.testContributions.some((entry) =>
+      entry.coversAcceptance.some((token) => aliases.has(normalizeCoverageToken(token)))
+    ) || (fields.requiredTestCaseIds.length > 0 && fields.testContributions.length === 0);
+    if (!covered && fields.testContributions.length > 0) {
+      const text = `Acceptance criterion "${criterion}" has no resolvable required case coverage`;
+      errors.push(text);
+      diagnostics.push({
+        code: 'ATM_TASK_IMPORT_ACCEPTANCE_CASE_UNRESOLVED',
+        severity: 'error',
+        field: 'testContributions',
+        message: text
+      });
+    }
+  }
+
+  for (const edge of impactEdges) {
+    const covered = fields.testContributions.some((entry) =>
+      entry.coversImpactEdges.some((token) => normalizeCoverageToken(token) === normalizeCoverageToken(edge))
+    ) || (fields.requiredTestCaseIds.length > 0 && fields.testContributions.length === 0);
+    if (!covered && fields.testContributions.length > 0) {
+      const text = `Causal impact edge "${edge}" has no resolvable required case coverage`;
+      errors.push(text);
+      diagnostics.push({
+        code: 'ATM_TASK_IMPORT_IMPACT_EDGE_CASE_UNRESOLVED',
+        severity: 'error',
+        field: 'testContributions',
+        message: text
+      });
+    }
+  }
+
+  for (const contribution of fields.testContributions) {
+    if (contribution.responsibility !== 'task-required') continue;
+    const suiteLike = isBroadSuiteCommandOrKey(contribution.caseId)
+      || (contribution.semanticKey ? isBroadSuiteCommandOrKey(contribution.semanticKey) : false);
+    const hasEdge = Boolean(contribution.dependencyEdge || contribution.contractEdge || contribution.resourceKey || contribution.contributionResourceKey);
+    if (suiteLike && !hasEdge) {
+      const text = `Full-suite case "${contribution.caseId}" cannot be task-required without a dependency, contract, or resource edge`;
+      errors.push(text);
+      diagnostics.push({
+        code: 'ATM_TASK_IMPORT_TASK_REQUIRED_FULL_SUITE_WITHOUT_EDGE',
+        severity: 'error',
+        field: 'testContributions',
+        message: text
+      });
+    }
+  }
+
+  for (const caseId of fields.requiredTestCaseIds) {
+    if (!isBroadSuiteCommandOrKey(caseId)) continue;
+    const contribution = fields.testContributions.find((entry) => entry.caseId === caseId);
+    const hasEdge = Boolean(
+      contribution?.dependencyEdge
+      || contribution?.contractEdge
+      || contribution?.resourceKey
+      || contribution?.contributionResourceKey
+    );
+    if (!hasEdge) {
+      const text = `Full-suite requiredTestCaseId "${caseId}" cannot be task-required without a dependency, contract, or resource edge`;
+      errors.push(text);
+      diagnostics.push({
+        code: 'ATM_TASK_IMPORT_TASK_REQUIRED_FULL_SUITE_WITHOUT_EDGE',
+        severity: 'error',
+        field: 'requiredTestCaseIds',
+        message: text
+      });
+    }
+  }
+
+  if (resolvableRequired.size === 0 && (acceptance.length > 0 || impactEdges.length > 0)) {
+    const text = 'Declared acceptance or impact edges lack resolvable required case ids';
+    if (!errors.includes(text)) {
+      errors.push(text);
+      diagnostics.push({
+        code: 'ATM_TASK_IMPORT_REQUIRED_CASE_MISSING',
+        severity: 'error',
+        field: 'requiredTestCaseIds',
+        message: text
+      });
+    }
+  }
+
+  return { fields, diagnostics, errors };
+}
+
+function parseTestContributions(raw: unknown): TaskTestContribution[] {
+  let source: unknown = raw;
+  if (typeof raw === 'string' && raw.trim()) {
+    try {
+      source = JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(source)) return [];
+  const items: TaskTestContribution[] = [];
+  for (const entry of source) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+    const record = entry as Record<string, unknown>;
+    const caseId = normalizeOptionalString(record.caseId ?? record.case_id);
+    if (!caseId) continue;
+    const responsibilityRaw = normalizeOptionalString(record.responsibility) ?? 'task-required';
+    const responsibility = responsibilityRaw === 'phase-suite' || responsibilityRaw === 'advisory'
+      ? responsibilityRaw
+      : 'task-required';
+    items.push({
+      caseId,
+      targetGroupId: normalizeOptionalString(record.targetGroupId ?? record.target_group_id),
+      semanticKey: normalizeOptionalString(record.semanticKey ?? record.semantic_key),
+      coversAcceptance: uniqueStrings(parseYamlList(record.coversAcceptance ?? record.covers_acceptance)),
+      coversImpactEdges: uniqueStrings(parseYamlList(record.coversImpactEdges ?? record.covers_impact_edges)),
+      expectedRedPredicate: normalizeOptionalString(record.expectedRedPredicate ?? record.expected_red_predicate),
+      contributionResourceKey: normalizeOptionalString(record.contributionResourceKey ?? record.contribution_resource_key),
+      responsibility,
+      dependencyEdge: normalizeOptionalString(record.dependencyEdge ?? record.dependency_edge),
+      contractEdge: normalizeOptionalString(record.contractEdge ?? record.contract_edge),
+      resourceKey: normalizeOptionalString(record.resourceKey ?? record.resource_key)
+    });
+  }
+  return items;
+}
+
+function uniqueStrings(values: readonly string[]): string[] {
+  return [...new Set(values.map((entry) => String(entry ?? '').trim()).filter(Boolean))];
+}
+
+function looksLikeCaseId(value: string): boolean {
+  return /^(test_int_|test_task_|legacy_cmd_)[A-Za-z0-9_.:-]+$/.test(value);
+}
+
+function normalizeCoverageToken(value: string): string {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function acceptanceAliases(criterion: string, index: number): Set<string> {
+  const aliases = new Set<string>([
+    normalizeCoverageToken(criterion),
+    `acc-${index + 1}`,
+    `acceptance-${index + 1}`
+  ]);
+  const explicit = /^(ACC[-_ ]?\d+)\b/i.exec(criterion.trim());
+  if (explicit) aliases.add(normalizeCoverageToken(explicit[1].replace(/\s+/g, '-')));
+  return aliases;
 }
