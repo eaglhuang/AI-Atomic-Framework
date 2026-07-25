@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0265",
+  "title": "Shared mutation finalization and sealed runner publication",
+  "status": "done",
+  "milestone": "ATM-3.1-R0Q.3",
+  "dependencies": [
+    "TASK-LANE-0022"
+  ],
+  "acceptance": [
+    "Before implementation, invoke `atm-deep-module-refactor` separately on branch finalization and runner publication. Seal interfaces, ports, state ownership, deletion tests, and the `deep-module-review:2154f107` / `deep-module-review:2797aed9` baselines.",
+    "`coordinateBranchCommit(request, snapshot, ports)` is the only branch commit-window policy. It returns acquire/wait/reclaim/release actions, fencing token, idempotency key, exact candidate set, and executable recovery without mutating during planning.",
+    "A dead owner before commit is recoverable even when HEAD did not move. Reclaim requires expiry, dead/invalid owner proof, unchanged fenced generation, and lane capability; it never relies on manual deletion under `.atm/runtime`.",
+    "Commit, taskflow close, and batch checkpoint adapters consume the same coordinator plan. No caller re-derives stale-lock, candidate, stage, or queue ownership rules.",
+    "`publishSealedRunner(request, snapshot, ports)` owns reservation -> build-ready -> built-sealed -> publication-ready -> published -> receipt-archived state and returns one canonical receipt.",
+    "The publication receipt binds task/lane authority, sealed source SHA, runner/build digest, exact surfaces, generated manifest, publication commit, remote visibility policy, and archived receipt disposition.",
+    "Taskflow close and internal release use the same publication lifecycle. A successful normal task does not require a later framework-temp hygiene conversation, native pathspec, manual receipt archival, or manual release-artifact commit.",
+    "Receipt archival is a governed terminal phase, not untracked advisory residue. Repeated publication/reconcile calls are idempotent and never publish the same generation twice.",
+    "Frozen/source bootstrap is explicit: source-first code may prepare a build, but the hook and final validation run against the sealed newly built runner without circularly requiring the stale runner to approve its own replacement.",
+    "Tests replay the pre-commit timeout orphan-lock incident, post-close release artifact residue, closed-task receipt rejection, Windows manifest retry, actor drift, and publication interruption at every phase.",
+    "Deletion tests remove caller-local lock cleanup and post-close publish recipes. Existing framework-mode remains an emergency/manual framework channel, not the normal task publication path.",
+    "Command-backed evidence reports manual interventions, orphan-lock recovery latency, duplicate publications, unarchived receipts, release-surface residue, actor mismatches, and false blocks; Plan3.1 requires zero manual interventions and zero residue for the N=2 proof."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/branch-commit-coordinator.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "tests/cli/branch-commit-orphan-recovery.test.ts",
+    "tests/cli/sealed-runner-publication-lifecycle.test.ts",
+    "tests/cli/post-close-zero-release-residue.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/branch-commit-coordinator.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/internal-release/publication.ts",
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/runner-sync-incremental-build.ts",
+    "scripts/build-root-drop-release.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/build-release-hygiene.ts",
+    "tests/cli/branch-commit-orphan-recovery.test.ts",
+    "tests/cli/sealed-runner-publication-lifecycle.test.ts",
+    "tests/cli/post-close-zero-release-residue.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/branch-commit-orphan-recovery.test.ts",
+    "node --strip-types tests/cli/sealed-runner-publication-lifecycle.test.ts",
+    "node --strip-types tests/cli/post-close-zero-release-residue.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "shared-mutation-finalization-and-publication-receipt",
+  "rollbackStrategy": "revert-adapters-and-retain-fail-closed-queue-state",
+  "rollbackNotes": "Do not delete receipts or locks manually. Reconciliation must use fenced coordinator state and the sealed publication journal.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/git-governance/branch-commit-coordinator.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/internal-release/publication.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-release-hygiene.ts",
+        "tests/cli/branch-commit-orphan-recovery.test.ts",
+        "tests/cli/sealed-runner-publication-lifecycle.test.ts",
+        "tests/cli/post-close-zero-release-residue.test.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    },
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts (689 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0265-shared-mutation-finalization-and-sealed-runner-publication.task.md",
+    "sectionTitle": "ATM-GOV-0265",
+    "headingLine": 89,
+    "hash": "16fb16f1edb9a97d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0265-shared-mutation-finalization-and-sealed-runner-publication.task.md",
+      "planningCommitSha": "10ef055c46c4d2b888417e7e3cd2b13b6f55fb51",
+      "contentDigest": "sha256:16fb16f1edb9a97d04b19075df6efc445584dc54c80b12af6ab0624bcccf954d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-25T08:38:44.457Z"
+    }
+  },
+  "importedAt": "2026-07-25T08:38:44.457Z",
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.branch.commit.orphan.recovery.test.ts",
+      "command": "node --strip-types tests/cli/branch-commit-orphan-recovery.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.sealed.runner.publication.lifecycle.test.ts",
+      "command": "node --strip-types tests/cli/sealed-runner-publication-lifecycle.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.post.close.zero.release.residue.test.ts",
+      "command": "node --strip-types tests/cli/post-close-zero-release-residue.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-25T13-23-44-701Z-close-97906943410c",
+  "lastTransitionAt": "2026-07-25T13:23:44.701Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-07-25T11:56:29.776Z",
+  "promotedAt": "2026-07-25T11:56:29.780Z",
+  "claim": {
+    "actorId": "claude-0265-plan31-captain",
+    "leaseId": "lease-3c9288771794",
+    "claimedAt": "2026-07-25T11:56:29.787Z",
+    "heartbeatAt": "2026-07-25T13:22:36.916Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0265.*",
+      ".atm/history/task-events/ATM-GOV-0265/**",
+      ".atm/history/tasks/ATM-GOV-0265.json",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-queue-ownership.ts",
+      "packages/cli/src/commands/git-governance/branch-commit-coordinator.ts",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/internal-release/publication.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-release-hygiene.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "tests/cli/branch-commit-orphan-recovery.test.ts",
+      "tests/cli/post-close-zero-release-residue.test.ts",
+      "tests/cli/sealed-runner-publication-lifecycle.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260725115630-codex-gpt-5.4-mini-ac7bd08073",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725115630-codex-gpt-5.4-mini-ac7bd08073\""
+    },
+    "reason": "adopt rebound claim.actorId to claude-0265-plan31-captain but ledger owner field remained codex-gpt-5.4-mini; realign owner for governed close"
+  },
+  "startedAt": "2026-07-25T11:56:29.787Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260725115629-codex-gpt-5.4-mini-ATM-GOV-0265-a64af2fa38",
+  "owner": "claude-0265-plan31-captain",
+  "closedAt": "2026-07-25T13:23:44.699Z",
+  "closedByActor": "claude-0265-plan31-captain",
+  "closedBySessionId": "session-20260725115629-codex-gpt-5.4-mini-ATM-GOV-0265-a64af2fa38",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0265.closure-packet.json"
+}

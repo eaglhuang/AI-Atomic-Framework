@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T12-18-34-038Z-scope-amendment-bbb730bd160e",
+  "taskId": "ATM-GOV-0265",
+  "action": "scope-amendment",
+  "actorId": "claude-0265-plan31-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0265.json",
+  "taskSha256": "sha256:fbd4d7e864382b603af81c71f361cb4d3a0272480ba90418a8e49d161c6c9a93",
+  "createdAt": "2026-07-25T12:18:34.038Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0265 --actor claude-0265-plan31-captain --add packages/cli/src/commands/framework-development/runner-sync-queue-ownership.ts --reason \"deep-module split target: queue-head ownership subsystem extracted from runner-sync-admission.ts to bring it under budget (Captain-mandated first step)\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "deep-module split target: queue-head ownership subsystem extracted from runner-sync-admission.ts to bring it under budget (Captain-mandated first step)"
+  }
+}

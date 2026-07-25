@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T13-22-37-059Z-repair-claim-50b5080c016b",
+  "taskId": "ATM-GOV-0265",
+  "action": "repair-claim",
+  "actorId": "claude-0265-plan31-captain",
+  "sessionId": "session-20260725115629-codex-gpt-5.4-mini-ATM-GOV-0265-a64af2fa38",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0265.json",
+  "taskSha256": "sha256:2429223a2d0a291556f58b730c6c668c6c9a4618a9822018990fa486cdb56f5d",
+  "createdAt": "2026-07-25T13:22:37.059Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0265 --actor claude-0265-plan31-captain --write --reason \"adopt rebound claim.actorId to claude-0265-plan31-captain but ledger owner field remained codex-gpt-5.4-mini; realign owner for governed close\" --json"
+}
