@@ -10,6 +10,7 @@
  * - 禁止從此模組反向 import tasks.ts
  */
 import { createHash } from 'node:crypto';
+import { isTddMode, parseTddMode } from '../../../../core/dist/evidence/tdd-cycle.js';
 import { isBroadSuiteCommandOrKey, projectLegacyCommandValidators } from '../test-catalog.js';
 export { parseAcceptanceEvidenceMap } from './acceptance-evidence-import.js';
 export function normalizeTaskCausalGraphContract(value) {
@@ -686,6 +687,121 @@ function parseTestContributions(raw) {
             dependencyEdge: normalizeOptionalString(record.dependencyEdge ?? record.dependency_edge),
             contractEdge: normalizeOptionalString(record.contractEdge ?? record.contract_edge),
             resourceKey: normalizeOptionalString(record.resourceKey ?? record.resource_key)
+        });
+    }
+    return items;
+}
+export function parseTddCardFields(input) {
+    const data = input.frontmatter && typeof input.frontmatter === 'object' ? input.frontmatter : {};
+    return {
+        tddMode: parseTddMode(data.tddMode ?? data.tdd_mode),
+        tddNotApplicableReason: normalizeOptionalString(data.tddNotApplicableReason ?? data.tdd_not_applicable_reason ?? data.tddNaReason),
+        tddExemptions: parseTddExemptions(data.tddExemptions ?? data.tdd_exemptions)
+    };
+}
+export function validateTddCardImport(input) {
+    const fields = parseTddCardFields(input);
+    const diagnostics = [];
+    const errors = [];
+    const rawMode = input.frontmatter?.tddMode ?? input.frontmatter?.tdd_mode;
+    if (rawMode != null && rawMode !== '' && !fields.tddMode) {
+        const text = `tddMode "${String(rawMode)}" is invalid; expected required|recommended|reasoned-not-applicable`;
+        errors.push(text);
+        diagnostics.push({
+            code: 'ATM_TASK_IMPORT_TDD_MODE_INVALID',
+            severity: 'error',
+            field: 'tddMode',
+            message: text
+        });
+    }
+    if (fields.tddMode === 'reasoned-not-applicable' && !fields.tddNotApplicableReason) {
+        const text = 'tddMode reasoned-not-applicable requires tddNotApplicableReason';
+        errors.push(text);
+        diagnostics.push({
+            code: 'ATM_TASK_IMPORT_TDD_NA_REASON_REQUIRED',
+            severity: 'error',
+            field: 'tddNotApplicableReason',
+            message: text
+        });
+    }
+    for (const exemption of fields.tddExemptions) {
+        if (!exemption.caseId) {
+            const text = 'tddExemptions entry is missing caseId';
+            errors.push(text);
+            diagnostics.push({
+                code: 'ATM_TASK_IMPORT_TDD_EXEMPTION_INVALID',
+                severity: 'error',
+                field: 'tddExemptions',
+                message: text
+            });
+            continue;
+        }
+        if ((exemption.kind === 'mechanical' || exemption.kind === 'docs') && !exemption.reviewed) {
+            const text = `tddExemption ${exemption.caseId} (${exemption.kind}) must be reviewed before import`;
+            errors.push(text);
+            diagnostics.push({
+                code: 'ATM_TASK_IMPORT_TDD_EXEMPTION_UNREVIEWED',
+                severity: 'error',
+                field: 'tddExemptions',
+                message: text
+            });
+        }
+        if (!exemption.reason) {
+            const text = `tddExemption ${exemption.caseId} requires a reason`;
+            errors.push(text);
+            diagnostics.push({
+                code: 'ATM_TASK_IMPORT_TDD_EXEMPTION_INVALID',
+                severity: 'error',
+                field: 'tddExemptions',
+                message: text
+            });
+        }
+    }
+    if (fields.tddMode && !isTddMode(fields.tddMode)) {
+        const text = 'tddMode failed typed validation';
+        errors.push(text);
+        diagnostics.push({
+            code: 'ATM_TASK_IMPORT_TDD_MODE_INVALID',
+            severity: 'error',
+            field: 'tddMode',
+            message: text
+        });
+    }
+    return { fields, diagnostics, errors };
+}
+function parseTddExemptions(raw) {
+    let source = raw;
+    if (typeof raw === 'string' && raw.trim()) {
+        try {
+            source = JSON.parse(raw);
+        }
+        catch {
+            return [];
+        }
+    }
+    if (!Array.isArray(source))
+        return [];
+    const items = [];
+    for (const entry of source) {
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry))
+            continue;
+        const record = entry;
+        const caseId = normalizeOptionalString(record.caseId ?? record.case_id);
+        const kindRaw = normalizeOptionalString(record.kind);
+        const kind = (kindRaw === 'mechanical'
+            || kindRaw === 'docs'
+            || kindRaw === 'advisory'
+            || kindRaw === 'quarantined')
+            ? kindRaw
+            : null;
+        if (!caseId || !kind)
+            continue;
+        items.push({
+            caseId,
+            kind,
+            reason: normalizeOptionalString(record.reason) ?? '',
+            reviewed: record.reviewed === true || record.reviewed === 'true',
+            reviewActorId: normalizeOptionalString(record.reviewActorId ?? record.review_actor_id)
         });
     }
     return items;
