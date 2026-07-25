@@ -10,6 +10,7 @@ import {
 } from './lane-session/store.ts';
 import { issueProxyReceipt, listProxyReceipts, type ProxyReceiptCommandClass } from './lane-session/proxy-receipt.ts';
 import { capabilityFingerprint } from './lane-session/redaction.ts';
+import { runLaneMutationStatus } from './lane-session/mutation-status-command.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
 const proxyReceiptCommandClasses: readonly ProxyReceiptCommandClass[] = [
@@ -37,8 +38,11 @@ export function runLane(argv: string[]) {
   if (options.action === 'proxy-status') {
     return runLaneProxyStatus(options);
   }
+  if (options.action === 'mutation-status') {
+    return runLaneMutationStatus(options);
+  }
   if (options.action !== 'status') {
-    throw new CliError('ATM_CLI_USAGE', 'lane supports: status, adopt <lane-id>, heartbeat [lane-id], sweep, proxy-grant, proxy-status', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'lane supports: status, adopt <lane-id>, heartbeat [lane-id], sweep, proxy-grant, proxy-status, mutation-status', { exitCode: 2 });
   }
 
   const lane = resolveLaneSession({
@@ -408,7 +412,7 @@ function normalizeProxyCommandClasses(values: readonly string[]): ProxyReceiptCo
 
 interface ParsedLaneOptions {
   readonly cwd: string;
-  readonly action: 'status' | 'adopt' | 'heartbeat' | 'sweep' | 'proxy-grant' | 'proxy-status';
+  readonly action: 'status' | 'adopt' | 'heartbeat' | 'sweep' | 'proxy-grant' | 'proxy-status' | 'mutation-status';
   readonly targetLaneId: string | null;
   readonly laneSessionId: string | null;
   readonly actorId: string | null;
@@ -424,6 +428,7 @@ interface ParsedLaneOptions {
   readonly approver: string | null;
   readonly grantKind: string | null;
   readonly ttlMs: number | null;
+  readonly operation: string | null;
 }
 
 function parseLaneOptions(argv: string[]): ParsedLaneOptions {
@@ -444,7 +449,8 @@ function parseLaneOptions(argv: string[]): ParsedLaneOptions {
     commandClasses: [] as string[],
     approver: null as string | null,
     grantKind: null as string | null,
-    ttlMs: null as number | null
+    ttlMs: null as number | null,
+    operation: null as string | null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -479,6 +485,11 @@ function parseLaneOptions(argv: string[]): ParsedLaneOptions {
     }
     if (arg === '--grant-kind') {
       state.grantKind = requireValue(argv, index, '--grant-kind');
+      index += 1;
+      continue;
+    }
+    if (arg === '--operation') {
+      state.operation = requireValue(argv, index, '--operation');
       index += 1;
       continue;
     }
@@ -558,7 +569,8 @@ function parseLaneOptions(argv: string[]): ParsedLaneOptions {
     commandClasses: state.commandClasses,
     approver: state.approver,
     grantKind: state.grantKind,
-    ttlMs: state.ttlMs
+    ttlMs: state.ttlMs,
+    operation: state.operation
   };
 }
 
