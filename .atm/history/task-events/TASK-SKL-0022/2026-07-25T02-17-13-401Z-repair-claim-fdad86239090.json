@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T02-17-13-401Z-repair-claim-fdad86239090",
+  "taskId": "TASK-SKL-0022",
+  "action": "repair-claim",
+  "actorId": "claude-003-plan31-captain",
+  "sessionId": "session-20260725005407-cursor-skl-0022-captain-TASK-SKL-0022-3ff62742f4",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0022.json",
+  "taskSha256": "sha256:de4592a71e77829d0525c666c4e31e5035b08b5a71ce0a12d4381d68f40dffcc",
+  "createdAt": "2026-07-25T02:17:13.401Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-SKL-0022 --actor claude-003-plan31-captain --write --reason \"reconcile task owner field to adopted lane actor after governed lane adopt (coalesced runner-sync window; SKL delivery unchanged)\" --json"
+}

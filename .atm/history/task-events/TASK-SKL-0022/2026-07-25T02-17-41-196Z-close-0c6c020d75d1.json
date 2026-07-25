@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T02-17-41-196Z-close-0c6c020d75d1",
+  "taskId": "TASK-SKL-0022",
+  "action": "close",
+  "actorId": "claude-003-plan31-captain",
+  "sessionId": "session-20260725005407-cursor-skl-0022-captain-TASK-SKL-0022-3ff62742f4",
+  "fromStatus": "ready",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0022.json",
+  "taskSha256": "sha256:18ed97d34f88eb4b40329591ee4de6a4f004ffe192ded6d165a042732a83421c",
+  "createdAt": "2026-07-25T02:17:41.196Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0022 --actor claude-003-plan31-captain --status done --historical-delivery 6dea40d8bdc74d71350dbeb382d02cb1a9782b68",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260725005407-cursor-skl-0022-captain-TASK-SKL-0022-3ff62742f4",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0022.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/causal-validator-contract-import.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-25T02:17:41.187Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0022.*",
+        ".atm/history/task-events/TASK-SKL-0022/**",
+        ".atm/history/tasks/TASK-SKL-0022.json",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/cli/src/commands/test-catalog.ts",
+        "schemas/validators/validator-execution-contract.schema.json",
+        "scripts/test-catalog.config.json",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "tests/cli/causal-validator-contract-import.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/cli/src/commands/test-catalog.ts",
+        "schemas/validators/validator-execution-contract.schema.json",
+        "scripts/test-catalog.config.json",
+        "tests/cli/causal-validator-contract-import.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
