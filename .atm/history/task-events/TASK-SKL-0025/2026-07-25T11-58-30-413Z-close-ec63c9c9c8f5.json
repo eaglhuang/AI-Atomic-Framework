@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T11-58-30-413Z-close-ec63c9c9c8f5",
+  "taskId": "TASK-SKL-0025",
+  "action": "close",
+  "actorId": "cursor-skl-0025-captain",
+  "sessionId": "session-20260725083908-cursor-skl-0025-captain-TASK-SKL-0025-92c21c7afe",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0025.json",
+  "taskSha256": "sha256:75093b00393e1b0e5f7944ae89ebe866db837a027a6ed4e6daa2d0a20cbf201b",
+  "createdAt": "2026-07-25T11:58:30.413Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0025 --actor cursor-skl-0025-captain --status done --historical-delivery 9cd36eae21cedffc8acdd98f39e0fecc02d0d44f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260725083908-cursor-skl-0025-captain-TASK-SKL-0025-92c21c7afe",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0025.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/tdd-case-id-red-green-lifecycle.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-25T11:58:30.400Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0025.*",
+        ".atm/history/task-events/TASK-SKL-0025/**",
+        ".atm/history/tasks/TASK-SKL-0025.json",
+        "packages/cli/src/commands/evidence/verbs/run.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/tdd-cycle.ts",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "tests/cli/tdd-case-id-red-green-lifecycle.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/verbs/run.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/tdd-cycle.ts",
+        "tests/cli/tdd-case-id-red-green-lifecycle.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

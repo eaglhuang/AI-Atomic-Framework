@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-SKL-0025",
   "title": "Test case ID bound TDD red-green lifecycle",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-SKL-VG-R0.5",
   "dependencies": [
     "TASK-SKL-0023",
@@ -136,8 +136,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-25T08-39-23-317Z-claim-647e3524852b",
-  "lastTransitionAt": "2026-07-25T08:39:23.317Z",
+  "lastTransitionId": "2026-07-25T11-58-30-413Z-close-ec63c9c9c8f5",
+  "lastTransitionAt": "2026-07-25T11:58:30.413Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-skl-0025-captain",
   "reservedAt": "2026-07-25T08:39:08.097Z",
@@ -146,7 +146,7 @@
     "actorId": "cursor-skl-0025-captain",
     "leaseId": "lease-b00be376db29",
     "claimedAt": "2026-07-25T08:39:08.108Z",
-    "heartbeatAt": "2026-07-25T08:39:08.108Z",
+    "heartbeatAt": "2026-07-25T11:58:30.411Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-SKL-0025.json",
@@ -157,14 +157,14 @@
       "templates/skills/atm-task-card-authoring.skill.md",
       "tests/cli/tdd-case-id-red-green-lifecycle.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260725083908-cursor-skl-0025-captain-7d62025fee",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725083908-cursor-skl-0025-captain-7d62025fee\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-25T08:39:08.108Z",
   "startedByActor": "cursor-skl-0025-captain",
@@ -202,5 +202,9 @@
     },
     "createdAt": "2026-07-25T08:39:23.315Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-25T11:58:30.411Z",
+  "closedByActor": "cursor-skl-0025-captain",
+  "closedBySessionId": "session-20260725083908-cursor-skl-0025-captain-TASK-SKL-0025-92c21c7afe",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0025.closure-packet.json"
 }
