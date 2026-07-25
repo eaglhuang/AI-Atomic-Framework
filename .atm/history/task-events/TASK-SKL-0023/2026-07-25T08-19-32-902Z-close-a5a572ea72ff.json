@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-25T08-19-32-902Z-close-a5a572ea72ff",
+  "taskId": "TASK-SKL-0023",
+  "action": "close",
+  "actorId": "cursor-skl-0023-captain",
+  "sessionId": "session-20260725071229-cursor-skl-0023-captain-TASK-SKL-0023-83aafd9fa0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0023.json",
+  "taskSha256": "sha256:c50d9ad68c482d64a53011abe3fb61d654487b0c1ed0207cb6daabe2fe13f591",
+  "createdAt": "2026-07-25T08:19:32.902Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0023 --actor cursor-skl-0023-captain --status done --historical-delivery 5c0c432995124c0572a729c3201b39e1e311f5d3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260725071229-cursor-skl-0023-captain-TASK-SKL-0023-83aafd9fa0",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0023.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+      "node --strip-types tests/core/test-case-contribution-broker.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-25T08:19:32.890Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0023.*",
+        ".atm/history/task-events/TASK-SKL-0023/**",
+        ".atm/history/tasks/TASK-SKL-0023.json",
+        "packages/cli/src/commands/test-catalog.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/test-case-contribution.ts",
+        "schemas/validators/test-case-group.schema.json",
+        "scripts/test-catalog.config.json",
+        "tests/catalog/groups/**",
+        "tests/cli/test-case-catalog-shards.test.ts",
+        "tests/core/test-case-contribution-broker.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/test-catalog.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/test-case-contribution.ts",
+        "schemas/validators/test-case-group.schema.json",
+        "scripts/test-catalog.config.json",
+        "tests/catalog/groups/**",
+        "tests/cli/test-case-catalog-shards.test.ts",
+        "tests/core/test-case-contribution-broker.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

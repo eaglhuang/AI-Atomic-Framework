@@ -1,0 +1,179 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0023",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4076979b61358253f2af7afe6199261537ab6ea6",
+  "governedTreeSha": "2b9766d9aac9e71722ba40b264ee49b8c42d7783",
+  "targetCommitDelta": {
+    "currentCommitSha": "4076979b61358253f2af7afe6199261537ab6ea6",
+    "parentCommitShas": [
+      "4076979b61358253f2af7afe6199261537ab6ea6"
+    ],
+    "governedTreeSha": "2b9766d9aac9e71722ba40b264ee49b8c42d7783",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0249.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0251.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0259.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-LANE-0021.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0017.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0023.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/test-case-contribution.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/test_group_catalog_query.shard.json",
+      "tests/catalog/groups/test_group_runner_sync.shard.json",
+      "tests/cli/test-case-catalog-shards.test.ts",
+      "tests/core/test-case-contribution-broker.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:64bd8dcf5dab4ddbbeee5912eec62d9731f31992a1b02d395366b4fa7191ea8e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/core/test-case-contribution-broker.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0d355184cd7e347b85b4ccb1e2b0db1aa3576fdddb0ed1be6450eab38c783d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6b85b34caec4dd9c9141003810eba937b373d719a04e206ddb85d637b362bf3",
+      "stderrSha256": "sha256:d96de8746a7b4ce3c52b98859d11dbc0878fbac986ad177e057ff3b5b880f6fd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+    "node --strip-types tests/core/test-case-contribution-broker.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-25T08:19:32.890Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0023.*",
+      ".atm/history/task-events/TASK-SKL-0023/**",
+      ".atm/history/tasks/TASK-SKL-0023.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/test-case-contribution.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/**",
+      "tests/cli/test-case-catalog-shards.test.ts",
+      "tests/core/test-case-contribution-broker.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/test-case-contribution.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/**",
+      "tests/cli/test-case-catalog-shards.test.ts",
+      "tests/core/test-case-contribution-broker.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0023.json",
+  "closedAt": "2026-07-25T08:19:32.890Z",
+  "closedByActor": "cursor-skl-0023-captain",
+  "sessionId": "session-20260725071229-cursor-skl-0023-captain-TASK-SKL-0023-83aafd9fa0",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "5c0c432995124c0572a729c3201b39e1e311f5d3",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/test-case-contribution.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/test_group_catalog_query.shard.json",
+      "tests/catalog/groups/test_group_runner_sync.shard.json",
+      "tests/cli/test-case-catalog-shards.test.ts",
+      "tests/core/test-case-contribution-broker.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0023.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0023/2026-07-25T07-12-12-611Z-import-9b3deee547a5.json",
+      ".atm/history/task-events/TASK-SKL-0023/2026-07-25T07-12-29-380Z-reserve-c44c20bdfa9e.json",
+      ".atm/history/task-events/TASK-SKL-0023/2026-07-25T07-12-29-384Z-promote-76549f7d3eb6.json",
+      ".atm/history/task-events/TASK-SKL-0023/2026-07-25T07-12-38-856Z-claim-ebf758b7fecf.json",
+      ".atm/history/tasks/TASK-SKL-0023.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
