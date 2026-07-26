@@ -1,0 +1,195 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0026",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c778a76b8c2b0f6c8461bfb47713662c81cb8393",
+  "governedTreeSha": "3a476c06093933681fdcd2886f0fdd4ce5677ef0",
+  "targetCommitDelta": {
+    "currentCommitSha": "c778a76b8c2b0f6c8461bfb47713662c81cb8393",
+    "parentCommitShas": [
+      "c778a76b8c2b0f6c8461bfb47713662c81cb8393"
+    ],
+    "governedTreeSha": "3a476c06093933681fdcd2886f0fdd4ce5677ef0",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0026.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0026.json",
+      ".atm/history/task-events/TASK-SKL-0026/2026-07-26T12-32-23-718Z-repair-claim-c9e0357a72d8.json",
+      ".atm/history/tasks/TASK-SKL-0026.json",
+      "packages/cli/dist/commands/batch/plan-executor.js",
+      "packages/cli/dist/commands/test-catalog.js",
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/phase-suite.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "packages/core/src/evidence/validation-contract.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/adapter-local-git/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/batch/plan-executor.js",
+      "release/atm-root-drop/packages/cli/dist/commands/test-catalog.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/batch/plan-executor.ts",
+      "release/atm-root-drop/packages/cli/src/commands/test-catalog.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/tdd-cycle.d.ts",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-csharp/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-behavior-pack/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-experience-loop/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-human-review/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-review-advisory/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-rule-guard/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/run-validators/implementation.ts",
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/causal-validator-selector.test.ts",
+      "tests/cli/phase-suite-promotion-gate.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/causal-validator-selector.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a09b7ce5873c5278454b4e2c2a554fce39d123242482b178e8bf46f709a63d05",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/phase-suite-promotion-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1fdcb5afcd63177aa0c5131eb13b177b51f0b0efa3579b4c162b11ea4307c378",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+      "stderrSha256": "sha256:351d72bbd9a236049d53f5b3547bc64d4350bd19f43acf990ac3783b6eebdd13",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/causal-validator-selector.test.ts",
+    "node --strip-types tests/cli/phase-suite-promotion-gate.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-26T12:33:00.853Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0026.*",
+      ".atm/history/task-events/TASK-SKL-0026/**",
+      ".atm/history/tasks/TASK-SKL-0026.json",
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/phase-suite.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "packages/core/src/evidence/validation-contract.ts",
+      "packages/core/src/evidence/validator-lifecycle.ts",
+      "scripts/run-validators/implementation.ts",
+      "scripts/test-catalog.config.json",
+      "tests/cli/causal-validator-selector.test.ts",
+      "tests/cli/phase-suite-promotion-gate.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/phase-suite.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "packages/core/src/evidence/validation-contract.ts",
+      "packages/core/src/evidence/validator-lifecycle.ts",
+      "scripts/run-validators/implementation.ts",
+      "scripts/test-catalog.config.json",
+      "tests/cli/causal-validator-selector.test.ts",
+      "tests/cli/phase-suite-promotion-gate.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0026.json",
+  "closedAt": "2026-07-26T12:33:00.854Z",
+  "closedByActor": "claude-004-skl-0026-captain",
+  "sessionId": "session-20260725152729-claude-004-skl-0026-captain-TASK-SKL-0026-6b105cd680",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c778a76b8c2b0f6c8461bfb47713662c81cb8393",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/phase-suite.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "packages/core/src/evidence/validation-contract.ts",
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/causal-validator-selector.test.ts",
+      "tests/cli/phase-suite-promotion-gate.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0026.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0026/2026-07-25T15-26-47-135Z-import-09661eaf70eb.json",
+      ".atm/history/task-events/TASK-SKL-0026/2026-07-25T15-27-29-344Z-reserve-82855316d84e.json",
+      ".atm/history/task-events/TASK-SKL-0026/2026-07-25T15-27-29-346Z-promote-e9c4fd699627.json",
+      ".atm/history/task-events/TASK-SKL-0026/2026-07-25T15-27-36-948Z-claim-9d6456f159fc.json",
+      ".atm/history/task-events/TASK-SKL-0026/2026-07-26T01-08-53-753Z-scope-amendment-046555fe51b6.json",
+      ".atm/history/tasks/TASK-SKL-0026.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

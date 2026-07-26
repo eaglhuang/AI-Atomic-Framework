@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-SKL-0026",
   "title": "Causal validator selector and phase-suite scheduler",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-SKL-VG-R0.5",
   "dependencies": [
     "TASK-SKL-0023",
@@ -164,17 +164,16 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-26T01-08-53-753Z-scope-amendment-046555fe51b6",
-  "lastTransitionAt": "2026-07-26T01:08:53.753Z",
+  "lastTransitionId": "2026-07-26T12-33-00-863Z-close-861646bf411e",
+  "lastTransitionAt": "2026-07-26T12:33:00.863Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-004-skl-0026-captain",
   "reservedAt": "2026-07-25T15:27:29.344Z",
   "promotedAt": "2026-07-25T15:27:29.346Z",
   "claim": {
     "actorId": "claude-004-skl-0026-captain",
     "leaseId": "lease-1275542f9494",
     "claimedAt": "2026-07-25T15:27:29.349Z",
-    "heartbeatAt": "2026-07-25T15:27:29.349Z",
+    "heartbeatAt": "2026-07-26T12:32:23.598Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-SKL-0026.*",
@@ -191,61 +190,21 @@
       "tests/cli/causal-validator-selector.test.ts",
       "tests/cli/phase-suite-promotion-gate.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
-    "laneSession": {
-      "laneSessionId": "lane-20260725152729-claude-004-skl-0026-captain-8a3705cd14",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725152729-claude-004-skl-0026-captain-8a3705cd14\""
-    }
-  },
-  "startedAt": "2026-07-25T15:27:29.349Z",
-  "startedByActor": "claude-004-skl-0026-captain",
-  "startedBySessionId": "session-20260725152729-claude-004-skl-0026-captain-TASK-SKL-0026-6b105cd680",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
-    "taskId": "TASK-SKL-0026",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/TASK-SKL-0026.*",
-      ".atm/history/task-events/TASK-SKL-0026/**",
-      ".atm/history/tasks/TASK-SKL-0026.json",
-      "packages/cli/src/commands/batch/plan-executor.ts",
-      "packages/cli/src/commands/test-catalog.ts",
-      "packages/core/src/evidence/phase-suite.ts",
-      "packages/core/src/evidence/test-case-catalog.ts",
-      "packages/core/src/evidence/validation-contract.ts",
-      "packages/core/src/evidence/validator-lifecycle.ts",
-      "scripts/run-validators/implementation.ts",
-      "scripts/test-catalog.config.json",
-      "tests/cli/causal-validator-selector.test.ts",
-      "tests/cli/phase-suite-promotion-gate.test.ts"
-    ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0026-causal-validator-selector-and-phase-suite-scheduler.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
-      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
-      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0026-causal-validator-selector-and-phase-suite-scheduler.task.md"
-    ],
-    "allowPlanningMirror": false,
-    "promptHash": "0738ac9631f094c28fda3593c9d0ee38e43c0323b2c8f919cd1eeb0e67d473a9",
-    "actorId": "claude-004-skl-0026-captain",
-    "sessionId": null,
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260725152729-claude-004-skl-0026-captain-8a3705cd14",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260725152729-claude-004-skl-0026-captain-8a3705cd14\""
     },
-    "createdAt": "2026-07-25T15:27:36.957Z",
-    "status": "active"
-  }
+    "reason": "refresh stale claim lease + rebind owner lane to current executing lane for authorized TASK-SKL-0026 close (same actor, no ownership change)"
+  },
+  "startedAt": "2026-07-25T15:27:29.349Z",
+  "startedByActor": "claude-004-skl-0026-captain",
+  "startedBySessionId": "session-20260725152729-claude-004-skl-0026-captain-TASK-SKL-0026-6b105cd680",
+  "owner": "claude-004-skl-0026-captain",
+  "closedAt": "2026-07-26T12:33:00.861Z",
+  "closedByActor": "claude-004-skl-0026-captain",
+  "closedBySessionId": "session-20260725152729-claude-004-skl-0026-captain-TASK-SKL-0026-6b105cd680",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0026.closure-packet.json"
 }

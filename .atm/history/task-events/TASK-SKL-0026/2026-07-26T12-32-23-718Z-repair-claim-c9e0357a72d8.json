@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-26T12-32-23-718Z-repair-claim-c9e0357a72d8",
+  "taskId": "TASK-SKL-0026",
+  "action": "repair-claim",
+  "actorId": "claude-004-skl-0026-captain",
+  "sessionId": "session-20260725152729-claude-004-skl-0026-captain-TASK-SKL-0026-6b105cd680",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0026.json",
+  "taskSha256": "sha256:6a83ed4507390d16312a0789019f58f5bd744a4d40ff30e8b40e670d3b461701",
+  "createdAt": "2026-07-26T12:32:23.718Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-SKL-0026 --actor claude-004-skl-0026-captain --write --reason \"refresh stale claim lease + rebind owner lane to current executing lane for authorized TASK-SKL-0026 close (same actor, no ownership change)\" --json"
+}

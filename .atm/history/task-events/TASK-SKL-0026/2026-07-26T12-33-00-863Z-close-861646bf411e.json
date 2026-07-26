@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-26T12-33-00-863Z-close-861646bf411e",
+  "taskId": "TASK-SKL-0026",
+  "action": "close",
+  "actorId": "claude-004-skl-0026-captain",
+  "sessionId": "session-20260725152729-claude-004-skl-0026-captain-TASK-SKL-0026-6b105cd680",
+  "fromStatus": "ready",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0026.json",
+  "taskSha256": "sha256:ae81dd14e72ff6805ebdc7158eb1b4958b8759241fa829ac757e6732c1ef5277",
+  "createdAt": "2026-07-26T12:33:00.863Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0026 --actor claude-004-skl-0026-captain --status done --historical-delivery c778a76b8c2b0f6c8461bfb47713662c81cb8393",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260725152729-claude-004-skl-0026-captain-TASK-SKL-0026-6b105cd680",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0026.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/causal-validator-selector.test.ts",
+      "node --strip-types tests/cli/phase-suite-promotion-gate.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-26T12:33:00.853Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0026.*",
+        ".atm/history/task-events/TASK-SKL-0026/**",
+        ".atm/history/tasks/TASK-SKL-0026.json",
+        "packages/cli/src/commands/batch/plan-executor.ts",
+        "packages/cli/src/commands/test-catalog.ts",
+        "packages/core/src/evidence/phase-suite.ts",
+        "packages/core/src/evidence/test-case-catalog.ts",
+        "packages/core/src/evidence/validation-contract.ts",
+        "packages/core/src/evidence/validator-lifecycle.ts",
+        "scripts/run-validators/implementation.ts",
+        "scripts/test-catalog.config.json",
+        "tests/cli/causal-validator-selector.test.ts",
+        "tests/cli/phase-suite-promotion-gate.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/plan-executor.ts",
+        "packages/cli/src/commands/test-catalog.ts",
+        "packages/core/src/evidence/phase-suite.ts",
+        "packages/core/src/evidence/test-case-catalog.ts",
+        "packages/core/src/evidence/validation-contract.ts",
+        "packages/core/src/evidence/validator-lifecycle.ts",
+        "scripts/run-validators/implementation.ts",
+        "scripts/test-catalog.config.json",
+        "tests/cli/causal-validator-selector.test.ts",
+        "tests/cli/phase-suite-promotion-gate.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
