@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-SKL-0026",
+  "updatedAt": "2026-07-26T01:12:36.020Z",
+  "updatedBy": "claude-004-skl-0026-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/causal-validator-selector.test.ts",
+    "node --strip-types tests/cli/phase-suite-promotion-gate.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/causal-validator-selector.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a09b7ce5873c5278454b4e2c2a554fce39d123242482b178e8bf46f709a63d05",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/causal-validator-selector.test.ts"
+      ],
+      "generatedAt": "2026-07-26T01:12:09.141Z",
+      "startedAt": "2026-07-26T01:12:08.667Z",
+      "finishedAt": "2026-07-26T01:12:09.141Z",
+      "durationMs": 474,
+      "runnerKind": "dev-source",
+      "sourceCommit": "077df466340ea683b27f42cdd7c2e20834748ede",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/phase-suite-promotion-gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1fdcb5afcd63177aa0c5131eb13b177b51f0b0efa3579b4c162b11ea4307c378",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/phase-suite-promotion-gate.test.ts"
+      ],
+      "generatedAt": "2026-07-26T01:12:24.181Z",
+      "startedAt": "2026-07-26T01:12:23.870Z",
+      "finishedAt": "2026-07-26T01:12:24.181Z",
+      "durationMs": 311,
+      "runnerKind": "dev-source",
+      "sourceCommit": "077df466340ea683b27f42cdd7c2e20834748ede",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-26T01:12:36.019Z",
+      "startedAt": "2026-07-26T01:12:26.973Z",
+      "finishedAt": "2026-07-26T01:12:36.019Z",
+      "durationMs": 9046,
+      "runnerKind": "dev-source",
+      "sourceCommit": "077df466340ea683b27f42cdd7c2e20834748ede",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

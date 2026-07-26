@@ -1,6 +1,7 @@
 import crypto from "node:crypto"; import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, } from "node:fs"; import path from "node:path"; import { spawn, spawnSync } from "node:child_process"; import { fileURLToPath } from "node:url"; import { applyBaselineFailureSnapshot, collectBaselineFindingFingerprints, createValidatorFailureEnvelope, firstRequiredCommand, summarizeBlockingFindings,
 } from "../lib/validator-envelope.ts"; import { findDuplicateDedupeKeys, normalizeTier, readTestCatalog, selectTestEntries, type TestCatalogEntry, type TestTier, } from "../lib/test-catalog.ts"; import { buildValidationReceiptInput, readReusableValidationReceipt, writeValidationReceipt, type ValidationReceiptStatus, } from "../../packages/core/src/evidence/validation-receipt.ts";
-import { buildValidatorLifecycleSummary } from "../../packages/core/src/evidence/validator-lifecycle.ts"; import { createSealedCommitCanaryPlan, resolveValidationObligations, } from "../../packages/cli/src/commands/validation-obligations.ts"; const root = path.resolve( path.dirname(fileURLToPath(import.meta.url)), "..", "..", ); const configPath = path.join(root, "scripts", "validators.config.json");
+import { buildValidatorLifecycleSummary } from "../../packages/core/src/evidence/validator-lifecycle.ts"; import { createSealedCommitCanaryPlan, resolveValidationObligations, } from "../../packages/cli/src/commands/validation-obligations.ts";
+import { evaluateValidationContract, type ValidationContractCatalog, type ValidationContractChangeSet, type ValidationContractEvaluation, type ValidationContractEvidence, type ValidationContractTask, } from "../../packages/core/src/evidence/validation-contract.ts"; const root = path.resolve( path.dirname(fileURLToPath(import.meta.url)), "..", "..", ); const configPath = path.join(root, "scripts", "validators.config.json");
 if (!existsSync(configPath)) { throw new Error( `validators config missing: ${path.relative(root, configPath)}`, ); } const config: any = JSON.parse(readFileSync(configPath, "utf8")); const validatorMap = new Map( config.validators.map((entry: any) => [entry.name, entry]), ); const selectionFamilies = Array.isArray(config.selectionFamilies) ? config.selectionFamilies : [];
 const DEFAULT_FAST_VALIDATOR_BUDGET_MS = 10_000; const DEFAULT_SLOW_VALIDATOR_BUDGET_MS = 90_000; const VALIDATOR_RUNS_ROOT = path.join( root, ".atm", "runtime", "validator-runs", ); const runningValidatorChildren = new Set<ReturnType<typeof spawn>>(); function killChild( child: ReturnType<typeof spawn>, signal: NodeJS.Signals | number | string = "SIGTERM", ): void { if (process.platform === "win32") {
 if (child.pid) { const result = spawnSync( "taskkill", ["/F", "/T", "/PID", String(child.pid)], { stdio: "ignore" }, ); if (result.status === 0) { return; } } } try { child.kill(signal as NodeJS.Signals); } catch {} } function killAllRunningValidatorChildren(signal: NodeJS.Signals): void { for (const runningChild of runningValidatorChildren) { killChild(runningChild, signal); } } process.on("SIGINT", () => {
@@ -177,3 +178,17 @@ function buildFocusedValidatorCommand( results: readonly any[], ): string | null
 function safeFileSha256(filePath: string): string | null { try { return `sha256:${crypto.createHash("sha256").update(readFileSync(filePath)).digest("hex")}`; } catch { return null; } } function isEnvironmentFinding(finding: any): boolean { const code = String(finding?.code ?? ""); const source = String(finding?.source ?? ""); const classification = String(finding?.classification ?? ""); return (
 classification === "environment" || source === "environment" || source === "git-index" || code.startsWith("ATM_ENV_") || code.startsWith("ATM_GIT_INDEX_") ); } function isBaselineFinding(finding: any): boolean { return ( String(finding?.classification ?? "") === "baseline" || String(finding?.source ?? "") === "baseline" ); } function dedupeFindings(findings: readonly any[]): readonly any[] {
 const seen = new Set<string>(); const deduped: any[] = []; for (const finding of findings) { const key = `${finding?.code ?? ""}\0${finding?.source ?? ""}\0${finding?.detail ?? ""}\0${finding?.requiredCommand ?? ""}`; if (seen.has(key)) continue; seen.add(key); deduped.push(finding); } return deduped; } }
+
+// Runner adapter for the causal validator selector. The runner no longer
+// recomputes its own required-validator set: required-set computation is
+// delegated entirely to the single evaluateValidationContract evaluator. When
+// the evaluator has no resolvable required contract it fails closed (empty
+// required set) rather than defaulting to a full-repository run.
+export function resolveRunnerRequiredValidationContract(
+  task: ValidationContractTask,
+  changeSet: ValidationContractChangeSet,
+  catalog: ValidationContractCatalog,
+  evidence: ValidationContractEvidence = {},
+): ValidationContractEvaluation {
+  return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
