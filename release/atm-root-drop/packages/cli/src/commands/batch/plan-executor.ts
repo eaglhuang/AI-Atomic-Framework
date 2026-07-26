@@ -11,6 +11,28 @@ import {
 import { buildTelemetryObservation } from '../../../../core/src/telemetry/observation.ts';
 import { resolveActorId } from '../actor-registry.ts';
 import { CliError, makeResult, message, parseOptions } from '../shared.ts';
+import {
+  evaluateValidationContract,
+  type ValidationContractCatalog,
+  type ValidationContractChangeSet,
+  type ValidationContractEvaluation,
+  type ValidationContractEvidence,
+  type ValidationContractTask
+} from '../../../../core/src/evidence/validation-contract.ts';
+
+// Batch adapter for the causal validator selector. The batch executor no longer
+// recomputes its own required-validator set: required-set computation is
+// delegated entirely to the single evaluateValidationContract evaluator, which
+// fails closed (empty required set) rather than defaulting to a full-repository
+// run when no required contract resolves.
+export function resolveBatchRequiredValidationContract(
+  task: ValidationContractTask,
+  changeSet: ValidationContractChangeSet,
+  catalog: ValidationContractCatalog,
+  evidence: ValidationContractEvidence = {}
+): ValidationContractEvaluation {
+  return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
 
 export function runBatchExecutePlan(argv: string[]) {
   const { options } = parseOptions(stripPlanExecutorArgs(argv), 'batch');

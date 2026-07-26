@@ -3,6 +3,15 @@ import { appendPlanBatchRunEvent, planExecutorPhaseChain, readPlanBatchRunEvents
 import { buildTelemetryObservation } from '../../../../core/dist/telemetry/observation.js';
 import { resolveActorId } from '../actor-registry.js';
 import { CliError, makeResult, message, parseOptions } from '../shared.js';
+import { evaluateValidationContract } from '../../../../core/dist/evidence/validation-contract.js';
+// Batch adapter for the causal validator selector. The batch executor no longer
+// recomputes its own required-validator set: required-set computation is
+// delegated entirely to the single evaluateValidationContract evaluator, which
+// fails closed (empty required set) rather than defaulting to a full-repository
+// run when no required contract resolves.
+export function resolveBatchRequiredValidationContract(task, changeSet, catalog, evidence = {}) {
+    return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
 export function runBatchExecutePlan(argv) {
     const { options } = parseOptions(stripPlanExecutorArgs(argv), 'batch');
     const resolvedActor = resolveActorId(options.agent ?? undefined);
