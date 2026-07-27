@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import path from 'node:path';
 import { CliError, makeResult, message } from './shared.ts';
 import { validateStrictPathHeuristic } from './tasks/task-import-validators.ts';
-import { createTeamShadowWorkspaceProviderPlan } from './team/shadow-workspace.ts';
+import { createTeamProposalWorkspaceProviderPlan } from './team/proposal-workspace.ts';
 import { findActiveTaskQueue, type TaskDirectionTask } from './task-direction.ts';
 import { readActiveBatchRun, type BatchRunRecord } from './work-channels.ts';
 import {
@@ -119,7 +119,7 @@ type WaveExecutor = 'auto' | 'local-lanes' | 'editor-subagents' | 'team-agents' 
 export interface TeamWaveRuntimeLane {
   readonly taskId: string;
   readonly laneSessionId: string;
-  readonly workspace: ReturnType<typeof createTeamShadowWorkspaceProviderPlan>;
+  readonly workspace: ReturnType<typeof createTeamProposalWorkspaceProviderPlan>;
   readonly workerCanCommitOrClose: false;
   readonly allowedReturnSchemas: readonly ['atm.patchEnvelope.v1', 'atm.teamWorkerReport.v1'];
 }
@@ -265,7 +265,10 @@ export function buildManifestRuntimeRecordFromBatch(input: {
     lanes: workerExecution.lanes.map((lane) => ({
       taskId: lane.taskId,
       laneSessionId: lane.laneSessionId,
-      workspace: createTeamShadowWorkspaceProviderPlan({ baseCommit: manifest.sealedBaseSha ?? 'HEAD' }),
+      workspace: createTeamProposalWorkspaceProviderPlan({
+        baseCommit: manifest.sealedBaseSha ?? 'HEAD',
+        declaredFiles: manifest.tasks.flatMap((task) => task.scopePaths)
+      }),
       workerCanCommitOrClose: false,
       allowedReturnSchemas: ['atm.patchEnvelope.v1', 'atm.teamWorkerReport.v1']
     })),

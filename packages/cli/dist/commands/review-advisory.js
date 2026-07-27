@@ -3,7 +3,32 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { attachStandardsSpecReviewReceipt, appendMachineFindings, createStubReviewAdvisoryReport, createUnavailableAdvisoryReport, normalizeProviderPayload } from '../../../plugin-review-advisory/dist/index.js';
+import { evaluateValidationContract } from '../../../core/dist/evidence/validation-contract.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
+// TASK-SKL-0029 — review-advisory lifecycle adapter.
+//
+// Model review stays advisory: it never selects the required set. When it needs
+// the task-required cases (e.g. to scope its candidate), it delegates to the one
+// evaluateValidationContract evaluator instead of deriving its own.
+export function resolveReviewAdvisoryValidationContract(task, changeSet, catalog, evidence = {}) {
+    return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
+/**
+ * A candidate change invalidates every TDD, review, and required-case receipt
+ * whose recorded candidate digest no longer matches the current candidate. This
+ * keeps stale green/review receipts from surviving a source change under them.
+ */
+export function invalidateReceiptsForCandidateChange(input) {
+    return input.receipts
+        .filter((receipt) => receipt.candidateDigest !== input.candidateDigest)
+        .map((receipt) => ({
+        kind: receipt.kind,
+        caseId: receipt.caseId,
+        reason: 'candidate-digest-changed',
+        recordedDigest: receipt.candidateDigest,
+        currentDigest: input.candidateDigest
+    }));
+}
 export function runReviewAdvisory(argv) {
     const { options } = parseReviewAdvisoryOptions(argv);
     const reportId = options.reportId || `review-advisory.${Date.now()}`;

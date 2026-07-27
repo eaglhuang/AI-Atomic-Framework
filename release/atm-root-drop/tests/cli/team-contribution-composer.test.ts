@@ -12,9 +12,9 @@ import {
 const baseCommit = 'abc123base';
 const contextManifestDigest = `sha256:${'a'.repeat(64)}`;
 
-function manifest(role: string, changedFiles: readonly string[]) {
+function manifest(role: string, changedFiles: readonly string[], taskId = 'ATM-GOV-0136') {
   return createTeamContributionManifest({
-    taskId: 'ATM-GOV-0136',
+    taskId,
     role,
     workerId: `worker-${role}`,
     baseCommit,
@@ -87,6 +87,41 @@ assert.equal(bundle.failClosed, true);
 assert.equal(bundle.scopeAmendment.required, true);
 assert.equal(bundle.scopeAmendment.candidateFiles.includes('packages/core/src/team-runtime/foreign.ts'), true);
 assert.equal(bundle.targetRepo.stageFiles.includes('packages/core/src/team-runtime/foreign.ts'), true);
+
+const disjointSameFile = composeTeamContributionManifests({
+  taskId: 'ATM-GOV-0248',
+  baseCommit,
+  declaredScope: ['packages/cli/src/commands/team/proposal-workspace.ts'],
+  contributions: [
+    {
+      manifest: manifest('implementer-a', ['packages/cli/src/commands/team/proposal-workspace.ts'], 'ATM-GOV-0248'),
+      files: [{ path: 'packages/cli/src/commands/team/proposal-workspace.ts', sha256: `sha256:${'9'.repeat(64)}` }]
+    },
+    {
+      manifest: manifest('implementer-b', ['packages/cli/src/commands/team/proposal-workspace.ts'], 'ATM-GOV-0248'),
+      files: [{ path: 'packages/cli/src/commands/team/proposal-workspace.ts', sha256: `sha256:${'9'.repeat(64)}` }]
+    }
+  ]
+});
+assert.equal(disjointSameFile.failClosed, false);
+assert.equal(disjointSameFile.finalTree.files[0].contributionIds.length, 2);
+
+const overlappingSameFile = composeTeamContributionManifests({
+  taskId: 'ATM-GOV-0248',
+  baseCommit,
+  declaredScope: ['packages/cli/src/commands/team/proposal-workspace.ts'],
+  contributions: [
+    {
+      manifest: manifest('implementer-a', ['packages/cli/src/commands/team/proposal-workspace.ts'], 'ATM-GOV-0248'),
+      files: [{ path: 'packages/cli/src/commands/team/proposal-workspace.ts', sha256: `sha256:${'a'.repeat(64)}` }]
+    },
+    {
+      manifest: manifest('implementer-b', ['packages/cli/src/commands/team/proposal-workspace.ts'], 'ATM-GOV-0248'),
+      files: [{ path: 'packages/cli/src/commands/team/proposal-workspace.ts', sha256: `sha256:${'b'.repeat(64)}` }]
+    }
+  ]
+});
+assert.equal(overlappingSameFile.failClosed, true);
 
 console.log('[team-contribution-composer] ok');
 

@@ -307,6 +307,30 @@ errorCodes:
     `extractionCandidates` receives the advisory diagnostic
     `ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE` (warning-only).
 
+## Validation Contract Lifecycle
+
+Author cards so one validation contract drives the whole lifecycle. Evidence run,
+auto-evidence, pre-close, write-readiness, and the advisory review consume the
+single `evaluateValidationContract` selector — a card must never ask an adapter
+to derive its own required set or recompute freshness.
+
+- **Selected-case execution.** The contract's `requiredTestCaseIds` /
+  `testContributions` are the exact cases evidence runs; declare them precisely
+  so only the task-impact cases run per card and broader integration, milestone,
+  plan, or release groups run at their `phaseTestCaseIds` phase owner.
+- **Zero-test / fail-closed.** A required case that exits zero without executing
+  its declared assertions is a zero-test failure, not a pass. A card with
+  acceptance or impact edges but no resolvable required case fails closed on
+  import; keep the contract resolvable rather than leaning on a full-suite run.
+- **Candidate freshness.** Because a candidate change invalidates TDD, review,
+  and required-case receipts, bind each required case to a stable `caseId` and
+  `testDigest` so a source change under a green receipt is detected.
+- **One digest, executable recovery.** The same validation-contract digest
+  threads through evidence, pre-close, close, and pre-push. When the contract is
+  missing or unresolvable, import surfaces the exact missing contract/case/group
+  fields with one executable recovery command (`tasks import --from <plan>
+  --dry-run --json`) — author the missing fields rather than waiving the gate.
+
 ## Follow-up Task Pattern
 
 When extending an existing plan, append a follow-up section to the original plan

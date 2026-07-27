@@ -14,7 +14,66 @@ import {
   createUnavailableAdvisoryReport,
   normalizeProviderPayload
 } from '../../../plugin-review-advisory/src/index.ts';
+import {
+  evaluateValidationContract,
+  type ValidationContractCatalog,
+  type ValidationContractChangeSet,
+  type ValidationContractEvaluation,
+  type ValidationContractEvidence,
+  type ValidationContractTask
+} from '../../../core/src/evidence/validation-contract.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
+
+// TASK-SKL-0029 — review-advisory lifecycle adapter.
+//
+// Model review stays advisory: it never selects the required set. When it needs
+// the task-required cases (e.g. to scope its candidate), it delegates to the one
+// evaluateValidationContract evaluator instead of deriving its own.
+export function resolveReviewAdvisoryValidationContract(
+  task: ValidationContractTask,
+  changeSet: ValidationContractChangeSet,
+  catalog: ValidationContractCatalog,
+  evidence: ValidationContractEvidence = {}
+): ValidationContractEvaluation {
+  return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
+
+export type LifecycleReceiptKind = 'tdd' | 'review' | 'required-case';
+
+export interface LifecycleReceiptRef {
+  readonly kind: LifecycleReceiptKind;
+  readonly caseId: string;
+  /** The candidate digest recorded when this receipt was produced. */
+  readonly candidateDigest: string;
+}
+
+export interface LifecycleReceiptInvalidation {
+  readonly kind: LifecycleReceiptKind;
+  readonly caseId: string;
+  readonly reason: 'candidate-digest-changed';
+  readonly recordedDigest: string;
+  readonly currentDigest: string;
+}
+
+/**
+ * A candidate change invalidates every TDD, review, and required-case receipt
+ * whose recorded candidate digest no longer matches the current candidate. This
+ * keeps stale green/review receipts from surviving a source change under them.
+ */
+export function invalidateReceiptsForCandidateChange(input: {
+  readonly candidateDigest: string;
+  readonly receipts: readonly LifecycleReceiptRef[];
+}): readonly LifecycleReceiptInvalidation[] {
+  return input.receipts
+    .filter((receipt) => receipt.candidateDigest !== input.candidateDigest)
+    .map((receipt) => ({
+      kind: receipt.kind,
+      caseId: receipt.caseId,
+      reason: 'candidate-digest-changed' as const,
+      recordedDigest: receipt.candidateDigest,
+      currentDigest: input.candidateDigest
+    }));
+}
 
 interface ReviewAdvisoryOptions {
   cwd: string;

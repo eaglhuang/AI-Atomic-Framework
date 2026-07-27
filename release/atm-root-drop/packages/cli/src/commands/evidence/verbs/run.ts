@@ -7,6 +7,14 @@ import {
   type TddPhase,
   type TddPhaseReceipt
 } from '../../../../../core/src/evidence/tdd-cycle.ts';
+import {
+  evaluateValidationContract,
+  type ValidationContractCatalog,
+  type ValidationContractChangeSet,
+  type ValidationContractEvaluation,
+  type ValidationContractEvidence,
+  type ValidationContractTask
+} from '../../../../../core/src/evidence/validation-contract.ts';
 import { CliError, makeResult, message } from '../../shared.ts';
 import { runEvidenceRun as runEvidenceRunBase } from '../bundle-io.ts';
 
@@ -163,6 +171,54 @@ export function runEvidenceRun(argv: string[]) {
 }
 
 export { runEvidenceRun as run };
+
+// TASK-SKL-0029 — evidence-run lifecycle adapter.
+//
+// The evidence runner must not derive its own required-case set or recompute
+// freshness. Selection is delegated entirely to the single
+// evaluateValidationContract evaluator; the runner only executes the selected
+// case manifests and preserves their structured output. A missing required
+// contract fails closed rather than defaulting to a full-repository run.
+export function resolveEvidenceRunValidationContract(
+  task: ValidationContractTask,
+  changeSet: ValidationContractChangeSet,
+  catalog: ValidationContractCatalog,
+  evidence: ValidationContractEvidence = {}
+): ValidationContractEvaluation {
+  return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
+
+export interface SelectedCaseExecutionStep {
+  readonly caseId: string;
+  readonly command: string;
+  readonly responsibility: 'task-required' | 'phase-suite' | 'advisory';
+}
+
+export interface SelectedCaseExecutionPlan {
+  readonly failClosed: boolean;
+  readonly steps: readonly SelectedCaseExecutionStep[];
+}
+
+/**
+ * Turn a validation-contract evaluation into the ordered, structured set of
+ * case commands the evidence runner should execute. When the contract fails
+ * closed the plan is empty — the runner must never fall back to a full run.
+ */
+export function planSelectedCaseExecution(
+  evaluation: ValidationContractEvaluation
+): SelectedCaseExecutionPlan {
+  if (evaluation.failClosed) {
+    return { failClosed: true, steps: [] };
+  }
+  return {
+    failClosed: false,
+    steps: evaluation.executableManifests.map((manifest) => ({
+      caseId: manifest.caseId,
+      command: manifest.command,
+      responsibility: manifest.responsibility
+    }))
+  };
+}
 
 export function parseEvidenceTddRunOptions(argv: readonly string[]): EvidenceTddRunOptions | null {
   const values = new Map<string, string>();

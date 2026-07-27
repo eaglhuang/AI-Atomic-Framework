@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { createTeamContextManifest, type TeamContextManifest } from '../../../../core/src/team-runtime/context-manifest.ts';
 import { createTeamContributionManifest, createCleanContextReviewerReceipt, type TeamContributionManifest } from '../../../../core/src/team-runtime/contribution-manifest.ts';
 import type { TeamProviderId } from '../../../../core/src/team-runtime/provider-contract.ts';
-import type { TeamShadowWorkspaceProviderPlan } from './shadow-workspace.ts';
+import type { TeamProposalWorkspaceProviderPlan } from './proposal-workspace.ts';
 
 export type TeamWorkGroup = {
   readonly groupId: string;
@@ -35,7 +35,7 @@ export type TeamShadowSchedule = {
   readonly rosterFingerprint: TeamRosterFingerprint;
   readonly dagStreamingReadyGroups: readonly string[];
   readonly reviewerLane: TeamReviewerLane | null;
-  readonly workspaceProvider: TeamShadowWorkspaceProviderPlan | null;
+  readonly workspaceProvider: TeamProposalWorkspaceProviderPlan | null;
 };
 
 export type TeamReservation = {
@@ -92,7 +92,7 @@ export function createTeamShadowSchedule(input: {
   readonly acceptanceCriteria: readonly string[];
   readonly promptCachePolicy?: 'stable-prefix-preferred' | 'cache-disabled';
   readonly cleanContextReviewer?: boolean;
-  readonly workspaceProvider?: TeamShadowWorkspaceProviderPlan | null;
+  readonly workspaceProvider?: TeamProposalWorkspaceProviderPlan | null;
 }): TeamShadowSchedule {
   const collapsedGroups = collapseNonIndependentGroups(input.workGroups);
   const reservations = collapsedGroups.map((group) => createReservation(input, group));

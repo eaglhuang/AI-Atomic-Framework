@@ -1,6 +1,7 @@
 import { sha256Digest, type SharedWriteGateCoverage } from '../census/index.ts';
 
 export * from './lifecycle-receipts.ts';
+export * from './runner-discrimination.ts';
 
 export type ReplayFailureClass =
   | 'stale-current-allowed-task'

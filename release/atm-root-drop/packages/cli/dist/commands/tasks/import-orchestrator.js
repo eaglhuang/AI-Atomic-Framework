@@ -8,6 +8,7 @@ import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from '../planning
 import { assertRunnerFreshForWriteAction } from '../framework-development.js';
 import { assertEmergencyApproval } from '../emergency/gate.js';
 import { buildExtractionFirstPatrolDiagnostics, extractFrontMatter, normalizeTaskCausalGraphContract, parseAcceptanceEvidenceMap, validateCausalValidatorContractImport, validateDeliverablesList } from './task-import-validators.js';
+import { buildContractImportRecoveryManifest } from './contract-import-recovery.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
 import { classifyForceImportAdmission } from './import-validation.js';
@@ -160,6 +161,10 @@ export async function runTasksImport(argv) {
         }
     }
     const causalFrontmatter = extractFrontMatter(planText)?.data ?? null;
+    // TASK-SKL-0029 — when a single card fails its validation contract, carry the
+    // executable recovery manifest (missing contract/case/group fields + one
+    // dry-run recovery command) into the structured import failure below.
+    let contractRecovery = null;
     if (parsed.tasks.length === 1) {
         const task = parsed.tasks[0];
         const causalValidation = validateCausalValidatorContractImport({
@@ -167,6 +172,11 @@ export async function runTasksImport(argv) {
             validators: task.validators ?? [],
             acceptance: task.acceptance ?? [],
             causalImpactEdges: normalizeTaskCausalGraphContract(causalFrontmatter?.causalGraph ?? causalFrontmatter?.causal_graph).causalImpactEdges
+        });
+        contractRecovery = buildContractImportRecoveryManifest({
+            validation: causalValidation,
+            taskId: task.workItemId,
+            planPath: toStoredPlanningPath(options.cwd, planAbsolute)
         });
         for (const diagnostic of causalValidation.diagnostics) {
             if (diagnostic.severity === 'error') {
@@ -282,7 +292,16 @@ export async function runTasksImport(argv) {
             exitCode: 1,
             details: {
                 diagnostics: parsed.diagnostics,
-                planPath: relativePathFrom(options.cwd, planAbsolute)
+                planPath: relativePathFrom(options.cwd, planAbsolute),
+                ...(contractRecovery?.failClosed
+                    ? {
+                        contractRecovery: {
+                            failClosed: contractRecovery.failClosed,
+                            missing: contractRecovery.missing,
+                            recoveryCommand: contractRecovery.recoveryCommand
+                        }
+                    }
+                    : {})
             }
         });
     }

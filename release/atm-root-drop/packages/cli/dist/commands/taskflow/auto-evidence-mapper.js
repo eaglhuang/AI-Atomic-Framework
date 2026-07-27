@@ -25,6 +25,31 @@
  * touch the filesystem. `taskflow.ts` wires it to the current package.json
  * before calling `executeAutoEvidencePlan`.
  */
+import { evaluateValidationContract } from '../../../../core/dist/evidence/validation-contract.js';
+// TASK-SKL-0029 — auto-evidence lifecycle adapter.
+//
+// Auto-evidence must map only the cases the validation contract selected; it
+// must not compute its own required set. Selection is delegated to the single
+// evaluateValidationContract evaluator, then each selected case's declared
+// command is passed through mapAutoEvidenceCommand for shape normalization.
+// A missing required contract fails closed (no cases) rather than mapping the
+// full repository suite.
+export function resolveAutoEvidenceValidationContract(task, changeSet, catalog, evidence = {}) {
+    return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
+/**
+ * Map the validation-contract selected cases into concrete auto-evidence
+ * commands. Fails closed to an empty mapping list when the contract is missing.
+ */
+export function mapAutoEvidenceSelectedCases(evaluation, packageJson) {
+    if (evaluation.failClosed)
+        return [];
+    return evaluation.executableManifests.map((manifest) => ({
+        caseId: manifest.caseId,
+        responsibility: manifest.responsibility,
+        mapping: mapAutoEvidenceCommand(manifest.command, packageJson)
+    }));
+}
 const NODE_STRIP_TYPES_RE = /^node\s+--strip-types\s+scripts\/([A-Za-z0-9_.-]+)\.ts(\s+.*)?$/;
 const ATM_PSEUDO_SUBCOMMAND_RE = /^node\s+atm\.mjs\s+([A-Za-z0-9_.:-]+)\s+--json$/;
 function normalizeInvocation(raw) {

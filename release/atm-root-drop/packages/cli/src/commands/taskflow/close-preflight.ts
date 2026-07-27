@@ -2,6 +2,19 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
+import {
+  evaluateValidationContract,
+  type ValidationContractCatalog,
+  type ValidationContractChangeSet,
+  type ValidationContractEvaluation,
+  type ValidationContractEvidence,
+  type ValidationContractTask
+} from '../../../../core/src/evidence/validation-contract.ts';
+import {
+  evaluatePhaseSuitePromotion,
+  type PhaseSuitePromotionInput,
+  type PhaseSuitePromotionReport
+} from '../../../../core/src/evidence/phase-suite.ts';
 import { inspectStandardsSpecReviewReceipt, type ReviewAdvisoryReport } from '../../../../plugin-review-advisory/src/index.ts';
 import { detectHistoricalDeliveryCommit } from '../tasks/historical-delivery.ts';
 import { ATM_INDEX_FOREIGN_ACTIVE_STAGED } from '../git-index-ownership.ts';
@@ -341,6 +354,138 @@ export function selectPreCloseLineBudgetTouchedFiles(input: {
 
 export function buildPlanningDeliveryRequiredCommand(taskId: string, actorId: string): string {
   return `node atm.mjs taskflow close --task ${taskId} --actor ${quoteCliValue(actorId || '<actor>')} --historical-delivery <commit> --write --json`;
+}
+
+// ─── TASK-SKL-0029: atm.validator-review-lifecycle-gate ─────────────────────
+//
+// Pre-close consumes the one validation contract instead of deriving its own
+// required set or recomputing freshness. It fails closed on unresolved required
+// cases, zero-test results, and stale phase ownership, while advisory checks
+// remain non-blocking. The contract digest it seals here is the same digest the
+// evidence run, close packet, and pre-push guard thread through the lifecycle.
+
+export function resolveClosePreflightValidationContract(
+  task: ValidationContractTask,
+  changeSet: ValidationContractChangeSet,
+  catalog: ValidationContractCatalog,
+  evidence: ValidationContractEvidence = {}
+): ValidationContractEvaluation {
+  return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
+
+/**
+ * Deterministic digest of a validation-contract evaluation. Evidence run,
+ * pre-close, close packet, and pre-push must all recompute the identical digest
+ * from the same evaluation so a card cannot silently change its required set,
+ * freshness, or phase ownership between stages.
+ */
+export function validationContractDigest(evaluation: ValidationContractEvaluation): string {
+  const stable = JSON.stringify({
+    evaluatorId: evaluation.evaluatorId,
+    failClosed: evaluation.failClosed,
+    requiredCaseIds: [...evaluation.requiredCaseIds].sort((a, b) => a.localeCompare(b)),
+    phaseCaseIds: [...evaluation.phaseCaseIds].sort((a, b) => a.localeCompare(b)),
+    advisoryCaseIds: [...evaluation.advisoryCaseIds].sort((a, b) => a.localeCompare(b)),
+    phaseOwners: [...evaluation.phaseOwners]
+      .map((entry) => ({ phase: entry.phase, caseIds: [...entry.caseIds].sort((a, b) => a.localeCompare(b)) }))
+      .sort((a, b) => a.phase.localeCompare(b.phase)),
+    freshness: [...evaluation.freshnessInputs]
+      .map((entry) => ({ caseId: entry.caseId, status: entry.status }))
+      .sort((a, b) => a.caseId.localeCompare(b.caseId))
+  });
+  return `validation-contract:${createHash('sha256').update(stable).digest('hex').slice(0, 16)}`;
+}
+
+export interface ValidatorReviewLifecycleRequiredReceipt {
+  readonly caseId: string;
+  readonly status: 'passed' | 'failed' | 'missing' | 'stale';
+  readonly executedCaseCount: number;
+}
+
+export interface ValidatorReviewLifecycleGateInput {
+  readonly evaluation: ValidationContractEvaluation;
+  readonly requiredReceipts?: readonly ValidatorReviewLifecycleRequiredReceipt[];
+  readonly phaseSuite?: PhaseSuitePromotionInput;
+}
+
+export interface ValidatorReviewLifecycleGateBlocker {
+  readonly code: string;
+  readonly reason: string;
+  readonly caseIds: readonly string[];
+}
+
+export interface ValidatorReviewLifecycleGateReport {
+  readonly ok: boolean;
+  readonly failClosed: boolean;
+  readonly contractDigest: string;
+  readonly blockers: readonly ValidatorReviewLifecycleGateBlocker[];
+  readonly phaseReport: PhaseSuitePromotionReport | null;
+}
+
+/**
+ * The fail-closed pre-close gate. Blocks on unresolved required cases, zero-test
+ * results, and stale phase ownership; advisory selections never block.
+ */
+export function evaluateValidatorReviewLifecycleGate(
+  input: ValidatorReviewLifecycleGateInput
+): ValidatorReviewLifecycleGateReport {
+  const evaluation = input.evaluation;
+  const contractDigest = validationContractDigest(evaluation);
+  const blockers: ValidatorReviewLifecycleGateBlocker[] = [];
+
+  // (1) A missing required contract fails closed — never default to a full run.
+  if (evaluation.failClosed) {
+    blockers.push({
+      code: 'ATM_VALIDATION_CONTRACT_MISSING_REQUIRED_SET',
+      reason: 'validation contract is missing a task-required set; pre-close fails closed instead of running the full repository',
+      caseIds: []
+    });
+    return { ok: false, failClosed: true, contractDigest, blockers, phaseReport: null };
+  }
+
+  const requiredIds = new Set(evaluation.requiredCaseIds);
+
+  // (2) Required cases whose freshness is not fresh are unresolved.
+  const unresolved = evaluation.freshnessInputs
+    .filter((entry) => requiredIds.has(entry.caseId) && entry.status !== 'fresh')
+    .map((entry) => entry.caseId);
+  if (unresolved.length > 0) {
+    blockers.push({
+      code: 'ATM_CLOSE_PRECHECK_REQUIRED_CASE_UNRESOLVED',
+      reason: `required validation cases are missing, stale, or failed: ${unresolved.join(', ')}`,
+      caseIds: unresolved
+    });
+  }
+
+  // (3) Zero-test: a required case whose receipt executed no cases.
+  const receiptById = new Map((input.requiredReceipts ?? []).map((entry) => [entry.caseId, entry]));
+  const zeroTest = [...requiredIds].filter((caseId) => {
+    const receipt = receiptById.get(caseId);
+    return receipt !== undefined && receipt.status === 'passed' && receipt.executedCaseCount <= 0;
+  });
+  if (zeroTest.length > 0) {
+    blockers.push({
+      code: 'ATM_CLOSE_PRECHECK_ZERO_TEST_RESULT',
+      reason: `required validation cases reported success without executing any case: ${zeroTest.join(', ')}`,
+      caseIds: zeroTest
+    });
+  }
+
+  // (4) Stale phase ownership via the single phase-suite evaluator.
+  let phaseReport: PhaseSuitePromotionReport | null = null;
+  if (input.phaseSuite) {
+    phaseReport = evaluatePhaseSuitePromotion(input.phaseSuite);
+    const staleBlockers = phaseReport.blockers.filter((entry) => entry.reason === 'stale');
+    if (staleBlockers.length > 0) {
+      blockers.push({
+        code: 'ATM_CLOSE_PRECHECK_STALE_PHASE_OWNERSHIP',
+        reason: `phase-suite ownership is stale for: ${staleBlockers.map((entry) => entry.caseId).join(', ')}`,
+        caseIds: staleBlockers.map((entry) => entry.caseId)
+      });
+    }
+  }
+
+  return { ok: blockers.length === 0, failClosed: false, contractDigest, blockers, phaseReport };
 }
 
 export { preflightBlockersToWriteReadinessBlockers };

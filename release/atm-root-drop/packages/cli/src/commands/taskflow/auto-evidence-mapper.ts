@@ -26,8 +26,56 @@
  * before calling `executeAutoEvidencePlan`.
  */
 
+import {
+  evaluateValidationContract,
+  type ValidationContractCatalog,
+  type ValidationContractChangeSet,
+  type ValidationContractEvaluation,
+  type ValidationContractEvidence,
+  type ValidationContractTask
+} from '../../../../core/src/evidence/validation-contract.ts';
+
 export interface PackageJsonLike {
   readonly scripts?: Record<string, string>;
+}
+
+// TASK-SKL-0029 — auto-evidence lifecycle adapter.
+//
+// Auto-evidence must map only the cases the validation contract selected; it
+// must not compute its own required set. Selection is delegated to the single
+// evaluateValidationContract evaluator, then each selected case's declared
+// command is passed through mapAutoEvidenceCommand for shape normalization.
+// A missing required contract fails closed (no cases) rather than mapping the
+// full repository suite.
+export function resolveAutoEvidenceValidationContract(
+  task: ValidationContractTask,
+  changeSet: ValidationContractChangeSet,
+  catalog: ValidationContractCatalog,
+  evidence: ValidationContractEvidence = {}
+): ValidationContractEvaluation {
+  return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
+
+export interface AutoEvidenceSelectedMapping {
+  readonly caseId: string;
+  readonly responsibility: 'task-required' | 'phase-suite' | 'advisory';
+  readonly mapping: AutoEvidenceCommandMapping;
+}
+
+/**
+ * Map the validation-contract selected cases into concrete auto-evidence
+ * commands. Fails closed to an empty mapping list when the contract is missing.
+ */
+export function mapAutoEvidenceSelectedCases(
+  evaluation: ValidationContractEvaluation,
+  packageJson: PackageJsonLike | null | undefined
+): readonly AutoEvidenceSelectedMapping[] {
+  if (evaluation.failClosed) return [];
+  return evaluation.executableManifests.map((manifest) => ({
+    caseId: manifest.caseId,
+    responsibility: manifest.responsibility,
+    mapping: mapAutoEvidenceCommand(manifest.command, packageJson)
+  }));
 }
 
 export interface AutoEvidenceCommandMapping {

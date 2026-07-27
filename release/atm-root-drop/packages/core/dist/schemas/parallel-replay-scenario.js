@@ -1,1 +1,1 @@
-export { buildParallelReplayScenario, evaluateParallelReplayScenario } from '../broker/replay/index.js';
+export { buildParallelReplayScenario, evaluateParallelReplayScenario, sealRunnerIdentity, digestRunnerContent, sealDiscriminationScenario, deriveProbeCounters, classifyProbeVerdict, buildRunnerProbeReceipt, evaluateRedGreenDiscrimination, validateRedGreenDiscriminationSummary } from '../broker/replay/index.js';

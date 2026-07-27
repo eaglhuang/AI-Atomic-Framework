@@ -1,3 +1,4 @@
+import { evaluateValidationContract } from '../../../../core/dist/evidence/validation-contract.js';
 import { resolveActorWorkSession } from '../actor-session.js';
 import { evaluateTaskDoneCloseAdmission } from '../tasks/lifecycle-state.js';
 import { detectHistoricalDeliveryCommit, inspectHistoricalDelivery } from '../tasks/historical-delivery.js';
@@ -5,6 +6,15 @@ import { evaluateTaskflowBranchCommitQueueGate } from './branch-commit-queue-gat
 import { evaluateTaskflowBrokerConflictGate } from './broker-gate.js';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { quoteCliValue } from '../shared.js';
+// TASK-SKL-0029 — write-readiness lifecycle adapter.
+//
+// Write-readiness must not recompute a task's required-case set or freshness; it
+// delegates selection to the single evaluateValidationContract evaluator so the
+// readiness hint reports the same required set that evidence, pre-close, close,
+// and pre-push observe. A missing required contract fails closed.
+export function resolveWriteReadinessValidationContract(task, changeSet, catalog, evidence = {}) {
+    return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
 const SHARED_DELIVERY_WAIVER_BLOCKER_CODES = new Set([
     'ATM_TASKFLOW_CLOSE_OUT_OF_SCOPE_WAIVER_REQUIRED',
     'ATM_TASKFLOW_PRECLOSE_MIXED_DELIVERY_COMMIT',

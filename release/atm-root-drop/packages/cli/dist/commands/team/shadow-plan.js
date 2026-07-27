@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createTeamShadowSchedule } from './scheduler.js';
-import { createTeamShadowWorkspaceProviderPlan } from './shadow-workspace.js';
+import { createTeamProposalWorkspaceProviderPlan } from './proposal-workspace.js';
 export function buildTeamShadowScheduleForPlan(input) {
     const taskId = String(input.task?.workItemId ?? input.task?.taskId ?? 'unknown-task');
     const workGroups = buildShadowWorkGroups(input.recipe, input.writePaths);
@@ -29,7 +29,11 @@ export function buildTeamShadowScheduleForPlan(input) {
         quotaProbeDigest,
         acceptanceCriteria,
         cleanContextReviewer: true,
-        workspaceProvider: createTeamShadowWorkspaceProviderPlan({ baseCommit })
+        workspaceProvider: createTeamProposalWorkspaceProviderPlan({
+            repoRoot: input.cwd,
+            baseCommit,
+            declaredFiles: input.writePaths
+        })
     });
 }
 function buildShadowWorkGroups(recipe, writePaths) {

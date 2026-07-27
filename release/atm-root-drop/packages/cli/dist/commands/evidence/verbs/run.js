@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { evaluateTddPhaseReceipt } from '../../../../../core/dist/evidence/tdd-cycle.js';
+import { evaluateValidationContract } from '../../../../../core/dist/evidence/validation-contract.js';
 import { CliError, makeResult, message } from '../../shared.js';
 import { runEvidenceRun as runEvidenceRunBase } from '../bundle-io.js';
 const TDD_FLAG_KEYS = new Set([
@@ -131,6 +132,34 @@ export function runEvidenceRun(argv) {
     });
 }
 export { runEvidenceRun as run };
+// TASK-SKL-0029 — evidence-run lifecycle adapter.
+//
+// The evidence runner must not derive its own required-case set or recompute
+// freshness. Selection is delegated entirely to the single
+// evaluateValidationContract evaluator; the runner only executes the selected
+// case manifests and preserves their structured output. A missing required
+// contract fails closed rather than defaulting to a full-repository run.
+export function resolveEvidenceRunValidationContract(task, changeSet, catalog, evidence = {}) {
+    return evaluateValidationContract(task, changeSet, catalog, evidence);
+}
+/**
+ * Turn a validation-contract evaluation into the ordered, structured set of
+ * case commands the evidence runner should execute. When the contract fails
+ * closed the plan is empty — the runner must never fall back to a full run.
+ */
+export function planSelectedCaseExecution(evaluation) {
+    if (evaluation.failClosed) {
+        return { failClosed: true, steps: [] };
+    }
+    return {
+        failClosed: false,
+        steps: evaluation.executableManifests.map((manifest) => ({
+            caseId: manifest.caseId,
+            command: manifest.command,
+            responsibility: manifest.responsibility
+        }))
+    };
+}
 export function parseEvidenceTddRunOptions(argv) {
     const values = new Map();
     for (let i = 0; i < argv.length; i++) {
