@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-27-244",
+  "date": "2026-07-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in ATM-GOV-0266 (pending delivery)",
+  "area": "Governance",
+  "finding": "`tasks block` can leave one staged ledger plus block-event pair for each of several parked cards. While an unrelated framework task has an active claim, `git record-commit` rejects even one exact parked-card pair as out-of-claim staging. Releasing the active recovery task just to persist those records can make its uncommitted source WIP unowned again, creating a lifecycle serialization deadlock.",
+  "expectedBehavior": "A narrow record-only path must persist exactly one complete `blocked`/`released` task's ledger and matching block event while another framework claim remains active. It must reject mixed tasks, source, evidence, close/release records, incomplete pairs, and any mutation of the active task's source bundle.",
+  "evidenceOrRepro": "ATM-GOV-0266 recovery after parking TASK-SKL-0029, ATM-GOV-0248, and ATM-GOV-0240. After exact index re-batching, `node atm.mjs git record-commit --actor claude-004-skl-0029-captain ...` failed with `ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS`; its `outOfScopeStagedFiles` was the exact TASK-SKL-0029 ledger/block pair because ATM-GOV-0266 remained active.",
+  "followUp": "ATM-GOV-0266 owns the repair: add an active-claim-safe blocked lifecycle record bridge in git-governance plus focused `git-record-commit` regressions. Verify one pair succeeds without staging active-claim source and all non-block/mixed-task payloads fail closed."
+}

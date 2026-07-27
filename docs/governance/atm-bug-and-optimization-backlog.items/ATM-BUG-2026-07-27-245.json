@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-27-245",
+  "date": "2026-07-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Task import fidelity",
+  "finding": "A planning-side scope amendment for an already imported, actively claimed task can only replace the ledger via `tasks import --write --force`. ATM classifies that same-task, source-hash-verified re-import as protected emergency work requiring a human emergency approval lease, even when it only adds declared implementation and test paths.",
+  "expectedBehavior": "Provide a normal governed amendment/re-import route that verifies the planning revision, preserves the existing actor, claim, lane, direction lock history, and audit trail, and applies an additive scope change without an emergency bypass. Destructive replacement or ownership-changing amendments should remain protected.",
+  "evidenceOrRepro": "ATM-GOV-0266 planning amendment at 3KLife commit a57f54b7. `tasks import --write` wrote zero files because the source hash differed. `tasks import --write --force` returned `ATM_EMERGENCY_LANE_APPROVAL_REQUIRED` with permission `backend.tasks.import.write`, although the amendment only adds the lifecycle-record bridge and canonical error-code registry scope.",
+  "followUp": "Create an import-fidelity task: define additive-versus-destructive amendment classification, add a claim-preserving `tasks amend` or re-import path, and test same-task additive scope updates, active-claim retention, audit evidence, and rejection of incompatible scope/owner changes."
+}
