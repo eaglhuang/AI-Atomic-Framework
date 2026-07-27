@@ -1,0 +1,28 @@
+{
+  "scenarioId": "temp-pair",
+  "probeArgv": [
+    "--probe"
+  ],
+  "assertion": {
+    "kind": "closure-verdict",
+    "expectedHistorical": "red",
+    "expectedCurrent": "green"
+  },
+  "thresholds": {
+    "starvationThresholdMs": 30000,
+    "thresholdSource": "paired-baseline-evidence"
+  },
+  "coverage": {
+    "surface": "runner-discrimination"
+  },
+  "workload": {
+    "probe": "json-verdict"
+  },
+  "sealed": {
+    "assertionDigest": "sha256:13f9de6fb4133cfd02a782f3c635dffe4690a6c5ef25f75ece23f4e358415ed7",
+    "thresholdDigest": "sha256:5368a30fcf80b8fb3e5bbd7882ed9c399961a86e6ec1b8b2763f0ca70b18ad7f",
+    "coverageDigest": "sha256:e4b52e9cc02db62e9980de3726d75b5a66da23adf19f50922665b620c4ec7d7d",
+    "workloadDigest": "sha256:2841808b5c0b1775d02ff69650755aecb936c9d3cca5aa56639751507dd10e37",
+    "scenarioDigest": "sha256:6fe135dd7100c68d5c37b814f93b69a56dfeacb8f3ab4d58db702d7a8c4525eb"
+  }
+}

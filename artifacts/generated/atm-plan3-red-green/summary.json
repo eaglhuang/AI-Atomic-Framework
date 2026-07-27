@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.runnerRedGreenDiscriminationSummary.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-07-26T16:25:48.221Z",
+  "scenario": {
+    "schemaId": "atm.runnerDiscriminationScenario.v1",
+    "specVersion": "0.1.0",
+    "scenarioId": "temp-pair",
+    "probeArgv": [
+      "--probe"
+    ],
+    "assertionDigest": "sha256:13f9de6fb4133cfd02a782f3c635dffe4690a6c5ef25f75ece23f4e358415ed7",
+    "thresholdDigest": "sha256:5368a30fcf80b8fb3e5bbd7882ed9c399961a86e6ec1b8b2763f0ca70b18ad7f",
+    "coverageDigest": "sha256:e4b52e9cc02db62e9980de3726d75b5a66da23adf19f50922665b620c4ec7d7d",
+    "workloadDigest": "sha256:2841808b5c0b1775d02ff69650755aecb936c9d3cca5aa56639751507dd10e37",
+    "scenarioDigest": "sha256:6fe135dd7100c68d5c37b814f93b69a56dfeacb8f3ab4d58db702d7a8c4525eb"
+  },
+  "historical": {
+    "schemaId": "atm.runnerProbeReceipt.v1",
+    "role": "historical",
+    "runner": {
+      "schemaId": "atm.sealedRunnerIdentity.v1",
+      "role": "historical",
+      "entrypoint": "../AppData/Local/Temp/atm-red-green-JzTT61/old.mjs",
+      "digest": "sha256:8596d5b66a52f0d21c75c9269f9b473b928262c9f27582c2ac92a218152f42a5",
+      "commitSha": "1111111111111111111111111111111111111111",
+      "available": true
+    },
+    "scenarioDigest": "sha256:6fe135dd7100c68d5c37b814f93b69a56dfeacb8f3ab4d58db702d7a8c4525eb",
+    "command": "C:\\Program Files\\nodejs\\node.exe C:\\Users\\User\\AppData\\Local\\Temp\\atm-red-green-JzTT61\\old.mjs --probe",
+    "exitCode": 1,
+    "stdoutDigest": "sha256:af1c98cb4b68c7b771a259a3be13addcf025125bf836a7ed85a55d88f3dbe183",
+    "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "executed": true,
+    "counters": {
+      "failureExitCount": 1,
+      "remainOpenCount": 1,
+      "readyToCloseCount": 0,
+      "blockerCount": 1,
+      "passCount": 0,
+      "failCount": 1,
+      "stderrSignalCount": 0,
+      "staleAuthorizationCount": 1
+    },
+    "verdict": "red",
+    "reason": "probe output exposed one or more failure counters"
+  },
+  "current": {
+    "schemaId": "atm.runnerProbeReceipt.v1",
+    "role": "current",
+    "runner": {
+      "schemaId": "atm.sealedRunnerIdentity.v1",
+      "role": "current",
+      "entrypoint": "../AppData/Local/Temp/atm-red-green-JzTT61/new.mjs",
+      "digest": "sha256:097fb0ac4b40f065c2c46bd6846baa55b8a976012a7b03a68fc7b77c36121b68",
+      "commitSha": "2222222222222222222222222222222222222222",
+      "available": true
+    },
+    "scenarioDigest": "sha256:6fe135dd7100c68d5c37b814f93b69a56dfeacb8f3ab4d58db702d7a8c4525eb",
+    "command": "C:\\Program Files\\nodejs\\node.exe C:\\Users\\User\\AppData\\Local\\Temp\\atm-red-green-JzTT61\\new.mjs --probe",
+    "exitCode": 0,
+    "stdoutDigest": "sha256:533197c7b511aabcb0aea60f93ca0843994fa8e0d84a7ec5c99707c3b0a7d811",
+    "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "executed": true,
+    "counters": {
+      "failureExitCount": 0,
+      "remainOpenCount": 0,
+      "readyToCloseCount": 1,
+      "blockerCount": 0,
+      "passCount": 1,
+      "failCount": 0,
+      "stderrSignalCount": 0,
+      "staleAuthorizationCount": 0
+    },
+    "verdict": "green",
+    "reason": "probe output cleared without failure counters"
+  },
+  "discrimination": "red-green",
+  "reason": "historical runner is red and current runner is green on the same scenarioDigest",
+  "digest": "sha256:f1cceddac115434cde8b50c39c254e4353fe80eb34544d8d31f2d7b907f8c4c6"
+}

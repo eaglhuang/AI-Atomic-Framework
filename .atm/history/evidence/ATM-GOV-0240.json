@@ -1,0 +1,200 @@
+{
+  "taskId": "ATM-GOV-0240",
+  "updatedAt": "2026-07-26T16:26:06.184Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-003-plan31-0240",
+      "sessionId": "session-20260726161847-cursor-003-plan31-0240-ATM-GOV-0240-fed859d74a",
+      "createdAt": "2026-07-26T16:25:48.274Z",
+      "details": {
+        "actorId": "cursor-003-plan31-0240",
+        "sessionId": "session-20260726161847-cursor-003-plan31-0240-ATM-GOV-0240-fed859d74a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker.parallel-replay",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:17edb0f45f15604416e480267a0c0defb64f133e9d8b1fcbc6067a8082293f68",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-26T16:25:45.749Z",
+            "finishedAt": "2026-07-26T16:25:48.272Z",
+            "durationMs": 2523,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f85eca8b41127234203f5a303eb811dc4bf6ade4",
+            "cacheKey": "sha256:516598a81125dbef17a9c0e19b2e59c9b1d7c2c35ab7ef9e8efe962e6c3fdf88",
+            "generatedAt": "2026-07-26T16:25:48.272Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:516598a81125dbef17a9c0e19b2e59c9b1d7c2c35ab7ef9e8efe962e6c3fdf88",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-26T16:25:48.272Z",
+              "observedAt": "2026-07-26T16:25:48.272Z",
+              "startedAt": "2026-07-26T16:25:45.749Z",
+              "finishedAt": "2026-07-26T16:25:48.272Z",
+              "durationMs": 2523,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:e72f3c153bf90814f5561cf2784d87991009099e75153922df439bf222112fdc",
+              "outputDigest": "sha256:1de3a97e8543afdbac9b7f2396df93df615b49987df2a051f061bea63bb54c92",
+              "cache": {
+                "key": "sha256:516598a81125dbef17a9c0e19b2e59c9b1d7c2c35ab7ef9e8efe962e6c3fdf88",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f85eca8b41127234203f5a303eb811dc4bf6ade4",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:90598f11f68b340dfb54aafab3db922705b7005e47b58c4da1d89d1c1bae1568",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-003-plan31-0240",
+      "sessionId": "session-20260726161847-cursor-003-plan31-0240-ATM-GOV-0240-fed859d74a",
+      "createdAt": "2026-07-26T16:26:06.184Z",
+      "details": {
+        "actorId": "cursor-003-plan31-0240",
+        "sessionId": "session-20260726161847-cursor-003-plan31-0240-ATM-GOV-0240-fed859d74a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker.parallel-replay",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e0bbca4144a58ba8a1e1fdc9937b41f854580d603f5eba6600580f58494bf241",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-26T16:26:05.740Z",
+            "finishedAt": "2026-07-26T16:26:06.183Z",
+            "durationMs": 443,
+            "cached": false,
+            "validators": [
+              "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "f85eca8b41127234203f5a303eb811dc4bf6ade4",
+            "cacheKey": "sha256:7a1b617d2e1cabad3516cff7c699832192a6c5c87e09fbdadd91078d1a6fea03",
+            "generatedAt": "2026-07-26T16:26:06.183Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7a1b617d2e1cabad3516cff7c699832192a6c5c87e09fbdadd91078d1a6fea03",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-26T16:26:06.183Z",
+              "observedAt": "2026-07-26T16:26:06.183Z",
+              "startedAt": "2026-07-26T16:26:05.740Z",
+              "finishedAt": "2026-07-26T16:26:06.183Z",
+              "durationMs": 443,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:a0ada00680c3029c160b7dc7fa04167febb1af6d73111e2bc3c3bc9c666b7055",
+              "outputDigest": "sha256:587f26ec5a14f9b38ee0107ee7ff0cd736cd4f0db92b567c45d8e9fdd2140dc8",
+              "cache": {
+                "key": "sha256:7a1b617d2e1cabad3516cff7c699832192a6c5c87e09fbdadd91078d1a6fea03",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "f85eca8b41127234203f5a303eb811dc4bf6ade4",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4097059b4e7346de695d10be43563b2c848ee8fcbf4dcc88f116d7e46f708287",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

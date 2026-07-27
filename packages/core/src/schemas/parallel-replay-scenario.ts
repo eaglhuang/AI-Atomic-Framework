@@ -7,5 +7,21 @@ export {
   type ParallelReplayScenarioFailureShape,
   type ParallelReplayScenarioInput,
   type ParallelReplayThresholds,
-  type ReplayFailureClass
+  type ReplayFailureClass,
+  sealRunnerIdentity,
+  digestRunnerContent,
+  sealDiscriminationScenario,
+  deriveProbeCounters,
+  classifyProbeVerdict,
+  buildRunnerProbeReceipt,
+  evaluateRedGreenDiscrimination,
+  validateRedGreenDiscriminationSummary,
+  type SealedRunnerIdentity,
+  type DiscriminationScenarioSeal,
+  type DiscriminationScenarioInput,
+  type RunnerProbeReceipt,
+  type RedGreenDiscriminationSummary,
+  type RunnerRole,
+  type RunnerProbeVerdict,
+  type RedGreenDiscriminationVerdict
 } from '../broker/replay/index.ts';

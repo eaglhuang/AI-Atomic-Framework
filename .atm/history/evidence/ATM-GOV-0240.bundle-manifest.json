@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0240",
+  "updatedAt": "2026-07-26T16:26:06.184Z",
+  "updatedBy": "cursor-003-plan31-0240",
+  "freshValidationPasses": [
+    "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
+    "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:17edb0f45f15604416e480267a0c0defb64f133e9d8b1fcbc6067a8082293f68",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts"
+      ],
+      "generatedAt": "2026-07-26T16:25:48.272Z",
+      "startedAt": "2026-07-26T16:25:45.749Z",
+      "finishedAt": "2026-07-26T16:25:48.272Z",
+      "durationMs": 2523,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f85eca8b41127234203f5a303eb811dc4bf6ade4",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e0bbca4144a58ba8a1e1fdc9937b41f854580d603f5eba6600580f58494bf241",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate"
+      ],
+      "generatedAt": "2026-07-26T16:26:06.183Z",
+      "startedAt": "2026-07-26T16:26:05.740Z",
+      "finishedAt": "2026-07-26T16:26:06.183Z",
+      "durationMs": 443,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f85eca8b41127234203f5a303eb811dc4bf6ade4",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
