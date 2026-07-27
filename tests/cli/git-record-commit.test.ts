@@ -310,6 +310,22 @@ function writeJson(filePath: string, value: unknown) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+function runFrozenAtmJson(repo: string, args: string[]) {
+  const atmEntrypoint = path.resolve('atm.mjs');
+  const stdout = execFileSync(process.execPath, [atmEntrypoint, ...args], {
+    cwd: path.resolve('.'),
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    env: {
+      ...process.env,
+      ATM_GIT_NAME: 'Record Actor',
+      ATM_GIT_EMAIL: 'record-actor@example.invalid'
+    }
+  });
+  void repo;
+  return JSON.parse(stdout) as Record<string, unknown>;
+}
+
 async function expectRecordCommitBlocked(repo: string, expectedCode: string) {
   let caught: unknown = null;
   try {
@@ -365,6 +381,21 @@ try {
   ]);
   assert.equal(dryRun.ok, true);
   assert.equal((dryRun.evidence as Record<string, unknown>).action, 'record-commit');
+
+  const frozenDryRun = runFrozenAtmJson(repo, [
+    'git',
+    'record-commit',
+    '--cwd',
+    repo,
+    '--actor',
+    'record-actor',
+    '--message',
+    'atm: frozen record fixture',
+    '--dry-run',
+    '--json'
+  ]);
+  assert.equal(frozenDryRun.ok, true);
+  assert.equal((frozenDryRun.evidence as Record<string, unknown>).action, 'record-commit');
 
   const commitResult = await runAtmGit([
     'record-commit',

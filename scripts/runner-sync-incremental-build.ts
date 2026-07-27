@@ -3,6 +3,21 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
+import {
+  attestRunnerSyncPublication,
+  finalizeRunnerSyncPublication,
+  reconcileRunnerSyncSession,
+  recordRunnerSyncBuild,
+  startRunnerSyncSession,
+  type ChildReceipt,
+  type CoalescedGroupManifest,
+  type RunnerSyncSessionPhase,
+  type RunnerSyncSessionState
+} from '../packages/core/src/broker/runner-sync-session.ts';
+import {
+  RUNNER_INPUT_GRAPH_SCHEMA,
+  type RunnerInputGraph
+} from '../packages/core/src/broker/runner-version-contract.ts';
 import type { BuildDecision, BuildTarget, SealedBuildTimings } from './run-sealed-runner-build.ts';
 
 const releaseManifestPaths = [
@@ -100,6 +115,33 @@ export type RunnerSyncReceipt = {
   };
   readonly stewardWorkId: string;
   readonly sealedSourceSha: string;
+  readonly memberTaskIds: readonly string[];
+  readonly groupManifest: CoalescedGroupManifest;
+  readonly childReceipts: readonly ChildReceipt[];
+  readonly childAttribution: {
+    readonly schemaId: 'atm.runnerSyncChildAttribution.v1';
+    readonly complete: boolean;
+    readonly members: readonly {
+      readonly taskId: string;
+      readonly actorId: string;
+      readonly laneFingerprint: string | null;
+      readonly childReceiptDigest: string | null;
+    }[];
+    readonly missingTaskIds: readonly string[];
+  };
+  readonly lifecycle: {
+    readonly schemaId: 'atm.runnerSyncReceiptLifecycle.v1';
+    readonly durableStates: readonly RunnerSyncSessionPhase[];
+    readonly provisionalState: 'built-provisional';
+    readonly publicationReadyState: 'publication-ready';
+    readonly terminalState: 'published' | 'reconciled';
+    readonly releasePhase: RunnerSyncSessionPhase;
+    readonly reconcilePhase: RunnerSyncSessionPhase;
+    readonly finalizable: boolean;
+    readonly recoveryCommand: string | null;
+  };
+  readonly runnerInputTreeHash: string;
+  readonly runnerInputGraph: RunnerInputGraph;
   readonly requestedSurfaces: readonly string[];
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
@@ -330,6 +372,21 @@ export function buildRunnerSyncReceipt(input: {
     throw new Error('ATM_RUNNER_SYNC_RECEIPT_INVALID: queue-head task and steward work id are required to publish a runner-sync receipt.');
   }
   const brokerTicket = input.brokerTicket ?? normalizeBrokerTicket(input.admission);
+  const runnerInputGraph = buildReceiptRunnerInputGraph(input.sealedSourceSha, input.buildInputsTreeHash, input.admission.runnerSyncSteward?.requestedSurfaces ?? []);
+  const session = buildReceiptSession({
+    admission: input.admission,
+    stewardWorkId,
+    sealedSourceSha: input.sealedSourceSha,
+    runnerInputTreeHash: input.buildInputsTreeHash,
+    runnerInputGraph,
+    sharedOutputDigest: digestJson({
+      buildTarget: input.buildTarget,
+      buildInputsTreeHash: input.buildInputsTreeHash,
+      buildDecision: input.buildDecision,
+      requestedSurfaces: input.admission.runnerSyncSteward?.requestedSurfaces ?? []
+    }),
+    issuedAt: input.publishedAt ?? new Date().toISOString()
+  });
   return {
     schemaId: 'atm.runnerSyncReceipt.v1',
     specVersion: '0.1.0',
@@ -341,6 +398,23 @@ export function buildRunnerSyncReceipt(input: {
     },
     stewardWorkId,
     sealedSourceSha: input.sealedSourceSha,
+    memberTaskIds: session.release.state.groupManifest.memberTaskIds,
+    groupManifest: session.release.state.groupManifest,
+    childReceipts: session.release.state.childReceipts,
+    childAttribution: buildChildAttribution(session.release.state),
+    lifecycle: {
+      schemaId: 'atm.runnerSyncReceiptLifecycle.v1',
+      durableStates: ['building', 'built-provisional', 'publication-ready', 'published', 'reconciled'],
+      provisionalState: 'built-provisional',
+      publicationReadyState: 'publication-ready',
+      terminalState: session.reconcile.state.phase === 'reconciled' ? 'reconciled' : 'published',
+      releasePhase: session.release.state.phase,
+      reconcilePhase: session.reconcile.state.phase,
+      finalizable: session.release.allowed && session.release.state.phase === 'published' && session.reconcile.allowed,
+      recoveryCommand: session.release.recoveryCommand ?? session.reconcile.recoveryCommand
+    },
+    runnerInputTreeHash: input.buildInputsTreeHash,
+    runnerInputGraph,
     requestedSurfaces: [...input.admission.runnerSyncSteward?.requestedSurfaces ?? []].sort(),
     buildTarget: input.buildTarget,
     buildInputsTreeHash: input.buildInputsTreeHash,
@@ -382,6 +456,83 @@ export function buildRunnerSyncReceipt(input: {
       tsBuildCacheDigest: input.tsBuildCache ? digestJson(input.tsBuildCache) : null
     },
     publishedAt: input.publishedAt ?? new Date().toISOString()
+  };
+}
+
+function buildReceiptSession(input: {
+  readonly admission: RunnerSyncAdmissionReport;
+  readonly stewardWorkId: string;
+  readonly sealedSourceSha: string;
+  readonly runnerInputTreeHash: string;
+  readonly runnerInputGraph: RunnerInputGraph;
+  readonly sharedOutputDigest: string;
+  readonly issuedAt: string;
+}) {
+  const ports = { now: () => input.issuedAt };
+  const members = (input.admission.runnerSyncSteward?.requests ?? []).map((request) => ({
+    taskId: request.taskId,
+    actorId: request.actorId,
+    laneSessionId: null,
+    requestedSurfaces: request.requestedSurfaces
+  }));
+  const started = startRunnerSyncSession({
+    stewardWorkId: input.stewardWorkId,
+    sealedSourceSha: input.sealedSourceSha,
+    members,
+    sharedSealedInputDigest: input.runnerInputTreeHash
+  }, ports);
+  if (!started.allowed) throw new Error(`ATM_RUNNER_SYNC_RECEIPT_INVALID: ${started.reason}`);
+  const recorded = recordRunnerSyncBuild(started.state, {
+    sharedOutputDigest: input.sharedOutputDigest,
+    inputGraph: input.runnerInputGraph
+  }, ports);
+  if (!recorded.allowed) throw new Error(`ATM_RUNNER_SYNC_RECEIPT_INVALID: ${recorded.reason}`);
+  const attested = attestRunnerSyncPublication(recorded.state, ports);
+  if (!attested.allowed) throw new Error(`ATM_RUNNER_SYNC_RECEIPT_INVALID: ${attested.reason}`);
+  const release = finalizeRunnerSyncPublication(attested.state, {
+    currentHead: input.sealedSourceSha,
+    headDeltaPaths: []
+  }, ports);
+  if (!release.allowed) throw new Error(`ATM_RUNNER_SYNC_RECEIPT_INVALID: ${release.reason}`);
+  const reconcile = reconcileRunnerSyncSession(recorded.state, {
+    currentHead: input.sealedSourceSha,
+    headDeltaPaths: []
+  }, ports);
+  return { release, reconcile };
+}
+
+function buildChildAttribution(session: RunnerSyncSessionState): RunnerSyncReceipt['childAttribution'] {
+  const receiptsByTask = new Map(session.childReceipts.map((receipt) => [receipt.taskId, receipt]));
+  const missingTaskIds = session.groupManifest.memberTaskIds.filter((taskId) => !receiptsByTask.has(taskId));
+  return {
+    schemaId: 'atm.runnerSyncChildAttribution.v1',
+    complete: missingTaskIds.length === 0 && session.groupManifest.memberTaskIds.length > 0,
+    members: session.groupManifest.members.map((member) => ({
+      taskId: member.taskId,
+      actorId: member.actorId,
+      laneFingerprint: member.laneFingerprint,
+      childReceiptDigest: receiptsByTask.get(member.taskId)?.receiptDigest ?? null
+    })),
+    missingTaskIds
+  };
+}
+
+function buildReceiptRunnerInputGraph(
+  sealedSourceSha: string,
+  aggregateInputTreeHash: string,
+  requestedSurfaces: readonly string[]
+): RunnerInputGraph {
+  return {
+    schemaId: RUNNER_INPUT_GRAPH_SCHEMA,
+    sealedSourceSha,
+    aggregateInputTreeHash,
+    nodes: [{
+      segment: 'packages',
+      inputPaths: [...buildInputPaths].sort(),
+      inputDigest: aggregateInputTreeHash,
+      outputEntries: [...requestedSurfaces].sort(),
+      outputDigest: digestJson({ sealedSourceSha, aggregateInputTreeHash, requestedSurfaces: [...requestedSurfaces].sort() })
+    }]
   };
 }
 

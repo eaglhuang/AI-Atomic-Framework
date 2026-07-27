@@ -1,4 +1,10 @@
 import assert from 'node:assert/strict';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {
+  enqueueRunnerSyncStewardRequest
+} from '../../packages/core/src/broker/runner-sync-steward-queue.ts';
 import {
   startRunnerSyncSession,
   renewRunnerSyncSession,
@@ -17,6 +23,8 @@ import {
   type RunnerInputGraph,
   type RunnerInputGraphNode
 } from '../../packages/core/src/broker/runner-version-contract.ts';
+import { validateRunnerSyncReleaseReceipt } from '../../packages/cli/src/commands/broker/steward-queues.ts';
+import { buildRunnerSyncReceipt } from '../../scripts/runner-sync-incremental-build.ts';
 
 // Deterministic clock helper.
 function fixedPorts(iso: string): SessionPorts {
@@ -96,5 +104,138 @@ assert.equal(finalized.state.phase, 'published');
 // Group state (member attribution) survives publication.
 assert.deepEqual([...finalized.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
 assert.equal(finalized.childReceipts.length, 3);
+
+// 6. Production receipt wiring: one coalesced group receipt carries every
+//    member id, child attribution, runner-input digest, and finalizable lifecycle.
+{
+  let queue = enqueueRunnerSyncStewardRequest(null, {
+    taskId: 'ATM-GOV-0240',
+    actorId: 'captain',
+    sealedSourceSha: SEAL,
+    requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+    createdAt: '2026-07-27T08:00:00.000Z',
+    heartbeatAt: '2026-07-27T08:00:00.000Z'
+  }).queue;
+  queue = enqueueRunnerSyncStewardRequest(queue, {
+    taskId: 'ATM-GOV-0248',
+    actorId: 'captain',
+    sealedSourceSha: SEAL,
+    requestedSurfaces: ['release/atm-root-drop'],
+    createdAt: '2026-07-27T08:00:01.000Z',
+    heartbeatAt: '2026-07-27T08:00:01.000Z'
+  }).queue;
+  const queued = enqueueRunnerSyncStewardRequest(queue, {
+    taskId: 'TASK-SKL-0029',
+    actorId: 'captain',
+    sealedSourceSha: SEAL,
+    requestedSurfaces: ['packages/cli/dist'],
+    createdAt: '2026-07-27T08:00:02.000Z',
+    heartbeatAt: '2026-07-27T08:00:02.000Z'
+  });
+  const group = queued.queue.groups[0]!;
+  const admission = {
+    schemaId: 'atm.runnerSyncAdmission.v1',
+    ok: true,
+    stewardActorId: 'captain',
+    sealedSourceSha: SEAL,
+    actorAuthority: { ok: true },
+    runnerSyncSteward: {
+      stewardWorkId: group.stewardWorkId,
+      queuePosition: 1,
+      suggestedNextAction: group.suggestedNextAction,
+      requestedSurfaces: group.requestedSurfaces,
+      waitingTasks: group.waitingTasks,
+      requests: group.requests.map((request) => ({
+        taskId: request.taskId,
+        actorId: request.actorId,
+        requestedSurfaces: request.requestedSurfaces
+      }))
+    },
+    queueHeadOwnership: {
+      ok: true,
+      stewardWorkId: group.stewardWorkId,
+      queuePosition: 1,
+      queueHeadHealth: 'task-active',
+      waitingTasks: group.waitingTasks,
+      ownerActorIds: ['captain'],
+      reason: null,
+      cleanupCommand: null
+    },
+    foreignNonReleaseWip: [],
+    foreignBuildInputConflicts: [],
+    releaseWip: [],
+    ordinaryTaskReleaseAutoStageAllowed: false,
+    brokerTicket: null,
+    requiredCommand: null
+  } as any;
+  const receipt = buildRunnerSyncReceipt({
+    admission,
+    actorId: 'captain',
+    sealedSourceSha: SEAL,
+    buildTarget: 'full',
+    buildInputsTreeHash: INPUT_DIGEST,
+    buildDecision: 'built',
+    decisionReason: 'fixture',
+    timings: {
+      startedAt: 0,
+      inputHashCalculationMs: 1,
+      skipDecisionMs: 1,
+      worktreeSetupMs: 1,
+      typescriptBuildMs: 1,
+      rootDropAssemblyMs: 1,
+      onefileAssemblyMs: 1,
+      artifactSyncMs: 1,
+      cleanupMs: 1,
+      totalElapsedMs: 8
+    },
+    publishedAt: '2026-07-27T08:01:00.000Z'
+  });
+  assert.deepEqual([...receipt.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
+  assert.equal(receipt.childReceipts.length, 3);
+  assert.equal(receipt.childAttribution.complete, true);
+  assert.equal(receipt.lifecycle.provisionalState, 'built-provisional');
+  assert.equal(receipt.lifecycle.publicationReadyState, 'publication-ready');
+  assert.equal(receipt.lifecycle.reconcilePhase, 'reconciled');
+  assert.equal(receipt.lifecycle.finalizable, true);
+  assert.equal(receipt.runnerInputTreeHash, INPUT_DIGEST);
+
+  const receiptRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-receipt-'));
+  validateRunnerSyncReleaseReceipt({
+    cwd: receiptRepo,
+    queue: queued.queue,
+    taskId: 'ATM-GOV-0240',
+    stewardWorkId: group.stewardWorkId,
+    receiptRef: writeTempReceipt(receiptRepo, receipt),
+    receiptDigest: null
+  });
+
+  const invalidReceipt = { ...receipt, lifecycle: { ...receipt.lifecycle, finalizable: false } };
+  assert.throws(() => validateRunnerSyncReleaseReceipt({
+    cwd: receiptRepo,
+    queue: queued.queue,
+    taskId: 'ATM-GOV-0240',
+    stewardWorkId: group.stewardWorkId,
+    receiptRef: writeTempReceipt(receiptRepo, invalidReceipt),
+    receiptDigest: null
+  }), /ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING/);
+  assert.equal(queued.queue.groups.length, 1, 'release validation failure must not clear the queue fixture');
+
+  assert.throws(() => validateRunnerSyncReleaseReceipt({
+    cwd: receiptRepo,
+    queue: { ...queued.queue, groups: [] },
+    taskId: 'ATM-GOV-0240',
+    stewardWorkId: group.stewardWorkId,
+    receiptRef: writeTempReceipt(receiptRepo, receipt),
+    receiptDigest: null
+  }), /ATM_RUNNER_SYNC_RESUME_REQUIRED/);
+}
+
+function writeTempReceipt(cwd: string, value: unknown): string {
+  const rel = `.atm/runtime/test-receipts/${Date.now()}-${Math.random().toString(16).slice(2)}.json`;
+  const absolute = path.join(cwd, rel);
+  mkdirSync(path.dirname(absolute), { recursive: true });
+  writeFileSync(absolute, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  return rel;
+}
 
 console.log('runner-sync-build-lease-heartbeat.test.ts: assertions passed');
