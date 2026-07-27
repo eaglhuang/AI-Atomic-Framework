@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-27T12-17-09-215Z-scope-amendment-f746335db82d",
+  "taskId": "ATM-GOV-0266",
+  "action": "scope-amendment",
+  "actorId": "claude-004-skl-0029-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0266.json",
+  "taskSha256": "sha256:a416ab65d902cd71d5624c95b1ff2ed536bec8bc277c9abbf40c231f64b0043b",
+  "createdAt": "2026-07-27T12:17:09.215Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0266 --actor claude-004-skl-0029-captain --add \"packages/cli/src/commands/git-governance/implementation.ts,packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts,tests/cli/git-record-commit.test.ts,docs/governance/error-code-registry.json,docs/ERROR_CODES.md,packages/core/src/error-code-registry.generated.ts\" --reason \"Repair taskDirectionLock with c3d1066c full delivery scope set (lifecycle bridge + error-code generated docs) so Phase A deliverables commit without direction-drift.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Repair taskDirectionLock with c3d1066c full delivery scope set (lifecycle bridge + error-code generated docs) so Phase A deliverables commit without direction-drift."
+  }
+}

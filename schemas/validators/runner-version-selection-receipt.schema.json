@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/validators/runner-version-selection-receipt.schema.json",
+  "title": "ATM Runner Version Selection Receipt",
+  "description": "Receipt binding a runner version requirement to a deterministic selection outcome (ATM-GOV-0266). A fail-closed selection carries a runner-sync error code and empty selected surfaces.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "requirement",
+    "selection",
+    "selectionDigest",
+    "issuedAt"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.runnerVersionSelectionReceipt.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sealedSourceSha", "requiredSurfaces"],
+      "properties": {
+        "sealedSourceSha": { "type": "string", "minLength": 1 },
+        "aggregateInputTreeHash": {
+          "type": ["string", "null"]
+        },
+        "requiredSurfaces": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "sealedSourceSha",
+        "aggregateInputTreeHash",
+        "selectedSurfaces",
+        "errorCode",
+        "reason"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "exact-seal-match",
+            "aggregate-hash-match",
+            "seal-revalidation-required",
+            "no-candidate"
+          ]
+        },
+        "sealedSourceSha": { "type": "string", "minLength": 1 },
+        "aggregateInputTreeHash": { "type": ["string", "null"] },
+        "selectedSurfaces": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "errorCode": {
+          "type": ["string", "null"],
+          "enum": [
+            "ATM_RUNNER_SYNC_SEAL_REVALIDATION_REQUIRED",
+            "ATM_RUNNER_SYNC_STEWARD_LEASE_EXPIRED",
+            "ATM_RUNNER_SYNC_RESUME_REQUIRED",
+            "ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING",
+            null
+          ]
+        },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "comment": "A matched selection has no error code and a non-empty surface set.",
+          "if": {
+            "properties": {
+              "outcome": { "enum": ["exact-seal-match", "aggregate-hash-match"] }
+            }
+          },
+          "then": {
+            "properties": {
+              "errorCode": { "type": "null" },
+              "selectedSurfaces": { "minItems": 1 }
+            }
+          }
+        },
+        {
+          "comment": "A fail-closed selection carries an error code and empty surfaces.",
+          "if": {
+            "properties": {
+              "outcome": { "enum": ["seal-revalidation-required", "no-candidate"] }
+            }
+          },
+          "then": {
+            "properties": {
+              "errorCode": { "type": "string" },
+              "selectedSurfaces": { "maxItems": 0 }
+            }
+          }
+        }
+      ]
+    },
+    "selectionDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

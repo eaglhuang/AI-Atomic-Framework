@@ -1,0 +1,245 @@
+import { createHash } from 'node:crypto';
+
+/**
+ * Runner-sync sealed-input and version/selection contract (ATM-GOV-0266 Phase A).
+ *
+ * This module owns the *data-shaped* half of the runner-sync session policy: the
+ * content-addressed sealed-input graph, the runner version requirement/selection
+ * types, and the version-selection receipt. It is pure and side-effect free; the
+ * session state machine (`runner-sync-session.ts`) composes these types into a
+ * durable lifecycle, and the registry (`runner-version-registry.ts`) indexes
+ * published versions for selection.
+ *
+ * Design intent (card acceptance): the aggregate `runnerInputTreeHash` is a
+ * *consistency summary*, not the only rebuild key. The `runnerInputGraph` maps
+ * schema-declared input segments to package/release-entry outputs with per-node
+ * input/output digests, so a runner-affecting commit after the seal can be
+ * classified against the affected graph closure rather than forcing a blind
+ * full rebuild.
+ */
+
+export const RUNNER_VERSION_SELECTION_RECEIPT_SCHEMA = 'atm.runnerVersionSelectionReceipt.v1' as const;
+export const RUNNER_INPUT_GRAPH_SCHEMA = 'atm.runnerInputGraph.v1' as const;
+
+/**
+ * Canonical runner-sync error codes declared by ATM-GOV-0266. These are modeled
+ * as named constants (INV-ATM-009: data-shaped behavior kept out of control
+ * flow). Canonical cross-cutting registration in
+ * `docs/governance/error-code-registry.json` is a scoped follow-up.
+ */
+export const RUNNER_SYNC_ERROR_CODES = {
+  sealRevalidationRequired: 'ATM_RUNNER_SYNC_SEAL_REVALIDATION_REQUIRED',
+  stewardLeaseExpired: 'ATM_RUNNER_SYNC_STEWARD_LEASE_EXPIRED',
+  resumeRequired: 'ATM_RUNNER_SYNC_RESUME_REQUIRED',
+  coalescedAttributionMissing: 'ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING'
+} as const;
+
+export type RunnerSyncErrorCode = (typeof RUNNER_SYNC_ERROR_CODES)[keyof typeof RUNNER_SYNC_ERROR_CODES];
+
+/**
+ * Schema-declared input segments. A runner-affecting change lands in exactly one
+ * segment; `nonRunnerAffecting` paths (planning, backlog docs, task ledgers) do
+ * not invalidate an otherwise-matching sealed build.
+ */
+export const RUNNER_INPUT_SEGMENTS = [
+  'packages',
+  'scripts',
+  'templates',
+  'schemas',
+  'atomicWorkbench',
+  'rootConfig'
+] as const;
+
+export type RunnerInputSegment = (typeof RUNNER_INPUT_SEGMENTS)[number];
+
+/** Prefixes / exact files that map a repo path to a runner input segment. */
+const SEGMENT_PREFIXES: readonly { readonly segment: RunnerInputSegment; readonly test: (p: string) => boolean }[] = [
+  { segment: 'packages', test: (p) => p.startsWith('packages/') },
+  { segment: 'scripts', test: (p) => p.startsWith('scripts/') },
+  { segment: 'templates', test: (p) => p.startsWith('templates/') },
+  { segment: 'schemas', test: (p) => p.startsWith('schemas/') },
+  { segment: 'atomicWorkbench', test: (p) => p.startsWith('atomic_workbench/') },
+  {
+    segment: 'rootConfig',
+    test: (p) => ['package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json'].includes(p)
+  }
+];
+
+export interface RunnerInputGraphNode {
+  readonly segment: RunnerInputSegment;
+  /** Sorted repo-relative input paths contributing to this segment. */
+  readonly inputPaths: readonly string[];
+  /** Digest of the segment's input content. */
+  readonly inputDigest: string;
+  /** Sorted package dirs / release-entry outputs produced from this segment. */
+  readonly outputEntries: readonly string[];
+  /** Digest of the segment's produced outputs. */
+  readonly outputDigest: string;
+}
+
+export interface RunnerInputGraph {
+  readonly schemaId: typeof RUNNER_INPUT_GRAPH_SCHEMA;
+  readonly sealedSourceSha: string;
+  readonly nodes: readonly RunnerInputGraphNode[];
+  /** Consistency summary over all node input digests; not the only rebuild key. */
+  readonly aggregateInputTreeHash: string;
+}
+
+export interface RunnerVersionRequirement {
+  readonly sealedSourceSha: string;
+  /** Optional: require a specific aggregate input tree hash (strict match). */
+  readonly aggregateInputTreeHash?: string | null;
+  /** Surfaces the consumer needs the runner to have published. */
+  readonly requiredSurfaces: readonly string[];
+}
+
+export type RunnerVersionSelectionOutcome =
+  | 'exact-seal-match'
+  | 'aggregate-hash-match'
+  | 'seal-revalidation-required'
+  | 'no-candidate';
+
+export interface RunnerVersionSelection {
+  readonly outcome: RunnerVersionSelectionOutcome;
+  readonly sealedSourceSha: string;
+  readonly aggregateInputTreeHash: string | null;
+  readonly selectedSurfaces: readonly string[];
+  readonly errorCode: RunnerSyncErrorCode | null;
+  readonly reason: string;
+}
+
+export interface RunnerVersionSelectionReceipt {
+  readonly schemaId: typeof RUNNER_VERSION_SELECTION_RECEIPT_SCHEMA;
+  readonly specVersion: '0.1.0';
+  readonly requirement: RunnerVersionRequirement;
+  readonly selection: RunnerVersionSelection;
+  readonly selectionDigest: string;
+  readonly issuedAt: string;
+}
+
+export interface RunnerAffectingClassification {
+  readonly runnerAffecting: readonly string[];
+  readonly nonRunnerAffecting: readonly string[];
+  readonly affectedSegments: readonly RunnerInputSegment[];
+}
+
+/** Map a single repo-relative path to its runner input segment, or null. */
+export function classifyRunnerPathSegment(path: string): RunnerInputSegment | null {
+  const normalized = normalizePath(path);
+  if (!normalized) return null;
+  for (const entry of SEGMENT_PREFIXES) {
+    if (entry.test(normalized)) return entry.segment;
+  }
+  return null;
+}
+
+/**
+ * Classify a set of changed paths into runner-affecting vs non-runner-affecting.
+ * A commit that changes only non-runner paths (planning, backlog docs, `.atm`
+ * ledgers) may advance HEAD without invalidating a matching sealed build.
+ */
+export function classifyRunnerAffectingPaths(paths: readonly string[]): RunnerAffectingClassification {
+  const runnerAffecting: string[] = [];
+  const nonRunnerAffecting: string[] = [];
+  const segments = new Set<RunnerInputSegment>();
+  for (const raw of paths) {
+    const normalized = normalizePath(raw);
+    if (!normalized) continue;
+    const segment = classifyRunnerPathSegment(normalized);
+    if (segment) {
+      runnerAffecting.push(normalized);
+      segments.add(segment);
+    } else {
+      nonRunnerAffecting.push(normalized);
+    }
+  }
+  return {
+    runnerAffecting: sortedUnique(runnerAffecting),
+    nonRunnerAffecting: sortedUnique(nonRunnerAffecting),
+    affectedSegments: [...segments].sort((a, b) => a.localeCompare(b))
+  };
+}
+
+export interface SealContinuityInput {
+  readonly graph: RunnerInputGraph;
+  /** Paths changed between the sealed source and the current HEAD. */
+  readonly headDeltaPaths: readonly string[];
+}
+
+export interface SealContinuityResult {
+  readonly continuous: boolean;
+  readonly revalidationRequired: boolean;
+  readonly errorCode: RunnerSyncErrorCode | null;
+  /** Graph node segments whose closure must be rebuilt+revalidated. */
+  readonly affectedClosure: readonly RunnerInputSegment[];
+  readonly reason: string;
+}
+
+/**
+ * Decide whether a sealed build remains valid against the current HEAD. A
+ * non-runner-affecting delta is continuous (reuse). A runner-affecting delta
+ * returns the affected graph closure and fails closed with
+ * `ATM_RUNNER_SYNC_SEAL_REVALIDATION_REQUIRED` — never publish a runner
+ * assembled from mixed input generations.
+ */
+export function evaluateSealContinuity(input: SealContinuityInput): SealContinuityResult {
+  const classification = classifyRunnerAffectingPaths(input.headDeltaPaths);
+  if (classification.runnerAffecting.length === 0) {
+    return {
+      continuous: true,
+      revalidationRequired: false,
+      errorCode: null,
+      affectedClosure: [],
+      reason:
+        classification.nonRunnerAffecting.length === 0
+          ? 'HEAD matches the sealed source; no delta.'
+          : 'HEAD delta touches only non-runner-affecting paths; sealed build remains valid.'
+    };
+  }
+  const knownSegments = new Set(input.graph.nodes.map((node) => node.segment));
+  const affectedClosure = classification.affectedSegments.filter((segment) => knownSegments.has(segment));
+  const hasUngraphedOwner = classification.affectedSegments.some((segment) => !knownSegments.has(segment));
+  return {
+    continuous: false,
+    revalidationRequired: true,
+    errorCode: RUNNER_SYNC_ERROR_CODES.sealRevalidationRequired,
+    affectedClosure,
+    reason: hasUngraphedOwner
+      ? 'Runner-affecting delta has no valid input-graph owner; full graph refresh + rebuild required before publish.'
+      : `Runner-affecting delta in segment(s) ${affectedClosure.join(', ')}; rebuild only the affected closure and regenerate the aggregate manifest.`
+  };
+}
+
+export function computeAggregateInputTreeHash(nodes: readonly RunnerInputGraphNode[]): string {
+  const ordered = [...nodes]
+    .sort((a, b) => a.segment.localeCompare(b.segment))
+    .map((node) => ({ segment: node.segment, inputDigest: node.inputDigest, outputDigest: node.outputDigest }));
+  return `sha256:${createHash('sha256').update(JSON.stringify(ordered)).digest('hex')}`;
+}
+
+export function buildRunnerVersionSelectionReceipt(
+  requirement: RunnerVersionRequirement,
+  selection: RunnerVersionSelection,
+  issuedAt: string
+): RunnerVersionSelectionReceipt {
+  const core = {
+    schemaId: RUNNER_VERSION_SELECTION_RECEIPT_SCHEMA,
+    specVersion: '0.1.0' as const,
+    requirement: {
+      ...requirement,
+      requiredSurfaces: sortedUnique(requirement.requiredSurfaces),
+      aggregateInputTreeHash: requirement.aggregateInputTreeHash ?? null
+    },
+    selection: { ...selection, selectedSurfaces: sortedUnique(selection.selectedSurfaces) }
+  };
+  const selectionDigest = `sha256:${createHash('sha256').update(JSON.stringify(core)).digest('hex')}`;
+  return { ...core, selectionDigest, issuedAt };
+}
+
+export function sortedUnique(values: readonly string[]): readonly string[] {
+  return [...new Set(values.map((v) => normalizePath(v)).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+export function normalizePath(value: string): string {
+  return String(value ?? '').trim().replace(/\\/g, '/').replace(/^\.\//, '');
+}
