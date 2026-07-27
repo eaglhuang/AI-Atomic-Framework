@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-27T06-11-50-646Z-scope-amendment-5b33f058dda3",
+  "taskId": "TASK-SKL-0029",
+  "action": "scope-amendment",
+  "actorId": "claude-004-skl-0029-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0029.json",
+  "taskSha256": "sha256:3bc5cd4db4c4d1791cfdbe04bb7ef09c68797d8467e8b2597ff8ab7332dd14b0",
+  "createdAt": "2026-07-27T06:11:50.646Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0029 --actor claude-004-skl-0029-captain --add \"packages/cli/src/commands/tasks/task-import-validators.ts,packages/cli/src/commands/taskflow/auto-evidence-mapper.ts,packages/cli/src/commands/taskflow/close-preflight.ts,packages/cli/src/commands/taskflow/write-readiness.ts,packages/cli/src/commands/evidence/verbs/run.ts,packages/cli/src/commands/review-advisory.ts,templates/skills/atm-evidence.skill.md,templates/skills/atm-task-card-authoring.skill.md,tests/cli/autonomous-validator-review-lifecycle.test.ts,packages/cli/src/commands/tasks/contract-import-recovery.ts,packages/cli/src/commands/tasks/import-orchestrator.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

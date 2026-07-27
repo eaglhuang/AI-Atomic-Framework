@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-26T15-23-34-262Z-repair-claim-57342737ef7b",
+  "taskId": "TASK-SKL-0029",
+  "action": "repair-claim",
+  "actorId": "claude-004-skl-0029-captain",
+  "sessionId": "session-20260726144841-claude-004-skl-0029-captain-TASK-SKL-0029-a860c21a78",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0029.json",
+  "taskSha256": "sha256:875fe9d131394775354ab28d4e2b28892a868e1a5223326d5d5f27cf41af4e2e",
+  "createdAt": "2026-07-26T15:23:34.262Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-SKL-0029 --actor claude-004-skl-0029-captain --write --reason \"Captain ruling A: lease stale during governed session; owner-preserving repair of expired-claim + stale-running + dangling-lock to resume authorized TASK-SKL-0029 delivery (no takeover/adopt/waiver)\" --json"
+}

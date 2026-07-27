@@ -1,0 +1,226 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0029",
+  "title": "Autonomous validator and review lifecycle integration",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.7",
+  "dependencies": [
+    "TASK-SKL-0021",
+    "TASK-SKL-0025",
+    "TASK-SKL-0026",
+    "TASK-SKL-0028"
+  ],
+  "acceptance": [
+    "Before integration, invoke `atm-deep-module-refactor` on evidence run, auto-evidence, pre-close, write-readiness, and review adapters. The review must prove they consume TASK-SKL-0026's validation contract rather than derive local required sets.",
+    "Import exposes exact missing contract/case/group fields and recovery.",
+    "Evidence runner executes selected case IDs and preserves structured output.",
+    "Candidate changes invalidate TDD, review and required-case receipts.",
+    "Pre-close rejects unresolved required cases, zero-test results and stale phase ownership while advisory checks remain non-blocking.",
+    "A representative captain can complete a card without step-by-step human instructions unless the card/scope/provider is genuinely invalid.",
+    "Evidence run, pre-close, close packet, and pre-push persist the same validation-contract digest. A shell command that exits zero without executing its declared assertions fails the execution contract.",
+    "Required task-impact cases run per card; broader integration, milestone, plan, and release groups run only at their declared phase owner. No adapter silently upgrades every task to a full repository suite.",
+    "Deletion tests remove duplicate freshness/required-set logic from taskflow and evidence adapters; contract unavailability fails closed with one executable recovery manifest."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/evidence/verbs/run.ts",
+    "templates/skills/atm-evidence.skill.md",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/evidence/verbs/run.ts",
+    "packages/cli/src/commands/review-advisory.ts",
+    "templates/skills/atm-evidence.skill.md",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/autonomous-validator-review-lifecycle.test.ts",
+    "npm run validate:skill-templates",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "autonomous-authoring-tdd-review-preclose-path",
+  "rollbackStrategy": "revert-commit-and-disable-vnext-lifecycle-feature-flag",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-review-lifecycle-gate",
+        "pattern": "Taskflow Policy",
+        "source": "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/evidence/verbs/run.ts",
+        "packages/cli/src/commands/review-advisory.ts",
+        "templates/skills/atm-evidence.skill.md",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0029-autonomous-validator-and-review-lifecycle-integration.task.md",
+    "sectionTitle": "TASK-SKL-0029",
+    "headingLine": 55,
+    "hash": "5114bfaff2a59bed",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0029-autonomous-validator-and-review-lifecycle-integration.task.md",
+      "planningCommitSha": "10ef055c46c4d2b888417e7e3cd2b13b6f55fb51",
+      "contentDigest": "sha256:5114bfaff2a59bed9f9c797828f6d53a25f2ff70c04d2b0f8a84f26a5ce89768",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-26T13:23:19.466Z"
+    }
+  },
+  "importedAt": "2026-07-26T13:23:19.466Z",
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.autonomous.validator.review.lifecycle.test.ts",
+      "command": "node --strip-types tests/cli/autonomous-validator-review-lifecycle.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.skill.templates",
+      "command": "npm run validate:skill-templates",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-26T16-02-22-238Z-scope-amendment-25ddee59e85e",
+  "lastTransitionAt": "2026-07-26T16:02:22.238Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-07-26T13:25:57.155Z",
+  "promotedAt": "2026-07-26T13:25:57.159Z",
+  "claim": {
+    "actorId": "claude-004-skl-0029-captain",
+    "leaseId": "lease-2bc3d4b0df0c",
+    "claimedAt": "2026-07-26T16:01:27.906Z",
+    "heartbeatAt": "2026-07-26T16:01:27.906Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0029.*",
+      ".atm/history/task-events/TASK-SKL-0029/**",
+      ".atm/history/tasks/TASK-SKL-0029.json",
+      "packages/cli/src/commands/tasks/contract-import-recovery.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260726160128-claude-004-skl-0029-captain-2939108494",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260726160128-claude-004-skl-0029-captain-2939108494\""
+    }
+  },
+  "startedAt": "2026-07-26T13:25:57.162Z",
+  "startedByActor": "claude-004-skl-0029-captain",
+  "startedBySessionId": "session-20260726160127-claude-004-skl-0029-captain-TASK-SKL-0029-82c3ce0668",
+  "owner": "claude-004-skl-0029-captain",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0029",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0029.*",
+      ".atm/history/task-events/TASK-SKL-0029/**",
+      ".atm/history/tasks/TASK-SKL-0029.json",
+      "packages/cli/src/commands/tasks/contract-import-recovery.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3ce97da910025c38e5156b7b7f6d5896733e2f0e87e7cce7b9d116054deda3b8",
+    "actorId": "claude-004-skl-0029-captain",
+    "sessionId": "session-20260726160127-claude-004-skl-0029-captain-TASK-SKL-0029-82c3ce0668",
+    "laneSession": {
+      "laneSessionId": "lane-20260726160128-claude-004-skl-0029-captain-2939108494",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260726160128-claude-004-skl-0029-captain-2939108494\""
+    },
+    "createdAt": "2026-07-26T16:01:41.637Z",
+    "status": "active"
+  }
+}

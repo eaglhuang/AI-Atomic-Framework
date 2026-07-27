@@ -1,6 +1,14 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
+import {
+  evaluateValidationContract,
+  type ValidationContractCatalog,
+  type ValidationContractChangeSet,
+  type ValidationContractEvaluation,
+  type ValidationContractEvidence,
+  type ValidationContractTask
+} from '../../../../core/src/evidence/validation-contract.ts';
 import { resolveActorWorkSession } from '../actor-session.ts';
 import { evaluateTaskDoneCloseAdmission } from '../tasks/lifecycle-state.ts';
 import { detectHistoricalDeliveryCommit, inspectHistoricalDelivery } from '../tasks/historical-delivery.ts';
@@ -16,6 +24,21 @@ export interface TaskflowCloseKnownBlocker {
   readonly requiredCommand: string | null;
   readonly files?: readonly string[];
   readonly multiTaskCloseRecipe?: string | null;
+}
+
+// TASK-SKL-0029 — write-readiness lifecycle adapter.
+//
+// Write-readiness must not recompute a task's required-case set or freshness; it
+// delegates selection to the single evaluateValidationContract evaluator so the
+// readiness hint reports the same required set that evidence, pre-close, close,
+// and pre-push observe. A missing required contract fails closed.
+export function resolveWriteReadinessValidationContract(
+  task: ValidationContractTask,
+  changeSet: ValidationContractChangeSet,
+  catalog: ValidationContractCatalog,
+  evidence: ValidationContractEvidence = {}
+): ValidationContractEvaluation {
+  return evaluateValidationContract(task, changeSet, catalog, evidence);
 }
 
 const SHARED_DELIVERY_WAIVER_BLOCKER_CODES = new Set([

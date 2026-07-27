@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-26T14-18-56-490Z-repair-claim-292f9cef8e6f",
+  "taskId": "TASK-SKL-0029",
+  "action": "repair-claim",
+  "actorId": "claude-004-skl-0029-captain",
+  "sessionId": "session-20260726132557-claude-004-skl-0029-captain-TASK-SKL-0029-4abe42e6a2",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0029.json",
+  "taskSha256": "sha256:b019ecae6ea9bd54c2205d0f5cc97af98508b6e5e62c3f1cbc5fa779b3964aff",
+  "createdAt": "2026-07-26T14:18:56.490Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-SKL-0029 --actor claude-004-skl-0029-captain --write --reason \"Captain dispatch: lease lease-ebf943acbc53 expired (1800s TTL) while broker shows 0 active intent; same-actor repair of expired-claim + stale-running + dangling-governance-lock to resume authorized TASK-SKL-0029 work\" --json"
+}

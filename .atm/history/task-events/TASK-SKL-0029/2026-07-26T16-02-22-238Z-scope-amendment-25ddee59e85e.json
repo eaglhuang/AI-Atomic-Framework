@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-26T16-02-22-238Z-scope-amendment-25ddee59e85e",
+  "taskId": "TASK-SKL-0029",
+  "action": "scope-amendment",
+  "actorId": "claude-004-skl-0029-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0029.json",
+  "taskSha256": "sha256:66638579d0cd64c46675af7970b015b939dc87445a5a49eb0cda708b7d2c1054",
+  "createdAt": "2026-07-26T16:02:22.238Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0029 --actor claude-004-skl-0029-captain --add \"packages/cli/src/commands/tasks/contract-import-recovery.ts,packages/cli/src/commands/tasks/import-orchestrator.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
