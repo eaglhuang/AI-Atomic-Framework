@@ -389,7 +389,7 @@ export function validateRunnerSyncReleaseReceipt(input: {
 
   const group = input.queue.groups.find((candidate) => candidate.stewardWorkId === input.stewardWorkId);
   if (!group) {
-    throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_NOT_FOUND: steward work ${input.stewardWorkId} is not queued.`);
+    throw new Error(`ATM_RUNNER_SYNC_RESUME_REQUIRED: steward work ${input.stewardWorkId} is not queued; do not trust an orphan autoReleaseCommand. Run node atm.mjs broker runner-sync status --json, then re-enqueue/reconcile the steward session before release.`);
   }
   const ownerRequest = group.requests.find((request) => request.taskId === input.taskId);
   if (!ownerRequest) {
@@ -408,10 +408,61 @@ export function validateRunnerSyncReleaseReceipt(input: {
   if (mismatches.length > 0) {
     throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID: receipt does not match queued runner-sync steward fields: ${mismatches.join(', ')}.`);
   }
+  validateRunnerSyncReleaseFinalizableReceipt({ receipt, group, stewardWorkId: input.stewardWorkId });
   return {
     receiptRef: receiptRef.replace(/\\/g, '/'),
     receiptDigest: digest
   };
+}
+
+function validateRunnerSyncReleaseFinalizableReceipt(input: {
+  receipt: Record<string, unknown>;
+  group: RunnerSyncStewardQueueDocument['groups'][number];
+  stewardWorkId: string;
+}): void {
+  const receipt = input.receipt;
+  const expectedMembers = normalizeReceiptStringArray(input.group.waitingTasks);
+  const memberTaskIds = normalizeReceiptStringArray(receipt.memberTaskIds);
+  const lifecycle = isRecord(receipt.lifecycle) ? receipt.lifecycle : {};
+  const childAttribution = isRecord(receipt.childAttribution) ? receipt.childAttribution : {};
+  const childReceipts = Array.isArray(receipt.childReceipts) ? receipt.childReceipts : [];
+  const groupManifest = isRecord(receipt.groupManifest) ? receipt.groupManifest : {};
+  const runnerInputGraph = isRecord(receipt.runnerInputGraph) ? receipt.runnerInputGraph : {};
+  const manifestMembers = normalizeReceiptStringArray(groupManifest.memberTaskIds);
+  const runnerInputTreeHash = typeof receipt.runnerInputTreeHash === 'string' ? receipt.runnerInputTreeHash : '';
+  const missingFields = [
+    memberTaskIds.length > 0 ? null : 'memberTaskIds',
+    childReceipts.length > 0 || childAttribution.complete === true ? null : 'childReceipts/childAttribution',
+    runnerInputTreeHash ? null : 'runnerInputTreeHash',
+    Object.keys(runnerInputGraph).length > 0 ? null : 'runnerInputGraph',
+    lifecycle.provisionalState === 'built-provisional' ? null : 'lifecycle.provisionalState',
+    lifecycle.publicationReadyState === 'publication-ready' ? null : 'lifecycle.publicationReadyState',
+    lifecycle.reconcilePhase === 'reconciled' ? null : 'lifecycle.reconcilePhase',
+    lifecycle.finalizable === true ? null : 'lifecycle.finalizable'
+  ].filter(Boolean);
+  if (missingFields.length > 0) {
+    throw new Error(`ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING: runner-sync receipt for ${input.stewardWorkId} is not finalizable (${missingFields.join(', ')}). Run ${resumeRunnerSyncCommand(input.stewardWorkId, String(receipt.sealedSourceSha ?? input.group.sealedSourceSha))}.`);
+  }
+  if (!arraysEqual(memberTaskIds, expectedMembers) || !arraysEqual(manifestMembers, expectedMembers)) {
+    throw new Error(`ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING: runner-sync receipt member attribution does not match queued group. expected=${expectedMembers.join(',')} receipt=${memberTaskIds.join(',')}. Run ${resumeRunnerSyncCommand(input.stewardWorkId, String(receipt.sealedSourceSha ?? input.group.sealedSourceSha))}.`);
+  }
+  const receiptTasks = normalizeReceiptStringArray(childReceipts.map((entry) => isRecord(entry) ? entry.taskId : null));
+  if (!arraysEqual(receiptTasks, expectedMembers)) {
+    throw new Error(`ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING: runner-sync child receipts do not cover every queued member. expected=${expectedMembers.join(',')} childReceipts=${receiptTasks.join(',')}. Run ${resumeRunnerSyncCommand(input.stewardWorkId, String(receipt.sealedSourceSha ?? input.group.sealedSourceSha))}.`);
+  }
+  const graphSeal = typeof runnerInputGraph.sealedSourceSha === 'string' ? runnerInputGraph.sealedSourceSha : '';
+  const graphTreeHash = typeof runnerInputGraph.aggregateInputTreeHash === 'string' ? runnerInputGraph.aggregateInputTreeHash : '';
+  if (graphSeal !== receipt.sealedSourceSha || graphSeal !== input.group.sealedSourceSha || graphTreeHash !== runnerInputTreeHash) {
+    throw new Error(`ATM_RUNNER_SYNC_SEAL_CONTINUITY_MISMATCH: runner-sync receipt seal continuity is incomplete for ${input.stewardWorkId}. Run ${resumeRunnerSyncCommand(input.stewardWorkId, String(receipt.sealedSourceSha ?? input.group.sealedSourceSha))}.`);
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function resumeRunnerSyncCommand(stewardWorkId: string, sealedSourceSha: string): string {
+  return `node atm.mjs broker runner-sync resume --steward-work-id ${JSON.stringify(stewardWorkId)} --sealed-source-sha ${JSON.stringify(sealedSourceSha)} --json`;
 }
 
 function normalizeReceiptStringArray(value: unknown): string[] {

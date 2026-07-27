@@ -3,7 +3,8 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
-  enqueueRunnerSyncStewardRequest
+  enqueueRunnerSyncStewardRequest,
+  releaseRunnerSyncStewardQueue
 } from '../../packages/core/src/broker/runner-sync-steward-queue.ts';
 import {
   startRunnerSyncSession,
@@ -25,6 +26,7 @@ import {
 } from '../../packages/core/src/broker/runner-version-contract.ts';
 import { validateRunnerSyncReleaseReceipt } from '../../packages/cli/src/commands/broker/steward-queues.ts';
 import { buildRunnerSyncReceipt } from '../../scripts/runner-sync-incremental-build.ts';
+import { shouldAutoReleaseRunnerSyncSteward } from '../../scripts/run-sealed-runner-build.ts';
 
 // Deterministic clock helper.
 function fixedPorts(iso: string): SessionPorts {
@@ -52,6 +54,10 @@ const buildResult: BuildResult = {
     aggregateInputTreeHash: computeAggregateInputTreeHash(graphNodes)
   } as RunnerInputGraph
 };
+
+assert.equal(shouldAutoReleaseRunnerSyncSteward({}), false);
+assert.equal(shouldAutoReleaseRunnerSyncSteward({ ATM_RUNNER_SYNC_AUTO_RELEASE: '0' }), false);
+assert.equal(shouldAutoReleaseRunnerSyncSteward({ ATM_RUNNER_SYNC_AUTO_RELEASE: '1' }), true);
 
 // 1. Start binds all three coalesced members into the manifest (memberTaskIds).
 const started = startRunnerSyncSession(
@@ -200,14 +206,32 @@ assert.equal(finalized.childReceipts.length, 3);
   assert.equal(receipt.runnerInputTreeHash, INPUT_DIGEST);
 
   const receiptRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-receipt-'));
-  validateRunnerSyncReleaseReceipt({
+  const receiptRef = writeTempReceipt(receiptRepo, receipt);
+  const validated = validateRunnerSyncReleaseReceipt({
     cwd: receiptRepo,
     queue: queued.queue,
     taskId: 'ATM-GOV-0240',
     stewardWorkId: group.stewardWorkId,
-    receiptRef: writeTempReceipt(receiptRepo, receipt),
+    receiptRef,
     receiptDigest: null
   });
+  assert.equal(queued.queue.groups.length, 1, 'release receipt validation must not clear the queue');
+  const released = releaseRunnerSyncStewardQueue(queued.queue, {
+    taskId: 'ATM-GOV-0240',
+    stewardWorkId: group.stewardWorkId,
+    receiptRef: validated.receiptRef,
+    receiptDigest: validated.receiptDigest,
+    releasedAt: '2026-07-27T08:02:00.000Z'
+  });
+  assert.equal(released.queue.groups.length, 0, 'explicit runner-sync release removes the queue group after validation');
+  assert.throws(() => validateRunnerSyncReleaseReceipt({
+    cwd: receiptRepo,
+    queue: released.queue,
+    taskId: 'ATM-GOV-0240',
+    stewardWorkId: group.stewardWorkId,
+    receiptRef,
+    receiptDigest: null
+  }), /ATM_RUNNER_SYNC_RESUME_REQUIRED/, 'duplicate release must fail closed when the group is gone');
 
   const invalidReceipt = { ...receipt, lifecycle: { ...receipt.lifecycle, finalizable: false } };
   assert.throws(() => validateRunnerSyncReleaseReceipt({

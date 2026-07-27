@@ -419,7 +419,7 @@ function releaseRunnerSyncSteward(input: {
   readonly admission: RunnerSyncAdmissionReport;
   readonly receiptRef: string;
 }): void {
-  if (process.env.ATM_RUNNER_SYNC_AUTO_RELEASE === '0') return;
+  if (!shouldAutoReleaseRunnerSyncSteward()) return;
   const taskId = input.admission.queueHeadOwnership.waitingTasks[0] ?? '';
   const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
   if (!taskId || !stewardWorkId) return;
@@ -448,6 +448,10 @@ function releaseRunnerSyncSteward(input: {
   if (result.status !== 0) {
     fail(`Runner-sync steward auto-release failed after receipt publication. Retry: ${retryCommand}\n${result.stderr || result.stdout}`, result.status ?? 1);
   }
+}
+
+export function shouldAutoReleaseRunnerSyncSteward(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.ATM_RUNNER_SYNC_AUTO_RELEASE === '1';
 }
 
 export function unlinkWorktreeNodeModulesLink(worktreeRoot: string): void {

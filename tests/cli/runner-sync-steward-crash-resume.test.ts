@@ -127,7 +127,9 @@ const started = startRunnerSyncSession(
   const reconciled = reconcileRunnerSyncSession(recorded.state, { currentHead: SEAL, headDeltaPaths: [] }, fixedPorts('2026-07-27T08:25:00.000Z'));
   assert.equal(reconciled.allowed, true);
   assert.equal(reconciled.state.phase, 'reconciled');
+  assert.deepEqual([...reconciled.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
   assert.equal(reconciled.childReceipts.length, 3);
+  assert.deepEqual(reconciled.childReceipts.map((receipt) => receipt.taskId).sort(), ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
 }
 
 console.log('runner-sync-steward-crash-resume.test.ts: assertions passed');
