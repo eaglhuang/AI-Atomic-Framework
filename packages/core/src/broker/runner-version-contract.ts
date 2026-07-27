@@ -85,12 +85,53 @@ export interface RunnerInputGraph {
   readonly aggregateInputTreeHash: string;
 }
 
+/**
+ * Explicit lifecycle state of a published runner version. Only the *trusted*
+ * states may satisfy a fallback selection. A candidate that merely shares an
+ * aggregate hash but is provisional/superseded/revoked is never selectable.
+ */
+export type RunnerVersionLifecycleState =
+  | 'provisional'
+  | 'published'
+  | 'trusted'
+  | 'superseded'
+  | 'revoked';
+
+/** Lifecycle states a selection may resolve to. */
+export const TRUSTED_RUNNER_VERSION_LIFECYCLE_STATES: readonly RunnerVersionLifecycleState[] = [
+  'published',
+  'trusted'
+];
+
+export function isTrustedRunnerVersionLifecycleState(state: RunnerVersionLifecycleState | string): boolean {
+  return (TRUSTED_RUNNER_VERSION_LIFECYCLE_STATES as readonly string[]).includes(state);
+}
+
+/**
+ * Capability proof a published version attests: the validators it passed and the
+ * schema versions it can satisfy. A fallback selection must cover the consumer's
+ * required capabilities — an aggregate-hash match alone is insufficient.
+ */
+export interface RunnerVersionCapabilityProof {
+  readonly validators: readonly string[];
+  readonly schemas: readonly string[];
+}
+
 export interface RunnerVersionRequirement {
   readonly sealedSourceSha: string;
   /** Optional: require a specific aggregate input tree hash (strict match). */
   readonly aggregateInputTreeHash?: string | null;
   /** Surfaces the consumer needs the runner to have published. */
   readonly requiredSurfaces: readonly string[];
+  /**
+   * Compatibility identity (runner contract / ABI generation). A fallback
+   * selection to a different sha must present the same compatibility identity.
+   */
+  readonly compatibilityKey?: string | null;
+  /** Validator capabilities the consumer requires the version to prove. */
+  readonly requiredValidatorCapabilities?: readonly string[];
+  /** Schema capabilities the consumer requires the version to prove. */
+  readonly requiredSchemaCapabilities?: readonly string[];
 }
 
 export type RunnerVersionSelectionOutcome =

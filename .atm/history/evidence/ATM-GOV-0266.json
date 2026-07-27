@@ -1,0 +1,83 @@
+{
+  "taskId": "ATM-GOV-0266",
+  "updatedAt": "2026-07-27T14:04:23.440Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0266: claude-004-skl-0029-captain -> codex-0266-b1-steward.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0266.json"
+      ],
+      "producedBy": "codex-0266-b1-steward",
+      "createdAt": "2026-07-27T14:04:23.440Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "claude-004-skl-0029-captain",
+          "leaseId": "lease-482d801e8379",
+          "claimedAt": "2026-07-27T09:44:53.405Z",
+          "heartbeatAt": "2026-07-27T09:44:53.405Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/evidence/ATM-GOV-0266.*",
+            ".atm/history/task-events/ATM-GOV-0266/**",
+            ".atm/history/tasks/ATM-GOV-0266.json",
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/dist/commands/taskflow/auto-evidence-mapper.js",
+            "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+            "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+            "packages/cli/src/commands/git-governance/implementation.ts",
+            "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+            "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+            "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+            "packages/core/src/broker/runner-sync-session.ts",
+            "packages/core/src/broker/runner-sync-steward-queue.ts",
+            "packages/core/src/broker/runner-version-contract.ts",
+            "packages/core/src/broker/runner-version-registry.ts",
+            "packages/core/src/error-code-registry.generated.ts",
+            "schemas/validators/runner-version-selection-receipt.schema.json",
+            "scripts/run-sealed-runner-build.ts",
+            "scripts/runner-sync-incremental-build.ts",
+            "tests/cli/git-record-commit.test.ts",
+            "tests/cli/pre-commit-hook-extraction.test.ts",
+            "tests/cli/runner-sync-build-lease-heartbeat.test.ts",
+            "tests/cli/runner-sync-sealed-input-continuity.test.ts",
+            "tests/cli/runner-sync-steward-crash-resume.test.ts",
+            "tests/cli/runner-version-selection.test.ts",
+            "tests/cli/sealed-runner-publication-lifecycle.test.ts"
+          ],
+          "state": "active",
+          "laneSession": {
+            "laneSessionId": "lane-20260727094453-claude-004-skl-0029-captain-45d9e4e1e6",
+            "status": "active",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260727094453-claude-004-skl-0029-captain-45d9e4e1e6\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-0266-b1-steward",
+          "leaseId": "lease-7d6dd6ea1645",
+          "claimedAt": "2026-07-27T14:04:23.230Z",
+          "heartbeatAt": "2026-07-27T14:04:23.230Z",
+          "ttlSeconds": 1800,
+          "files": [
+            "packages/cli/src/commands/git-governance/implementation.ts",
+            "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+            "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+            "packages/core/src/broker/runner-sync-session.ts",
+            "packages/core/src/broker/runner-version-contract.ts",
+            "packages/core/src/broker/runner-version-registry.ts",
+            "tests/cli/git-record-commit.test.ts",
+            "tests/cli/pre-commit-hook-extraction.test.ts",
+            "tests/cli/runner-sync-build-lease-heartbeat.test.ts",
+            "tests/cli/runner-sync-steward-crash-resume.test.ts",
+            "tests/cli/runner-version-selection.test.ts"
+          ],
+          "state": "active",
+          "reason": "Owner-approved continuation after Claude-004 exhausted its context; preserve Phase B.1 worktree and complete a bounded validation checkpoint before delegation"
+        }
+      }
+    }
+  ]
+}

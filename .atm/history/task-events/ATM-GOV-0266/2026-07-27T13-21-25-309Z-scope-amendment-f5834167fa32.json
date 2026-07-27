@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-27T13-21-25-309Z-scope-amendment-f5834167fa32",
+  "taskId": "ATM-GOV-0266",
+  "action": "scope-amendment",
+  "actorId": "claude-004-skl-0029-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0266.json",
+  "taskSha256": "sha256:c8da2effbbea1b8b4654d816e8bfe06eb792dff11b6d987c388928934b6a8b9e",
+  "createdAt": "2026-07-27T13:21:25.309Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0266 --actor claude-004-skl-0029-captain --add \"packages/cli/src/commands/hook/pre-commit/implementation.ts,tests/cli/pre-commit-hook-extraction.test.ts\" --reason \"Phase B.1: repair direction lock for pre-commit hook parity paths per planning 10a467cd\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Phase B.1: repair direction lock for pre-commit hook parity paths per planning 10a467cd"
+  }
+}

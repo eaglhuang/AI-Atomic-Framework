@@ -74,7 +74,7 @@ assert.deepEqual([...expired.state.groupManifest.memberTaskIds], ['ATM-GOV-0240'
 // 4. Record build publishes exactly one attributable child receipt per member.
 const recorded = recordRunnerSyncBuild(started.state, buildResult, fixedPorts('2026-07-27T08:45:00.000Z'));
 assert.equal(recorded.allowed, true);
-assert.equal(recorded.state.phase, 'receipt-published');
+assert.equal(recorded.state.phase, 'built-provisional');
 assert.equal(recorded.childReceipts.length, 3);
 assert.deepEqual(recorded.childReceipts.map((r) => r.taskId).sort(), ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
 for (const receipt of recorded.childReceipts) {
@@ -92,6 +92,9 @@ const finalized = finalizeRunnerSyncPublication(
 );
 assert.equal(finalized.allowed, true);
 assert.equal(finalized.action, 'release');
-assert.equal(finalized.state.phase, 'released');
+assert.equal(finalized.state.phase, 'published');
+// Group state (member attribution) survives publication.
+assert.deepEqual([...finalized.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
+assert.equal(finalized.childReceipts.length, 3);
 
 console.log('runner-sync-build-lease-heartbeat.test.ts: assertions passed');

@@ -28,6 +28,7 @@
     "Crash or child interruption after build start is recoverable through `reconcileRunnerSyncSession`. Resume is allowed only when the provisional receipt and sealed input proof are intact; otherwise the returned recovery is reseal/rebuild. No raw runtime-lock deletion or manually fabricated receipt is permitted.",
     "`git record-commit` can persist exactly one already-`blocked`/`released` task's ledger plus its matching `block` event while another framework task has an active claim. The exception is record-only, requires the target task's retained actor/lease attribution, rejects source, evidence, close, release, and non-block lifecycle files, and never admits a mixed-task payload.",
     "The active framework claim's source bundle remains isolated while the record-only lifecycle commit is prepared. The command neither stages active-claim source nor defers, snapshots, unstages, or changes foreign worktree content; it returns a fail-closed diagnostic when the target task is not `blocked`/`released` or the pair is incomplete.",
+    "The pre-commit hook consumes the same block-lifecycle classifier as `git record-commit`. It permits the eligible two-file record-only bundle without bypassing hooks, while preserving `ATM_CROSS_TASK_MUTATION_BLOCKED` for every ineligible, mixed-task, source, or non-block-history payload.",
     "The canonical error-code registry and generated projection define `ATM_RUNNER_SYNC_SEAL_REVALIDATION_REQUIRED`, `ATM_RUNNER_SYNC_STEWARD_LEASE_EXPIRED`, `ATM_RUNNER_SYNC_RESUME_REQUIRED`, and `ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING`; each exposes an executable recovery path and is covered by registry generation validation.",
     "Taskflow close and internal release use the same session result. They do not require a worker to predict that all unrelated captains will refrain from committing while a shared build runs.",
     "Regression proves a docs-only commit during a coalesced build can publish the matching sealed runner without rebuild or false stale verdict.",
@@ -47,6 +48,7 @@
     "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
     "packages/cli/src/commands/git-governance/implementation.ts",
     "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
     "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
     "schemas/validators/runner-version-selection-receipt.schema.json",
     "docs/governance/error-code-registry.json",
@@ -56,7 +58,8 @@
     "tests/cli/runner-sync-build-lease-heartbeat.test.ts",
     "tests/cli/runner-sync-steward-crash-resume.test.ts",
     "tests/cli/runner-version-selection.test.ts",
-    "tests/cli/git-record-commit.test.ts"
+    "tests/cli/git-record-commit.test.ts",
+    "tests/cli/pre-commit-hook-extraction.test.ts"
   ],
   "scopePaths": [
     "packages/core/src/broker/runner-sync-session.ts",
@@ -67,6 +70,7 @@
     "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
     "packages/cli/src/commands/git-governance/implementation.ts",
     "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
     "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
     "packages/cli/dist/commands/taskflow/auto-evidence-mapper.js",
     "scripts/run-sealed-runner-build.ts",
@@ -76,6 +80,7 @@
     "docs/ERROR_CODES.md",
     "packages/core/src/error-code-registry.generated.ts",
     "tests/cli/git-record-commit.test.ts",
+    "tests/cli/pre-commit-hook-extraction.test.ts",
     "tests/cli/runner-sync-sealed-input-continuity.test.ts",
     "tests/cli/runner-sync-build-lease-heartbeat.test.ts",
     "tests/cli/runner-sync-steward-crash-resume.test.ts",
@@ -89,6 +94,7 @@
     "node --strip-types tests/cli/runner-version-selection.test.ts",
     "node --strip-types tests/cli/sealed-runner-publication-lifecycle.test.ts",
     "node --strip-types tests/cli/git-record-commit.test.ts",
+    "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
     "npm run generate:error-codes",
     "npm run typecheck",
     "npm run validate:cli"
@@ -141,6 +147,7 @@
         "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
         "packages/cli/src/commands/git-governance/implementation.ts",
         "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
         "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
         "packages/cli/dist/commands/taskflow/auto-evidence-mapper.js",
         "scripts/run-sealed-runner-build.ts",
@@ -150,6 +157,7 @@
         "docs/ERROR_CODES.md",
         "packages/core/src/error-code-registry.generated.ts",
         "tests/cli/git-record-commit.test.ts",
+        "tests/cli/pre-commit-hook-extraction.test.ts",
         "tests/cli/runner-sync-sealed-input-continuity.test.ts",
         "tests/cli/runner-sync-build-lease-heartbeat.test.ts",
         "tests/cli/runner-sync-steward-crash-resume.test.ts",
@@ -163,20 +171,20 @@
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0266-runner-sync-sealed-input-continuity-and-durable-steward-finalization.task.md",
     "sectionTitle": "ATM-GOV-0266",
-    "headingLine": 134,
-    "hash": "725d6f47adb3cac7",
+    "headingLine": 139,
+    "hash": "6411e9ccb2faba75",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0266-runner-sync-sealed-input-continuity-and-durable-steward-finalization.task.md",
-      "planningCommitSha": "c3d1066cd38ec6a625504751bab5b72185e6dbb3",
-      "contentDigest": "sha256:725d6f47adb3cac79814f2789966d198edb14fbc19a1a7bfa5ec2bd2ce1021d0",
+      "planningCommitSha": "10a467cd4b34b91813966ec63fc87b73734c8eb2",
+      "contentDigest": "sha256:6411e9ccb2faba752d0b1d6cdfd713b38e061c822287d64c35f9987a5c2210ff",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-27T12:09:36.681Z"
+      "sealedAt": "2026-07-27T13:20:31.696Z"
     }
   },
-  "importedAt": "2026-07-27T12:09:36.681Z",
+  "importedAt": "2026-07-27T13:20:31.696Z",
   "testContributions": [],
   "requiredTestCaseIds": [
     "test_int_runner_sync_sealed_input_continuity",
@@ -202,48 +210,28 @@
     "phaseOwner": null
   },
   "claim": {
-    "actorId": "claude-004-skl-0029-captain",
-    "leaseId": "lease-482d801e8379",
-    "claimedAt": "2026-07-27T09:44:53.405Z",
-    "heartbeatAt": "2026-07-27T09:44:53.405Z",
+    "actorId": "codex-0266-b1-steward",
+    "leaseId": "lease-7d6dd6ea1645",
+    "claimedAt": "2026-07-27T14:04:23.230Z",
+    "heartbeatAt": "2026-07-27T14:04:23.230Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/ATM-GOV-0266.*",
-      ".atm/history/task-events/ATM-GOV-0266/**",
-      ".atm/history/tasks/ATM-GOV-0266.json",
-      "docs/ERROR_CODES.md",
-      "docs/governance/error-code-registry.json",
-      "packages/cli/dist/commands/taskflow/auto-evidence-mapper.js",
-      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
-      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
       "packages/cli/src/commands/git-governance/implementation.ts",
       "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
-      "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/core/src/broker/runner-sync-session.ts",
-      "packages/core/src/broker/runner-sync-steward-queue.ts",
       "packages/core/src/broker/runner-version-contract.ts",
       "packages/core/src/broker/runner-version-registry.ts",
-      "packages/core/src/error-code-registry.generated.ts",
-      "schemas/validators/runner-version-selection-receipt.schema.json",
-      "scripts/run-sealed-runner-build.ts",
-      "scripts/runner-sync-incremental-build.ts",
       "tests/cli/git-record-commit.test.ts",
+      "tests/cli/pre-commit-hook-extraction.test.ts",
       "tests/cli/runner-sync-build-lease-heartbeat.test.ts",
-      "tests/cli/runner-sync-sealed-input-continuity.test.ts",
       "tests/cli/runner-sync-steward-crash-resume.test.ts",
-      "tests/cli/runner-version-selection.test.ts",
-      "tests/cli/sealed-runner-publication-lifecycle.test.ts"
+      "tests/cli/runner-version-selection.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
-    "laneSession": {
-      "laneSessionId": "lane-20260727094453-claude-004-skl-0029-captain-45d9e4e1e6",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260727094453-claude-004-skl-0029-captain-45d9e4e1e6\""
-    }
+    "state": "taken_over",
+    "reason": "Owner-approved continuation after Claude-004 exhausted its context; preserve Phase B.1 worktree and complete a bounded validation checkpoint before delegation"
   },
-  "owner": "claude-004-skl-0029-captain",
+  "owner": "codex-0266-b1-steward",
   "startedAt": "2026-07-27T09:44:53.405Z",
   "startedBySessionId": "session-20260727094453-claude-004-skl-0029-captain-ATM-GOV-0266-c1a49b5268",
   "taskDirectionLock": {
@@ -265,6 +253,7 @@
       "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
       "packages/cli/src/commands/git-governance/implementation.ts",
       "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
       "packages/core/src/broker/runner-sync-session.ts",
       "packages/core/src/broker/runner-sync-steward-queue.ts",
@@ -275,6 +264,7 @@
       "scripts/run-sealed-runner-build.ts",
       "scripts/runner-sync-incremental-build.ts",
       "tests/cli/git-record-commit.test.ts",
+      "tests/cli/pre-commit-hook-extraction.test.ts",
       "tests/cli/runner-sync-build-lease-heartbeat.test.ts",
       "tests/cli/runner-sync-sealed-input-continuity.test.ts",
       "tests/cli/runner-sync-steward-crash-resume.test.ts",
@@ -303,7 +293,7 @@
     "createdAt": "2026-07-27T09:45:02.145Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-07-27T12-17-09-215Z-scope-amendment-f746335db82d",
-  "lastTransitionAt": "2026-07-27T12:17:09.215Z",
+  "lastTransitionId": "2026-07-27T14-04-23-437Z-takeover-daa10c2adbc5",
+  "lastTransitionAt": "2026-07-27T14:04:23.437Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

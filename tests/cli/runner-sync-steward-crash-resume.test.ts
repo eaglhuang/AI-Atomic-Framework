@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   startRunnerSyncSession,
   recordRunnerSyncBuild,
+  attestRunnerSyncPublication,
   finalizeRunnerSyncPublication,
   reconcileRunnerSyncSession,
   type SessionPorts,
@@ -77,12 +78,16 @@ const started = startRunnerSyncSession(
   const finalize = finalizeRunnerSyncPublication(headOnly, { currentHead: SEAL, headDeltaPaths: [] }, fixedPorts('2026-07-27T08:21:00.000Z'));
   assert.equal(finalize.allowed, false);
   assert.equal(finalize.errorCode, RUNNER_SYNC_ERROR_CODES.coalescedAttributionMissing);
-  assert.equal(finalize.state.phase, 'receipt-published'); // not released
+  assert.equal(finalize.state.phase, 'built-provisional'); // provisional retained, not published
   assert.match(finalize.reason, /ATM-GOV-0248/);
   assert.match(finalize.reason, /TASK-SKL-0029/);
+  // Group manifest survives the failed finalize.
+  assert.deepEqual([...finalize.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
 }
 
-// 4. Full attribution + seal-revalidation on runner-affecting HEAD delta.
+// 4. Full attribution + seal-revalidation on runner-affecting HEAD delta →
+//    provisional build abandoned; reconcile of an abandoned session resumes to
+//    rebuild without erasing group state.
 {
   const recorded = recordRunnerSyncBuild(started.state, buildResult, fixedPorts('2026-07-27T08:20:00.000Z'));
   const finalize = finalizeRunnerSyncPublication(
@@ -93,16 +98,36 @@ const started = startRunnerSyncSession(
   assert.equal(finalize.allowed, false);
   assert.equal(finalize.errorCode, RUNNER_SYNC_ERROR_CODES.sealRevalidationRequired);
   assert.equal(finalize.action, 'revalidate-seal');
+  assert.equal(finalize.state.phase, 'abandoned');
+  assert.deepEqual([...finalize.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
+
+  const resume = reconcileRunnerSyncSession(finalize.state, { currentHead: SEAL, headDeltaPaths: [] }, fixedPorts('2026-07-27T08:23:00.000Z'));
+  assert.equal(resume.action, 'resume-build');
+  assert.equal(resume.errorCode, RUNNER_SYNC_ERROR_CODES.resumeRequired);
+  assert.deepEqual([...resume.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
 }
 
-// 5. Reconcile a released session is an idempotent no-op.
+// 5. Provisional → attest → publication-ready → published happy path.
 {
   const recorded = recordRunnerSyncBuild(started.state, buildResult, fixedPorts('2026-07-27T08:20:00.000Z'));
-  const released = finalizeRunnerSyncPublication(recorded.state, { currentHead: SEAL, headDeltaPaths: [] }, fixedPorts('2026-07-27T08:23:00.000Z'));
-  assert.equal(released.state.phase, 'released');
+  assert.equal(recorded.state.phase, 'built-provisional');
+  const attested = attestRunnerSyncPublication(recorded.state, fixedPorts('2026-07-27T08:20:30.000Z'));
+  assert.equal(attested.allowed, true);
+  assert.equal(attested.state.phase, 'publication-ready');
+  const released = finalizeRunnerSyncPublication(attested.state, { currentHead: SEAL, headDeltaPaths: [] }, fixedPorts('2026-07-27T08:23:00.000Z'));
+  assert.equal(released.state.phase, 'published');
   const again = reconcileRunnerSyncSession(released.state, { currentHead: SEAL, headDeltaPaths: [] }, fixedPorts('2026-07-27T08:24:00.000Z'));
   assert.equal(again.action, 'complete');
   assert.equal(again.allowed, true);
+}
+
+// 6. Reconcile-driven recovery of a provisional session reaches `reconciled`.
+{
+  const recorded = recordRunnerSyncBuild(started.state, buildResult, fixedPorts('2026-07-27T08:20:00.000Z'));
+  const reconciled = reconcileRunnerSyncSession(recorded.state, { currentHead: SEAL, headDeltaPaths: [] }, fixedPorts('2026-07-27T08:25:00.000Z'));
+  assert.equal(reconciled.allowed, true);
+  assert.equal(reconciled.state.phase, 'reconciled');
+  assert.equal(reconciled.childReceipts.length, 3);
 }
 
 console.log('runner-sync-steward-crash-resume.test.ts: assertions passed');

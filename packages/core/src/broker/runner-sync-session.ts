@@ -12,8 +12,9 @@ import {
  * (ATM-GOV-0266 Phase A deep module).
  *
  * Deletion test: without this module, coalesced-group attribution, per-member
- * child receipts, the durable `queued -> building -> receipt-published ->
- * released/reconciled` state machine, build-lease heartbeat, and seal
+ * child receipts, the durable `queued -> building -> built-provisional ->
+ * publication-ready -> published` (with `reconciled`/`abandoned` recovery)
+ * state machine, build-lease heartbeat, and seal
  * revalidation must reappear scattered across `runner-sync-steward-queue.ts`
  * (coalescing), `runner-sync-incremental-build.ts` (single-task receipt), and
  * `runner-publication-lifecycle.ts` (single-task phase machine) — exactly the
@@ -29,12 +30,24 @@ export const RUNNER_SYNC_SESSION_STATE_SCHEMA = 'atm.runnerSyncSessionState.v1' 
 export const RUNNER_SYNC_GROUP_MANIFEST_SCHEMA = 'atm.runnerSyncCoalescedGroupManifest.v1' as const;
 export const RUNNER_SYNC_CHILD_RECEIPT_SCHEMA = 'atm.runnerSyncChildReceipt.v1' as const;
 
+/**
+ * Durable coalesced-session lifecycle. A recorded build is *provisional*: the
+ * group manifest and per-member child receipts are retained through every phase
+ * until the session is released (`published`) or reconciled. No transition erases
+ * group state before release/reconcile.
+ *
+ *   queued -> building -> built-provisional -> publication-ready -> published
+ *                                    \                                  |
+ *                                     -> abandoned (seal drift)     reconciled (recovered)
+ */
 export type RunnerSyncSessionPhase =
   | 'queued'
   | 'building'
-  | 'receipt-published'
-  | 'released'
-  | 'reconciled';
+  | 'built-provisional'
+  | 'publication-ready'
+  | 'published'
+  | 'reconciled'
+  | 'abandoned';
 
 export interface SessionPorts {
   readonly now: () => string;
@@ -109,6 +122,7 @@ export type SessionAction =
   | 'build'
   | 'renew-lease'
   | 'publish-receipts'
+  | 'attest-publication'
   | 'release'
   | 'resume-build'
   | 'revalidate-seal'
@@ -221,7 +235,9 @@ export function renewRunnerSyncSession(
 /**
  * Record a completed build. Fills the shared output digest, attaches the input
  * graph, generates one attributable child receipt per member, and advances to
- * `receipt-published`. Fails closed if the manifest has no members.
+ * `built-provisional`. The build output and child receipts are provisional: they
+ * are retained (never erased) until the session is released or reconciled. Fails
+ * closed if the manifest has no members.
  */
 export function recordRunnerSyncBuild(
   session: RunnerSyncSessionState,
@@ -240,21 +256,78 @@ export function recordRunnerSyncBuild(
   const childReceipts = manifest.members.map((member) => buildChildReceipt(manifest, member, buildResult.sharedOutputDigest, now));
   const state: RunnerSyncSessionState = {
     ...session,
-    phase: 'receipt-published',
+    phase: 'built-provisional',
     groupManifest: manifest,
     childReceipts,
     inputGraph: buildResult.inputGraph,
     updatedAt: now
   };
   return decide('publish-receipts', true, null, state, childReceipts, null,
-    `Build recorded; published ${childReceipts.length} attributable child receipt(s). Finalize against current HEAD before releasing.`);
+    `Build recorded provisionally; generated ${childReceipts.length} attributable child receipt(s). Attest attribution and finalize against current HEAD before releasing.`);
 }
 
 /**
- * Finalize publication and release the session. Requires a published receipt
- * state with one child receipt per member (else fail closed on missing
- * attribution) and seal continuity against the current HEAD (else fail closed
- * with seal revalidation). Only then advances to `released`.
+ * Attest that a provisional build carries one child receipt per member and
+ * advance to `publication-ready`. Fails closed (attribution missing) and stays
+ * `built-provisional` — never erasing group state — when attribution is
+ * incomplete.
+ */
+export function attestRunnerSyncPublication(
+  session: RunnerSyncSessionState,
+  ports: SessionPorts
+): RunnerSyncSessionDecision {
+  const now = ports.now();
+  if (session.phase !== 'built-provisional' && session.phase !== 'publication-ready') {
+    return decide('wait', false, null, touch(session, now), [], null,
+      `Attestation requires a built-provisional session; session is ${session.phase}.`);
+  }
+  const attribution = verifyMemberAttribution(session);
+  if (!attribution.complete) {
+    return decide('attest-publication', false, RUNNER_SYNC_ERROR_CODES.coalescedAttributionMissing,
+      { ...session, phase: 'built-provisional', updatedAt: now }, session.childReceipts, null,
+      `Missing attributable child receipt(s) for member(s): ${attribution.missing.join(', ')}. Publication is blocked; provisional build retained.`);
+  }
+  return decide('attest-publication', true, null, { ...session, phase: 'publication-ready', updatedAt: now }, session.childReceipts, null,
+    `All ${session.groupManifest.memberTaskIds.length} member(s) attributed; publication is ready pending seal continuity.`);
+}
+
+/**
+ * Drive a provisional/publication-ready session to a terminal success phase.
+ * Verifies complete member attribution (else fail closed, provisional retained)
+ * and seal continuity against the current HEAD. A runner-affecting seal drift
+ * abandons the provisional build (`abandoned`, rebuild required); otherwise the
+ * session reaches `successPhase` with group state intact.
+ */
+function drivePublication(
+  session: RunnerSyncSessionState,
+  observation: SealObservation,
+  now: string,
+  successPhase: 'published' | 'reconciled'
+): RunnerSyncSessionDecision {
+  const attribution = verifyMemberAttribution(session);
+  if (!attribution.complete) {
+    return decide('attest-publication', false, RUNNER_SYNC_ERROR_CODES.coalescedAttributionMissing,
+      { ...session, phase: 'built-provisional', updatedAt: now }, session.childReceipts, null,
+      `Missing attributable child receipt(s) for member(s): ${attribution.missing.join(', ')}. Release and non-head close are blocked; provisional build retained.`);
+  }
+  if (session.inputGraph) {
+    const continuity = evaluateSealContinuity({ graph: session.inputGraph, headDeltaPaths: observation.headDeltaPaths });
+    if (continuity.revalidationRequired) {
+      return decide('revalidate-seal', false, continuity.errorCode,
+        { ...session, phase: 'abandoned', updatedAt: now }, session.childReceipts, resumeCommand(session),
+        `${continuity.reason} Provisional build abandoned; rebuild and reseal before publication (group manifest retained).`);
+    }
+  }
+  return decide('release', true, null, { ...session, phase: successPhase, updatedAt: now }, session.childReceipts, null,
+    `All ${session.groupManifest.memberTaskIds.length} member(s) attributed and seal continuous at HEAD ${observation.currentHead}; ${successPhase === 'reconciled' ? 'reconciled and released' : 'released'} the steward group.`);
+}
+
+/**
+ * Finalize publication and release the session. Accepts a `built-provisional` or
+ * `publication-ready` session, requires one child receipt per member (else fail
+ * closed on missing attribution, provisional retained) and seal continuity
+ * against the current HEAD (else abandon and rebuild). Only then advances to
+ * `published`.
  */
 export function finalizeRunnerSyncPublication(
   session: RunnerSyncSessionState,
@@ -262,31 +335,21 @@ export function finalizeRunnerSyncPublication(
   ports: SessionPorts
 ): RunnerSyncSessionDecision {
   const now = ports.now();
-  if (session.phase !== 'receipt-published') {
+  if (session.phase !== 'built-provisional' && session.phase !== 'publication-ready') {
     return decide('wait', false, null, touch(session, now), [], null,
-      `Finalization requires a receipt-published session; session is ${session.phase}.`);
+      `Finalization requires a built-provisional or publication-ready session; session is ${session.phase}.`);
   }
-  const attribution = verifyMemberAttribution(session);
-  if (!attribution.complete) {
-    return decide('publish-receipts', false, RUNNER_SYNC_ERROR_CODES.coalescedAttributionMissing, touch(session, now), [], null,
-      `Missing attributable child receipt(s) for member(s): ${attribution.missing.join(', ')}. Release and non-head close are blocked.`);
-  }
-  if (session.inputGraph) {
-    const continuity = evaluateSealContinuity({ graph: session.inputGraph, headDeltaPaths: observation.headDeltaPaths });
-    if (continuity.revalidationRequired) {
-      return decide('revalidate-seal', false, continuity.errorCode, touch(session, now), session.childReceipts, resumeCommand(session), continuity.reason);
-    }
-  }
-  const state: RunnerSyncSessionState = { ...session, phase: 'released', updatedAt: now };
-  return decide('release', true, null, state, session.childReceipts, null,
-    `All ${session.groupManifest.memberTaskIds.length} member(s) attributed and seal continuous at HEAD ${observation.currentHead}; safe to release the steward group.`);
+  return drivePublication(session, observation, now, 'published');
 }
 
 /**
  * Reconcile a session recovered from durable state (e.g. after a steward crash
  * or timeout). A `building` session with an expired/absent lease resumes to a
- * fresh build (`ATM_RUNNER_SYNC_RESUME_REQUIRED`); a `receipt-published`
- * session re-runs finalization; terminal states are idempotent no-ops.
+ * fresh build (`ATM_RUNNER_SYNC_RESUME_REQUIRED`); a provisional/publication-ready
+ * session re-drives publication (reaching `reconciled` on success, or `abandoned`
+ * on seal drift); an `abandoned` session resumes to rebuild; terminal states are
+ * idempotent no-ops. Reconciliation never erases the retained group manifest or
+ * child receipts.
  */
 export function reconcileRunnerSyncSession(
   session: RunnerSyncSessionState,
@@ -305,11 +368,15 @@ export function reconcileRunnerSyncSession(
       return decide('resume-build', false, RUNNER_SYNC_ERROR_CODES.resumeRequired, touch(session, now), [], resumeCommand(session),
         'Session was building with no live lease (crash/timeout); resume the build deterministically from the preserved manifest.');
     }
-    case 'receipt-published':
-      return finalizeRunnerSyncPublication(session, observation, ports);
-    case 'released':
+    case 'built-provisional':
+    case 'publication-ready':
+      return drivePublication(session, observation, now, 'reconciled');
+    case 'abandoned':
+      return decide('resume-build', false, RUNNER_SYNC_ERROR_CODES.resumeRequired, touch(session, now), session.childReceipts, resumeCommand(session),
+        'Session was abandoned after a seal drift; resume the build to reseal and rebuild before publication (group manifest retained).');
+    case 'published':
       return decide('complete', true, null, touch(session, now), session.childReceipts, null,
-        'Session already released; reconciliation is an idempotent no-op.');
+        'Session already published/released; reconciliation is an idempotent no-op.');
     case 'reconciled':
       return decide('complete', true, null, touch(session, now), session.childReceipts, null, 'Session already reconciled.');
     default: {
