@@ -1,0 +1,280 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0248",
+  "title": "Non-Git proposal workspace provider and steward write-path migration",
+  "status": "running",
+  "milestone": "ATM-3.1-R0",
+  "dependencies": [
+    "ATM-GOV-0247"
+  ],
+  "acceptance": [
+    "The canonical provider mode is a versioned `bounded-proposal-tree` contract containing canonical root/base/HEAD digests, declared files/intents, immutable base blobs/hashes, and an output proposal root; it has no branch, worktree, merge, rebase, or alternate-index fields.",
+    "Provisioning never executes `git worktree`, `git branch`, `git switch`, `git merge`, `git rebase`, or task-local `GIT_INDEX_FILE`. It cannot mutate the canonical worktree or `.atm` runtime state.",
+    "Only declared files/atoms/anchors/ranges are materialized. Any added surface requires broker re-arbitration before proposal generation continues.",
+    "Worker output is normalized into the existing `PatchProposal`/mutation request contracts. Existing format adapters and transactional composer remain the merge authority; no file-type or task-specific merge branches are added to Team code.",
+    "The neutral steward is the only component that applies composed shared-file output to the canonical worktree. Shared delivery emits one commit receipt with complete member attribution and HEAD/CAS evidence.",
+    "`shadow-workspace.ts`, if retained for compatibility, is a thin deprecated alias over the new provider and contains no Git process execution. The compatibility period and removal condition are explicit.",
+    "Short English comments explain the base-tree immutability boundary, proposal-only worker contract, and why canonical writes are delegated to the steward.",
+    "Focused tests prove two same-file disjoint mutations compose from one immutable base, a true overlapping mutation is queued/revalidated, stale base is rejected, undeclared file access fails closed, and no Git topology command is spawned.",
+    "Scheduler and Team plan output use provider capabilities/data, not provider/task/path hardcoding; unknown provider versions fail closed and trip queue-only.",
+    "A source-wide call-site census classifies every production `git worktree add` invocation through a closed enum: emergency/anomaly recovery, historical read-only discrimination, or non-development sealed packaging. Each surviving call requires a named receipt contract; unclassified production call sites fail validation. Test/fixture strings are reported separately and cannot whitelist production code.",
+    "The provider migration cannot close on source-only tests. One card-defined behavior projection must pass through source and frozen `node atm.mjs` with matching canonical digest and a runner-sync/build receipt. A shared frozen build may satisfy multiple cards, but this card retains its own attributable parity receipt."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team/proposal-workspace.ts",
+    "packages/cli/src/commands/team/shadow-workspace.ts",
+    "packages/cli/src/commands/team/shadow-plan.ts",
+    "packages/cli/src/commands/team/scheduler.ts",
+    "packages/cli/src/commands/team-wave.ts",
+    "tests/cli/team-proposal-workspace.test.ts",
+    "tests/cli/team-plan-contract.test.ts",
+    "scripts/validate-worktree-callsite-census.ts",
+    "tests/cli/worktree-callsite-census.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team/proposal-workspace.ts",
+    "packages/cli/src/commands/team/shadow-workspace.ts",
+    "packages/cli/src/commands/team/shadow-plan.ts",
+    "packages/cli/src/commands/team/scheduler.ts",
+    "packages/cli/src/commands/team-wave.ts",
+    "tests/cli/team-proposal-workspace.test.ts",
+    "tests/cli/team-shadow-workspace.test.ts",
+    "tests/cli/team-plan-contract.test.ts",
+    "tests/cli/team-contribution-composer.test.ts",
+    "scripts/validate-worktree-callsite-census.ts",
+    "tests/cli/worktree-callsite-census.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-proposal-workspace.test.ts",
+    "node --strip-types tests/cli/team-shadow-workspace.test.ts",
+    "node --strip-types tests/cli/team-plan-contract.test.ts",
+    "node --strip-types tests/cli/team-contribution-composer.test.ts",
+    "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "non-git-bounded-proposal-provider-receipts",
+  "rollbackStrategy": "revert-commit-and-trip-queue-only",
+  "rollbackNotes": "Do not restore detached-worktree development as a fallback; retain proposals and run queue-only while the provider is repaired.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team.proposal-workspace",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team.proposal-workspace",
+        "pattern": "Workspace Adapter",
+        "source": "packages/cli/src/commands/team/proposal-workspace.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/team/proposal-workspace.ts",
+        "packages/cli/src/commands/team/shadow-workspace.ts",
+        "packages/cli/src/commands/team/shadow-plan.ts",
+        "packages/cli/src/commands/team/scheduler.ts",
+        "packages/cli/src/commands/team-wave.ts",
+        "tests/cli/team-proposal-workspace.test.ts",
+        "tests/cli/team-shadow-workspace.test.ts",
+        "tests/cli/team-plan-contract.test.ts",
+        "tests/cli/team-contribution-composer.test.ts",
+        "scripts/validate-worktree-callsite-census.ts",
+        "tests/cli/worktree-callsite-census.test.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 6 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0248-non-git-proposal-workspace-provider-and-steward-write-path-migration.task.md",
+    "sectionTitle": "ATM-GOV-0248",
+    "headingLine": 74,
+    "hash": "a29894cf3e99085a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0248-non-git-proposal-workspace-provider-and-steward-write-path-migration.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:a29894cf3e99085a0a552b95292fa380b00c361aa5a90ff658615f04b596d985",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-26T16:19:11.295Z"
+    }
+  },
+  "importedAt": "2026-07-26T16:19:11.295Z",
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.team.proposal.workspace.test.ts",
+      "command": "node --strip-types tests/cli/team-proposal-workspace.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.team.shadow.workspace.test.ts",
+      "command": "node --strip-types tests/cli/team-shadow-workspace.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.team.plan.contract.test.ts",
+      "command": "node --strip-types tests/cli/team-plan-contract.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.team.contribution.composer.test.ts",
+      "command": "node --strip-types tests/cli/team-contribution-composer.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.worktree.callsite.census.test.ts",
+      "command": "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-26T16-20-03-657Z-claim-22bfc76f1f84",
+  "lastTransitionAt": "2026-07-26T16:20:03.657Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-002-plan31-0248",
+  "reservedAt": "2026-07-26T16:19:31.593Z",
+  "promotedAt": "2026-07-26T16:19:31.597Z",
+  "claim": {
+    "actorId": "codex-002-plan31-0248",
+    "leaseId": "lease-d996aba59019",
+    "claimedAt": "2026-07-26T16:19:31.605Z",
+    "heartbeatAt": "2026-07-26T16:19:31.605Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0248.json",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/proposal-workspace.ts",
+      "packages/cli/src/commands/team/scheduler.ts",
+      "packages/cli/src/commands/team/shadow-plan.ts",
+      "packages/cli/src/commands/team/shadow-workspace.ts",
+      "scripts/validate-worktree-callsite-census.ts",
+      "tests/cli/team-contribution-composer.test.ts",
+      "tests/cli/team-plan-contract.test.ts",
+      "tests/cli/team-proposal-workspace.test.ts",
+      "tests/cli/team-shadow-workspace.test.ts",
+      "tests/cli/worktree-callsite-census.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260726161933-codex-002-plan31-0248-37237d92f1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260726161933-codex-002-plan31-0248-37237d92f1\""
+    }
+  },
+  "startedAt": "2026-07-26T16:19:31.605Z",
+  "startedByActor": "codex-002-plan31-0248",
+  "startedBySessionId": "session-20260726161931-codex-002-plan31-0248-ATM-GOV-0248-ecc4281ba7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0248",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0248.*",
+      ".atm/history/task-events/ATM-GOV-0248/**",
+      ".atm/history/tasks/ATM-GOV-0248.json",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/proposal-workspace.ts",
+      "packages/cli/src/commands/team/scheduler.ts",
+      "packages/cli/src/commands/team/shadow-plan.ts",
+      "packages/cli/src/commands/team/shadow-workspace.ts",
+      "scripts/validate-worktree-callsite-census.ts",
+      "tests/cli/team-contribution-composer.test.ts",
+      "tests/cli/team-plan-contract.test.ts",
+      "tests/cli/team-proposal-workspace.test.ts",
+      "tests/cli/team-shadow-workspace.test.ts",
+      "tests/cli/worktree-callsite-census.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "80418209123e88755eabaa203c80b86a6f9723da4ed7188c9771d8c826d91c26",
+    "actorId": "codex-002-plan31-0248",
+    "sessionId": "session-20260726161931-codex-002-plan31-0248-ATM-GOV-0248-ecc4281ba7",
+    "laneSession": {
+      "laneSessionId": "lane-20260726161933-codex-002-plan31-0248-37237d92f1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260726161933-codex-002-plan31-0248-37237d92f1\""
+    },
+    "createdAt": "2026-07-26T16:20:03.655Z",
+    "status": "active"
+  }
+}

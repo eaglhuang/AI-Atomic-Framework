@@ -168,10 +168,11 @@ assert.equal(teamPlanWithIndexLane.shadowSchedule.fanOutCap >= 1, true);
 assert.equal(teamPlanWithIndexLane.shadowSchedule.rosterFingerprint.schemaId, 'atm.teamRosterFingerprint.v1');
 assert.equal(teamPlanWithIndexLane.shadowSchedule.reviewerLane?.cleanContext, true);
 assert.equal(teamPlanWithIndexLane.shadowSchedule.reviewerLane?.barrierRequired, true);
-assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.schemaId, 'atm.teamShadowWorkspaceProvider.v1');
-assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.mode, 'ephemeral-detached-worktree');
-assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.isolatedIndexEnv, 'GIT_INDEX_FILE');
-assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.writebackToPrimaryWorktree, false);
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.schemaId, 'atm.teamProposalWorkspaceProvider.v1');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.mode, 'bounded-proposal-tree');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.canMutateCanonicalWorktree, false);
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.stewardWritePath, true);
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.declaredFiles.includes('packages/cli/src/commands/git-governance.ts'), true);
 const teamRunTemp = mkdtempSync(path.join(os.tmpdir(), 'atm-team-plan-contract-'));
 try {
   const teamRun = writeTeamRun({

@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 
 import { type TeamProviderId } from '../../../../core/src/team-runtime/provider-contract.ts';
 import { createTeamShadowSchedule, type TeamModelOption, type TeamWorkGroup } from './scheduler.ts';
-import { createTeamShadowWorkspaceProviderPlan } from './shadow-workspace.ts';
+import { createTeamProposalWorkspaceProviderPlan } from './proposal-workspace.ts';
 
 type ShadowPlanAgent = {
   role: string;
@@ -61,7 +61,11 @@ export function buildTeamShadowScheduleForPlan(input: {
     quotaProbeDigest,
     acceptanceCriteria,
     cleanContextReviewer: true,
-    workspaceProvider: createTeamShadowWorkspaceProviderPlan({ baseCommit })
+    workspaceProvider: createTeamProposalWorkspaceProviderPlan({
+      repoRoot: input.cwd,
+      baseCommit,
+      declaredFiles: input.writePaths
+    })
   });
 }
 
