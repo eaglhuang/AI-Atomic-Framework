@@ -10,6 +10,7 @@
  * CLI diagnostic projects the decision produced here.
  */
 import { createHash } from 'node:crypto';
+import { checkWorkAdmissionTicket, type WorkAdmissionTicket } from '../broker/work-admission-ticket.ts';
 
 export const RESTRICTED_EXECUTION_RECEIPT_SCHEMA_ID = 'atm.restrictedExecutionReceipt.v1';
 
@@ -63,7 +64,9 @@ export type RestrictedExecutionReasonCode =
   | 'validator-declares-writes'
   | 'missing-execution-authority'
   | 'undeclared-output'
-  | 'external-write-capability-unsupported';
+  | 'external-write-capability-unsupported'
+  | 'work-admission-ticket-missing'
+  | 'work-admission-ticket-invalid';
 
 export interface RestrictedExecutionRequest {
   readonly actor?: string | null;
@@ -80,6 +83,9 @@ export interface RestrictedExecutionRequest {
    * it then never receives an external-write allow.
    */
   readonly adapterCapability?: RestrictedExecutionAdapterCapability;
+  /** Claim-issued authority. Presence is mandatory on mutation-capable worker routes. */
+  readonly workAdmissionTicket?: WorkAdmissionTicket | null;
+  readonly claimGeneration?: string | null;
   readonly now?: string;
 }
 
@@ -99,6 +105,8 @@ export interface RestrictedExecutionReceipt {
   readonly cwd: string | null;
   readonly declaredOutputs: readonly string[];
   readonly adapterCapability: RestrictedExecutionAdapterCapability;
+  readonly workAdmissionTicketId: string | null;
+  readonly workAdmissionDecisionCode: string | null;
   readonly approvedAtmCommand: string;
   readonly atmOnlyRouteNotice: typeof ATM_ONLY_EXECUTION_ROUTE_NOTICE;
   /** Text can never grant permission; recorded so audits can prove it. */
@@ -178,14 +186,18 @@ export function evaluateRestrictedExecution(request: RestrictedExecutionRequest)
   const classification = classifyExecutable(executable, argv);
   const strictness = strictnessFor(request.executionClass);
 
-  const deny = (reasonCode: RestrictedExecutionReasonCode, riskLevel: RestrictedExecutionRiskLevel) =>
-    finalize('deny', reasonCode, riskLevel);
+  const deny = (
+    reasonCode: RestrictedExecutionReasonCode,
+    riskLevel: RestrictedExecutionRiskLevel,
+    workAdmissionDecisionCode: string | null = null
+  ) => finalize('deny', reasonCode, riskLevel, workAdmissionDecisionCode);
   const allow = (reasonCode: RestrictedExecutionReasonCode) => finalize('allow', reasonCode, 'none');
 
   function finalize(
     decision: 'allow' | 'deny',
     reasonCode: RestrictedExecutionReasonCode,
-    riskLevel: RestrictedExecutionRiskLevel
+    riskLevel: RestrictedExecutionRiskLevel,
+    workAdmissionDecisionCode: string | null = null
   ): RestrictedExecutionEvaluation {
     const approvedAtmCommand = resolveApprovedAtmCommand(reasonCode, classification, { actor, taskId });
     const receipt: RestrictedExecutionReceipt = {
@@ -204,6 +216,8 @@ export function evaluateRestrictedExecution(request: RestrictedExecutionRequest)
       cwd,
       declaredOutputs,
       adapterCapability,
+      workAdmissionTicketId: request.workAdmissionTicket?.ticketId ?? null,
+      workAdmissionDecisionCode,
       approvedAtmCommand,
       atmOnlyRouteNotice: ATM_ONLY_EXECUTION_ROUTE_NOTICE,
       overridePolicy: { promptTextAccepted: false, environmentVariableAccepted: false },
@@ -238,6 +252,19 @@ export function evaluateRestrictedExecution(request: RestrictedExecutionRequest)
     if (requiresExecutionAuthority(request.executionClass)) {
       if (adapterCapability !== 'enforced') return deny('external-write-capability-unsupported', 'none');
       if (!actor || !taskId || !laneSessionId) return deny('missing-execution-authority', 'none');
+      const ticketDecision = checkWorkAdmissionTicket({
+        ticket: request.workAdmissionTicket,
+        taskId,
+        actorId: actor,
+        laneSessionId,
+        claimGeneration: request.claimGeneration ?? null,
+        files: declaredOutputs,
+        operation: 'write',
+        now: request.now
+      });
+      if (!ticketDecision.ok) {
+        return deny(ticketDecision.code === 'ATM_WRITE_TICKET_MISSING' ? 'work-admission-ticket-missing' : 'work-admission-ticket-invalid', 'none', ticketDecision.code);
+      }
     }
     if (request.executionClass === 'command-manifest' && declaredOutputs.length === 0) {
       return deny('undeclared-output', 'none');
@@ -262,6 +289,19 @@ export function evaluateRestrictedExecution(request: RestrictedExecutionRequest)
     if (adapterCapability !== 'enforced') return deny('external-write-capability-unsupported', 'none');
     if (!actor || !taskId || !laneSessionId) return deny('missing-execution-authority', 'none');
     if (declaredOutputs.length === 0) return deny('undeclared-output', 'none');
+    const ticketDecision = checkWorkAdmissionTicket({
+      ticket: request.workAdmissionTicket,
+      taskId,
+      actorId: actor,
+      laneSessionId,
+      claimGeneration: request.claimGeneration ?? null,
+      files: declaredOutputs,
+      operation: 'write',
+      now: request.now
+    });
+    if (!ticketDecision.ok) {
+      return deny(ticketDecision.code === 'ATM_WRITE_TICKET_MISSING' ? 'work-admission-ticket-missing' : 'work-admission-ticket-invalid', 'none', ticketDecision.code);
+    }
     return allow('declared-generated-write-command');
   }
 

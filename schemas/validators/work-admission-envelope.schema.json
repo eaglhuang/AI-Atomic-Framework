@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/validators/work-admission-envelope.schema.json",
+  "title": "ATM Work Admission Ticket",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "ticketId",
+    "ticketDigest",
+    "taskId",
+    "actorId",
+    "claimGeneration",
+    "issuedAt",
+    "expiresAt",
+    "scopeDigest",
+    "runnerSelection",
+    "grants",
+    "recovery"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.workAdmissionTicket.v1" },
+    "specVersion": { "type": "string", "minLength": 1 },
+    "ticketId": { "type": "string", "minLength": 1 },
+    "ticketDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "taskId": { "type": "string", "minLength": 1 },
+    "actorId": { "type": "string", "minLength": 1 },
+    "laneSessionId": { "type": ["string", "null"] },
+    "claimGeneration": { "type": "string", "minLength": 1 },
+    "issuedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "scopeDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "runnerSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runnerKind", "runnerRef", "selectedAt"],
+      "properties": {
+        "runnerKind": { "enum": ["frozen", "source-first"] },
+        "runnerRef": { "type": "string", "minLength": 1 },
+        "selectedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "grants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "values", "digest"],
+        "properties": {
+          "kind": { "enum": ["file-write", "lifecycle-operation", "process-manifest"] },
+          "values": { "type": "array", "items": { "type": "string" } },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestedMode", "resolvedMode", "reasons", "maxSavePoints", "perTaskByteBudget", "repositoryByteBudget", "handoffTtlSeconds", "tempRoot", "policyDigest"],
+      "properties": {
+        "requestedMode": { "enum": ["auto", "enabled", "disabled"] },
+        "resolvedMode": { "enum": ["enabled", "disabled"] },
+        "reasons": { "type": "array", "items": { "type": "string" } },
+        "maxSavePoints": { "enum": [0, 2] },
+        "perTaskByteBudget": { "type": "integer", "minimum": 0 },
+        "repositoryByteBudget": { "type": "integer", "minimum": 0 },
+        "handoffTtlSeconds": { "type": "integer", "minimum": 0 },
+        "tempRoot": { "const": ".atm/runtime/work-admission-temp" },
+        "policyDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

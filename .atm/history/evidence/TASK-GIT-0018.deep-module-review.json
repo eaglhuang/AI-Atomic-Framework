@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.deepModuleReviewReport.v1",
+  "providerContract": "atm.deepModuleRefactorProvider.v1",
+  "providerId": "matt-pocock-deep-module-reference",
+  "providerVersion": "2026-07-24.ed37663",
+  "generatedAt": "1970-01-01T00:00:00.000Z",
+  "taskId": "TASK-GIT-0018",
+  "status": "pass",
+  "candidate": {
+    "moduleId": "atm.work-admission-ticket-authority",
+    "sourcePaths": [
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/task-work-admission-import.ts",
+      "packages/core/src/team-agents/restricted-execution-gateway.ts"
+    ],
+    "ownerAtomOrMap": "atm.work-admission-ticket-authority",
+    "publicInterface": "issueWorkAdmissionTicket, checkWorkAdmissionTicket, createWorkAdmissionCoverageReceipt, captureWorkAdmissionSnapshot, recoverUnattributedMutation",
+    "rollback": "Revert claim and gateway wiring while retaining ticket coverage and recovery evidence for audit.",
+    "causalValidators": [
+      "tests/cli/work-admission-ticket-claim.test.ts",
+      "tests/cli/work-admission-ticket-recovery.test.ts",
+      "tests/cli/restricted-execution-gateway.test.ts",
+      "tests/cli/write-ticket-scope-guard.test.ts"
+    ]
+  },
+  "triggerVerdict": {
+    "actionableTriggers": ["duplicated-policy", "caller-complexity", "repeated-bugs"],
+    "fileLengthAdvisoryOnly": true
+  },
+  "seam": {
+    "proposedInterface": "issueWorkAdmissionTicket, checkWorkAdmissionTicket, createWorkAdmissionCoverageReceipt, captureWorkAdmissionSnapshot, recoverUnattributedMutation",
+    "requiresTwoAdapters": true,
+    "proposedAdapters": ["claim-work-admission", "task-work-admission-import", "restricted-execution-gateway"],
+    "deletionTest": "If this module is deleted, the policy and caller complexity must reappear across callers; otherwise the module is too shallow.",
+    "interfaceTest": "Replace internals through the proposed interface and assert observable behavior through that interface only."
+  },
+  "hiddenComplexity": {
+    "depth": "high",
+    "leverage": "Concentrate repeated policy behind one interface so callers gain more behavior per fact learned.",
+    "locality": "Keep fixes, rollback, and causal validator updates inside the owner atom or map."
+  },
+  "dependencyClass": ["in-process", "local-substitutable"],
+  "replaceDontLayerTest": "Replace old private-internal tests with tests through the proposed interface once the adapters exist; do not layer tests over old shallow modules.",
+  "rollback": "Revert claim and gateway wiring while retaining ticket coverage and recovery evidence for audit.",
+  "causalValidators": [
+    "tests/cli/work-admission-ticket-claim.test.ts",
+    "tests/cli/work-admission-ticket-recovery.test.ts",
+    "tests/cli/restricted-execution-gateway.test.ts",
+    "tests/cli/write-ticket-scope-guard.test.ts"
+  ],
+  "confidence": "high",
+  "receiptFingerprint": "deep-module-review:536477bc"
+}

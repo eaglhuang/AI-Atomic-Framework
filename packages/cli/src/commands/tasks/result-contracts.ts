@@ -16,6 +16,7 @@ import type { ContextMap } from './task-import-validators.ts';
 import type { TaskDispatchPattern } from './task-markdown-helpers.ts';
 import type { TaskHistoricalDeliveryReport } from './historical-delivery.ts';
 import type { AcceptanceEvidenceMap } from '@ai-atomic-framework/core';
+import type { WorkAdmissionRecoveryMode } from '../../../../core/src/broker/work-admission-ticket.ts';
 
 // ---------------------------------------------------------------------------
 // tasks import contracts
@@ -87,6 +88,9 @@ export interface TaskImportRecord {
     readonly responsibility: 'advisory';
     readonly legacyProjection: true;
   }[];
+  readonly workAdmission?: {
+    readonly recoveryMode: WorkAdmissionRecoveryMode;
+  };
   readonly planningRepo?: string | null;
   readonly targetRepo?: string | null;
   readonly closureAuthority?: string | null;

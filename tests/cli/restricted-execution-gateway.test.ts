@@ -6,6 +6,7 @@ import {
   describeRestrictedExecutionPolicy,
   evaluateRestrictedExecution
 } from '../../packages/core/src/team-agents/restricted-execution-gateway.ts';
+import { issueWorkAdmissionTicket } from '../../packages/core/src/broker/work-admission-ticket.ts';
 import { evaluateTeamWorkerExecutionRequest } from '../../packages/core/src/team-agents/worker-executor.ts';
 
 const now = '2026-07-28T00:00:00.000Z';
@@ -16,6 +17,17 @@ const authority = {
   laneSessionId: 'lane-1'
 } as const;
 
+const workAdmissionTicket = issueWorkAdmissionTicket({
+  taskId: authority.taskId,
+  actorId: authority.actor,
+  laneSessionId: authority.laneSessionId,
+  claimGeneration: 'lease-worker-1',
+  allowedFiles: ['dist/atm.js'],
+  requestedRecoveryMode: 'disabled',
+  runnerSelection: { runnerKind: 'frozen', runnerRef: 'atm.mjs@fixture', selectedAt: now },
+  now
+});
+
 function worker(executable: string, argv: readonly string[], overrides: Record<string, unknown> = {}) {
   return evaluateRestrictedExecution({
     ...authority,
@@ -24,6 +36,8 @@ function worker(executable: string, argv: readonly string[], overrides: Record<s
     argv,
     cwd: '.',
     adapterCapability: 'enforced',
+    workAdmissionTicket,
+    claimGeneration: 'lease-worker-1',
     now,
     ...overrides
   });
@@ -69,6 +83,11 @@ assert.equal(worker('/usr/bin/git', ['commit', '-m', 'x']).reasonCode, 'raw-git-
 const governed = worker('node', ['atm.mjs', 'git', 'commit', '--actor', 'worker-1', '--json']);
 assert.equal(governed.decision, 'allow', 'the ATM governed wrapper is the normal mutation path');
 assert.equal(governed.reasonCode, 'approved-atm-command');
+
+const missingTicket = worker('node', ['atm.mjs', 'git', 'commit', '--json'], { workAdmissionTicket: null });
+assert.equal(missingTicket.decision, 'deny');
+assert.equal(missingTicket.reasonCode, 'work-admission-ticket-missing');
+assert.equal(missingTicket.receipt.workAdmissionDecisionCode, 'ATM_WRITE_TICKET_MISSING');
 
 const readOnlyGit = worker('git', ['status', '--short']);
 assert.equal(readOnlyGit.decision, 'allow');
@@ -141,6 +160,8 @@ assert.equal(wrongCapability.reasonCode, 'external-write-capability-unsupported'
 
 const manifestWithoutOutputs = evaluateRestrictedExecution({
   ...authority,
+  workAdmissionTicket,
+  claimGeneration: 'lease-worker-1',
   executionClass: 'command-manifest',
   executable: 'npm',
   argv: ['run', 'build'],
@@ -153,6 +174,8 @@ assert.equal(manifestWithoutOutputs.reasonCode, 'undeclared-output');
 
 const manifestWithOutputs = evaluateRestrictedExecution({
   ...authority,
+  workAdmissionTicket,
+  claimGeneration: 'lease-worker-1',
   executionClass: 'command-manifest',
   executable: 'npm',
   argv: ['run', 'build'],
@@ -163,6 +186,19 @@ const manifestWithOutputs = evaluateRestrictedExecution({
 });
 assert.equal(manifestWithOutputs.decision, 'allow');
 assert.equal(manifestWithOutputs.reasonCode, 'declared-generated-write-command');
+
+const manifestMissingTicket = evaluateRestrictedExecution({
+  ...authority,
+  executionClass: 'command-manifest',
+  executable: 'npm',
+  argv: ['run', 'build'],
+  cwd: '.',
+  declaredOutputs: ['dist/atm.js'],
+  adapterCapability: 'enforced',
+  now
+});
+assert.equal(manifestMissingTicket.reasonCode, 'work-admission-ticket-missing');
+assert.equal(manifestMissingTicket.receipt.workAdmissionDecisionCode, 'ATM_WRITE_TICKET_MISSING');
 
 const manifestEval = evaluateRestrictedExecution({
   ...authority,
