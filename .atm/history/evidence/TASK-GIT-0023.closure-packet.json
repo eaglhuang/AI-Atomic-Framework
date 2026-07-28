@@ -1,0 +1,208 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0023",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "49700cd073c3ecbcaa14de23eecd25da4b9a5ebd",
+  "governedTreeSha": "7ba6ecaae83b2f4a655d812aae0867ad6dc0294f",
+  "targetCommitDelta": {
+    "currentCommitSha": "49700cd073c3ecbcaa14de23eecd25da4b9a5ebd",
+    "parentCommitShas": [
+      "49700cd073c3ecbcaa14de23eecd25da4b9a5ebd"
+    ],
+    "governedTreeSha": "7ba6ecaae83b2f4a655d812aae0867ad6dc0294f",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0023.json",
+      ".atm/history/task-events/TASK-GIT-0023/2026-07-28T22-20-57-515Z-import-2daaf4489806.json",
+      ".atm/history/task-events/TASK-GIT-0023/2026-07-28T22-27-12-997Z-renew-525d2aa58828.json",
+      ".atm/history/tasks/TASK-GIT-0023.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/commands/hook/pre-commit/failure-envelope.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "packages/cli/dist/commands/next/route-resolution/pending-worktree.js",
+      "packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/failure-envelope.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-resolution/pending-worktree.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/foreign-generated-residue-ticket-continuity.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/foreign-generated-residue-ticket-continuity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0d1da3ef6c89a34efa892fee88dcdbd8be9a9eb0c61d6d4009f2ccd69ebf21ce",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5c861bff6ac517c5aed08760e80db1a5cbeabdfe13f4c62337bc678a6853e9d7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae3fb3d729be92f3d724e5c0a94061ace8eb5bf084e6634456f4c52b96051340",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e435e09d86b363c9cf866e8b5b71c5466dfe22fd2b4c68e2201be9780bd9adb2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1b88e05bef873a45ff86b57e7dcf284c038671543c2dae7058db2fd29156d01d",
+      "stderrSha256": "sha256:224d2a76d81c73b0e13952ef2642594623544e14a044815f62dfdc8e3d1deeef",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "node --strip-types tests/cli/foreign-generated-residue-ticket-continuity.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-28T22:28:03.836Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0023.*",
+      ".atm/history/task-events/TASK-GIT-0023/**",
+      ".atm/history/tasks/TASK-GIT-0023.json",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "tests/cli/foreign-generated-residue-ticket-continuity.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "tests/cli/foreign-generated-residue-ticket-continuity.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-GIT-0023.json",
+  "closedAt": "2026-07-28T22:28:03.836Z",
+  "closedByActor": "codex-git-0023-captain",
+  "sessionId": "session-20260728220105-codex-git-0023-captain-TASK-GIT-0023-e4260099c1",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "bf99dd0ffd52f9fe2548526600045041fcf2b679",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/work-admission-ticket.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
