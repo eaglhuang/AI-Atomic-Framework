@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-69acaf4c8663",
+  "recordedAt": "2026-07-27T16:34:14.321Z",
+  "actorId": null,
+  "taskId": "ATM-GOV-0266",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0266-runner-sync-sealed-input-continuity-and-durable-steward-finalization.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-ATM-GOV-0266-6a52ed3109",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-27T16-34-14-320Z-EMG-ATM-GOV-0266-6a52ed3109.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
