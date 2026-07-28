@@ -1,0 +1,183 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TMP-0005",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9666c2111e02abdd1660629451e2728161fe2ac4",
+  "governedTreeSha": "d789e66f1d6e530d3a4f891050f8a76e66c5db10",
+  "targetCommitDelta": {
+    "currentCommitSha": "9666c2111e02abdd1660629451e2728161fe2ac4",
+    "parentCommitShas": [
+      "9666c2111e02abdd1660629451e2728161fe2ac4"
+    ],
+    "governedTreeSha": "d789e66f1d6e530d3a4f891050f8a76e66c5db10",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TMP-0005.json",
+      ".atm/history/task-events/TASK-TMP-0005/2026-07-28T11-05-48-728Z-import-9700d57178f3.json",
+      ".atm/history/task-events/TASK-TMP-0005/2026-07-28T11-15-46-554Z-reserve-c689bf242beb.json",
+      ".atm/history/task-events/TASK-TMP-0005/2026-07-28T11-15-46-558Z-promote-189ee846ec65.json",
+      ".atm/history/task-events/TASK-TMP-0005/2026-07-28T11-15-56-036Z-claim-e08091c04a07.json",
+      ".atm/history/tasks/TASK-TMP-0005.json",
+      "docs/reports/post-close-shared-residue-reconciliation.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs broker status --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:570257e87178193024eb06c7273726f61d79f0256bea02d3d79a24f7b37bc7bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcae1c5ca17ba28eef32fa608fdedc2b6326573175a9e68f026a9cbafd46d6c7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs tasks status --task TASK-SKL-0029 --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a863c931202f4f64a2aa28b63e91454271c5bc1921a81fb25a843b4fbcf30dbf",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs tasks status --task ATM-GOV-0240 --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:861db575c28fe0d452900b87b835745eff5b828a30bc5baf03c221c1f02aa8f2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs tasks status --task ATM-GOV-0248 --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:774b349c0969b983989a1f43dee146e445b881216f91f39763522bc6e3d45ef5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:089acb4c34fc575514d96cdc7dc41f13c309cb699ae6c4578867c704a07ed690",
+      "stderrSha256": "sha256:7029511dbd8cd318b584fc13e2668c5789eec0982b25a69f07577d8879eb5c06",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "git diff --check",
+    "node atm.mjs broker status --json",
+    "node atm.mjs tasks status --task ATM-GOV-0240 --json",
+    "node atm.mjs tasks status --task ATM-GOV-0248 --json",
+    "node atm.mjs tasks status --task TASK-SKL-0029 --json",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-28T11:48:49.262Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-claude-004-skl-0026-captain.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0240.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0266.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0026.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-SKL-0031.*",
+      ".atm/history/evidence/TASK-TMP-0005.*",
+      ".atm/history/task-events/ATM-GOV-0240/**",
+      ".atm/history/task-events/ATM-GOV-0248/**",
+      ".atm/history/task-events/TASK-SKL-0029/**",
+      ".atm/history/task-events/TASK-TMP-0005/**",
+      ".atm/history/tasks/ATM-GOV-0240.json",
+      ".atm/history/tasks/ATM-GOV-0248.json",
+      ".atm/history/tasks/TASK-SKL-0029.json",
+      ".atm/history/tasks/TASK-TMP-0005.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/reports/post-close-shared-residue-reconciliation.md",
+      "packages/cli/dist/commands/taskflow/implementation.js",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/commands/taskflow/implementation.js"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TMP-0005.json",
+  "closedAt": "2026-07-28T11:48:49.263Z",
+  "closedByActor": "cursor-004-tmp-0005-steward",
+  "sessionId": "session-20260728111546-cursor-004-tmp-0005-steward-TASK-TMP-0005-52d7e071a6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9666c2111e02abdd1660629451e2728161fe2ac4",
+    "taskMatchedFiles": [
+      "docs/reports/post-close-shared-residue-reconciliation.md"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
