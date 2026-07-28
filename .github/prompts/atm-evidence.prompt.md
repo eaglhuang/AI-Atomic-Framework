@@ -42,6 +42,27 @@ If a required signal is unavailable, say `unavailable` with the receipt or
 reason. Do not treat missing telemetry as zero latency, zero failures, or
 success.
 
+## Validation Contract Lifecycle
+
+Evidence run, auto-evidence, pre-close, write-readiness, and the advisory review
+all consume the one `evaluateValidationContract` selector. Never derive a local
+required set or recompute freshness in an adapter.
+
+- **Selected-case execution.** Run only the contract-selected case ids and
+  preserve each case's structured output. A shell command that exits zero
+  without executing its declared assertions is a zero-test result and fails the
+  execution contract — it is not a pass.
+- **One contract digest.** Evidence, pre-close, close packet, and pre-push must
+  thread the same validation-contract digest. A changed required set, freshness,
+  or phase owner between stages is a defect, not a refresh.
+- **Candidate freshness.** A candidate source change invalidates every TDD,
+  review, and required-case receipt whose recorded candidate digest no longer
+  matches; stale green receipts do not survive a change under them.
+- **Fail closed.** Pre-close rejects unresolved required cases, zero-test
+  results, and stale phase ownership; advisory checks stay non-blocking. A
+  missing required contract fails closed with one executable recovery manifest —
+  never a full-repository run.
+
 ## Team Agents Evidence Surface
 
 When evidence or blocked guidance involves Team Agents, recognize these as

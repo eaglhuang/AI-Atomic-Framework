@@ -62,6 +62,20 @@ bound. The closed exceptions are emergency/anomaly recovery, historical
 read-only discrimination, and non-development sealed packaging, each with a
 named receipt. A safe same-file compose may have zero queue residency.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: dispatch by cohesive ownership before dispatching by ticket count.
+Each card or sidecar should own one behavior, interface, evidence contract, or
+rollback boundary. If the proposed split would scatter one behavior across
+several actors merely to shrink claims, keep one owner and use reviewers,
+sidecars, or provider-neutral receipts for confidence.
+
+For skill-template or integration projection dispatch, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 ## Actor Identity Handoff Gate
 
 Before any `next --claim`, worker claim, batch checkpoint, `tasks ... --actor`,
@@ -184,6 +198,14 @@ Prefer task-card-referenced dispatch over reprinting the task card. Treat the
 task card as the full specification for scope, deliverables, acceptance, and
 validators; treat the dispatch packet as a concise navigation note for the
 current lane state.
+
+When a card contains `causalGraph`, dispatch references the sealed card and
+reports only the current phase owner, start-condition verdict, and frontier
+inputs. Do not restate causal edges or soft relations in the packet.
+
+When a card contains `causalGraph`, dispatch references the sealed card and
+reports only the current phase owner, start-condition verdict, and frontier
+inputs. Do not restate causal edges or soft relations in the packet.
 
 A good dispatch packet should normally contain only:
 

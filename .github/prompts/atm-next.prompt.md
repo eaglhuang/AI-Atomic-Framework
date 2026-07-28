@@ -59,6 +59,20 @@ If a route blocks parallel work, surface the concrete Tier 2 shared surface and
 the intersecting task, actor, or file set. Do not treat an unrelated active lane
 as a reason to block Tier 0 reading or Tier 1 private evidence/ledger progress.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: choose or recommend task splits by cohesive ownership before ticket
+count. A good next action owns one behavior, interface, evidence contract, or
+rollback boundary. If the next route would scatter one behavior across several
+cards merely to make small claims, keep one card active or request a
+provider-neutral review receipt.
+
+For skill-template or integration projection work, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 First command:
 
 ```bash

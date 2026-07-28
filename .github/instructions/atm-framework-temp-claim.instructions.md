@@ -38,6 +38,20 @@ If `node atm.mjs framework-mode status --json` reports `mode: not-required`,
 this route does not apply — either you are not in the framework repo, or the
 change does not intersect framework-critical files.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: use framework temp claims only for cohesive quickfix ownership, not
+as a way to split one behavior across many small claims. A temporary claim
+should own one behavior, interface, evidence contract, or rollback boundary.
+If the change is broader, route it through the governed task card or a
+provider-neutral review receipt before mutating framework files.
+
+For skill-template or integration projection work, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 ## Route layers
 
 Every step of this route uses the same four layers. Prefer higher layers first;

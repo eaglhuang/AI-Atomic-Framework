@@ -62,6 +62,20 @@ Use this model before widening a blocker. A natural-language request for
 inspection, planning, evidence, or private ledger work should remain parallel
 unless ATM identifies a concrete Tier 2 shared surface intersection.
 
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: split work by cohesion before splitting by ticket count. A proposed
+"to-tickets" breakdown is healthy only when each card owns one behavior,
+interface, evidence contract, or rollback boundary. If a split would scatter
+one behavior across several cards merely to reduce file count or make smaller
+claims, keep it as one card or create a provider-neutral review receipt first.
+
+For skill-template or integration projection work, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
 ## Delivery Principle
 
 The objective is to deliver the task content, not to close task cards. A task
@@ -333,11 +347,28 @@ node atm.mjs tasks mirror --provider <provider> --origin-task <id> --origin-url 
 If the editor provides pre-write hooks, keep them thin and run only:
 
 ```bash
-node atm.mjs guard mutation --task <task-id> --actor "$ATM_ACTOR_ID" --files <csv> --json
+node atm.mjs write-ticket check --task <task-id> --actor "$ATM_ACTOR_ID" --ticket <ticket.json> --files <csv> --observed pre-write --json
 ```
 
-If no hook is available, continue with task claim + `git prepare/check` +
-`evidence verify` gates as the fallback safety boundary.
+Before a mutating implementation pass, acquire a task-scoped ticket:
+
+```bash
+node atm.mjs write-ticket acquire --task <task-id> --actor "$ATM_ACTOR_ID" --files <csv> --intent write --json
+```
+
+If no pre-write hook is available, immediately record touched files after the
+write pass:
+
+```bash
+node atm.mjs write-ticket record-touch --task <task-id> --actor "$ATM_ACTOR_ID" --ticket <ticket.json> --files <csv> --observed post-write --json
+```
+
+Out-of-scope pre-write intent should route to
+`ATM_WRITE_SCOPE_AMENDMENT_REQUIRED`. Already dirty out-of-scope work should
+route to `ATM_WRITE_SCOPE_UNATTACHED_WIP` with recovery commands. Only
+unresolved bypass at commit, close, or push should become
+`ATM_WRITE_TICKET_SCOPE_VIOLATION`. Treat these as evidence consumed by the
+broker/task-scope authority model, not as a second permission system.
 
 ## Required Evidence
 
