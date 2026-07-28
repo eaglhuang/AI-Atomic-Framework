@@ -8,6 +8,7 @@ import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.j
 import { inspectIntegrationBootstrap } from './integration.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { createFrameworkModeStatus } from './framework-development.js';
+import { describeRestrictedExecutionPolicy } from '../../../core/dist/team-agents/restricted-execution-gateway.js';
 import { makeResult, message, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
 import { uniqueInOrder } from './next/view-projections.js';
 import { hasPromptScopedWorkItems, inspectImportedTaskQueue, resolveTaskIntent } from './next/route-resolution.js';
@@ -20,7 +21,27 @@ export async function runNext(argv) {
     const verbose = Array.isArray(argv) && argv.includes('--verbose');
     const routeArgv = verbose ? argv.filter((arg) => arg !== '--verbose') : argv;
     const result = await runNextRoute(routeArgv);
-    return verbose ? result : compactNextRouteResult(result);
+    return withRestrictedExecutionGuidance(verbose ? result : compactNextRouteResult(result));
+}
+/**
+ * Structured ATM-only route guidance. `next` projects the
+ * RestrictedExecutionGateway decision surface; it does not keep its own list of
+ * forbidden commands, and the guidance text is not itself an authorization.
+ */
+function withRestrictedExecutionGuidance(result) {
+    const executionSurfacePolicy = describeRestrictedExecutionPolicy();
+    const evidence = result.evidence ?? {};
+    const nextAction = evidence.nextAction && typeof evidence.nextAction === 'object'
+        ? { ...evidence.nextAction, executionSurfacePolicy }
+        : evidence.nextAction;
+    return {
+        ...result,
+        evidence: {
+            ...evidence,
+            ...(nextAction ? { nextAction } : {}),
+            executionSurfacePolicy
+        }
+    };
 }
 async function runNextRoute(argv) {
     const profile = createNextProfiler();
