@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-6b512976e313",
+  "recordedAt": "2026-07-28T13:34:41.741Z",
+  "actorId": null,
+  "taskId": "TASK-GIT-0016",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from ../3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0016-restricted-external-worker-execution-surface-and-atm-only-guidance.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-TASK-GIT-0016-13af6c5d73",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-28T13-34-41-739Z-EMG-TASK-GIT-0016-13af6c5d73.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

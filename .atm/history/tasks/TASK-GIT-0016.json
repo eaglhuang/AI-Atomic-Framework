@@ -1,0 +1,320 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0016",
+  "title": "Restricted external-worker execution surface and ATM-only guidance",
+  "status": "running",
+  "milestone": "G8",
+  "dependencies": [
+    "TASK-GIT-0015"
+  ],
+  "acceptance": [
+    "A deep-module review receipt passes before source edits, names both real adapters, includes the deletion test, and preserves rollback plus causal validators.",
+    "A Team worker attempting raw `git commit`, `node -e` filesystem write, PowerShell `Set-Content`, `cmd /c`, or `bash -c` is denied before execution and produces a structured receipt.",
+    "A command manifest that uses `process.execPath` with `-e` or equivalent evaluation argument is denied; the existing positive write fixture is replaced by a fail-closed regression.",
+    "A declared read-only validator command is admitted only when it satisfies the executable/argv allowlist and has no shell fallback.",
+    "The same normalized decision is observed through the Team worker adapter and a supported editor pre-tool hook adapter.",
+    "An adapter without an enforceable pre-tool surface advertises no external-write capability and is rejected by dispatch/claim admission for external write work.",
+    "The three canonical ATM entry skills and structured CLI guidance contain the ATM-only route warning, compiled projections validate, and no unresolved template placeholder is introduced.",
+    "Tests prove warning text cannot itself grant permission, and missing/wrong actor, task, lane, declared output, or broker authority fails closed.",
+    "`npm run validate:skill-templates` and `npm run typecheck` pass."
+  ],
+  "deliverables": [
+    "packages/core/src/team-agents/restricted-execution-gateway.ts",
+    "packages/core/src/team-agents/worker-executor.ts",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "packages/cli/src/commands/integration-hooks/implementation.ts",
+    "packages/cli/src/commands/team-runtime-gates.ts",
+    "packages/cli/src/commands/next.ts",
+    "templates/skills/atm-governance-router.skill.md",
+    "templates/skills/atm-dispatch.skill.md",
+    "templates/skills/atm-next.skill.md",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "tests/cli/restricted-execution-gateway.test.ts",
+    "tests/cli/command-manifest-shellless.test.ts",
+    "tests/cli/integration-raw-git-command-guard.test.ts",
+    "artifacts/generated/skill-corpus-audit.json",
+    "docs/governance/error-code-registry.json",
+    "packages/core/src/error-code-registry.generated.ts",
+    "docs/ERROR_CODES.md"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-agents/restricted-execution-gateway.ts",
+    "packages/core/src/team-agents/worker-executor.ts",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "packages/cli/src/commands/integration-hooks/implementation.ts",
+    "packages/cli/src/commands/team-runtime-gates.ts",
+    "packages/cli/src/commands/next.ts",
+    "templates/skills/atm-governance-router.skill.md",
+    "templates/skills/atm-dispatch.skill.md",
+    "templates/skills/atm-next.skill.md",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "tests/cli/restricted-execution-gateway.test.ts",
+    "tests/cli/command-manifest-shellless.test.ts",
+    "tests/cli/integration-raw-git-command-guard.test.ts",
+    "artifacts/generated/skill-corpus-audit.json",
+    "docs/governance/error-code-registry.json",
+    "packages/core/src/error-code-registry.generated.ts",
+    "docs/ERROR_CODES.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+    "node --strip-types tests/cli/command-manifest-shellless.test.ts",
+    "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+    "npm run validate:skill-templates",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Operating-system sandboxing for arbitrary human shells outside an ATM-managed worker process.",
+    "Changing ordinary local human Git workflows that do not opt into the external-worker runtime.",
+    "A broad rewrite of every CLI command executor."
+  ],
+  "nonGoals": [
+    "Do not treat prompt text, a skill warning, or an env variable alone as execution authorization.",
+    "Do not allow a generic interpreter exception that reintroduces node -e or PowerShell write escapes."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the gateway and its adapter projections as one unit. Do not restore a policy-only integration guard while claiming the external-worker execution surface remains hard-gated.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-boundary-restricted-execution-gateway",
+    "atomCid": null,
+    "mapUpdates": [
+      "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance."
+    ],
+    "extractionCandidates": [
+      {
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/team-agents/restricted-execution-gateway.ts",
+        "packages/core/src/team-agents/worker-executor.ts",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/integration-hooks/implementation.ts",
+        "packages/cli/src/commands/team-runtime-gates.ts",
+        "packages/cli/src/commands/next.ts",
+        "templates/skills/atm-governance-router.skill.md",
+        "templates/skills/atm-dispatch.skill.md",
+        "templates/skills/atm-next.skill.md",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "tests/cli/restricted-execution-gateway.test.ts",
+        "tests/cli/command-manifest-shellless.test.ts",
+        "tests/cli/integration-raw-git-command-guard.test.ts",
+        "artifacts/generated/skill-corpus-audit.json",
+        "docs/governance/error-code-registry.json",
+        "packages/core/src/error-code-registry.generated.ts",
+        "docs/ERROR_CODES.md",
+        "One RestrictedExecutionGateway interface that accepts actor/task/lane context plus structured executable and argv, and returns an allow/deny decision with an ATM recovery command.",
+        "External-worker execution uses the gateway before process launch; direct host mutation is not a valid worker capability.",
+        "The gateway rejects raw Git mutation and interpreter-evaluation or shell-command escapes including node -e/--eval, PowerShell -Command/-File write paths, cmd /c, bash -c, and equivalent configured interpreters unless an explicit brokered ATM command contract permits a non-mutating validator.",
+        "Command manifests use executable and argv policy rather than only forbidding a shell field; validators remain allowlisted read-only commands with declared working-directory and output contracts.",
+        "Supported editor integration hooks delegate to the same gateway decision; adapters unable to enforce pre-tool policy advertise no external-write capability instead of implying a hard gate.",
+        "ATM entry skills (governance router, dispatch, next) and structured CLI recovery output state that raw Git, node -e, PowerShell write commands, and direct shell mutation are not approved worker routes; they name the returned ATM command as the only normal mutation path.",
+        "A sealed deep-module review receipt records the chosen interface, two adapters, deletion-test result, rollback, and causal validators before production edits.",
+        "The declared skill-template validator's regenerated skill corpus audit artifact ships with the change that alters the template source digests.",
+        "The fail-closed restricted-execution ErrorCode is registered in the canonical error-code registry, its generated core projection, and the generated public error-code index as one governance delivery.",
+        "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance."
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": "Prefer one small public interface with two adapters. Do not create a separate deny-list implementation in every integration, skill, hook, or executor. Preserve normal human-local shell workflows outside the external-worker runtime, and state that limitation in user-facing guidance.",
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0016-restricted-external-worker-execution-surface-and-atm-only-guidance.task.md",
+    "sectionTitle": "TASK-GIT-0016",
+    "headingLine": 70,
+    "hash": "d81dc6fe1c74fc20",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0016-restricted-external-worker-execution-surface-and-atm-only-guidance.task.md",
+      "planningCommitSha": "dfef7708626782af78fd1cdb6894f6686c0b5970",
+      "contentDigest": "sha256:d81dc6fe1c74fc20b059b732b412003e24956fad22e665a20a856619cb9d5f87",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-28T13:34:41.637Z"
+    }
+  },
+  "importedAt": "2026-07-28T13:34:41.637Z",
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.restricted.execution.gateway.test.ts",
+      "command": "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.command.manifest.shellless.test.ts",
+      "command": "node --strip-types tests/cli/command-manifest-shellless.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.integration.raw.git.command.guard.test.ts",
+      "command": "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.skill.templates",
+      "command": "npm run validate:skill-templates",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "claim": {
+    "actorId": "claude-005-git-0016-captain",
+    "leaseId": "lease-181460bb76fb",
+    "claimedAt": "2026-07-28T12:52:10.496Z",
+    "heartbeatAt": "2026-07-28T12:52:10.496Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0016.*",
+      ".atm/history/task-events/TASK-GIT-0016/**",
+      ".atm/history/tasks/TASK-GIT-0016.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/integration-hooks/implementation.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/team-runtime-gates.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/core/src/team-agents/restricted-execution-gateway.ts",
+      "packages/core/src/team-agents/worker-executor.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "tests/cli/command-manifest-shellless.test.ts",
+      "tests/cli/integration-raw-git-command-guard.test.ts",
+      "tests/cli/restricted-execution-gateway.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260728125211-claude-005-git-0016-captain-70bbadf5c8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728125211-claude-005-git-0016-captain-70bbadf5c8\""
+    }
+  },
+  "owner": "claude-005-git-0016-captain",
+  "startedAt": "2026-07-28T12:52:10.496Z",
+  "startedBySessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0016",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0016.*",
+      ".atm/history/task-events/TASK-GIT-0016/**",
+      ".atm/history/tasks/TASK-GIT-0016.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/integration-hooks/implementation.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/team-runtime-gates.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/core/src/team-agents/restricted-execution-gateway.ts",
+      "packages/core/src/team-agents/worker-executor.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "tests/cli/command-manifest-shellless.test.ts",
+      "tests/cli/integration-raw-git-command-guard.test.ts",
+      "tests/cli/restricted-execution-gateway.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0016-restricted-external-worker-execution-surface-and-atm-only-guidance.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/git-boundary-admission/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0016-restricted-external-worker-execution-surface-and-atm-only-guidance.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "562f144d4eb39d2f9ed2bce20833f294451704464c3b2f6d7a116f00f48b1345",
+    "actorId": "claude-005-git-0016-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260728125211-claude-005-git-0016-captain-70bbadf5c8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728125211-claude-005-git-0016-captain-70bbadf5c8\""
+    },
+    "createdAt": "2026-07-28T12:52:30.657Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-07-28T13-35-27-657Z-scope-amendment-049d2379b76e",
+  "lastTransitionAt": "2026-07-28T13:35:27.657Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

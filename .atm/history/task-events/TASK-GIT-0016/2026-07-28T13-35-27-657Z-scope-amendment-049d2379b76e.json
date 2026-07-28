@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T13-35-27-657Z-scope-amendment-049d2379b76e",
+  "taskId": "TASK-GIT-0016",
+  "action": "scope-amendment",
+  "actorId": "claude-005-git-0016-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0016.json",
+  "taskSha256": "sha256:6f8ebc84cf87d9cfd589d61d725d6ed80da03d0908f54d36f5098fa96a89c985",
+  "createdAt": "2026-07-28T13:35:27.657Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0016 --actor claude-005-git-0016-captain --add \"artifacts/generated/skill-corpus-audit.json,docs/governance/error-code-registry.json,packages/core/src/error-code-registry.generated.ts,docs/ERROR_CODES.md\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

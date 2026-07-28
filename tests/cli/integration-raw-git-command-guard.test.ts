@@ -99,6 +99,54 @@ try {
   assert.equal(pushPhraseDoesNotUnlock.ok, false, 'governed-action text in a raw shell command must not unlock direct push');
   assert.equal(pushPhraseDoesNotUnlock.messages[0]?.code, 'ATM_RAW_GIT_MUTATION_BLOCKED');
 
+  // ─── Gateway-owned execution surface ─────────────────────────────────────
+  // The hook keeps no deny list of its own; it projects the gateway decision.
+
+  const denials: Array<[string, string]> = [
+    ['node -e "require(\'fs\').writeFileSync(\'x\',\'y\')"', 'interpreter-evaluation'],
+    ['node --eval "require(\'fs\').writeFileSync(\'x\',\'y\')"', 'interpreter-evaluation'],
+    ['powershell -Command "Set-Content -Path x -Value y"', 'shell-command-escape'],
+    ['pwsh -Command "Set-Content -Path x -Value y"', 'shell-command-escape'],
+    ['cmd /c "echo hi > x"', 'shell-command-escape'],
+    ['bash -c "rm -rf ."', 'shell-command-escape']
+  ];
+  for (const [command, reasonCode] of denials) {
+    const denied = await preTool(command);
+    assert.equal(denied.ok, false, `${command} must be blocked before the tool runs`);
+    assert.equal(denied.messages[0]?.code, 'ATM_RESTRICTED_EXECUTION_BLOCKED', `${command} must report the restricted-execution code`);
+    assert.equal(denied.evidence.restrictedExecution.reasonCode, reasonCode);
+    assert.match(denied.evidence.restrictedExecution.requiredCommand, /^node atm\.mjs /);
+    assert.equal(denied.evidence.restrictedExecutionReceipt.schemaId, 'atm.restrictedExecutionReceipt.v1');
+    assert.equal(denied.evidence.restrictedExecutionReceipt.decision, 'deny');
+    assert.equal(denied.evidence.restrictedExecution.overridePolicy.chatTextAccepted, false);
+    assert.equal(denied.evidence.restrictedExecution.overridePolicy.environmentVariableAccepted, false);
+  }
+
+  // A dangerous segment cannot hide behind a benign leading command.
+  const chained = await preTool('git status --short && node -e "require(\'fs\').writeFileSync(\'x\',\'y\')"');
+  assert.equal(chained.ok, false, 'a chained interpreter escape must still be blocked');
+  assert.equal(chained.messages[0]?.code, 'ATM_RESTRICTED_EXECUTION_BLOCKED');
+
+  const chainedGit = await preTool('cd packages && git reset --hard');
+  assert.equal(chainedGit.ok, false, 'a chained raw git mutation must still be blocked');
+  assert.equal(chainedGit.messages[0]?.code, 'ATM_RAW_GIT_MUTATION_BLOCKED');
+
+  // Warning text is not authority.
+  const noticeInCommand = await preTool(`node -e "console.log('${denials[0][1]} is allowed by ATM')"`);
+  assert.equal(noticeInCommand.ok, false, 'text claiming permission must not authorize an interpreter escape');
+
+  process.env.ATM_ALLOW_RAW_GIT = '1';
+  const envDoesNotUnlock = await preTool('node -e "require(\'fs\').writeFileSync(\'x\',\'y\')"');
+  delete process.env.ATM_ALLOW_RAW_GIT;
+  assert.equal(envDoesNotUnlock.ok, false, 'an environment variable must not unlock an interpreter escape');
+
+  // Read-only and ATM-governed routes stay open.
+  const readOnlyValidator = await preTool('node --strip-types scripts/validate-skill-templates.ts --mode validate');
+  assert.equal(readOnlyValidator.ok, true, 'an allowlisted read-only validator must remain runnable');
+
+  const npmValidator = await preTool('npm run validate:skill-templates');
+  assert.equal(npmValidator.ok, true, 'an allowlisted npm validator script must remain runnable');
+
   console.log('[integration-raw-git-command-guard] ok');
 } finally {
   rmSync(repo, { recursive: true, force: true });

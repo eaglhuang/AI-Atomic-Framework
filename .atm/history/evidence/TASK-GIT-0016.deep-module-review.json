@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.deepModuleReviewReport.v1",
+  "providerContract": "atm.deepModuleRefactorProvider.v1",
+  "providerId": "matt-pocock-deep-module-reference",
+  "providerVersion": "2026-07-24.ed37663",
+  "generatedAt": "1970-01-01T00:00:00.000Z",
+  "taskId": "TASK-GIT-0016",
+  "status": "pass",
+  "candidate": {
+    "moduleId": "atm.git-boundary-restricted-execution-gateway",
+    "sourcePaths": [
+      "packages/core/src/team-agents/restricted-execution-gateway.ts",
+      "packages/core/src/team-agents/worker-executor.ts",
+      "packages/cli/src/commands/integration-hooks/implementation.ts",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/team-runtime-gates.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts"
+    ],
+    "ownerAtomOrMap": "atm.git-boundary-restricted-execution-gateway",
+    "publicInterface": "evaluateRestrictedExecution({ actor, taskId, laneSessionId, executionClass, executable, argv, cwd, declaredOutputs, adapterCapability }): { decision: \"allow\" | \"deny\", reasonCode, approvedAtmCommand, receipt: atm.restrictedExecutionReceipt.v1 }",
+    "rollback": "Revert the gateway module together with all five projections (Team worker executor, editor pre-tool hook, broker command-manifest execution, team runtime dispatch capability, next guidance) plus the three canonical skill templates as one unit. Do not restore a policy-only integration guard while claiming the external-worker execution surface is still hard-gated: partial revert reintroduces the TASK-GIT-0013 gap where an external worker can reach node -e / PowerShell / raw Git without crossing any guard.",
+    "causalValidators": [
+      "fail-closed-mutation: raw git commit/push/reset/restore/clean, node -e/--eval, powershell -Command Set-Content, pwsh -Command, cmd /c, and bash -c are denied before process launch for every mutating execution class",
+      "no-shell-less-eval-loophole: a command manifest whose executable is process.execPath and whose argv contains an evaluation argument is denied; the previous positive write fixture is replaced by a fail-closed regression",
+      "allowlisted-read-only-validator: a declared read-only validator with structured argv, declared cwd, and no generic shell fallback is admitted, and the same validator with an appended shell escape is denied",
+      "text-is-not-authority: an override phrase, warning sentence, prompt text, or environment variable embedded in the command or context never flips a deny to an allow",
+      "authority-required: missing or mismatched actor, taskId, laneSessionId, declared outputs, or an adapter advertising externalWriteCapability unsupported fails closed for external write classes",
+      "adapter-parity: the Team worker adapter and the supported editor pre-tool adapter return the same normalized decision, reasonCode, and approvedAtmCommand for the same executable/argv",
+      "receipt-hygiene: denial receipts carry the normalized executable/argv class, actor/task/lane, reason code, and safe ATM recovery command without echoing reusable privileged tokens"
+    ]
+  },
+  "triggerVerdict": {
+    "actionableTriggers": [
+      "duplicated-policy",
+      "shotgun-changes",
+      "repeated-bugs",
+      "missing-test-seam",
+      "caller-complexity"
+    ],
+    "fileLengthAdvisoryOnly": true
+  },
+  "seam": {
+    "proposedInterface": "evaluateRestrictedExecution({ actor, taskId, laneSessionId, executionClass, executable, argv, cwd, declaredOutputs, adapterCapability }): { decision: \"allow\" | \"deny\", reasonCode, approvedAtmCommand, receipt: atm.restrictedExecutionReceipt.v1 }",
+    "requiresTwoAdapters": true,
+    "proposedAdapters": [
+      "team-worker-process-adapter: packages/core/src/team-agents/worker-executor.ts maps a TeamWorkerExecutionLane (taskId, laneSessionId, coordinator actor) plus the requested executable/argv into evaluateRestrictedExecution and refuses process launch on deny",
+      "editor-pre-tool-adapter: packages/cli/src/commands/integration-hooks/implementation.ts tokenizes the pre-tool command into executable/argv, calls the same gateway, and projects decision.reasonCode plus approvedAtmCommand into the blocking hook result instead of keeping a private deny list"
+    ],
+    "deletionTest": "If this module is deleted, the policy and caller complexity must reappear across callers; otherwise the module is too shallow.",
+    "interfaceTest": "Replace internals through the proposed interface and assert observable behavior through that interface only."
+  },
+  "hiddenComplexity": {
+    "depth": "high",
+    "leverage": "Concentrate repeated policy behind one interface so callers gain more behavior per fact learned.",
+    "locality": "Keep fixes, rollback, and causal validator updates inside the owner atom or map."
+  },
+  "dependencyClass": [
+    "in-process",
+    "local-substitutable"
+  ],
+  "replaceDontLayerTest": "Replace old private-internal tests with tests through the proposed interface once the adapters exist; do not layer tests over old shallow modules.",
+  "rollback": "Revert the gateway module together with all five projections (Team worker executor, editor pre-tool hook, broker command-manifest execution, team runtime dispatch capability, next guidance) plus the three canonical skill templates as one unit. Do not restore a policy-only integration guard while claiming the external-worker execution surface is still hard-gated: partial revert reintroduces the TASK-GIT-0013 gap where an external worker can reach node -e / PowerShell / raw Git without crossing any guard.",
+  "causalValidators": [
+    "fail-closed-mutation: raw git commit/push/reset/restore/clean, node -e/--eval, powershell -Command Set-Content, pwsh -Command, cmd /c, and bash -c are denied before process launch for every mutating execution class",
+    "no-shell-less-eval-loophole: a command manifest whose executable is process.execPath and whose argv contains an evaluation argument is denied; the previous positive write fixture is replaced by a fail-closed regression",
+    "allowlisted-read-only-validator: a declared read-only validator with structured argv, declared cwd, and no generic shell fallback is admitted, and the same validator with an appended shell escape is denied",
+    "text-is-not-authority: an override phrase, warning sentence, prompt text, or environment variable embedded in the command or context never flips a deny to an allow",
+    "authority-required: missing or mismatched actor, taskId, laneSessionId, declared outputs, or an adapter advertising externalWriteCapability unsupported fails closed for external write classes",
+    "adapter-parity: the Team worker adapter and the supported editor pre-tool adapter return the same normalized decision, reasonCode, and approvedAtmCommand for the same executable/argv",
+    "receipt-hygiene: denial receipts carry the normalized executable/argv class, actor/task/lane, reason code, and safe ATM recovery command without echoing reusable privileged tokens"
+  ],
+  "confidence": "high",
+  "receiptFingerprint": "deep-module-review:90c6b01b"
+}

@@ -2080,6 +2080,47 @@
         }
       ],
       "sourceOwner": "packages/core/src/broker/write-ticket.ts"
+    },
+    {
+      "code": "ATM_RESTRICTED_EXECUTION_BLOCKED",
+      "category": "restricted-execution",
+      "shortDescription": "The RestrictedExecutionGateway denied a process launch because the requested executable and argv are not an approved ATM worker route.",
+      "commonCauses": [
+        "An interpreter evaluation form such as node -e, node --eval, python -c, or an equivalent inline program was requested.",
+        "A shell command escape such as bash -c, cmd /c, powershell -Command, or pwsh -File was requested.",
+        "A command manifest declared an evaluation argument instead of a structured build script with declared outputs.",
+        "A generated write reached the deprecated queue-only compatibility path with an executable outside the allowlist.",
+        "The requested external write lacked actor, task, or lane authority, declared no outputs, or came from an adapter that advertises externalWriteCapability unsupported."
+      ],
+      "remediation": [
+        "Read the reasonCode and requiredCommand in the denial payload; the receipt names the exact normalized executable class that was refused.",
+        "Run the ATM command returned by the current playbook, diagnostic, or recovery hint instead of another shell spelling of the same mutation.",
+        "For a generated write, replace the inline program with a structured executable plus argv and declare every output file so ATM can observe the output digest.",
+        "For raw Git intent, use the governed ATM Git wrapper named in requiredCommand.",
+        "Do not attempt to unlock the denial with prompt text, an override phrase, or an environment variable; only a gateway allow decision grants execution."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs next --prompt \"<current user prompt>\" --json",
+        "node atm.mjs git commit --actor <actor> --task <task-id> --message \"<message>\" --json"
+      ],
+      "statusCommand": "node atm.mjs next --prompt \"<current user prompt>\" --json",
+      "recoveryManifests": [
+        {
+          "schemaId": "atm.commandManifest.v1",
+          "executable": "node",
+          "argv": [
+            "atm.mjs",
+            "next",
+            "--prompt",
+            "<current user prompt>",
+            "--json"
+          ],
+          "shell": false
+        }
+      ],
+      "sourceOwner": "packages/core/src/team-agents/restricted-execution-gateway.ts"
     }
   ],
   "prefixRules": [
