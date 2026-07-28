@@ -43,6 +43,12 @@ export interface RunnerPublicationDispositionReport {
   readonly terminalDisposition: 'published' | 'recovery-retained' | null;
 }
 
+export interface RunnerBuildOutputInventoryValidation {
+  readonly ok: boolean;
+  readonly inventory: RunnerBuildOutputInventory | null;
+  readonly reason: string | null;
+}
+
 export interface BuildOutputOwnership {
   readonly path: string;
   readonly ownerTaskId?: string | null;
@@ -187,6 +193,57 @@ export function verifyRunnerBuildOutputParity(
   const missing = [...declared].filter((entry) => !observed.has(entry)).sort();
   const extra = [...observed].filter((entry) => !declared.has(entry)).sort();
   return { ok: missing.length === 0 && extra.length === 0, missing, extra };
+}
+
+/**
+ * Validate a receipt-provided inventory against the same canonical digest used
+ * by the build writer. Consumers must not accept a merely shape-compatible
+ * inventory, because it could describe a different sealed generation.
+ */
+export function validateRunnerBuildOutputInventory(value: unknown): RunnerBuildOutputInventoryValidation {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return { ok: false, inventory: null, reason: 'inventory must be an object' };
+  }
+  const candidate = value as Record<string, unknown>;
+  if (candidate.schemaId !== 'atm.runnerBuildOutputInventory.v1') {
+    return { ok: false, inventory: null, reason: 'inventory schemaId is invalid' };
+  }
+  const sealedSourceSha = typeof candidate.sealedSourceSha === 'string' ? candidate.sealedSourceSha.trim() : '';
+  if (!sealedSourceSha || !Array.isArray(candidate.entries) || typeof candidate.digest !== 'string') {
+    return { ok: false, inventory: null, reason: 'inventory is missing sealedSourceSha, entries, or digest' };
+  }
+  const entries: RunnerBuildOutputInventoryEntry[] = [];
+  for (const entry of candidate.entries) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      return { ok: false, inventory: null, reason: 'inventory contains an invalid entry' };
+    }
+    const raw = entry as Record<string, unknown>;
+    const path = typeof raw.path === 'string' ? normalizePath(raw.path) : '';
+    const disposition = raw.disposition;
+    if (!path || !['owned-current', 'foreign-live', 'stale-recovery-input', 'unowned'].includes(String(disposition))) {
+      return { ok: false, inventory: null, reason: 'inventory contains an invalid path or disposition' };
+    }
+    entries.push({
+      path,
+      disposition: disposition as RunnerBuildOutputDisposition,
+      ownerTaskId: typeof raw.ownerTaskId === 'string' && raw.ownerTaskId.trim() ? raw.ownerTaskId.trim() : null,
+      ownerActorId: typeof raw.ownerActorId === 'string' && raw.ownerActorId.trim() ? raw.ownerActorId.trim() : null
+    });
+  }
+  const paths = entries.map((entry) => entry.path);
+  if (paths.length !== new Set(paths).size || JSON.stringify(paths) !== JSON.stringify([...paths].sort())) {
+    return { ok: false, inventory: null, reason: 'inventory paths must be unique and sorted' };
+  }
+  const inventory: RunnerBuildOutputInventory = {
+    schemaId: 'atm.runnerBuildOutputInventory.v1',
+    sealedSourceSha,
+    entries,
+    digest: String(candidate.digest).trim()
+  };
+  if (inventory.digest !== digestInventory(inventory.sealedSourceSha, inventory.entries)) {
+    return { ok: false, inventory: null, reason: 'inventory digest does not match its canonical entries' };
+  }
+  return { ok: true, inventory, reason: null };
 }
 
 function digestInventory(sealedSourceSha: string, entries: readonly RunnerBuildOutputInventoryEntry[]): string {

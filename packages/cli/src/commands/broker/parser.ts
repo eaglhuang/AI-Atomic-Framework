@@ -44,7 +44,7 @@ export interface ParsedBrokerOptions {
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
-  readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | 'release' | null;
+  readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | 'release' | 'reconcile-receipt' | null;
   readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;
   readonly scheduleAction: 'enqueue' | 'plan' | 'status' | null;
   readonly batchAction: 'execute' | null;
