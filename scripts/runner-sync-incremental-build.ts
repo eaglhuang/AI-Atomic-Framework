@@ -1,8 +1,9 @@
-import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
+import { deriveRunnerBuildOutputInventory, type RunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import {
   attestRunnerSyncPublication,
   finalizeRunnerSyncPublication,
@@ -19,6 +20,8 @@ import {
   type RunnerInputGraph
 } from '../packages/core/src/broker/runner-version-contract.ts';
 import type { BuildDecision, BuildTarget, SealedBuildTimings } from './run-sealed-runner-build.ts';
+import { buildRunnerSyncBuildObservation, summarizeDominantPhase } from './runner-sync-observability.ts';
+export { buildRunnerSyncBuildObservation, persistTsBuildCache, prepareTsBuildCache, summarizeDominantPhase, writeRunnerBuildRuntimeTelemetry } from './runner-sync-observability.ts';
 
 const releaseManifestPaths = [
   path.join('release', 'atm-root-drop', 'release-manifest.json'),
@@ -56,7 +59,6 @@ export type RunnerIncrementalBuildPlan = {
   readonly incrementalEligible: boolean;
   readonly unsafeReasons: readonly string[];
 };
-
 export type TsBuildCacheSummary = {
   readonly schemaId: 'atm.runnerTsBuildCacheSummary.v1';
   readonly cacheRoot: string;
@@ -115,6 +117,8 @@ export type RunnerSyncReceipt = {
   };
   readonly stewardWorkId: string;
   readonly sealedSourceSha: string;
+  /** Immutable publication membership for the sealed build, not a best-effort diff. */
+  readonly outputInventory: RunnerBuildOutputInventory;
   readonly memberTaskIds: readonly string[];
   readonly groupManifest: CoalescedGroupManifest;
   readonly childReceipts: readonly ChildReceipt[];
@@ -241,91 +245,6 @@ export function planRunnerIncrementalBuild(input: {
   };
 }
 
-export function writeRunnerBuildRuntimeTelemetry(input: {
-  readonly cwd: string;
-  readonly actorId: string;
-  readonly sealedSourceSha: string;
-  readonly buildTarget: BuildTarget;
-  readonly buildInputsTreeHash: string;
-  readonly buildDecision: BuildDecision;
-  readonly decisionReason: string;
-  readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
-  readonly tsBuildCache?: TsBuildCacheSummary | null;
-  readonly timings: SealedBuildTimings;
-  readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
-  readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
-}): string {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const taskId = process.env.ATM_TASK_ID?.trim() || 'runner-sync';
-  const relative = path.join('.atm', 'runtime', 'telemetry', 'runner-sync-build', `${timestamp}-${taskId}.jsonl`);
-  const absolute = path.join(input.cwd, relative);
-  mkdirSync(path.dirname(absolute), { recursive: true });
-  appendFileSync(absolute, `${JSON.stringify({
-    schemaId: 'atm.runnerSyncBuildRuntimeTelemetry.v1',
-    recordedAt: new Date().toISOString(),
-    actorId: input.actorId,
-    sealedSourceSha: input.sealedSourceSha,
-    buildTarget: input.buildTarget,
-    buildInputsTreeHash: input.buildInputsTreeHash,
-    buildDecision: input.buildDecision,
-    decisionReason: input.decisionReason,
-    changedPathCount: input.incrementalPlan?.changedPaths.length ?? 0,
-    affectedPackageCount: input.incrementalPlan?.affectedPackages.length ?? 0,
-    affectedGroups: input.incrementalPlan?.affectedGroups ?? null,
-    unsafeReasons: input.incrementalPlan?.unsafeReasons ?? [],
-    tsBuildCache: input.tsBuildCache ?? null,
-    phaseTimingsMs: phaseTimingsRecord(input.timings),
-    brokerTicket: input.brokerTicket ?? null,
-    dominantPhaseSummary: input.dominantPhaseSummary ?? summarizeDominantPhase(input.timings),
-    gitPolicy: {
-      rawLogsCommitted: false,
-      storage: '.atm/runtime/telemetry/runner-sync-build/**'
-    }
-  })}\n`, 'utf8');
-  return relative.replace(/\\/g, '/');
-}
-
-export function buildRunnerSyncBuildObservation(input: {
-  readonly buildDecision: RunnerSyncBuildObservation['buildDecision'];
-  readonly decisionReason: string;
-  readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
-  readonly timings: SealedBuildTimings;
-  readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
-}): RunnerSyncBuildObservation {
-  return {
-    schemaId: 'atm.runnerSyncBuildObservation.v1',
-    buildDecision: input.buildDecision,
-    decisionReason: input.decisionReason,
-    brokerTicket: input.brokerTicket ?? null,
-    changedPathCount: input.incrementalPlan?.changedPaths.length ?? 0,
-    affectedPackageCount: input.incrementalPlan?.affectedPackages.length ?? 0,
-    unsafeReasons: input.incrementalPlan?.unsafeReasons ?? [],
-    dominantPhaseSummary: summarizeDominantPhase(input.timings)
-  };
-}
-
-export function summarizeDominantPhase(
-  timings: SealedBuildTimings,
-  basis: RunnerSyncDominantPhaseSummary['basis'] = 'single-run'
-): RunnerSyncDominantPhaseSummary {
-  const phases = Object.entries(phaseTimingsRecord(timings))
-    .filter(([phase]) => phase !== 'totalElapsed') as [keyof ReturnType<typeof phaseTimingsRecord>, number][];
-  const sorted = phases.map(([, value]) => value).sort((left, right) => left - right);
-  const dominant = phases.reduce((current, candidate) => candidate[1] > current[1] ? candidate : current, phases[0]);
-  const totalElapsedMs = phaseTimingsRecord(timings).totalElapsed;
-  return {
-    schemaId: 'atm.runnerSyncDominantPhaseSummary.v1',
-    dominantPhase: dominant[0],
-    dominantPhaseMs: dominant[1],
-    totalElapsedMs,
-    dominanceRatio: totalElapsedMs > 0 ? Number((dominant[1] / totalElapsedMs).toFixed(4)) : 0,
-    phaseMedianMs: percentile(sorted, 0.5),
-    phaseP95Ms: percentile(sorted, 0.95),
-    measuredPhaseCount: sorted.length,
-    optimizationVerdict: basis === 'ab-ba' ? 'improved' : 'inconclusive',
-    basis
-  };
-}
 
 export function writeJsonWithRetry(input: {
   readonly filePath: string;
@@ -354,6 +273,7 @@ export function buildRunnerSyncReceipt(input: {
   readonly actorId: string;
   readonly actorIdentitySource?: RunnerSyncReceipt['actorIdentity']['source'];
   readonly sealedSourceSha: string;
+  readonly outputInventory?: RunnerBuildOutputInventory;
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
@@ -398,6 +318,11 @@ export function buildRunnerSyncReceipt(input: {
     },
     stewardWorkId,
     sealedSourceSha: input.sealedSourceSha,
+    outputInventory: input.outputInventory ?? deriveRunnerBuildOutputInventory({
+      sealedSourceSha: input.sealedSourceSha,
+      observedPaths: [],
+      currentTaskId: taskId
+    }),
     memberTaskIds: session.release.state.groupManifest.memberTaskIds,
     groupManifest: session.release.state.groupManifest,
     childReceipts: session.release.state.childReceipts,
@@ -469,12 +394,13 @@ function buildReceiptSession(input: {
   readonly issuedAt: string;
 }) {
   const ports = { now: () => input.issuedAt };
-  const members = (input.admission.runnerSyncSteward?.requests ?? []).map((request) => ({
-    taskId: request.taskId,
-    actorId: request.actorId,
-    laneSessionId: null,
-    requestedSurfaces: request.requestedSurfaces
-  }));
+  const requests = input.admission.runnerSyncSteward?.requests ?? [];
+  const members = requests.length > 0
+    ? requests.map((request) => ({ taskId: request.taskId, actorId: request.actorId, laneSessionId: null, requestedSurfaces: request.requestedSurfaces }))
+    : input.admission.queueHeadOwnership.waitingTasks.map((taskId) => ({
+        taskId, actorId: input.admission.stewardActorId || 'runner-sync-steward', laneSessionId: null,
+        requestedSurfaces: input.admission.runnerSyncSteward?.requestedSurfaces ?? []
+      }));
   const started = startRunnerSyncSession({
     stewardWorkId: input.stewardWorkId,
     sealedSourceSha: input.sealedSourceSha,
@@ -542,6 +468,7 @@ export function writeRunnerSyncReceipt(input: {
   readonly actorId: string;
   readonly actorIdentitySource?: RunnerSyncReceipt['actorIdentity']['source'];
   readonly sealedSourceSha: string;
+  readonly outputInventory?: RunnerBuildOutputInventory;
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
@@ -569,58 +496,6 @@ export function buildRunnerSyncReleaseCommand(input: {
 }): string {
   const digest = input.receiptDigest ? ` --receipt-digest ${quoteCliArg(input.receiptDigest)}` : '';
   return `node atm.mjs broker runner-sync release --task ${quoteCliArg(input.taskId)} --steward-work-id ${quoteCliArg(input.stewardWorkId)} --receipt-ref ${quoteCliArg(input.receiptRef)}${digest} --json`;
-}
-
-export function prepareTsBuildCache(input: {
-  readonly cwd: string;
-  readonly worktreeRoot: string;
-}): TsBuildCacheSummary {
-  const cacheRoot = path.join(input.cwd, '.atm', 'runtime', 'runner-sync-build-cache', 'typescript');
-  const cacheFile = path.join(cacheRoot, 'tsconfig.build.tsbuildinfo');
-  const worktreeCacheFile = path.join(input.worktreeRoot, '.atm-runtime-cache', 'tsconfig.build.tsbuildinfo');
-  mkdirSync(path.dirname(worktreeCacheFile), { recursive: true });
-  const existedBefore = existsSync(cacheFile);
-  const digestBefore = existedBefore ? fileDigest(cacheFile) : null;
-  let restoredBeforeBuild = false;
-  if (existedBefore) {
-    cpSync(cacheFile, worktreeCacheFile);
-    restoredBeforeBuild = true;
-  }
-  return {
-    schemaId: 'atm.runnerTsBuildCacheSummary.v1',
-    cacheRoot: '.atm/runtime/runner-sync-build-cache/typescript',
-    tsBuildInfoPath: '.atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo',
-    existedBefore,
-    existsAfter: false,
-    digestBefore,
-    digestAfter: null,
-    restoredBeforeBuild,
-    persistedAfterBuild: false,
-    gitPolicy: {
-      rawCacheCommitted: false,
-      storage: '.atm/runtime/runner-sync-build-cache/typescript/**'
-    }
-  };
-}
-
-export function persistTsBuildCache(input: {
-  readonly cwd: string;
-  readonly worktreeRoot: string;
-  readonly summary: TsBuildCacheSummary | null;
-}): TsBuildCacheSummary | null {
-  if (!input.summary) return null;
-  const cacheRoot = path.join(input.cwd, '.atm', 'runtime', 'runner-sync-build-cache', 'typescript');
-  const cacheFile = path.join(cacheRoot, 'tsconfig.build.tsbuildinfo');
-  const worktreeCacheFile = path.join(input.worktreeRoot, '.atm-runtime-cache', 'tsconfig.build.tsbuildinfo');
-  const existsAfter = existsSync(worktreeCacheFile);
-  mkdirSync(cacheRoot, { recursive: true });
-  if (existsAfter) cpSync(worktreeCacheFile, cacheFile);
-  return {
-    ...input.summary,
-    existsAfter,
-    digestAfter: existsAfter ? fileDigest(worktreeCacheFile) : null,
-    persistedAfterBuild: existsAfter
-  };
 }
 
 export function syncDirectoryHashChanged(source: string, target: string): void {
@@ -716,10 +591,4 @@ function normalizeBrokerTicket(admission: RunnerSyncAdmissionReport): RunnerSync
     position: ticket.position,
     headOwner: ticket.headOwner
   };
-}
-
-function percentile(sortedValues: readonly number[], fraction: number): number {
-  if (sortedValues.length === 0) return 0;
-  const index = Math.min(sortedValues.length - 1, Math.max(0, Math.ceil(sortedValues.length * fraction) - 1));
-  return sortedValues[index];
 }

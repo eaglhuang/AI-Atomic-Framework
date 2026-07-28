@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T18-34-44-103Z-scope-amendment-76dc31260fb6",
+  "taskId": "TASK-GIT-0017",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0017.json",
+  "taskSha256": "sha256:b168f8e37096092c4877d2a8beb6c16c24f9e5c278526d6eb597a80a70ff2413",
+  "createdAt": "2026-07-28T18:34:44.103Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0017 --actor codex-git-series-captain --add \"scripts/runner-sync-incremental-build.ts,scripts/runner-sync-observability.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
