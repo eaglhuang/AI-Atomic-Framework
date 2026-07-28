@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0017",
   "title": "Runner publication inventory and framework-temp claim/commit-surface parity",
-  "status": "running",
+  "status": "done",
   "milestone": "G9",
   "dependencies": [
     "TASK-GIT-0016"
@@ -226,7 +226,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-8b25d6f1a718",
     "claimedAt": "2026-07-28T17:44:23.989Z",
-    "heartbeatAt": "2026-07-28T18:41:45.046Z",
+    "heartbeatAt": "2026-07-28T18:45:44.293Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-GIT-0017.*",
@@ -259,13 +259,14 @@
       "tests/cli/runner-publication-residue-classification.test.ts",
       "tests/cli/runner-sync-publication-residue.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260728174424-codex-git-series-captain-d7bb433b3b",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728174424-codex-git-series-captain-d7bb433b3b\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-git-series-captain",
   "startedAt": "2026-07-28T17:44:23.989Z",
@@ -331,7 +332,11 @@
     "createdAt": "2026-07-28T17:44:27.374Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-07-28T18-41-45-299Z-renew-03cefaedd8fb",
-  "lastTransitionAt": "2026-07-28T18:41:45.299Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-28T18-45-44-295Z-close-1bdbffcb8841",
+  "lastTransitionAt": "2026-07-28T18:45:44.295Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-07-28T18:45:44.293Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260728174423-codex-git-series-captain-TASK-GIT-0017-f89fe2936d",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0017.closure-packet.json"
 }

@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-GIT-0017",
-  "updatedAt": "2026-07-28T18:41:22.169Z",
+  "updatedAt": "2026-07-28T18:45:21.083Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -2049,6 +2049,210 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:7e2760d6549b021e390df7d1bb3a834551ca47e06d04ff2c45590fb95cb85d85",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:onefile-release",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-git-series-captain",
+      "sessionId": "session-20260728174423-codex-git-series-captain-TASK-GIT-0017-f89fe2936d",
+      "createdAt": "2026-07-28T18:44:10.651Z",
+      "details": {
+        "actorId": "codex-git-series-captain",
+        "sessionId": "session-20260728174423-codex-git-series-captain-TASK-GIT-0017-f89fe2936d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:onefile-release"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-publication-inventory",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map BuildOutputInventory as the only authority shared by runner-sync enqueue, framework-temp claim, receipt writer, publication commit, and doctor.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:onefile-release",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-28T18:43:17.542Z",
+            "finishedAt": "2026-07-28T18:44:10.651Z",
+            "durationMs": 53109,
+            "cached": false,
+            "validators": [
+              "validate:onefile-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7998693dda5dc8e71c292f9f18b9fbcf4031dd670b029e00e0e6a127ad109667",
+            "generatedAt": "2026-07-28T18:44:10.651Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7998693dda5dc8e71c292f9f18b9fbcf4031dd670b029e00e0e6a127ad109667",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T18:44:10.651Z",
+              "observedAt": "2026-07-28T18:44:10.651Z",
+              "startedAt": "2026-07-28T18:43:17.542Z",
+              "finishedAt": "2026-07-28T18:44:10.651Z",
+              "durationMs": 53109,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:774795f7ac41d48cb6afccf11aeedf682480bf10417e753083073e91260cf207",
+              "outputDigest": "sha256:4efda88f253390b0333db5a0993e00b97448e6b72ca4e24b8fc0d90a0e696299",
+              "cache": {
+                "key": "sha256:7998693dda5dc8e71c292f9f18b9fbcf4031dd670b029e00e0e6a127ad109667",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:onefile-release",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:onefile-release"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:bd0f28546d35e986d771d5897f39ceaa00d6332f989d979570273cf60b2aaa16",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:root-drop-release",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-git-series-captain",
+      "sessionId": "session-20260728174423-codex-git-series-captain-TASK-GIT-0017-f89fe2936d",
+      "createdAt": "2026-07-28T18:45:21.083Z",
+      "details": {
+        "actorId": "codex-git-series-captain",
+        "sessionId": "session-20260728174423-codex-git-series-captain-TASK-GIT-0017-f89fe2936d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:root-drop-release"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-publication-inventory",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map BuildOutputInventory as the only authority shared by runner-sync enqueue, framework-temp claim, receipt writer, publication commit, and doctor.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:root-drop-release",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-28T18:44:13.189Z",
+            "finishedAt": "2026-07-28T18:45:21.082Z",
+            "durationMs": 67893,
+            "cached": false,
+            "validators": [
+              "validate:root-drop-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:5a5719d94d4f01b4bb7322f5d6add0c96e83a55de922eb88f506045f5e9f87b6",
+            "generatedAt": "2026-07-28T18:45:21.082Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:5a5719d94d4f01b4bb7322f5d6add0c96e83a55de922eb88f506045f5e9f87b6",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T18:45:21.082Z",
+              "observedAt": "2026-07-28T18:45:21.082Z",
+              "startedAt": "2026-07-28T18:44:13.189Z",
+              "finishedAt": "2026-07-28T18:45:21.082Z",
+              "durationMs": 67893,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:24e2626c5665724f84452961945f2dc0ba7e6319f83074b3d7f464f4b2417d33",
+              "outputDigest": "sha256:62c1d5bda56bf20f122a1a63e4095c9784327a32ab089866f76e12e8ea257883",
+              "cache": {
+                "key": "sha256:5a5719d94d4f01b4bb7322f5d6add0c96e83a55de922eb88f506045f5e9f87b6",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:root-drop-release",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:root-drop-release"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:2b724a4146979b94af24ce7541e62ceec37cb8cd3408c89b187e97f1ea8d5ebb",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
