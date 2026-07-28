@@ -1,0 +1,148 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-GIT-0018",
+  "updatedAt": "2026-07-28T19:28:36.234Z",
+  "updatedBy": "codex-git-series-captain",
+  "freshValidationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-recovery.test.ts",
+    "node --strip-types tests/cli/write-ticket-scope-guard.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run generate:error-codes",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e247f4e0f4cb184e80ebe2e8e72e2efab2a08305db9e6c5436703a60292df858",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "generate:error-codes"
+      ],
+      "generatedAt": "2026-07-28T19:23:37.791Z",
+      "startedAt": "2026-07-28T19:23:36.670Z",
+      "finishedAt": "2026-07-28T19:23:37.791Z",
+      "durationMs": 1121,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a1e138ac59c3c613495189ddb976d7e1aa77718ffcfbd07f890605edae3cc31e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/restricted-execution-gateway.test.ts"
+      ],
+      "generatedAt": "2026-07-28T19:23:42.796Z",
+      "startedAt": "2026-07-28T19:23:42.210Z",
+      "finishedAt": "2026-07-28T19:23:42.796Z",
+      "durationMs": 586,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c7ed597e4295e170a65cee47e83159f0df2b143f7c5dcf923b6fb47b5b8b5f16",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/work-admission-ticket-claim.test.ts"
+      ],
+      "generatedAt": "2026-07-28T19:23:46.696Z",
+      "startedAt": "2026-07-28T19:23:46.347Z",
+      "finishedAt": "2026-07-28T19:23:46.696Z",
+      "durationMs": 349,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-recovery.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:017b3fceaed62cc7fef7738ebc4300adf530a7ddadd9623168cf155cd2d4eb1b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/work-admission-ticket-recovery.test.ts"
+      ],
+      "generatedAt": "2026-07-28T19:23:50.604Z",
+      "startedAt": "2026-07-28T19:23:49.585Z",
+      "finishedAt": "2026-07-28T19:23:50.604Z",
+      "durationMs": 1019,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/write-ticket-scope-guard.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6245ff240cd53255a5723534de5b20a76c28fa215d4bceb5f7eb3a9f5e17dba4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/write-ticket-scope-guard.test.ts"
+      ],
+      "generatedAt": "2026-07-28T19:23:55.067Z",
+      "startedAt": "2026-07-28T19:23:54.719Z",
+      "finishedAt": "2026-07-28T19:23:55.067Z",
+      "durationMs": 348,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-28T19:24:11.751Z",
+      "startedAt": "2026-07-28T19:24:02.070Z",
+      "finishedAt": "2026-07-28T19:24:11.751Z",
+      "durationMs": 9681,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a2e31458d17df80919780f26beb752f8e398d27b11023c6de7c9b7ea4129b074",
+      "stderrSha256": "sha256:a68bde6b266599e05784532728b5791359553143997ddc78bfa464f37a561b47",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-28T19:27:03.552Z",
+      "startedAt": "2026-07-28T19:26:29.073Z",
+      "finishedAt": "2026-07-28T19:27:03.552Z",
+      "durationMs": 34479,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-28T19:28:36.233Z",
+      "startedAt": "2026-07-28T19:27:07.995Z",
+      "finishedAt": "2026-07-28T19:28:36.233Z",
+      "durationMs": 88238,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0018",
   "title": "Claim-issued work-admission ticket authority, attribution, and recovery",
-  "status": "running",
+  "status": "done",
   "milestone": "G10",
   "dependencies": [
     "TASK-GIT-0016",
@@ -224,7 +224,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-33abb20a6ee1",
     "claimedAt": "2026-07-28T18:49:52.407Z",
-    "heartbeatAt": "2026-07-28T19:16:12.865Z",
+    "heartbeatAt": "2026-07-28T19:32:04.026Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-GIT-0018.*",
@@ -253,13 +253,14 @@
       "tests/cli/work-admission-ticket-recovery.test.ts",
       "tests/cli/write-ticket-scope-guard.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260728184954-codex-git-series-captain-967a1b2145",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728184954-codex-git-series-captain-967a1b2145\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-git-series-captain",
   "startedAt": "2026-07-28T18:49:52.407Z",
@@ -321,8 +322,8 @@
     "createdAt": "2026-07-28T18:49:59.535Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-07-28T19-16-13-269Z-renew-846ccf8fbe35",
-  "lastTransitionAt": "2026-07-28T19:16:13.269Z",
+  "lastTransitionId": "2026-07-28T19-32-04-029Z-close-7b6a5ff3a991",
+  "lastTransitionAt": "2026-07-28T19:32:04.029Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -406,5 +407,9 @@
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
     "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
-  }
+  },
+  "closedAt": "2026-07-28T19:32:04.026Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260728184952-codex-git-series-captain-TASK-GIT-0018-e01f3e4c13",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0018.closure-packet.json"
 }

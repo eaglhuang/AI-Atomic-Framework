@@ -1,0 +1,220 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0018",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "dfd03f7c2fd32953cdd44946a2e61ab8ee3dff00",
+  "governedTreeSha": "3e3f0536ee5d811eeab1076023ed5f513eed93aa",
+  "targetCommitDelta": {
+    "currentCommitSha": "dfd03f7c2fd32953cdd44946a2e61ab8ee3dff00",
+    "parentCommitShas": [
+      "dfd03f7c2fd32953cdd44946a2e61ab8ee3dff00"
+    ],
+    "governedTreeSha": "3e3f0536ee5d811eeab1076023ed5f513eed93aa",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0018.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-work-admission-import.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/core/src/team-agents/restricted-execution-gateway.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/result-contracts.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/validators/work-admission-envelope.schema.json",
+      "tests/catalog/groups/test_group_work_admission_authority.shard.json",
+      "tests/cli/restricted-execution-gateway.test.ts",
+      "tests/cli/work-admission-ticket-claim.test.ts",
+      "tests/cli/work-admission-ticket-recovery.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run generate:error-codes",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e247f4e0f4cb184e80ebe2e8e72e2efab2a08305db9e6c5436703a60292df858",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a1e138ac59c3c613495189ddb976d7e1aa77718ffcfbd07f890605edae3cc31e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c7ed597e4295e170a65cee47e83159f0df2b143f7c5dcf923b6fb47b5b8b5f16",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:017b3fceaed62cc7fef7738ebc4300adf530a7ddadd9623168cf155cd2d4eb1b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/write-ticket-scope-guard.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6245ff240cd53255a5723534de5b20a76c28fa215d4bceb5f7eb3a9f5e17dba4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a2e31458d17df80919780f26beb752f8e398d27b11023c6de7c9b7ea4129b074",
+      "stderrSha256": "sha256:a68bde6b266599e05784532728b5791359553143997ddc78bfa464f37a561b47",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-recovery.test.ts",
+    "node --strip-types tests/cli/write-ticket-scope-guard.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-28T19:32:04.017Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0018.*",
+      ".atm/history/task-events/TASK-GIT-0018/**",
+      ".atm/history/tasks/TASK-GIT-0018.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/cli/src/commands/tasks/task-work-admission-import.ts",
+      "packages/cli/src/commands/write-ticket.ts",
+      "packages/core/src/broker/freeze.ts",
+      "packages/core/src/broker/patch-envelope.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "packages/core/src/broker/write-scope-policy.ts",
+      "packages/core/src/broker/write-ticket.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/core/src/team-agents/restricted-execution-gateway.ts",
+      "schemas/validators/work-admission-envelope.schema.json",
+      "tests/catalog/groups/test_group_work_admission_authority.shard.json",
+      "tests/cli/restricted-execution-gateway.test.ts",
+      "tests/cli/work-admission-ticket-claim.test.ts",
+      "tests/cli/work-admission-ticket-recovery.test.ts",
+      "tests/cli/write-ticket-scope-guard.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/cli/src/commands/tasks/task-work-admission-import.ts",
+      "packages/cli/src/commands/write-ticket.ts",
+      "packages/core/src/broker/freeze.ts",
+      "packages/core/src/broker/patch-envelope.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "packages/core/src/broker/write-scope-policy.ts",
+      "packages/core/src/broker/write-ticket.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/core/src/team-agents/restricted-execution-gateway.ts",
+      "schemas/validators/work-admission-envelope.schema.json",
+      "tests/catalog/groups/test_group_work_admission_authority.shard.json",
+      "tests/cli/restricted-execution-gateway.test.ts",
+      "tests/cli/work-admission-ticket-claim.test.ts",
+      "tests/cli/work-admission-ticket-recovery.test.ts",
+      "tests/cli/write-ticket-scope-guard.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-GIT-0018.json",
+  "closedAt": "2026-07-28T19:32:04.018Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260728184952-codex-git-series-captain-TASK-GIT-0018-e01f3e4c13",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "dfd03f7c2fd32953cdd44946a2e61ab8ee3dff00",
+    "taskMatchedFiles": [
+      "docs/ERROR_CODES.md"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
