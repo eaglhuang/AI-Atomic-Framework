@@ -1,0 +1,84 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T14-37-05-006Z-close-869b4622ffd2",
+  "taskId": "TASK-GIT-0016",
+  "action": "close",
+  "actorId": "claude-005-git-0016-captain",
+  "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0016.json",
+  "taskSha256": "sha256:a49af1ad2e78d79dd559ae8c04ff8d9ae42679a448cbacf1fab3bb9049f6ad97",
+  "createdAt": "2026-07-28T14:37:05.006Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0016 --actor claude-005-git-0016-captain --status done --historical-delivery 34de57dacebda9516c894502739d84cb2600d7b9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0016.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/command-manifest-shellless.test.ts",
+      "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+      "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-28T14:37:04.993Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0016.*",
+        ".atm/history/task-events/TASK-GIT-0016/**",
+        ".atm/history/tasks/TASK-GIT-0016.json",
+        "artifacts/generated/skill-corpus-audit.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/integration-hooks/implementation.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/team-runtime-gates.ts",
+        "packages/core/src/error-code-registry.generated.ts",
+        "packages/core/src/team-agents/restricted-execution-gateway.ts",
+        "packages/core/src/team-agents/worker-executor.ts",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "templates/skills/atm-dispatch.skill.md",
+        "templates/skills/atm-governance-router.skill.md",
+        "templates/skills/atm-next.skill.md",
+        "tests/cli/command-manifest-shellless.test.ts",
+        "tests/cli/integration-raw-git-command-guard.test.ts",
+        "tests/cli/restricted-execution-gateway.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/integration-hooks/implementation.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/team-runtime-gates.ts",
+        "packages/core/src/error-code-registry.generated.ts",
+        "packages/core/src/team-agents/restricted-execution-gateway.ts",
+        "packages/core/src/team-agents/worker-executor.ts",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "tests/cli/command-manifest-shellless.test.ts",
+        "tests/cli/integration-raw-git-command-guard.test.ts",
+        "tests/cli/restricted-execution-gateway.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

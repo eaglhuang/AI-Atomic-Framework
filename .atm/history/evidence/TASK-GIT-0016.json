@@ -1,0 +1,720 @@
+{
+  "taskId": "TASK-GIT-0016",
+  "updatedAt": "2026-07-28T14:33:47.983Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-005-git-0016-captain",
+      "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+      "createdAt": "2026-07-28T14:29:58.527Z",
+      "details": {
+        "actorId": "claude-005-git-0016-captain",
+        "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/restricted-execution-gateway.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-restricted-execution-gateway",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:a1e138ac59c3c613495189ddb976d7e1aa77718ffcfbd07f890605edae3cc31e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-28T14:29:58.156Z",
+            "finishedAt": "2026-07-28T14:29:58.526Z",
+            "durationMs": 370,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/restricted-execution-gateway.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:b208d6f9071817ed284a8bf8728e13842d467c22d62fd7515e4d978ad2287be8",
+            "generatedAt": "2026-07-28T14:29:58.526Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:b208d6f9071817ed284a8bf8728e13842d467c22d62fd7515e4d978ad2287be8",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T14:29:58.526Z",
+              "observedAt": "2026-07-28T14:29:58.526Z",
+              "startedAt": "2026-07-28T14:29:58.156Z",
+              "finishedAt": "2026-07-28T14:29:58.526Z",
+              "durationMs": 370,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:cb719ea9cdd85b25316cb8b2d6bac1dd40dfb30876962863f819eb83b93ab6ff",
+              "outputDigest": "sha256:d5de40def3d8aa4c1389ae9e9a3c8602abb9f28629005176c5730a2faca9f95e",
+              "cache": {
+                "key": "sha256:b208d6f9071817ed284a8bf8728e13842d467c22d62fd7515e4d978ad2287be8",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/restricted-execution-gateway.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/restricted-execution-gateway.test.ts"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c785ca852edd0ac147adb2c869555c185ee79eaf72f2408e111f08c20518995d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/command-manifest-shellless.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-005-git-0016-captain",
+      "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+      "createdAt": "2026-07-28T14:30:18.696Z",
+      "details": {
+        "actorId": "claude-005-git-0016-captain",
+        "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/command-manifest-shellless.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-restricted-execution-gateway",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/command-manifest-shellless.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:93e5f3046e8e82db1610a1230ee722612a9d2f69124607a2695ee1f95f68005e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-28T14:30:01.386Z",
+            "finishedAt": "2026-07-28T14:30:18.695Z",
+            "durationMs": 17309,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/command-manifest-shellless.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4943131b8eda4755e3e30ccd75f9e473bc277a9a1c5b586f52d03bfe59015e7a",
+            "generatedAt": "2026-07-28T14:30:18.695Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:4943131b8eda4755e3e30ccd75f9e473bc277a9a1c5b586f52d03bfe59015e7a",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T14:30:18.695Z",
+              "observedAt": "2026-07-28T14:30:18.695Z",
+              "startedAt": "2026-07-28T14:30:01.386Z",
+              "finishedAt": "2026-07-28T14:30:18.695Z",
+              "durationMs": 17309,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:25bd18c5321bbf3926972870f3a9357330eada63149cafc4886c32db1faa4f01",
+              "outputDigest": "sha256:467ca47bd90d577d9907ce891cd2c12529b630abc64f5ec98e9d32fe6fde8c76",
+              "cache": {
+                "key": "sha256:4943131b8eda4755e3e30ccd75f9e473bc277a9a1c5b586f52d03bfe59015e7a",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/command-manifest-shellless.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/command-manifest-shellless.test.ts"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:35b05bc75c67226ad4a4d5b591971dfa537d5570c6b6ca8250d33a5f32250cdf",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-005-git-0016-captain",
+      "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+      "createdAt": "2026-07-28T14:30:48.880Z",
+      "details": {
+        "actorId": "claude-005-git-0016-captain",
+        "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-restricted-execution-gateway",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:800e3da90ae5e6eeacbbacd32d807eb020254f8fb2d2955b0ea70b717fd35bd0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-28T14:30:21.420Z",
+            "finishedAt": "2026-07-28T14:30:48.878Z",
+            "durationMs": 27458,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:bf94c1df0c9d59dff04ec9876b2f03697cf7a62c37a7a0d077816ae90f647803",
+            "generatedAt": "2026-07-28T14:30:48.878Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:bf94c1df0c9d59dff04ec9876b2f03697cf7a62c37a7a0d077816ae90f647803",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T14:30:48.878Z",
+              "observedAt": "2026-07-28T14:30:48.878Z",
+              "startedAt": "2026-07-28T14:30:21.420Z",
+              "finishedAt": "2026-07-28T14:30:48.878Z",
+              "durationMs": 27458,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:5ec947a3e7ecefd91ff63191582d478f54b2c7724c83f4b97bce6ade407d90d5",
+              "outputDigest": "sha256:1a4a6f6cfa0b067ee3dbac53e5581aa89fd7a8d7dfd73f2d3d4cea0033a900fe",
+              "cache": {
+                "key": "sha256:bf94c1df0c9d59dff04ec9876b2f03697cf7a62c37a7a0d077816ae90f647803",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6cf85f2fde1a09770814f1f9752d96ca29c823d3a87612e77506c2b5d4acccd6",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:skill-templates",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-005-git-0016-captain",
+      "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+      "createdAt": "2026-07-28T14:31:35.627Z",
+      "details": {
+        "actorId": "claude-005-git-0016-captain",
+        "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:skill-templates"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-restricted-execution-gateway",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:skill-templates",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:aa9fb8853bb4f000b753cc9ca7a6bc2b7a4c6d6b8438acb8bf829b70bcb415c2",
+            "stderrSha256": "sha256:f2d16c194863d592d4cec053be289090e8f004d532578587c28a4788b8ec716e",
+            "startedAt": "2026-07-28T14:31:29.833Z",
+            "finishedAt": "2026-07-28T14:31:35.626Z",
+            "durationMs": 5793,
+            "cached": false,
+            "validators": [
+              "validate:skill-templates"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:96ee5be7a23484b380ad33dadcc750480202c285a7e4f097f07cfca47d2c6bab",
+            "generatedAt": "2026-07-28T14:31:35.626Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:96ee5be7a23484b380ad33dadcc750480202c285a7e4f097f07cfca47d2c6bab",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T14:31:35.626Z",
+              "observedAt": "2026-07-28T14:31:35.626Z",
+              "startedAt": "2026-07-28T14:31:29.833Z",
+              "finishedAt": "2026-07-28T14:31:35.626Z",
+              "durationMs": 5793,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:f426520685881ad746afe80e7e56a291119bd370cd34a1a717287489cb2d44a1",
+              "outputDigest": "sha256:ab7d60f4f2fa91ff5a1ce7e52beba35ed4810c28b1330cd5f0e675df30b34880",
+              "cache": {
+                "key": "sha256:96ee5be7a23484b380ad33dadcc750480202c285a7e4f097f07cfca47d2c6bab",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:skill-templates",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:skill-templates"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:8c80874233440433d18ea78039d25e968408ad611d8eaf15c9bdc9ad17839700",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-005-git-0016-captain",
+      "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+      "createdAt": "2026-07-28T14:31:53.675Z",
+      "details": {
+        "actorId": "claude-005-git-0016-captain",
+        "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-restricted-execution-gateway",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-28T14:31:42.057Z",
+            "finishedAt": "2026-07-28T14:31:53.675Z",
+            "durationMs": 11618,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "generatedAt": "2026-07-28T14:31:53.675Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T14:31:53.675Z",
+              "observedAt": "2026-07-28T14:31:53.675Z",
+              "startedAt": "2026-07-28T14:31:42.057Z",
+              "finishedAt": "2026-07-28T14:31:53.675Z",
+              "durationMs": 11618,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:d40d450fc9341a5b5f33bb863a8aa44005d8706d91ecd50382d9ec4c4f3828fb",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b0b88f12f1406507fa162614c522c66e63887507d1402582b3558a430135c6b3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-005-git-0016-captain",
+      "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+      "createdAt": "2026-07-28T14:32:33.013Z",
+      "details": {
+        "actorId": "claude-005-git-0016-captain",
+        "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-restricted-execution-gateway",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6143615808ee0e07889108945ef0b2ce28104882410720cd765a5e728e19b9bd",
+            "stderrSha256": "sha256:d07a73be747021d56f5f766ca12510da344fd5660fe019ab8a00dbeb83ac1e4f",
+            "startedAt": "2026-07-28T14:31:56.647Z",
+            "finishedAt": "2026-07-28T14:32:33.012Z",
+            "durationMs": 36365,
+            "cached": false,
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:699ea06f5fe9c219c0947750981be7152e9d32387334f3fcd64c3ac57fe222c9",
+            "generatedAt": "2026-07-28T14:32:33.012Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:699ea06f5fe9c219c0947750981be7152e9d32387334f3fcd64c3ac57fe222c9",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T14:32:33.012Z",
+              "observedAt": "2026-07-28T14:32:33.012Z",
+              "startedAt": "2026-07-28T14:31:56.647Z",
+              "finishedAt": "2026-07-28T14:32:33.012Z",
+              "durationMs": 36365,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:4c7b3d5b39e8744cf36dda86f0263ee2dac5659b4f7aee121ac81bd29d66a5bd",
+              "outputDigest": "sha256:622882324438a7e5c3a610373a243cc00681464bb7e37bacb64af76d2e72a7e5",
+              "cache": {
+                "key": "sha256:699ea06f5fe9c219c0947750981be7152e9d32387334f3fcd64c3ac57fe222c9",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:cli",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:cli"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6a70779ee36516f51c36f7930acaa3e371197630a3d6b56ba20ecc7fbf3634f6",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-005-git-0016-captain",
+      "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+      "createdAt": "2026-07-28T14:33:47.983Z",
+      "details": {
+        "actorId": "claude-005-git-0016-captain",
+        "sessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-restricted-execution-gateway",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Map the single gateway decision to Team worker execution, command-manifest execution, editor pre-tool hooks, skills, and structured CLI guidance.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-28T14:32:38.170Z",
+            "finishedAt": "2026-07-28T14:33:47.981Z",
+            "durationMs": 69811,
+            "cached": false,
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "generatedAt": "2026-07-28T14:33:47.981Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-28T14:33:47.981Z",
+              "observedAt": "2026-07-28T14:33:47.981Z",
+              "startedAt": "2026-07-28T14:32:38.170Z",
+              "finishedAt": "2026-07-28T14:33:47.981Z",
+              "durationMs": 69811,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:c20050f2defd28bf121eec4443c8a8bfd815281c734dedefe99438030d3a7107",
+              "outputDigest": "sha256:be4bf9fa561d02eaa8ea014e9c342775cea0dc27cddc293655c129794de2a829",
+              "cache": {
+                "key": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:git-head-evidence",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:git-head-evidence"
+                ],
+                "runnerKind": "unknown",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1c661d912003f55cb2d21213b16ee40c203f1b99e686863e311e973167f2eb26",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

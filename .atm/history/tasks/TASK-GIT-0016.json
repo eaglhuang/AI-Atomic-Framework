@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0016",
   "title": "Restricted external-worker execution surface and ATM-only guidance",
-  "status": "running",
+  "status": "done",
   "milestone": "G8",
   "dependencies": [
     "TASK-GIT-0015"
@@ -226,7 +226,7 @@
     "actorId": "claude-005-git-0016-captain",
     "leaseId": "lease-181460bb76fb",
     "claimedAt": "2026-07-28T12:52:10.496Z",
-    "heartbeatAt": "2026-07-28T12:52:10.496Z",
+    "heartbeatAt": "2026-07-28T14:37:05.004Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-GIT-0016.*",
@@ -250,14 +250,14 @@
       "tests/cli/integration-raw-git-command-guard.test.ts",
       "tests/cli/restricted-execution-gateway.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260728125211-claude-005-git-0016-captain-70bbadf5c8",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728125211-claude-005-git-0016-captain-70bbadf5c8\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "claude-005-git-0016-captain",
   "startedAt": "2026-07-28T12:52:10.496Z",
@@ -314,7 +314,11 @@
     "createdAt": "2026-07-28T12:52:30.657Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-07-28T13-35-27-657Z-scope-amendment-049d2379b76e",
-  "lastTransitionAt": "2026-07-28T13:35:27.657Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-28T14-37-05-006Z-close-869b4622ffd2",
+  "lastTransitionAt": "2026-07-28T14:37:05.006Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-07-28T14:37:05.004Z",
+  "closedByActor": "claude-005-git-0016-captain",
+  "closedBySessionId": "session-20260728125210-claude-005-git-0016-captain-TASK-GIT-0016-0ec2eafa54",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0016.closure-packet.json"
 }
