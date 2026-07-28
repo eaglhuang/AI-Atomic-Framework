@@ -1,4 +1,6 @@
 import { createHash } from 'node:crypto';
+import { existsSync, readdirSync } from 'node:fs';
+import path from 'node:path';
 
 export type RunnerBuildOutputDisposition =
   | 'owned-current'
@@ -27,6 +29,8 @@ export interface BuildOutputOwnership {
   readonly leaseFresh?: boolean | null;
 }
 
+export type RunnerBuildOutputTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
+
 /** The stable output family of a sealed ATM runner build. */
 export function isRunnerBuildOutputPath(filePath: string): boolean {
   const normalized = normalizePath(filePath);
@@ -45,6 +49,27 @@ export function deriveRunnerBuildOutputInventory(input: {
   return buildRunnerBuildOutputInventory({
     ...input,
     outputPaths: input.observedPaths.filter(isRunnerBuildOutputPath)
+  });
+}
+
+/**
+ * The sealed build adapter asks this module for publication membership. It does
+ * not infer it from a dirty Git diff, which may contain another lane's work.
+ */
+export function scanSealedRunnerBuildOutputInventory(input: {
+  readonly cwd: string;
+  readonly buildTarget: RunnerBuildOutputTarget;
+  readonly sealedSourceSha: string;
+  readonly taskId: string | null;
+}): RunnerBuildOutputInventory {
+  const outputPaths = publicationRoots(input.cwd, input.buildTarget)
+    .flatMap((root) => listFiles(input.cwd, root));
+  if (input.taskId) outputPaths.push(`.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`);
+  return deriveRunnerBuildOutputInventory({
+    sealedSourceSha: input.sealedSourceSha,
+    observedPaths: outputPaths,
+    currentTaskId: input.taskId,
+    ownership: outputPaths.map((entry) => ({ path: entry, ownerTaskId: input.taskId }))
   });
 }
 
@@ -111,4 +136,34 @@ function uniquePaths(paths: readonly string[]): string[] {
 
 function normalizePath(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+
+function publicationRoots(cwd: string, buildTarget: RunnerBuildOutputTarget): string[] {
+  const roots: string[] = [];
+  if (buildTarget === 'full' || buildTarget === 'packages') {
+    const packagesRoot = path.join(cwd, 'packages');
+    if (existsSync(packagesRoot)) {
+      for (const entry of readdirSync(packagesRoot, { withFileTypes: true })) {
+        if (entry.isDirectory()) roots.push(path.join('packages', entry.name, 'dist'));
+      }
+    }
+  }
+  if (buildTarget === 'full' || buildTarget === 'root-drop') roots.push(path.join('release', 'atm-root-drop'));
+  if (buildTarget === 'full' || buildTarget === 'onefile') roots.push(path.join('release', 'atm-onefile'));
+  return roots;
+}
+
+function listFiles(cwd: string, relativeRoot: string): string[] {
+  const absoluteRoot = path.join(cwd, relativeRoot);
+  if (!existsSync(absoluteRoot)) return [];
+  const files: string[] = [];
+  const visit = (absolute: string) => {
+    for (const entry of readdirSync(absolute, { withFileTypes: true })) {
+      const child = path.join(absolute, entry.name);
+      if (entry.isDirectory()) visit(child);
+      else if (entry.isFile()) files.push(path.relative(cwd, child).replace(/\\/g, '/'));
+    }
+  };
+  visit(absoluteRoot);
+  return files;
 }
