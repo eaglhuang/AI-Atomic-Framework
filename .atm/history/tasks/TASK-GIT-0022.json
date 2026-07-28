@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0022",
   "title": "Runner publication disposition enforcement and clean-worktree finalization",
-  "status": "running",
+  "status": "done",
   "milestone": "G14",
   "dependencies": [
     "TASK-GIT-0017",
@@ -170,10 +170,10 @@
       "planningCommitSha": "5f2913eea88aa32dd2c3fd571513656a5c802d6c",
       "contentDigest": "sha256:7444e4739c9c1015664586b675a4e09a8b9706b2391f383f4a91648c4d94c454",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-28T21:26:40.536Z"
+      "sealedAt": "2026-07-28T22:22:30.354Z"
     }
   },
-  "importedAt": "2026-07-28T21:26:40.536Z",
+  "importedAt": "2026-07-28T22:22:30.354Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
@@ -259,7 +259,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-69e2ca44d076",
     "claimedAt": "2026-07-28T20:36:01.857Z",
-    "heartbeatAt": "2026-07-28T21:33:16.483Z",
+    "heartbeatAt": "2026-07-28T22:00:09.241Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-FRAMEWORK-TEMP-claude-005-git-0016-captain.runner-sync-receipt.json",
@@ -340,15 +340,16 @@
       "tests/cli/runner-publication-reconciliation.test.ts",
       "tests/cli/runner-publication-residue-classification.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260728203601-codex-git-series-captain-82cc5c35aa",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728203601-codex-git-series-captain-82cc5c35aa\""
-    }
+    },
+    "reason": "GIT-0023 must provide shared foreign-generated residue admission before this task can renew its ticket or close without absorbing the SKL-owned artifact."
   },
-  "owner": "codex-git-series-captain",
+  "owner": "codex-git-0023-captain",
   "startedAt": "2026-07-28T20:36:01.857Z",
   "startedBySessionId": "session-20260728203601-codex-git-series-captain-TASK-GIT-0022-0fabed0ab7",
   "taskDirectionLock": {
@@ -460,25 +461,25 @@
     "createdAt": "2026-07-28T20:36:05.562Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-07-28T21-33-16-767Z-renew-5c76a4f7d333",
-  "lastTransitionAt": "2026-07-28T21:33:16.767Z",
+  "lastTransitionId": "2026-07-28T22-22-30-485Z-planning-mirror-reconcile-e30fa9a62d4b",
+  "lastTransitionAt": "2026-07-28T22:22:30.485Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-2effe91134480e9d",
-    "ticketDigest": "sha256:2effe91134480e9d74d61c291165702e13571cbd25e932137451751482ccd416",
+    "ticketId": "wat-571d4eabb7422be2",
+    "ticketDigest": "sha256:571d4eabb7422be28cd09f9989d0ff89725995a3fb00f793adbcb1caaa9315e5",
     "taskId": "TASK-GIT-0022",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260728203601-codex-git-series-captain-82cc5c35aa",
     "claimGeneration": "lease-69e2ca44d076",
-    "issuedAt": "2026-07-28T21:33:16.483Z",
-    "expiresAt": "2026-07-28T22:03:16.483Z",
+    "issuedAt": "2026-07-28T21:44:55.506Z",
+    "expiresAt": "2026-07-28T22:14:55.506Z",
     "scopeDigest": "sha256:652b03c65d874e59687ff38710c12dde64b24295c97f933529720772ab35d740",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-28T21:33:16.483Z"
+      "selectedAt": "2026-07-28T21:44:55.506Z"
     },
     "grants": [
       {
@@ -539,5 +540,10 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  }
+  },
+  "closedAt": "2026-07-28T22:19:22.555Z",
+  "closedByActor": "codex-git-0023-captain",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 1f566b660d525aa04b7b9695d873186468aab99b",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0022.closure-packet.json"
 }
