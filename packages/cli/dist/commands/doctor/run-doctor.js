@@ -13,6 +13,7 @@ import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.js'
 import { makeResult, message, parseOptions, relativePathFrom } from '../shared.js';
 import { detectCrossTaskMutation, readIncidentFlag } from '../../../../core/dist/broker/cross-task-mutation-guard.js';
 import { inspectRunnerSourceDrift } from '../framework-development/closure-packet-schema.js';
+import { inspectRunnerPublicationDisposition } from '../framework-development/runner-publication-lifecycle.js';
 import { knownTsNoCheckBaseline, knownTsNoCheckCleanupOwners, legacyBehaviorPackageNames } from './constants.js';
 import { applyDoctorPolicyToCheck, downgradeAdopterGitHeadEvidenceCheck, resolveDoctorPolicy } from './policy.js';
 import { checkOnboardingLifecycle, createVersionSummaryMessages } from './lifecycle.js';
@@ -105,6 +106,7 @@ export async function runDoctor(argv) {
     const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
     const versionSummary = createATMVersionSummary(root);
     const runnerSourceDrift = inspectRunnerSourceDrift(root);
+    const runnerPublication = inspectRunnerPublicationDisposition(root);
     const versionWarnings = createVersionSummaryMessages(versionSummary);
     const trustIntegrity = trustMode ? checkStartupIntegrity(resolveBundledIntegrityRoot()) : null;
     const knownBadStatus = knownBadMode ? checkStartupKnownBadVersion() : null;
@@ -167,6 +169,7 @@ export async function runDoctor(argv) {
         ...(trustMode && trustIntegrity ? [createCheck('release-trust', trustIntegrity.ok, trustIntegrity)] : []),
         ...(knownBadMode && knownBadStatus ? [createCheck('known-bad-version', knownBadStatus.ok, knownBadStatus)] : []),
         createCheck('git-worktree-readiness', gitWorktreeReadiness.ok, gitWorktreeReadiness),
+        createCheck('runner-publication-disposition', runnerPublication.ok, runnerPublication),
         gitHeadEvidenceCheck,
         governanceEntryReadiness,
         backlogSyncCheck,
@@ -214,6 +217,9 @@ export async function runDoctor(argv) {
         ...versionWarnings,
         ...(runnerSourceDrift.syncRequired
             ? [message('warning', 'ATM_RUNNER_SOURCE_DRIFT', runnerSourceDrift.advisory, runnerSourceDrift)]
+            : []),
+        ...(!runnerPublication.ok && runnerPublication.code
+            ? [message('error', runnerPublication.code, 'A sealed runner publication has no complete governed terminal disposition.', runnerPublication)]
             : []),
         ...(integrationInstallHint
             ? [message('warning', 'ATM_DOCTOR_INTEGRATION_INSTALL_RECOMMENDED', integrationInstallHint.text, integrationInstallHint.data)]
@@ -332,6 +338,7 @@ export async function runDoctor(argv) {
             migrationNeeded: runtime.migrationNeeded,
             versionSummary,
             runnerSourceDrift,
+            runnerPublication,
             integrationBootstrap,
             integrationDriftRemediation: integrationDriftRemediation.failedAdapters.length > 0 ? integrationDriftRemediation : undefined,
             frameworkHookReadiness,

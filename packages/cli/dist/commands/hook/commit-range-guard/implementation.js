@@ -44,6 +44,14 @@ export function createCommitRangeGuardReport(cwd, base, head) {
         const match = evidenceMatches.find((candidate) => candidate.commitSha === entry.commitSha);
         return inspectCommitClosurePackets(root, entry.commitSha, match ?? null, head);
     });
+    const workAdmissionCoverageFindings = enforcedCriticalCommits
+        .filter((entry) => !hasWorkAdmissionCommitCoverage(root, entry.commitSha))
+        .map((entry) => ({
+        level: 'error',
+        code: 'ATM_WRITE_TICKET_MISSING',
+        commitSha: entry.commitSha,
+        detail: `Critical commit ${entry.commitSha} is missing an ATM-Work-Admission trailer. Protected-branch acceptance requires committed ticket coverage from the governed git facade.`
+    }));
     const missingEvidenceMatches = evidenceMatches
         .filter((entry) => !legacyBaseline || !isAcceptedByLegacyBaseline(entry.commitSha))
         .filter((entry) => !entry.matched);
@@ -58,6 +66,7 @@ export function createCommitRangeGuardReport(cwd, base, head) {
         : null;
     const taskAudit = auditTasks(root);
     const findings = [
+        ...workAdmissionCoverageFindings,
         ...closurePacketInspections.flatMap((entry) => legacyBaseline && isAcceptedByLegacyBaseline(entry.commitSha) ? [] : entry.findings.map((finding) => ({
             level: 'error',
             code: finding.code,
@@ -93,6 +102,10 @@ export function createCommitRangeGuardReport(cwd, base, head) {
         findings,
         ok: findings.length === 0
     };
+}
+function hasWorkAdmissionCommitCoverage(cwd, commitSha) {
+    const message = runGitScalar(cwd, ['log', '-1', '--format=%B', commitSha]) ?? '';
+    return /^ATM-Work-Admission:\s+wat-[a-f0-9]{16}\s+sha256:[a-f0-9]{64}$/m.test(message);
 }
 export function readGitObjectText(cwd, ref) {
     // Git invokes hooks with a temporary index for path-limited commits. Keep

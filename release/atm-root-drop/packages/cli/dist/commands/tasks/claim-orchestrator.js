@@ -9,13 +9,13 @@ import { buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlocked
 import { findTaskClaimDependencyBlockers } from './dependency-gates.js';
 import { evaluateTaskClaimAdmission } from './lifecycle-state.js';
 import { CliError, makeResult, message, relativePathFrom, resolveValue } from '../shared.js';
-import { findActiveTaskQueue, writeTaskDirectionLock } from '../task-direction.js';
 import { normalizeWorkItemStatus } from './task-transition-helpers.js';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.js';
 import { taskPathFor } from './task-file-io-helpers.js';
 import { parseClaimRecord, createClaimRecord, isClaimExpired } from './task-ledger-readers.js';
 import { parseClaimLifecycleOptions } from './task-option-parsers.js';
 import { resolveTaskClaimIntent } from './claim-intent.js';
+import { completeTaskClaimWithWorkAdmission, resealWorkAdmissionTicketForRenewal } from './claim-work-admission.js';
 import { writeTakeoverEvidence } from './takeover-evidence.js';
 import { assertPlanningSourceSealValid } from './import-task.js';
 import { resolveLaneSession } from '../lane-session/resolve.js';
@@ -137,82 +137,24 @@ export async function runTasksClaimLifecycle(action, argv) {
                 }
             });
         }
-        // TASK-CID-0024: persist the declared claim intent so downstream gates
-        // (next --claim parallel preflight, hook pre-commit ownership checks) can
-        // distinguish mutating write claims from non-mutating closeout-only claims.
-        const claim = {
-            ...createClaimRecord({
-                taskId: options.taskId,
-                actorId,
-                files,
-                ttlSeconds: options.ttlSeconds,
-                timestamp: nowIso
-            }),
-            intent: claimIntentResolution.resolvedClaimIntent,
-            laneSession: laneSession.envelope
-        };
-        try {
-            const lockAcquireStartedAt = Date.now();
-            await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
-            claimLifecyclePhases.push({ phase: 'lock-acquire', durationMs: Date.now() - lockAcquireStartedAt });
-        }
-        catch (error) {
-            const code = extractErrorCode(error);
-            if (code === 'ATM_LOCK_CONFLICT') {
-                throw new CliError('ATM_LOCK_CONFLICT', `Task ${options.taskId} has an active conflicting lock.`, {
-                    exitCode: 1,
-                    details: extractErrorDetails(error)
-                });
-            }
-            throw error;
-        }
-        taskDocument.claim = claim;
-        taskDocument.owner = actorId;
-        taskDocument.startedAt = String(taskDocument.startedAt ?? nowIso);
-        taskDocument.startedByActor = String(taskDocument.startedByActor ?? actorId);
-        const sessionRecord = upsertActorWorkSession({
-            cwd: options.cwd,
-            actorId,
-            taskId: options.taskId,
-            claimLeaseId: claim.leaseId,
-            status: 'active',
-            taskPath: relativeTaskPath,
-            timestamp: nowIso,
-            guidanceSessionId: laneSession.session.laneId
-        });
-        taskDocument.startedBySessionId = sessionRecord.session.sessionId;
-        const previousStatus = String(taskDocument.status ?? '');
-        taskDocument.status = 'running';
-        const directionLockStartedAt = Date.now();
-        const directionLock = writeTaskDirectionLock({
+        const claimCompletion = await completeTaskClaimWithWorkAdmission({
             cwd: options.cwd,
             taskId: options.taskId,
             actorId,
-            queue: findActiveTaskQueue(options.cwd),
-            batchId: null,
-            scopeKey: null,
-            allowedFiles: files,
+            taskPath,
+            taskRef,
+            taskDocument,
+            files,
+            ttlSeconds: options.ttlSeconds,
+            claimIntent: claimIntentResolution.resolvedClaimIntent,
+            laneSession,
+            previousStatus: String(taskDocument.status ?? ''),
             planningReadOnlyPaths: Array.isArray(taskDocument.planningReadOnlyPaths) ? taskDocument.planningReadOnlyPaths : [],
             planningMirrorPaths: Array.isArray(taskDocument.planningMirrorPaths) ? taskDocument.planningMirrorPaths : [],
             allowPlanningMirror: taskDocument.allowPlanningMirror === true,
-            prompt: options.taskId,
-            sessionId: sessionRecord.session.sessionId,
-            laneSession: laneSession.envelope
+            nowIso,
+            phases: claimLifecyclePhases
         });
-        claimLifecyclePhases.push({ phase: 'direction-lock-write', durationMs: Date.now() - directionLockStartedAt });
-        taskDocument.taskDirectionLock = directionLock;
-        const transitionStartedAt = Date.now();
-        const transitionPath = writeTaskDocumentWithTransition({
-            cwd: options.cwd,
-            taskPath,
-            taskId: options.taskId,
-            taskDocument,
-            action,
-            actorId,
-            sessionId: sessionRecord.session.sessionId,
-            previousStatus
-        });
-        claimLifecyclePhases.push({ phase: 'task-transition-write', durationMs: Date.now() - transitionStartedAt });
         return makeResult({
             ok: true,
             command: 'tasks',
@@ -230,13 +172,14 @@ export async function runTasksClaimLifecycle(action, argv) {
                 claimIntent: claimIntentResolution.resolvedClaimIntent,
                 planningSourceSealValidation,
                 claimIntentResolution,
-                claim,
+                claim: claimCompletion.claim,
+                workAdmissionTicket: claimCompletion.ticket,
                 taskPath: relativeTaskPath,
-                transitionPath,
-                sessionId: sessionRecord.session.sessionId,
-                session: sessionRecord.session,
+                transitionPath: claimCompletion.transitionPath,
+                sessionId: claimCompletion.session.sessionId,
+                session: claimCompletion.session,
                 laneSession: laneSession.envelope,
-                taskDirectionLock: directionLock,
+                taskDirectionLock: claimCompletion.taskDirectionLock,
                 claimLatency: {
                     schemaId: 'atm.claimLatencyTelemetry.v1',
                     totalMs: Date.now() - claimLifecycleStartedAt,
@@ -311,6 +254,13 @@ export async function runTasksClaimLifecycle(action, argv) {
             state: 'active'
         };
         taskDocument.claim = renewed;
+        const workAdmissionTicket = resealWorkAdmissionTicketForRenewal({
+            taskId: options.taskId,
+            actorId,
+            taskDocument,
+            claim: renewed,
+            nowIso
+        });
         const sessionRecord = updateActorWorkSessionState({
             cwd: options.cwd,
             actorId,
@@ -346,6 +296,7 @@ export async function runTasksClaimLifecycle(action, argv) {
                 taskId: options.taskId,
                 actorId,
                 claim: renewed,
+                workAdmissionTicket,
                 transitionPath,
                 sessionId: sessionRecord?.session.sessionId ?? null,
                 session: sessionRecord?.session ?? null
@@ -635,18 +586,4 @@ export async function runTasksClaimLifecycle(action, argv) {
             session: sessionRecord.session
         }
     });
-}
-function extractErrorCode(error) {
-    if (!error || typeof error !== 'object')
-        return null;
-    const code = error.code;
-    return typeof code === 'string' && code.trim().length > 0 ? code : null;
-}
-function extractErrorDetails(error) {
-    if (!error || typeof error !== 'object')
-        return {};
-    const details = error.details;
-    if (!details || typeof details !== 'object' || Array.isArray(details))
-        return {};
-    return details;
 }

@@ -2082,6 +2082,90 @@
       "sourceOwner": "packages/core/src/broker/write-ticket.ts"
     },
     {
+      "code": "ATM_WORK_ADMISSION_RECOVERY_MODE_INVALID",
+      "category": "work-admission",
+      "shortDescription": "Task import rejected workAdmission.recoveryMode because it is not auto, enabled, or disabled.",
+      "commonCauses": [
+        "A planning card used an unsupported recovery mode.",
+        "A hand-authored card used the legacy snake_case field with an invalid value."
+      ],
+      "remediation": [
+        "Set workAdmission.recoveryMode to auto, enabled, or disabled in the planning card.",
+        "Re-run task import dry-run before writing the amended ledger."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <task-card> --dry-run --json"
+      ],
+      "statusCommand": "node atm.mjs tasks status --task <task-id> --json",
+      "recoveryManifests": [],
+      "sourceOwner": "packages/cli/src/commands/tasks/task-work-admission-import.ts"
+    },
+    {
+      "code": "ATM_WORK_ADMISSION_RECOVERY_REQUIRED",
+      "category": "work-admission",
+      "shortDescription": "The requested recovery snapshot operation is unavailable under the claim-sealed recovery policy.",
+      "commonCauses": [
+        "The task's auto policy resolved recovery to disabled.",
+        "A caller requested a recovery snapshot after the task was explicitly disabled."
+      ],
+      "remediation": [
+        "Use the ticket's deterministic recovery disposition instead of creating an unmanaged backup.",
+        "Amend the task before claim if recovery must be enabled; do not change the policy through prompt text or an environment variable."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json"
+      ],
+      "statusCommand": "node atm.mjs tasks status --task <task-id> --json",
+      "recoveryManifests": [],
+      "sourceOwner": "packages/core/src/broker/work-admission-ticket.ts"
+    },
+    {
+      "code": "ATM_WORK_ADMISSION_DELIVERY_NOT_AUTHORIZED",
+      "category": "work-admission",
+      "shortDescription": "A ticket did not match the current task, actor, lane, claim generation, runner, or lifecycle operation.",
+      "commonCauses": [
+        "A ticket from a prior claim, handoff, or lane was reused.",
+        "The selected runner or requested operation no longer matches the claim-issued ticket."
+      ],
+      "remediation": [
+        "Renew or re-claim through ATM so the authority can issue a ticket for the current claim generation.",
+        "Do not retrofit a ticket onto native changes; use the ticket recovery disposition and fresh validation."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks renew --task <task-id> --actor <actor> --json"
+      ],
+      "statusCommand": "node atm.mjs tasks status --task <task-id> --json",
+      "recoveryManifests": [],
+      "sourceOwner": "packages/core/src/broker/work-admission-ticket.ts"
+    },
+    {
+      "code": "ATM_WORK_ADMISSION_SNAPSHOT_BUDGET_EXCEEDED",
+      "category": "work-admission",
+      "shortDescription": "A bounded task recovery snapshot would exceed its claim-sealed disk budget.",
+      "commonCauses": [
+        "Dirty or untracked preimages exceed the per-task recovery budget.",
+        "The repository recovery budget is already consumed by live task snapshots."
+      ],
+      "remediation": [
+        "Use the ticket's recovery disposition to split or hand off the work instead of writing another snapshot.",
+        "Close or explicitly clean up completed task recovery snapshots before retrying."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json"
+      ],
+      "statusCommand": "node atm.mjs tasks status --task <task-id> --json",
+      "recoveryManifests": [],
+      "sourceOwner": "packages/core/src/broker/work-admission-ticket.ts"
+    },
+    {
       "code": "ATM_RESTRICTED_EXECUTION_BLOCKED",
       "category": "restricted-execution",
       "shortDescription": "The RestrictedExecutionGateway denied a process launch because the requested executable and argv are not an approved ATM worker route.",
@@ -2121,6 +2205,50 @@
         }
       ],
       "sourceOwner": "packages/core/src/team-agents/restricted-execution-gateway.ts"
+    },
+    {
+      "code": "ATM_RUNNER_PUBLICATION_PENDING",
+      "category": "runner-publication",
+      "shortDescription": "A sealed runner generation has dirty declared output members without a terminal governed publication or recovery disposition.",
+      "commonCauses": [
+        "A runner build updated dist, release, or its receipt and the exact inventory was not yet published.",
+        "A prior publication transaction stopped after the build but before the receipt and every inventory member reached a terminal disposition."
+      ],
+      "remediation": [
+        "Inspect the receipt-bound publication disposition reported by node atm.mjs doctor --json.",
+        "Use the governed publication or recovery transaction for the reported inventory digest; do not restore or stage a subset manually."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs doctor --json",
+        "node atm.mjs broker runner-sync status --json"
+      ],
+      "statusCommand": "node atm.mjs doctor --json",
+      "recoveryManifests": [],
+      "sourceOwner": "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts"
+    },
+    {
+      "code": "ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE",
+      "category": "runner-publication",
+      "shortDescription": "A runner publication has dirty output artifacts that are absent from its sealed inventory, so ATM cannot safely publish or retain it.",
+      "commonCauses": [
+        "The receipt omitted an output produced by the selected build target.",
+        "A different generation modified a runner artifact after the receipt was sealed."
+      ],
+      "remediation": [
+        "Rebuild or reconcile through the governed runner-sync route so the receipt inventories the exact sealed generation.",
+        "Do not add a doctor-local allowlist or publish the unmatched artifact independently."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs doctor --json",
+        "node atm.mjs broker runner-sync status --json"
+      ],
+      "statusCommand": "node atm.mjs doctor --json",
+      "recoveryManifests": [],
+      "sourceOwner": "packages/core/src/broker/runner-build-output-inventory.ts"
     }
   ],
   "prefixRules": [

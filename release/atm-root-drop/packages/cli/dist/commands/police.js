@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { makePoliceFamilyReport, runPoliceFamilyGate } from '../../../core/dist/police/family.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
+import { evaluateTaskWorkAdmissionGate } from './git-governance/work-admission-check.js';
 export async function runPolice(argv) {
     const options = parsePoliceOptions(argv);
     const action = options.action ?? 'run';
@@ -9,6 +10,15 @@ export async function runPolice(argv) {
         throw new CliError('ATM_CLI_USAGE', `police only supports action "run" (got ${action})`, { exitCode: 2 });
     }
     const registryDocument = readOptionalJson(resolvePath(options.cwd, options.registryPath));
+    const workAdmission = options.taskId && options.files.length > 0
+        ? evaluateTaskWorkAdmissionGate({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            operation: options.operation,
+            files: options.files,
+            producingAtmCommand: 'node atm.mjs police --json'
+        })
+        : null;
     const report = await runPoliceFamilyGate({
         profile: options.profile,
         coreFamilies: [
@@ -40,11 +50,11 @@ export async function runPolice(argv) {
         writeFileSync(outPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
     }
     return makeResult({
-        ok: report.ok,
+        ok: report.ok && (workAdmission?.decision.ok ?? true),
         command: 'police',
         cwd: options.cwd,
         messages: [
-            message(report.ok ? 'info' : 'error', report.ok ? 'ATM_POLICE_GATE_OK' : 'ATM_POLICE_GATE_FAILED', report.ok
+            message(report.ok && (workAdmission?.decision.ok ?? true) ? 'info' : 'error', report.ok && (workAdmission?.decision.ok ?? true) ? 'ATM_POLICE_GATE_OK' : 'ATM_POLICE_GATE_FAILED', report.ok && (workAdmission?.decision.ok ?? true)
                 ? 'Police family gate completed.'
                 : 'Police family gate completed with blocking findings.', {
                 profile: report.profile,
@@ -56,7 +66,8 @@ export async function runPolice(argv) {
         evidence: {
             report,
             outputPath: outPath ? relativePathFrom(options.cwd, outPath) : null,
-            sharedGates: report.sharedGates ?? []
+            sharedGates: report.sharedGates ?? [],
+            workAdmission
         }
     });
 }
@@ -67,7 +78,10 @@ function parsePoliceOptions(argv) {
         profile: 'standard',
         outputPath: '',
         registryPath: 'atomic-registry.json',
-        maxFileLines: undefined
+        maxFileLines: undefined,
+        taskId: '',
+        operation: 'write',
+        files: []
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -98,6 +112,16 @@ function parsePoliceOptions(argv) {
                 throw new CliError('ATM_CLI_USAGE', `police --max-file-lines requires a positive integer (got ${raw})`, { exitCode: 2 });
             }
             options.maxFileLines = parsed;
+            index += 1;
+            continue;
+        }
+        if (arg === '--task') {
+            options.taskId = requireOptionValue(argv, index, '--task');
+            index += 1;
+            continue;
+        }
+        if (arg === '--file') {
+            options.files.push(requireOptionValue(argv, index, '--file'));
             index += 1;
             continue;
         }

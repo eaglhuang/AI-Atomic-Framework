@@ -6,6 +6,7 @@ import { evaluateTaskflowBranchCommitQueueGate } from './branch-commit-queue-gat
 import { evaluateTaskflowBrokerConflictGate } from './broker-gate.js';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { quoteCliValue } from '../shared.js';
+import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.js';
 // TASK-SKL-0029 — write-readiness lifecycle adapter.
 //
 // Write-readiness must not recompute a task's required-case set or freshness; it
@@ -107,6 +108,20 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
     });
     const taskStatus = normalizeTaskflowLifecycleStatus(input.taskDocument.status);
     const claim = readTaskflowClaimContext(input.taskDocument);
+    const workAdmission = evaluateTaskWorkAdmissionGate({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        operation: 'close',
+        files: input.declaredFiles,
+        producingAtmCommand: 'node atm.mjs taskflow close --write --json'
+    });
+    if (!workAdmission.decision.ok) {
+        blockers.push({
+            code: workAdmission.decision.code,
+            summary: `Taskflow close requires current work-admission coverage: ${workAdmission.decision.reason}`,
+            requiredCommand: `node atm.mjs tasks renew --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --json`
+        });
+    }
     const activeSession = input.actorId
         ? resolveActorWorkSession(input.cwd, {
             actorId: input.actorId,

@@ -22,6 +22,7 @@ import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import { classifyForceImportAdmission } from './import-validation.ts';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.ts';
+import { validateWorkAdmissionImport } from './task-work-admission-import.ts';
 import {
   type TaskImportManifest,
   classifyResetOpenImportForOptions,
@@ -193,6 +194,21 @@ export async function runTasksImport(argv: string[]) {
   }
 
   const causalFrontmatter = extractFrontMatter(planText)?.data ?? null;
+  const workAdmissionValidation = validateWorkAdmissionImport(causalFrontmatter);
+  for (const diagnostic of workAdmissionValidation.diagnostics) {
+    parsed.diagnostics.push({
+      level: diagnostic.severity,
+      code: diagnostic.code,
+      text: diagnostic.message,
+      workItemId: parsed.tasks.length === 1 ? parsed.tasks[0]?.workItemId : undefined
+    });
+  }
+  if (parsed.tasks.length === 1) {
+    parsed = {
+      ...parsed,
+      tasks: parsed.tasks.map((task) => ({ ...task, workAdmission: workAdmissionValidation.policy }))
+    };
+  }
   // TASK-SKL-0029 — when a single card fails its validation contract, carry the
   // executable recovery manifest (missing contract/case/group fields + one
   // dry-run recovery command) into the structured import failure below.

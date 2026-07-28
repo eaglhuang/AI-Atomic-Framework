@@ -13,6 +13,7 @@ import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
 import { classifyForceImportAdmission } from './import-validation.js';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.js';
+import { validateWorkAdmissionImport } from './task-work-admission-import.js';
 import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
 export async function runTasksImport(argv) {
     const options = parseImportOptions(argv);
@@ -161,6 +162,21 @@ export async function runTasksImport(argv) {
         }
     }
     const causalFrontmatter = extractFrontMatter(planText)?.data ?? null;
+    const workAdmissionValidation = validateWorkAdmissionImport(causalFrontmatter);
+    for (const diagnostic of workAdmissionValidation.diagnostics) {
+        parsed.diagnostics.push({
+            level: diagnostic.severity,
+            code: diagnostic.code,
+            text: diagnostic.message,
+            workItemId: parsed.tasks.length === 1 ? parsed.tasks[0]?.workItemId : undefined
+        });
+    }
+    if (parsed.tasks.length === 1) {
+        parsed = {
+            ...parsed,
+            tasks: parsed.tasks.map((task) => ({ ...task, workAdmission: workAdmissionValidation.policy }))
+        };
+    }
     // TASK-SKL-0029 — when a single card fails its validation contract, carry the
     // executable recovery manifest (missing contract/case/group fields + one
     // dry-run recovery command) into the structured import failure below.

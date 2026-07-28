@@ -68,6 +68,13 @@ Expected pack behavior:
 
 This keeps convenience at the edge and governance in ATM.
 
+For write work, `next --claim` mints a task-bound admission ticket with its
+scope, actor, lane, runner, and recovery policy. Entry files must direct agents
+to the current ATM playbook rather than raw Git, `node -e`, or PowerShell write
+commands. The ticket is checked again at downstream review, commit, close,
+push, and protected-branch acceptance, so entry text helps prevention but never
+grants authority.
+
 ## Team Runtime Capability Manifest
 
 Integration manifests may declare optional `teamRuntimeCapabilities` entries when

@@ -17,6 +17,7 @@ import { evaluateTaskflowBranchCommitQueueGate, type TaskflowBranchCommitQueueGa
 import { evaluateTaskflowBrokerConflictGate, type TaskflowBrokerConflictGate } from './broker-gate.ts';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { quoteCliValue } from '../shared.ts';
+import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.ts';
 
 export interface TaskflowCloseKnownBlocker {
   readonly code: string;
@@ -194,6 +195,21 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
   });
   const taskStatus = normalizeTaskflowLifecycleStatus(input.taskDocument.status);
   const claim = readTaskflowClaimContext(input.taskDocument);
+  const workAdmission = evaluateTaskWorkAdmissionGate({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    operation: 'close',
+    files: input.declaredFiles,
+    producingAtmCommand: 'node atm.mjs taskflow close --write --json'
+  });
+
+  if (!workAdmission.decision.ok) {
+    blockers.push({
+      code: workAdmission.decision.code,
+      summary: `Taskflow close requires current work-admission coverage: ${workAdmission.decision.reason}`,
+      requiredCommand: `node atm.mjs tasks renew --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --json`
+    });
+  }
   const activeSession = input.actorId
     ? resolveActorWorkSession(input.cwd, {
       actorId: input.actorId,

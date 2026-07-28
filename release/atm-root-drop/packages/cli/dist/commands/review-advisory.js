@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { attachStandardsSpecReviewReceipt, appendMachineFindings, createStubReviewAdvisoryReport, createUnavailableAdvisoryReport, normalizeProviderPayload } from '../../../plugin-review-advisory/dist/index.js';
 import { evaluateValidationContract } from '../../../core/dist/evidence/validation-contract.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
+import { evaluateTaskWorkAdmissionGate } from './git-governance/work-admission-check.js';
 // TASK-SKL-0029 — review-advisory lifecycle adapter.
 //
 // Model review stays advisory: it never selects the required set. When it needs
@@ -35,6 +36,27 @@ export function runReviewAdvisory(argv) {
     const effectiveSourcePaths = options.standardsSpecReceipt && options.sourcePaths.length === 0 && options.taskId
         ? readTaskDeclaredFiles(options.cwd, options.taskId)
         : options.sourcePaths;
+    const workAdmission = options.taskId && effectiveSourcePaths.length > 0
+        ? evaluateTaskWorkAdmissionGate({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            operation: 'write',
+            files: effectiveSourcePaths,
+            producingAtmCommand: 'node atm.mjs review-advisory --json'
+        })
+        : null;
+    if (workAdmission && !workAdmission.decision.ok) {
+        return makeResult({
+            ok: false,
+            command: 'review-advisory',
+            cwd: options.cwd,
+            messages: [message('error', workAdmission.decision.code, 'Review advisory cannot attest task change coverage without a current work-admission ticket.', {
+                    taskId: options.taskId,
+                    reason: workAdmission.decision.reason
+                })],
+            evidence: { workAdmission }
+        });
+    }
     const target = {
         kind: options.targetKind,
         id: options.targetId || undefined,
@@ -129,6 +151,7 @@ export function runReviewAdvisory(argv) {
         evidence: {
             mode,
             report,
+            workAdmission,
             outputPath: relativePathFrom(options.cwd, outputPath)
         }
     });

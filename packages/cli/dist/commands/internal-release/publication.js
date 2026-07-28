@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { assertRunnerSyncAdmission, inspectRunnerSyncAdmission } from '../framework-development/runner-sync-admission.js';
+import { inspectRunnerPublicationDisposition } from '../framework-development/runner-publication-lifecycle.js';
 import { CliError } from '../shared.js';
 import { defaultOnefileRunnerPath } from './constants.js';
 import { normalizeActiveCaptains, normalizeOptionalText, normalizePaths, readActiveReleaseCaptainsFromEnv, readGitDirtyFiles, readGitScalar, runCommand, sha256File } from './support.js';
@@ -80,6 +81,12 @@ export function runNpmBuildAfterAdmission(cwd) {
         stewardActorId,
         sealedSourceSha: sourceCommit
     }));
+    const runnerPublication = inspectRunnerPublicationDisposition(cwd);
+    if (!runnerPublication.ok && runnerPublication.code) {
+        const error = new Error('Internal release requires a complete terminal disposition for the preceding sealed runner publication.');
+        Object.assign(error, { code: runnerPublication.code, details: runnerPublication });
+        throw error;
+    }
     assertReleasePublicationReadiness(inspectReleasePublicationReadiness({
         cwd,
         stewardActorId,

@@ -8,6 +8,7 @@ import { cleanupRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explain
 import { cleanupGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../../core/dist/broker/generated-projection-steward.js';
 import { readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward } from './persistence.js';
 import { appendLaneSessionEvent } from '../lane-session/events.js';
+import { inspectRunnerPublicationDisposition } from '../framework-development/runner-publication-lifecycle.js';
 export function handleBrokerStewardQueues(options, context) {
     const runnerSyncQueuePath = context.runnerSyncQueuePath;
     const projectionStewardPath = context.projectionStewardPath;
@@ -360,6 +361,10 @@ export function validateRunnerSyncReleaseReceipt(input) {
     ].filter(Boolean);
     if (mismatches.length > 0) {
         throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID: receipt does not match queued runner-sync steward fields: ${mismatches.join(', ')}.`);
+    }
+    const publication = inspectRunnerPublicationDisposition(input.cwd);
+    if (!publication.ok && publication.code) {
+        throw new Error(`${publication.code}: receipt ${receiptRef} cannot release ${input.stewardWorkId} while its sealed output inventory is ${publication.report.disposition}. inventoryDigest=${publication.report.inventoryDigest}.`);
     }
     validateRunnerSyncReleaseFinalizableReceipt({ receipt, group, stewardWorkId: input.stewardWorkId });
     return {
