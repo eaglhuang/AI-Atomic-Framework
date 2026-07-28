@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFile
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { readBrokerLifecycleState } from './lifecycle.ts';
+import { classifyTerminalLifecycleOwnership } from './historical-work-admission-attestation.ts';
 
 export interface CrossTaskMutationBlock {
   readonly conflictTaskId: string;
@@ -127,8 +128,22 @@ export function getActiveTasks(cwd: string): readonly ActiveTaskInfo[] {
           : null;
         const claimState = claim?.state;
         const owner = claim?.actorId || doc.owner || '';
+        const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+        let lockReleased = true;
+        if (existsSync(lockPath)) {
+          try {
+            const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+            lockReleased = lock.released === true || lock.status === 'released';
+          } catch {
+            lockReleased = false;
+          }
+        }
+        const lifecycle = classifyTerminalLifecycleOwnership({ status, claimState, lockReleased });
         
-        if (status === 'open' || claimState === 'active') {
+        // A terminal task must not become a ghost owner merely because an old
+        // projection survived. Conversely, an inconsistent terminal record
+        // remains conservatively active until repair resolves it.
+        if (lifecycle.decision !== 'terminal' && (status === 'open' || claimState === 'active' || lifecycle.decision === 'inconsistent')) {
           const allowedPathsSet = new Set<string>();
           collectTaskFileValues(doc.scopePaths, allowedPathsSet);
           collectTaskFileValues(doc.deliverables, allowedPathsSet);

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T22-52-47-041Z-scope-amendment-1f46c69f8086",
+  "taskId": "TASK-GIT-0024",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0024.json",
+  "taskSha256": "sha256:f2c75391b8b80bebd1a52e935664c1a1060c7f7a62a65bef663a86ee8177cc15",
+  "createdAt": "2026-07-28T22:52:47.041Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0024 --actor codex-git-series-captain --add \"packages/cli/src/commands/git-governance.ts,packages/cli/src/commands/hook/pre-push.ts,packages/cli/src/commands/hook/commit-range-guard/implementation.ts\" --reason \"Deep-module adapter correction: facade, actual pre-push entrypoint, and shared range evaluator.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Deep-module adapter correction: facade, actual pre-push entrypoint, and shared range evaluator."
+  }
+}

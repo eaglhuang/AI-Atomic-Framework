@@ -1,0 +1,410 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0024",
+  "title": "Historical work-admission attestation and terminal ownership convergence",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-GIT-0022",
+    "TASK-GIT-0023"
+  ],
+  "acceptance": [
+    "A temporary-repository fixture proves that an ordinary governed commit with `ATM-Work-Admission` passes unchanged.",
+    "A missing-trailer critical commit remains blocked until one valid historical attestation binds its exact commit, parent, tree, provenance digest, task, and lane context.",
+    "Tampering with any bound value, targeting a non-ancestor/future commit, or adding a conflicting second attestation fails closed.",
+    "The pre-push hook and the attestation command use the same evaluator and report the same covered/missing/invalid decision.",
+    "A done/released task with a released direction lock is not reported as an active cross-task owner; a terminal ledger/lock mismatch remains blocked.",
+    "Existing GIT-0022/GIT-0023 emergency commits can be covered only through a reviewable forward attestation; their commit messages and history remain unchanged.",
+    "Focused tests, error-code generation, typecheck, and validate:cli pass."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/historical-work-admission-attestation.ts",
+    "packages/core/src/broker/cross-task-mutation-guard.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/hook/pre-push.ts",
+    "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+    "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+    "schemas/governance/historical-work-admission-attestation.schema.json",
+    "docs/governance/error-code-registry.json",
+    "packages/core/src/error-code-registry.generated.ts",
+    "docs/ERROR_CODES.md",
+    "tests/cli/historical-work-admission-attestation.test.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/historical-work-admission-attestation.ts",
+    "packages/core/src/broker/cross-task-mutation-guard.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/hook/pre-push.ts",
+    "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+    "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+    "schemas/governance/historical-work-admission-attestation.schema.json",
+    "docs/governance/error-code-registry.json",
+    "packages/core/src/error-code-registry.generated.ts",
+    "docs/ERROR_CODES.md",
+    "tests/cli/historical-work-admission-attestation.test.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+    "npm run generate:error-codes",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the attestation authority and both hook projections together. Existing historical commits remain untouched and missing-ticket commits return to fail-closed pre-push blocking.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.historical-work-admission-attestation-authority",
+    "atomCid": null,
+    "mapUpdates": [
+      "Map one historical-attestation evaluator to the governed command, pre-push, and terminal lifecycle ownership projections."
+    ],
+    "extractionCandidates": [
+      {
+        "inlineReason": "The canonical registry is a required paired projection, not a behavioral owner for this card."
+      },
+      {
+        "inlineReason": "Generated public documentation must remain paired with the canonical registry and is not an extraction target."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/historical-work-admission-attestation.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+        "schemas/governance/historical-work-admission-attestation.schema.json",
+        "docs/governance/error-code-registry.json",
+        "packages/core/src/error-code-registry.generated.ts",
+        "docs/ERROR_CODES.md",
+        "tests/cli/historical-work-admission-attestation.test.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "One HistoricalWorkAdmissionAttestationAuthority deep module that verifies an append-only attestation against a fixed commit SHA, canonical ticket digest or approved emergency provenance, task/lane identity, and observed parent/range context.",
+        "A governed attestation command produces only a forward corrective record; it never rewrites, amends, or claims to add a trailer to historical commits.",
+        "Pre-push consumes the same authority: a normal ATM-Work-Admission trailer remains preferred, while a missing historical trailer blocks unless an exact, valid attestation covers that commit in the pushed range.",
+        "The authority rejects an unknown commit, mismatched tree or parent context, altered ticket/provenance digest, duplicate conflicting attestation, non-ancestor target, and an attestation that attempts to cover a future commit.",
+        "One terminal lifecycle ownership predicate is used by pre-commit and claim-repair diagnostics. A done/released task with a released lock is not active; a missing or inconsistent terminal transition remains blocked.",
+        "Canonical ErrorCode registry, generated projection, and public index carry the new attestation and terminal-lifecycle failure codes together.",
+        "Map one historical-attestation evaluator to the governed command, pre-push, and terminal lifecycle ownership projections."
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 6 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0024-historical-work-admission-attestation-and-terminal-ownership-convergence.task.md",
+    "sectionTitle": "TASK-GIT-0024",
+    "headingLine": 85,
+    "hash": "a5d022d73f4a76e1",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0024-historical-work-admission-attestation-and-terminal-ownership-convergence.task.md",
+      "planningCommitSha": "211ed6497946320153673776d0345f06283195c1",
+      "contentDigest": "sha256:a5d022d73f4a76e1663d10f55c42d40e1c11ff66b4309ea53a6ddb335044a07f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-28T22:52:38.529Z"
+    }
+  },
+  "importedAt": "2026-07-28T22:52:38.529Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.historical.work.admission.attestation.test.ts",
+      "command": "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.hook.tests.pre.commit.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.hook.tests.pre.push.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.generate.error.codes",
+      "command": "npm run generate:error-codes",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-242ccba91c4f",
+    "claimedAt": "2026-07-28T22:49:44.482Z",
+    "heartbeatAt": "2026-07-28T23:04:24.869Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0024.*",
+      ".atm/history/task-events/TASK-GIT-0024/**",
+      ".atm/history/tasks/TASK-GIT-0024.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/hook/pre-push/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/historical-work-admission-attestation.schema.json",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260728224944-codex-git-series-captain-18981af7ea",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728224944-codex-git-series-captain-18981af7ea\""
+    }
+  },
+  "owner": "codex-git-series-captain",
+  "startedAt": "2026-07-28T22:49:44.482Z",
+  "startedBySessionId": "session-20260728224944-codex-git-series-captain-TASK-GIT-0024-dc11ed16a4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0024",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0024.*",
+      ".atm/history/task-events/TASK-GIT-0024/**",
+      ".atm/history/tasks/TASK-GIT-0024.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/hook/pre-push/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/historical-work-admission-attestation.schema.json",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0024-historical-work-admission-attestation-and-terminal-ownership-convergence.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/git-boundary-admission/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0024-historical-work-admission-attestation-and-terminal-ownership-convergence.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "55e49d8a8ad0fe50d07b7baf2136b1faf80e43341e90d68095524b8a2df6db7e",
+    "actorId": "codex-git-series-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260728224944-codex-git-series-captain-18981af7ea",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728224944-codex-git-series-captain-18981af7ea\""
+    },
+    "createdAt": "2026-07-28T22:49:50.129Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-07-28T23-04-25-298Z-renew-8d893a0beafd",
+  "lastTransitionAt": "2026-07-28T23:04:25.298Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-e396355f52166743",
+    "ticketDigest": "sha256:e396355f52166743fb06d3db7cbedcf6e93f59bd117b310b0d1260ef222a3b41",
+    "taskId": "TASK-GIT-0024",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260728224944-codex-git-series-captain-18981af7ea",
+    "claimGeneration": "lease-242ccba91c4f",
+    "issuedAt": "2026-07-28T23:04:24.869Z",
+    "expiresAt": "2026-07-28T23:34:24.869Z",
+    "scopeDigest": "sha256:b0e53faab592e7c63a15c955af6eeb36ae3cb7b40d61fb856681918c2cb9dcbb",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-28T23:04:24.869Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0024.*",
+          ".atm/history/task-events/TASK-GIT-0024/**",
+          ".atm/history/tasks/TASK-GIT-0024.json",
+          "docs/ERROR_CODES.md",
+          "docs/governance/error-code-registry.json",
+          "packages/cli/src/commands/git-governance.ts",
+          "packages/cli/src/commands/git-governance/implementation.ts",
+          "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+          "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+          "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/hook/pre-push.ts",
+          "packages/cli/src/commands/hook/pre-push/implementation.ts",
+          "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+          "packages/core/src/broker/cross-task-mutation-guard.ts",
+          "packages/core/src/broker/historical-work-admission-attestation.ts",
+          "packages/core/src/broker/index.ts",
+          "packages/core/src/error-code-registry.generated.ts",
+          "schemas/governance/historical-work-admission-attestation.schema.json",
+          "tests/cli/historical-work-admission-attestation.test.ts"
+        ],
+        "digest": "sha256:87480604766988272c254714bbae1772cd314e53fbd2ac8a5982e83aa8da33c2"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:3b09034b576f26e8321df7261d6e042f868b3bc19d699d2b5641c44caea73079",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:ac249182061e9147ec9bba16419a7d79c8b9b3feab160454f1ba59279fa1aec2"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  }
+}

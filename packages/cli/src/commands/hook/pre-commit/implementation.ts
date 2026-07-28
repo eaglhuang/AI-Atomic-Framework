@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { classifyTerminalLifecycleOwnership } from '../../../../../core/src/broker/historical-work-admission-attestation.ts';
 import {
   auditTasks,
   buildFrameworkTempClaimCommand,
@@ -231,7 +232,13 @@ export function runPreCommitHook(cwd: string) {
         const status = String(taskDocument.status ?? '').trim().toLowerCase();
         const claim = taskDocument.claim as Record<string, unknown> | null | undefined;
         const claimState = claim ? String(claim.state ?? '').trim().toLowerCase() : '';
-        return (status === 'done' || status === 'abandoned' || status === 'blocked') && claimState !== 'active';
+        const lockPath = path.join(root, '.atm', 'runtime', 'locks', `${ownerTaskId}.lock.json`);
+        let lockReleased = true;
+        if (existsSync(lockPath)) {
+          const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+          lockReleased = lock.released === true || lock.status === 'released';
+        }
+        return classifyTerminalLifecycleOwnership({ status, claimState, lockReleased }).decision === 'terminal';
       } catch {
         return false;
       }

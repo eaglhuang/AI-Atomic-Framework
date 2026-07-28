@@ -7,6 +7,7 @@ import { CliError, resolveValue } from '../shared.ts';
 import { diagnoseTaskDirectionLockAllowedFiles } from '../task-direction.ts';
 import { isClaimExpired, parseClaimRecord } from './task-ledger-readers.ts';
 import { compareClaimLifecycleOwners, type ClaimOwnerComparisonMode } from '../next/claim-admission.ts';
+import { classifyTerminalLifecycleOwnership } from '../../../../core/src/broker/historical-work-admission-attestation.ts';
 
 export type ClaimRepairIssueKind =
   | 'valid-active-claim'
@@ -152,6 +153,11 @@ export function diagnoseClaimRepairState(cwd: string, taskId: string, actorId?: 
   const claim = parseClaimRecord(taskDocument?.claim);
   const governanceLock = readGovernanceLock(root, taskId);
   const lockReleased = isLockReleased(governanceLock);
+  const terminalOwnership = classifyTerminalLifecycleOwnership({
+    status,
+    claimState: claim?.state,
+    lockReleased
+  });
   const lockActorId = readLockActorId(governanceLock);
   const claimLaneSessionId = readLaneSessionId(claim);
   const lockLaneSessionId = readLaneSessionId(governanceLock);
@@ -172,6 +178,14 @@ export function diagnoseClaimRepairState(cwd: string, taskId: string, actorId?: 
   });
 
   const issues: ClaimRepairIssue[] = [];
+  if (terminalOwnership.decision === 'inconsistent' && ['done', 'abandoned', 'blocked'].includes(status ?? '')) {
+    issues.push({
+      kind: 'dangling-governance-lock',
+      severity: 'blocking',
+      summary: 'Terminal lifecycle ownership is inconsistent and must be reconciled before claim repair.',
+      details: { code: 'ATM_TERMINAL_LIFECYCLE_OWNERSHIP_INCONSISTENT', reason: terminalOwnership.reason }
+    });
+  }
   const hasValidActiveClaim = claim?.state === 'active' && !isClaimExpired(claim, nowIso);
 
   if (hasValidActiveClaim) {
