@@ -206,6 +206,38 @@ try {
   assert.equal(receiptReady.evidence.runnerReceiptPublicationClosure.status, 'accepted');
   assert.equal((receiptReady.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER'), false);
 
+  const dirtyReceiptDocsTask = 'TASK-LANE-DIRTY-RECEIPT-DOCS-0001';
+  const dirtyReceiptDocsSeal = currentHead();
+  const dirtyReceiptDocsHash = computeBuildInputsTreeHash(dirtyReceiptDocsSeal);
+  writeTask(dirtyReceiptDocsTask, 'running', [
+    `.atm/history/evidence/${dirtyReceiptDocsTask}.*`,
+    'docs/ERROR_CODES.md',
+    'packages/cli/src/commands/taskflow/implementation.ts'
+  ]);
+  writeFileSync(path.join(repo, 'docs/ERROR_CODES.md'), '# Error Codes\n', 'utf8');
+  const dirtyReceiptDocsReceipt = writeRunnerSyncReceipt(dirtyReceiptDocsTask, dirtyReceiptDocsSeal, dirtyReceiptDocsHash);
+  commitPaths([
+    `docs/tasks/${dirtyReceiptDocsTask}.task.md`,
+    `.atm/history/tasks/${dirtyReceiptDocsTask}.json`,
+    dirtyReceiptDocsReceipt,
+    'docs/ERROR_CODES.md'
+  ], 'fixture dirty receipt docs closure');
+  const dirtyReceipt = JSON.parse(readFileSync(path.join(repo, dirtyReceiptDocsReceipt), 'utf8')) as Record<string, any>;
+  dirtyReceipt.lifecycle.note = 'updated after durable publication';
+  writeJson(path.join(repo, dirtyReceiptDocsReceipt), dirtyReceipt);
+  writeFileSync(path.join(repo, 'docs/ERROR_CODES.md'), '# Error Codes\n\nRegenerated docs.\n', 'utf8');
+  const dirtyReceiptDocsAllowed = runAtm(['taskflow', 'pre-close', '--task', dirtyReceiptDocsTask, '--actor', 'lane-captain'], 1);
+  assert.equal(dirtyReceiptDocsAllowed.evidence.runnerReceiptPublicationClosure.status, 'accepted');
+  assert.equal(dirtyReceiptDocsAllowed.evidence.historicalClosePreflight.dirtyGuard.reason, 'no-blocking-dirty-files');
+  assert.deepEqual(dirtyReceiptDocsAllowed.evidence.historicalClosePreflight.scopeTrackedDirtyFiles, []);
+  assert.equal((dirtyReceiptDocsAllowed.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY'), false);
+
+  writeFileSync(path.join(repo, 'packages/cli/src/commands/taskflow/implementation.ts'), '// uncommitted runner source drift\n', 'utf8');
+  const dirtySourceBlocked = runAtm(['taskflow', 'pre-close', '--task', dirtyReceiptDocsTask, '--actor', 'lane-captain'], 1);
+  assert.equal(dirtySourceBlocked.evidence.runnerReceiptPublicationClosure.status, 'accepted');
+  assert.ok(dirtySourceBlocked.evidence.historicalClosePreflight.scopeTrackedDirtyFiles.includes('packages/cli/src/commands/taskflow/implementation.ts'));
+  assert.equal((dirtySourceBlocked.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY'), true);
+
   commitFixtureChange('packages/cli/src/commands/taskflow/implementation.ts', '// runner input drift after receipt\n');
   const runnerInputDrift = runAtm(['taskflow', 'pre-close', '--task', 'TASK-LANE-RECEIPT-0001', '--actor', 'lane-captain'], 1);
   assert.equal(runnerInputDrift.evidence.runnerReceiptPublicationClosure.status, 'rebuild-required');
