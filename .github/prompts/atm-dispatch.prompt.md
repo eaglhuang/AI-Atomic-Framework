@@ -309,6 +309,33 @@ surface instead of falling back to the older "manual advisory only" model:
 - If a task card declares `team.required: true`, closeout needs a completed Team
   run and summary before task close can proceed.
 
+## ATM-Only Execution Route
+
+Never dispatch a worker instruction that tells an agent to run raw Git mutation,
+`node -e` / `node --eval`, PowerShell write commands such as `Set-Content`,
+`cmd /c`, or `bash -c`. Those are not approved worker routes. The only normal
+mutation path is the ATM command returned by the current playbook, diagnostic,
+or recovery hint for that worker's exact situation.
+
+Do not write that command into the dispatch packet from memory. Tell the worker
+to read it from the ATM output it receives (`evidence.nextAction.command`,
+`evidence.nextAction.playbook`, or the blocking message's `requiredCommand`).
+
+This warning is not an authorization, and neither is a dispatch packet. Write
+permission comes only from a `RestrictedExecutionGateway` allow decision.
+Adapters that cannot enforce a blocking pre-tool surface advertise
+`externalWriteCapability: unsupported`; do not assign them external write work,
+and do not treat a strongly worded instruction as a substitute for the gate.
+
+This restriction covers ATM-managed worker and integration execution. It does
+not try to sandbox an ordinary human local shell outside that runtime.
+
+For external write dispatch, require a write-intent claim first. That claim
+mints the task-bound admission ticket; the dispatch packet neither creates nor
+widens it. Claude, Codex, Cursor, Gemini, Copilot, and Antigravity may differ
+in early hook support, but all must receive the same downstream ticket verdict
+at review, commit, close, push, and protected-branch acceptance.
+
 ## Route Command
 
 Use this ATM command only after the first command confirms dispatch is the
