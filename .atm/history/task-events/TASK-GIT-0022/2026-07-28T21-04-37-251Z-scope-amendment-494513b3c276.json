@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T21-04-37-251Z-scope-amendment-494513b3c276",
+  "taskId": "TASK-GIT-0022",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0022.json",
+  "taskSha256": "sha256:f69a2cc73986bf33a61b7494a5e4a7e97918284994d282e098479e417a892169",
+  "createdAt": "2026-07-28T21:04:37.251Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0022 --actor codex-git-series-captain --add \"packages/cli/src/commands/broker/parser.ts,tests/cli/runner-publication-reconcile.test.ts\" --reason \"Add the thin runner-sync reconciliation command parser and focused deep-module coverage\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add the thin runner-sync reconciliation command parser and focused deep-module coverage"
+  }
+}

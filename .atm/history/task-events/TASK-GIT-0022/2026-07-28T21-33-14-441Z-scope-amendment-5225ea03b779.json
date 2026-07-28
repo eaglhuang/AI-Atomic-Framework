@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T21-33-14-441Z-scope-amendment-5225ea03b779",
+  "taskId": "TASK-GIT-0022",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0022.json",
+  "taskSha256": "sha256:19c2f41b6645fd78f45b4e65cae5f78b324a4abf193873f2870c130cbedf773f",
+  "createdAt": "2026-07-28T21:33:14.441Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0022 --actor codex-git-series-captain --add tests/cli-fixtures/help-snapshots/broker.json --reason \"Keep the public broker help snapshot in the same scoped command-contract delivery.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Keep the public broker help snapshot in the same scoped command-contract delivery."
+  }
+}

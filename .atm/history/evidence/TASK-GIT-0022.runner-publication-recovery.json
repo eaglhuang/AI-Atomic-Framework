@@ -1,0 +1,48 @@
+{
+  "schemaId": "atm.runnerPublicationRecoveryLedger.v1",
+  "taskId": "TASK-GIT-0022",
+  "records": [
+    {
+      "schemaId": "atm.runnerPublicationReceiptReconciliation.v1",
+      "taskId": "TASK-GIT-0022",
+      "actorId": "codex-git-series-captain",
+      "legacyReceiptPath": ".atm/history/evidence/TASK-GIT-0019.runner-sync-receipt.json",
+      "legacyTaskId": "TASK-GIT-0019",
+      "expectedHeadDigest": "sha256:8a29c3fa822b092b0b687436ae223e0d30aefe6e22bdb4fe29b08f4a4872ee2a",
+      "dirtyBeforeDigest": "sha256:fa8fc09ebdeb27ba9bdf8af52af8a979d0ff4dc8366b3f5226d54dfbcd0ab378",
+      "restoredAfterDigest": "sha256:8a29c3fa822b092b0b687436ae223e0d30aefe6e22bdb4fe29b08f4a4872ee2a",
+      "legacyInventoryDigest": "sha256:5acaae87b4441105e4682efbf447481625ad7bca95bc5c44fe9c296b8df02545",
+      "sealedSourceSha": "20adac80b3a135f0842c1214cbfdd587004778a5",
+      "decision": "restored-from-head",
+      "reconciledAt": "2026-07-28T21:15:54.016Z"
+    },
+    {
+      "schemaId": "atm.runnerPublicationReceiptReconciliation.v1",
+      "taskId": "TASK-GIT-0022",
+      "actorId": "codex-git-series-captain",
+      "legacyReceiptPath": ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain.runner-sync-receipt.json",
+      "legacyTaskId": "ATM-FRAMEWORK-TEMP-codex-git-series-captain",
+      "expectedHeadDigest": null,
+      "dirtyBeforeDigest": "sha256:0189573ec9fb77292437ef842b0beb74d2ae46e1f219acf173ec7763abc26690",
+      "restoredAfterDigest": null,
+      "legacyInventoryDigest": "sha256:254a7e0a75fbc2db2fb0d1c43129a0d8da71e8ec5dddd744c9f596ed2d7f6bbb",
+      "sealedSourceSha": "dfd03f7c2fd32953cdd44946a2e61ab8ee3dff00",
+      "decision": "deleted-untracked-orphan",
+      "reconciledAt": "2026-07-28T21:23:32.291Z"
+    },
+    {
+      "schemaId": "atm.runnerPublicationReceiptReconciliation.v1",
+      "taskId": "TASK-GIT-0022",
+      "actorId": "codex-git-series-captain",
+      "legacyReceiptPath": ".atm/history/evidence/TASK-GIT-0018.runner-sync-receipt.json",
+      "legacyTaskId": "TASK-GIT-0018",
+      "expectedHeadDigest": null,
+      "dirtyBeforeDigest": "sha256:3c628c5214f024952eec6a001ebe94c8986cc553b9ded60e0b8af446250182dd",
+      "restoredAfterDigest": null,
+      "legacyInventoryDigest": "sha256:832b710b88efb3872888ff62549496899d9e6b9161c3ae52526176447b9238e9",
+      "sealedSourceSha": "a9f2cb234738e39c49631da4058114b20da6463c",
+      "decision": "deleted-untracked-orphan",
+      "reconciledAt": "2026-07-28T21:23:35.645Z"
+    }
+  ]
+}

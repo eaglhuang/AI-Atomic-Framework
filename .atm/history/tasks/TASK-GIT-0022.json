@@ -12,7 +12,9 @@
     "A fixture reproduces the current shape: a sealed runner receipt, dirty dist/release members, and unrelated TMP/Plan3.1 evidence. It proves only the inventory members become publication-pending.",
     "Doctor fails closed with `ATM_RUNNER_PUBLICATION_PENDING` for incomplete current-generation inventory, and returns current only after exact publication or recorded recovery disposition.",
     "Publication and release consume the same inventory digest; missing, extra, foreign, stale-seal, or unattributed receipt members fail with a structured remediation.",
+    "The GIT-0019 receipt-only residue is reconciled through the ATM runner-sync route, not a raw Git command; the route refuses to touch any dirty dist/release member or a receipt whose committed predecessor does not match the requested task-owned evidence path.",
     "A governed recovery transaction handles the GIT-0019 generation without raw Git and leaves unrelated Plan3.1/TMP evidence untouched.",
+    "The same route distinguishes a verified committed predecessor from a named untracked orphan: it restores the former and deletes the latter only after exact-inventory and inactive-steward proof, appending both decisions to the TASK-GIT-0022 recovery ledger.",
     "The final target worktree is clean except only independently active, explicitly preserved Plan3.1 work; planning worktree is clean.",
     "Focused tests, typecheck, and `validate:cli` pass.",
     "Canonical error-code registry, generated TypeScript registry, and generated error-code documentation describe both G14 publication gates; no caller keeps private recovery prose for either error."
@@ -22,6 +24,8 @@
     "packages/core/src/broker/index.ts",
     "packages/cli/src/commands/doctor/run-doctor.ts",
     "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/broker/parser.ts",
+    "packages/cli/src/commands/command-specs/broker.spec.ts",
     "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
     "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
     "packages/cli/src/commands/framework-development/runner-sync-queue-ownership.ts",
@@ -32,13 +36,19 @@
     "scripts/run-sealed-runner-build.ts",
     "tests/cli/runner-publication-inventory-parity.test.ts",
     "tests/cli/runner-publication-residue-classification.test.ts",
-    "tests/cli/runner-publication-disposition-gate.test.ts"
+    "tests/cli/runner-publication-disposition-gate.test.ts",
+    "tests/cli/runner-publication-reconciliation.test.ts",
+    ".atm/history/evidence/TASK-GIT-0019.runner-sync-receipt.json",
+    ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain.runner-sync-receipt.json",
+    ".atm/history/evidence/TASK-GIT-0018.runner-sync-receipt.json"
   ],
   "scopePaths": [
     "packages/core/src/broker/runner-build-output-inventory.ts",
     "packages/core/src/broker/index.ts",
     "packages/cli/src/commands/doctor/run-doctor.ts",
     "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/broker/parser.ts",
+    "packages/cli/src/commands/command-specs/broker.spec.ts",
     "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
     "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
     "packages/cli/src/commands/framework-development/runner-sync-queue-ownership.ts",
@@ -49,12 +59,17 @@
     "scripts/run-sealed-runner-build.ts",
     "tests/cli/runner-publication-inventory-parity.test.ts",
     "tests/cli/runner-publication-residue-classification.test.ts",
-    "tests/cli/runner-publication-disposition-gate.test.ts"
+    "tests/cli/runner-publication-disposition-gate.test.ts",
+    "tests/cli/runner-publication-reconciliation.test.ts",
+    ".atm/history/evidence/TASK-GIT-0019.runner-sync-receipt.json",
+    ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain.runner-sync-receipt.json",
+    ".atm/history/evidence/TASK-GIT-0018.runner-sync-receipt.json"
   ],
   "validators": [
     "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts",
     "node --strip-types tests/cli/runner-publication-residue-classification.test.ts",
     "node --strip-types tests/cli/runner-publication-disposition-gate.test.ts",
+    "node --strip-types tests/cli/runner-publication-reconciliation.test.ts",
     "npm run typecheck",
     "npm run validate:cli"
   ],
@@ -67,7 +82,8 @@
   "outOfScope": [
     "Discarding, staging, or committing Plan3.1/TMP evidence not attributable to the selected sealed inventory.",
     "Changing source files compiled by the runner build.",
-    "Reopening GIT-0017 or GIT-0019."
+    "Reopening GIT-0017 or GIT-0019.",
+    "Deleting legacy runner receipts that do not carry a validated BuildOutputInventory."
   ],
   "nonGoals": [
     "No raw Git restore, reset, or pathspec cleanup for generated runner outputs.",
@@ -104,6 +120,8 @@
         "packages/core/src/broker/index.ts",
         "packages/cli/src/commands/doctor/run-doctor.ts",
         "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/broker/parser.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
         "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
         "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
         "packages/cli/src/commands/framework-development/runner-sync-queue-ownership.ts",
@@ -115,10 +133,17 @@
         "tests/cli/runner-publication-inventory-parity.test.ts",
         "tests/cli/runner-publication-residue-classification.test.ts",
         "tests/cli/runner-publication-disposition-gate.test.ts",
+        "tests/cli/runner-publication-reconciliation.test.ts",
+        ".atm/history/evidence/TASK-GIT-0019.runner-sync-receipt.json",
+        ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain.runner-sync-receipt.json",
+        ".atm/history/evidence/TASK-GIT-0018.runner-sync-receipt.json",
         "BuildOutputInventory is the single authority for the exact sealed build output set, receipt membership, ownership, and terminal disposition.",
         "doctor reports a blocking publication-pending result whenever the current sealed build has dirty or untracked inventory members without a governed publication or recovery disposition; source mtime alone cannot report current.",
         "One governed publication/recovery transaction can either publish the exact owned inventory or retain an explicit stale/foreign recovery disposition; it never silently restores, adopts, or drops Plan3.1/TMP evidence.",
         "Runner-sync release rejects a receipt whose declared inventory is incomplete, unowned, mismatched to its sealed source, or lacks an attributable terminal disposition.",
+        "A receipt-only stale-generation reconciliation is exposed through an ATM runner-sync command. It proves the prior committed receipt matches the named path, refuses any dirty generated member or foreign task ownership, restores only the verified stale receipt through ATM, and records a TASK-GIT-0022 reconciliation receipt.",
+        "The same constrained ATM route may delete a named untracked orphan receipt only when it has no committed predecessor, its exact inventory is otherwise clean, and its steward is inactive; each restore or delete decision is appended to the TASK-GIT-0022 recovery ledger.",
+        "The reconciliation command accepts exactly one repository-local runner-sync receipt path and exposes no raw Git restore, reset, or pathspec option; its command specification documents the constrained task, actor, and receipt-ref route.",
         "The current GIT-0019 build residue is either published as exact inventory or preserved under an attributable recovery receipt, leaving both repositories clean except for separately classified active Plan3.1 work.",
         "BuildOutputInventory remains the only source for output membership and disposition; doctor, runner-sync release, and publication transaction are adapters."
       ]
@@ -127,7 +152,7 @@
       "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
       "severity": "warning",
       "field": "validators",
-      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+      "message": "Command-only validators were projected to 6 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
     }
   ],
   "tags": [],
@@ -135,20 +160,20 @@
   "source": {
     "planPath": "git-boundary-admission/tasks/TASK-GIT-0022-runner-publication-disposition-enforcement-and-clean-worktree-finalization.task.md",
     "sectionTitle": "TASK-GIT-0022",
-    "headingLine": 112,
-    "hash": "5a3eaa945940bdeb",
+    "headingLine": 125,
+    "hash": "7444e4739c9c1015",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0022-runner-publication-disposition-enforcement-and-clean-worktree-finalization.task.md",
-      "planningCommitSha": "79e688b0aa9b5f107057c3ce2fd48e9f292b896a",
-      "contentDigest": "sha256:5a3eaa945940bdeb73fb3ac4100e5bf35a3a9b1ec7ffb8c5d2086bf83ef620d4",
+      "planningCommitSha": "5f2913eea88aa32dd2c3fd571513656a5c802d6c",
+      "contentDigest": "sha256:7444e4739c9c1015664586b675a4e09a8b9706b2391f383f4a91648c4d94c454",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-28T20:42:57.692Z"
+      "sealedAt": "2026-07-28T21:26:40.536Z"
     }
   },
-  "importedAt": "2026-07-28T20:42:57.692Z",
+  "importedAt": "2026-07-28T21:26:40.536Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
@@ -193,6 +218,16 @@
       "schemaId": "atm.validatorExecutionContract.v1",
       "specVersion": "0.1.0",
       "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.runner.publication.reconciliation.test.ts",
+      "command": "node --strip-types tests/cli/runner-publication-reconciliation.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
       "caseId": "legacy_cmd_npm.run.typecheck",
       "command": "npm run typecheck",
       "legacyProjection": true,
@@ -224,9 +259,13 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-69e2ca44d076",
     "claimedAt": "2026-07-28T20:36:01.857Z",
-    "heartbeatAt": "2026-07-28T20:58:31.661Z",
+    "heartbeatAt": "2026-07-28T21:33:16.483Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-claude-005-git-0016-captain.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-GIT-0018.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-GIT-0019.runner-sync-receipt.json",
       ".atm/history/evidence/TASK-GIT-0022.*",
       ".atm/history/task-events/TASK-GIT-0022/**",
       ".atm/history/tasks/TASK-GIT-0022.json",
@@ -243,7 +282,9 @@
       "packages/cli/dist/commands/taskflow/write-readiness.js",
       "packages/cli/dist/commands/tasks/claim-orchestrator.js",
       "packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "packages/cli/src/commands/broker/parser.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
       "packages/cli/src/commands/doctor/run-doctor.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
       "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
@@ -292,14 +333,17 @@
       "release/atm-root-drop/templates/skills/atm-governance-router.skill.md",
       "release/atm-root-drop/templates/skills/atm-next.skill.md",
       "scripts/run-sealed-runner-build.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
       "tests/cli/runner-publication-disposition-gate.test.ts",
       "tests/cli/runner-publication-inventory-parity.test.ts",
+      "tests/cli/runner-publication-reconcile.test.ts",
+      "tests/cli/runner-publication-reconciliation.test.ts",
       "tests/cli/runner-publication-residue-classification.test.ts"
     ],
     "state": "active",
     "laneSession": {
       "laneSessionId": "lane-20260728203601-codex-git-series-captain-82cc5c35aa",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728203601-codex-git-series-captain-82cc5c35aa\""
     }
@@ -316,6 +360,10 @@
     "queueId": null,
     "queueIndex": null,
     "allowedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-claude-005-git-0016-captain.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-GIT-0018.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-GIT-0019.runner-sync-receipt.json",
       ".atm/history/evidence/TASK-GIT-0022.*",
       ".atm/history/task-events/TASK-GIT-0022/**",
       ".atm/history/tasks/TASK-GIT-0022.json",
@@ -332,7 +380,9 @@
       "packages/cli/dist/commands/taskflow/write-readiness.js",
       "packages/cli/dist/commands/tasks/claim-orchestrator.js",
       "packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "packages/cli/src/commands/broker/parser.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
       "packages/cli/src/commands/doctor/run-doctor.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
       "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
@@ -381,8 +431,11 @@
       "release/atm-root-drop/templates/skills/atm-governance-router.skill.md",
       "release/atm-root-drop/templates/skills/atm-next.skill.md",
       "scripts/run-sealed-runner-build.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
       "tests/cli/runner-publication-disposition-gate.test.ts",
       "tests/cli/runner-publication-inventory-parity.test.ts",
+      "tests/cli/runner-publication-reconcile.test.ts",
+      "tests/cli/runner-publication-reconciliation.test.ts",
       "tests/cli/runner-publication-residue-classification.test.ts"
     ],
     "planningReadOnlyPaths": [
@@ -407,33 +460,38 @@
     "createdAt": "2026-07-28T20:36:05.562Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-07-28T20-58-31-950Z-renew-a755626cf5a3",
-  "lastTransitionAt": "2026-07-28T20:58:31.950Z",
+  "lastTransitionId": "2026-07-28T21-33-16-767Z-renew-5c76a4f7d333",
+  "lastTransitionAt": "2026-07-28T21:33:16.767Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-1981542f52e8df13",
-    "ticketDigest": "sha256:1981542f52e8df1320e4eb0620ca14ce7981ba7f0e236096d4946a28a6d6ed1c",
+    "ticketId": "wat-2effe91134480e9d",
+    "ticketDigest": "sha256:2effe91134480e9d74d61c291165702e13571cbd25e932137451751482ccd416",
     "taskId": "TASK-GIT-0022",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260728203601-codex-git-series-captain-82cc5c35aa",
     "claimGeneration": "lease-69e2ca44d076",
-    "issuedAt": "2026-07-28T20:58:31.661Z",
-    "expiresAt": "2026-07-28T21:28:31.661Z",
-    "scopeDigest": "sha256:ae41045eea4e5c6f7a2d8b00087e5d3512eba52382a5bccde3b628a57cb46cc8",
+    "issuedAt": "2026-07-28T21:33:16.483Z",
+    "expiresAt": "2026-07-28T22:03:16.483Z",
+    "scopeDigest": "sha256:652b03c65d874e59687ff38710c12dde64b24295c97f933529720772ab35d740",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-28T20:58:31.661Z"
+      "selectedAt": "2026-07-28T21:33:16.483Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
+          ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain.runner-sync-receipt.json",
+          ".atm/history/evidence/TASK-GIT-0018.runner-sync-receipt.json",
+          ".atm/history/evidence/TASK-GIT-0019.runner-sync-receipt.json",
           "docs/ERROR_CODES.md",
           "docs/governance/error-code-registry.json",
+          "packages/cli/src/commands/broker/parser.ts",
           "packages/cli/src/commands/broker/steward-queues.ts",
+          "packages/cli/src/commands/command-specs/broker.spec.ts",
           "packages/cli/src/commands/doctor/run-doctor.ts",
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
           "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
@@ -445,9 +503,10 @@
           "scripts/run-sealed-runner-build.ts",
           "tests/cli/runner-publication-disposition-gate.test.ts",
           "tests/cli/runner-publication-inventory-parity.test.ts",
+          "tests/cli/runner-publication-reconciliation.test.ts",
           "tests/cli/runner-publication-residue-classification.test.ts"
         ],
-        "digest": "sha256:eab97adf1c53904fd0bbbe16884c9abad507e289d61605614a86249f1a8cd0bd"
+        "digest": "sha256:290f6b445ca89d14ee2ee19d5cf2c69eca9f99bd891139a4acbfee01d555d71f"
       },
       {
         "kind": "lifecycle-operation",

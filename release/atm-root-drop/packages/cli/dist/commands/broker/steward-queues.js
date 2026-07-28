@@ -8,7 +8,7 @@ import { cleanupRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explain
 import { cleanupGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../../core/dist/broker/generated-projection-steward.js';
 import { readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward } from './persistence.js';
 import { appendLaneSessionEvent } from '../lane-session/events.js';
-import { inspectRunnerPublicationDisposition } from '../framework-development/runner-publication-lifecycle.js';
+import { inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.js';
 export function handleBrokerStewardQueues(options, context) {
     const runnerSyncQueuePath = context.runnerSyncQueuePath;
     const projectionStewardPath = context.projectionStewardPath;
@@ -153,7 +153,41 @@ export function handleBrokerStewardQueues(options, context) {
                 throw toRunnerSyncReleaseCliError(error);
             }
         }
-        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, status, cleanup, release', { exitCode: 2 });
+        if (options.runnerSyncAction === 'reconcile-receipt') {
+            if (!options.task || !options.actorId || !options.receiptRef) {
+                throw new CliError('ATM_CLI_USAGE', 'broker runner-sync reconcile-receipt requires --task <task-id>, --actor <actor-id>, and --receipt-ref <path>.', { exitCode: 2 });
+            }
+            assertRunnerSyncRecoveryAuthority(options.cwd, options.task, options.actorId);
+            try {
+                const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
+                const reconciliation = reconcileReceiptOnlyRunnerPublicationResidue({
+                    cwd: options.cwd,
+                    taskId: options.task,
+                    actorId: options.actorId,
+                    receiptRef: options.receiptRef,
+                    activeStewardWorkIds: queue.groups.map((group) => group.stewardWorkId)
+                });
+                return makeResult({
+                    ok: true,
+                    command: 'broker',
+                    cwd: options.cwd,
+                    messages: [
+                        message('info', 'ATM_BROKER_RUNNER_SYNC_RECEIPT_RECONCILED', reconciliation.decision === 'deleted-untracked-orphan'
+                            ? `Deleted the verified untracked orphan runner receipt ${reconciliation.legacyReceiptPath} through the receipt-only recovery route.`
+                            : `Restored the verified stale runner receipt ${reconciliation.legacyReceiptPath} through the receipt-only recovery route.`, reconciliation)
+                    ],
+                    evidence: {
+                        runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+                        reconciliation,
+                        recoveryReceiptPath: `.atm/history/evidence/${options.task}.runner-publication-recovery.json`
+                    }
+                });
+            }
+            catch (error) {
+                throw toRunnerSyncQueueCliError(error);
+            }
+        }
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, status, cleanup, release, reconcile-receipt', { exitCode: 2 });
     }
     if (options.action === 'projection') {
         if (options.projectionAction === 'enqueue') {
@@ -274,6 +308,24 @@ function resolveRunnerSyncTaskIdHealth(cwd, taskId) {
     }
     catch {
         return 'task-active';
+    }
+}
+function assertRunnerSyncRecoveryAuthority(cwd, taskId, actorId) {
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (!existsSync(taskPath)) {
+        throw new CliError('ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE', `Recovery task ${taskId} does not exist.`, { exitCode: 1 });
+    }
+    try {
+        const task = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const claim = task.claim && typeof task.claim === 'object' ? task.claim : null;
+        if (task.status !== 'running' || claim?.state !== 'active' || claim.actorId !== actorId) {
+            throw new CliError('ATM_RUNNER_PUBLICATION_PENDING', `Receipt-only reconciliation requires an active claim for ${taskId} held by ${actorId}.`, { exitCode: 1 });
+        }
+    }
+    catch (error) {
+        if (error instanceof CliError)
+            throw error;
+        throw new CliError('ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE', `Recovery task ${taskId} could not be read.`, { exitCode: 1 });
     }
 }
 function resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId) {
