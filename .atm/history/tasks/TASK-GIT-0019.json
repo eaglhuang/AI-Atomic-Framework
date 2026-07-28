@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0019",
   "title": "Unified ticket coverage gates and cross-adapter rollout evidence",
-  "status": "running",
+  "status": "done",
   "milestone": "G11",
   "dependencies": [
     "TASK-GIT-0018"
@@ -266,7 +266,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-1c636742f088",
     "claimedAt": "2026-07-28T19:35:56.896Z",
-    "heartbeatAt": "2026-07-28T20:20:48.818Z",
+    "heartbeatAt": "2026-07-28T20:28:15.001Z",
     "ttlSeconds": 1800,
     "files": [
       ".agents/skills/atm-dispatch/SKILL.md",
@@ -322,13 +322,14 @@
       "tests/cli/work-admission-coverage-gates.test.ts",
       "tests/cli/work-admission-cross-adapter-dogfood.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260728193557-codex-git-series-captain-8010edce12",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728193557-codex-git-series-captain-8010edce12\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-git-series-captain",
   "startedAt": "2026-07-28T19:35:56.896Z",
@@ -417,8 +418,8 @@
     "createdAt": "2026-07-28T19:36:10.285Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-07-28T20-20-49-102Z-renew-b6758cef6ffb",
-  "lastTransitionAt": "2026-07-28T20:20:49.102Z",
+  "lastTransitionId": "2026-07-28T20-28-15-004Z-close-3f3c1dcc28f5",
+  "lastTransitionAt": "2026-07-28T20:28:15.004Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -524,5 +525,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  }
+  },
+  "closedAt": "2026-07-28T20:28:15.001Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260728193556-codex-git-series-captain-TASK-GIT-0019-8bb584aca1",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0019.closure-packet.json"
 }
