@@ -44,6 +44,12 @@ Supported pre-tool integrations must treat raw Git index/worktree mutation as a 
 
 `git push` is a governed publish action, not a safe raw Git exception. Agents must use `node atm.mjs git push --actor <actor-id> --branch <branch> --remote <remote> --json`, which reruns ATM Git admission before the host push, records a push-attempt status file under `.atm/runtime/git-push-attempts/`, supports `--dry-run`, and fails before invoking host Git when remote drift or same-file conflicts require admission routing. If the host push still fails after admission, agents must use `node atm.mjs git recover-push-fail ...` for command-backed recovery guidance.
 
+For a claimed task, the governed commit/push facade also reads the claim-sealed
+work-admission ticket from the task ledger. Commit records its ticket coverage
+as an `ATM-Work-Admission` trailer; protected-branch range checks reject new
+critical commits without that committed coverage. This is a shared downstream
+gate, not adapter-local prose or an environment-variable bypass.
+
 | Adapter | Raw Git mutation gate | Verification |
 | --- | --- | --- |
 | Codex | Hard-gated when `integration hook pre-tool` is installed or invoked by the host surface. | `node --strip-types tests/cli/integration-raw-git-command-guard.test.ts` |

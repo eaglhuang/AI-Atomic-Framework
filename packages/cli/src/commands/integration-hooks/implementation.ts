@@ -20,6 +20,7 @@ import { buildFrameworkTempClaimCommand, createFrameworkModeStatus, detectFramew
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../task-direction.ts';
 import { extractPathLikeStringsFromPrompt, isPathAllowedByScope, isQuickfixPrompt, readActiveQuickfixLock } from '../work-channels.ts';
 import { hookContractVersion, hookMarker, hookProvider, inspectGitHooks, installGitHooks } from '../hook.ts';
+import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.ts';
 import { evaluateTeamPreToolGate } from '../team-runtime-gates.ts';
 import { resolvePromptScopedTaskContext } from '../next.ts';
 import { CliError, makeResult, message, relativePathFrom } from '../shared.ts';
@@ -115,6 +116,15 @@ const promptScopedAllowedPaths = promptScope ? buildPromptScopedAllowedPaths(pro
 const promptScopedPlanningMirrorPaths = promptScope ? buildPromptScopedPlanningMirrorPaths(promptScopedHeadTasks) : [];
 const promptScopedAllowsPlanningMirror = promptScopedHeadTasks.some((task) => task.allowPlanningMirror === true);
 const activeDirectionLocks = readActiveTaskDirectionLocks(options.cwd);
+const activeWorkAdmission = mutatingIntent && !gitCommitIntent && activeDirectionLocks.length === 1 && toolFiles.length > 0
+  ? evaluateTaskWorkAdmissionGate({
+    cwd: options.cwd,
+    taskId: activeDirectionLocks[0].taskId,
+    operation: 'write',
+    files: toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)),
+    producingAtmCommand: 'node atm.mjs integration hook pre-tool --json'
+  })
+  : null;
 const directionLockAllowedPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
 const directionLockPlanningMirrorPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.planningMirrorPaths ?? []));
 const directionLockAllowsPlanningMirror = activeDirectionLocks.some((lock) => lock.allowPlanningMirror === true);
@@ -145,6 +155,11 @@ if (restrictedExecution) {
 const restrictedExecutionFinding = toRestrictedExecutionFinding(restrictedExecution); return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_RESTRICTED_EXECUTION_BLOCKED', 'Direct interpreter evaluation or shell mutation is not an approved worker route. Use the ATM command returned by the current playbook or diagnostic.', { editor: options.editor, command: toolCommand,
 reasonCode: restrictedExecutionFinding.reasonCode, executableClass: restrictedExecutionFinding.executableClass, requiredCommand: restrictedExecutionFinding.requiredCommand, atmOnlyRouteNotice: restrictedExecutionFinding.atmOnlyRouteNotice, overridePolicy: restrictedExecutionFinding.overridePolicy })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, toolCommand,
 restrictedExecution: restrictedExecutionFinding, restrictedExecutionReceipt: restrictedExecutionFinding.receipt, frameworkStatus: status }
+});
+}
+if (activeWorkAdmission && !activeWorkAdmission.decision.ok) {
+return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', activeWorkAdmission.decision.code, 'Active task write is missing current work-admission coverage.', { taskId: activeDirectionLocks[0]?.taskId ?? null, reason: activeWorkAdmission.decision.reason })], evidence: {
+action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, workAdmission: activeWorkAdmission, frameworkStatus: status }
 });
 }
 if (status.mode === 'cross-repo-target-required' && gitCommitIntent) { return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_COMMIT_BLOCKED', 'Git commit is blocked in the planning repository while ATM framework closure authority belongs to the target repository.', { editor: options.editor, targetRepo: status.targetRepo,

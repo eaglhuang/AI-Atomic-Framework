@@ -328,6 +328,12 @@ and do not treat a strongly worded instruction as a substitute for the gate.
 This restriction covers ATM-managed worker and integration execution. It does
 not try to sandbox an ordinary human local shell outside that runtime.
 
+For external write dispatch, require a write-intent claim first. That claim
+mints the task-bound admission ticket; the dispatch packet neither creates nor
+widens it. Claude, Codex, Cursor, Gemini, Copilot, and Antigravity may differ
+in early hook support, but all must receive the same downstream ticket verdict
+at review, commit, close, push, and protected-branch acceptance.
+
 ## Route Command
 
 Use this ATM command only after the first command confirms dispatch is the

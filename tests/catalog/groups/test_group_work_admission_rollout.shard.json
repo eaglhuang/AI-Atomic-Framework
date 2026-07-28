@@ -1,0 +1,35 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_work_admission_rollout",
+  "theme": "Claim-issued ticket coverage rollout",
+  "resourceKey": "test-group:work-admission-rollout",
+  "maintainers": ["atm-agent-skills"],
+  "supportedSeams": ["claim-to-protected-push"],
+  "dependencyEdges": ["work-admission-ticket-authority"],
+  "cases": [
+    {
+      "caseId": "test_task_git_0019_work_admission_coverage_gates_7f07d359",
+      "semanticKey": "shared_gate_coverage",
+      "responsibility": "task-required",
+      "command": "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "coversAcceptance": ["ACC-1", "ACC-2"],
+      "coversImpactEdges": ["claim-to-protected-push"]
+    },
+    {
+      "caseId": "test_task_git_0019_work_admission_cross_adapter_dogfood_fa2bc836",
+      "semanticKey": "adapter_downstream_verdict",
+      "responsibility": "task-required",
+      "command": "node --strip-types tests/cli/work-admission-cross-adapter-dogfood.test.ts",
+      "coversAcceptance": ["ACC-3", "ACC-4"],
+      "coversImpactEdges": ["claim-to-protected-push"],
+      "dependsOnCaseIds": ["test_task_git_0019_work_admission_coverage_gates_7f07d359"]
+    }
+  ],
+  "aliases": [],
+  "lineage": [],
+  "costBudgetMs": 30000,
+  "timeoutMs": 60000,
+  "quarantine": false,
+  "checkpointPolicy": "task-required"
+}

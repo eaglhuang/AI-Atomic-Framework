@@ -1,0 +1,366 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0019",
+  "title": "Unified ticket coverage gates and cross-adapter rollout evidence",
+  "status": "running",
+  "milestone": "G11",
+  "dependencies": [
+    "TASK-GIT-0018"
+  ],
+  "acceptance": [
+    "A single fixture matrix proves identical decision codes across Police, Broker, Reviewer, commit, close, push, and remote required-check adapters.",
+    "A native write can be detected and recovered, but cannot silently advance from recovery-required to delivery-authorized.",
+    "Cross-gate fixtures prove snapshot recovery may resolve disabled without disabling or weakening any ticket-coverage decision.",
+    "Cross-adapter fixtures prove a worker cannot override the claim-sealed recovery policy through prompt text, environment variables, editor settings, or an adapter-local default.",
+    "A direct raw local commit remains non-delivery until provenance review; a direct raw push cannot satisfy protected-branch acceptance without committed ticket coverage.",
+    "Supported editor hooks may block earlier, while unsupported editors still fail at shared downstream gates. Documentation states this distinction plainly.",
+    "Skills and `next` project the shared decision and recovery command but cannot mint, widen, or advance a ticket."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/work-admission-ticket.ts",
+    "packages/cli/src/commands/police.ts",
+    "packages/cli/src/commands/review-advisory.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/git-governance/work-admission-check.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+    "packages/cli/src/commands/hook/pre-push.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/taskflow/broker-gate.ts",
+    "packages/cli/src/commands/integration-hooks/implementation.ts",
+    "packages/cli/src/commands/team-runtime-gates.ts",
+    "packages/cli/src/commands/next.ts",
+    "templates/skills/atm-governance-router.skill.md",
+    "templates/skills/atm-dispatch.skill.md",
+    "templates/skills/atm-next.skill.md",
+    "docs/governance/integration-plugin-matrix.md",
+    "docs/AGENT_PACK_ONBOARDING.md",
+    "tests/cli/work-admission-coverage-gates.test.ts",
+    "tests/cli/work-admission-cross-adapter-dogfood.test.ts",
+    "tests/catalog/groups/test_group_work_admission_rollout.shard.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/work-admission-ticket.ts",
+    "packages/cli/src/commands/police.ts",
+    "packages/cli/src/commands/review-advisory.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/git-governance/work-admission-check.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+    "packages/cli/src/commands/hook/pre-push.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/taskflow/broker-gate.ts",
+    "packages/cli/src/commands/integration-hooks/implementation.ts",
+    "packages/cli/src/commands/team-runtime-gates.ts",
+    "packages/cli/src/commands/next.ts",
+    "templates/skills/atm-governance-router.skill.md",
+    "templates/skills/atm-dispatch.skill.md",
+    "templates/skills/atm-next.skill.md",
+    "docs/governance/integration-plugin-matrix.md",
+    "docs/AGENT_PACK_ONBOARDING.md",
+    "tests/cli/work-admission-coverage-gates.test.ts",
+    "tests/cli/work-admission-cross-adapter-dogfood.test.ts",
+    "tests/catalog/groups/test_group_work_admission_rollout.shard.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+    "node --strip-types tests/cli/work-admission-cross-adapter-dogfood.test.ts",
+    "npm run validate:skill-templates",
+    "npm run validate:cli",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "No second adapter capability registry or conformance policy owner.",
+    "No claim that skills, prompts, or editor labels grant authority.",
+    "No remote merge/rebase engine; the remote check verifies ticket coverage only."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-cross-gate-ticket-conformance",
+  "rollbackStrategy": "revert-commit-and-disable-work-admission-required-check",
+  "rollbackNotes": "Revert gate adapters together so no boundary retains a private partial policy; retain all dogfood and bypass evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.work-admission-ticket-authority",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.work-admission-gate-adapters",
+        "pattern": "Adapter Set",
+        "source": "packages/cli/src/commands/git-governance/work-admission-check.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/work-admission-ticket.ts",
+        "packages/cli/src/commands/police.ts",
+        "packages/cli/src/commands/review-advisory.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/work-admission-check.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/cli/src/commands/integration-hooks/implementation.ts",
+        "packages/cli/src/commands/team-runtime-gates.ts",
+        "packages/cli/src/commands/next.ts",
+        "templates/skills/atm-governance-router.skill.md",
+        "templates/skills/atm-dispatch.skill.md",
+        "templates/skills/atm-next.skill.md",
+        "docs/governance/integration-plugin-matrix.md",
+        "docs/AGENT_PACK_ONBOARDING.md",
+        "tests/cli/work-admission-coverage-gates.test.ts",
+        "tests/cli/work-admission-cross-adapter-dogfood.test.ts",
+        "tests/catalog/groups/test_group_work_admission_rollout.shard.json",
+        "Police, Broker, Reviewer, governed commit, taskflow close, protected push, and the remote required-check command consume the same WorkAdmissionTicketAuthority decision and ErrorCode family; none maintains a private allowlist.",
+        "Warnings are projections of the shared decision. Hard boundaries reject missing, stale, wrong-scope, wrong-digest, wrong-operation, recovery-required, or not-delivery-authorized tickets.",
+        "The protected-branch check verifies committed ticket coverage evidence so direct raw push cannot publish an accepted mainline change merely by bypassing local hooks.",
+        "Cross-adapter fixtures cover Claude, Codex, Cursor, Gemini, Copilot, and Antigravity as behavior/evidence surfaces. Adapter prose and pre-tool support may improve prevention, but every adapter receives the same downstream coverage verdict.",
+        "Dogfood covers governed writes, native in-scope late attach, out-of-scope split/quarantine, raw local commit review, missing ticket, stale ticket, digest drift, raw push rejection, and recovery retry idempotency.",
+        "Dogfood proves that recoveryMode=disabled performs zero snapshot writes while the same Police, Broker, Reviewer, commit, close, push, and remote ticket gates remain mandatory.",
+        "Skills, next, doctor, and onboarding explain the ATM-only route and exact recovery command without claiming that text itself grants or enforces authority."
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0019-adapter-enforcement-capability-attestation-and-fail-closed-write-dispatch.task.md",
+    "sectionTitle": "TASK-GIT-0019",
+    "headingLine": 95,
+    "hash": "7b86a4b197982105",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0019-adapter-enforcement-capability-attestation-and-fail-closed-write-dispatch.task.md",
+      "planningCommitSha": "09a25920082a70fce135977db45e4872458204d4",
+      "contentDigest": "sha256:7b86a4b197982105e47a311d055a82eaf8fe7a1b3e22759e9cec431d87108706",
+      "amendmentEpoch": 2,
+      "sealedAt": "2026-07-28T19:55:22.731Z"
+    }
+  },
+  "importedAt": "2026-07-28T19:55:22.731Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [
+    "test_task_git_0019_work_admission_coverage_gates_7f07d359",
+    "test_task_git_0019_work_admission_cross_adapter_dogfood_fa2bc836"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-1c636742f088",
+    "claimedAt": "2026-07-28T19:35:56.896Z",
+    "heartbeatAt": "2026-07-28T19:55:29.812Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0019.*",
+      ".atm/history/task-events/TASK-GIT-0019/**",
+      ".atm/history/tasks/TASK-GIT-0019.json",
+      "docs/AGENT_PACK_ONBOARDING.md",
+      "docs/governance/integration-plugin-matrix.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/integration-hooks/implementation.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/police.ts",
+      "packages/cli/src/commands/review-advisory.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/team-runtime-gates.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "tests/catalog/groups/test_group_work_admission_rollout.shard.json",
+      "tests/cli/work-admission-coverage-gates.test.ts",
+      "tests/cli/work-admission-cross-adapter-dogfood.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260728193557-codex-git-series-captain-8010edce12",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728193557-codex-git-series-captain-8010edce12\""
+    }
+  },
+  "owner": "codex-git-series-captain",
+  "startedAt": "2026-07-28T19:35:56.896Z",
+  "startedBySessionId": "session-20260728193556-codex-git-series-captain-TASK-GIT-0019-8bb584aca1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0019",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0019.*",
+      ".atm/history/task-events/TASK-GIT-0019/**",
+      ".atm/history/tasks/TASK-GIT-0019.json",
+      "docs/AGENT_PACK_ONBOARDING.md",
+      "docs/governance/integration-plugin-matrix.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/integration-hooks/implementation.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/police.ts",
+      "packages/cli/src/commands/review-advisory.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/team-runtime-gates.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "tests/catalog/groups/test_group_work_admission_rollout.shard.json",
+      "tests/cli/work-admission-coverage-gates.test.ts",
+      "tests/cli/work-admission-cross-adapter-dogfood.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0019-adapter-enforcement-capability-attestation-and-fail-closed-write-dispatch.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/git-boundary-admission/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0019-adapter-enforcement-capability-attestation-and-fail-closed-write-dispatch.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "2232a9ba5b5db33cbed662af0ccc642b0ab5f29ca9eaa21a11766171a08157c0",
+    "actorId": "codex-git-series-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260728193557-codex-git-series-captain-8010edce12",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728193557-codex-git-series-captain-8010edce12\""
+    },
+    "createdAt": "2026-07-28T19:36:10.285Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-07-28T19-55-30-188Z-renew-9f1aa9a63e4e",
+  "lastTransitionAt": "2026-07-28T19:55:30.188Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-db4da4267b94ccad",
+    "ticketDigest": "sha256:db4da4267b94ccad3a86afcfd0d708b551e4a3d20be6fa05e18586a30d0e0492",
+    "taskId": "TASK-GIT-0019",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260728193557-codex-git-series-captain-8010edce12",
+    "claimGeneration": "lease-1c636742f088",
+    "issuedAt": "2026-07-28T19:55:29.812Z",
+    "expiresAt": "2026-07-28T20:25:29.812Z",
+    "scopeDigest": "sha256:c136b79882d4f4d0a16eaa60d2e43937b2733e3c04fd82b70c9ed926fbbe52c6",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-28T19:55:29.812Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          "docs/AGENT_PACK_ONBOARDING.md",
+          "docs/governance/integration-plugin-matrix.md",
+          "packages/cli/src/commands/git-governance.ts",
+          "packages/cli/src/commands/git-governance/implementation.ts",
+          "packages/cli/src/commands/git-governance/work-admission-check.ts",
+          "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/hook/pre-push.ts",
+          "packages/cli/src/commands/integration-hooks/implementation.ts",
+          "packages/cli/src/commands/next.ts",
+          "packages/cli/src/commands/police.ts",
+          "packages/cli/src/commands/review-advisory.ts",
+          "packages/cli/src/commands/taskflow/broker-gate.ts",
+          "packages/cli/src/commands/taskflow/write-readiness.ts",
+          "packages/cli/src/commands/team-runtime-gates.ts",
+          "packages/core/src/broker/work-admission-ticket.ts",
+          "templates/skills/atm-dispatch.skill.md",
+          "templates/skills/atm-governance-router.skill.md",
+          "templates/skills/atm-next.skill.md",
+          "tests/catalog/groups/test_group_work_admission_rollout.shard.json",
+          "tests/cli/work-admission-coverage-gates.test.ts",
+          "tests/cli/work-admission-cross-adapter-dogfood.test.ts"
+        ],
+        "digest": "sha256:cd0987088dec722d394d3189da5751c9aa3638c1b3934fcd6041384ab4091dfc"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  }
+}

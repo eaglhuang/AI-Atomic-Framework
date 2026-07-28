@@ -220,6 +220,12 @@ returned ATM recovery command instead of finding another shell spelling.
 This restriction covers ATM-managed worker and integration execution. It does
 not try to sandbox an ordinary human local shell outside that runtime.
 
+A write-intent claim seals a task-bound work-admission ticket. It is not a
+chat permission: downstream Police, reviewer, commit, close, push, and
+protected-branch gates verify the same ticket coverage. When a gate denies,
+use its returned recovery command; never substitute raw Git or a different
+shell spelling.
+
 ## Route Command
 
 Use this ATM command only after the first command confirms it is the current governed route:

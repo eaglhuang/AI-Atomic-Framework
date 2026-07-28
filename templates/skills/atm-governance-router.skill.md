@@ -362,31 +362,13 @@ visible mirror before implementation:
 node atm.mjs tasks mirror --provider <provider> --origin-task <id> --origin-url <url> --actor "$ATM_ACTOR_ID" --json
 ```
 
-If the editor provides pre-write hooks, keep them thin and run only:
-
-```bash
-node atm.mjs write-ticket check --task <task-id> --actor "$ATM_ACTOR_ID" --ticket <ticket.json> --files <csv> --observed pre-write --json
-```
-
-Before a mutating implementation pass, acquire a task-scoped ticket:
-
-```bash
-node atm.mjs write-ticket acquire --task <task-id> --actor "$ATM_ACTOR_ID" --files <csv> --intent write --json
-```
-
-If no pre-write hook is available, immediately record touched files after the
-write pass:
-
-```bash
-node atm.mjs write-ticket record-touch --task <task-id> --actor "$ATM_ACTOR_ID" --ticket <ticket.json> --files <csv> --observed post-write --json
-```
-
-Out-of-scope pre-write intent should route to
-`ATM_WRITE_SCOPE_AMENDMENT_REQUIRED`. Already dirty out-of-scope work should
-route to `ATM_WRITE_SCOPE_UNATTACHED_WIP` with recovery commands. Only
-unresolved bypass at commit, close, or push should become
-`ATM_WRITE_TICKET_SCOPE_VIOLATION`. Treat these as evidence consumed by the
-broker/task-scope authority model, not as a second permission system.
+A write-intent claim mints the task admission ticket; do not invent a second
+`write-ticket` command or copy a ticket between tasks. Pre-tool hooks may ask
+ATM to project that ticket early, but unsupported editors still meet the same
+Police, review, commit, close, push, and protected-branch gates. If a gate
+reports missing, stale, wrong-scope, or recovery-required ticket coverage,
+stop and follow its returned recovery command. The ticket is authority data in
+the task ledger; this skill only explains the route.
 
 ## Required Evidence
 
