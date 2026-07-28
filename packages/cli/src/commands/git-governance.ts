@@ -115,13 +115,22 @@ function recordHistoricalWorkAdmissionAttestation(argv: readonly string[]) {
       messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'Historical attestation requires an existing non-root commit that is an ancestor of HEAD.', { commitSha })]
     });
   }
-  const provenancePath = path.resolve(cwd, provenanceRef);
-  if (!existsSync(provenancePath)) {
-    return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'Attestation provenance reference must be an existing immutable evidence file.', { provenanceRef })] });
+  let provenanceBytes: Buffer;
+  if (provenanceRef === `git:${resolvedCommit}`) {
+    const commitMessage = scalar(['log', '-1', '--format=%B', resolvedCommit]);
+    if (!commitMessage.includes('ATM-Emergency-Reason:')) {
+      return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'A git:<commit> provenance reference requires the immutable commit message to carry ATM-Emergency-Reason.', { commitSha: resolvedCommit })] });
+    }
+    provenanceBytes = Buffer.from(commitMessage, 'utf8');
+  } else {
+    const provenancePath = path.resolve(cwd, provenanceRef);
+    if (!existsSync(provenancePath)) {
+      return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'Attestation provenance reference must be an existing immutable evidence file or git:<commit>.', { provenanceRef })] });
+    }
+    provenanceBytes = readFileSync(provenancePath);
   }
-  const provenanceBytes = readFileSync(provenancePath);
   const observedProvenanceDigest = `sha256:${createHash('sha256').update(provenanceBytes).digest('hex')}`;
-  if (observedProvenanceDigest !== provenanceDigest || !provenanceBytes.toString('utf8').includes(resolvedCommit)) {
+  if (observedProvenanceDigest !== provenanceDigest || (!provenanceRef.startsWith('git:') && !provenanceBytes.toString('utf8').includes(resolvedCommit))) {
     return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'Attestation provenance digest or commit binding does not match the referenced evidence.', { provenanceRef, commitSha: resolvedCommit })] });
   }
   const record = createHistoricalWorkAdmissionAttestation({

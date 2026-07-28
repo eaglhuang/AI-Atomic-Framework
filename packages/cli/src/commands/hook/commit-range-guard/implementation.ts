@@ -1,4 +1,5 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import {
   isCommitAcceptedByLegacyBaseline,
   readFrameworkCommitRangeBaseline
@@ -101,7 +102,8 @@ export function createCommitRangeGuardReport(cwd: string, base: string, head: st
     const evaluation = evaluateHistoricalWorkAdmission({
       commit: readHistoricalCommitIdentity(root, entry.commitSha, head),
       hasNormalWorkAdmissionTrailer: hasWorkAdmissionCommitCoverage(root, entry.commitSha),
-      attestations: historicalAttestations
+      attestations: historicalAttestations,
+      isProvenanceValid: (record) => provenanceReferenceMatches(root, record)
     });
     return evaluation.decision === 'covered' ? [] : [{
       level: 'error' as const,
@@ -161,6 +163,24 @@ export function createCommitRangeGuardReport(cwd: string, base: string, head: st
       findings,
       ok: findings.length === 0
   };
+}
+
+function provenanceReferenceMatches(cwd: string, record: HistoricalWorkAdmissionAttestation): boolean {
+  const reference = record.provenance.ref.trim();
+  if (reference === `git:${record.commitSha}`) {
+    const message = runGitScalar(cwd, ['log', '-1', '--format=%B', record.commitSha]) ?? '';
+    const digest = `sha256:${createHash('sha256').update(message).digest('hex')}`;
+    return message.includes('ATM-Emergency-Reason:') && digest === record.provenance.digest;
+  }
+  const filePath = path.resolve(cwd, reference);
+  if (!existsSync(filePath)) return false;
+  try {
+    const bytes = readFileSync(filePath);
+    return `sha256:${createHash('sha256').update(bytes).digest('hex')}` === record.provenance.digest
+      && bytes.toString('utf8').includes(record.commitSha);
+  } catch {
+    return false;
+  }
 }
 
 function readHistoricalCommitIdentity(cwd: string, commitSha: string, head: string) {

@@ -102,6 +102,7 @@ export function evaluateHistoricalWorkAdmission(input: {
   readonly commit: HistoricalCommitIdentity;
   readonly hasNormalWorkAdmissionTrailer: boolean;
   readonly attestations: readonly HistoricalWorkAdmissionAttestation[];
+  readonly isProvenanceValid?: (record: HistoricalWorkAdmissionAttestation) => boolean;
 }): HistoricalAdmissionEvaluation {
   if (input.hasNormalWorkAdmissionTrailer) {
     return { decision: 'covered', code: null, reason: 'Commit has normal ATM-Work-Admission coverage.', attestation: null };
@@ -113,7 +114,8 @@ export function evaluateHistoricalWorkAdmission(input: {
   const valid = matching.filter((record) => isWellFormed(record)
     && record.parentCommitSha === input.commit.parentCommitSha
     && record.treeSha === input.commit.treeSha
-    && input.commit.isAncestorOfHead);
+    && input.commit.isAncestorOfHead
+    && (input.isProvenanceValid?.(record) ?? true));
   if (valid.length !== 1 || matching.length !== 1) {
     return { decision: 'invalid', code: HISTORICAL_WORK_ADMISSION_ERROR_CODES.invalid, reason: 'Historical attestation is malformed, no longer matches the immutable commit, targets a non-ancestor, or conflicts with another attestation.', attestation: null };
   }
