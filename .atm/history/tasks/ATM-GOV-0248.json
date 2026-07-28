@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0248",
   "title": "Non-Git proposal workspace provider and steward write-path migration",
-  "status": "running",
+  "status": "blocked",
   "milestone": "ATM-3.1-R0",
   "dependencies": [
     "ATM-GOV-0247"
@@ -200,20 +200,22 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-26T16-20-03-657Z-claim-22bfc76f1f84",
-  "lastTransitionAt": "2026-07-26T16:20:03.657Z",
+  "lastTransitionId": "2026-07-27T08-56-56-792Z-block-66203ec059c5",
+  "lastTransitionAt": "2026-07-27T08:56:56.792Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-002-plan31-0248",
-  "reservedAt": "2026-07-26T16:19:31.593Z",
-  "promotedAt": "2026-07-26T16:19:31.597Z",
+  "owner": "claude-004-skl-0029-captain",
+  "reservedAt": "2026-07-27T07:04:33.967Z",
+  "promotedAt": "2026-07-27T07:04:33.969Z",
   "claim": {
-    "actorId": "codex-002-plan31-0248",
-    "leaseId": "lease-d996aba59019",
-    "claimedAt": "2026-07-26T16:19:31.605Z",
-    "heartbeatAt": "2026-07-26T16:19:31.605Z",
+    "actorId": "claude-004-skl-0029-captain",
+    "leaseId": "lease-8af94347c707",
+    "claimedAt": "2026-07-27T07:04:33.973Z",
+    "heartbeatAt": "2026-07-27T08:56:56.790Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0248.json",
+      ".atm/history/evidence/ATM-GOV-0248.*",
+      ".atm/history/task-events/ATM-GOV-0248/**",
       "packages/cli/src/commands/team-wave.ts",
       "packages/cli/src/commands/team/proposal-workspace.ts",
       "packages/cli/src/commands/team/scheduler.ts",
@@ -226,18 +228,18 @@
       "tests/cli/team-shadow-workspace.test.ts",
       "tests/cli/worktree-callsite-census.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260726161933-codex-002-plan31-0248-37237d92f1",
+      "laneSessionId": "lane-20260727070434-claude-004-skl-0029-captain-2a784b4791",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260726161933-codex-002-plan31-0248-37237d92f1\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260727070434-claude-004-skl-0029-captain-2a784b4791\""
+    },
+    "reason": "Parked for ATM-GOV-0266 governed recovery: coalesced runner-sync receipt/reconcile lifecycle repair; preserve responsibility chain, lock, and recovery evidence."
   },
   "startedAt": "2026-07-26T16:19:31.605Z",
   "startedByActor": "codex-002-plan31-0248",
-  "startedBySessionId": "session-20260726161931-codex-002-plan31-0248-ATM-GOV-0248-ecc4281ba7",
+  "startedBySessionId": "session-20260727070433-claude-004-skl-0029-captain-ATM-GOV-0248-5ad7fe0fa7",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -266,15 +268,19 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "80418209123e88755eabaa203c80b86a6f9723da4ed7188c9771d8c826d91c26",
-    "actorId": "codex-002-plan31-0248",
-    "sessionId": "session-20260726161931-codex-002-plan31-0248-ATM-GOV-0248-ecc4281ba7",
+    "actorId": "claude-004-skl-0029-captain",
+    "sessionId": "session-20260727070433-claude-004-skl-0029-captain-ATM-GOV-0248-5ad7fe0fa7",
     "laneSession": {
-      "laneSessionId": "lane-20260726161933-codex-002-plan31-0248-37237d92f1",
+      "laneSessionId": "lane-20260727070434-claude-004-skl-0029-captain-2a784b4791",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260726161933-codex-002-plan31-0248-37237d92f1\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260727070434-claude-004-skl-0029-captain-2a784b4791\""
     },
-    "createdAt": "2026-07-26T16:20:03.655Z",
+    "createdAt": "2026-07-27T07:04:41.266Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-27T08:56:56.790Z",
+  "closedByActor": "claude-004-skl-0029-captain",
+  "closedBySessionId": "session-20260727070433-claude-004-skl-0029-captain-ATM-GOV-0248-5ad7fe0fa7",
+  "closeReason": "Parked for ATM-GOV-0266 governed recovery: coalesced runner-sync receipt/reconcile lifecycle repair; preserve responsibility chain, lock, and recovery evidence."
 }
