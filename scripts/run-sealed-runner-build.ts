@@ -28,6 +28,7 @@ import {
   type RunnerSyncReceipt,
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
+import { deriveRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 export type BuildDecision = 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
@@ -161,6 +162,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       actorId,
       actorIdentitySource,
       sealedSourceSha,
+      outputInventory: buildPublicationInventory(repoRoot, buildTarget, admission, sealedSourceSha),
       buildTarget,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
@@ -235,6 +237,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       actorId,
       actorIdentitySource,
       sealedSourceSha,
+      outputInventory: buildPublicationInventory(repoRoot, buildTarget, admission, sealedSourceSha),
       buildTarget,
       buildInputsTreeHash,
       buildDecision,
@@ -504,6 +507,51 @@ function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTar
   if (buildTarget === 'full' || buildTarget === 'onefile') {
     syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'));
   }
+}
+
+function buildPublicationInventory(
+  cwd: string,
+  buildTarget: BuildTarget,
+  admission: RunnerSyncAdmissionReport,
+  sealedSourceSha: string
+) {
+  const taskId = admission.queueHeadOwnership.waitingTasks[0] ?? null;
+  const outputPaths = publicationPathsForTarget(cwd, buildTarget);
+  if (taskId) outputPaths.push(`.atm/history/evidence/${taskId}.runner-sync-receipt.json`);
+  return deriveRunnerBuildOutputInventory({
+    sealedSourceSha,
+    observedPaths: outputPaths,
+    currentTaskId: taskId,
+    ownership: outputPaths.map((entry) => ({ ownerTaskId: taskId, path: entry }))
+  });
+}
+
+/** Enumerate the authoritative generated tree, never an incidental Git diff. */
+function publicationPathsForTarget(cwd: string, buildTarget: BuildTarget): string[] {
+  const roots: string[] = [];
+  if (buildTarget === 'full' || buildTarget === 'packages') {
+    for (const packageName of readDirectoryNames(path.join(cwd, 'packages'))) {
+      roots.push(path.join('packages', packageName, 'dist'));
+    }
+  }
+  if (buildTarget === 'full' || buildTarget === 'root-drop') roots.push(path.join('release', 'atm-root-drop'));
+  if (buildTarget === 'full' || buildTarget === 'onefile') roots.push(path.join('release', 'atm-onefile'));
+  return roots.flatMap((root) => listPublicationFiles(cwd, root));
+}
+
+function listPublicationFiles(cwd: string, relativeRoot: string): string[] {
+  const absoluteRoot = path.join(cwd, relativeRoot);
+  if (!existsSync(absoluteRoot)) return [];
+  const files: string[] = [];
+  const visit = (absolute: string) => {
+    for (const entry of readdirSync(absolute, { withFileTypes: true })) {
+      const child = path.join(absolute, entry.name);
+      if (entry.isDirectory()) visit(child);
+      else if (entry.isFile()) files.push(path.relative(cwd, child).replace(/\\/g, '/'));
+    }
+  };
+  visit(absoluteRoot);
+  return files;
 }
 
 export function hydratePackageDistFromCurrentRootDrop(input: { readonly cwd: string; readonly worktreeRoot: string; }): void {
