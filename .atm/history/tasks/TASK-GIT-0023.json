@@ -1,0 +1,411 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0023",
+  "title": "Foreign generated residue admission deferral and ticket continuity",
+  "status": "running",
+  "milestone": "G15",
+  "dependencies": [
+    "TASK-GIT-0017",
+    "TASK-GIT-0018",
+    "TASK-GIT-0019"
+  ],
+  "acceptance": [
+    "The GIT-0022 fixture with `artifacts/generated/skill-corpus-audit.json` receives a deferred result only after canonical producer/provenance and digest verification; GIT-0022's task ticket contains the attribution but no write grant for the artifact.",
+    "The same ticket can renew and reach close readiness without changing, staging, committing, restoring, deleting, or adding that artifact to the GIT-0022 close bundle.",
+    "A dirty unknown source file, semantic artifact, missing producer proof, digest mismatch, or stale/unverifiable owner remains blocked by the existing fail-closed admission path.",
+    "A path returned by BuildOutputInventory is never deferred, including a stale or foreign runner output; it remains subject to the GIT-0017 publication/recovery disposition.",
+    "Claim admission, renewal, write-readiness, and close observe identical deferred/block outcomes from one content-addressed evidence record.",
+    "Focused tests, typecheck, and `validate:cli` pass."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/core/src/broker/runner-build-output-inventory.ts",
+    "packages/core/src/broker/work-admission-ticket.ts",
+    "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+    "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+    "packages/cli/src/commands/tasks/claim-work-admission.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/git-governance/work-admission-check.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+    "tests/cli/foreign-generated-residue-ticket-continuity.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/core/src/broker/runner-build-output-inventory.ts",
+    "packages/core/src/broker/work-admission-ticket.ts",
+    "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+    "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+    "packages/cli/src/commands/tasks/claim-work-admission.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/git-governance/work-admission-check.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+    "tests/cli/foreign-generated-residue-ticket-continuity.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/foreign-generated-residue-ticket-continuity.test.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Changing, regenerating, staging, restoring, deleting, or committing the foreign artifact used by the dogfood fixture.",
+    "Changing SKL corpus generation, its canonical templates, or its task ownership.",
+    "Reopening TASK-GIT-0017, TASK-GIT-0018, or TASK-GIT-0019.",
+    "A second generated-artifact registry, path allowlist, or task-specific exception."
+  ],
+  "nonGoals": [
+    "No automatic cleanup or adoption of foreign residue.",
+    "No relaxation for unknown source, semantic WIP, or any BuildOutputInventory member."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the shared disposition adapter and ticket projection together. Preserve deferred-residue evidence as historical attribution; do not delete or absorb the foreign artifact.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.work-admission-ticket",
+    "atomCid": null,
+    "mapUpdates": [
+      "Map ForeignGeneratedResidueDisposition as an admission adapter beneath WorkAdmissionTicketAuthority; BuildOutputInventory remains a consumed runner-membership provider."
+    ],
+    "extractionCandidates": [
+      {
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "packages/core/src/broker/work-admission-ticket.ts",
+        "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/git-governance/work-admission-check.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+        "tests/cli/foreign-generated-residue-ticket-continuity.test.ts",
+        "One ForeignGeneratedResidueDisposition deep module that first queries BuildOutputInventory and then classifies a non-member only from verifiable producer/provenance facts, ownership, and base/observed digests.",
+        "A deferred disposition records path, producer identity, owner/task attribution when available, base digest, observed digest, and reason in the work-admission ticket evidence; it grants no write, stage, commit, restore, delete, or close-bundle authority over that path.",
+        "Claim admission, ticket renewal, governed write-readiness, and taskflow close consume the same disposition result. Unknown, semantic, stale, or unverifiable foreign WIP remains a hard block through the existing admission error route.",
+        "BuildOutputInventory remains the only authority for runner-output membership and terminal publication disposition. Any inventory member is rejected from the deferred branch and follows GIT-0017/GIT-0022 publication recovery.",
+        "The TASK-GIT-0022 dogfood artifact may be deferred with its canonical skill producer proof, allowing a fresh task ticket and close readiness while preserving that artifact for its SKL owner.",
+        "Map ForeignGeneratedResidueDisposition as an admission adapter beneath WorkAdmissionTicketAuthority; BuildOutputInventory remains a consumed runner-membership provider."
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 6 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0023-foreign-generated-residue-admission-deferral-and-ticket-continuity.task.md",
+    "sectionTitle": "TASK-GIT-0023",
+    "headingLine": 95,
+    "hash": "fc411a8bcccaa7b5",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0023-foreign-generated-residue-admission-deferral-and-ticket-continuity.task.md",
+      "planningCommitSha": "f7279218bdd3c79ab6e2a23bd1cd1d8d2b632e72",
+      "contentDigest": "sha256:fc411a8bcccaa7b51786d1d575f47625cdf9f04e77b117b8a9e11dbe17980384",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-28T22:00:26.243Z"
+    }
+  },
+  "importedAt": "2026-07-28T22:00:26.243Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.foreign.generated.residue.ticket.continuity.test.ts",
+      "command": "node --strip-types tests/cli/foreign-generated-residue-ticket-continuity.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.next.tests.claim.admission.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.tasks.tests.claim.orchestrator.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.write.readiness.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-28T22-13-04-698Z-renew-43e84b6f1ad5",
+  "lastTransitionAt": "2026-07-28T22:13:04.698Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-0023-captain",
+  "reservedAt": "2026-07-28T22:01:05.687Z",
+  "promotedAt": "2026-07-28T22:01:05.689Z",
+  "claim": {
+    "actorId": "codex-git-0023-captain",
+    "leaseId": "lease-a21e4b122c3a",
+    "claimedAt": "2026-07-28T22:01:05.692Z",
+    "heartbeatAt": "2026-07-28T22:13:04.367Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0023.*",
+      ".atm/history/task-events/TASK-GIT-0023/**",
+      ".atm/history/tasks/TASK-GIT-0023.json",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "tests/cli/foreign-generated-residue-ticket-continuity.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260728220106-codex-git-0023-captain-743a3a1f40",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728220106-codex-git-0023-captain-743a3a1f40\""
+    }
+  },
+  "startedAt": "2026-07-28T22:01:05.692Z",
+  "startedByActor": "codex-git-0023-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-1a3ccdc17a53ec6e",
+    "ticketDigest": "sha256:1a3ccdc17a53ec6e8b38ef0ad525c0ee6ac0f0c3dd4d274a1c588f78f309d22d",
+    "taskId": "TASK-GIT-0023",
+    "actorId": "codex-git-0023-captain",
+    "laneSessionId": "lane-20260728220106-codex-git-0023-captain-743a3a1f40",
+    "claimGeneration": "lease-a21e4b122c3a",
+    "issuedAt": "2026-07-28T22:13:04.367Z",
+    "expiresAt": "2026-07-28T22:43:04.367Z",
+    "scopeDigest": "sha256:e1e249f63e50e31692883f13a4df76cb7f23747d8d7fe7d98e263eec780a132d",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-28T22:13:04.367Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0023.*",
+          ".atm/history/task-events/TASK-GIT-0023/**",
+          ".atm/history/tasks/TASK-GIT-0023.json",
+          "packages/cli/src/commands/git-governance/work-admission-check.ts",
+          "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+          "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+          "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+          "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+          "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+          "packages/cli/src/commands/taskflow/write-readiness.ts",
+          "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+          "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+          "packages/cli/src/commands/tasks/claim-work-admission.ts",
+          "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+          "packages/core/src/broker/index.ts",
+          "packages/core/src/broker/runner-build-output-inventory.ts",
+          "packages/core/src/broker/work-admission-ticket.ts",
+          "tests/cli/foreign-generated-residue-ticket-continuity.test.ts"
+        ],
+        "digest": "sha256:2321f3ef5e96d1271f0980a533274a554845881ae927837c9ab782b1b1de228e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:3b09034b576f26e8321df7261d6e042f868b3bc19d699d2b5641c44caea73079",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:ac249182061e9147ec9bba16419a7d79c8b9b3feab160454f1ba59279fa1aec2"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260728220105-codex-git-0023-captain-TASK-GIT-0023-e4260099c1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0023",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0023.*",
+      ".atm/history/task-events/TASK-GIT-0023/**",
+      ".atm/history/tasks/TASK-GIT-0023.json",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/core/src/broker/foreign-generated-residue-disposition.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "tests/cli/foreign-generated-residue-ticket-continuity.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0023-foreign-generated-residue-admission-deferral-and-ticket-continuity.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/git-boundary-admission/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0023-foreign-generated-residue-admission-deferral-and-ticket-continuity.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "e5f307209c3b4313f36eda81a2fef0e20db1c4fdd13f75bce56f50cfd2233fb8",
+    "actorId": "codex-git-0023-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260728220106-codex-git-0023-captain-743a3a1f40",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728220106-codex-git-0023-captain-743a3a1f40\""
+    },
+    "createdAt": "2026-07-28T22:01:12.859Z",
+    "status": "active"
+  }
+}

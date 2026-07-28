@@ -3,6 +3,7 @@ import { deflateSync } from 'node:zlib';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { computeWriteScopeDigest, normalizeWritePathList } from './write-scope-policy.ts';
+import type { ForeignGeneratedResidueProvenance } from './foreign-generated-residue-disposition.ts';
 
 export const WORK_ADMISSION_TICKET_SCHEMA_ID = 'atm.workAdmissionTicket.v1';
 export const WORK_ADMISSION_COVERAGE_RECEIPT_SCHEMA_ID = 'atm.workAdmissionCoverageReceipt.v1';
@@ -50,6 +51,7 @@ export interface WorkAdmissionTicket {
   readonly scopeDigest: `sha256:${string}`;
   readonly runnerSelection: WorkAdmissionRunnerSelection;
   readonly grants: readonly WorkAdmissionGrant[];
+  readonly deferredForeignResidue: readonly ForeignGeneratedResidueProvenance[];
   readonly recovery: WorkAdmissionRecoveryPolicy;
 }
 
@@ -142,6 +144,7 @@ export function issueWorkAdmissionTicket(input: {
     readonly workerEvidence?: 'trusted' | 'untrusted' | 'degraded' | 'unproven';
   };
   readonly processManifests?: readonly string[];
+  readonly deferredForeignResidue?: readonly ForeignGeneratedResidueProvenance[];
 }): WorkAdmissionTicket {
   const issuedAt = input.now ?? new Date().toISOString();
   const ttlSeconds = positiveInteger(input.ttlSeconds, 3600);
@@ -167,6 +170,7 @@ export function issueWorkAdmissionTicket(input: {
     expiresAt,
     runnerSelection: input.runnerSelection,
     grants,
+    deferredForeignResidue: normalizeDeferredResidue(input.deferredForeignResidue ?? []),
     recovery
   };
   const ticketDigest = digest(ticketBasis);
@@ -184,8 +188,17 @@ export function issueWorkAdmissionTicket(input: {
     scopeDigest,
     runnerSelection: input.runnerSelection,
     grants,
+    deferredForeignResidue: normalizeDeferredResidue(input.deferredForeignResidue ?? []),
     recovery
   };
+}
+
+function normalizeDeferredResidue(entries: readonly ForeignGeneratedResidueProvenance[]): readonly ForeignGeneratedResidueProvenance[] {
+  const seen = new Set<string>();
+  return [...entries]
+    .map((entry) => ({ ...entry, path: normalizeWritePathList([entry.path])[0] ?? entry.path }))
+    .filter((entry) => !seen.has(entry.path) && (seen.add(entry.path), true))
+    .sort((left, right) => left.path.localeCompare(right.path));
 }
 
 export function checkWorkAdmissionTicket(input: {

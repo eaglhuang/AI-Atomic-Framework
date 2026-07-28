@@ -30,6 +30,7 @@ import {
 } from '../../task-direction.ts';
 import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.ts';
 import { isRunnerBuildOutputPath } from '../../../../../core/src/broker/runner-build-output-inventory.ts';
+import { classifyForeignGeneratedResidue, type ForeignGeneratedResidueProvenance } from '../../../../../core/src/broker/foreign-generated-residue-disposition.ts';
 import {
   extractPathLikeStringsFromPrompt,
   isPathAllowedByScope,
@@ -79,6 +80,7 @@ interface PendingTaskArtifactScopeDiagnostic {
   readonly schemaId: 'atm.taskArtifactScopeDiagnostic.v1';
   readonly ignoredUntrackedFiles: readonly string[];
   readonly advisoryTrackedFiles: readonly string[];
+  readonly deferredForeignResidue: readonly ForeignGeneratedResidueProvenance[];
 }
 
 /**
@@ -105,8 +107,11 @@ export function checkPendingTaskArtifactScopeExpansion(input: {
     .filter((lock) => lock.workItemId !== input.task.workItemId);
   const outsideScope = (entry: string) =>
     !entry.startsWith('.atm/') && !isPathAllowedByScope(entry, allowedFiles);
+  const deferredForeignResidue = stagedOrTracked.flatMap((entry) => deferredGeneratedResidue(input.cwd, input.task.workItemId, entry));
+  const deferredPaths = new Set(deferredForeignResidue.map((entry) => entry.path));
   const isAdvisoryOutsideScopePath = (entry: string) =>
-    isAdvisoryPendingTaskArtifactPath(entry)
+    deferredPaths.has(entry)
+    || isAdvisoryPendingTaskArtifactPath(entry)
     || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles))
     || foreignFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
 
@@ -144,8 +149,43 @@ export function checkPendingTaskArtifactScopeExpansion(input: {
   return {
     schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
     ignoredUntrackedFiles: untrackedExpansion,
-    advisoryTrackedFiles
+    advisoryTrackedFiles,
+    deferredForeignResidue
   };
+}
+
+function deferredGeneratedResidue(cwd: string, candidateTaskId: string, entry: string): readonly ForeignGeneratedResidueProvenance[] {
+  const normalized = normalizeOptionalTaskPath(entry)?.replace(/\\/g, '/') ?? '';
+  if (!normalized.startsWith('artifacts/generated/')) return [];
+  const absolute = path.join(cwd, normalized);
+  if (!existsSync(absolute)) return [];
+  const content = readFileSync(absolute, 'utf8');
+  const producerTaskId = readGeneratedArtifactProducerTaskId(content);
+  const disposition = classifyForeignGeneratedResidue({
+    path: normalized,
+    content,
+    candidateTaskId,
+    producerDeclaresPath: producerTaskId ? producerDeclaresArtifactPath(cwd, producerTaskId, normalized) : false,
+    runnerInventoryMember: isRunnerBuildOutputPath(normalized)
+  });
+  return disposition.state === 'deferred' && disposition.provenance ? [disposition.provenance] : [];
+}
+
+function readGeneratedArtifactProducerTaskId(content: string): string | null {
+  try {
+    const value = JSON.parse(content) as { taskId?: unknown };
+    return typeof value.taskId === 'string' && value.taskId.trim() ? value.taskId.trim() : null;
+  } catch { return null; }
+}
+
+function producerDeclaresArtifactPath(cwd: string, taskId: string, artifactPath: string): boolean {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return false;
+  try {
+    const task = parseJsonText(readFileSync(taskPath, 'utf8')) as { scopePaths?: unknown; deliverables?: unknown };
+    const values = [...(Array.isArray(task.scopePaths) ? task.scopePaths : []), ...(Array.isArray(task.deliverables) ? task.deliverables : [])];
+    return values.some((value) => String(value).replace(/\\/g, '/') === artifactPath);
+  } catch { return false; }
 }
 
 function isAdvisoryPendingTaskArtifactPath(filePath: string): boolean {

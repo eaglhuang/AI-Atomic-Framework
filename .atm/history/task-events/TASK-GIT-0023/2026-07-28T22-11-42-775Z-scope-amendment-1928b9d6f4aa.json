@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T22-11-42-775Z-scope-amendment-1928b9d6f4aa",
+  "taskId": "TASK-GIT-0023",
+  "action": "scope-amendment",
+  "actorId": "codex-git-0023-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0023.json",
+  "taskSha256": "sha256:f19705eae164f35a70c2fe0089a6e311d7a0fd19c160d000faeeb1ddf8b022b4",
+  "createdAt": "2026-07-28T22:11:42.775Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0023 --actor codex-git-0023-captain --add \"packages/cli/src/commands/hook/pre-commit/failure-envelope.ts,packages/cli/src/commands/hook/pre-commit/implementation.ts,packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

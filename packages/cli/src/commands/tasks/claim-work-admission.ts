@@ -1,6 +1,11 @@
 import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/src/index.ts';
+import { classifyForeignGeneratedResidue, type ForeignGeneratedResidueProvenance } from '../../../../core/src/broker/foreign-generated-residue-disposition.ts';
+import { isRunnerBuildOutputPath } from '../../../../core/src/broker/runner-build-output-inventory.ts';
 import { issueWorkAdmissionTicket, type WorkAdmissionTicket } from '../../../../core/src/broker/work-admission-ticket.ts';
+import { existsSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import path from 'node:path';
 import { upsertActorWorkSession, type ActorWorkSessionDocument } from '../actor-session.ts';
 import { CliError, relativePathFrom, resolveValue } from '../shared.ts';
 import { findActiveTaskQueue, writeTaskDirectionLock, type TaskDirectionLock } from '../task-direction.ts';
@@ -62,6 +67,7 @@ export async function completeTaskClaimWithWorkAdmission(input: {
         selectedAt: input.nowIso
       },
       elevatedRisk: assessElevatedRisk(input.taskDocument),
+      deferredForeignResidue: collectDeferredForeignGeneratedResidue(input.cwd, input.taskId),
       now: input.nowIso,
       ttlSeconds: input.ttlSeconds
     })
@@ -140,6 +146,7 @@ export async function completeTaskClaimWithWorkAdmission(input: {
 
 /** Rebinds a claim ticket whenever a governed renew changes its validity window. */
 export function resealWorkAdmissionTicketForRenewal(input: {
+  readonly cwd: string;
   readonly taskId: string;
   readonly actorId: string;
   readonly taskDocument: Record<string, unknown>;
@@ -161,6 +168,7 @@ export function resealWorkAdmissionTicketForRenewal(input: {
       selectedAt: input.nowIso
     },
     elevatedRisk: assessElevatedRisk(input.taskDocument),
+    deferredForeignResidue: collectDeferredForeignGeneratedResidue(input.cwd, input.taskId),
     now: input.nowIso,
     ttlSeconds: input.claim.ttlSeconds
   });
@@ -174,7 +182,50 @@ export function resealWorkAdmissionTicketForRenewal(input: {
   return ticket;
 }
 
+function collectDeferredForeignGeneratedResidue(cwd: string, candidateTaskId: string): readonly ForeignGeneratedResidueProvenance[] {
+  const result = spawnSync('git', ['diff', '--name-only'], { cwd, encoding: 'utf8', windowsHide: true });
+  if (result.status !== 0) return [];
+  return String(result.stdout ?? '').split(/\r?\n/)
+    .map((entry) => entry.replace(/\\/g, '/').trim())
+    .filter((entry) => entry.startsWith('artifacts/generated/'))
+    .flatMap((entry) => {
+      const absolute = path.join(cwd, entry);
+      if (!existsSync(absolute)) return [];
+      const content = readFileSync(absolute, 'utf8');
+      const producerTaskId = readProducerTaskId(content);
+      const disposition = classifyForeignGeneratedResidue({
+        path: entry,
+        content,
+        candidateTaskId,
+        producerDeclaresPath: producerTaskId ? producerDeclaresArtifactPath(cwd, producerTaskId, entry) : false,
+        runnerInventoryMember: isRunnerBuildOutputPath(entry)
+      });
+      return disposition.state === 'deferred' && disposition.provenance ? [disposition.provenance] : [];
+    });
+}
+
+function readProducerTaskId(content: string): string | null {
+  try {
+    const parsed = JSON.parse(content) as { taskId?: unknown };
+    return typeof parsed.taskId === 'string' && parsed.taskId.trim() ? parsed.taskId.trim() : null;
+  } catch { return null; }
+}
+
+function producerDeclaresArtifactPath(cwd: string, taskId: string, artifactPath: string): boolean {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return false;
+  try {
+    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as { scopePaths?: unknown; deliverables?: unknown };
+    const values = [...(Array.isArray(task.scopePaths) ? task.scopePaths : []), ...(Array.isArray(task.deliverables) ? task.deliverables : [])];
+    return values.some((entry) => String(entry).replace(/\\/g, '/') === artifactPath);
+  } catch { return false; }
+}
+
 function taskScopeFiles(taskDocument: Record<string, unknown>, fallback: readonly string[]): readonly string[] {
+  const directionLock = readRecord(taskDocument.taskDirectionLock);
+  if (Array.isArray(directionLock?.allowedFiles)) {
+    return directionLock.allowedFiles.map(String);
+  }
   return Array.isArray(taskDocument.scopePaths)
     ? taskDocument.scopePaths.map(String)
     : fallback;
