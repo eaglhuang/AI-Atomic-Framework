@@ -260,7 +260,8 @@ export function selectActionableResidueFindings(input: any): readonly any[] {
       if (!stagedHere && owner && owner !== taskId
         && !ownersWithNonDeferrableForeignResidue.has(owner)
         && isDeferrableForeignGovernanceResidue(finding)
-        && (input.activeLockTaskIds.has(owner) || input.hasActiveClaim(owner) || input.hasTerminalOwner(owner))) {
+        && (input.activeLockTaskIds.has(owner) || input.hasActiveClaim(owner)
+          || (input.hasInactiveLifecycleOwner ?? input.hasTerminalOwner)(owner))) {
         return false;
       }
       return true;
@@ -378,4 +379,3 @@ function isPreCommitGovernanceStateFinding(finding: PreCommitBlockingFinding): b
     || finding.source === 'generated-residue'
     || finding.source === 'emergency-use-audit';
 }
-

@@ -229,7 +229,8 @@ export function selectActionableResidueFindings(input) {
             if (!stagedHere && owner && owner !== taskId
                 && !ownersWithNonDeferrableForeignResidue.has(owner)
                 && isDeferrableForeignGovernanceResidue(finding)
-                && (input.activeLockTaskIds.has(owner) || input.hasActiveClaim(owner) || input.hasTerminalOwner(owner))) {
+                && (input.activeLockTaskIds.has(owner) || input.hasActiveClaim(owner)
+                    || (input.hasInactiveLifecycleOwner ?? input.hasTerminalOwner)(owner))) {
                 return false;
             }
             return true;

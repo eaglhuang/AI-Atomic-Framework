@@ -145,13 +145,13 @@ export function runPreCommitHook(cwd) {
                 return false;
             }
         },
-        hasTerminalOwner: (ownerTaskId) => {
+        hasInactiveLifecycleOwner: (ownerTaskId) => {
             try {
                 const taskDocument = JSON.parse(readFileSync(path.join(root, '.atm', 'history', 'tasks', `${ownerTaskId}.json`), 'utf8'));
                 const status = String(taskDocument.status ?? '').trim().toLowerCase();
                 const claim = taskDocument.claim;
                 const claimState = claim ? String(claim.state ?? '').trim().toLowerCase() : '';
-                return (status === 'done' || status === 'abandoned') && claimState !== 'active';
+                return (status === 'done' || status === 'abandoned' || status === 'blocked') && claimState !== 'active';
             }
             catch {
                 return false;

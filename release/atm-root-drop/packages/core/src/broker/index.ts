@@ -25,6 +25,7 @@ export * from './intent-enrichment.ts';
 export * from './global-resource-projection.ts';
 export * from './runner-sync-steward-queue.ts';
 export * from './runner-build-output-inventory.ts';
+export * from './foreign-generated-residue-disposition.ts';
 export * from './generated-projection-steward.ts';
 export * from './wave-manifest.ts';
 export * from './wave-broker-scheduler.ts';

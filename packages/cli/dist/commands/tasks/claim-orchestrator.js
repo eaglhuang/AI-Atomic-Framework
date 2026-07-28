@@ -255,6 +255,7 @@ export async function runTasksClaimLifecycle(action, argv) {
         };
         taskDocument.claim = renewed;
         const workAdmissionTicket = resealWorkAdmissionTicketForRenewal({
+            cwd: options.cwd,
             taskId: options.taskId,
             actorId,
             taskDocument,

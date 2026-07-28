@@ -1,9 +1,13 @@
+// @ts-nocheck
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { looksLikeTaskArtifact } from '../match-and-sort.js';
-import { CliError, quoteCliValue } from '../../shared.js';
+import { CliError, parseJsonText, quoteCliValue } from '../../shared.js';
 import { buildAllowedFilesForTask, readActiveTaskDirectionLocks } from '../../task-direction.js';
 import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.js';
 import { isRunnerBuildOutputPath } from '../../../../../core/dist/broker/runner-build-output-inventory.js';
+import { classifyForeignGeneratedResidue } from '../../../../../core/dist/broker/foreign-generated-residue-disposition.js';
 import { isPathAllowedByScope } from '../../work-channels.js';
 import { normalizeOptionalTaskPath } from '../intent-normalizers.js';
 import { uniqueSorted } from '../view-projections.js';
@@ -27,7 +31,10 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
     const foreignFrameworkLocks = readFrameworkTempLockProjection(input.cwd)
         .filter((lock) => lock.workItemId !== input.task.workItemId);
     const outsideScope = (entry) => !entry.startsWith('.atm/') && !isPathAllowedByScope(entry, allowedFiles);
-    const isAdvisoryOutsideScopePath = (entry) => isAdvisoryPendingTaskArtifactPath(entry)
+    const deferredForeignResidue = stagedOrTracked.flatMap((entry) => deferredGeneratedResidue(input.cwd, input.task.workItemId, entry));
+    const deferredPaths = new Set(deferredForeignResidue.map((entry) => entry.path));
+    const isAdvisoryOutsideScopePath = (entry) => deferredPaths.has(entry)
+        || isAdvisoryPendingTaskArtifactPath(entry)
         || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles))
         || foreignFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
     const advisoryTrackedFiles = stagedOrTracked
@@ -58,8 +65,49 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
     return {
         schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
         ignoredUntrackedFiles: untrackedExpansion,
-        advisoryTrackedFiles
+        advisoryTrackedFiles,
+        deferredForeignResidue
     };
+}
+function deferredGeneratedResidue(cwd, candidateTaskId, entry) {
+    const normalized = normalizeOptionalTaskPath(entry)?.replace(/\\/g, '/') ?? '';
+    if (!normalized.startsWith('artifacts/generated/'))
+        return [];
+    const absolute = path.join(cwd, normalized);
+    if (!existsSync(absolute))
+        return [];
+    const content = readFileSync(absolute, 'utf8');
+    const producerTaskId = readGeneratedArtifactProducerTaskId(content);
+    const disposition = classifyForeignGeneratedResidue({
+        path: normalized,
+        content,
+        candidateTaskId,
+        producerDeclaresPath: producerTaskId ? producerDeclaresArtifactPath(cwd, producerTaskId, normalized) : false,
+        runnerInventoryMember: isRunnerBuildOutputPath(normalized)
+    });
+    return disposition.state === 'deferred' && disposition.provenance ? [disposition.provenance] : [];
+}
+function readGeneratedArtifactProducerTaskId(content) {
+    try {
+        const value = JSON.parse(content);
+        return typeof value.taskId === 'string' && value.taskId.trim() ? value.taskId.trim() : null;
+    }
+    catch {
+        return null;
+    }
+}
+function producerDeclaresArtifactPath(cwd, taskId, artifactPath) {
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (!existsSync(taskPath))
+        return false;
+    try {
+        const task = parseJsonText(readFileSync(taskPath, 'utf8'));
+        const values = [...(Array.isArray(task.scopePaths) ? task.scopePaths : []), ...(Array.isArray(task.deliverables) ? task.deliverables : [])];
+        return values.some((value) => String(value).replace(/\\/g, '/') === artifactPath);
+    }
+    catch {
+        return false;
+    }
 }
 function isAdvisoryPendingTaskArtifactPath(filePath) {
     const normalized = normalizeOptionalTaskPath(filePath)?.replace(/\\/g, '/') ?? '';
