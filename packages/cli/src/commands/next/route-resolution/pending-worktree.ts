@@ -28,6 +28,8 @@ import {
   readActiveTaskDirectionLocks,
   type TaskQueueRecord
 } from '../../task-direction.ts';
+import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.ts';
+import { isRunnerBuildOutputPath } from '../../../../../core/src/broker/runner-build-output-inventory.ts';
 import {
   extractPathLikeStringsFromPrompt,
   isPathAllowedByScope,
@@ -99,11 +101,14 @@ export function checkPendingTaskArtifactScopeExpansion(input: {
   const { stagedOrTracked, untracked } = listPendingGitFilesByKind(input.cwd);
   const foreignDirectionLocks = readActiveTaskDirectionLocks(input.cwd)
     .filter((lock) => lock.taskId !== input.task.workItemId);
+  const foreignFrameworkLocks = readFrameworkTempLockProjection(input.cwd)
+    .filter((lock) => lock.workItemId !== input.task.workItemId);
   const outsideScope = (entry: string) =>
     !entry.startsWith('.atm/') && !isPathAllowedByScope(entry, allowedFiles);
   const isAdvisoryOutsideScopePath = (entry: string) =>
     isAdvisoryPendingTaskArtifactPath(entry)
-    || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles));
+    || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles))
+    || foreignFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
 
   const advisoryTrackedFiles = stagedOrTracked
     .filter(outsideScope)
@@ -147,8 +152,7 @@ function isAdvisoryPendingTaskArtifactPath(filePath: string): boolean {
   const normalized = normalizeOptionalTaskPath(filePath)?.replace(/\\/g, '/') ?? '';
   if (!normalized) return false;
   return normalized === 'atomic_workbench/atomization-coverage/path-to-atom-map.json'
-    || normalized.startsWith('release/atm-root-drop/')
-    || normalized.startsWith('release/atm-onefile/');
+    || isRunnerBuildOutputPath(normalized);
 }
 
 function listPendingGitFilesByKind(cwd: string): {
