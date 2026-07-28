@@ -1,0 +1,217 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0007",
+  "title": "TMP-0006 provenance correction and formatting-noise reduction",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Deterministic comparison of `5f53e505` (488 files) against target live ledger is recorded with verified/failed counts.",
+    "TASK-TMP-0006 remains `planned` and explicitly notes absence of target closure.",
+    "TMP-0005 evidence disposition is attested (retain/bind historical receipts; no silent deletion).",
+    "Target-side attestation report and JSON receipt exist and are delivered.",
+    "Target lifecycle reaches `done` through normal claim → evidence → close; planning closeback follows."
+  ],
+  "deliverables": [
+    "docs/reports/TASK-TMP-0007-target-side-attestation.md",
+    ".atm/history/evidence/TASK-TMP-0007.target-attestation.json"
+  ],
+  "scopePaths": [
+    "docs/reports/TASK-TMP-0007-target-side-attestation.md",
+    ".atm/history/evidence/TASK-TMP-0007.target-attestation.json",
+    ".atm/history/evidence/TASK-TMP-0005.seal-and-commit.json",
+    ".atm/history/evidence/TASK-TMP-0005.residue-reconciliation.json",
+    ".atm/history/evidence/TASK-TMP-0005.runner-sync-receipt.json",
+    ".atm/history/evidence/TASK-TMP-0005.archived-non-block-events.json",
+    ".atm/history/evidence/TASK-TMP-0005.skl-0031-compact-receipt.json"
+  ],
+  "validators": [
+    "git diff --check",
+    "node atm.mjs doctor --json",
+    "node atm.mjs tasks status --task TASK-TMP-0007 --json"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    },
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        ".atm/history/evidence/TASK-TMP-0005.residue-reconciliation.json (782 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "temporary-governance/tasks/TASK-TMP-0007-tmp-0006-provenance-correction-and-formatting-noise-reduction.task.md",
+    "sectionTitle": "TASK-TMP-0007",
+    "headingLine": 53,
+    "hash": "939833edb06e2e54",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "temporary-governance/tasks/TASK-TMP-0007-tmp-0006-provenance-correction-and-formatting-noise-reduction.task.md",
+      "planningCommitSha": "014a77eec3e2b422bcd4e386d8adf58d21e80b62",
+      "contentDigest": "sha256:939833edb06e2e543aac1d5fbee9e494a860721e98daf7bb9b99c999d407a6d3",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-28T12:51:10.804Z"
+    }
+  },
+  "importedAt": "2026-07-28T12:51:10.804Z",
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.doctor.json",
+      "command": "node atm.mjs doctor --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.tasks.status.task.task.tmp.0007.json",
+      "command": "node atm.mjs tasks status --task TASK-TMP-0007 --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "claim": {
+    "actorId": "cursor-003-tmp-0007-recovery",
+    "leaseId": "lease-1b16c36f5e13",
+    "claimedAt": "2026-07-28T12:33:52.310Z",
+    "heartbeatAt": "2026-07-28T12:53:26.703Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-TMP-0005.archived-non-block-events.json",
+      ".atm/history/evidence/TASK-TMP-0005.residue-reconciliation.json",
+      ".atm/history/evidence/TASK-TMP-0005.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0005.seal-and-commit.json",
+      ".atm/history/evidence/TASK-TMP-0005.skl-0031-compact-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0007.*",
+      ".atm/history/evidence/TASK-TMP-0007.target-attestation.json",
+      ".atm/history/task-events/TASK-TMP-0007/**",
+      ".atm/history/tasks/TASK-TMP-0007.json",
+      "docs/reports/TASK-TMP-0007-target-side-attestation.md"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260728123352-cursor-003-tmp-0007-recovery-c523503d8a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728123352-cursor-003-tmp-0007-recovery-c523503d8a\""
+    },
+    "reason": "closed"
+  },
+  "owner": "cursor-003-tmp-0007-recovery",
+  "startedAt": "2026-07-28T12:11:15.197Z",
+  "startedBySessionId": "session-20260728123352-cursor-003-tmp-0007-recovery-TASK-TMP-0007-f475551734",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0007",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0005.archived-non-block-events.json",
+      ".atm/history/evidence/TASK-TMP-0005.residue-reconciliation.json",
+      ".atm/history/evidence/TASK-TMP-0005.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0005.seal-and-commit.json",
+      ".atm/history/evidence/TASK-TMP-0005.skl-0031-compact-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0007.*",
+      ".atm/history/evidence/TASK-TMP-0007.target-attestation.json",
+      ".atm/history/task-events/TASK-TMP-0007/**",
+      ".atm/history/tasks/TASK-TMP-0007.json",
+      "docs/reports/TASK-TMP-0007-target-side-attestation.md"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3klife-npc-brain/docs/ai_atomic_framework/temporary-governance/reports/TASK-TMP-0007-reconciliation-report.json",
+      "C:/Users/User/3klife-npc-brain/docs/ai_atomic_framework/temporary-governance/reports/TASK-TMP-0007-reconciliation-report.md",
+      "C:/Users/User/3klife-npc-brain/docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0007-tmp-0006-provenance-correction-and-formatting-noise-reduction.task.md",
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0007-tmp-0006-provenance-correction-and-formatting-noise-reduction.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/temporary-governance/",
+      "docs/ai_atomic_framework/temporary-governance/reports/",
+      "docs/ai_atomic_framework/temporary-governance/reports/TASK-TMP-0007-reconciliation-report.json",
+      "docs/ai_atomic_framework/temporary-governance/reports/TASK-TMP-0007-reconciliation-report.md",
+      "docs/ai_atomic_framework/temporary-governance/tasks/",
+      "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0007-tmp-0006-provenance-correction-and-formatting-noise-reduction.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "9437318d052d32c89b85fcf3b341638edffc383fa622c95151c2da2842cd5cea",
+    "actorId": "cursor-003-tmp-0007-recovery",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260728123352-cursor-003-tmp-0007-recovery-c523503d8a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728123352-cursor-003-tmp-0007-recovery-c523503d8a\""
+    },
+    "createdAt": "2026-07-28T12:34:06.282Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-07-28T12-53-26-707Z-close-27bca8fb76b6",
+  "lastTransitionAt": "2026-07-28T12:53:26.707Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-07-28T12:53:26.703Z",
+  "closedByActor": "cursor-003-tmp-0007-recovery",
+  "closedBySessionId": "session-20260728123352-cursor-003-tmp-0007-recovery-TASK-TMP-0007-f475551734",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0007.closure-packet.json"
+}

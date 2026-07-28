@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T12-21-05-723Z-reserve-db1100e8a27f",
+  "taskId": "TASK-TMP-0007",
+  "action": "reserve",
+  "actorId": "cursor-003-tmp-0007-recovery",
+  "sessionId": null,
+  "fromStatus": "open",
+  "toStatus": "reserved",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0007.json",
+  "taskSha256": "sha256:8780558131546df1953414d8a656edce051e6b0d8a1275653ceabbfd55b97b78",
+  "createdAt": "2026-07-28T12:21:05.723Z",
+  "command": "node atm.mjs next --claim --task TASK-TMP-0007 --actor cursor-003-tmp-0007-recovery --auto-intent --json"
+}

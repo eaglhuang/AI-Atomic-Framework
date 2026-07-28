@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T12-53-26-707Z-close-27bca8fb76b6",
+  "taskId": "TASK-TMP-0007",
+  "action": "close",
+  "actorId": "cursor-003-tmp-0007-recovery",
+  "sessionId": "session-20260728123352-cursor-003-tmp-0007-recovery-TASK-TMP-0007-f475551734",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0007.json",
+  "taskSha256": "sha256:13ef30c7635a04ee63435ab5713bcb1c136766d205efb8bda2b6fff6a37b1317",
+  "createdAt": "2026-07-28T12:53:26.707Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0007 --actor cursor-003-tmp-0007-recovery --status done --historical-delivery 0e9241ac51c4ed9cfe37405a13f2696a559e09ae",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260728123352-cursor-003-tmp-0007-recovery-TASK-TMP-0007-f475551734",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0007.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "git diff --check",
+      "node atm.mjs tasks status --task TASK-TMP-0007 --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-28T12:53:26.691Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0005.archived-non-block-events.json",
+        ".atm/history/evidence/TASK-TMP-0005.residue-reconciliation.json",
+        ".atm/history/evidence/TASK-TMP-0005.runner-sync-receipt.json",
+        ".atm/history/evidence/TASK-TMP-0005.seal-and-commit.json",
+        ".atm/history/evidence/TASK-TMP-0005.skl-0031-compact-receipt.json",
+        ".atm/history/evidence/TASK-TMP-0007.*",
+        ".atm/history/evidence/TASK-TMP-0007.target-attestation.json",
+        ".atm/history/task-events/TASK-TMP-0007/**",
+        ".atm/history/tasks/TASK-TMP-0007.json",
+        "docs/reports/TASK-TMP-0007-target-side-attestation.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

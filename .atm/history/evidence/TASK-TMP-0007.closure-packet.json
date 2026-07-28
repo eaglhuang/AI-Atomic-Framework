@@ -1,0 +1,189 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TMP-0007",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0e9241ac51c4ed9cfe37405a13f2696a559e09ae",
+  "governedTreeSha": "33da3bab5ac97f66335ea73d1dee9d3c807cd3c5",
+  "targetCommitDelta": {
+    "currentCommitSha": "0e9241ac51c4ed9cfe37405a13f2696a559e09ae",
+    "parentCommitShas": [
+      "0e9241ac51c4ed9cfe37405a13f2696a559e09ae"
+    ],
+    "governedTreeSha": "33da3bab5ac97f66335ea73d1dee9d3c807cd3c5",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TMP-0005.archived-non-block-events.json",
+      ".atm/history/evidence/TASK-TMP-0005.residue-reconciliation.json",
+      ".atm/history/evidence/TASK-TMP-0005.skl-0031-compact-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0007.json",
+      ".atm/history/evidence/TASK-TMP-0007.target-attestation.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-10-47-202Z-import-6bacc60fff14.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-11-03-258Z-import-2c54fb96ee58.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-11-15-191Z-reserve-be114e0e63c3.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-11-15-193Z-promote-ce1aec184f9a.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-11-23-517Z-claim-06880847acc4.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-19-08-213Z-handoff-eb46a47dc051.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-21-05-723Z-reserve-db1100e8a27f.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-21-05-725Z-promote-76687d25f325.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-34-06-258Z-claim-4ab62ecb933d.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-34-39-442Z-scope-amendment-292d6843dc4e.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-51-10-958Z-import-9c487e96bb6d.json",
+      ".atm/history/task-events/TASK-TMP-0007/2026-07-28T12-51-52-511Z-scope-amendment-c6cf20741eca.json",
+      ".atm/history/tasks/TASK-TMP-0007.json",
+      "docs/reports/TASK-TMP-0007-target-side-attestation.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:073faa2fb630746979ff1d37307c6b75434956e39293680ebe4bb1bbb1a5c17c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check -- docs/reports/TASK-TMP-0007-target-side-attestation.md .atm/history/evidence/TASK-TMP-0007.target-attestation.json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9815393645e53e512d1c8b5f894ff15c5a2d04ecc636565dd0d54f1b98ce4b01",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs tasks status --task TASK-TMP-0007 --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b53c74a8d7d8e96b556c24d14d7252626be3d5e4f98e9373f2420f0cbde271f9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da5dadb01b86b7a7fcaebdf13521fd1f5008e3225792a4184f644984edf0199b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:139557ec24c24c19030794134ad913ada3a500b23d7cb3ab0ffe832bae6f3285",
+      "stderrSha256": "sha256:a314d9a9a76c90d2198c709dd3741c5ce45e5f13b905d5c47f8c440b965c9ebe",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs tasks status --task TASK-TMP-0007 --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0f3ff3c0a62ce9d393db24ca88cb7075250a5d111531fed550ee28eb80992e9c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "git diff --check",
+    "node atm.mjs tasks status --task TASK-TMP-0007 --json",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-28T12:53:26.691Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TMP-0005.archived-non-block-events.json",
+      ".atm/history/evidence/TASK-TMP-0005.residue-reconciliation.json",
+      ".atm/history/evidence/TASK-TMP-0005.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0005.seal-and-commit.json",
+      ".atm/history/evidence/TASK-TMP-0005.skl-0031-compact-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0007.*",
+      ".atm/history/evidence/TASK-TMP-0007.target-attestation.json",
+      ".atm/history/task-events/TASK-TMP-0007/**",
+      ".atm/history/tasks/TASK-TMP-0007.json",
+      "docs/reports/TASK-TMP-0007-target-side-attestation.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TMP-0007.json",
+  "closedAt": "2026-07-28T12:53:26.692Z",
+  "closedByActor": "cursor-003-tmp-0007-recovery",
+  "sessionId": "session-20260728123352-cursor-003-tmp-0007-recovery-TASK-TMP-0007-f475551734",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0e9241ac51c4ed9cfe37405a13f2696a559e09ae",
+    "taskMatchedFiles": [
+      "docs/reports/TASK-TMP-0007-target-side-attestation.md"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
