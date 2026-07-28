@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   deriveRunnerBuildOutputInventory,
+  evaluateRunnerPublicationDisposition,
   verifyRunnerBuildOutputParity
 } from '../../packages/core/src/broker/runner-build-output-inventory.ts';
 import { buildRunnerSyncReceipt } from '../../scripts/runner-sync-incremental-build.ts';
@@ -49,4 +50,22 @@ const receipt = buildRunnerSyncReceipt({
 });
 assert.equal(receipt.outputInventory.digest, inventory.digest);
 assert.deepEqual(receipt.outputInventory.entries, inventory.entries);
+
+const pending = evaluateRunnerPublicationDisposition({
+  inventory,
+  dirtyPaths: [
+    'packages/cli/dist/atm.js',
+    '.atm/history/evidence/TASK-TMP-0005.residue-reconciliation.json'
+  ]
+});
+assert.equal(pending.disposition, 'publication-pending');
+assert.deepEqual(pending.dirtyInventoryPaths, ['packages/cli/dist/atm.js']);
+assert.deepEqual(pending.extraOutputPaths, []);
+
+const incomplete = evaluateRunnerPublicationDisposition({
+  inventory,
+  dirtyPaths: ['release/atm-onefile/release-manifest.json']
+});
+assert.equal(incomplete.disposition, 'inventory-incomplete');
+assert.deepEqual(incomplete.extraOutputPaths, ['release/atm-onefile/release-manifest.json']);
 console.log('[runner-publication-inventory-parity.test] ok');

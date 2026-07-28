@@ -1,4 +1,13 @@
 import { createHash } from 'node:crypto';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import {
+  deriveRunnerBuildOutputInventory,
+  evaluateRunnerPublicationDisposition,
+  type RunnerBuildOutputInventory,
+  type RunnerPublicationDispositionReport
+} from '../../../../core/src/broker/runner-build-output-inventory.ts';
 
 /**
  * Sealed runner publication lifecycle.
@@ -111,6 +120,15 @@ export interface PublicationDecision {
   readonly reason: string;
 }
 
+export interface RunnerPublicationInspection {
+  readonly schemaId: 'atm.runnerPublicationInspection.v1';
+  readonly ok: boolean;
+  readonly code: 'ATM_RUNNER_PUBLICATION_PENDING' | 'ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE' | null;
+  readonly receiptPath: string | null;
+  readonly sealedSourceSha: string | null;
+  readonly report: RunnerPublicationDispositionReport;
+}
+
 function fingerprint(value: string | null | undefined, kind: string): string | null {
   if (typeof value !== 'string' || value.trim().length === 0) return null;
   return `${kind}fp:${createHash('sha256').update(`${kind}\n${value}`).digest('hex').slice(0, 16)}`;
@@ -219,4 +237,86 @@ export function publishSealedRunner(
 export function nextPublicationPhase(phase: PublicationPhase): PublicationPhase | null {
   const index = PHASE_ORDER.indexOf(phase);
   return index >= 0 && index < PHASE_ORDER.length - 1 ? PHASE_ORDER[index + 1] : null;
+}
+
+/**
+ * Filesystem/Git adapter for the pure BuildOutputInventory disposition rule.
+ * It selects the receipt that actually names dirty runner artifacts, never an
+ * unrelated task's evidence receipt.
+ */
+export function inspectRunnerPublicationDisposition(cwd: string): RunnerPublicationInspection {
+  const dirtyPaths = readDirtyPaths(cwd);
+  const receipts = readRunnerReceipts(cwd);
+  const selected = receipts.find((candidate) => {
+    const members = new Set(candidate.inventory.entries.map((entry) => entry.path));
+    return dirtyPaths.some((entry) => members.has(entry));
+  }) ?? receipts[0] ?? null;
+  const inventory = selected?.inventory ?? deriveRunnerBuildOutputInventory({
+    sealedSourceSha: readHeadSha(cwd),
+    observedPaths: []
+  });
+  const terminalDisposition = selected?.terminalDisposition ?? null;
+  const report = evaluateRunnerPublicationDisposition({ inventory, dirtyPaths, terminalDisposition });
+  const code = report.disposition === 'publication-pending'
+    ? 'ATM_RUNNER_PUBLICATION_PENDING'
+    : report.disposition === 'inventory-incomplete'
+      ? 'ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE'
+      : null;
+  return {
+    schemaId: 'atm.runnerPublicationInspection.v1',
+    ok: report.ok,
+    code,
+    receiptPath: selected?.path ?? null,
+    sealedSourceSha: selected?.inventory.sealedSourceSha ?? null,
+    report
+  };
+}
+
+function readDirtyPaths(cwd: string): string[] {
+  const result = spawnSync('git', ['status', '--porcelain', '--untracked-files=all'], { cwd, encoding: 'utf8' });
+  if ((result.status ?? 1) !== 0) return [];
+  return String(result.stdout ?? '').split(/\r?\n/)
+    .map((line) => line.length >= 4 ? line.slice(3).replace(/\\/g, '/').trim() : '')
+    .filter(Boolean);
+}
+
+function readHeadSha(cwd: string): string {
+  const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd, encoding: 'utf8' });
+  return (result.status ?? 1) === 0 ? String(result.stdout ?? '').trim() : 'unknown';
+}
+
+function readRunnerReceipts(cwd: string): Array<{
+  readonly path: string;
+  readonly inventory: RunnerBuildOutputInventory;
+  readonly terminalDisposition: 'published' | 'recovery-retained' | null;
+}> {
+  const evidenceRoot = path.join(cwd, '.atm', 'history', 'evidence');
+  if (!existsSync(evidenceRoot)) return [];
+  return readdirSync(evidenceRoot)
+    .filter((entry) => entry.endsWith('.runner-sync-receipt.json'))
+    .map((entry) => path.join(evidenceRoot, entry))
+    .map((absolute) => {
+      try {
+        const document = JSON.parse(readFileSync(absolute, 'utf8')) as Record<string, unknown>;
+        const inventory = document.outputInventory as RunnerBuildOutputInventory | undefined;
+        if (!inventory || inventory.schemaId !== 'atm.runnerBuildOutputInventory.v1' || !Array.isArray(inventory.entries)) return null;
+        const disposition = document.publicationDisposition;
+        return {
+          path: path.relative(cwd, absolute).replace(/\\/g, '/'),
+          inventory,
+          terminalDisposition: disposition === 'published' || disposition === 'recovery-retained' ? disposition : null,
+          mtimeMs: statSync(absolute).mtimeMs
+        };
+      } catch {
+        return null;
+      }
+    })
+    .filter((entry): entry is {
+      readonly path: string;
+      readonly inventory: RunnerBuildOutputInventory;
+      readonly terminalDisposition: 'published' | 'recovery-retained' | null;
+      readonly mtimeMs: number;
+    } => entry !== null)
+    .sort((left, right) => right.mtimeMs - left.mtimeMs)
+    .map(({ mtimeMs: _mtimeMs, ...entry }) => entry);
 }

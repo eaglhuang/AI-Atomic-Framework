@@ -33,6 +33,7 @@ import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleas
 import { loadComposeProposals, relativeStorePath, resolveBrokerRunEvidenceDir, normalizeEvidencePath } from './parser.ts';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
 import { appendLaneSessionEvent } from '../lane-session/events.ts';
+import { inspectRunnerPublicationDisposition } from '../framework-development/runner-publication-lifecycle.ts';
 
 
 export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context: BrokerCommandContext) {
@@ -407,6 +408,10 @@ export function validateRunnerSyncReleaseReceipt(input: {
   ].filter(Boolean);
   if (mismatches.length > 0) {
     throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID: receipt does not match queued runner-sync steward fields: ${mismatches.join(', ')}.`);
+  }
+  const publication = inspectRunnerPublicationDisposition(input.cwd);
+  if (!publication.ok && publication.code) {
+    throw new Error(`${publication.code}: receipt ${receiptRef} cannot release ${input.stewardWorkId} while its sealed output inventory is ${publication.report.disposition}. inventoryDigest=${publication.report.inventoryDigest}.`);
   }
   validateRunnerSyncReleaseFinalizableReceipt({ receipt, group, stewardWorkId: input.stewardWorkId });
   return {

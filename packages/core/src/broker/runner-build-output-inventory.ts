@@ -22,6 +22,27 @@ export interface RunnerBuildOutputInventory {
   readonly digest: string;
 }
 
+export type RunnerPublicationDisposition =
+  | 'published'
+  | 'publication-pending'
+  | 'inventory-incomplete'
+  | 'recovery-retained';
+
+/**
+ * The stable answer shared by doctor, runner-sync release, and publication.
+ * Callers supply observed worktree state; this provider never runs Git or
+ * selects a receipt on its own.
+ */
+export interface RunnerPublicationDispositionReport {
+  readonly schemaId: 'atm.runnerPublicationDisposition.v1';
+  readonly disposition: RunnerPublicationDisposition;
+  readonly ok: boolean;
+  readonly inventoryDigest: string;
+  readonly dirtyInventoryPaths: readonly string[];
+  readonly extraOutputPaths: readonly string[];
+  readonly terminalDisposition: 'published' | 'recovery-retained' | null;
+}
+
 export interface BuildOutputOwnership {
   readonly path: string;
   readonly ownerTaskId?: string | null;
@@ -38,6 +59,14 @@ export function isRunnerBuildOutputPath(filePath: string): boolean {
     || normalized.startsWith('release/atm-root-drop/')
     || normalized.startsWith('release/atm-onefile/')
     || /^\.atm\/history\/evidence\/[^/]+\.runner-sync-receipt\.json$/i.test(normalized);
+}
+
+/** Build artifacts whose unexpected dirty state must match a sealed inventory. */
+export function isRunnerPublicationArtifactPath(filePath: string): boolean {
+  const normalized = normalizePath(filePath);
+  return normalized.startsWith('packages/cli/dist/')
+    || normalized.startsWith('release/atm-root-drop/')
+    || normalized.startsWith('release/atm-onefile/');
 }
 
 export function deriveRunnerBuildOutputInventory(input: {
@@ -112,6 +141,41 @@ export function inventoryPathsForPublication(inventory: RunnerBuildOutputInvento
 
 export function inventoryRecoveryBlockers(inventory: RunnerBuildOutputInventory): readonly RunnerBuildOutputInventoryEntry[] {
   return inventory.entries.filter((entry) => entry.disposition === 'foreign-live' || entry.disposition === 'unowned');
+}
+
+export function evaluateRunnerPublicationDisposition(input: {
+  readonly inventory: RunnerBuildOutputInventory;
+  readonly dirtyPaths: readonly string[];
+  /** A receipt-backed recovery transaction may intentionally retain exact members. */
+  readonly terminalDisposition?: 'published' | 'recovery-retained' | null;
+}): RunnerPublicationDispositionReport {
+  const inventoryPaths = new Set(input.inventory.entries.map((entry) => entry.path));
+  const dirtyPaths = uniquePaths(input.dirtyPaths);
+  // A foreign task's evidence receipt is not an artifact of this generation.
+  // It is relevant only when this inventory explicitly named it.
+  const publicationDirtyPaths = dirtyPaths.filter((entry) => (
+    inventoryPaths.has(entry) || isRunnerPublicationArtifactPath(entry)
+  ));
+  const dirtyInventoryPaths = publicationDirtyPaths.filter((entry) => inventoryPaths.has(entry));
+  const extraOutputPaths = publicationDirtyPaths.filter((entry) => !inventoryPaths.has(entry));
+  const terminalDisposition = input.terminalDisposition ?? null;
+
+  const disposition: RunnerPublicationDisposition = extraOutputPaths.length > 0
+    ? 'inventory-incomplete'
+    : terminalDisposition === 'recovery-retained'
+      ? 'recovery-retained'
+      : dirtyInventoryPaths.length > 0
+        ? 'publication-pending'
+        : 'published';
+  return {
+    schemaId: 'atm.runnerPublicationDisposition.v1',
+    disposition,
+    ok: disposition === 'published' || disposition === 'recovery-retained',
+    inventoryDigest: input.inventory.digest,
+    dirtyInventoryPaths,
+    extraOutputPaths,
+    terminalDisposition
+  };
 }
 
 export function verifyRunnerBuildOutputParity(

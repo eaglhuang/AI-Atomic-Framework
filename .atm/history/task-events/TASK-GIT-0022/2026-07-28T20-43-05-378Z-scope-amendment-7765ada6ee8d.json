@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-28T20-43-05-378Z-scope-amendment-7765ada6ee8d",
+  "taskId": "TASK-GIT-0022",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0022.json",
+  "taskSha256": "sha256:34be731846a79eab07a239cad029ae5f211f4a7172eff3f6b132ef0bf23f70de",
+  "createdAt": "2026-07-28T20:43:05.378Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0022 --actor codex-git-series-captain --add packages/cli/src/commands/broker/steward-queues.ts --reason \"Synchronize active direction lock with G14 runner-sync release consumer\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Synchronize active direction lock with G14 runner-sync release consumer"
+  }
+}
