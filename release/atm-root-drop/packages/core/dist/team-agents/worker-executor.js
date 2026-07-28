@@ -1,4 +1,27 @@
 import { effectiveExecutionState, validateWorkerReport } from '../broker/team-worker-report.js';
+import { evaluateRestrictedExecution } from './restricted-execution-gateway.js';
+/**
+ * Adapter A of the RestrictedExecutionGateway.
+ *
+ * External workers hold no ambient mutation capability. They may *request* a
+ * structured action; the process is launched only if the gateway admits it for
+ * the lane's own task and lane session. The lane supplies the authority, so a
+ * worker cannot fabricate one by naming a different task in its request.
+ */
+export function evaluateTeamWorkerExecutionRequest(input) {
+    return evaluateRestrictedExecution({
+        actor: input.actorId,
+        taskId: input.lane.taskId,
+        laneSessionId: input.lane.laneSessionId,
+        executionClass: 'external-worker-process',
+        executable: input.executable,
+        argv: input.argv,
+        cwd: input.cwd,
+        declaredOutputs: input.declaredOutputs,
+        adapterCapability: input.adapterCapability ?? 'enforced',
+        now: input.now
+    });
+}
 export function buildTeamWorkerExecutionRuntime(input) {
     const now = input.now ?? new Date().toISOString();
     const reports = input.workerReports ?? [];

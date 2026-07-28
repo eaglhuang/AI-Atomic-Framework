@@ -165,6 +165,29 @@ export const minimumAtmEntrySkillDefinitions = [
         command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
     }
 ];
+/**
+ * Section marker that carries the ATM-only execution route warning into the
+ * canonical entry skills. The policy itself lives in the core
+ * RestrictedExecutionGateway; templates only project it, and the projection is
+ * required so a compiled skill cannot silently drop the warning.
+ */
+export const atmOnlyExecutionRouteSectionMarker = 'ATM-Only Execution Route';
+export const atmOnlyExecutionRouteTemplateIds = [
+    'atm-governance-router',
+    'atm-dispatch',
+    'atm-next'
+];
+export function assertAtmOnlyExecutionRouteProjection(templates) {
+    const templatesById = new Map(templates.map((template) => [template.frontmatter.id, template]));
+    for (const templateId of atmOnlyExecutionRouteTemplateIds) {
+        const template = templatesById.get(templateId);
+        if (!template)
+            continue;
+        if (!template.body.includes(atmOnlyExecutionRouteSectionMarker)) {
+            throw new Error(`skill template ${templateId} must project the ${atmOnlyExecutionRouteSectionMarker} section`);
+        }
+    }
+}
 export function parseSkillTemplate(content, sourcePath = '<inline>') {
     const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
     if (!frontmatterMatch) {
@@ -188,13 +211,15 @@ export function loadSkillTemplates(templateDirectory = defaultSkillTemplateDirec
 }
 export function loadMinimumAtmSkillTemplates(templateDirectory = defaultSkillTemplateDirectory) {
     const templatesById = new Map(loadSkillTemplates(templateDirectory).map((template) => [template.frontmatter.id, template]));
-    return minimumAtmEntrySkillDefinitions.map((entryDefinition) => {
+    const loaded = minimumAtmEntrySkillDefinitions.map((entryDefinition) => {
         const template = templatesById.get(entryDefinition.id);
         if (!template) {
             throw new Error(`missing ATM skill template: ${entryDefinition.id}`);
         }
         return template;
     });
+    assertAtmOnlyExecutionRouteProjection(loaded);
+    return loaded;
 }
 export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTemplateDirectory) {
     const templates = loadSkillTemplates(templateDirectory);

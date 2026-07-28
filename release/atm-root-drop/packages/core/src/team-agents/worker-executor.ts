@@ -1,5 +1,10 @@
 import { effectiveExecutionState, validateWorkerReport, type TeamWorkerReport } from '../broker/team-worker-report.ts';
 import type { WaveManifest } from '../broker/wave-manifest.ts';
+import {
+  evaluateRestrictedExecution,
+  type RestrictedExecutionAdapterCapability,
+  type RestrictedExecutionEvaluation
+} from './restricted-execution-gateway.ts';
 
 export type TeamWorkerExecutorResultState =
   | 'executing'
@@ -66,6 +71,38 @@ export interface TeamWorkerExecutionRuntime {
   readonly writesPerformed: false;
   readonly telemetrySummary: TeamWorkerExecutorTelemetrySummary;
   readonly createdAt: string;
+}
+
+/**
+ * Adapter A of the RestrictedExecutionGateway.
+ *
+ * External workers hold no ambient mutation capability. They may *request* a
+ * structured action; the process is launched only if the gateway admits it for
+ * the lane's own task and lane session. The lane supplies the authority, so a
+ * worker cannot fabricate one by naming a different task in its request.
+ */
+export function evaluateTeamWorkerExecutionRequest(input: {
+  readonly lane: Pick<TeamWorkerExecutionLane, 'taskId' | 'laneSessionId'>;
+  readonly actorId: string | null;
+  readonly executable: string;
+  readonly argv?: readonly string[];
+  readonly cwd?: string | null;
+  readonly declaredOutputs?: readonly string[];
+  readonly adapterCapability?: RestrictedExecutionAdapterCapability;
+  readonly now?: string;
+}): RestrictedExecutionEvaluation {
+  return evaluateRestrictedExecution({
+    actor: input.actorId,
+    taskId: input.lane.taskId,
+    laneSessionId: input.lane.laneSessionId,
+    executionClass: 'external-worker-process',
+    executable: input.executable,
+    argv: input.argv,
+    cwd: input.cwd,
+    declaredOutputs: input.declaredOutputs,
+    adapterCapability: input.adapterCapability ?? 'enforced',
+    now: input.now
+  });
 }
 
 export function buildTeamWorkerExecutionRuntime(input: {

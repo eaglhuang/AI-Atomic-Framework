@@ -1,8 +1,15 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import {
+  ATM_ONLY_EXECUTION_ROUTE_NOTICE,
+  describeRestrictedExecutionAdapterCapability,
+  evaluateRestrictedExecution,
+  type RestrictedExecutionAdapterCapability,
+  type RestrictedExecutionEvaluation
+} from '../../../core/src/team-agents/restricted-execution-gateway.ts';
 
 export type TeamRuntimeGateFinding = {
-  code: 'ATM_TEAM_GIT_OWNER_REQUIRED' | 'ATM_TEAM_WRITE_SCOPE_EXCEEDED';
+  code: 'ATM_TEAM_GIT_OWNER_REQUIRED' | 'ATM_TEAM_WRITE_SCOPE_EXCEEDED' | 'ATM_RESTRICTED_EXECUTION_BLOCKED';
   detail: string;
   teamRunId: string;
   teamRunIds?: string[];
@@ -59,6 +66,54 @@ export function evaluateTeamPreToolGate(input: {
     }
   }
   return findings;
+}
+
+/**
+ * Dispatch/claim admission for external write work.
+ *
+ * An adapter that cannot enforce a blocking pre-tool surface advertises
+ * `externalWriteCapability: unsupported`. The gateway — not this file — decides
+ * what that means, so dispatch cannot quietly disagree with the hook.
+ */
+export function describeExternalWriteCapability(adapterId: string | null | undefined): RestrictedExecutionAdapterCapability {
+  return describeRestrictedExecutionAdapterCapability(adapterId);
+}
+
+export function evaluateExternalWriteDispatchAdmission(input: {
+  adapterId: string | null;
+  actorId: string | null;
+  taskId: string | null;
+  laneSessionId: string | null;
+  now?: string;
+}): { admitted: boolean; capability: RestrictedExecutionAdapterCapability; evaluation: RestrictedExecutionEvaluation; findings: TeamRuntimeGateFinding[] } {
+  const capability = describeExternalWriteCapability(input.adapterId);
+  const evaluation = evaluateRestrictedExecution({
+    actor: input.actorId,
+    taskId: input.taskId,
+    laneSessionId: input.laneSessionId,
+    executionClass: 'external-worker-process',
+    executable: 'node',
+    argv: ['atm.mjs', 'git', 'commit', '--json'],
+    adapterCapability: capability,
+    now: input.now
+  });
+  const admitted = evaluation.decision === 'allow';
+  return {
+    admitted,
+    capability,
+    evaluation,
+    findings: admitted
+      ? []
+      : [{
+        code: 'ATM_RESTRICTED_EXECUTION_BLOCKED',
+        detail: `${input.adapterId ?? '<adapter>'} cannot be assigned external write work: ${evaluation.reasonCode}. ${ATM_ONLY_EXECUTION_ROUTE_NOTICE}`,
+        teamRunId: '',
+        taskId: normalizeOptional(input.taskId),
+        actorId: normalizeOptional(input.actorId),
+        files: [],
+        requiredCommand: evaluation.approvedAtmCommand
+      }]
+  };
 }
 
 export function evaluateTeamPreCommitGate(input: {

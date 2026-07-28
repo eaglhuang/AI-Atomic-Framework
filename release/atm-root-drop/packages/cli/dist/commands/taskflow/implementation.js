@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -21,6 +22,7 @@ import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliv
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js';
 import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../../core/dist/team-runtime/handoff-ledger.js';
 import { clearBrokerRuntimeStateForTask } from '../../../../core/dist/broker/lifecycle.js';
+import { classifyRunnerAffectingPaths } from '../../../../core/dist/broker/runner-version-contract.js';
 function buildTasksNewCommand(input) {
     const parts = ['node atm.mjs tasks new'];
     if (input.template) {
@@ -221,6 +223,96 @@ function buildTaskflowRunnerGateDecision(filePaths) { const scopeClass = deriveA
 function buildRunnerSyncEnqueueCommand(input) { const sealedSource = input.sealedSourceSha ?? '<sealed-source-sha>'; const surfaces = runnerSyncSurfaces.map((surface) => `--surface ${quoteCliValue(surface)}`).join(' '); return `node atm.mjs broker runner-sync enqueue --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --sealed-source-sha ${quoteCliValue(sealedSource)} ${surfaces} --json`; }
 function buildRunnerSyncTaskflowCloseCommand(input) { return `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --write --json`; }
 function buildTaskflowStaleRunnerBlocker(input) { const sealedSourceSha = readCurrentGitHead(input.cwd); const enqueueCommand = buildRunnerSyncEnqueueCommand({ taskId: input.taskId, actorId: input.actorId, sealedSourceSha }); const buildCommand = 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build'; const closeCommand = buildRunnerSyncTaskflowCloseCommand({ taskId: input.taskId, actorId: input.actorId }); const admission = inspectRunnerSyncAdmission({ cwd: input.cwd, stewardActorId: input.actorId || '<actor>', sealedSourceSha, dirtyFiles: [] }); const ownership = admission.queueHeadOwnership; const actionChain = ownership.ok ? [buildCommand, closeCommand] : ownership.cleanupCommand ? [ownership.cleanupCommand, enqueueCommand] : ownership.queuePosition && ownership.queuePosition > 1 ? [`node atm.mjs broker runner-sync status --task ${input.taskId} --json`, buildCommand, closeCommand] : [enqueueCommand, buildCommand, closeCommand]; const queueStatus = ownership.queuePosition === null ? 'not enqueued' : `queued at position ${ownership.queuePosition}`; const requiredCommand = actionChain[0] ?? enqueueCommand; const summary = ownership.ok ? 'The frozen runner is stale and this task owns the active runner-sync queue head; run the runner-sync build, then retry taskflow close.' : ownership.cleanupCommand ? `The frozen runner is stale, but the runner-sync queue head is orphaned (${ownership.queueHeadHealth}); cleanup is required before enqueue/build/close.` : ownership.queuePosition && ownership.queuePosition > 1 ? `The frozen runner is stale and this task is ${queueStatus}; wait for the queue head before build. queueHeadHealth=${ownership.queueHeadHealth}.` : 'The frozen runner is stale and this task is not enqueued in runner-sync; enqueue before build so closeback can proceed without mutating the runner-sync queue silently.'; return { code: 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER', summary, requiredCommand, runnerSyncAdmission: admission, runnerSyncActionChain: actionChain, queuePosition: ownership.queuePosition, queueHeadHealth: ownership.queueHeadHealth, ...(input.runnerGateDecision ? { runnerGateDecision: input.runnerGateDecision.runnerGateDecision, runnerGateIntersectingFiles: input.runnerGateDecision.runnerGateIntersectingFiles, sharedSurface: input.runnerGateDecision.sharedSurface, scopeClass: input.runnerGateDecision.scopeClass } : {}) }; }
+const runnerGateBuildInputTreePaths = ['packages', 'scripts', 'templates', 'schemas', 'atomic_workbench', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json'];
+function readJsonRecordIfExists(filePath) { if (!existsSync(filePath))
+    return null; try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+}
+catch {
+    return null;
+} }
+function gitCommandOk(cwd, args) { try {
+    execFileSync('git', [...args], { cwd, stdio: ['ignore', 'ignore', 'ignore'] });
+    return true;
+}
+catch {
+    return false;
+} }
+function gitLines(cwd, args) { try {
+    return execFileSync('git', [...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).split(/\r?\n/).map((entry) => entry.trim().replace(/\\/g, '/')).filter(Boolean);
+}
+catch {
+    return [];
+} }
+function computeRunnerInputTreeHash(cwd, commitSha = 'HEAD') { try {
+    const output = execFileSync('git', ['ls-tree', '-r', '-z', commitSha, '--', ...runnerGateBuildInputTreePaths], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    return `sha256:${createHash('sha256').update(output).digest('hex')}`;
+}
+catch {
+    return null;
+} }
+function normalizeReceiptStringArray(value) { return Array.isArray(value) ? uniqueSorted(value.filter((entry) => typeof entry === 'string').map((entry) => entry.trim())) : []; }
+function objectRecord(value) { return value && typeof value === 'object' && !Array.isArray(value) ? value : null; }
+function validateReceiptAttribution(receipt, runnerInputTreeHash) {
+    const memberTaskIds = normalizeReceiptStringArray(receipt.memberTaskIds);
+    if (memberTaskIds.length === 0)
+        return 'receipt has no memberTaskIds';
+    const childAttribution = objectRecord(receipt.childAttribution);
+    const childReceipts = Array.isArray(receipt.childReceipts) ? receipt.childReceipts.map(objectRecord).filter((entry) => entry !== null) : [];
+    const attributedByChildren = new Set(childReceipts.map((entry) => typeof entry.taskId === 'string' ? entry.taskId.trim() : '').filter(Boolean));
+    const childrenCoverMembers = memberTaskIds.every((taskId) => attributedByChildren.has(taskId));
+    if (childAttribution?.complete !== true && !childrenCoverMembers)
+        return 'receipt child attribution is incomplete';
+    const sealedSourceSha = typeof receipt.sealedSourceSha === 'string' ? receipt.sealedSourceSha : '';
+    for (const child of childReceipts) {
+        if (child.sealedSourceSha !== sealedSourceSha || child.sharedSealedInputDigest !== runnerInputTreeHash)
+            return 'receipt child receipt is stale relative to sealed source or runner input hash';
+    }
+    return null;
+}
+function inspectRunnerReceiptPublicationClosure(input) {
+    const receiptRef = `.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`;
+    const receiptPath = path.join(input.cwd, receiptRef);
+    const currentHead = readCurrentGitHead(input.cwd);
+    const missing = (reason, extra) => ({ schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'missing', receiptRef, sealedSourceSha: null, currentHead, receiptRunnerInputTreeHash: null, currentRunnerInputTreeHash: null, headDeltaPaths: [], runnerAffectingDeltaPaths: [], nonRunnerAffectingDeltaPaths: [], reason, ...extra });
+    const rebuild = (reason, extra) => ({ schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'rebuild-required', receiptRef, sealedSourceSha: null, currentHead, receiptRunnerInputTreeHash: null, currentRunnerInputTreeHash: null, headDeltaPaths: [], runnerAffectingDeltaPaths: [], nonRunnerAffectingDeltaPaths: [], reason, ...extra });
+    const receipt = readJsonRecordIfExists(receiptPath);
+    if (!receipt)
+        return missing('No durable runner-sync receipt exists for this task.');
+    const sealedSourceSha = typeof receipt.sealedSourceSha === 'string' && receipt.sealedSourceSha.trim() ? receipt.sealedSourceSha.trim() : null;
+    const receiptRunnerInputTreeHash = typeof receipt.runnerInputTreeHash === 'string' && receipt.runnerInputTreeHash.trim() ? receipt.runnerInputTreeHash.trim() : null;
+    const graph = objectRecord(receipt.runnerInputGraph);
+    const graphRunnerInputTreeHash = typeof graph?.aggregateInputTreeHash === 'string' ? graph.aggregateInputTreeHash : null;
+    const lifecycle = objectRecord(receipt.lifecycle);
+    if (!sealedSourceSha || !currentHead)
+        return rebuild('Receipt or current HEAD is missing a usable source seal.', { sealedSourceSha, receiptRunnerInputTreeHash });
+    if (lifecycle?.finalizable !== true)
+        return rebuild('Receipt lifecycle is not finalizable.', { sealedSourceSha, receiptRunnerInputTreeHash });
+    if (!receiptRunnerInputTreeHash || graphRunnerInputTreeHash !== receiptRunnerInputTreeHash)
+        return rebuild('Receipt runnerInputTreeHash is missing or inconsistent with runnerInputGraph.', { sealedSourceSha, receiptRunnerInputTreeHash });
+    const attributionProblem = validateReceiptAttribution(receipt, receiptRunnerInputTreeHash);
+    if (attributionProblem)
+        return rebuild(attributionProblem, { sealedSourceSha, receiptRunnerInputTreeHash });
+    if (sealedSourceSha !== currentHead && !gitCommandOk(input.cwd, ['merge-base', '--is-ancestor', sealedSourceSha, currentHead]))
+        return rebuild('Receipt sealedSourceSha is not current HEAD or an ancestor of current HEAD.', { sealedSourceSha, receiptRunnerInputTreeHash });
+    const headDeltaPaths = sealedSourceSha === currentHead ? [] : gitLines(input.cwd, ['diff', '--name-only', `${sealedSourceSha}..${currentHead}`]);
+    const classified = classifyRunnerAffectingPaths(headDeltaPaths);
+    if (classified.runnerAffecting.length > 0)
+        return rebuild('HEAD advanced through runner-affecting input paths; rebuild is required.', { sealedSourceSha, receiptRunnerInputTreeHash, headDeltaPaths, runnerAffectingDeltaPaths: classified.runnerAffecting, nonRunnerAffectingDeltaPaths: classified.nonRunnerAffecting });
+    const currentRunnerInputTreeHash = computeRunnerInputTreeHash(input.cwd, 'HEAD');
+    if (!currentRunnerInputTreeHash || currentRunnerInputTreeHash !== receiptRunnerInputTreeHash)
+        return rebuild('Current runner input tree hash does not match the durable receipt.', { sealedSourceSha, receiptRunnerInputTreeHash, currentRunnerInputTreeHash, headDeltaPaths, runnerAffectingDeltaPaths: classified.runnerAffecting, nonRunnerAffectingDeltaPaths: classified.nonRunnerAffecting });
+    return { schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'accepted', receiptRef, sealedSourceSha, currentHead, receiptRunnerInputTreeHash, currentRunnerInputTreeHash, headDeltaPaths, runnerAffectingDeltaPaths: classified.runnerAffecting, nonRunnerAffectingDeltaPaths: classified.nonRunnerAffecting, reason: sealedSourceSha === currentHead ? 'Receipt is sealed to current HEAD and runner input hash matches.' : 'Receipt sealed source is a HEAD ancestor; only non-runner-affecting lifecycle/evidence delta occurred and runner input hash still matches.' };
+}
+function isTaskScopedLifecycleEvidencePath(taskId, filePath) { const normalized = filePath.replace(/\\/g, '/'); return normalized === `.atm/history/tasks/${taskId}.json` || normalized.startsWith(`.atm/history/task-events/${taskId}/`) || normalized.startsWith(`.atm/history/evidence/${taskId}.`); }
+function isTaskScopedGeneratedDocumentationPath(filePath) { const normalized = filePath.replace(/\\/g, '/'); return normalized === 'docs/ERROR_CODES.md' || normalized === 'docs/governance/error-code-registry.json'; }
+function isReceiptClosureDirtyFileAllowed(input) { if (input.closure.status !== 'accepted')
+    return false; const normalized = input.filePath.replace(/\\/g, '/'); const classification = classifyRunnerAffectingPaths([normalized]); if (classification.runnerAffecting.length > 0)
+    return false; return normalized === input.closure.receiptRef || isTaskScopedLifecycleEvidencePath(input.taskId, normalized) || isTaskScopedGeneratedDocumentationPath(normalized); }
+function applyRunnerReceiptPublicationClosureDirtyException(input) { const dirtyGuard = input.preflight.dirtyGuard; if (input.closure.status !== 'accepted' || dirtyGuard.blockingTrackedDirtyFiles.length === 0)
+    return input.preflight; const allowedDirtyFiles = dirtyGuard.blockingTrackedDirtyFiles.filter((filePath) => isReceiptClosureDirtyFileAllowed({ taskId: input.taskId, filePath, closure: input.closure })); if (allowedDirtyFiles.length !== dirtyGuard.blockingTrackedDirtyFiles.length)
+    return input.preflight; const allowed = new Set(allowedDirtyFiles); const adjustedDirtyGuard = { ...dirtyGuard, ok: true, reason: 'no-blocking-dirty-files', blockingTrackedDirtyFiles: [], scopeTrackedDirtyFiles: dirtyGuard.scopeTrackedDirtyFiles.filter((filePath) => !allowed.has(filePath)), governanceTrackedDirtyFiles: dirtyGuard.governanceTrackedDirtyFiles.filter((filePath) => !allowed.has(filePath)), advisoryTrackedDirtyFiles: uniqueSorted([...dirtyGuard.advisoryTrackedDirtyFiles, ...allowedDirtyFiles]) }; const keepBlocker = (entry) => entry.id !== 'scopeTrackedDirtyFiles' || adjustedDirtyGuard.scopeTrackedDirtyFiles.length > 0; const blockers = input.preflight.blockers.filter(keepBlocker); const operationalBlockers = input.preflight.operationalBlockers.filter(keepBlocker); return { ...input.preflight, ok: blockers.length === 0 && adjustedDirtyGuard.ok, blockers, operationalBlockers, scopeTrackedDirtyFiles: adjustedDirtyGuard.scopeTrackedDirtyFiles, dirtyGuard: adjustedDirtyGuard }; }
 function buildCloseOwnedDirtyPendingBlocker(input) { const advisoryDirty = new Set(uniqueSorted([...(input.dirtyGuard.advisoryTrackedDirtyFiles ?? []), ...(input.dirtyGuard.regenerableArtifactFiles ?? []), ...(input.dirtyGuard.correctPlanningMirrorPreEditFiles ?? [])])); const closeOwnedFiles = uniqueSorted([...input.previewCommitBundle.targetRepo.stageFiles, ...input.previewCommitBundle.targetGovernanceFiles, ...input.previewCommitBundle.planningRepo.stageFiles, ...input.previewCommitBundle.planningFiles]); const pendingFiles = closeOwnedFiles.filter((file) => advisoryDirty.has(file)); if (pendingFiles.length === 0)
     return null; const preview = pendingFiles.slice(0, 4).join(', '); const suffix = pendingFiles.length > 4 ? ` (+${pendingFiles.length - 4} more)` : ''; return { code: 'ATM_TASKFLOW_CLOSE_OWNED_DIRTY_PENDING', summary: `taskflow close owns pending dirty file(s) (${preview}${suffix}), but close --write is blocked by another readiness issue. Leaving them unstaged or uncommitted can block other lanes as foreign dirty work.`, requiredCommand: input.fallbackCommand ?? `node atm.mjs taskflow pre-close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --json`, files: pendingFiles, multiTaskCloseRecipe: 'Finish taskflow close, commit the close-owned bundle, or explicitly hand off the listed files before claiming another lane.' }; }
 function listExistingFilesRecursively(root, relativeDirectory) {
@@ -309,11 +401,13 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline' ? closebackPlan.writerBoundary.rosterIndexPath : null, historicalDeliveryRefs, historicalBatchRef, planningAuthorityDeliveryOk: planningAuthorityDeliveryGate.ok });
     const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
     const declaredFiles = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
-    const historicalClosePreflight = buildTaskflowClosePreflight({ cwd, taskId, actorId: actorId || '<actor>', taskDocument, previewCommitBundle, historicalDeliveryRefs, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason });
+    const rawHistoricalClosePreflight = buildTaskflowClosePreflight({ cwd, taskId, actorId: actorId || '<actor>', taskDocument, previewCommitBundle, historicalDeliveryRefs, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason });
     let writeReadinessHint = buildTaskflowCloseWriteReadinessHint({ cwd, taskId, actorId, taskDocument, declaredFiles, closebackPlan, previewCommitBundle,
         historicalDeliveryRefs, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason, planningAuthorityDeliveryGate });
     const runnerGateEvidence = buildTaskflowRunnerGateDecision(uniqueSorted([...declaredFiles, ...previewCommitBundle.targetDeliveryFiles, ...previewCommitBundle.targetGovernanceFiles]));
-    const staleRunnerBlockers = isRunnerSyncRequired(cwd) && runnerGateEvidence.runnerGateDecision === 'required' ? [buildTaskflowStaleRunnerBlocker({ cwd, taskId, actorId, runnerGateDecision: runnerGateEvidence })] : [];
+    const runnerReceiptPublicationClosure = inspectRunnerReceiptPublicationClosure({ cwd, taskId });
+    const historicalClosePreflight = applyRunnerReceiptPublicationClosureDirtyException({ taskId, preflight: rawHistoricalClosePreflight, closure: runnerReceiptPublicationClosure });
+    const staleRunnerBlockers = isRunnerSyncRequired(cwd) && runnerGateEvidence.runnerGateDecision === 'required' && runnerReceiptPublicationClosure.status !== 'accepted' ? [buildTaskflowStaleRunnerBlocker({ cwd, taskId, actorId, runnerGateDecision: runnerGateEvidence })] : [];
     const baseWriteBlockers = [...writeReadinessHint.blockers, ...staleRunnerBlockers, ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)];
     const closeOwnedDirtyPendingBlocker = baseWriteBlockers.length > 0 ? buildCloseOwnedDirtyPendingBlocker({ taskId, actorId: actorId || '<actor>', previewCommitBundle, dirtyGuard: historicalClosePreflight.dirtyGuard, fallbackCommand: baseWriteBlockers[0]?.requiredCommand ?? writeReadinessHint.nextCommand }) : null;
     if (baseWriteBlockers.length > 0 || closeOwnedDirtyPendingBlocker) {
@@ -329,7 +423,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     if (surface === 'pre-close') {
         return { ...makeResult({ ok: historicalClosePreflight.ok && !preCloseWriteBlocked, command: 'taskflow pre-close', cwd, mode: 'pre-close', messages: [
                     message(preCloseMessageLevel, preCloseMessageCode, preCloseMessageText, { taskId, blockerCount: historicalClosePreflight.blockers.length, writeReadinessBlockerCount: writeReadinessHint.blockers.length, runnerGateDecision: runnerGateEvidence.runnerGateDecision })
-                ], evidence: { historicalClosePreflight, writeReadinessHint, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, closebackPlan, governedCommitBundle: previewCommitBundle, residueDiagnosis: enrichedDiagnosis, closebackPathResolution,
+                ], evidence: { historicalClosePreflight, writeReadinessHint, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, runnerReceiptPublicationClosure, closebackPlan, governedCommitBundle: previewCommitBundle, residueDiagnosis: enrichedDiagnosis, closebackPathResolution,
                     ...(autoEvidencePlan ? { autoEvidencePlan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowPreCloseResult.v1', writeEnabled: false, historicalClosePreflight };
     }
     const writeSupport = resolveCloseWriteSupport({ writeRequested, closeMode: closebackPlan.closeMode, actorSupplied: actorId.length > 0, taskIdSupplied: taskId.length > 0,
@@ -445,7 +539,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     }
     return { ...makeResult({ ok: true, command: 'taskflow close', cwd, mode: 'dry-run', messages: [message(closebackPlan.closeMode === 'ambiguous-manual-review' || writeReadinessHint.status === 'blocked' ? 'warn' : 'info', closebackPlan.closeMode === 'ambiguous-manual-review' ? 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE' : writeReadinessHint.status === 'blocked' ? 'ATM_TASKFLOW_CLOSE_WRITE_NOT_READY' : 'ATM_TASKFLOW_CLOSE_ORCHESTRATION_READY', closebackPlan.closeMode === 'ambiguous-manual-review' ? 'taskflow close dry-run blocked on ambiguous residue; operator review required.' : writeReadinessHint.status === 'blocked'
                     ? `taskflow close dry-run found known write blockers (${closebackPlan.closeMode}); inspect writeReadinessHint before --write.` : `taskflow close dry-run plan is ready (${closebackPlan.closeMode}).`, { taskId, closeMode: closebackPlan.closeMode })], evidence: { closeMode: closebackPlan.closeMode, commitMode, writeSupport, writeReadinessHint, delegationContract, diagnostics, closebackPlan,
-                governedCommitBundle: previewCommitBundle, historicalClosePreflight, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, residueDiagnosis: enrichedDiagnosis, closebackPathResolution, ...(autoEvidencePlan ? { autoEvidencePlan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowCloseResult.v1', writeEnabled: false };
+                governedCommitBundle: previewCommitBundle, historicalClosePreflight, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, runnerReceiptPublicationClosure, residueDiagnosis: enrichedDiagnosis, closebackPathResolution, ...(autoEvidencePlan ? { autoEvidencePlan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowCloseResult.v1', writeEnabled: false };
 }
 function promoteTaskRuntimeHandoffs(cwd, taskId, runOutcome) {
     const root = path.join(cwd, '.atm', 'runtime', 'handoff', taskId.replace(/[^A-Za-z0-9._-]/g, '_'));

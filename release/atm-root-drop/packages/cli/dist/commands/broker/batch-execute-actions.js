@@ -11,6 +11,7 @@ import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID } from '../../../../core/dist
 import { planSharedDeliverySaga } from '../../../../core/dist/broker/shared-delivery-saga.js';
 import { planWaveGeneratedWrite } from '../../../../core/dist/broker/wave-generated-executor.js';
 import { assertRecordCommitPayloadPresent } from '../git-governance/record-commit-payload-assertion.js';
+import { ATM_ONLY_EXECUTION_ROUTE_NOTICE, evaluateRestrictedExecution } from '../../../../core/dist/team-agents/restricted-execution-gateway.js';
 function readJson(pathName) {
     if (!existsSync(pathName)) {
         throw new CliError('ATM_BROKER_SCHEDULER_MISSING', `Wave broker scheduler document does not exist: ${pathName}`, { exitCode: 2 });
@@ -259,6 +260,38 @@ function readCommandManifest(cwd, manifestPath) {
         ioDigest: typeof record.ioDigest === 'string' ? record.ioDigest : null
     };
 }
+/**
+ * Command-manifest projection of the RestrictedExecutionGateway. The manifest
+ * carries executable + argv, so the gateway answers the same question it
+ * answers for the Team worker and the editor pre-tool hook. Forbidding a
+ * `shell` field is not a policy; it only forbids one spelling.
+ */
+function admitGeneratedCommandManifest(input) {
+    const evaluation = evaluateRestrictedExecution({
+        actor: input.actorId,
+        taskId: input.taskId,
+        laneSessionId: input.laneSessionId,
+        executionClass: 'command-manifest',
+        executable: input.manifest.executable,
+        argv: input.manifest.argv,
+        cwd: input.manifest.cwd ?? input.cwd,
+        declaredOutputs: input.declaredOutputs,
+        adapterCapability: 'enforced'
+    });
+    if (evaluation.decision === 'deny') {
+        throw new CliError('ATM_RESTRICTED_EXECUTION_BLOCKED', `command manifest execution is not an approved worker route: ${evaluation.reasonCode}`, {
+            exitCode: 2,
+            details: {
+                reasonCode: evaluation.reasonCode,
+                requiredCommand: evaluation.approvedAtmCommand,
+                atmOnlyRouteNotice: ATM_ONLY_EXECUTION_ROUTE_NOTICE,
+                commandManifestDigest: digestCommandManifest(input.manifest),
+                receipt: evaluation.receipt
+            }
+        });
+    }
+    return evaluation;
+}
 function runGeneratedCommandManifest(cwd, manifest) {
     const started = Date.now();
     const result = spawnSync(manifest.executable, [...manifest.argv], {
@@ -277,6 +310,37 @@ function runGeneratedCommandManifest(cwd, manifest) {
         });
     }
     return { exitCode: result.status ?? 0, stdout: result.stdout, stderr: result.stderr, durationMs };
+}
+/**
+ * Deprecated queue-only compatibility path. It still crosses the gateway, so it
+ * is no longer a generic shell fallback: only the same allowlist that admits a
+ * structured manifest can admit this string.
+ */
+function admitDeprecatedGeneratedShellCommand(input) {
+    const tokens = input.command.trim().split(/\s+/).filter(Boolean);
+    const evaluation = evaluateRestrictedExecution({
+        actor: input.actorId,
+        taskId: input.taskId,
+        laneSessionId: input.laneSessionId,
+        executionClass: 'command-manifest',
+        executable: tokens[0] ?? '',
+        argv: tokens.slice(1),
+        cwd: input.cwd,
+        declaredOutputs: input.declaredOutputs,
+        adapterCapability: 'enforced'
+    });
+    if (evaluation.decision === 'deny') {
+        throw new CliError('ATM_RESTRICTED_EXECUTION_BLOCKED', `deprecated generated shell command is not an approved worker route: ${evaluation.reasonCode}`, {
+            exitCode: 2,
+            details: {
+                reasonCode: evaluation.reasonCode,
+                requiredCommand: evaluation.approvedAtmCommand,
+                atmOnlyRouteNotice: ATM_ONLY_EXECUTION_ROUTE_NOTICE,
+                receipt: evaluation.receipt
+            }
+        });
+    }
+    return evaluation;
 }
 function runDeprecatedGeneratedShellCommand(cwd, command) {
     const started = Date.now();
@@ -324,11 +388,28 @@ export function handleBrokerBatchExecute(options, context) {
         }
         const surfaceKind = selectedSurface;
         const commandManifest = options.commandManifestPath ? readCommandManifest(options.cwd, options.commandManifestPath) : null;
+        const commandManifestAdmission = commandManifest
+            ? admitGeneratedCommandManifest({
+                cwd: options.cwd,
+                manifest: commandManifest,
+                actorId: options.actorId,
+                taskId: options.expectedTasks[0] ?? null,
+                laneSessionId: options.waveId,
+                declaredOutputs: options.outputFiles
+            })
+            : null;
         const commandRun = options.apply
             ? commandManifest
                 ? runGeneratedCommandManifest(options.cwd, commandManifest)
                 : options.runCommand && options.policyFallbackMode === 'queue-only'
-                    ? runDeprecatedGeneratedShellCommand(options.cwd, options.runCommand)
+                    ? (admitDeprecatedGeneratedShellCommand({
+                        cwd: options.cwd,
+                        command: options.runCommand,
+                        actorId: options.actorId,
+                        taskId: options.expectedTasks[0] ?? null,
+                        laneSessionId: options.waveId,
+                        declaredOutputs: options.outputFiles
+                    }), runDeprecatedGeneratedShellCommand(options.cwd, options.runCommand))
                     : null
             : null;
         const outputDigestMeasurement = options.commandManifestPath || options.runCommand
@@ -382,7 +463,8 @@ export function handleBrokerBatchExecute(options, context) {
                 message(plan.ok ? 'info' : 'error', plan.ok ? 'ATM_BROKER_BATCH_GENERATED_RECEIPT_READY' : 'ATM_BROKER_BATCH_GENERATED_BLOCKED', plan.reason, {
                     receiptPath,
                     blockers: plan.blockers,
-                    commandManifestDigest: commandManifest ? digestCommandManifest(commandManifest) : null
+                    commandManifestDigest: commandManifest ? digestCommandManifest(commandManifest) : null,
+                    restrictedExecutionReasonCode: commandManifestAdmission?.reasonCode ?? null
                 }),
                 ...(options.runCommand && options.policyFallbackMode === 'queue-only'
                     ? [message('warning', 'ATM_RUN_COMMAND_DEPRECATED', '--run-command is deprecated for generated writes and is allowed only in queue-only compatibility mode.', {})]
@@ -394,7 +476,8 @@ export function handleBrokerBatchExecute(options, context) {
                 schedulerPath: '.atm/runtime/wave-broker-scheduler.json',
                 decision,
                 plan,
-                receiptPath
+                receiptPath,
+                restrictedExecutionReceipt: commandManifestAdmission?.receipt ?? null
             }
         });
     }

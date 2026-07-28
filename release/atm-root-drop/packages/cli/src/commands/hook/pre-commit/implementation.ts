@@ -33,6 +33,14 @@ import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } fro
 import { readBrokerLifecycleState } from '../../../../../core/src/broker/lifecycle.ts';
 import { buildPendingCheckpointCommitWindow } from '../../batch.ts';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.ts';
+import {
+  classifyBlockLifecycleRecordBundle,
+  isRecordCommitBlockBridgeAuthorized,
+  recordOnlyClaimScopeExemptCovers,
+  RECORD_COMMIT_BLOCK_BRIDGE_AUTH_DIR,
+  RECORD_COMMIT_BLOCK_BRIDGE_AUTH_ENV,
+  type RecordCommitBlockBridgeAuthorization
+} from '../../git-governance/record-only-block-lifecycle-bridge.ts';
 import { evaluateTeamPreCommitGate } from '../../team-runtime-gates.ts';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../../tasks/task-import-validators.ts';
 import { hookContractVersion, hookProvider } from '../git-hooks-installer.ts';
@@ -90,12 +98,99 @@ import {
 
 export { inspectProtectedAtmStateChanges, isUnconsumedCloseWindowDeferralSnapshot } from './support.ts';
 
+// ATM-GOV-0266 hook parity: a governed `git record-commit` may persist exactly
+// one already-blocked/released card's ledger plus its matching block event while
+// an unrelated framework claim is active. The pre-commit hook consumes the same
+// block-lifecycle classifier and only lets that exact pair through when a
+// single-use, content-bound authorization artifact — written by the governed
+// record-commit path and referenced by a commit-env nonce — proves the context.
+// A raw `git commit` of an identical pair has no such artifact and stays blocked
+// with `ATM_CROSS_TASK_MUTATION_BLOCKED`.
+export function authorizeBlockLifecycleRecordBridge(
+  root: string,
+  crossTaskBlock: { readonly conflictFiles: readonly string[] }
+): { readonly authorized: boolean; readonly reason: string } {
+  const stagedFiles = readStagedFiles(root).filter(
+    (entry) => entry !== gitHeadEvidencePaths.legacyJson && entry !== gitHeadEvidencePaths.jsonl
+  );
+  const outcome = classifyBlockLifecycleRecordBundle({
+    stagedFiles,
+    readLedgerRecord: (bridgeTaskId) => {
+      const ledgerPath = path.join(root, '.atm', 'history', 'tasks', `${bridgeTaskId}.json`);
+      if (!existsSync(ledgerPath)) return null;
+      try {
+        const ledgerDoc = JSON.parse(readFileSync(ledgerPath, 'utf8')) as Record<string, any>;
+        const claim = ledgerDoc.claim && typeof ledgerDoc.claim === 'object' ? ledgerDoc.claim : null;
+        return {
+          workItemId: typeof ledgerDoc.workItemId === 'string' ? ledgerDoc.workItemId : (typeof ledgerDoc.id === 'string' ? ledgerDoc.id : null),
+          status: typeof ledgerDoc.status === 'string' ? ledgerDoc.status : '',
+          claimState: claim && typeof claim.state === 'string' ? claim.state : null,
+          claimActorId: claim && typeof claim.actorId === 'string' ? claim.actorId : null,
+          claimLeaseId: claim && typeof claim.leaseId === 'string' ? claim.leaseId : null
+        };
+      } catch {
+        return null;
+      }
+    },
+    readEventRecord: (eventPath) => {
+      const eventAbs = path.join(root, eventPath);
+      if (!existsSync(eventAbs)) return null;
+      try {
+        const eventDoc = JSON.parse(readFileSync(eventAbs, 'utf8')) as Record<string, any>;
+        return {
+          taskId: typeof eventDoc.taskId === 'string' ? eventDoc.taskId : null,
+          action: typeof eventDoc.action === 'string' ? eventDoc.action : null,
+          toStatus: typeof eventDoc.toStatus === 'string' ? eventDoc.toStatus : null,
+          actorId: typeof eventDoc.actorId === 'string' ? eventDoc.actorId : null,
+          taskPath: typeof eventDoc.taskPath === 'string' ? eventDoc.taskPath : null
+        };
+      } catch {
+        return null;
+      }
+    }
+  });
+  if (outcome.kind !== 'eligible') {
+    return { authorized: false, reason: `staged set is not an eligible block-lifecycle pair (${outcome.kind})` };
+  }
+  // The exempt pair must fully cover the flagged conflict; any extra conflicting
+  // file keeps the block fail-closed.
+  if (!recordOnlyClaimScopeExemptCovers(outcome.exemptPaths, crossTaskBlock.conflictFiles)) {
+    return { authorized: false, reason: 'cross-task conflict extends beyond the eligible block-lifecycle pair' };
+  }
+  const nonce = typeof process.env[RECORD_COMMIT_BLOCK_BRIDGE_AUTH_ENV] === 'string'
+    ? process.env[RECORD_COMMIT_BLOCK_BRIDGE_AUTH_ENV].trim()
+    : '';
+  let authorization: RecordCommitBlockBridgeAuthorization | null = null;
+  if (nonce.length > 0) {
+    const authPath = path.join(root, RECORD_COMMIT_BLOCK_BRIDGE_AUTH_DIR, `${nonce}.json`);
+    if (existsSync(authPath)) {
+      try {
+        authorization = JSON.parse(readFileSync(authPath, 'utf8')) as RecordCommitBlockBridgeAuthorization;
+      } catch {
+        authorization = null;
+      }
+    }
+  }
+  const sha256 = (filePath: string): string => createHash('sha256').update(readFileSync(path.join(root, filePath))).digest('hex');
+  const committingActorId = typeof process.env.ATM_COMMIT_ACTOR_ID === 'string' && process.env.ATM_COMMIT_ACTOR_ID.trim().length > 0
+    ? process.env.ATM_COMMIT_ACTOR_ID.trim()
+    : null;
+  return isRecordCommitBlockBridgeAuthorized({
+    eligible: outcome,
+    authorization,
+    committingActorId,
+    ledgerSha256: sha256(outcome.ledgerPath),
+    eventSha256: sha256(outcome.eventPath),
+    nowMs: Date.now()
+  });
+}
+
 export function runPreCommitHook(cwd: string) {
   const root = path.resolve(cwd);
   const committingTaskIdForHook = typeof process.env.ATM_COMMIT_TASK_ID === 'string' ? process.env.ATM_COMMIT_TASK_ID.trim() : null;
   const crossTaskBlock = detectCrossTaskMutation(root, committingTaskIdForHook, 'pre-commit');
   const hasTaskHistoryCrossTaskBlock = crossTaskBlock?.conflicts.some((entry) => entry.surface === 'task-history') ?? false;
-  if (crossTaskBlock && hasTaskHistoryCrossTaskBlock && !isResolutionAuthorizedCurrentTask(root, committingTaskIdForHook, crossTaskBlock.conflictTaskId)) {
+  if (crossTaskBlock && hasTaskHistoryCrossTaskBlock && !isResolutionAuthorizedCurrentTask(root, committingTaskIdForHook, crossTaskBlock.conflictTaskId) && !authorizeBlockLifecycleRecordBridge(root, crossTaskBlock).authorized) {
     recordIncidentFlag(root, crossTaskBlock);
     throw new CliError('ATM_CROSS_TASK_MUTATION_BLOCKED', `Cross-task mutation incident detected: files owned by active task ${crossTaskBlock.conflictTaskId} are mutated. File(s): ${crossTaskBlock.conflictFiles.join(', ')}. Recovery: ${crossTaskBlock.recoveryLane}`, {
       exitCode: 1,

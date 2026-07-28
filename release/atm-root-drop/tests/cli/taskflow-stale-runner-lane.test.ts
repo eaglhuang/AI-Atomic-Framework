@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -95,13 +96,74 @@ function currentHead(): string {
 
 function commitFixtureChange(filePath: string, content: string): void {
   writeFileSync(path.join(repo, filePath), content, 'utf8');
-  spawnSync('git', ['add', filePath], { cwd: repo, stdio: 'ignore' });
-  const commit = spawnSync('git', ['commit', '-m', `fixture ${filePath}`], {
+  commitPaths([filePath], `fixture ${filePath}`);
+}
+
+function commitPaths(filePaths: readonly string[], message: string): void {
+  spawnSync('git', ['add', '--', ...filePaths], { cwd: repo, stdio: 'ignore' });
+  const commit = spawnSync('git', ['commit', '-m', message], {
     cwd: repo,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
   assert.equal(commit.status, 0, commit.stderr);
+}
+
+function computeBuildInputsTreeHash(commitSha = 'HEAD'): string {
+  const result = spawnSync('git', [
+    'ls-tree',
+    '-r',
+    '-z',
+    commitSha,
+    '--',
+    'packages',
+    'scripts',
+    'templates',
+    'schemas',
+    'atomic_workbench',
+    'package.json',
+    'package-lock.json',
+    'tsconfig.json',
+    'tsconfig.build.json'
+  ], {
+    cwd: repo,
+    encoding: 'buffer',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  assert.equal(result.status, 0, String(result.stderr));
+  return `sha256:${createHash('sha256').update(result.stdout).digest('hex')}`;
+}
+
+function writeRunnerSyncReceipt(taskId: string, sealedSourceSha: string, runnerInputTreeHash: string, options: { complete?: boolean; staleChild?: boolean } = {}): string {
+  const receiptRef = `.atm/history/evidence/${taskId}.runner-sync-receipt.json`;
+  const complete = options.complete !== false;
+  writeJson(path.join(repo, receiptRef), {
+    schemaId: 'atm.runnerSyncReceipt.v1',
+    taskId,
+    sealedSourceSha,
+    memberTaskIds: [taskId],
+    childReceipts: complete ? [{
+      taskId,
+      sealedSourceSha,
+      sharedSealedInputDigest: options.staleChild ? 'sha256:stale' : runnerInputTreeHash
+    }] : [],
+    childAttribution: {
+      schemaId: 'atm.runnerSyncChildAttribution.v1',
+      complete,
+      missingTaskIds: complete ? [] : [taskId]
+    },
+    lifecycle: {
+      finalizable: true
+    },
+    runnerInputTreeHash,
+    runnerInputGraph: {
+      schemaId: 'atm.runnerInputGraph.v1',
+      sealedSourceSha,
+      aggregateInputTreeHash: runnerInputTreeHash,
+      nodes: []
+    }
+  });
+  return receiptRef;
 }
 
 function staleRunnerBlocker(taskId: string): Record<string, any> {
@@ -130,6 +192,83 @@ try {
   assert.equal(docsOnly.evidence.runnerGateDecision, 'skipped-non-code');
   assert.deepEqual(docsOnly.evidence.runnerGateIntersectingFiles, []);
   assert.equal((docsOnly.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER'), false);
+
+  const receiptSeal = currentHead();
+  const receiptInputHash = computeBuildInputsTreeHash(receiptSeal);
+  writeTask('TASK-LANE-RECEIPT-0001');
+  const receiptRef = writeRunnerSyncReceipt('TASK-LANE-RECEIPT-0001', receiptSeal, receiptInputHash);
+  commitPaths([
+    'docs/tasks/TASK-LANE-RECEIPT-0001.task.md',
+    '.atm/history/tasks/TASK-LANE-RECEIPT-0001.json',
+    receiptRef
+  ], 'fixture receipt publication closure');
+  const receiptReady = runAtm(['taskflow', 'pre-close', '--task', 'TASK-LANE-RECEIPT-0001', '--actor', 'lane-captain'], 1);
+  assert.equal(receiptReady.evidence.runnerReceiptPublicationClosure.status, 'accepted');
+  assert.equal((receiptReady.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER'), false);
+
+  const dirtyReceiptDocsTask = 'TASK-LANE-DIRTY-RECEIPT-DOCS-0001';
+  const dirtyReceiptDocsSeal = currentHead();
+  const dirtyReceiptDocsHash = computeBuildInputsTreeHash(dirtyReceiptDocsSeal);
+  writeTask(dirtyReceiptDocsTask, 'running', [
+    `.atm/history/evidence/${dirtyReceiptDocsTask}.*`,
+    'docs/ERROR_CODES.md',
+    'packages/cli/src/commands/taskflow/implementation.ts'
+  ]);
+  writeFileSync(path.join(repo, 'docs/ERROR_CODES.md'), '# Error Codes\n', 'utf8');
+  const dirtyReceiptDocsReceipt = writeRunnerSyncReceipt(dirtyReceiptDocsTask, dirtyReceiptDocsSeal, dirtyReceiptDocsHash);
+  commitPaths([
+    `docs/tasks/${dirtyReceiptDocsTask}.task.md`,
+    `.atm/history/tasks/${dirtyReceiptDocsTask}.json`,
+    dirtyReceiptDocsReceipt,
+    'docs/ERROR_CODES.md'
+  ], 'fixture dirty receipt docs closure');
+  const dirtyReceipt = JSON.parse(readFileSync(path.join(repo, dirtyReceiptDocsReceipt), 'utf8')) as Record<string, any>;
+  dirtyReceipt.lifecycle.note = 'updated after durable publication';
+  writeJson(path.join(repo, dirtyReceiptDocsReceipt), dirtyReceipt);
+  writeFileSync(path.join(repo, 'docs/ERROR_CODES.md'), '# Error Codes\n\nRegenerated docs.\n', 'utf8');
+  const dirtyReceiptDocsAllowed = runAtm(['taskflow', 'pre-close', '--task', dirtyReceiptDocsTask, '--actor', 'lane-captain'], 1);
+  assert.equal(dirtyReceiptDocsAllowed.evidence.runnerReceiptPublicationClosure.status, 'accepted');
+  assert.equal(dirtyReceiptDocsAllowed.evidence.historicalClosePreflight.dirtyGuard.reason, 'no-blocking-dirty-files');
+  assert.deepEqual(dirtyReceiptDocsAllowed.evidence.historicalClosePreflight.scopeTrackedDirtyFiles, []);
+  assert.equal((dirtyReceiptDocsAllowed.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY'), false);
+
+  writeFileSync(path.join(repo, 'packages/cli/src/commands/taskflow/implementation.ts'), '// uncommitted runner source drift\n', 'utf8');
+  const dirtySourceBlocked = runAtm(['taskflow', 'pre-close', '--task', dirtyReceiptDocsTask, '--actor', 'lane-captain'], 1);
+  assert.equal(dirtySourceBlocked.evidence.runnerReceiptPublicationClosure.status, 'accepted');
+  assert.ok(dirtySourceBlocked.evidence.historicalClosePreflight.scopeTrackedDirtyFiles.includes('packages/cli/src/commands/taskflow/implementation.ts'));
+  assert.equal((dirtySourceBlocked.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY'), true);
+
+  commitFixtureChange('packages/cli/src/commands/taskflow/implementation.ts', '// runner input drift after receipt\n');
+  const runnerInputDrift = runAtm(['taskflow', 'pre-close', '--task', 'TASK-LANE-RECEIPT-0001', '--actor', 'lane-captain'], 1);
+  assert.equal(runnerInputDrift.evidence.runnerReceiptPublicationClosure.status, 'rebuild-required');
+  assert.deepEqual(runnerInputDrift.evidence.runnerReceiptPublicationClosure.runnerAffectingDeltaPaths, ['packages/cli/src/commands/taskflow/implementation.ts']);
+  assert.equal((runnerInputDrift.evidence.writeReadinessHint.blockers as Record<string, any>[]).some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER'), true);
+
+  const missingAttributionSeal = currentHead();
+  const missingAttributionHash = computeBuildInputsTreeHash(missingAttributionSeal);
+  writeTask('TASK-LANE-MISSING-ATTR-0001');
+  const missingAttributionReceipt = writeRunnerSyncReceipt('TASK-LANE-MISSING-ATTR-0001', missingAttributionSeal, missingAttributionHash, { complete: false });
+  commitPaths([
+    'docs/tasks/TASK-LANE-MISSING-ATTR-0001.task.md',
+    '.atm/history/tasks/TASK-LANE-MISSING-ATTR-0001.json',
+    missingAttributionReceipt
+  ], 'fixture missing receipt attribution');
+  const missingAttribution = runAtm(['taskflow', 'pre-close', '--task', 'TASK-LANE-MISSING-ATTR-0001', '--actor', 'lane-captain'], 1);
+  assert.equal(missingAttribution.evidence.runnerReceiptPublicationClosure.status, 'rebuild-required');
+  assert.match(missingAttribution.evidence.runnerReceiptPublicationClosure.reason, /attribution/i);
+
+  const staleChildSeal = currentHead();
+  const staleChildHash = computeBuildInputsTreeHash(staleChildSeal);
+  writeTask('TASK-LANE-STALE-CHILD-0001');
+  const staleChildReceipt = writeRunnerSyncReceipt('TASK-LANE-STALE-CHILD-0001', staleChildSeal, staleChildHash, { staleChild: true });
+  commitPaths([
+    'docs/tasks/TASK-LANE-STALE-CHILD-0001.task.md',
+    '.atm/history/tasks/TASK-LANE-STALE-CHILD-0001.json',
+    staleChildReceipt
+  ], 'fixture stale child receipt');
+  const staleChild = runAtm(['taskflow', 'pre-close', '--task', 'TASK-LANE-STALE-CHILD-0001', '--actor', 'lane-captain'], 1);
+  assert.equal(staleChild.evidence.runnerReceiptPublicationClosure.status, 'rebuild-required');
+  assert.match(staleChild.evidence.runnerReceiptPublicationClosure.reason, /stale/i);
 
   runAtm([
     'broker',
