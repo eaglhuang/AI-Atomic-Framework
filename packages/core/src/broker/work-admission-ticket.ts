@@ -215,13 +215,29 @@ export function checkWorkAdmissionTicket(input: {
   const fileGrant = ticket.grants.find((grant) => grant.kind === 'file-write');
   const operationGrant = ticket.grants.find((grant) => grant.kind === 'lifecycle-operation');
   const requestedFiles = normalizeWritePathList(input.files);
-  if (!fileGrant || requestedFiles.some((file) => !fileGrant.values.includes(file))) {
+  const filesAreAuthorized = Boolean(fileGrant) && requestedFiles.every((file) =>
+    fileGrant!.values.includes(file) || isTaskManagedCloseLifecyclePath(input.taskId, input.operation, file)
+  );
+  if (!filesAreAuthorized) {
     return deny('ATM_WRITE_TICKET_SCOPE_VIOLATION', 'Requested mutation path is outside the ticket file grant.');
   }
   if (!operationGrant?.values.includes(input.operation)) {
     return deny('ATM_WORK_ADMISSION_DELIVERY_NOT_AUTHORIZED', 'Requested lifecycle operation is outside the ticket grant.');
   }
   return { ok: true, code: 'ATM_WORK_ADMISSION_OK', reason: 'Ticket identity, scope, runner, and lifecycle operation are current.' };
+}
+
+/**
+ * Taskflow owns these close records; a card should not need to list its own
+ * generated ledger/evidence namespace as a delivery file. The exception is
+ * deliberately narrow: it applies only to close and only to this task ID.
+ */
+function isTaskManagedCloseLifecyclePath(taskId: string, operation: WorkAdmissionOperation, file: string): boolean {
+  if (operation !== 'close') return false;
+  const normalized = normalizeWritePathList([file])[0] ?? '';
+  return normalized === `.atm/history/tasks/${taskId}.json`
+    || normalized.startsWith(`.atm/history/evidence/${taskId}.`)
+    || normalized.startsWith(`.atm/history/task-events/${taskId}/`);
 }
 
 export function createWorkAdmissionCoverageReceipt(input: {
