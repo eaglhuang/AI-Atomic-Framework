@@ -1,0 +1,268 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0017",
+  "actorId": "codex-git-series-captain",
+  "actorIdentity": {
+    "actorId": "codex-git-series-captain",
+    "source": "ATM_ACTOR_ID"
+  },
+  "stewardWorkId": "runner-sync-f32f3a38",
+  "sealedSourceSha": "8029e0d8ee5d33e1726868a8f034fd90f2e3b2c0",
+  "memberTaskIds": [
+    "TASK-GIT-0017"
+  ],
+  "groupManifest": {
+    "schemaId": "atm.runnerSyncCoalescedGroupManifest.v1",
+    "stewardWorkId": "runner-sync-f32f3a38",
+    "sealedSourceSha": "8029e0d8ee5d33e1726868a8f034fd90f2e3b2c0",
+    "members": [
+      {
+        "taskId": "TASK-GIT-0017",
+        "actorId": "codex-git-series-captain",
+        "laneFingerprint": null,
+        "requestedSurfaces": [
+          "packages/cli/dist",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
+        ],
+        "requestDigest": "sha256:f2ed43e570c528438d531a0457a700f0eabed09bc4a3147dff5e370989db0997"
+      }
+    ],
+    "memberTaskIds": [
+      "TASK-GIT-0017"
+    ],
+    "sharedSealedInputDigest": "sha256:1d7cbd92dba1b5c1b92071ba654f36776883c3aad2aee446ed3951aabad5d037",
+    "sharedOutputDigest": "sha256:4c8749840457cd60bf6324ae2819dd2ab95b949d5b63c322a8c9a1427c281295",
+    "manifestDigest": "sha256:095274f3560573d2ebec6c477f917882801f8ecfec06bbc674b265957e078c90",
+    "createdAt": "2026-07-28T17:59:20.544Z"
+  },
+  "childReceipts": [
+    {
+      "schemaId": "atm.runnerSyncChildReceipt.v1",
+      "taskId": "TASK-GIT-0017",
+      "parentStewardWorkId": "runner-sync-f32f3a38",
+      "groupManifestDigest": "sha256:095274f3560573d2ebec6c477f917882801f8ecfec06bbc674b265957e078c90",
+      "memberRequestDigest": "sha256:f2ed43e570c528438d531a0457a700f0eabed09bc4a3147dff5e370989db0997",
+      "sealedSourceSha": "8029e0d8ee5d33e1726868a8f034fd90f2e3b2c0",
+      "sharedSealedInputDigest": "sha256:1d7cbd92dba1b5c1b92071ba654f36776883c3aad2aee446ed3951aabad5d037",
+      "sharedOutputDigest": "sha256:4c8749840457cd60bf6324ae2819dd2ab95b949d5b63c322a8c9a1427c281295",
+      "receiptDigest": "sha256:3d614e11961fb4e2b8822ddbe3e0d23079fec3849337f1a4770b32341f8d87f7",
+      "issuedAt": "2026-07-28T17:59:20.544Z"
+    }
+  ],
+  "childAttribution": {
+    "schemaId": "atm.runnerSyncChildAttribution.v1",
+    "complete": true,
+    "members": [
+      {
+        "taskId": "TASK-GIT-0017",
+        "actorId": "codex-git-series-captain",
+        "laneFingerprint": null,
+        "childReceiptDigest": "sha256:3d614e11961fb4e2b8822ddbe3e0d23079fec3849337f1a4770b32341f8d87f7"
+      }
+    ],
+    "missingTaskIds": []
+  },
+  "lifecycle": {
+    "schemaId": "atm.runnerSyncReceiptLifecycle.v1",
+    "durableStates": [
+      "building",
+      "built-provisional",
+      "publication-ready",
+      "published",
+      "reconciled"
+    ],
+    "provisionalState": "built-provisional",
+    "publicationReadyState": "publication-ready",
+    "terminalState": "reconciled",
+    "releasePhase": "published",
+    "reconcilePhase": "reconciled",
+    "finalizable": true,
+    "recoveryCommand": null
+  },
+  "runnerInputTreeHash": "sha256:1d7cbd92dba1b5c1b92071ba654f36776883c3aad2aee446ed3951aabad5d037",
+  "runnerInputGraph": {
+    "schemaId": "atm.runnerInputGraph.v1",
+    "sealedSourceSha": "8029e0d8ee5d33e1726868a8f034fd90f2e3b2c0",
+    "aggregateInputTreeHash": "sha256:1d7cbd92dba1b5c1b92071ba654f36776883c3aad2aee446ed3951aabad5d037",
+    "nodes": [
+      {
+        "segment": "packages",
+        "inputPaths": [
+          "atomic_workbench",
+          "package-lock.json",
+          "package.json",
+          "packages",
+          "schemas",
+          "scripts",
+          "templates",
+          "tsconfig.build.json",
+          "tsconfig.json"
+        ],
+        "inputDigest": "sha256:1d7cbd92dba1b5c1b92071ba654f36776883c3aad2aee446ed3951aabad5d037",
+        "outputEntries": [
+          "packages/cli/dist",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
+        ],
+        "outputDigest": "sha256:01c04e1b0b30dd65a651d435712c5085008ae0559dff05949b66f2c3f94eb521"
+      }
+    ]
+  },
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:1d7cbd92dba1b5c1b92071ba654f36776883c3aad2aee446ed3951aabad5d037",
+  "buildDecision": "incrementalBuild",
+  "decisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlan": {
+    "schemaId": "atm.runnerIncrementalBuildPlan.v1",
+    "specVersion": "0.1.0",
+    "previousSealedSourceSha": "34de57dacebda9516c894502739d84cb2600d7b9",
+    "currentSealedSourceSha": "8029e0d8ee5d33e1726868a8f034fd90f2e3b2c0",
+    "changedPaths": [
+      "packages/cli/dist/commands/broker/batch-execute-actions.js",
+      "packages/cli/dist/commands/integration-hooks/implementation.js",
+      "packages/cli/dist/commands/next.js",
+      "packages/cli/dist/commands/taskflow/implementation.js",
+      "packages/cli/dist/commands/team-runtime-gates.js",
+      "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts"
+    ],
+    "affectedPackages": [
+      "packages/cli",
+      "packages/core"
+    ],
+    "affectedGroups": {
+      "packages": [
+        "packages/cli/dist/commands/broker/batch-execute-actions.js",
+        "packages/cli/dist/commands/integration-hooks/implementation.js",
+        "packages/cli/dist/commands/next.js",
+        "packages/cli/dist/commands/taskflow/implementation.js",
+        "packages/cli/dist/commands/team-runtime-gates.js",
+        "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts"
+      ],
+      "scripts": [],
+      "templates": [],
+      "schemas": [],
+      "atomicWorkbench": [],
+      "rootConfig": [],
+      "unknown": []
+    },
+    "incrementalEligible": true,
+    "unsafeReasons": []
+  },
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-07-28T17-59-20-542Z-runner-sync.jsonl",
+  "tsBuildCache": {
+    "schemaId": "atm.runnerTsBuildCacheSummary.v1",
+    "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
+    "tsBuildInfoPath": ".atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo",
+    "existedBefore": true,
+    "existsAfter": true,
+    "digestBefore": "sha256:b08a7ed225363952d05c7fc3d3decbe64b9a4a806c3fcab0f8270abaeace4790",
+    "digestAfter": "sha256:3ba3dd4fbdb808b2acba68ef3f6bcee27baa47f47122116c205e03a2bb462b67",
+    "restoredBeforeBuild": true,
+    "persistedAfterBuild": true,
+    "gitPolicy": {
+      "rawCacheCommitted": false,
+      "storage": ".atm/runtime/runner-sync-build-cache/typescript/**"
+    }
+  },
+  "brokerTicket": {
+    "ticketId": "runner-sync-f32f3a38:8029e0d8ee5d33e1726868a8f034fd90f2e3b2c0",
+    "waitedMs": 0,
+    "position": 1,
+    "headOwner": "TASK-GIT-0017"
+  },
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "typescriptBuild",
+    "dominantPhaseMs": 11608,
+    "totalElapsedMs": 39033,
+    "dominanceRatio": 0.2974,
+    "phaseMedianMs": 1280,
+    "phaseP95Ms": 11608,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
+  },
+  "buildObservation": {
+    "schemaId": "atm.runnerSyncBuildObservation.v1",
+    "buildDecision": "incrementalBuild",
+    "decisionReason": "diff planner selected 2 affected package(s)",
+    "brokerTicket": {
+      "ticketId": "runner-sync-f32f3a38:8029e0d8ee5d33e1726868a8f034fd90f2e3b2c0",
+      "waitedMs": 0,
+      "position": 1,
+      "headOwner": "TASK-GIT-0017"
+    },
+    "changedPathCount": 11,
+    "affectedPackageCount": 2,
+    "unsafeReasons": [],
+    "dominantPhaseSummary": {
+      "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+      "dominantPhase": "typescriptBuild",
+      "dominantPhaseMs": 11608,
+      "totalElapsedMs": 39033,
+      "dominanceRatio": 0.2974,
+      "phaseMedianMs": 1280,
+      "phaseP95Ms": 11608,
+      "measuredPhaseCount": 8,
+      "optimizationVerdict": "inconclusive",
+      "basis": "single-run"
+    }
+  },
+  "phaseTimingsMs": {
+    "inputHashCalculation": 52,
+    "skipDecision": 47,
+    "worktreeSetup": 11464,
+    "typescriptBuild": 11608,
+    "rootDropReleaseAssembly": 5448,
+    "onefileReleaseAssembly": 1280,
+    "artifactSync": 5506,
+    "cleanup": 0,
+    "totalElapsed": 39033
+  },
+  "atomicWrite": {
+    "schemaId": "atm.runnerSyncAtomicWrite.v1",
+    "strategy": "temp-file-rename-with-retry",
+    "platform": "win32",
+    "maxAttempts": 4
+  },
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"TASK-GIT-0017\" --steward-work-id \"runner-sync-f32f3a38\" --receipt-ref \".atm/history/evidence/TASK-GIT-0017.runner-sync-receipt.json\" --json",
+  "treatmentTelemetry": {
+    "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
+    "executionMode": "command-executed",
+    "commandExecuted": true,
+    "outputObserved": true,
+    "receiptValidity": "valid",
+    "buildDecision": "incrementalBuild",
+    "phaseTimingsMs": {
+      "inputHashCalculation": 52,
+      "skipDecision": 47,
+      "worktreeSetup": 11464,
+      "typescriptBuild": 11608,
+      "rootDropReleaseAssembly": 5448,
+      "onefileReleaseAssembly": 1280,
+      "artifactSync": 5506,
+      "cleanup": 0,
+      "totalElapsed": 39033
+    },
+    "rawTelemetryPolicy": "gitignored-runtime-only",
+    "tsBuildCacheDigest": "sha256:524a7759e754d42bf75f149408b4878fbdfead243d106d5b37098129b8476926"
+  },
+  "publishedAt": "2026-07-28T17:59:20.545Z"
+}

@@ -7,6 +7,7 @@ import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText
 import { uniqueSorted } from '../view-projections.ts';
 import { parseJsonText } from '../../shared.ts';
 import { normalizeOptionalString } from '../route-resolution.ts';
+import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.ts';
 
 const NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS = 30 * 60;
 
@@ -541,32 +542,15 @@ function readActiveClaimRecords(cwd: string, now: number): ActiveWorkSummary['ac
 }
 
 function readActiveLockRecords(cwd: string, now: number): ActiveWorkSummary['activeLocks'] {
-  const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
-  if (!existsSync(lockRoot)) return [];
-  return readdirSync(lockRoot)
-    .filter((entry) => entry.endsWith('.lock.json'))
-    .flatMap((entry): ActiveWorkSummary['activeLocks'] => {
-      try {
-        const parsed = parseJsonText(readFileSync(path.join(lockRoot, entry), 'utf8')) as Record<string, unknown>;
-        if (normalizeOptionalString(parsed.status) === 'released') return [];
-        const workItemId = normalizeOptionalString(parsed.workItemId);
-        const actorId = normalizeOptionalString(parsed.actorId ?? parsed.lockedBy);
-        if (!workItemId || !actorId) return [];
-        const heartbeatAt = normalizeOptionalString(parsed.heartbeatAt ?? parsed.lockedAt);
-        const ttlSeconds = normalizeOptionalNumber(parsed.ttlSeconds);
-        return [{
-          workItemId,
-          actorId,
-          heartbeatAt,
-          heartbeatAgeSeconds: heartbeatAt ? Math.max(0, Math.floor((now - Date.parse(heartbeatAt)) / 1000)) : null,
-          ttlSeconds,
-          leaseFresh: heartbeatAt && ttlSeconds !== null ? now - Date.parse(heartbeatAt) <= ttlSeconds * 1000 : null,
-          files: uniqueSorted(readStringArray(parsed.files).map(normalizeWorkPath))
-        }];
-      } catch {
-        return [];
-      }
-    });
+  return readFrameworkTempLockProjection(cwd, now).map((lock) => ({
+    workItemId: lock.workItemId,
+    actorId: lock.actorId,
+    heartbeatAt: lock.heartbeatAt,
+    heartbeatAgeSeconds: lock.heartbeatAt ? Math.max(0, Math.floor((now - Date.parse(lock.heartbeatAt)) / 1000)) : null,
+    ttlSeconds: lock.ttlSeconds,
+    leaseFresh: lock.leaseFresh,
+    files: uniqueSorted(lock.files.map(normalizeWorkPath))
+  }));
 }
 
 function normalizeOptionalNumber(value: unknown): number | null {

@@ -24,6 +24,7 @@ export * from './resource-overlap.js';
 export * from './intent-enrichment.js';
 export * from './global-resource-projection.js';
 export * from './runner-sync-steward-queue.js';
+export * from './runner-build-output-inventory.js';
 export * from './generated-projection-steward.js';
 export * from './wave-manifest.js';
 export * from './wave-broker-scheduler.js';

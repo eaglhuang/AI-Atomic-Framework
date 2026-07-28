@@ -1,12 +1,13 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { isRunnerBuildOutputPath } from '../../../../core/dist/broker/runner-build-output-inventory.js';
 import { attachSharedWriteActorAuthority, buildCommandManifest, buildOrderedCommandStep, renderCommandManifest } from '../shared/command-manifest.js';
 import { buildSharedWriteActorRecoveryCommand, explicitActorIdEnvVar, legacyActorIdEnvVar, mintFrameworkTempTaskId, resolveSharedWriteActorAuthority, sanitizeIdentityValue } from '../shared/identity-normalization.js';
 import { inspectRunnerSyncQueueHeadOwnership, normalizeInputRunnerSyncSteward, readRunnerSyncStewardForSealedSource, resolveActiveClaimOwnerActorId, resolveActiveLaneSessionId } from './runner-sync-queue-ownership.js';
 export function inspectRunnerSyncAdmission(input) {
     const dirtyFiles = normalizePaths(input.dirtyFiles ?? readGitDirtyFiles(input.cwd));
-    const releaseWip = dirtyFiles.filter(isReleasePath);
+    const releaseWip = dirtyFiles.filter(isRunnerBuildOutputPath);
     const foreignClaims = input.foreignClaims ?? readActiveForeignClaims(input.cwd, input.stewardActorId);
     const foreignBuildInputConflicts = inspectForeignBuildInputConflicts({
         cwd: input.cwd,
@@ -243,9 +244,6 @@ function uniqueSorted(paths) {
     return [...new Set(paths.map((entry) => entry.trim()).filter(Boolean))]
         .sort((left, right) => left.localeCompare(right));
 }
-function isReleasePath(file) {
-    return file === 'release' || file.startsWith('release/');
-}
 function isRunnerBuildInputPath(file) {
     const normalized = file.replace(/\\/g, '/').replace(/^\.\//, '');
     return normalized === 'package.json'
@@ -260,7 +258,7 @@ function inspectForeignBuildInputConflicts(input) {
     const explicitLandedFiles = input.landedFiles === null ? null : new Set(normalizePaths(input.landedFiles));
     const conflicts = [];
     for (const claim of input.foreignClaims) {
-        const intersectingFiles = normalizePaths(claim.files).filter((file) => !isReleasePath(file) && isRunnerBuildInputPath(file));
+        const intersectingFiles = normalizePaths(claim.files).filter((file) => !isRunnerBuildOutputPath(file) && isRunnerBuildInputPath(file));
         if (intersectingFiles.length === 0)
             continue;
         const landedIntersectingFiles = explicitLandedFiles

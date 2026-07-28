@@ -2,6 +2,8 @@ import { spawnSync } from 'node:child_process';
 import { looksLikeTaskArtifact } from '../match-and-sort.js';
 import { CliError, quoteCliValue } from '../../shared.js';
 import { buildAllowedFilesForTask, readActiveTaskDirectionLocks } from '../../task-direction.js';
+import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.js';
+import { isRunnerBuildOutputPath } from '../../../../../core/dist/broker/runner-build-output-inventory.js';
 import { isPathAllowedByScope } from '../../work-channels.js';
 import { normalizeOptionalTaskPath } from '../intent-normalizers.js';
 import { uniqueSorted } from '../view-projections.js';
@@ -22,9 +24,12 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
     const { stagedOrTracked, untracked } = listPendingGitFilesByKind(input.cwd);
     const foreignDirectionLocks = readActiveTaskDirectionLocks(input.cwd)
         .filter((lock) => lock.taskId !== input.task.workItemId);
+    const foreignFrameworkLocks = readFrameworkTempLockProjection(input.cwd)
+        .filter((lock) => lock.workItemId !== input.task.workItemId);
     const outsideScope = (entry) => !entry.startsWith('.atm/') && !isPathAllowedByScope(entry, allowedFiles);
     const isAdvisoryOutsideScopePath = (entry) => isAdvisoryPendingTaskArtifactPath(entry)
-        || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles));
+        || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles))
+        || foreignFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
     const advisoryTrackedFiles = stagedOrTracked
         .filter(outsideScope)
         .filter(isAdvisoryOutsideScopePath);
@@ -61,8 +66,7 @@ function isAdvisoryPendingTaskArtifactPath(filePath) {
     if (!normalized)
         return false;
     return normalized === 'atomic_workbench/atomization-coverage/path-to-atom-map.json'
-        || normalized.startsWith('release/atm-root-drop/')
-        || normalized.startsWith('release/atm-onefile/');
+        || isRunnerBuildOutputPath(normalized);
 }
 function listPendingGitFilesByKind(cwd) {
     const collect = (args) => {

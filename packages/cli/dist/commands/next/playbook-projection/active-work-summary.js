@@ -7,6 +7,7 @@ import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText
 import { uniqueSorted } from '../view-projections.js';
 import { parseJsonText } from '../../shared.js';
 import { normalizeOptionalString } from '../route-resolution.js';
+import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.js';
 const NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS = 30 * 60;
 export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
     const now = Date.now();
@@ -469,36 +470,15 @@ function readActiveClaimRecords(cwd, now) {
     });
 }
 function readActiveLockRecords(cwd, now) {
-    const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
-    if (!existsSync(lockRoot))
-        return [];
-    return readdirSync(lockRoot)
-        .filter((entry) => entry.endsWith('.lock.json'))
-        .flatMap((entry) => {
-        try {
-            const parsed = parseJsonText(readFileSync(path.join(lockRoot, entry), 'utf8'));
-            if (normalizeOptionalString(parsed.status) === 'released')
-                return [];
-            const workItemId = normalizeOptionalString(parsed.workItemId);
-            const actorId = normalizeOptionalString(parsed.actorId ?? parsed.lockedBy);
-            if (!workItemId || !actorId)
-                return [];
-            const heartbeatAt = normalizeOptionalString(parsed.heartbeatAt ?? parsed.lockedAt);
-            const ttlSeconds = normalizeOptionalNumber(parsed.ttlSeconds);
-            return [{
-                    workItemId,
-                    actorId,
-                    heartbeatAt,
-                    heartbeatAgeSeconds: heartbeatAt ? Math.max(0, Math.floor((now - Date.parse(heartbeatAt)) / 1000)) : null,
-                    ttlSeconds,
-                    leaseFresh: heartbeatAt && ttlSeconds !== null ? now - Date.parse(heartbeatAt) <= ttlSeconds * 1000 : null,
-                    files: uniqueSorted(readStringArray(parsed.files).map(normalizeWorkPath))
-                }];
-        }
-        catch {
-            return [];
-        }
-    });
+    return readFrameworkTempLockProjection(cwd, now).map((lock) => ({
+        workItemId: lock.workItemId,
+        actorId: lock.actorId,
+        heartbeatAt: lock.heartbeatAt,
+        heartbeatAgeSeconds: lock.heartbeatAt ? Math.max(0, Math.floor((now - Date.parse(lock.heartbeatAt)) / 1000)) : null,
+        ttlSeconds: lock.ttlSeconds,
+        leaseFresh: lock.leaseFresh,
+        files: uniqueSorted(lock.files.map(normalizeWorkPath))
+    }));
 }
 function normalizeOptionalNumber(value) {
     return typeof value === 'number' && Number.isFinite(value) ? value : null;

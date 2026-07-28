@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { isRunnerBuildOutputPath } from '../../../../core/src/broker/runner-build-output-inventory.ts';
 import {
   attachSharedWriteActorAuthority,
   buildCommandManifest,
@@ -109,7 +110,7 @@ export function inspectRunnerSyncAdmission(input: {
   readonly landedFiles?: readonly string[] | null;
 }): RunnerSyncAdmissionReport {
   const dirtyFiles = normalizePaths(input.dirtyFiles ?? readGitDirtyFiles(input.cwd));
-  const releaseWip = dirtyFiles.filter(isReleasePath);
+  const releaseWip = dirtyFiles.filter(isRunnerBuildOutputPath);
   const foreignClaims = input.foreignClaims ?? readActiveForeignClaims(input.cwd, input.stewardActorId);
   const foreignBuildInputConflicts = inspectForeignBuildInputConflicts({
     cwd: input.cwd,
@@ -383,10 +384,6 @@ function uniqueSorted(paths: readonly string[]): readonly string[] {
     .sort((left, right) => left.localeCompare(right));
 }
 
-function isReleasePath(file: string): boolean {
-  return file === 'release' || file.startsWith('release/');
-}
-
 function isRunnerBuildInputPath(file: string): boolean {
   const normalized = file.replace(/\\/g, '/').replace(/^\.\//, '');
   return normalized === 'package.json'
@@ -407,7 +404,7 @@ function inspectForeignBuildInputConflicts(input: {
   const explicitLandedFiles = input.landedFiles === null ? null : new Set(normalizePaths(input.landedFiles));
   const conflicts: RunnerSyncForeignBuildInputConflict[] = [];
   for (const claim of input.foreignClaims) {
-    const intersectingFiles = normalizePaths(claim.files).filter((file) => !isReleasePath(file) && isRunnerBuildInputPath(file));
+    const intersectingFiles = normalizePaths(claim.files).filter((file) => !isRunnerBuildOutputPath(file) && isRunnerBuildInputPath(file));
     if (intersectingFiles.length === 0) continue;
     const landedIntersectingFiles = explicitLandedFiles
       ? intersectingFiles.filter((file) => explicitLandedFiles.has(file))
