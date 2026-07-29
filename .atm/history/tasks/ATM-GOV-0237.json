@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0237",
   "title": "Plan 3 real dogfood shared replay surface A",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R3",
   "dependencies": [
     "ATM-GOV-0246"
@@ -155,8 +155,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T20-32-23-397Z-claim-2956f677a563",
-  "lastTransitionAt": "2026-07-29T20:32:23.397Z",
+  "lastTransitionId": "2026-07-29T20-42-56-835Z-lock-cleanup-811d4384e264",
+  "lastTransitionAt": "2026-07-29T20:42:56.835Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T20:32:01.146Z",
@@ -165,7 +165,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-2a2f3e4ceece",
     "claimedAt": "2026-07-29T20:32:01.155Z",
-    "heartbeatAt": "2026-07-29T20:32:01.155Z",
+    "heartbeatAt": "2026-07-29T20:42:56.299Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0237.json",
@@ -175,14 +175,14 @@
       "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
       "tests/cli/plan3-dashboard-ticket-observations.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260729203201-codex-git-series-captain-e7d4150fc2",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729203201-codex-git-series-captain-e7d4150fc2\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-29T20:32:01.155Z",
   "startedByActor": "codex-git-series-captain",
@@ -284,6 +284,13 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729203201-codex-git-series-captain-e7d4150fc2\""
     },
     "createdAt": "2026-07-29T20:32:23.396Z",
-    "status": "active"
-  }
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-29T20:42:56.832Z",
+    "releasedBy": "codex-git-series-captain"
+  },
+  "closedAt": "2026-07-29T20:42:56.299Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729203201-codex-git-series-captain-ATM-GOV-0237-9afb15506b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0237.closure-packet.json"
 }

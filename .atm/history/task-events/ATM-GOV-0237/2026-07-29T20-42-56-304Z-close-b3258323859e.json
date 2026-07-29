@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T20-42-56-304Z-close-b3258323859e",
+  "taskId": "ATM-GOV-0237",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729203201-codex-git-series-captain-ATM-GOV-0237-9afb15506b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0237.json",
+  "taskSha256": "sha256:169d717bbe6ccac34049e3764031241c933b2afcc1b549a96e791aa2643f83a6",
+  "createdAt": "2026-07-29T20:42:56.304Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0237 --actor codex-git-series-captain --status done --from-batch-checkpoint --batch batch-655d05340102",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-655d05340102",
+    "sessionId": "session-20260729203201-codex-git-series-captain-ATM-GOV-0237-9afb15506b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0237.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/plan3-dashboard-ticket-observations.test.ts",
+      "node atm.mjs broker replay dashboard --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T20:42:56.291Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0237.*",
+        ".atm/history/task-events/ATM-GOV-0237/**",
+        ".atm/history/tasks/ATM-GOV-0237.json",
+        "artifacts/generated/atm-plan3-dogfood/ATM-GOV-0237.json",
+        "docs/governance/atm-3-replay-evidence.md",
+        "packages/cli/src/commands/broker/replay/dashboard-ticket-observations.ts",
+        "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+        "tests/cli/plan3-dashboard-ticket-observations.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/replay/dashboard-ticket-observations.ts",
+        "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+        "tests/cli/plan3-dashboard-ticket-observations.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

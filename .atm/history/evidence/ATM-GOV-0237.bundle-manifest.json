@@ -1,13 +1,15 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0237",
-  "updatedAt": "2026-07-29T20:34:37.706Z",
+  "updatedAt": "2026-07-29T20:42:32.362Z",
   "updatedBy": "codex-git-series-captain",
   "freshValidationPasses": [
     "git diff --check",
     "node --strip-types tests/cli/plan3-dashboard-ticket-observations.test.ts",
     "node atm.mjs broker replay dashboard --json",
-    "typecheck"
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -73,6 +75,38 @@
       "durationMs": 1138,
       "runnerKind": "dev-source",
       "sourceCommit": "3f3282cc0d6e93f7f0189ea086efbd58f57dacbc",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1200a92f1ad95131b5cca595bd98b1397c2ba11296db8f13d3ed1c76ee7cdb4e",
+      "stderrSha256": "sha256:82b7ac05612e85ab63222ad29ddb29a2adc70060c7f5c139d0cbfa846d9cea34",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-29T20:40:49.815Z",
+      "startedAt": "2026-07-29T20:40:03.707Z",
+      "finishedAt": "2026-07-29T20:40:49.815Z",
+      "durationMs": 46108,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-29T20:42:32.361Z",
+      "startedAt": "2026-07-29T20:40:54.429Z",
+      "finishedAt": "2026-07-29T20:42:32.361Z",
+      "durationMs": 97932,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
