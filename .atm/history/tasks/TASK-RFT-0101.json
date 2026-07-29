@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0101",
   "title": "Rehabilitate git-governance transaction facade after preservation WIP",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -186,8 +186,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T14-17-55-432Z-scope-amendment-b04e8e43307c",
-  "lastTransitionAt": "2026-07-29T14:17:55.432Z",
+  "lastTransitionId": "2026-07-29T17-10-39-203Z-close-cc5e64312d94",
+  "lastTransitionAt": "2026-07-29T17:10:39.203Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T03:05:33.686Z",
@@ -196,7 +196,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-0f597e023a88",
     "claimedAt": "2026-07-29T03:05:33.692Z",
-    "heartbeatAt": "2026-07-29T14:03:21.151Z",
+    "heartbeatAt": "2026-07-29T17:10:39.199Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain-lane-lane-20260729030534-codex-git-series-captain-f9342714d3.runner-sync-receipt.json",
@@ -241,33 +241,34 @@
       "tests/cli/runner-sync-build-source-preservation.test.ts",
       "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260729030534-codex-git-series-captain-f9342714d3",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729030534-codex-git-series-captain-f9342714d3\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-29T03:05:33.692Z",
   "startedByActor": "codex-git-series-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-3318a0e2493c1888",
-    "ticketDigest": "sha256:3318a0e2493c18881ac22aa501af24709aa12ec2fba655c6066b515b37cc7081",
+    "ticketId": "wat-2a08ab835f4a6b82",
+    "ticketDigest": "sha256:2a08ab835f4a6b823c3a83fa28e1029f697bfe6270c310e06d6ccc223d43ceb9",
     "taskId": "TASK-RFT-0101",
     "origin": "claim",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260729030534-codex-git-series-captain-f9342714d3",
     "claimGeneration": "lease-0f597e023a88",
-    "issuedAt": "2026-07-29T14:03:21.151Z",
-    "expiresAt": "2026-07-29T14:33:21.151Z",
-    "scopeDigest": "sha256:f8fd609fb3c6a27d59e9049212bd1d7768f47c25551f743faee1da210d9af923",
+    "issuedAt": "2026-07-29T17:09:24.917Z",
+    "expiresAt": "2026-07-29T17:39:24.917Z",
+    "scopeDigest": "sha256:a1714322c863ea6ee618fbf09739f732093ff88b3431ea17db94d3452ba70a77",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-29T14:03:21.151Z"
+      "selectedAt": "2026-07-29T17:09:24.917Z"
     },
     "grants": [
       {
@@ -275,6 +276,7 @@
         "values": [
           ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain-lane-lane-20260729030534-codex-git-series-captain-f9342714d3.runner-sync-receipt.json",
           ".atm/history/evidence/TASK-RFT-0101.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-RFT-0101/**",
           ".atm/history/tasks/TASK-RFT-0101.json",
           "atomic_workbench/atomization-coverage/path-to-atom-map.json",
@@ -295,6 +297,7 @@
           "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
           "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
           "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/hook/pre-commit/support.ts",
           "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
           "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
           "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
@@ -310,10 +313,11 @@
           "tests/cli/git-commit-task-scoped-staging.test.ts",
           "tests/cli/git-commit-task-scoped-staging/**",
           "tests/cli/git-index-override-lease-consumption.test.ts",
+          "tests/cli/pre-commit-evidence-context-parity.test.ts",
           "tests/cli/runner-sync-build-source-preservation.test.ts",
           "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
         ],
-        "digest": "sha256:77fbdbfd120f48a4ccc1f664bccab96874fa2edce758f94dbb7d7cecba577693"
+        "digest": "sha256:28d7fc1ecef40bb8fcadd5e3581a29788d391b0baa4908e80220c2c15603c435"
       },
       {
         "kind": "lifecycle-operation",
@@ -430,5 +434,9 @@
     },
     "createdAt": "2026-07-29T09:34:51.322Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-29T17:10:39.199Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729030533-codex-git-series-captain-TASK-RFT-0101-555f251d79",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0101.closure-packet.json"
 }

@@ -1,9 +1,10 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0101",
-  "updatedAt": "2026-07-29T10:46:46.367Z",
+  "updatedAt": "2026-07-29T17:09:03.277Z",
   "updatedBy": "codex-git-series-captain",
   "freshValidationPasses": [
+    "doctor",
     "git diff --check",
     "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
     "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
@@ -217,6 +218,22 @@
       "startedAt": "2026-07-29T10:44:03.763Z",
       "finishedAt": "2026-07-29T10:46:46.366Z",
       "durationMs": 162603,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:44e82037b9ca57b9493b737ec089880b51be66ae8564ed6e2952c553f9248d22",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-29T17:09:03.276Z",
+      "startedAt": "2026-07-29T17:08:33.496Z",
+      "finishedAt": "2026-07-29T17:09:03.276Z",
+      "durationMs": 29780,
       "runnerKind": "unknown",
       "sourceCommit": null,
       "cached": false
