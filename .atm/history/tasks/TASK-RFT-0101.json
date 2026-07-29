@@ -186,8 +186,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T12-55-17-366Z-renew-2c7f972a1353",
-  "lastTransitionAt": "2026-07-29T12:55:17.366Z",
+  "lastTransitionId": "2026-07-29T14-17-55-432Z-scope-amendment-b04e8e43307c",
+  "lastTransitionAt": "2026-07-29T14:17:55.432Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T03:05:33.686Z",
@@ -196,7 +196,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-0f597e023a88",
     "claimedAt": "2026-07-29T03:05:33.692Z",
-    "heartbeatAt": "2026-07-29T12:55:16.466Z",
+    "heartbeatAt": "2026-07-29T14:03:21.151Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain-lane-lane-20260729030534-codex-git-series-captain-f9342714d3.runner-sync-receipt.json",
@@ -221,6 +221,7 @@
       "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
       "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
       "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
       "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
       "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
@@ -236,6 +237,7 @@
       "tests/cli/git-commit-task-scoped-staging.test.ts",
       "tests/cli/git-commit-task-scoped-staging/**",
       "tests/cli/git-index-override-lease-consumption.test.ts",
+      "tests/cli/pre-commit-evidence-context-parity.test.ts",
       "tests/cli/runner-sync-build-source-preservation.test.ts",
       "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
     ],
@@ -252,19 +254,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-7a42d1c13f3e58e5",
-    "ticketDigest": "sha256:7a42d1c13f3e58e52e30581ed5ed7a66db019b25921f7fb9b4a1837634f4ccd8",
+    "ticketId": "wat-3318a0e2493c1888",
+    "ticketDigest": "sha256:3318a0e2493c18881ac22aa501af24709aa12ec2fba655c6066b515b37cc7081",
     "taskId": "TASK-RFT-0101",
+    "origin": "claim",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260729030534-codex-git-series-captain-f9342714d3",
     "claimGeneration": "lease-0f597e023a88",
-    "issuedAt": "2026-07-29T12:55:16.466Z",
-    "expiresAt": "2026-07-29T13:25:16.466Z",
+    "issuedAt": "2026-07-29T14:03:21.151Z",
+    "expiresAt": "2026-07-29T14:33:21.151Z",
     "scopeDigest": "sha256:f8fd609fb3c6a27d59e9049212bd1d7768f47c25551f743faee1da210d9af923",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-29T12:55:16.466Z"
+      "selectedAt": "2026-07-29T14:03:21.151Z"
     },
     "grants": [
       {
@@ -386,6 +389,7 @@
       "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
       "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
       "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
       "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
       "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
@@ -401,6 +405,7 @@
       "tests/cli/git-commit-task-scoped-staging.test.ts",
       "tests/cli/git-commit-task-scoped-staging/**",
       "tests/cli/git-index-override-lease-consumption.test.ts",
+      "tests/cli/pre-commit-evidence-context-parity.test.ts",
       "tests/cli/runner-sync-build-source-preservation.test.ts",
       "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
     ],
