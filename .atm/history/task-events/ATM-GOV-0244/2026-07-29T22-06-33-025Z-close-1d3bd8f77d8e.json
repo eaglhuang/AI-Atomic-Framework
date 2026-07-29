@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T22-06-33-025Z-close-1d3bd8f77d8e",
+  "taskId": "ATM-GOV-0244",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729214705-codex-git-series-captain-ATM-GOV-0244-606ea89d29",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0244.json",
+  "taskSha256": "sha256:d09b34cd9788bb57894c27bf4be5215f3c660dcaef6e47ab5734f953846f3e8c",
+  "createdAt": "2026-07-29T22:06:33.025Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0244 --actor codex-git-series-captain --status done --historical-delivery f67f9ecbcf8a3328d4e588418208016e8b4c5694",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260729214705-codex-git-series-captain-ATM-GOV-0244-606ea89d29",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0244.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json",
+      "node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T22:06:33.016Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0244.*",
+        ".atm/history/task-events/ATM-GOV-0244/**",
+        ".atm/history/tasks/ATM-GOV-0244.json",
+        "artifacts/generated/atm-plan3-closeback/**",
+        "artifacts/generated/atm-plan3-closeback/summary.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/**",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/broker/parallel-admission/closure-observation.ts",
+        "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+        "scripts/diagnose-plan3-evidence-closure.ts",
+        "tests/cli/parallel-admission-circuit-breaker.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/parallel-admission/closure-observation.ts",
+        "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+        "scripts/diagnose-plan3-evidence-closure.ts",
+        "tests/cli/parallel-admission-circuit-breaker.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

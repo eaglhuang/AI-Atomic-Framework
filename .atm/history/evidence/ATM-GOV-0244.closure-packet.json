@@ -1,0 +1,157 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0244",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "34f50a551264fd1e279659b3360e500fd5ce2a46",
+  "governedTreeSha": "54a09cce6f558d44fd7ab6374c382ed976a0096f",
+  "targetCommitDelta": {
+    "currentCommitSha": "34f50a551264fd1e279659b3360e500fd5ce2a46",
+    "parentCommitShas": [
+      "34f50a551264fd1e279659b3360e500fd5ce2a46"
+    ],
+    "governedTreeSha": "54a09cce6f558d44fd7ab6374c382ed976a0096f",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0244.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0244.json",
+      "artifacts/generated/atm-plan3-closeback/summary.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-20-213.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-219.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-227.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-29-271.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-29-272.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker/parallel-admission/closure-observation.ts",
+      "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/parallel-admission-circuit-breaker.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e80e8c4deef33cb204724c446969c940fa7738adb643957394ae6c903b53f7ec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:70b6889ff6d67e4e81e81c1c4bb65767a5e014c012d61746449bb29169dc7cd1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:86a84c68c02886e9cf9014ef5484adb64140e71343513fcd359bf4c601e2f636",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cc0d2b68a950a467e1ff1684cf297168eafd24650930a689291c93317379c1bf",
+      "stderrSha256": "sha256:e7bd66577bd5cd0464a1c8101f8327eff4942b1d580c8c26080bb51e6a6d813f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json",
+    "node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T22:06:33.016Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0244.*",
+      ".atm/history/task-events/ATM-GOV-0244/**",
+      ".atm/history/tasks/ATM-GOV-0244.json",
+      "artifacts/generated/atm-plan3-closeback/**",
+      "artifacts/generated/atm-plan3-closeback/summary.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/broker/parallel-admission/closure-observation.ts",
+      "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/parallel-admission-circuit-breaker.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/parallel-admission/closure-observation.ts",
+      "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "tests/cli/parallel-admission-circuit-breaker.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0244.json",
+  "closedAt": "2026-07-29T22:06:33.017Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729214705-codex-git-series-captain-ATM-GOV-0244-606ea89d29",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f67f9ecbcf8a3328d4e588418208016e8b4c5694",
+    "taskMatchedFiles": [
+      "artifacts/generated/atm-plan3-closeback/summary.json"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
