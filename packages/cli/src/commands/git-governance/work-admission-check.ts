@@ -9,6 +9,7 @@ import {
   type WorkAdmissionTicket,
   type WorkAdmissionTicketDecision
 } from '../../../../core/src/broker/work-admission-ticket.ts';
+import { pathMatchesWriteScope } from '../../../../core/src/broker/write-scope-policy.ts';
 
 export interface WorkAdmissionGateResult {
   readonly decision: WorkAdmissionTicketDecision;
@@ -62,7 +63,7 @@ function issueFrameworkTempAdmissionTicket(input: Parameters<typeof evaluateWork
     candidate.workItemId === input.taskId
     && candidate.actorId === input.actorId
     && candidate.disposition === 'foreign-live'
-    && input.files.every((file) => candidate.files.some((scope) => file === scope || file.startsWith(`${scope.replace(/\*\*$/, '').replace(/\*$/, '')}`)))
+    && input.files.every((file) => candidate.files.some((scope) => pathMatchesWriteScope(file, scope)))
   );
   if (!lock || lock.ttlSeconds === null || lock.heartbeatAt === null) return null;
   const remainingSeconds = Math.max(1, Math.floor((Date.parse(lock.heartbeatAt) + lock.ttlSeconds * 1000 - nowMs) / 1000));

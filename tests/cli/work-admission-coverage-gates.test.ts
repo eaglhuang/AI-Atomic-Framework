@@ -60,14 +60,15 @@ try {
   assert.equal(rejected.receipt, null);
 
   const tempTaskId = 'ATM-FRAMEWORK-TEMP-gate-test';
+  const tempHeartbeatAt = new Date().toISOString();
   mkdirSync(path.join(root, '.atm', 'runtime', 'locks'), { recursive: true });
   writeFileSync(path.join(root, '.atm', 'runtime', 'locks', `${tempTaskId}.lock.json`), JSON.stringify({
-    workItemId: tempTaskId, actorId, heartbeatAt: '2026-07-29T13:00:00.000Z', ttlSeconds: 300,
+    workItemId: tempTaskId, actorId, heartbeatAt: tempHeartbeatAt, ttlSeconds: 300,
     files: ['packages/example.ts']
   }));
   const tempAccepted = evaluateWorkAdmissionGate({
     cwd: root, taskId: tempTaskId, actorId, operation: 'commit', files: ['packages/example.ts'],
-    producingAtmCommand: 'node atm.mjs git commit', now: '2026-07-29T13:01:00.000Z'
+    producingAtmCommand: 'node atm.mjs git commit', now: tempHeartbeatAt
   });
   assert.equal(tempAccepted.decision.code, 'ATM_WORK_ADMISSION_OK');
 
