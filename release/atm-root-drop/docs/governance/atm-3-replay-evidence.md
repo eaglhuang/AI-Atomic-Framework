@@ -93,3 +93,15 @@ Plan 3.1 dual-captain dashboard and run manifest:
   and that incomplete setup fails closed.
 - Focused receipt:
   - `node --strip-types tests/cli/plan3-dual-captain-dashboard.test.ts`
+
+Plan 3.1 dogfood surface A ticket observations:
+
+- ATM-GOV-0237 adds a read-only ticket-observation segment for the dashboard
+  view model. The segment exposes ticket generation, digest, queue position,
+  `waitedMs`, and release condition from canonical inputs without mutating
+  broker queues or task lifecycle state.
+- The zero-wait path is accepted only as a safe-compose observation where both
+  participants are selected for immediate execution. Queued fallback cells must
+  carry a positive event-derived wait and a release condition.
+- Focused receipt:
+  - `node --strip-types tests/cli/plan3-dashboard-ticket-observations.test.ts`

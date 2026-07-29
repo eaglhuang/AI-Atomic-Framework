@@ -8,6 +8,7 @@ import {
   type ReplayDashboardInput,
   type ReplayDashboardRunManifest
 } from '../../../../../core/src/broker/replay/dashboard.ts';
+import { summarizeTicketObservations } from './dashboard-ticket-observations.ts';
 
 export interface ReplayDashboardViewModelOptions {
   readonly cwd: string;
@@ -18,8 +19,21 @@ export interface ReplayDashboardViewModelOptions {
 
 export function buildReplayDashboardViewModel(options: ReplayDashboardViewModelOptions) {
   const input = buildReplayDashboardInput(options);
+  const ticketObservations = summarizeTicketObservations(input.participants.map((participant) => ({
+    participantId: participant.participantId,
+    taskId: participant.taskId ?? input.runId,
+    actorId: participant.actorId,
+    ticketId: participant.ticketDigest,
+    ticketGeneration: participant.ticketGeneration,
+    queuePosition: participant.queuedTaskIds && participant.queuedTaskIds.length > 0 ? 1 : 0,
+    waitedMs: participant.waitedMs,
+    state: participant.queuedTaskIds && participant.queuedTaskIds.length > 0 ? 'queued' : 'execute-now',
+    releaseCondition: participant.queuedTaskIds && participant.queuedTaskIds.length > 0 ? 'queue-head-release' : 'safe-compose-selected',
+    eventDigests: [participant.ticketDigest ?? ''].filter(Boolean)
+  })));
   return {
     snapshot: buildReplayDashboardSnapshot(input),
+    ticketObservations,
     human: null
   };
 }

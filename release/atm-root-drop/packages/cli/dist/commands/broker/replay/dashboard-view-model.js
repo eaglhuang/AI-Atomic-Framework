@@ -3,10 +3,24 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { buildReplayDashboardSnapshot, createReplayRunManifest } from '../../../../../core/dist/broker/replay/dashboard.js';
+import { summarizeTicketObservations } from './dashboard-ticket-observations.js';
 export function buildReplayDashboardViewModel(options) {
     const input = buildReplayDashboardInput(options);
+    const ticketObservations = summarizeTicketObservations(input.participants.map((participant) => ({
+        participantId: participant.participantId,
+        taskId: participant.taskId ?? input.runId,
+        actorId: participant.actorId,
+        ticketId: participant.ticketDigest,
+        ticketGeneration: participant.ticketGeneration,
+        queuePosition: participant.queuedTaskIds && participant.queuedTaskIds.length > 0 ? 1 : 0,
+        waitedMs: participant.waitedMs,
+        state: participant.queuedTaskIds && participant.queuedTaskIds.length > 0 ? 'queued' : 'execute-now',
+        releaseCondition: participant.queuedTaskIds && participant.queuedTaskIds.length > 0 ? 'queue-head-release' : 'safe-compose-selected',
+        eventDigests: [participant.ticketDigest ?? ''].filter(Boolean)
+    })));
     return {
         snapshot: buildReplayDashboardSnapshot(input),
+        ticketObservations,
         human: null
     };
 }
