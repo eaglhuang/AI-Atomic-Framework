@@ -107,7 +107,7 @@ export function authorizeGitIndexOverrideLease(input: {
 }): GitIndexOverrideLeaseAuthorization {
   const leaseId = String(input.leaseId ?? '').trim();
   if (!leaseId) {
-    return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_REQUIRED', summary: 'Foreign active staged entries require an explicit --stage-override-lease.' };
+    return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_REQUIRED', summary: 'Foreign protected staged entries require an explicit --stage-override-lease.' };
   }
   const leasePath = path.join(input.cwd, '.atm', 'runtime', 'git-index-leases', `${leaseId}.json`);
   if (!existsSync(leasePath)) {
@@ -131,7 +131,13 @@ export function authorizeGitIndexOverrideLease(input: {
   if (!Number.isFinite(Date.parse(lease.expiresAt)) || Date.parse(lease.expiresAt) <= Date.now()) {
     return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_EXPIRED', summary: `Stage override lease ${leaseId} has expired.` };
   }
-  const liveEntries = input.report.foreignActiveStaged;
+  // A released task's staged governance bundle remains protected until its
+  // owner commits or explicitly discards it. The capability is content-bound,
+  // so active and released foreign entries share the same authorization rule.
+  const liveEntries = input.report.entries.filter((entry) =>
+    entry.ownership === 'foreign-active-owned'
+    || entry.ownership === 'foreign-released-or-abandoned'
+  );
   const expected = uniqueSorted((lease.stagedEntries ?? []).map((entry) => `${entry.stagedMode}:${entry.stagedBlobId}:${entry.path}`));
   const actual = uniqueSorted(liveEntries.map((entry) => `${entry.stagedMode ?? 'missing'}:${entry.stagedBlobId ?? 'missing'}:${entry.path}`));
   const paths = uniqueSorted(lease.paths ?? []);
