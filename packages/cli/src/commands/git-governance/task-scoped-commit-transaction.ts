@@ -55,9 +55,11 @@ export function executeTaskScopedCommitTransaction<T>(
 
   let value: T | undefined;
   let commitError: unknown = null;
+  let commitFailed = false;
   try {
     value = ports.commitCurrentTaskBundle();
   } catch (error) {
+    commitFailed = true;
     commitError = error;
   }
 
@@ -68,6 +70,6 @@ export function executeTaskScopedCommitTransaction<T>(
     throw new TaskScopedCommitTransactionError({ commitError, restoreError });
   }
 
-  if (commitError) throw commitError;
+  if (commitFailed) throw commitError;
   return { value: value as T, restoredEntries: entries };
 }

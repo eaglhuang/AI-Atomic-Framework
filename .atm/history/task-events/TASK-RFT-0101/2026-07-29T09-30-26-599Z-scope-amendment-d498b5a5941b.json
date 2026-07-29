@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T09-30-26-599Z-scope-amendment-d498b5a5941b",
+  "taskId": "TASK-RFT-0101",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0101.json",
+  "taskSha256": "sha256:6259d41c7773e57c8463a41ea8346ddec68bc6918c2c5102cd08f26c36000a3b",
+  "createdAt": "2026-07-29T09:30:26.599Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0101 --actor codex-git-series-captain --add packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts --reason \"Extend RFT-0101 pre-commit transaction rehabilitation with generic broker-resolution dependency deferral for task-scoped commit temp-index transactions.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Extend RFT-0101 pre-commit transaction rehabilitation with generic broker-resolution dependency deferral for task-scoped commit temp-index transactions."
+  }
+}

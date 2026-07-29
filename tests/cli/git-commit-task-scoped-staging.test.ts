@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { resolveTaskScopedCommitBundle, runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
-import { inspectGitIndexOwnership } from '../../packages/cli/src/commands/git-index-ownership.ts';
+import { createBrokerConflictResolutionArtifact } from '../../packages/core/src/team-runtime/permission-broker.ts';
 import {
   assertBranchCommitQueueSchema,
   createFixtureRepository,
@@ -11,6 +11,7 @@ import {
   tempDir,
   writeJson
 } from './git-commit-task-scoped-staging/fixture.ts';
+import { runIndexLeaseTransactionScenarios } from './git-commit-task-scoped-staging/index-lease-transaction-scenarios.ts';
 
 try {
   const { taskId, foreignTaskId, foreignActiveTaskId, scopedFile, sessionId, taskDocument } = await createFixtureRepository();
@@ -233,20 +234,87 @@ try {
   const foreignEvidence = `.atm/history/evidence/${foreignTaskId}.json`;
   writeJson(path.join(tempDir, foreignEvidence), { taskId: foreignTaskId, evidence: [] });
   runGit(tempDir, ['add', foreignEvidence]);
-  const foreignIsolatedCommit = await runAtmGit([
+  await expectCliError(
+    runAtmGit([
+      'commit',
+      '--cwd', tempDir,
+      '--actor', 'fixture-agent',
+      '--task', taskId,
+      '--session', sessionId,
+      '--message', 'feat: foreign staged bundle',
+      '--auto-stage',
+      '--defer-foreign-staged',
+      '--json'
+    ]),
+    'ATM_GIT_COMMIT_PROTECTED_FOREIGN_STAGED_OWNERSHIP'
+  );
+  assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(foreignEvidence), true);
+
+  const brokerResolutionPath = '.atm/runtime/broker-conflict-resolutions/dry-run-parity.json';
+  writeJson(
+    path.join(tempDir, brokerResolutionPath),
+    createBrokerConflictResolutionArtifact({
+      primaryTaskId: taskId,
+      conflictingTaskIds: [foreignTaskId],
+      sharedPaths: [foreignEvidence],
+      conflictFiles: [foreignEvidence],
+      decisionReason: 'Authorize the current task to defer the complete foreign bundle during its scoped commit.'
+    })
+  );
+  const brokerAuthorizedDryRun = await runAtmGit([
     'commit',
     '--cwd', tempDir,
     '--actor', 'fixture-agent',
     '--task', taskId,
     '--session', sessionId,
-    '--message', 'feat: foreign staged bundle',
+    '--message', 'feat: broker-authorized foreign staged dry-run',
     '--auto-stage',
+    '--defer-foreign-staged',
+    '--broker-conflict-resolution', brokerResolutionPath,
+    '--dry-run',
     '--json'
   ]);
-  assert.equal(foreignIsolatedCommit.ok, true);
-  assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(foreignEvidence), false);
+  assert.equal(brokerAuthorizedDryRun.ok, true, 'Broker-authorized dry-run must model the protected defer without mutating the index');
+  assert.equal((brokerAuthorizedDryRun.evidence as any).commitBundle.deferredForeignStagedSnapshot, null);
   assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(foreignEvidence), true);
+
+  const brokerAuthorizedCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: broker-authorized foreign staged commit',
+    '--auto-stage',
+    '--defer-foreign-staged',
+    '--broker-conflict-resolution', brokerResolutionPath,
+    '--json'
+  ]);
+  assert.equal(brokerAuthorizedCommit.ok, true);
+  assert.ok(
+    (brokerAuthorizedCommit.evidence as any).deferredForeignStagedSnapshotPath,
+    'Broker-authorized commit must carry its deferred snapshot through execution'
+  );
+  assert.equal(
+    ((brokerAuthorizedCommit.evidence as any).restoredDeferredForeignStagedFiles as string[]).includes(foreignEvidence),
+    true,
+    'Commit execution must finalize the deferred foreign snapshot'
+  );
+  assert.equal(runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']).includes(foreignEvidence), false);
+  assert.equal(
+    runGit(tempDir, ['diff', '--cached', '--name-only']).includes(foreignEvidence),
+    true,
+    'Broker-deferred foreign entries must be restored to the live index after commit'
+  );
+
   runGit(tempDir, ['restore', '--staged', '--', foreignEvidence]);
+  rmSync(path.join(tempDir, foreignEvidence), { force: true });
+  const brokerForeignBundleManifest = `.atm/history/evidence/${foreignTaskId}.bundle-manifest.json`;
+  if (runGit(tempDir, ['diff', '--cached', '--name-only']).includes(brokerForeignBundleManifest)) {
+    runGit(tempDir, ['restore', '--staged', '--', brokerForeignBundleManifest]);
+  }
+  rmSync(path.join(tempDir, brokerForeignBundleManifest), { force: true });
+  writeJson(path.join(tempDir, foreignEvidence), { taskId: foreignTaskId, evidence: [] });
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "ordinary-unowned-staged";\n', 'utf8');
   const ordinaryUnownedStagedFile = 'packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts';
@@ -341,6 +409,9 @@ try {
   assert.equal(deferredGovernanceHead.includes(foreignClosurePacket), false, 'foreign closure packet must stay out of the current commit');
   assert.equal(deferredGovernanceHead.includes(foreignTaskEvent), false, 'foreign close event must stay out of the current commit');
   assert.equal(existsSync(path.join(tempDir, foreignBundleManifest)), true, 'deferred foreign governance files must remain available for the owning task');
+  if (runGit(tempDir, ['diff', '--cached', '--name-only']).includes(foreignBundleManifest)) {
+    runGit(tempDir, ['restore', '--staged', '--', foreignBundleManifest]);
+  }
   rmSync(path.join(tempDir, foreignBundleManifest), { force: true });
   rmSync(path.join(tempDir, foreignClosurePacket), { force: true });
   rmSync(path.join(tempDir, foreignTaskEvent), { force: true });
@@ -366,6 +437,9 @@ try {
     deferredDirtyGovernanceBundle.governanceBundleWarnings.some((entry) => entry.includes('Deferred foreign generated governance residue')),
     'deferrable dirty foreign governance residue must leave an explicit warning'
   );
+  if (runGit(tempDir, ['diff', '--cached', '--name-only']).includes(foreignBundleManifest)) {
+    runGit(tempDir, ['restore', '--staged', '--', foreignBundleManifest]);
+  }
   rmSync(path.join(tempDir, foreignBundleManifest), { force: true });
   rmSync(path.join(tempDir, foreignClosurePacket), { force: true });
   rmSync(path.join(tempDir, foreignTaskEvent), { force: true });
@@ -383,8 +457,10 @@ try {
     '--auto-stage',
     '--json'
   ]);
-  assert.equal(safeResidueCommit.ok, true);
-  assert.equal(readFileSync(gitHeadResiduePath, 'utf8').includes('{"fixture":true}'), false, 'safe generated git-head residue must be replaced before commit completes');
+  assert.equal(safeResidueCommit.ok, true, JSON.stringify(safeResidueCommit.messages));
+  const staleGitHeadResidueRemains = existsSync(gitHeadResiduePath)
+    && readFileSync(gitHeadResiduePath, 'utf8').includes('{"fixture":true}');
+  assert.equal(staleGitHeadResidueRemains, false, 'safe generated git-head residue must be removed or replaced before commit completes');
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "residue-blocked";\n', 'utf8');
   const foreignResiduePath = path.join(tempDir, '.atm/runtime/snapshots/foreign-staged-TASK-OTHER-9999-1781880000000.json');
@@ -446,122 +522,30 @@ try {
   const unrelatedStagedFile = 'src/unrelated.ts';
   writeFileSync(path.join(tempDir, unrelatedStagedFile), 'export const unrelated = true;\n', 'utf8');
   runGit(tempDir, ['add', unrelatedStagedFile]);
-  const isolatedCommit = await runAtmGit([
-    'commit',
-    '--cwd', tempDir,
-    '--actor', 'fixture-agent',
-    '--task', taskId,
-    '--session', sessionId,
-    '--message', 'feat: isolated task bundle commit',
-    '--auto-stage',
-    '--json'
-  ]);
-  assert.equal(isolatedCommit.ok, true);
-  assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(scopedFile), true);
-  assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(unrelatedStagedFile), false);
+  await expectCliError(
+    runAtmGit([
+      'commit',
+      '--cwd', tempDir,
+      '--actor', 'fixture-agent',
+      '--task', taskId,
+      '--session', sessionId,
+      '--message', 'feat: isolated task bundle commit',
+      '--auto-stage',
+      '--defer-foreign-staged',
+      '--json'
+    ]),
+    'ATM_INDEX_FOREIGN_ACTIVE_STAGED'
+  );
   assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(unrelatedStagedFile), true);
 
   runGit(tempDir, ['restore', '--staged', '--', unrelatedStagedFile]);
-  const foreignActiveFile = 'src/foreign-active.ts';
-  mkdirSync(path.join(tempDir, path.dirname(foreignActiveFile)), { recursive: true });
-  writeFileSync(path.join(tempDir, foreignActiveFile), 'export const foreignActive = true;\n', 'utf8');
-  writeJson(path.join(tempDir, `.atm/history/tasks/${foreignActiveTaskId}.json`), {
-    schemaVersion: 'atm.workItem.v0.2',
-    workItemId: foreignActiveTaskId,
-    status: 'running',
-    claim: {
-      actorId: 'other-agent',
-      leaseId: 'lease-foreign-active',
-      state: 'active',
-      files: [foreignActiveFile]
-    }
-  });
-  writeJson(path.join(tempDir, `.atm/runtime/locks/${foreignActiveTaskId}.lock.json`), {
-    schemaId: 'atm.governanceScopeLock',
-    specVersion: '0.1.0',
-    workItemId: foreignActiveTaskId,
-    lockedBy: 'other-agent',
-    actorId: 'other-agent',
-    leaseId: 'lease-foreign-active',
-    lockedAt: '2026-06-18T00:00:00.000Z',
-    heartbeatAt: '2026-06-18T00:00:00.000Z',
-    ttlSeconds: 999999999,
-    status: 'active',
-    files: [foreignActiveFile],
-    taskDirectionLock: {
-      schemaId: 'atm.taskDirectionLock.v1',
-      specVersion: '0.1.0',
-      taskId: foreignActiveTaskId,
-      batchId: null,
-      scopeKey: null,
-      queueId: null,
-      queueIndex: null,
-      allowedFiles: [foreignActiveFile],
-      planningReadOnlyPaths: [],
-      planningMirrorPaths: [],
-      allowPlanningMirror: false,
-      promptHash: null,
-      actorId: 'other-agent',
-      sessionId: 'session-foreign-active',
-      createdAt: '2026-06-18T00:00:00.000Z',
-      status: 'active'
-    }
-  });
-  writeJson(path.join(tempDir, '.atm/runtime/sessions/session-foreign-active.json'), {
-    schemaId: 'atm.actorWorkSession.v1',
-    specVersion: '0.1.0',
-    sessionId: 'session-foreign-active',
-    actorId: 'other-agent',
-    taskId: foreignActiveTaskId,
-    claimLeaseId: 'lease-foreign-active',
-    status: 'active',
-    createdAt: '2026-06-18T00:00:00.000Z',
-    updatedAt: '2026-06-18T00:00:00.000Z',
-    heartbeatAt: '2026-06-18T00:00:00.000Z',
-    taskPath: `.atm/history/tasks/${foreignActiveTaskId}.json`,
-    sourcePrompt: null,
-    batchId: null,
-    guidanceSessionId: null,
-    editor: 'codex',
-    gitName: 'Other Agent',
-    gitEmail: 'other-agent@example.invalid'
-  });
-  runGit(tempDir, ['add', foreignActiveFile]);
-  const ownership = inspectGitIndexOwnership({ cwd: tempDir, taskId, stagedFiles: [foreignActiveFile] });
-  assert.equal(ownership.indexLane.status, 'blocked-foreign-active-staged');
-  assert.equal(ownership.foreignActiveStaged[0]?.ownerTaskId, foreignActiveTaskId);
-  assert.equal(ownership.foreignActiveStaged[0]?.ownerActorId, 'other-agent');
-  assert.equal(ownership.foreignActiveStaged[0]?.ownerSessionId, 'session-foreign-active');
-  assert.equal(ownership.indexLane.ownerSessionId, 'session-foreign-active');
-  const foreignActiveBundle = resolveTaskScopedCommitBundle({
-    cwd: tempDir,
+  await runIndexLeaseTransactionScenarios({
     taskId,
-    taskDocument,
-    apply: false,
-    autoStage: false,
-    deferForeignStaged: true,
-    message: 'feat: refuse foreign active defer',
-    actorId: 'fixture-agent',
-    trailers: []
+    foreignActiveTaskId,
+    scopedFile,
+    sessionId,
+    taskDocument
   });
-  assert.equal(foreignActiveBundle.ok, false);
-  assert.equal(foreignActiveBundle.blockedCode, 'ATM_INDEX_FOREIGN_ACTIVE_STAGED');
-  assert.equal(foreignActiveBundle.gitIndexOwnership.indexLane.status, 'blocked-foreign-active-staged');
-  assert.equal(foreignActiveBundle.gitIndexOwnership.indexLane.ownerSessionId, 'session-foreign-active');
-  const stageOverrideLease = await runAtmGit([
-    'lease',
-    'stage-override',
-    '--cwd', tempDir,
-    '--actor', 'fixture-agent',
-    '--task', taskId,
-    '--paths', foreignActiveFile,
-    '--reason', 'Human approved fixture-only staged index lease.',
-    '--json'
-  ]) as any;
-  assert.equal(stageOverrideLease.ok, true);
-  assert.equal(stageOverrideLease.evidence.lease.chatTextAccepted, false);
-  assert.equal(stageOverrideLease.evidence.lease.kind, 'stage-override');
-  assert.equal(existsSync(path.join(tempDir, stageOverrideLease.evidence.leasePath)), true);
 
   console.log('[git-commit-task-scoped-staging] ok');
 } finally {

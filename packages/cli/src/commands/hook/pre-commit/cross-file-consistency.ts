@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 import { quoteCliValue, relativePathFrom } from '../../shared.ts';
@@ -132,7 +132,11 @@ export function checkStageTimeCrossFileConsistency(input: {
           }
         }
 
-        if (missingSymbols.length > 0 && !isBrokerResolutionAuthorizedDependencyDeferral(root, resolvedFile)) {
+        if (
+          missingSymbols.length > 0 &&
+          stagedImporterTouchesImport(root, stagedFile, imp.path, imp.symbols) &&
+          !isBrokerResolutionAuthorizedDependencyDeferral(root, resolvedFile)
+        ) {
           findings.push({
             code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
             source: 'cross-file-consistency',
@@ -148,6 +152,72 @@ export function checkStageTimeCrossFileConsistency(input: {
   }
 
   return findings;
+}
+
+export function buildBrokerResolutionDependencyDeferral(root: string, currentTaskId: string | null, resolutionPath: string | null | undefined) {
+  const normalizedTaskId = normalizeTaskId(currentTaskId);
+  const resolutions = readBrokerConflictResolutions(root, resolutionPath);
+  const sharedPaths = new Set<string>();
+  for (const resolution of resolutions) {
+    if (normalizeTaskId(resolution.currentAllowedTaskId) !== normalizedTaskId) continue;
+    for (const entry of readStringArray(resolution.sharedPaths)) {
+      sharedPaths.add(normalizeRelativePath(entry));
+    }
+  }
+  return (_cwd: string, dependencyPath: string) => {
+    if (!normalizedTaskId) return false;
+    return sharedPaths.has(normalizeRelativePath(dependencyPath));
+  };
+}
+
+function stagedImporterTouchesImport(root: string, stagedFile: string, importPath: string, symbols: readonly string[]): boolean {
+  const diffLines = runGitLines(root, ['diff', '--cached', '--', stagedFile]);
+  if (diffLines.length === 0) return true;
+  const importNeedles = [importPath, ...symbols.filter((symbol) => symbol !== '*')];
+  return diffLines.some((line) => {
+    if (!(line.startsWith('+') || line.startsWith('-')) || line.startsWith('+++') || line.startsWith('---')) return false;
+    return importNeedles.some((needle) => needle.length > 0 && line.includes(needle));
+  });
+}
+
+function readBrokerConflictResolution(root: string, resolutionPath: string | null | undefined): Record<string, unknown> | null {
+  const normalized = normalizeRelativePath(String(resolutionPath ?? '').trim());
+  if (!normalized) return null;
+  const absolutePath = path.isAbsolute(normalized) ? normalized : path.join(root, normalized);
+  try {
+    const parsed = JSON.parse(readFileSync(absolutePath, 'utf8')) as Record<string, unknown>;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function readBrokerConflictResolutions(root: string, resolutionPath: string | null | undefined): Record<string, unknown>[] {
+  const keyed = new Map<string, Record<string, unknown>>();
+  const add = (candidatePath: string | null | undefined) => {
+    const resolution = readBrokerConflictResolution(root, candidatePath);
+    if (!resolution) return;
+    const key = typeof resolution.resolutionId === 'string' ? resolution.resolutionId : String(candidatePath ?? keyed.size);
+    keyed.set(key, resolution);
+  };
+  add(resolutionPath);
+  const dir = path.join(root, '.atm', 'runtime', 'broker-conflict-resolutions');
+  try {
+    for (const entry of readdirSync(dir)) {
+      if (entry.endsWith('.json')) add(path.join(dir, entry));
+    }
+  } catch {
+    // Missing broker-resolution runtime state simply means no deferral authority.
+  }
+  return [...keyed.values()];
+}
+
+function readStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0) : [];
+}
+
+function normalizeTaskId(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim().toUpperCase() : null;
 }
 
 

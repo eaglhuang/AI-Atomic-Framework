@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T03-41-55-695Z-scope-amendment-728ca2222241",
+  "taskId": "TASK-RFT-0101",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0101.json",
+  "taskSha256": "sha256:fa07a42c759a34e3441f57d5c36db5f1616d7fe371bf31a229c532a8de32977f",
+  "createdAt": "2026-07-29T03:41:55.695Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0101 --actor codex-git-series-captain --add \"packages/cli/src/commands/git-governance/implementation/**,atomic_workbench/atomization-coverage/path-to-atom-map.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T09-14-14-883Z-scope-amendment-efffa6c4268b",
+  "taskId": "TASK-RFT-0101",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0101.json",
+  "taskSha256": "sha256:c6b4d7d64c3de38cc70461aa2cd74009e6619d667baf62a8a5738ce1cc72dc3c",
+  "createdAt": "2026-07-29T09:14:14.883Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0101 --actor codex-git-series-captain --add \"packages/cli/src/commands/git-governance/commit-scope-policy.ts,tests/cli/git-commit-staged-line-budget-isolation.test.ts\" --reason \"Extend RFT-0101 git-governance transaction rehabilitation to fix touched physical-line gate so oversized facade shrink/refactor commits are not blocked by deleted-line churn while new oversized candidates remain blocked.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Extend RFT-0101 git-governance transaction rehabilitation to fix touched physical-line gate so oversized facade shrink/refactor commits are not blocked by deleted-line churn while new oversized candidates remain blocked."
+  }
+}

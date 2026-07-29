@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T09-42-54-693Z-scope-amendment-94f38bbd7629",
+  "taskId": "TASK-RFT-0101",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0101.json",
+  "taskSha256": "sha256:9341517de08609b07229b5702b150a8b7896723e8a4ec046dd61cb6b4cb7fba8",
+  "createdAt": "2026-07-29T09:42:54.693Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0101 --actor codex-git-series-captain --add packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts --reason \"Add generic commit-time framework lock context filter for pre-commit without task-id-specific special cases.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add generic commit-time framework lock context filter for pre-commit without task-id-specific special cases."
+  }
+}

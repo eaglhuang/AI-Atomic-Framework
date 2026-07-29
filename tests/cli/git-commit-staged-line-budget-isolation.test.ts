@@ -72,4 +72,24 @@ const largeBase = Array.from({ length: 700 }, (_, index) => `export const line${
   }
 }
 
+{
+  const repo = initRepo();
+  try {
+    writeTracked(repo, 'packages/cli/src/facade.ts', largeBase);
+    writeFileSync(path.join(repo, 'packages/cli/src/facade.ts'), 'export { facade } from "./facade/implementation";\n', 'utf8');
+    execFileSync('git', ['add', 'packages/cli/src/facade.ts'], { cwd: repo, stdio: 'ignore' });
+
+    const report = inspectTouchedPhysicalLineBudget(repo, ['packages/cli/src/facade.ts'], {
+      taskId: 'TASK-CANDIDATE',
+      actorId: 'codex',
+      gate: 'git-commit'
+    });
+
+    assert(report.ok, 'shrinking an oversized source file into a small facade must not fail closed on deleted-line churn');
+    assert(report.topFile?.lines === 1, `expected final facade line count 1, got ${report.topFile?.lines}`);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+}
+
 console.log('[git-commit-staged-line-budget-isolation.test] ok');

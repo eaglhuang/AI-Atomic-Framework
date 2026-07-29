@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T09-05-45-528Z-scope-amendment-14bf7e9417f5",
+  "taskId": "TASK-RFT-0101",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0101.json",
+  "taskSha256": "sha256:4837072e0f6ed0feb664a70d65b2bb84d4902adbaf33fa87e8d0a08be047be89",
+  "createdAt": "2026-07-29T09:05:45.528Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0101 --actor codex-git-series-captain --add packages/cli/src/commands/hook/pre-commit/implementation.ts --reason \"Add linked hook repair required to let governed RFT commit use scoped framework validation instead of repo-wide line-budget recheck.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add linked hook repair required to let governed RFT commit use scoped framework validation instead of repo-wide line-budget recheck."
+  }
+}
