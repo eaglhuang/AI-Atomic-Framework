@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-253",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Batch checkpoint atomicity",
+  "finding": "A source-first `batch checkpoint` invocation can mutate the queue-head task close state and stage close artifacts, then fail later when the batch runner tries to auto-claim the next task through a source-first lifecycle write guard. The command is therefore not atomic from the operator's perspective.",
+  "expectedBehavior": "Batch checkpoint should either preflight all post-close lifecycle writes before mutating the queue head, or complete the close and stop with a deliberate checkpoint-complete/next-claim-deferred result. It must not leave operators to infer whether the close succeeded after a later source-first refusal.",
+  "evidenceOrRepro": "After the batch checkpoint repair was tested through `node atm.dev.mjs`, TASK-GIT-0026 was closed and close artifacts were staged, but the command returned `ATM_SOURCE_FIRST_WRITE_REFUSED` while trying to continue to the next claim. The close bundle then had to be committed separately.",
+  "followUp": "Add transaction boundaries or a two-phase checkpoint result for close-then-next-claim. Include source-first runner tests proving no partial mutation occurs unless the result explicitly reports the committed sub-step."
+}

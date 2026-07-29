@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-254",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Framework temp claim commit surface",
+  "finding": "Framework temp claims can safely acquire scoped locks and produce runner-sync receipts, but the governed commit and hook evidence classifiers still assume a normal task ledger. This forces emergency native Git for framework-temp source or release-artifact bundles when no `.atm/history/tasks/<temp-id>.json` exists.",
+  "expectedBehavior": "Framework temp work should have a governed commit surface and protected evidence context that can bind to the framework-temp claim or runner-sync steward record without inventing a task ledger. Hook bypass should not be required for exact scoped runner-sync receipts.",
+  "evidenceOrRepro": "The batch checkpoint repair used framework temp claim `ATM-FRAMEWORK-TEMP-codex-git-series-captain`. `node atm.mjs git commit --task ATM-FRAMEWORK-TEMP-...` had no task ledger route, and the pre-commit hook rejected the runner-sync receipt with `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT`, requiring emergency lease `EMG-ATM-FRAMEWORK-TEMP-codex-git-series-captain-1d7c8d5e8c` plus `git commit --no-verify`.",
+  "followUp": "Design a framework-temp commit candidate or claim-backed evidence context. Add tests for source-only temp claims, runner-sync release bundles, protected evidence classification, and no-verify-free governed commits."
+}
