@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T21-20-23-927Z-scope-amendment-c30ed0616ccb",
+  "taskId": "ATM-GOV-0243",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0243.json",
+  "taskSha256": "sha256:9cdee3ac8023bc90a72d413b6d46e1afc99473832896accd9396cb2f963f7be5",
+  "createdAt": "2026-07-29T21:20:23.927Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0243 --actor codex-git-series-captain --add scripts/plan-performance-report-v4.ts --reason \"Linked benchmark report builder/types are imported by the declared runner and must evolve with the ATM-GOV-0243 AB/BA evidence contract.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Linked benchmark report builder/types are imported by the declared runner and must evolve with the ATM-GOV-0243 AB/BA evidence contract."
+  }
+}

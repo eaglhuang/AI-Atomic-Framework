@@ -1,0 +1,313 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0243",
+  "title": "Matched AB BA governed workload benchmark",
+  "status": "running",
+  "milestone": "ATM-3.1-R3",
+  "dependencies": [
+    "ATM-GOV-0240",
+    "ATM-GOV-0241",
+    "ATM-GOV-0246",
+    "ATM-GOV-0242",
+    "ATM-GOV-0261"
+  ],
+  "acceptance": [
+    "Queue-only and compose-first arms use identical same-file/bounded-intent workload manifests; only policy mode and AB/BA execution order differ. Neither arm may remove the declared intersection or use a different worktree.",
+    "Queue-only is produced by the policy CLI trip/reset path, not by another build or a label.",
+    "Queue-only and compose-first execute the same workload adapter and the same compose/steward/shared-delivery implementation; the policy trip is the only behavioral switch and a locked call-path digest proves neither arm selects an alternate serial implementation.",
+    "The compose-first arm records both proposals in one mutation batch, serializability proof, steward-only apply, one shared commit, and complete member attribution; path-only locking or detached-worktree isolation invalidates the cell.",
+    "Both arms run the same sealed semantic validator union against the exact candidate/output they intend to deliver. A failed, unavailable, inconclusive, stale, or digest-mismatched validation invalidates the cell and contributes no performance sample.",
+    "The benchmark includes the locked serializable-but-semantically-broken negative control and proves it is rejected before canonical write in both policy modes; performance cannot be measured by bypassing correctness.",
+    "AB and BA each have at least three valid repeats per accepted comparison cell.",
+    "Before AB/BA measurement, a pre-sealed A/A null-control cell runs the same arm twice under the same workload, base, build, runner, validator union, and timing segmentation. Its paired dispersion is derived from command/event receipts rather than caller-provided constants.",
+    "The report includes median and a predeclared dispersion statistic such as IQR for A/A and AB/BA. A claimed improvement must meet the existing 25% threshold and exceed the sealed A/A noise bound; an effect inside that bound is `inconclusive`, never pass.",
+    "Makespan, active throughput, production cost, compose admission rate, steward apply latency, shared-commit count, correctness, queue residency, and starvation derive from the same command/event receipts.",
+    "Timing is split into proposal generation, proposal validation, compose planning, steward apply, and shared commit. Report proposal/validation overlap separately from the serialized steward tail; no claim may describe physical canonical writes as parallel.",
+    "Runner/build timing uses the same paired interface for full, incremental, and cache decisions with phase attribution and confidence/noise labels; an `incrementalBuild` decision is not reported as a speedup when matched evidence is slower (`ATM-BUG-2026-07-20-210`).",
+    "Arm-specific delay constants, fixed cost ratios, cosmetic scale/contention fields, and prefilled zero counters cannot influence the verdict.",
+    "Provider, task id, arm name, or scenario label cannot select delays, costs, success paths, or other result-shaping control flow (`INV-ATM-009`).",
+    "Missing pairs, receipt loss, build drift, or insufficient samples return `inconclusive`.",
+    "The read-only dashboard exposes every accepted/rejected paired cell and its canonical receipt digests without mutating benchmark state."
+  ],
+  "deliverables": [
+    "scripts/run-paired-ab-v4.ts",
+    "scripts/paired-ab-v4-cell-workload.ts",
+    "tests/performance/atm-3-paired-queue-compose.test.ts",
+    "artifacts/generated/atm-ab-v4/summary.json",
+    "artifacts/generated/atm-ab-v4/cells.json",
+    "docs/reports/atm-2-1-paired-ab-v4.md"
+  ],
+  "scopePaths": [
+    "scripts/run-paired-ab-v4.ts",
+    "scripts/paired-ab-v4-cell-workload.ts",
+    "tests/performance/atm-3-paired-queue-compose.test.ts",
+    "artifacts/generated/atm-ab-v4/**",
+    "docs/reports/atm-2-1-paired-ab-v4.md"
+  ],
+  "validators": [
+    "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts",
+    "node --strip-types scripts/run-paired-ab-v4.ts --mode command-backed",
+    "node --strip-types scripts/run-paired-ab-v4.ts --mode validate",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "matched-ab-ba-command-event-receipts",
+  "rollbackStrategy": "revert-commit-and-trip-queue-only",
+  "rollbackNotes": "Retain invalidated benchmark artifacts as non-closure history.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.performance.paired-ab",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.performance.governed-workload",
+        "pattern": "Workload Adapter",
+        "source": "scripts/paired-ab-v4-cell-workload.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0243-matched-ab-ba-governed-workload-benchmark.task.md",
+    "sectionTitle": "ATM-GOV-0243",
+    "headingLine": 71,
+    "hash": "3a2c53579e290123",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0243-matched-ab-ba-governed-workload-benchmark.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:3a2c53579e29012340eba54234c5f110b003de83c5a03b4ad494538672872fa3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T21:18:50.385Z"
+    }
+  },
+  "importedAt": "2026-07-29T21:18:50.385Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.performance.atm.3.paired.queue.compose.test.ts",
+      "command": "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.run.paired.ab.v4.ts.mode.command.backed",
+      "command": "node --strip-types scripts/run-paired-ab-v4.ts --mode command-backed",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.run.paired.ab.v4.ts.mode.validate",
+      "command": "node --strip-types scripts/run-paired-ab-v4.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T21-38-35-461Z-renew-8ffb8b16b6b9",
+  "lastTransitionAt": "2026-07-29T21:38:35.461Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T21:19:06.446Z",
+  "promotedAt": "2026-07-29T21:19:06.451Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-20d12cff97c4",
+    "claimedAt": "2026-07-29T21:19:06.457Z",
+    "heartbeatAt": "2026-07-29T21:38:34.441Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0243.*",
+      ".atm/history/task-events/ATM-GOV-0243/**",
+      ".atm/history/tasks/ATM-GOV-0243.json",
+      "artifacts/generated/atm-ab-v4/**",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "scripts/paired-ab-v4-cell-workload.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260729211907-codex-git-series-captain-49242903e2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729211907-codex-git-series-captain-49242903e2\""
+    }
+  },
+  "startedAt": "2026-07-29T21:19:06.457Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-437971c4fd3ac587",
+    "ticketDigest": "sha256:437971c4fd3ac58777188443909b79270214b9e4aba56e0f9256d91c3173dba4",
+    "taskId": "ATM-GOV-0243",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729211907-codex-git-series-captain-49242903e2",
+    "claimGeneration": "lease-20d12cff97c4",
+    "issuedAt": "2026-07-29T21:38:34.441Z",
+    "expiresAt": "2026-07-29T22:08:34.441Z",
+    "scopeDigest": "sha256:82313a4da862cee73b21f681e9aa26dd9b2dbba502983933a9df10bc751c4e20",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T21:38:34.441Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0243.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0243/**",
+          ".atm/history/tasks/ATM-GOV-0243.json",
+          "artifacts/generated/atm-ab-v4/**",
+          "docs/reports/atm-2-1-paired-ab-v4.md",
+          "scripts/paired-ab-v4-cell-workload.ts",
+          "scripts/plan-performance-report-v4.ts",
+          "scripts/run-paired-ab-v4.ts",
+          "tests/cli/paired-ab-v4-safety-controller.test.ts",
+          "tests/performance/atm-3-paired-queue-compose.test.ts"
+        ],
+        "digest": "sha256:209c677f9938d0552996367430841246f5649905f65a0ac8dec9053917fe3c13"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260729211906-codex-git-series-captain-ATM-GOV-0243-753175f4f8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0243",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0243.*",
+      ".atm/history/task-events/ATM-GOV-0243/**",
+      ".atm/history/tasks/ATM-GOV-0243.json",
+      "artifacts/generated/atm-ab-v4/**",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "scripts/paired-ab-v4-cell-workload.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0243-matched-ab-ba-governed-workload-benchmark.task.md",
+      "C:/Users/User/AI-Atomic-Framework/artifacts/generated/atm-ab-v4/**"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0243-matched-ab-ba-governed-workload-benchmark.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "3a1ab800b26e3e7ff31908511e873819e7f78d6a83f86e8a48db9f7dcf9a6d3b",
+    "actorId": "codex-git-series-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260729211907-codex-git-series-captain-49242903e2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729211907-codex-git-series-captain-49242903e2\""
+    },
+    "createdAt": "2026-07-29T21:19:20.269Z",
+    "status": "active"
+  }
+}

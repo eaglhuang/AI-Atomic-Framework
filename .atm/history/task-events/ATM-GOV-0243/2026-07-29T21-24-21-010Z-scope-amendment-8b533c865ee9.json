@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T21-24-21-010Z-scope-amendment-8b533c865ee9",
+  "taskId": "ATM-GOV-0243",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0243.json",
+  "taskSha256": "sha256:20ebef14be422d3a1a745d3084a1987a4761d091ebc193e5fc7e891c0abe7a98",
+  "createdAt": "2026-07-29T21:24:21.010Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0243 --actor codex-git-series-captain --add tests/cli/paired-ab-v4-safety-controller.test.ts --reason \"Linked legacy safety-controller test imports the paired AB v4 runner/report contract and must be updated with the ATM-GOV-0243 evidence shape.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Linked legacy safety-controller test imports the paired AB v4 runner/report contract and must be updated with the ATM-GOV-0243 evidence shape."
+  }
+}

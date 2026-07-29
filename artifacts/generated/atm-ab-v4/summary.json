@@ -1,14 +1,13 @@
 {
   "schemaId": "atm.pairedAbV4Summary.v1",
-  "taskId": "ATM-GOV-0224",
-  "generatedAt": "2026-07-21T16:17:39.391Z",
-  "cellCount": 420,
-  "requiredCellCount": 420,
+  "taskId": "ATM-GOV-0243",
+  "generatedAt": "2026-07-29T21:35:57.763Z",
+  "cellCount": 70,
+  "requiredCellCount": 70,
+  "acceptedCellCount": 70,
   "arms": [
-    "serial",
     "queue-only",
-    "atm-compose-first",
-    "isolated-git-branch-merge"
+    "atm-compose-first"
   ],
   "scales": [
     2,
@@ -26,36 +25,30 @@
     "noncommutative-cid",
     "generated-shared-surface"
   ],
-  "repeats": [
-    1,
-    2,
-    3
-  ],
+  "repeatsPerOrder": 3,
   "metrics": {
-    "medianMakespanImprovementPct": 40.8,
-    "activeThroughputImprovementPct": 62.3,
-    "productionCostRatio": 0.575,
+    "medianMakespanImprovementPct": 49.3,
+    "activeThroughputImprovementPct": 93,
+    "productionCostRatio": 1.006,
+    "aaNoiseBoundPct": 8.2,
     "coveragePct": 100
   },
+  "timingSegments": [
+    "proposalGenerationMs",
+    "proposalValidationMs",
+    "composePlanningMs",
+    "stewardApplyMs",
+    "sharedCommitMs"
+  ],
   "sideEffectCounts": {
     "silentOverwrite": 0,
     "escapedConflict": 0,
     "duplicateSideEffect": 0,
     "unresolvedStarvation": 0
   },
-  "safetyController": {
-    "verdict": "pass",
-    "fallbackMode": "queue-only",
-    "evidenceDigest": "sha256:de461aa49b08a478fef3409e0412038cbbcdb956cb61a5c919a356067f585118",
-    "resetEligible": true,
-    "blockers": []
-  },
-  "taskSummary": {
-    "taskId": "ATM-GOV-0224",
-    "window": "2026-07-20T18:00:00.000Z/2026-07-20T19:00:00.000Z",
-    "watermark": "atm-ab-v4-watermark-420-cells",
-    "cellCount": 420,
-    "sealedDigest": "sha256:136270476829cbd4efaf18b00c56fe5b0c265984f9cfefa8a9d0aa0ddea001d6"
+  "correctness": {
+    "negativeControlRejectedBeforeCanonicalWrite": true,
+    "canonicalWriteParallelismClaim": "serialized-steward-tail-only"
   },
   "artifacts": {
     "summaryPath": "artifacts/generated/atm-ab-v4/summary.json",
