@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T20-22-02-876Z-close-f4232c7d4404",
+  "taskId": "ATM-GOV-0246",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729200741-codex-git-series-captain-ATM-GOV-0246-2f95ce65d2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0246.json",
+  "taskSha256": "sha256:339d748b97493011e7016a0af8e729b0af33d3c9743fe4bcb06b25f6aee06941",
+  "createdAt": "2026-07-29T20:22:02.876Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0246 --actor codex-git-series-captain --status done --from-batch-checkpoint --batch batch-655d05340102",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-655d05340102",
+    "sessionId": "session-20260729200741-codex-git-series-captain-ATM-GOV-0246-2f95ce65d2",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0246.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan3-dual-captain-dashboard.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T20:22:02.863Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0246.*",
+        ".atm/history/task-events/ATM-GOV-0246/**",
+        ".atm/history/tasks/ATM-GOV-0246.json",
+        "docs/governance/atm-3-replay-evidence.md",
+        "packages/cli/src/commands/broker/replay-actions.ts",
+        "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+        "packages/cli/src/commands/broker/replay/dashboard.ts",
+        "packages/cli/src/commands/broker/replay/run-manifest.ts",
+        "packages/core/src/broker/replay/dashboard.ts",
+        "tests/cli/plan3-dual-captain-dashboard.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/replay-actions.ts",
+        "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+        "packages/cli/src/commands/broker/replay/dashboard.ts",
+        "packages/cli/src/commands/broker/replay/run-manifest.ts",
+        "packages/core/src/broker/replay/dashboard.ts",
+        "tests/cli/plan3-dual-captain-dashboard.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

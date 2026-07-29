@@ -1,0 +1,317 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0246",
+  "title": "Dual-captain dogfood dashboard and sealed run manifest",
+  "status": "done",
+  "milestone": "ATM-3.1-R2.5",
+  "dependencies": [
+    "ATM-GOV-0240",
+    "ATM-GOV-0241",
+    "ATM-GOV-0248",
+    "ATM-GOV-0249",
+    "ATM-GOV-0250",
+    "ATM-GOV-0254",
+    "ATM-GOV-0252",
+    "ATM-GOV-0263",
+    "ATM-GOV-0264",
+    "ATM-GOV-0265"
+  ],
+  "acceptance": [
+    "A pre-run manifest seals run id, participant cards, provider/role scenario data, runtime-assigned actors, PID/process expectations, canonical worktree root, base/HEAD/build/runner digests, non-Git bounded proposal roots, declared shared physical file plus each logical intent digest, private outputs, thresholds, time window, and stop rule.",
+    "The manifest also seals validator-policy/union and selection-input digests before either producer can read the locked semantic-break payload. Negative-control reveal is a separately timestamped event, and any later validator-union mutation invalidates readiness.",
+    "Provider and task bindings are data only; dashboard and harness contain no Codex-, Claude-, actor-, task-, date-, or local-path-specific control-flow branches.",
+    "Dashboard shows canonical claim/close state, actor/PID, active overlap and ratio, canonical root/base/HEAD, shared physical file and logical intents, ticket state/generation/digest, adapter decision, selected/queued request ids, compose batch, serializability proof, steward before/after digests, shared-commit attribution, queue position, `waitedMs`, wakeup, faults/correctness, throughput/cost, source availability, and stop condition.",
+    "Dashboard also shows emitted-command executions, usage errors, automatic continuations, terminal-task prunes, manual captain interventions, false stops, and unavailable receipts so autonomous completion is measured rather than inferred from task status.",
+    "Dashboard shows whether each mutation was executed by the owning lane, an approved proxy/takeover receipt, or was blocked as borrowed actor authority; reusable lease/ticket keys are never displayed, only fingerprints/status.",
+    "Dashboard consumes TASK-LANE-0022 and ATM-GOV-0265 receipts and shows capability replay attempts, WIP owner transitions, orphan-commit recovery, publication phases, unarchived runner receipts, release-surface residue, and manual post-close hygiene count.",
+    "Dashboard shows the canonical admission-facade disposition and seven-layer trace for each participant, including bounded-proposal request, direct/compose/queue/revalidate/true-conflict outcome, decision digest, and whether any caller attempted to re-derive the verdict.",
+    "Dashboard shows candidate-output digest, sealed validator selection and source, command-backed validator runs, runner/build digest, and semantic `pass`/`fail`/`inconclusive`; this view is observational and grants no write authority.",
+    "Dashboard shows each closure-critical acceptance predicate, required/observed realness, authoritative-source availability, verifier mode, negative-control result, and `pass`/`fail`/`inconclusive` without allowing display state to become the authority.",
+    "`ready` requires two different actors and OS processes on one sealed canonical worktree/base/HEAD/build, non-Git proposal roots, a non-empty same-file intersection, and distinct bounded logical intents; separate Git worktrees/branches/indexes, missing evidence, contradictory digests, or `not-required` returns `not-ready`.",
+    "The view distinguishes the primary safe-compose cell from the true-conflict/stale fallback cell: zero queue residency is valid only for the former, while a queued fallback requires positive event-derived wait and automatic wakeup.",
+    "JSON and human-readable views share the same compact digest and can be refreshed live or reconstructed post-run from canonical sources.",
+    "Refresh is strictly read-only: it cannot claim, wake, release, mutate queue/runtime state, or manufacture lifecycle events.",
+    "Focused tests prove untrusted producer labels cannot override canonical evidence and incomplete dual-captain setup fails closed.",
+    "Readiness is `not-ready` if normal-path publication still needs framework-temp cleanup, manual lock deletion, manual receipt archival, or a captain-authored recovery command."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/replay/dashboard.ts",
+    "packages/cli/src/commands/broker/replay/dashboard.ts",
+    "packages/cli/src/commands/broker/replay/run-manifest.ts",
+    "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+    "tests/cli/plan3-dual-captain-dashboard.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/replay/dashboard.ts",
+    "packages/cli/src/commands/broker/replay/dashboard.ts",
+    "packages/cli/src/commands/broker/replay/run-manifest.ts",
+    "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+    "packages/cli/src/commands/broker/replay-actions.ts",
+    "tests/cli/plan3-dual-captain-dashboard.test.ts",
+    "docs/governance/atm-3-replay-evidence.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan3-dual-captain-dashboard.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "dual-captain-dashboard-command-backed",
+  "rollbackStrategy": "revert-commit-and-trip-queue-only",
+  "rollbackNotes": "The dashboard is read-only. Revert implementation and keep Plan 3 active if canonical reconstruction fails.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.parallel-replay",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.replay.dashboard",
+        "pattern": "Read Model",
+        "source": "packages/core/src/broker/replay/dashboard.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.replay.run-manifest",
+        "pattern": "Sealed Manifest",
+        "source": "packages/cli/src/commands/broker/replay/run-manifest.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/replay/dashboard.ts",
+        "packages/cli/src/commands/broker/replay/dashboard.ts",
+        "packages/cli/src/commands/broker/replay/run-manifest.ts",
+        "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+        "packages/cli/src/commands/broker/replay-actions.ts",
+        "tests/cli/plan3-dual-captain-dashboard.test.ts",
+        "docs/governance/atm-3-replay-evidence.md"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0246-dual-captain-dogfood-dashboard-and-sealed-run-manifest.task.md",
+    "sectionTitle": "ATM-GOV-0246",
+    "headingLine": 74,
+    "hash": "876733864000e80a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0246-dual-captain-dogfood-dashboard-and-sealed-run-manifest.task.md",
+      "planningCommitSha": "10ef055c46c4d2b888417e7e3cd2b13b6f55fb51",
+      "contentDigest": "sha256:876733864000e80a085571ffeed204648b2b80e17615b00cded28bb14a46041d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T19:42:49.872Z"
+    }
+  },
+  "importedAt": "2026-07-29T19:42:49.872Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.plan3.dual.captain.dashboard.test.ts",
+      "command": "node --strip-types tests/cli/plan3-dual-captain-dashboard.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T20-22-03-420Z-lock-cleanup-0aee641b4c77",
+  "lastTransitionAt": "2026-07-29T20:22:03.420Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T20:07:41.342Z",
+  "promotedAt": "2026-07-29T20:07:41.346Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-0746b8a00a96",
+    "claimedAt": "2026-07-29T20:07:41.351Z",
+    "heartbeatAt": "2026-07-29T20:22:02.873Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0246.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+      "packages/cli/src/commands/broker/replay/dashboard.ts",
+      "packages/cli/src/commands/broker/replay/run-manifest.ts",
+      "packages/core/src/broker/replay/dashboard.ts",
+      "tests/cli/plan3-dual-captain-dashboard.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260729200741-codex-git-series-captain-cd95ab4c2b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729200741-codex-git-series-captain-cd95ab4c2b\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-29T20:07:41.351Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6c9836199420495e",
+    "ticketDigest": "sha256:6c9836199420495ef9a9c2ba6c3344b60147ef5a6cff9a3f748312e09d7fdc30",
+    "taskId": "ATM-GOV-0246",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729200741-codex-git-series-captain-cd95ab4c2b",
+    "claimGeneration": "lease-0746b8a00a96",
+    "issuedAt": "2026-07-29T20:07:41.351Z",
+    "expiresAt": "2026-07-29T20:37:41.351Z",
+    "scopeDigest": "sha256:f7839ee2a64af949296b463ea281b59bb1ed146cf82fafd2d1b6a5dc27731805",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T20:07:41.351Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0246.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0246/**",
+          ".atm/history/tasks/ATM-GOV-0246.json",
+          "docs/governance/atm-3-replay-evidence.md",
+          "packages/cli/src/commands/broker/replay-actions.ts",
+          "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+          "packages/cli/src/commands/broker/replay/dashboard.ts",
+          "packages/cli/src/commands/broker/replay/run-manifest.ts",
+          "packages/core/src/broker/replay/dashboard.ts",
+          "tests/cli/plan3-dual-captain-dashboard.test.ts"
+        ],
+        "digest": "sha256:a763216d8f8b0b04fc300d9cf14feca2b425fcbfcd3e2209ccdb090c4ddb27a3"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260729200741-codex-git-series-captain-ATM-GOV-0246-2f95ce65d2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0246",
+    "batchId": null,
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-3f5665c07bc432ff",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0246.*",
+      ".atm/history/task-events/ATM-GOV-0246/**",
+      ".atm/history/tasks/ATM-GOV-0246.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+      "packages/cli/src/commands/broker/replay/dashboard.ts",
+      "packages/cli/src/commands/broker/replay/run-manifest.ts",
+      "packages/core/src/broker/replay/dashboard.ts",
+      "tests/cli/plan3-dual-captain-dashboard.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "52ec2f59cf023abac6ae4b192946b0f7bae8262c27d75babdf2bb715c371b8b8",
+    "actorId": "codex-git-series-captain",
+    "sessionId": "session-20260729200741-codex-git-series-captain-ATM-GOV-0246-2f95ce65d2",
+    "laneSession": {
+      "laneSessionId": "lane-20260729200741-codex-git-series-captain-cd95ab4c2b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729200741-codex-git-series-captain-cd95ab4c2b\""
+    },
+    "createdAt": "2026-07-29T20:07:55.624Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-29T20:22:03.417Z",
+    "releasedBy": "codex-git-series-captain"
+  },
+  "closedAt": "2026-07-29T20:22:02.873Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729200741-codex-git-series-captain-ATM-GOV-0246-2f95ce65d2",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0246.closure-packet.json"
+}

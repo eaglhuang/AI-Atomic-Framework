@@ -7,22 +7,26 @@ import {
   runRuntimeDogfoodLifecycle,
   selectRuntimeDogfoodTasks
 } from './replay/implementation.ts';
+import { brokerReplayDashboard } from './replay/dashboard.ts';
+import { brokerReplayRunManifest } from './replay/run-manifest.ts';
 
 const defaultIntersection = ['docs/governance/atm-3-replay-evidence.md'];
 
 export async function handleBrokerReplayActions(options: ParsedBrokerOptions) {
   if (options.action !== 'replay') return null;
-  const action = options.replayAction ?? 'status';
+  const action: string = options.replayAction ?? 'status';
   if (action === 'status') return brokerReplayStatus(options);
   if (action === 'run') return brokerReplayRun(options);
   if (action === 'dogfood') return brokerReplayDogfood(options);
+  if (action === 'dashboard') return brokerReplayDashboard(options, requiredReplayIntersection(options));
+  if (action === 'manifest') return brokerReplayRunManifest(options, requiredReplayIntersection(options));
   return makeResult({
     ok: false,
     command: 'broker',
     cwd: options.cwd,
     messages: [
-      message('error', 'ATM_CLI_USAGE', 'broker replay supports: status, run, dogfood.', {
-        supportedActions: ['status', 'run', 'dogfood']
+      message('error', 'ATM_CLI_USAGE', 'broker replay supports: status, run, dogfood, dashboard, manifest.', {
+        supportedActions: ['status', 'run', 'dogfood', 'dashboard', 'manifest']
       })
     ],
     evidence: { action: 'replay-usage' }
