@@ -1,0 +1,240 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0253",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "fc5c61d1852ea46e2ce872b03a08af7328461de3",
+  "governedTreeSha": "99c6dde0480ea9716feb9a46e9a0a78e2d882f4c",
+  "targetCommitDelta": {
+    "currentCommitSha": "fc5c61d1852ea46e2ce872b03a08af7328461de3",
+    "parentCommitShas": [
+      "fc5c61d1852ea46e2ce872b03a08af7328461de3"
+    ],
+    "governedTreeSha": "99c6dde0480ea9716feb9a46e9a0a78e2d882f4c",
+    "changedFiles": [
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+      "tests/cli/taskflow-cross-task-residue-recovery.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e4cc18d9245759420799692fdcbb2ae18b107b79daa933f19ea23868b80b96b9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:741b4381fabcafad9c115296971d8d5b9646d06072ccab9c2549ba0d02c4083f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c22ec9b3f99226a8d2a01a720fd814283d180fdbdcd422201f011ae80ef516b1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-cross-task-residue-recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4d46570f5ca4b529ed65d2d0b53f953792210bdffe3a207077a0d5c4555b3af1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a3758b8bced69ad2219dc2a2cba146cac3c373969f7988549453121d08d4a79",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/planning-source-seal.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c4f7e49e70122028950cb4a5d0c5b61ea64c58e6e9c8ca49e1517a9fb99c092",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d044601268e96293af8e996fe87eb902cb1a669ee24aca0f6bb1f12d05373bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --input-type=module --eval eval(Buffer.from('aW1wb3J0IHsgY3JlYXRlRGVlcE1vZHVsZVJldmlld1JlcG9ydCB9IGZyb20gJy4vcGFja2FnZXMvcGx1Z2luLXJldmlldy1hZHZpc29yeS9zcmMvaW5kZXgudHMnOwpjb25zdCByZXBvcnQgPSBjcmVhdGVEZWVwTW9kdWxlUmV2aWV3UmVwb3J0KHsKICB0YXNrSWQ6ICdBVE0tR09WLTAyNTMnLAogIGNhbmRpZGF0ZTogewogICAgbW9kdWxlSWQ6ICdjcm9zcy1hdXRob3JpdHktY2xvc2ViYWNrLXNhZ2EnLAogICAgc291cmNlUGF0aHM6IFsncGFja2FnZXMvY2xpL3NyYy9jb21tYW5kcy90YXNrZmxvdy9jcm9zcy1hdXRob3JpdHktY2xvc2ViYWNrLnRzJywncGFja2FnZXMvY2xpL3NyYy9jb21tYW5kcy90YXNrZmxvdy9jbG9zZWJhY2stb3JjaGVzdHJhdGlvbi50cycsJ3BhY2thZ2VzL2NsaS9zcmMvY29tbWFuZHMvdGFza2Zsb3cvY2xvc2Utc2lkZS1lZmZlY3QtcmVjb25jaWxlLnRzJ10sCiAgICBvd25lckF0b21Pck1hcDogJ2F0bS50YXNrZmxvdy5jcm9zcy1hdXRob3JpdHktY2xvc2ViYWNrJywKICAgIHB1YmxpY0ludGVyZmFjZTogJ2V4ZWN1dGVUYXNrQ2xvc2VTYWdhKHJlcXVlc3QsIHNuYXBzaG90LCBwb3J0cyknLAogICAgcm9sbGJhY2s6ICdyZWNvbmNpbGUtZXhpc3Rpbmctc2FnYS10aGVuLXJldmVydDsgbmV2ZXIgcmVzZXQgZWl0aGVyIHJlcG9zaXRvcnkgb3IgcmVwbGF5IGFuIGFscmVhZHkgY29tbWl0dGVkIHNpZGUgZWZmZWN0JywKICAgIGNhdXNhbFZhbGlkYXRvcnM6IFsnbm9kZSAtLXN0cmlwLXR5cGVzIHRlc3RzL2NsaS90YXNrZmxvdy1jcm9zcy1hdXRob3JpdHktY2xvc2ViYWNrLXNhZ2EudGVzdC50cycsJ25vZGUgLS1zdHJpcC10eXBlcyB0ZXN0cy9jbGkvdGFza2Zsb3ctY3Jvc3MtYXV0aG9yaXR5LXJlbW90ZS1kdXJhYmlsaXR5LnRlc3QudHMnLCdub2RlIC0tc3RyaXAtdHlwZXMgdGVzdHMvY2xpL3Rhc2tmbG93LWNsb3NlLXNhZ2EtcGxhbi1wYXJpdHkudGVzdC50cyddCiAgfSwKICBvYnNlcnZlZEZyaWN0aW9uOiB7IHRyaWdnZXJzOiBbJ3JlcGVhdGVkLWJ1Z3MnLCdzaG90Z3VuLWNoYW5nZXMnLCdkdXBsaWNhdGVkLXBvbGljeScsJ2NhbGxlci1jb21wbGV4aXR5JywnbWlzc2luZy10ZXN0LXNlYW0nXSwgZXZpZGVuY2VSZWZzOiBbJ0FUTS1CVUctMjAyNi0wNy0yOS0yNzEnLCdBVE0tQlVHLTIwMjYtMDctMjktMjcyJywnQVRNLUJVRy0yMDI2LTA3LTI5LTI3MycsJ0FUTS1CVUctMjAyNi0wNy0yOS0yNzQnLCdBVE0tR09WLTAyNTMucHJlZmxpZ2h0J10gfSwKICBkZXBlbmRlbmN5Q2xhc3NlczogWydpbi1wcm9jZXNzJywnbG9jYWwtc3Vic3RpdHV0YWJsZScsJ3JlbW90ZS1vd25lZCddLAogIHByb3Bvc2VkQWRhcHRlcnM6IFsndGFza2Zsb3ctY2xpLWNsb3NlLWFkYXB0ZXInLCd0YXNrLWxlZGdlci1jbG9zZS1hZGFwdGVyJywncGxhbm5pbmctY2xvc2ViYWNrLWFkYXB0ZXInLCdiYXRjaC1jaGVja3BvaW50LWFkYXB0ZXInLCdyZWNvbmNpbGUtYWRhcHRlciddCn0pOwppZiAocmVwb3J0LnN0YXR1cyAhPT0gJ3Bhc3MnKSBwcm9jZXNzLmV4aXQoMSk7CmNvbnNvbGUubG9nKEpTT04uc3RyaW5naWZ5KHttYXJrZXI6J1thdG0tZ292LTAyNTMtZGVlcC1tb2R1bGUtcmV2aWV3XSBvaycsIGZpbmdlcnByaW50OiByZXBvcnQucmVjZWlwdEZpbmdlcnByaW50LCBiYXNlbGluZVJlcXVlc3RlZDogJ2RlZXAtbW9kdWxlLXJldmlldzpiMDMzMWZlYScsIGludGVyZmFjZTogcmVwb3J0LnNlYW0ucHJvcG9zZWRJbnRlcmZhY2UsIGFkYXB0ZXJzOiByZXBvcnQuc2VhbS5wcm9wb3NlZEFkYXB0ZXJzfSkpOw==','base64').toString('utf8'))",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:710b6671363631d6d3726bedd606501ab8fc689e32c27cfdafb10dd432b31b3c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:87ca48e064e38a8d7b4180a0be2f87b4cc4a9eaf5c38d46e6ce1f3ca130e3116",
+      "stderrSha256": "sha256:5cec77e57226271f97b8d50510c6b9253e019739b343bbec94d8a255aa6f71f9",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+    "node --strip-types tests/cli/planning-source-seal.test.ts",
+    "node --strip-types tests/cli/taskflow-close-saga-plan-parity.test.ts",
+    "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "node --strip-types tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+    "node --strip-types tests/cli/taskflow-cross-task-residue-recovery.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T22:38:31.309Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0253.*",
+      ".atm/history/task-events/ATM-GOV-0253/**",
+      ".atm/history/tasks/ATM-GOV-0253.json",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-planning-authority.ts",
+      "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+      "tests/cli/taskflow-cross-task-residue-recovery.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-planning-authority.ts",
+      "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+      "tests/cli/taskflow-cross-task-residue-recovery.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0253.json",
+  "closedAt": "2026-07-29T22:38:31.309Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729221923-codex-git-series-captain-ATM-GOV-0253-af3174b157",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+      "tests/cli/taskflow-cross-task-residue-recovery.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0253.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0253/2026-07-29T22-19-09-143Z-import-e8e4823d4576.json",
+      ".atm/history/task-events/ATM-GOV-0253/2026-07-29T22-19-23-353Z-reserve-3e12a49d4c92.json",
+      ".atm/history/task-events/ATM-GOV-0253/2026-07-29T22-19-23-357Z-promote-22a731af107d.json",
+      ".atm/history/task-events/ATM-GOV-0253/2026-07-29T22-19-35-523Z-claim-89564dc2ce58.json",
+      ".atm/history/tasks/ATM-GOV-0253.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
