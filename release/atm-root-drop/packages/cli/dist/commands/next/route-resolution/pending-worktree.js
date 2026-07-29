@@ -30,19 +30,25 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
         .filter((lock) => lock.taskId !== input.task.workItemId);
     const foreignFrameworkLocks = readFrameworkTempLockProjection(input.cwd)
         .filter((lock) => lock.workItemId !== input.task.workItemId);
+    const liveFrameworkLocks = foreignFrameworkLocks.filter((lock) => lock.disposition === 'foreign-live');
+    const staleFrameworkLocks = foreignFrameworkLocks.filter((lock) => lock.disposition === 'stale-recovery-input');
     const outsideScope = (entry) => !entry.startsWith('.atm/') && !isPathAllowedByScope(entry, allowedFiles);
     const deferredForeignResidue = stagedOrTracked.flatMap((entry) => deferredGeneratedResidue(input.cwd, input.task.workItemId, entry));
     const deferredPaths = new Set(deferredForeignResidue.map((entry) => entry.path));
     const isAdvisoryOutsideScopePath = (entry) => deferredPaths.has(entry)
         || isAdvisoryPendingTaskArtifactPath(entry)
         || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles))
-        || foreignFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
+        || liveFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
+    const isStaleRecoveryInputPath = (entry) => staleFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
     const advisoryTrackedFiles = stagedOrTracked
         .filter(outsideScope)
         .filter(isAdvisoryOutsideScopePath);
+    const staleRecoveryInputFiles = stagedOrTracked
+        .filter(outsideScope)
+        .filter(isStaleRecoveryInputPath);
     const stagedExpansion = stagedOrTracked
         .filter(outsideScope)
-        .filter((entry) => !isAdvisoryOutsideScopePath(entry))
+        .filter((entry) => !isAdvisoryOutsideScopePath(entry) && !isStaleRecoveryInputPath(entry))
         .filter((entry) => looksLikeTaskArtifact(entry, input.task));
     const untrackedExpansion = untracked
         .filter(outsideScope)
@@ -55,6 +61,7 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
                 taskId: input.task.workItemId,
                 outsideAllowedFiles: stagedExpansion,
                 advisoryTrackedFiles,
+                staleRecoveryInputFiles,
                 ignoredUntrackedFiles: untrackedExpansion,
                 allowedFiles,
                 requiredAction: 'Add these real deliverables to the task card frontmatter scope/deliverables (then re-import) or run `node atm.mjs tasks scope --add <paths>`; do not edit runtime locks.',
@@ -66,6 +73,7 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
         schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
         ignoredUntrackedFiles: untrackedExpansion,
         advisoryTrackedFiles,
+        staleRecoveryInputFiles,
         deferredForeignResidue
     };
 }

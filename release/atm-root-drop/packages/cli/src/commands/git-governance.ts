@@ -1,4 +1,13 @@
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import {
+  createHistoricalWorkAdmissionAttestation,
+  HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH,
+  type HistoricalWorkAdmissionAttestation
+} from '../../../core/src/broker/historical-work-admission-attestation.ts';
+import { pathMatchesWriteScope } from '../../../core/src/broker/write-scope-policy.ts';
 import { evaluateTaskWorkAdmissionGate, readWorkAdmissionTicket } from './git-governance/work-admission-check.ts';
 import { makeResult, message } from './shared.ts';
 import {
@@ -31,7 +40,10 @@ export {
  * ticket authority accepts the observed operation.
  */
 export async function runAtmGit(argv: string[]) {
-  const action = argv.find((entry) => entry === 'commit' || entry === 'push') ?? '';
+  const action = argv.find((entry) => entry === 'commit' || entry === 'push' || entry === 'attest') ?? '';
+  if (action === 'attest') {
+    return recordHistoricalWorkAdmissionAttestation(argv);
+  }
   const taskId = readOption(argv, '--task');
   if (!taskId || (action !== 'commit' && action !== 'push')) {
     return runAtmGitImplementation(argv);
@@ -39,7 +51,7 @@ export async function runAtmGit(argv: string[]) {
   const cwd = readOption(argv, '--cwd') ?? process.cwd();
   const ticket = readWorkAdmissionTicket(cwd, taskId);
   const files = action === 'commit'
-    ? readStagedFiles(cwd)
+    ? selectTicketValidatedCommitFiles(readStagedFiles(cwd), ticket, argv.includes('--defer-foreign-staged'))
     : ticket?.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
   const gate = evaluateTaskWorkAdmissionGate({
     cwd,
@@ -69,6 +81,100 @@ export async function runAtmGit(argv: string[]) {
       workAdmission: { decision: gate.decision, receipt: gate.receipt }
     }
   };
+}
+
+/**
+ * `--defer-foreign-staged` promises that the governed commit will preserve
+ * foreign index entries. Admission must therefore see the same filtered
+ * bundle, rather than reject the current task for paths it will not mutate.
+ */
+export function selectTicketValidatedCommitFiles(
+  stagedFiles: readonly string[],
+  ticket: ReturnType<typeof readWorkAdmissionTicket>,
+  deferForeignStaged: boolean
+): readonly string[] {
+  if (!deferForeignStaged || !ticket) return stagedFiles;
+  const fileScopes = ticket.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
+  return stagedFiles.filter((file) => fileScopes.some((scope) => pathMatchesWriteScope(file, scope)));
+}
+
+function recordHistoricalWorkAdmissionAttestation(argv: readonly string[]) {
+  const cwd = readOption(argv, '--cwd') ?? process.cwd();
+  const commitSha = readOption(argv, '--commit');
+  const taskId = readOption(argv, '--task');
+  const actorId = readOption(argv, '--actor');
+  const laneSessionId = readOption(argv, '--lane');
+  const provenanceKind = readOption(argv, '--provenance-kind');
+  const provenanceDigest = readOption(argv, '--provenance-digest');
+  const provenanceRef = readOption(argv, '--provenance-ref');
+  if (!commitSha || !taskId || !actorId || !laneSessionId || !provenanceDigest || !provenanceRef || !['ticket', 'emergency'].includes(provenanceKind ?? '')) {
+    return makeResult({
+      ok: false,
+      command: 'git',
+      cwd,
+      messages: [message('error', 'ATM_CLI_USAGE', 'git attest requires --commit, --task, --actor, --lane, --provenance-kind ticket|emergency, --provenance-ref, and --provenance-digest.', {})]
+    });
+  }
+  const scalar = (args: string[]) => {
+    try { return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { return ''; }
+  };
+  const resolvedCommit = scalar(['rev-parse', '--verify', commitSha]);
+  const parentCommitSha = scalar(['rev-parse', '--verify', `${commitSha}^`]);
+  const treeSha = scalar(['show', '-s', '--format=%T', commitSha]);
+  let ancestor = false;
+  try { execFileSync('git', ['merge-base', '--is-ancestor', resolvedCommit, 'HEAD'], { cwd, stdio: 'ignore' }); ancestor = true; } catch { /* handled below */ }
+  if (!resolvedCommit || !parentCommitSha || !treeSha || !ancestor) {
+    return makeResult({
+      ok: false,
+      command: 'git',
+      cwd,
+      messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'Historical attestation requires an existing non-root commit that is an ancestor of HEAD.', { commitSha })]
+    });
+  }
+  let provenanceBytes: Buffer;
+  if (provenanceRef === `git:${resolvedCommit}`) {
+    const commitMessage = scalar(['log', '-1', '--format=%B', resolvedCommit]);
+    if (!commitMessage.includes('ATM-Emergency-Reason:')) {
+      return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'A git:<commit> provenance reference requires the immutable commit message to carry ATM-Emergency-Reason.', { commitSha: resolvedCommit })] });
+    }
+    provenanceBytes = Buffer.from(commitMessage, 'utf8');
+  } else {
+    const provenancePath = path.resolve(cwd, provenanceRef);
+    if (!existsSync(provenancePath)) {
+      return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'Attestation provenance reference must be an existing immutable evidence file or git:<commit>.', { provenanceRef })] });
+    }
+    provenanceBytes = readFileSync(provenancePath);
+  }
+  const observedProvenanceDigest = `sha256:${createHash('sha256').update(provenanceBytes).digest('hex')}`;
+  if (observedProvenanceDigest !== provenanceDigest || (!provenanceRef.startsWith('git:') && !provenanceBytes.toString('utf8').includes(resolvedCommit))) {
+    return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'Attestation provenance digest or commit binding does not match the referenced evidence.', { provenanceRef, commitSha: resolvedCommit })] });
+  }
+  const record = createHistoricalWorkAdmissionAttestation({
+    commitSha: resolvedCommit,
+    parentCommitSha,
+    treeSha,
+    provenance: { kind: provenanceKind as 'ticket' | 'emergency', digest: provenanceDigest, ref: provenanceRef.replace(/\\/g, '/') },
+    taskId,
+    laneSessionId,
+    attestedBy: actorId,
+    attestedAt: new Date().toISOString()
+  });
+  const destination = path.join(cwd, HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH);
+  let attestations: HistoricalWorkAdmissionAttestation[] = [];
+  if (existsSync(destination)) {
+    try {
+      const parsed = JSON.parse(readFileSync(destination, 'utf8')) as { attestations?: HistoricalWorkAdmissionAttestation[] };
+      attestations = Array.isArray(parsed.attestations) ? parsed.attestations : [];
+    } catch {
+      return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'Existing historical attestation ledger is not valid JSON.', { path: HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH })] });
+    }
+  }
+  if (attestations.some((entry) => entry.commitSha === resolvedCommit)) {
+    return makeResult({ ok: false, command: 'git', cwd, messages: [message('error', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID', 'A historical commit may have exactly one forward attestation.', { commitSha: resolvedCommit })] });
+  }
+  mkdirSync(path.dirname(destination), { recursive: true });
+  writeFileSync(destination, `${JSON.stringify({ schemaId: 'atm.historicalWorkAdmissionAttestationLedger.v1', attestations: [...attestations, record] }, null, 2)}\n`, 'utf8');
+  return makeResult({ ok: true, command: 'git', cwd, messages: [message('info', 'ATM_HISTORICAL_WORK_ADMISSION_ATTESTED', 'Created an append-only historical work-admission attestation; commit it through the governed task bundle before push.', { path: HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH, record })], evidence: { historicalWorkAdmissionAttestation: record } });
 }
 
 function appendWorkAdmissionTrailer(argv: readonly string[], ticketId: string, ticketDigest: string): string[] {

@@ -3,18 +3,19 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { listActorWorkSessions, resolveActorWorkSession } from '../../actor-session.js';
-import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText, readStringArray } from '../intent-normalizers.js';
+import { normalizeSearchText, readStringArray } from '../intent-normalizers.js';
 import { uniqueSorted } from '../view-projections.js';
 import { parseJsonText } from '../../shared.js';
 import { normalizeOptionalString } from '../route-resolution.js';
 import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.js';
-const NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS = 30 * 60;
+import { readFreshTaskReservations } from './task-reservation-projection.js';
+export { inspectFreshTaskReservationForTask } from './task-reservation-projection.js';
 export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
     const now = Date.now();
     const currentActor = currentActorId?.trim() || null;
     const normalizedOwnFiles = uniqueSorted(ownFiles.map(normalizeWorkPath).filter(Boolean));
     const activeClaims = readActiveClaimRecords(cwd, now);
-    const activeLocks = readActiveLockRecords(cwd, now);
+    const { activeLocks, staleRecoveryLocks } = readFrameworkLockRecords(cwd, now);
     const freshReservations = readFreshTaskReservations(cwd, now);
     const stagedFiles = readStagedFiles(cwd);
     const currentSession = resolveActorWorkSession(cwd, {});
@@ -82,12 +83,17 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
         for (const file of lock.files)
             if (dirtyFiles.includes(file))
                 ownedDirtySet.add(file);
+    for (const lock of staleRecoveryLocks)
+        for (const file of lock.files)
+            if (dirtyFiles.includes(file))
+                ownedDirtySet.add(file);
     const unownedDirtyFiles = dirtyFiles.filter((file) => !ownedDirtySet.has(file));
     const hasForeignActiveWork = foreignActors.length > 0 || foreignSessionIds.length > 0 || stagedFiles.length > 0 || unownedDirtyFiles.length > 0;
     const teamLevelRecommendation = buildTeamLevelRecommendation({
         ownFiles: normalizedOwnFiles,
         activeClaims,
         activeLocks,
+        staleRecoveryLocks,
         freshReservations,
         stagedFiles,
         foreignDirtyFiles,
@@ -110,6 +116,7 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
         activeActors,
         activeClaims,
         activeLocks,
+        staleRecoveryLocks,
         freshReservationCount: freshReservations.length,
         freshReservations,
         stagedFiles,
@@ -277,146 +284,6 @@ function isFrameworkFoundationPath(filePath) {
         || normalized.startsWith('packages/core/src/broker/')
         || normalized.startsWith('packages/core/src/team-runtime/');
 }
-export function inspectFreshTaskReservationForTask(cwd, task, currentActorId, now, currentLaneSessionId = null) {
-    const reservations = readFreshTaskReservations(cwd, now);
-    const currentActor = currentActorId?.trim() || null;
-    const currentLane = normalizeOptionalString(currentLaneSessionId);
-    return reservations.find((reservation) => {
-        if (reservation.taskId !== task.workItemId)
-            return false;
-        if (!currentActor || reservation.actorId !== currentActor)
-            return true;
-        if (!currentLane || !reservation.laneSessionId)
-            return false;
-        return reservation.laneSessionId !== currentLane;
-    }) ?? null;
-}
-function readFreshTaskReservations(cwd, now) {
-    const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
-    if (!existsSync(taskStorePath))
-        return [];
-    return readdirSync(taskStorePath)
-        .filter((entry) => entry.endsWith('.json'))
-        .flatMap((entry) => {
-        const filePath = path.join(taskStorePath, entry);
-        try {
-            const parsed = parseJsonText(readFileSync(filePath, 'utf8'));
-            const workItemId = normalizeOptionalString(parsed.workItemId ?? parsed.id);
-            if (!workItemId)
-                return [];
-            if (!isTaskFreshReservationCandidate(parsed))
-                return [];
-            const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
-                ? parsed.claim
-                : {};
-            if (claimRecord.state === 'active')
-                return [];
-            const source = parsed.source && typeof parsed.source === 'object' && !Array.isArray(parsed.source)
-                ? parsed.source
-                : {};
-            const sourcePlanPath = normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path);
-            const sourceOwner = readPlanningCardOwner(cwd, sourcePlanPath);
-            const actorId = sourceOwner
-                ?? normalizeOptionalString(parsed.owner ?? parsed.ownerActorId ?? parsed.createdByActor ?? parsed.createdBy ?? parsed.importedByActor ?? parsed.importedBy ?? source.owner ?? source.actorId);
-            if (!actorId)
-                return [];
-            const laneSessionId = readLaneSessionIdFromTaskDocument(parsed);
-            const createdAt = normalizeOptionalString(parsed.createdAt ?? parsed.created_at ?? source.createdAt ?? source.created_at);
-            const importedAt = normalizeOptionalString(parsed.importedAt ?? parsed.imported_at ?? source.importedAt ?? source.imported_at);
-            const referenceAt = parseIsoMillis(importedAt) ?? parseIsoMillis(createdAt) ?? parseIsoMillis(normalizeOptionalString(parsed.lastTransitionAt ?? parsed.last_transition_at));
-            if (referenceAt === null)
-                return [];
-            const ageSeconds = Math.max(0, Math.floor((now - referenceAt) / 1000));
-            if (ageSeconds > NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS)
-                return [];
-            const files = uniqueSorted([
-                ...readStringArray(parsed.scope),
-                ...readStringArray(parsed.scopePaths),
-                ...readStringArray(parsed.files),
-                ...readStringArray(parsed.deliverables),
-                ...readStringArray(parsed.targetAllowedFiles),
-                ...readStringArray(claimRecord.files)
-            ].map((file) => {
-                const normalized = normalizeWorkPath(file);
-                return path.isAbsolute(normalized) ? path.relative(cwd, normalized).replace(/\\/g, '/') : normalized;
-            }).filter(Boolean));
-            return [{
-                    taskId: workItemId,
-                    title: normalizeOptionalString(parsed.title) ?? workItemId,
-                    actorId,
-                    laneSessionId,
-                    createdAt,
-                    importedAt,
-                    ageSeconds,
-                    ttlSeconds: NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS,
-                    leaseFresh: true,
-                    files
-                }];
-        }
-        catch {
-            return [];
-        }
-    });
-}
-function readLaneSessionIdFromTaskDocument(parsed) {
-    const source = parsed.source && typeof parsed.source === 'object' && !Array.isArray(parsed.source)
-        ? parsed.source
-        : {};
-    const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
-        ? parsed.claim
-        : {};
-    const directionLock = parsed.taskDirectionLock && typeof parsed.taskDirectionLock === 'object' && !Array.isArray(parsed.taskDirectionLock)
-        ? parsed.taskDirectionLock
-        : {};
-    return normalizeOptionalString(parsed.laneSessionId ?? parsed.laneId ?? source.laneSessionId ?? source.laneId)
-        ?? readLaneSessionIdFromEnvelope(parsed.laneSession)
-        ?? readLaneSessionIdFromEnvelope(source.laneSession)
-        ?? readLaneSessionIdFromEnvelope(claimRecord.laneSession)
-        ?? readLaneSessionIdFromEnvelope(directionLock.laneSession)
-        ?? normalizeOptionalString(directionLock.laneSessionId ?? directionLock.guidanceSessionId);
-}
-function readLaneSessionIdFromEnvelope(value) {
-    if (!value || typeof value !== 'object' || Array.isArray(value))
-        return null;
-    return normalizeOptionalString(value.laneSessionId);
-}
-function isTaskFreshReservationCandidate(parsed) {
-    const status = normalizeTaskRouteStatus(normalizeOptionalString(parsed.status) ?? 'planned');
-    return status === 'planned' || status === 'ready' || status === 'open' || status === 'reserved';
-}
-function readPlanningCardOwner(cwd, sourcePlanPath) {
-    if (!sourcePlanPath)
-        return null;
-    const candidate = path.isAbsolute(sourcePlanPath) ? sourcePlanPath : path.resolve(cwd, sourcePlanPath);
-    if (!existsSync(candidate))
-        return null;
-    try {
-        const rawText = readFileSync(candidate, 'utf8');
-        const frontmatter = parseMarkdownFrontmatter(rawText);
-        const owner = frontmatter && typeof frontmatter === 'object' && !Array.isArray(frontmatter)
-            ? normalizeOptionalString(frontmatter.owner ?? frontmatter.actor ?? frontmatter.captain)
-            : null;
-        return owner ?? readFrontmatterScalar(rawText, 'owner') ?? readFrontmatterScalar(rawText, 'actor') ?? readFrontmatterScalar(rawText, 'captain');
-    }
-    catch {
-        return null;
-    }
-}
-function readFrontmatterScalar(rawText, key) {
-    const match = /^---\s*\r?\n([\s\S]*?)\r?\n---/m.exec(rawText);
-    if (!match)
-        return null;
-    const line = match[1].split(/\r?\n/).find((entry) => entry.trim().startsWith(`${key}:`));
-    if (!line)
-        return null;
-    return normalizeOptionalString(line.slice(line.indexOf(':') + 1).replace(/^['"]|['"]$/g, ''));
-}
-function parseIsoMillis(value) {
-    if (!value)
-        return null;
-    const millis = Date.parse(value);
-    return Number.isFinite(millis) ? millis : null;
-}
 function readActiveClaimRecords(cwd, now) {
     const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
     if (!existsSync(taskStorePath))
@@ -469,8 +336,8 @@ function readActiveClaimRecords(cwd, now) {
         }
     });
 }
-function readActiveLockRecords(cwd, now) {
-    return readFrameworkTempLockProjection(cwd, now).map((lock) => ({
+function readFrameworkLockRecords(cwd, now) {
+    const records = readFrameworkTempLockProjection(cwd, now).map((lock) => ({
         workItemId: lock.workItemId,
         actorId: lock.actorId,
         heartbeatAt: lock.heartbeatAt,
@@ -479,6 +346,12 @@ function readActiveLockRecords(cwd, now) {
         leaseFresh: lock.leaseFresh,
         files: uniqueSorted(lock.files.map(normalizeWorkPath))
     }));
+    return {
+        activeLocks: records.filter((lock) => lock.leaseFresh === true),
+        staleRecoveryLocks: records
+            .filter((lock) => lock.leaseFresh !== true)
+            .map(({ workItemId, actorId, heartbeatAt, ttlSeconds, files }) => ({ workItemId, actorId, heartbeatAt, ttlSeconds, files }))
+    };
 }
 function normalizeOptionalNumber(value) {
     return typeof value === 'number' && Number.isFinite(value) ? value : null;

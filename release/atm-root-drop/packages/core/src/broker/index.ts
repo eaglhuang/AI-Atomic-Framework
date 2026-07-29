@@ -35,6 +35,7 @@ export * from './wave-generated-executor.ts';
 export * from './parallel-admission-policy.ts';
 export * from './adapters/index.ts';
 export * from './cross-task-mutation-guard.ts';
+export * from './historical-work-admission-attestation.ts';
 export * from './workspace-topology-policy.ts';
 export * from './boundaries/index.ts';
 export * from './semantic-contract.ts';

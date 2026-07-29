@@ -1,4 +1,5 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import {
   isCommitAcceptedByLegacyBaseline,
   readFrameworkCommitRangeBaseline
@@ -21,6 +22,11 @@ import {
   runGitLines,
   runGitScalar
 } from '../git-index-diagnostics.ts';
+import {
+  evaluateHistoricalWorkAdmission,
+  HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH,
+  type HistoricalWorkAdmissionAttestation
+} from '../../../../../core/src/broker/historical-work-admission-attestation.ts';
 
 interface ComparableCommandRun {
   readonly command: string;
@@ -91,14 +97,21 @@ export function createCommitRangeGuardReport(cwd: string, base: string, head: st
     const match = evidenceMatches.find((candidate) => candidate.commitSha === entry.commitSha);
     return inspectCommitClosurePackets(root, entry.commitSha, match ?? null, head);
   });
-  const workAdmissionCoverageFindings = enforcedCriticalCommits
-    .filter((entry) => !hasWorkAdmissionCommitCoverage(root, entry.commitSha))
-    .map((entry) => ({
+  const historicalAttestations = readHistoricalWorkAdmissionAttestations(root);
+  const workAdmissionCoverageFindings = enforcedCriticalCommits.flatMap((entry) => {
+    const evaluation = evaluateHistoricalWorkAdmission({
+      commit: readHistoricalCommitIdentity(root, entry.commitSha, head),
+      hasNormalWorkAdmissionTrailer: hasWorkAdmissionCommitCoverage(root, entry.commitSha),
+      attestations: historicalAttestations,
+      isProvenanceValid: (record) => provenanceReferenceMatches(root, record)
+    });
+    return evaluation.decision === 'covered' ? [] : [{
       level: 'error' as const,
-      code: 'ATM_WRITE_TICKET_MISSING',
+      code: evaluation.code ?? 'ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED',
       commitSha: entry.commitSha,
-      detail: `Critical commit ${entry.commitSha} is missing an ATM-Work-Admission trailer. Protected-branch acceptance requires committed ticket coverage from the governed git facade.`
-    }));
+      detail: evaluation.reason
+    }];
+  });
   const missingEvidenceMatches = evidenceMatches
     .filter((entry) => !legacyBaseline || !isAcceptedByLegacyBaseline(entry.commitSha))
     .filter((entry) => !entry.matched);
@@ -144,11 +157,53 @@ export function createCommitRangeGuardReport(cwd: string, base: string, head: st
       evidenceMatches,
       evidenceMissingDiagnostic,
       closurePacketInspections,
+      historicalAttestationPath: HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH,
       taskAudit,
       protectedBranchPatterns,
       findings,
       ok: findings.length === 0
   };
+}
+
+function provenanceReferenceMatches(cwd: string, record: HistoricalWorkAdmissionAttestation): boolean {
+  const reference = record.provenance.ref.trim();
+  if (reference === `git:${record.commitSha}`) {
+    const message = runGitScalar(cwd, ['log', '-1', '--format=%B', record.commitSha]) ?? '';
+    const digest = `sha256:${createHash('sha256').update(message).digest('hex')}`;
+    return message.includes('ATM-Emergency-Reason:') && digest === record.provenance.digest;
+  }
+  const filePath = path.resolve(cwd, reference);
+  if (!existsSync(filePath)) return false;
+  try {
+    const bytes = readFileSync(filePath);
+    return `sha256:${createHash('sha256').update(bytes).digest('hex')}` === record.provenance.digest
+      && bytes.toString('utf8').includes(record.commitSha);
+  } catch {
+    return false;
+  }
+}
+
+function readHistoricalCommitIdentity(cwd: string, commitSha: string, head: string) {
+  const parentCommitSha = runGitScalar(cwd, ['rev-parse', `${commitSha}^`]) ?? '';
+  const treeSha = runGitScalar(cwd, ['show', '-s', '--format=%T', commitSha]) ?? '';
+  const ancestor = runGit(cwd, ['merge-base', '--is-ancestor', commitSha, head]);
+  return { commitSha, parentCommitSha, treeSha, isAncestorOfHead: ancestor.exitCode === 0 };
+}
+
+function readHistoricalWorkAdmissionAttestations(cwd: string): readonly HistoricalWorkAdmissionAttestation[] {
+  const filePath = path.join(cwd, HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH);
+  if (!existsSync(filePath)) return [];
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as unknown;
+    const records = Array.isArray(parsed)
+      ? parsed
+      : parsed && typeof parsed === 'object' && Array.isArray((parsed as { attestations?: unknown }).attestations)
+        ? (parsed as { attestations: unknown[] }).attestations
+        : [];
+    return records.filter((entry): entry is HistoricalWorkAdmissionAttestation => Boolean(entry && typeof entry === 'object'));
+  } catch {
+    return [];
+  }
 }
 
 function hasWorkAdmissionCommitCoverage(cwd: string, commitSha: string): boolean {

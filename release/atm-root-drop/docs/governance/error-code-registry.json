@@ -2249,6 +2249,39 @@
       "statusCommand": "node atm.mjs doctor --json",
       "recoveryManifests": [],
       "sourceOwner": "packages/core/src/broker/runner-build-output-inventory.ts"
+    },
+    {
+      "code": "ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED",
+      "category": "write-ticket",
+      "shortDescription": "A historical critical commit has no normal work-admission trailer and no exact forward attestation.",
+      "commonCauses": ["A protected range contains a commit created before ticket trailers were recorded.", "The corrective attestation has not yet been committed."],
+      "remediation": ["Review the immutable commit and its contemporaneous provenance.", "Create one governed forward attestation, commit it, then retry the protected push."],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": ["node atm.mjs git attest --commit <sha> --task <task-id> --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-digest sha256:<digest> --json"],
+      "sourceOwner": "packages/core/src/broker/historical-work-admission-attestation.ts"
+    },
+    {
+      "code": "ATM_HISTORICAL_WORK_ADMISSION_ATTESTATION_INVALID",
+      "category": "write-ticket",
+      "shortDescription": "A historical work-admission attestation is malformed, mismatched, conflicting, or targets a non-ancestor commit.",
+      "commonCauses": ["The commit parent/tree changed from the reviewed record.", "An attestation digest was altered or a second record conflicts."],
+      "remediation": ["Do not edit historical commits or force-push.", "Remove the invalid forward record through governed recovery and create one exact attestation from the immutable commit metadata."],
+      "retryable": false,
+      "requiresHumanApproval": true,
+      "relatedCommands": ["node atm.mjs git attest --commit <sha> --task <task-id> --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-digest sha256:<digest> --json"],
+      "sourceOwner": "packages/core/src/broker/historical-work-admission-attestation.ts"
+    },
+    {
+      "code": "ATM_TERMINAL_LIFECYCLE_OWNERSHIP_INCONSISTENT",
+      "category": "task-ledger",
+      "shortDescription": "A terminal task does not have both a released claim and released direction lock.",
+      "commonCauses": ["A close, block, or handoff transition updated only part of the lifecycle projection.", "A stale lock survived a terminal task transition."],
+      "remediation": ["Run tasks repair-claim or the taskflow diagnostic returned for the task.", "Do not hand-edit runtime locks or treat the task as inactive until the shared predicate accepts it."],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": ["node atm.mjs tasks repair-claim --task <task-id> --actor <actor> --json"],
+      "sourceOwner": "packages/core/src/broker/historical-work-admission-attestation.ts"
     }
   ],
   "prefixRules": [

@@ -6,6 +6,7 @@ import { CliError, resolveValue } from '../shared.js';
 import { diagnoseTaskDirectionLockAllowedFiles } from '../task-direction.js';
 import { isClaimExpired, parseClaimRecord } from './task-ledger-readers.js';
 import { compareClaimLifecycleOwners } from '../next/claim-admission.js';
+import { classifyTerminalLifecycleOwnership } from '../../../../core/dist/broker/historical-work-admission-attestation.js';
 const CLOSEOUT_OWNER_RULE = 'Only the active lifecycle owner may mutate deliverables or run taskflow close --write. During lane migration, compare lane ids when both lifecycle records have them; otherwise fall back to claim.actorId with a valid lease and work session.';
 function normalizeTaskStatus(value) {
     return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
@@ -88,6 +89,11 @@ export function diagnoseClaimRepairState(cwd, taskId, actorId) {
     const claim = parseClaimRecord(taskDocument?.claim);
     const governanceLock = readGovernanceLock(root, taskId);
     const lockReleased = isLockReleased(governanceLock);
+    const terminalOwnership = classifyTerminalLifecycleOwnership({
+        status,
+        claimState: claim?.state,
+        lockReleased
+    });
     const lockActorId = readLockActorId(governanceLock);
     const claimLaneSessionId = readLaneSessionId(claim);
     const lockLaneSessionId = readLaneSessionId(governanceLock);
@@ -107,6 +113,14 @@ export function diagnoseClaimRepairState(cwd, taskId, actorId) {
         }
     });
     const issues = [];
+    if (terminalOwnership.decision === 'inconsistent' && ['done', 'abandoned', 'blocked'].includes(status ?? '')) {
+        issues.push({
+            kind: 'dangling-governance-lock',
+            severity: 'blocking',
+            summary: 'Terminal lifecycle ownership is inconsistent and must be reconciled before claim repair.',
+            details: { code: 'ATM_TERMINAL_LIFECYCLE_OWNERSHIP_INCONSISTENT', reason: terminalOwnership.reason }
+        });
+    }
     const hasValidActiveClaim = claim?.state === 'active' && !isClaimExpired(claim, nowIso);
     if (hasValidActiveClaim) {
         issues.push({
