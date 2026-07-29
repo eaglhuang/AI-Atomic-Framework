@@ -1,0 +1,440 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0253",
+  "title": "Cross-authority two-phase closeback saga",
+  "status": "running",
+  "milestone": "ATM-3.1-R0",
+  "dependencies": [
+    "ATM-GOV-0252",
+    "TASK-ERR-0005"
+  ],
+  "acceptance": [
+    "Before implementation, invoke `atm-deep-module-refactor` on taskflow close/preflight/write/backend call sites. Seal the proposed `executeTaskCloseSaga(request, snapshot, ports)` interface, adapter inventory, deletion test, and `deep-module-review:b0331fea` baseline.",
+    "`executeTaskCloseSaga` produces the single immutable close plan consumed by dry-run, write, task backend close, and reconcile. The plan contains blockers, ordered steps, expected files, authority CAS, idempotency keys, compensations, and exact recovery commands.",
+    "Taskflow CLI, task-ledger close, planning closeback, and batch checkpoint are adapters. They do not maintain separate phase tables, dirty-file classifications, or close readiness policies.",
+    "Prepare validates both repository roots, current HEAD/CAS, source-card identity/status, target task/closure packet, required acceptance-evidence gate, cleanly isolated commit bundle, and authority writeability before either authority mutates.",
+    "The saga receipt seals task/source identity, target and planning roots, prepared HEADs, target bundle digest, planning patch digest, plan/source status transition, acceptance-evidence digest, phase, and exactly-once side-effect journal.",
+    "Target ledger `done`, planning card `done`, and any plan-level terminal status are not exposed as a globally completed closeback until both authority commit receipts are durable. An intermediate state is reported as `closeback-pending`, never as success.",
+    "The sealed authority manifest declares, per repository, whether global completion requires remote visibility and the canonical remote/ref. When required, local commit durability is only an intermediate phase: the exact commit SHA must be remote-reachable and bound to a command-backed or named human-push receipt before global completion; unavailable remote evidence remains `closeback-pending`.",
+    "Remote durability policy is repository-neutral and data-driven. It does not hardcode a host path, branch, provider, or assumption that every authority auto-pushes; target and planning authorities are evaluated from the same manifest contract.",
+    "If target commit succeeds and planning commit fails, retry reuses the target receipt, does not close/release/notify twice, and either commits the sealed planning change or returns the same pending condition with exact diagnosis.",
+    "If planning HEAD/source-card CAS moves after prepare, ATM does not overwrite or silently rebase it. It returns `ATM_TASKFLOW_CROSS_AUTHORITY_CLOSEBACK_PENDING` and requires reconcile/re-prepare against the observed authority.",
+    "The imported task durably binds planning source identity/hash across repositories; drift during an active target task is detected before delivery or close and follows the saga reconcile path (`ATM-BUG-2026-07-12-119`).",
+    "If target HEAD moves, source identity changes, a commit crashes after object creation, or the process stops after any journal phase, restart deterministically detects the durable outcome and continues at most once.",
+    "Plan-level status remains `active` until all required source cards and target closures pass their declared gates; one caller cannot set the plan to complete early by passing a boolean.",
+    "The saga preserves unrelated dirty/staged work in both repositories and commits only the sealed bundle for each authority.",
+    "Dry-run prints both prepared bundles, phases, CAS expectations, and recovery action without writing either repository.",
+    "A crash matrix injects failure before/after each prepare, commit, receipt, and finalization boundary; every cell ends in both-committed or explicit pending, with zero duplicate side effects and no contradictory global completion.",
+    "Repeated close/reconcile calls are idempotent and never require manual `.atm` edits, `git reset`, branch/worktree merge, or task-specific repair code.",
+    "Plan parity tests feed the same snapshot to dry-run, write, backend close, and reconcile and assert the same blocker/step digest. Crash tests prove restart resumes the sealed plan rather than recomputing a different one.",
+    "Deletion tests remove duplicate close readiness and phase derivation from adapters; deleting the saga planner makes every protected close path fail closed.",
+    "A done/released task's stale close residue beside another active task receives a scoped reconcile/advisory recovery without circularly requiring the active task to commit first (`ATM-BUG-2026-07-12-126`).",
+    "Protected override audit/provenance files are included only through the sealed authority bundle and direction-lock model; no unowned audit sidecar can block or leak into another task's close (`ATM-BUG-2026-07-13-163`).",
+    "Before the first delivery commit, the implementer inventories adjacent taskflow types, shared helpers, mutex/lock modules, and tests; any required linked surface is added once through governed scope amendment rather than copied into the new saga module.",
+    "Short English comments explain phase ownership, the no-distributed-ACID boundary, and why global completion is derived only after both receipts exist.",
+    "This cross-authority enforcement path has its own source/frozen behavior-parity receipt before close. A shared runner-sync build is allowed, but the saga's phase and pending behavior must be attributable to this card and cannot rely only on the later 0244 aggregate drill."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+    "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+    "schemas/governance/cross-authority-closeback.schema.json",
+    "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+    "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+    "tests/cli/taskflow-cross-task-residue-recovery.test.ts",
+    "tests/cli/taskflow-close-saga-plan-parity.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator.ts",
+    "packages/cli/src/commands/tasks/import-planning-authority.ts",
+    "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+    "schemas/governance/cross-authority-closeback.schema.json",
+    "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+    "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+    "tests/cli/taskflow-cross-task-residue-recovery.test.ts",
+    "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+    "tests/cli/planning-source-seal.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+    "node --strip-types tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+    "node --strip-types tests/cli/taskflow-cross-task-residue-recovery.test.ts",
+    "node --strip-types tests/cli/taskflow-close-saga-plan-parity.test.ts",
+    "node --strip-types tests/cli/planning-source-seal.test.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "npm run validate:schemas",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "cross-authority-closeback-crash-matrix",
+  "rollbackStrategy": "reconcile-existing-saga-then-revert",
+  "rollbackNotes": "Never reset either repository or replay an already committed side effect. Finish or compensate through the durable saga receipt.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow.cross-authority-closeback",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.taskflow.cross-authority-closeback",
+        "pattern": "Durable Saga",
+        "source": "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-planning-authority.ts",
+        "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+        "schemas/governance/cross-authority-closeback.schema.json",
+        "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+        "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+        "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+        "tests/cli/taskflow-cross-task-residue-recovery.test.ts",
+        "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+        "tests/cli/planning-source-seal.test.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 9 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0253-cross-authority-two-phase-closeback-saga.task.md",
+    "sectionTitle": "ATM-GOV-0253",
+    "headingLine": 92,
+    "hash": "ee47938a81d5f8c2",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0253-cross-authority-two-phase-closeback-saga.task.md",
+      "planningCommitSha": "10ef055c46c4d2b888417e7e3cd2b13b6f55fb51",
+      "contentDigest": "sha256:ee47938a81d5f8c29e197c0b823e3b6cd023a6f84557e8fa8f4ff5733d2cd7c0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T22:19:08.986Z"
+    }
+  },
+  "importedAt": "2026-07-29T22:19:08.986Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.taskflow.cross.authority.closeback.saga.test.ts",
+      "command": "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.atomic.wave.checkpoint.closeback.saga.test.ts",
+      "command": "node --strip-types tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.taskflow.cross.authority.remote.durability.test.ts",
+      "command": "node --strip-types tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.taskflow.cross.task.residue.recovery.test.ts",
+      "command": "node --strip-types tests/cli/taskflow-cross-task-residue-recovery.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.taskflow.close.saga.plan.parity.test.ts",
+      "command": "node --strip-types tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.planning.source.seal.test.ts",
+      "command": "node --strip-types tests/cli/planning-source-seal.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.closeback.orchestration.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.schemas",
+      "command": "npm run validate:schemas",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T22-19-35-523Z-claim-89564dc2ce58",
+  "lastTransitionAt": "2026-07-29T22:19:35.523Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T22:19:23.353Z",
+  "promotedAt": "2026-07-29T22:19:23.357Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-85ec534c4175",
+    "claimedAt": "2026-07-29T22:19:23.361Z",
+    "heartbeatAt": "2026-07-29T22:19:23.361Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0253.json",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-planning-authority.ts",
+      "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+      "tests/cli/taskflow-cross-task-residue-recovery.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260729221923-codex-git-series-captain-485b761d8e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729221923-codex-git-series-captain-485b761d8e\""
+    }
+  },
+  "startedAt": "2026-07-29T22:19:23.361Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-8aff7d154d18a9a4",
+    "ticketDigest": "sha256:8aff7d154d18a9a4ac20b0e9c3c1dfa95e4018a2037f6ab634b75998577dad83",
+    "taskId": "ATM-GOV-0253",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729221923-codex-git-series-captain-485b761d8e",
+    "claimGeneration": "lease-85ec534c4175",
+    "issuedAt": "2026-07-29T22:19:23.361Z",
+    "expiresAt": "2026-07-29T22:49:23.361Z",
+    "scopeDigest": "sha256:09c66c801d5ba083722cb19ec2b9df49c42ff95c186bb6803cf46fa9cfc8ae13",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T22:19:23.361Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0253.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0253/**",
+          ".atm/history/tasks/ATM-GOV-0253.json",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/taskflow/close-preflight.ts",
+          "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+          "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
+          "packages/cli/src/commands/taskflow/write-readiness.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator.ts",
+          "packages/cli/src/commands/tasks/import-planning-authority.ts",
+          "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+          "schemas/governance/cross-authority-closeback.schema.json",
+          "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+          "tests/cli/planning-source-seal.test.ts",
+          "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+          "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+          "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+          "tests/cli/taskflow-cross-task-residue-recovery.test.ts"
+        ],
+        "digest": "sha256:d829bd2c0e434e269db7b3c81c517ea395fece32f6973c9f8817c9032ae07bd1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260729221923-codex-git-series-captain-ATM-GOV-0253-af3174b157",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0253",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0253.*",
+      ".atm/history/task-events/ATM-GOV-0253/**",
+      ".atm/history/tasks/ATM-GOV-0253.json",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-planning-authority.ts",
+      "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+      "tests/cli/taskflow-cross-task-residue-recovery.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "09dafe546abadee2191defef41b6db781a0fb51818b2e3de3a526205fc2ab807",
+    "actorId": "codex-git-series-captain",
+    "sessionId": "session-20260729221923-codex-git-series-captain-ATM-GOV-0253-af3174b157",
+    "laneSession": {
+      "laneSessionId": "lane-20260729221923-codex-git-series-captain-485b761d8e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729221923-codex-git-series-captain-485b761d8e\""
+    },
+    "createdAt": "2026-07-29T22:19:35.522Z",
+    "status": "active"
+  }
+}
