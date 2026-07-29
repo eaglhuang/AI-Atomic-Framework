@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-268",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Broker reservation / conflict resolution store",
+  "finding": "Broker release/conflict resolution can leave multiple opposing reservation artifacts for the same shared path without a supersession or last-writer contract, so `resolve` may report ready while later close/preclose sees the conflict again.",
+  "expectedBehavior": "Reservation resolution artifacts should have a formal supersession interface with a single authoritative release order per conflict set, or close should consume a deterministic latest valid artifact and explain why older artifacts are ignored.",
+  "evidenceOrRepro": "TASK-AAO-0206 and TASK-RFT-0101 shared `atom-cli-router`: `BCR-2ki403.json` selected TASK-AAO-0206 as primary while existing `BCR-snim65.json` selected TASK-RFT-0101 as primary. The agent observed `ATM_TEAM_BROKER_CONFLICT_RESOLUTION_READY`, then close surfaced the broker conflict again.",
+  "followUp": "Implement formal reservation supersession and add close/preclose regression coverage for opposing artifacts on the same shared atom/path."
+}

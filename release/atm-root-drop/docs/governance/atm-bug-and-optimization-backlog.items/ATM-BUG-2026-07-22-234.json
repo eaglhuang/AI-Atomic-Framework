@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-234",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Runner sync / emergency landed source recovery",
+  "finding": "After an emergency source fix landed and was pushed, frozen runner sync remained blocked because runner-sync admission treated nearby foreign non-release WIP and landed-not-closed build input risk as a terminal refusal rather than providing a safe queue or sealed-source recovery route.",
+  "expectedBehavior": "Runner-sync should provide a broker ticket or recovery plan for rebuilding from a sealed committed source while excluding uncommitted foreign WIP, or should expose a narrow steward workflow that preserves INV-ATM-008 without requiring manual arbitration.",
+  "evidenceOrRepro": "After commit 957a333fbc51085ee9968f437401d7527612c199, `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` failed with ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED and reasonCode landed-not-closed-build-input-risk while broker status was clean.",
+  "followUp": "Add runner-sync sealed-source isolation/revalidation for emergency landed commits, or a first-class queue-head steward path with precise foreign WIP exclusions and recoveryCommand."
+}

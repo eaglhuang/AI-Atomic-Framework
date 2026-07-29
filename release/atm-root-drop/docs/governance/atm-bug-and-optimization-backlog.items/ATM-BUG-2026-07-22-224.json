@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-22-224",
+  "date": "2026-07-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Team Broker / conflict-resolution authority",
+  "finding": "A `broker-conflict-blocked` claim recommends `team broker resolve`, but the command-produced `atm.brokerConflictResolution.v1` shape does not prove it carries the canonical broker ticket, authority generation/digest, authorization grants, and bounded resource keys required by claim admission. The advertised recovery can therefore produce a sidecar that the retry still rejects.",
+  "expectedBehavior": "The official resolution producer and claim consumer must share one authority-envelope contract. Running the exact command returned by the freeze should either admit the authorized task pair/resource on retry or fail before writing an unusable artifact with a precise missing-authority diagnosis.",
+  "evidenceOrRepro": "Plan 3.1 dogfood on 2026-07-22: `ATM-GOV-0239` claim by `claude-plan31-captain` froze against active `ATM-GOV-0249` at logical resource `atom-core-registry` with `sharedPaths: []`. Source audit found `createBrokerConflictResolutionArtifact` and the legacy resolve command do not visibly populate the authority fields checked by `readResolutionAuthorizedForeignTaskIds`, despite the freeze recommending that command.",
+  "followUp": "Implement and close ATM-GOV-0255. Add a command-to-retry regression covering the exact no-shared-path logical overlap, preserve fail-closed behavior for stale or over-broad grants, and link the resulting frozen-runner proof back to this item."
+}

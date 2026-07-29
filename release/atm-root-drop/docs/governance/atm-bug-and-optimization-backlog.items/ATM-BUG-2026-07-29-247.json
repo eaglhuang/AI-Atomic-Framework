@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-247",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Task claim and WIP recovery",
+  "finding": "A task with exact in-scope dirty WIP can be blocked from claim as unowned, while the returned `tasks release --wip-commit` recovery command itself rejects the task because no active claim exists. The operator has no normal ATM path to preserve and reclaim the same task's work.",
+  "expectedBehavior": "Admission must offer a governed same-task recovery path for an exact declared-scope WIP bundle, either by attaching a recovery claim before preservation or by creating a brokered non-delivery commit candidate that can be adopted by the task without a raw Git escape.",
+  "evidenceOrRepro": "TASK-GIT-0025 on 2026-07-29: `next --claim --auto-intent` returned `ATM_CLAIM_FOREIGN_UNSTAGED_WIP` for five staged in-scope source files; the returned `tasks release --wip-commit` then returned `ATM_TASK_CLAIM_MISSING`. Owner approved a one-time pathspec WIP preservation commit `27eccf8eeb1d8f092aaebd503d21e68a22d37d3f`.",
+  "followUp": "Implement and test a task-scoped claim-recovery/commit-candidate route. It must preserve exact scope, record attribution, and let the task resume normally without an emergency native Git commit."
+}

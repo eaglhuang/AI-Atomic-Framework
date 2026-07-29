@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-24-240",
+  "date": "2026-07-24",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Taskflow / Git admission",
+  "finding": "ATM has no governed admission path for required task deliverables that are hidden by local ignore rules such as .git/info/exclude. TASK-SKL-0027 required new templates/skills deliverables, but normal governed auto-stage could not see them because the local target worktree ignores templates/. The only obvious workaround was native git add -f, which is not ledgered as an ATM authority decision.",
+  "expectedBehavior": "When a sealed task card declares an ignored deliverable, ATM should fail closed with a structured recovery command that records an explicit ignored-deliverable admission receipt, binds the path to the active task/actor/lane, verifies the path is in allowedFiles/deliverables, and stages/commits it through governed taskflow without native ad hoc force-add.",
+  "evidenceOrRepro": "TASK-SKL-0027 dogfood: templates/skills/atm-deep-module-refactor.skill.md and references were declared deliverables, but .git/info/exclude contains templates/. SKL captain reported governed commit dry-run excluded the ignored deliverables and stopped rather than using native git add -f.",
+  "followUp": "Add an ATM-governed ignored-deliverable admission/recovery path and regression test. Until fixed, emergency owner-approved path may be used only for exact task-declared deliverables, with before/after staged-set proof and no expansion beyond the sealed task card."
+}

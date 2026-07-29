@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/atm.parallel-replay-evidence.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "scenarioDigest",
+    "runnerDigest",
+    "workerCount",
+    "maxConcurrentWorkers",
+    "overlapWindowMs",
+    "parallelAdmissionCount",
+    "serializedAdmissionCount",
+    "queueOnlyAdmissionCount",
+    "parallelOverlapRatio",
+    "serializedAdmissionRatio",
+    "timeInQueueOnlyRatio",
+    "throughputGainRatio",
+    "costRatio",
+    "faultCounters",
+    "verdict",
+    "unavailableReceipts",
+    "workerReceipts",
+    "digest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.parallelReplayEvidence.v1" },
+    "scenarioDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "runnerDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "workerCount": { "type": "integer", "minimum": 0 },
+    "maxConcurrentWorkers": { "type": "integer", "minimum": 0 },
+    "overlapWindowMs": { "type": "integer", "minimum": 0 },
+    "parallelAdmissionCount": { "type": "integer", "minimum": 0 },
+    "serializedAdmissionCount": { "type": "integer", "minimum": 0 },
+    "queueOnlyAdmissionCount": { "type": "integer", "minimum": 0 },
+    "parallelOverlapRatio": { "type": "number", "minimum": 0 },
+    "serializedAdmissionRatio": { "type": "number", "minimum": 0 },
+    "timeInQueueOnlyRatio": { "type": "number", "minimum": 0 },
+    "throughputGainRatio": { "type": "number", "minimum": 0 },
+    "costRatio": { "type": "number", "minimum": 0 },
+    "faultCounters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "escapedConflictCount",
+        "silentOverwriteCount",
+        "duplicateSideEffectCount",
+        "unresolvedStarvationCount",
+        "staleAuthorizationCount",
+        "dimensionMismatchedAuthorizationCount",
+        "decisionContradictionCount",
+        "unexpectedBreakerTripCount"
+      ],
+      "properties": {
+        "escapedConflictCount": { "type": "integer", "minimum": 0 },
+        "silentOverwriteCount": { "type": "integer", "minimum": 0 },
+        "duplicateSideEffectCount": { "type": "integer", "minimum": 0 },
+        "unresolvedStarvationCount": { "type": "integer", "minimum": 0 },
+        "staleAuthorizationCount": { "type": "integer", "minimum": 0 },
+        "dimensionMismatchedAuthorizationCount": { "type": "integer", "minimum": 0 },
+        "decisionContradictionCount": { "type": "integer", "minimum": 0 },
+        "unexpectedBreakerTripCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "verdict": { "enum": ["pass", "failed", "inconclusive", "queue-only"] },
+    "unavailableReceipts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "workerReceipts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workerId",
+          "actorId",
+          "processId",
+          "startedAtMs",
+          "finishedAtMs",
+          "runner",
+          "admission",
+          "sideEffects",
+          "exitCode",
+          "stdoutDigest",
+          "stderrDigest"
+        ],
+        "properties": {
+          "workerId": { "type": "string", "minLength": 1 },
+          "actorId": { "type": "string", "minLength": 1 },
+          "processId": { "type": ["integer", "null"] },
+          "startedAtMs": { "type": "number" },
+          "finishedAtMs": { "type": "number" },
+          "runner": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["entrypoint", "digest"],
+            "properties": {
+              "entrypoint": { "type": "string", "minLength": 1 },
+              "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+            }
+          },
+          "admission": { "enum": ["parallel", "serialized", "queue-only"] },
+          "sideEffects": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "exitCode": { "type": "integer" },
+          "stdoutDigest": { "type": "string", "minLength": 1 },
+          "stderrDigest": { "type": "string", "minLength": 1 },
+          "commandReceipts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "command",
+                "startedAtMs",
+                "finishedAtMs",
+                "exitCode",
+                "stdoutDigest",
+                "stderrDigest"
+              ],
+              "properties": {
+                "command": { "type": "string", "minLength": 1 },
+                "startedAtMs": { "type": "number" },
+                "finishedAtMs": { "type": "number" },
+                "exitCode": { "type": "integer" },
+                "stdoutDigest": { "type": "string", "minLength": 1 },
+                "stderrDigest": { "type": "string", "minLength": 1 },
+                "brokerTicketState": { "type": ["string", "null"] },
+                "waitedMs": { "type": ["number", "null"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "realTaskDogfood": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "taskCount",
+        "actorCount",
+        "declaredIntersection",
+        "preservedIntersection",
+        "terminalRefusalCount",
+        "manualWakeupCount",
+        "closurePacketPollutionCount",
+        "traces",
+        "digest"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.parallelReplayDogfoodEvidence.v1" },
+        "taskCount": { "type": "integer", "minimum": 0 },
+        "actorCount": { "type": "integer", "minimum": 0 },
+        "declaredIntersection": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "preservedIntersection": { "type": "boolean" },
+        "terminalRefusalCount": { "type": "integer", "minimum": 0 },
+        "manualWakeupCount": { "type": "integer", "minimum": 0 },
+        "closurePacketPollutionCount": { "type": "integer", "minimum": 0 },
+        "traces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "taskId",
+              "actorId",
+              "declaredIntersection",
+              "preservedIntersection",
+              "canonicalTicketState",
+              "waitedMs",
+              "successorWakeup",
+              "closurePacketDigest",
+              "lifecycle"
+            ],
+            "properties": {
+              "taskId": { "type": "string", "minLength": 1 },
+              "actorId": { "type": "string", "minLength": 1 },
+              "declaredIntersection": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "preservedIntersection": { "type": "boolean" },
+              "canonicalTicketState": { "type": ["string", "null"] },
+              "waitedMs": { "type": "number", "minimum": 0 },
+              "successorWakeup": { "type": "boolean" },
+              "closurePacketDigest": { "type": "string", "minLength": 1 },
+              "lifecycle": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "lifecycleReceipts": {
+      "type": "array",
+      "description": "Optional event-derived semantic lifecycle receipts validated by atm.parallelReplayLifecycleReceipt.v1.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaId",
+          "step",
+          "commandPurpose",
+          "taskId",
+          "actorId",
+          "ticketGeneration",
+          "sharedSurface",
+          "digest",
+          "timeWindow",
+          "command",
+          "exitCode"
+        ],
+        "properties": {
+          "schemaId": { "const": "atm.parallelReplayLifecycleReceipt.v1" },
+          "step": {
+            "enum": [
+              "claim",
+              "bounded-intent",
+              "ticket",
+              "adapter-decision",
+              "mutation-batch",
+              "compose",
+              "serializability",
+              "steward-apply",
+              "shared-delivery",
+              "queue-revalidation-fallback",
+              "wakeup",
+              "close",
+              "admission",
+              "post-compose-semantic-validation",
+              "correctness-counters"
+            ]
+          },
+          "commandPurpose": { "type": "string", "minLength": 1 },
+          "taskId": { "type": "string", "minLength": 1 },
+          "actorId": { "type": "string", "minLength": 1 },
+          "ticketGeneration": { "type": ["string", "null"] },
+          "sharedSurface": { "type": ["string", "null"] },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "timeWindow": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["startedAtMs", "finishedAtMs"],
+            "properties": {
+              "startedAtMs": { "type": "number" },
+              "finishedAtMs": { "type": "number" }
+            }
+          },
+          "command": { "type": "string", "minLength": 1 },
+          "exitCode": { "type": "integer" },
+          "canonicalEventRef": { "type": ["string", "null"] },
+          "producerLabel": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

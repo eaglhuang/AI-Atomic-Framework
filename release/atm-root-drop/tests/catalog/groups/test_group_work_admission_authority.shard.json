@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_work_admission_authority",
+  "theme": "Claim-issued work admission authority",
+  "resourceKey": "test-group:work-admission-authority",
+  "maintainers": ["atm-git-boundary"],
+  "supportedSeams": ["claim-to-ticket-to-delivery"],
+  "cases": [
+    {
+      "caseId": "test_task_work_admission_claim_recovery_b18a0d41",
+      "semanticKey": "claim_recovery",
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts && node --strip-types tests/cli/work-admission-ticket-recovery.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1"],
+      "coversImpactEdges": ["claim-to-ticket-to-delivery"]
+    },
+    {
+      "caseId": "test_task_work_admission_gateway_76a4cf02",
+      "semanticKey": "gateway_ticket",
+      "command": "node --strip-types tests/cli/restricted-execution-gateway.test.ts && node --strip-types tests/cli/write-ticket-scope-guard.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-2"],
+      "coversImpactEdges": ["claim-to-ticket-to-delivery"],
+      "dependsOnCaseIds": ["test_task_work_admission_claim_recovery_b18a0d41"]
+    }
+  ],
+  "aliases": [],
+  "lineage": [],
+  "costBudgetMs": 30000,
+  "timeoutMs": 60000,
+  "quarantine": false
+}

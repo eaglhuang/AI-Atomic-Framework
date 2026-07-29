@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-263",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Git governance / hook context",
+  "finding": "A native git commit over an ATM task-scoped staged bundle can be blocked as ATM_CROSS_TASK_MUTATION_BLOCKED because the pre-commit hook sees taskId=null and treats the current task's own active files as foreign cross-task mutations.",
+  "expectedBehavior": "When the staged set is already task-scoped and trailers or environment provide actor/task context, the hook should classify same-task mutations as owned, or return a precise missing-context error with the ATM commit command that preserves the staged bundle.",
+  "evidenceOrRepro": "During ATM-GOV-0252 closeout, ATM git commit dry-run accepted the bundle, but native git commit reported ATM_CROSS_TASK_MUTATION_BLOCKED for ATM-GOV-0252's own files with conflictTaskId=ATM-GOV-0252 and taskId=null.",
+  "followUp": "Add a hook-level task-context resolver for ATM trailers/environment and a regression test that same-task staged files do not become cross-task conflicts when the bundle is otherwise admitted."
+}

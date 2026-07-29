@@ -9,6 +9,7 @@ import type {
   ParallelAdmissionSafetyMetrics
 } from '../../../../../core/src/broker/parallel-admission-policy.ts';
 import type { ParallelReplayEvidence } from '../../../../../core/src/broker/replay/index.ts';
+import type { ClosureObservation } from './closure-observation.ts';
 
 export interface Atm3FinalClosureInput {
   readonly actorId: string | null;
@@ -49,6 +50,34 @@ export interface Atm3FinalClosureEvidenceInput {
   readonly sourceFrozenReleaseParity: boolean;
   readonly requiredCellCount?: number;
   readonly now?: string;
+}
+
+export interface Atm3FinalClosureObservationInput {
+  readonly actorId: string | null;
+  readonly metrics: ParallelAdmissionSafetyMetrics;
+  readonly observation: ClosureObservation;
+  readonly realMultiprocessReplay: boolean;
+  readonly realTaskDogfoodIntersection: readonly string[];
+  readonly realTaskDogfoodProven: boolean;
+  readonly now?: string;
+}
+
+export function buildAtm3FinalClosureVerdictFromObservation(input: Atm3FinalClosureObservationInput): Atm3FinalClosureVerdict {
+  return buildAtm3FinalClosureVerdict({
+    actorId: input.actorId,
+    metrics: input.metrics,
+    inheritedAcceptanceOpenCount: input.observation.dispositionSummary.lackingUniqueConsumer.length,
+    blockerBacklogIds: input.observation.openBlockerIds,
+    readinessProbeFailures: input.observation.readinessProbeFailures,
+    realMultiprocessReplay: input.realMultiprocessReplay,
+    realTaskDogfoodIntersection: input.realTaskDogfoodIntersection,
+    realTaskDogfoodProven: input.realTaskDogfoodProven,
+    rollbackExercised: input.observation.rollbackExercised && input.observation.rollbackExactlyOnceOnRetry,
+    sourceFrozenReleaseParity: input.observation.parity.equivalent,
+    observedBreakerTripCount: input.observation.healthyReplayUnexpectedTrips,
+    timeInQueueOnlyRatio: input.observation.healthyReplayQueueOnlyResidency,
+    now: input.now
+  });
 }
 
 export function buildAtm3FinalClosureVerdictFromEvidence(input: Atm3FinalClosureEvidenceInput): Atm3FinalClosureVerdict {

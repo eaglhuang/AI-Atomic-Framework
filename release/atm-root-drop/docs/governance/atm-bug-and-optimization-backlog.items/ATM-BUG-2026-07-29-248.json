@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-248",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Claim admission and physical line budget",
+  "finding": "Claim admission blocks a correction task before it can split an already oversized declared module. TASK-GIT-0025 was refused because `active-work-summary.ts` is 601 lines, one line above the 600 hard limit, even though the card is the governed correction path for that surface.",
+  "expectedBehavior": "When a task explicitly declares an oversized file and an extraction target, admission should permit a bounded refactor only when the card commits to reducing the file below the hard limit and validates the result. The exception must be data-backed, one-use, and fail closed if the delivery does not reduce the file.",
+  "evidenceOrRepro": "`node atm.mjs next --claim --actor codex-git-series-captain --task TASK-GIT-0025 --auto-intent --json` on 2026-07-29 returned `ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED`; `packages/cli/src/commands/next/playbook-projection/active-work-summary.ts` measured 601 lines.",
+  "followUp": "Add a refactor-aware admission contract and regression fixture. Do not add a general line-budget waiver; require declared extraction evidence and a post-delivery budget decrease."
+}

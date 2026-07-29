@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-266",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Task import / planning mirror reconciliation",
+  "finding": "`tasks import --write --reconcile-mirror` can record a `planning-mirror-reconcile` transition in the live ledger while leaving the source planning card frontmatter unchanged, so `tasks status` continues to report live-ledger done vs planning-frontmatter planned divergence.",
+  "expectedBehavior": "A reconcile-mirror command should either update the authoritative planning mirror, explicitly refuse with a cross-repo write authorization/error, or use an error code that says the mirror was not mutated. It must not emit a done-to-done reconcile transition that implies convergence when divergence remains.",
+  "evidenceOrRepro": "ATM-GOV-0237, ATM-GOV-0238, and ATM-GOV-0242 after governed close: `node atm.mjs tasks import --from ../3KLife/... --write --reconcile-mirror --json` wrote `.atm/history/tasks/<task>.json` and task-import reports, then `node atm.mjs tasks status --task <task> --json` still reported planningFrontmatter.status=`planned` and residue bucket `stale-import`.",
+  "followUp": "Add a regression around cross-repo planning mirror mutation and make reconcile semantics transactional: either both live ledger and planning mirror converge, or no reconcile transition is recorded."
+}

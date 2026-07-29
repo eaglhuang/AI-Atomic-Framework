@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/validators/runner-execution-attestation.schema.json",
+  "title": "ATM Runner Execution Attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "taskId",
+    "selectedRunnerReceiptDigest",
+    "frozenEntrypointDigest",
+    "frozenOutputDigests",
+    "taskChangeDigest",
+    "commandBackedValidators",
+    "runnerTransition",
+    "generatedAt",
+    "attestationDigest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.runnerExecutionAttestation.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "taskId": { "type": "string", "minLength": 1 },
+    "selectedRunnerReceiptDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "frozenEntrypointDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "frozenOutputDigests": { "type": "array", "items": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" } },
+    "taskChangeDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "commandBackedValidators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "exitCode", "stdoutSha256", "stderrSha256"],
+        "properties": {
+          "command": { "type": "string", "minLength": 1 },
+          "exitCode": { "type": "number" },
+          "stdoutSha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "stderrSha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "runnerTransition": { "type": ["string", "null"] },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "attestationDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

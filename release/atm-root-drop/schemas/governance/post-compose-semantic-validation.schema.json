@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/governance/post-compose-semantic-validation.schema.json",
+  "title": "ATM Post-Compose Semantic Validation",
+  "description": "Exact composed candidate envelope and policy decision for the post-compose / pre-steward semantic gate. Serializability alone never authorizes a canonical write.",
+  "oneOf": [
+    { "$ref": "#/$defs/candidate" },
+    { "$ref": "#/$defs/decision" },
+    { "$ref": "#/$defs/sealedSelection" },
+    { "$ref": "#/$defs/stewardAuthorization" }
+  ],
+  "$defs": {
+    "sha256Digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-fA-F0-9]{64}$"
+    },
+    "validatorReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["validatorId", "outcome", "commandBacked"],
+      "properties": {
+        "validatorId": { "type": "string", "minLength": 1 },
+        "outcome": {
+          "enum": ["pass", "fail", "unavailable", "unexecuted", "malformed"]
+        },
+        "commandBacked": { "type": "boolean" },
+        "executable": { "type": ["string", "null"] },
+        "argv": {
+          "type": ["array", "null"],
+          "items": { "type": "string" }
+        },
+        "cwd": { "type": ["string", "null"] },
+        "exitCode": { "type": ["integer", "null"] },
+        "stdoutDigest": { "type": ["string", "null"] },
+        "stderrDigest": { "type": ["string", "null"] }
+      }
+    },
+    "sealedSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "selectionInputDigest",
+        "sealedSelectionSourceDigest",
+        "requiredValidatorIds",
+        "cardValidators",
+        "adapterStaticChecks",
+        "catalogTargetedTests"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.sealedValidatorSelection.v1" },
+        "selectionInputDigest": { "$ref": "#/$defs/sha256Digest" },
+        "sealedSelectionSourceDigest": { "$ref": "#/$defs/sha256Digest" },
+        "requiredValidatorIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "cardValidators": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "adapterStaticChecks": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "catalogTargetedTests": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateDigest",
+        "baseHeadSha",
+        "sealedSelectionSourceDigest",
+        "requiredValidatorIds",
+        "validatorReceipts"
+      ],
+      "properties": {
+        "schemaId": {
+          "enum": ["atm.postComposeSemanticCandidate.v1"]
+        },
+        "candidateDigest": { "$ref": "#/$defs/sha256Digest" },
+        "baseHeadSha": { "type": "string", "minLength": 1 },
+        "sealedSelectionSourceDigest": { "$ref": "#/$defs/sha256Digest" },
+        "selectionInputDigest": { "$ref": "#/$defs/sha256Digest" },
+        "requiredValidatorIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "validatorReceipts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/validatorReceipt" }
+        },
+        "serializabilityProofPresent": { "type": "boolean" },
+        "canonicalWriteAttempted": { "type": "boolean" },
+        "observedSelection": { "$ref": "#/$defs/sealedSelection" }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "verdict",
+        "code",
+        "canonicalWriteAuthorized",
+        "failedValidatorIds",
+        "unavailableValidatorIds",
+        "malformedValidatorIds",
+        "recoveryCommand",
+        "reasons"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.postComposeSemanticValidationDecision.v1" },
+        "verdict": {
+          "enum": ["pass", "failed", "unavailable", "malformed"]
+        },
+        "code": {
+          "type": ["string", "null"],
+          "enum": [
+            null,
+            "ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_FAILED",
+            "ATM_BROKER_COMPOSE_SEMANTIC_VALIDATION_UNAVAILABLE"
+          ]
+        },
+        "canonicalWriteAuthorized": { "type": "boolean" },
+        "failedValidatorIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "unavailableValidatorIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "malformedValidatorIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "recoveryCommand": { "type": ["string", "null"] },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "stewardAuthorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "candidateDigest",
+        "outputDigest",
+        "decisionVerdict",
+        "ok"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.stewardSemanticValidationReceipt.v1" },
+        "candidateDigest": { "$ref": "#/$defs/sha256Digest" },
+        "outputDigest": { "$ref": "#/$defs/sha256Digest" },
+        "decisionVerdict": {
+          "enum": ["pass", "failed", "unavailable", "malformed"]
+        },
+        "ok": { "type": "boolean" }
+      }
+    }
+  }
+}

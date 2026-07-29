@@ -1,0 +1,208 @@
+export const explicitActorIdEnvVar = 'ATM_ACTOR_ID';
+export const legacyActorIdEnvVar = 'AGENT_IDENTITY';
+export function normalizeIdentitySegment(value) {
+    return String(value ?? '')
+        .normalize('NFKC')
+        .replace(/[^A-Za-z0-9_-]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+export function mintFrameworkTempTaskId(actorId) {
+    const normalized = normalizeIdentitySegment(actorId);
+    return `ATM-FRAMEWORK-TEMP-${normalized || 'unknown-actor'}`;
+}
+export function sanitizeIdentityValue(value) {
+    if (typeof value !== 'string')
+        return null;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}
+/**
+ * Resolve the actor that may mutate shared-write surfaces.
+ * Explicit CLI/--actor and ATM_ACTOR_ID stay authoritative.
+ * AGENT_IDENTITY is diagnostic-only when it disagrees with the active lane,
+ * claim, or queue-head owner, and must never silently replace them.
+ */
+export function resolveSharedWriteActorAuthority(input) {
+    const explicitActorId = sanitizeIdentityValue(input.explicitActorId);
+    const envActorId = sanitizeIdentityValue(input.envActorId);
+    const legacyEnvActorId = sanitizeIdentityValue(input.legacyEnvActorId);
+    const repoDefaultActorId = sanitizeIdentityValue(input.repoDefaultActorId);
+    const activeClaimOwnerActorId = sanitizeIdentityValue(input.activeClaimOwnerActorId);
+    const laneSessionId = sanitizeIdentityValue(input.laneSessionId);
+    const queueHeadOwnerActorIds = uniqueSorted((input.queueHeadOwnerActorIds ?? [])
+        .map((entry) => sanitizeIdentityValue(entry))
+        .filter((entry) => Boolean(entry)));
+    const buildCommand = sanitizeIdentityValue(input.buildCommand) ?? 'npm run build';
+    let actorId = null;
+    let resolutionSource = 'insufficient';
+    if (explicitActorId) {
+        actorId = explicitActorId;
+        resolutionSource = 'option';
+    }
+    else if (envActorId) {
+        actorId = envActorId;
+        resolutionSource = 'env';
+    }
+    else if (queueHeadOwnerActorIds.length === 1) {
+        actorId = queueHeadOwnerActorIds[0] ?? null;
+        resolutionSource = 'queue-head';
+    }
+    else if (activeClaimOwnerActorId) {
+        actorId = activeClaimOwnerActorId;
+        resolutionSource = 'active-lane';
+    }
+    else if (repoDefaultActorId) {
+        actorId = repoDefaultActorId;
+        resolutionSource = 'repo-default';
+    }
+    const legacyEnvDisagrees = Boolean(legacyEnvActorId
+        && ((actorId !== null && legacyEnvActorId !== actorId)
+            || (queueHeadOwnerActorIds.length > 0 && !queueHeadOwnerActorIds.includes(legacyEnvActorId))
+            || (activeClaimOwnerActorId !== null && legacyEnvActorId !== activeClaimOwnerActorId)));
+    if (!actorId) {
+        const preferredOwner = queueHeadOwnerActorIds[0]
+            ?? activeClaimOwnerActorId
+            ?? repoDefaultActorId
+            ?? null;
+        return {
+            schemaId: 'atm.sharedWriteActorAuthority.v1',
+            ok: false,
+            actorId: null,
+            resolutionSource: 'insufficient',
+            legacyEnvActorId,
+            legacyEnvDisagrees: Boolean(legacyEnvActorId),
+            laneSessionId,
+            queueHeadOwnerActorIds,
+            activeClaimOwnerActorId,
+            recoveryCommand: preferredOwner
+                ? buildSharedWriteActorRecoveryCommand({ actorId: preferredOwner, buildCommand })
+                : `node atm.mjs identity set --actor <actor-id> --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json`,
+            reason: legacyEnvActorId
+                ? `${legacyActorIdEnvVar} is diagnostic-only for shared-write lanes; set ${explicitActorIdEnvVar} or pass --actor before mutation.`
+                : `Shared-write mutation requires an explicit actor via --actor or ${explicitActorIdEnvVar}.`
+        };
+    }
+    if (queueHeadOwnerActorIds.length > 0 && !queueHeadOwnerActorIds.includes(actorId)) {
+        const owner = queueHeadOwnerActorIds[0] ?? null;
+        return {
+            schemaId: 'atm.sharedWriteActorAuthority.v1',
+            ok: false,
+            actorId,
+            resolutionSource,
+            legacyEnvActorId,
+            legacyEnvDisagrees: true,
+            laneSessionId,
+            queueHeadOwnerActorIds,
+            activeClaimOwnerActorId,
+            recoveryCommand: owner
+                ? buildSharedWriteActorRecoveryCommand({ actorId: owner, buildCommand })
+                : null,
+            reason: `Resolved actor ${actorId} does not own the shared-write queue head (${queueHeadOwnerActorIds.join(', ')}).`
+        };
+    }
+    if (activeClaimOwnerActorId && actorId !== activeClaimOwnerActorId && resolutionSource !== 'option' && resolutionSource !== 'env') {
+        return {
+            schemaId: 'atm.sharedWriteActorAuthority.v1',
+            ok: false,
+            actorId,
+            resolutionSource,
+            legacyEnvActorId,
+            legacyEnvDisagrees: true,
+            laneSessionId,
+            queueHeadOwnerActorIds,
+            activeClaimOwnerActorId,
+            recoveryCommand: buildSharedWriteActorRecoveryCommand({
+                actorId: activeClaimOwnerActorId,
+                buildCommand
+            }),
+            reason: `Active claim owner ${activeClaimOwnerActorId} must remain authoritative across shared-write child commands.`
+        };
+    }
+    return {
+        schemaId: 'atm.sharedWriteActorAuthority.v1',
+        ok: true,
+        actorId,
+        resolutionSource,
+        legacyEnvActorId,
+        legacyEnvDisagrees,
+        laneSessionId,
+        queueHeadOwnerActorIds,
+        activeClaimOwnerActorId,
+        recoveryCommand: null,
+        reason: legacyEnvDisagrees
+            ? `${legacyActorIdEnvVar}=${legacyEnvActorId} is diagnostic-only and does not replace authoritative actor ${actorId}.`
+            : null
+    };
+}
+export function buildSharedWriteActorRecoveryCommand(input) {
+    const buildCommand = sanitizeIdentityValue(input.buildCommand) ?? 'npm run build';
+    return `${explicitActorIdEnvVar}=${quoteShellAssignmentValue(input.actorId)} ${buildCommand}`;
+}
+/**
+ * Emergency/native Git commit identity must come from the active actor profile.
+ * Host `user.name` / `user.email` must not silently survive when an actor is known.
+ */
+export function buildEmergencyGitAuthorEnv(input) {
+    const gitName = sanitizeIdentityValue(input.gitName);
+    const gitEmail = sanitizeIdentityValue(input.gitEmail);
+    if (!gitName || !gitEmail) {
+        throw new Error('Emergency Git author env requires both gitName and gitEmail from actor identity.');
+    }
+    const env = {
+        GIT_AUTHOR_NAME: gitName,
+        GIT_AUTHOR_EMAIL: gitEmail,
+        GIT_COMMITTER_NAME: gitName,
+        GIT_COMMITTER_EMAIL: gitEmail
+    };
+    const actorId = sanitizeIdentityValue(input.actorId);
+    if (actorId) {
+        env[explicitActorIdEnvVar] = actorId;
+    }
+    return env;
+}
+export function verifyEmergencyGitAuthorContinuity(input) {
+    const expectedName = sanitizeIdentityValue(input.expectedGitName);
+    const expectedEmail = sanitizeIdentityValue(input.expectedGitEmail);
+    const authorName = sanitizeIdentityValue(input.observedAuthorName);
+    const authorEmail = sanitizeIdentityValue(input.observedAuthorEmail);
+    const committerName = sanitizeIdentityValue(input.observedCommitterName) ?? authorName;
+    const committerEmail = sanitizeIdentityValue(input.observedCommitterEmail) ?? authorEmail;
+    const expectedActorId = sanitizeIdentityValue(input.expectedActorId);
+    const trailerActor = sanitizeIdentityValue(input.atmActorTrailer);
+    if (!expectedName || !expectedEmail) {
+        return {
+            ok: false,
+            recoveryCommand: null,
+            reason: 'Expected emergency actor git identity is incomplete.'
+        };
+    }
+    if (authorName !== expectedName || authorEmail !== expectedEmail
+        || committerName !== expectedName || committerEmail !== expectedEmail) {
+        return {
+            ok: false,
+            recoveryCommand: [
+                `GIT_AUTHOR_NAME=${quoteShellAssignmentValue(expectedName)}`,
+                `GIT_AUTHOR_EMAIL=${quoteShellAssignmentValue(expectedEmail)}`,
+                `GIT_COMMITTER_NAME=${quoteShellAssignmentValue(expectedName)}`,
+                `GIT_COMMITTER_EMAIL=${quoteShellAssignmentValue(expectedEmail)}`,
+                'git commit --amend --no-edit --reset-author'
+            ].join(' '),
+            reason: `Stale host Git author/committer (${authorName} <${authorEmail}>) does not match actor identity (${expectedName} <${expectedEmail}>).`
+        };
+    }
+    if (expectedActorId && trailerActor && trailerActor !== expectedActorId) {
+        return {
+            ok: false,
+            recoveryCommand: `Ensure ATM-Actor trailer equals ${expectedActorId} before amending the emergency commit.`,
+            reason: `ATM-Actor trailer ${trailerActor} does not match active actor ${expectedActorId}.`
+        };
+    }
+    return { ok: true, recoveryCommand: null, reason: null };
+}
+export function quoteShellAssignmentValue(value) {
+    return /^[A-Za-z0-9_./:=@-]+$/.test(value) ? value : JSON.stringify(String(value));
+}
+function uniqueSorted(values) {
+    return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+}

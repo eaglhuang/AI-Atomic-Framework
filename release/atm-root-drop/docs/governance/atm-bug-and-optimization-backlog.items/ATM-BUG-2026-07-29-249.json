@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-249",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Lane ownership diagnostics",
+  "finding": "`ATM_TASK_CLAIM_OWNER_MISMATCH` can report the same actor on both sides when the real mismatch is `ownershipMode: \"lane-id\"` and the holding lane session differs from the requested lane session. `ATM_LANE_SESSION_ID` also silently falls back to a newly minted lane when the supplied lane has stale TTL, so a caller can keep passing the documented env var and still fail renewal until running a separate lane adopt.",
+  "expectedBehavior": "Lane-mode ownership mismatch should use a lane-specific error code and lane-vs-lane diagnostic payload. When a supplied lane session is stale but otherwise adoptable, the recovery path should either rebind/adopt it explicitly or fail with an actionable stale-lane error instead of silently minting a different session.",
+  "evidenceOrRepro": "TASK-AAO-0206 close recovery on 2026-07-29: `tasks renew` printed `currentActor` and `actorId` as the same actor while data showed different `holdingLaneSessionId` and `requestedLaneSessionId`. A later retry with `ATM_LANE_SESSION_ID` still failed until `lane adopt` re-bound stale lease `lease-c461a4c70a22`.",
+  "followUp": "Add lane-mode mismatch errors, CLI copy, and regression tests for fresh lane, stale-but-adoptable lane, and invalid lane session cases. Make lane adopt persist or emit the exact environment binding needed for subsequent lifecycle commands."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-252",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 10e283f6 / 3269f80a",
+  "area": "Batch checkpoint historical delivery",
+  "finding": "`batch checkpoint` did not expose or forward `--waiver-out-of-scope-delivery` and `--emergency-approval` to the underlying `tasks close` call. A batch queue head with already-verified historical delivery commits that included necessary out-of-scope context could not close through the only legal batch checkpoint route.",
+  "expectedBehavior": "Batch checkpoint should support the same explicit historical-delivery waiver and emergency approval controls as task close, and forward them unchanged to the close orchestrator. The route must remain explicit and auditable, not implicit.",
+  "evidenceOrRepro": "TASK-GIT-0026 had green evidence and historical delivery commits `91fcf80a5` and `dff658e7a`, but direct `taskflow close` was blocked by `ATM_BATCH_CHECKPOINT_REQUIRED`, while `batch checkpoint` was blocked by `ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED` and did not accept the close waiver flags.",
+  "followUp": "Repair landed in source commit `10e283f6250a684e884d8e92d3ab23e20af6f5d3` and runner publication `3269f80a5d704dea0c05645a787cc6f6e3b909aa`. Keep regression coverage for both long-form and alias waiver flags plus emergency approval forwarding."
+}

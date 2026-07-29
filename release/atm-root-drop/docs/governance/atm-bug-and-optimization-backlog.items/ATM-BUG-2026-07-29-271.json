@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-271",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Lane session / claim renewal UX",
+  "finding": "Lane-id ownership mismatch renders the same actor on both sides of ATM_TASK_CLAIM_OWNER_MISMATCH, and bare follow-up commands silently mint a new lane unless the operator keeps ATM_LANE_SESSION_ID bound. This makes valid same-actor recovery look self-contradictory and token-expensive.",
+  "expectedBehavior": "When ownershipMode is lane-id, the error code and prose should compare lane sessions directly, and lane adopt should persist the adopted session for subsequent commands or emit an explicit env-binding requirement that does not silently remint.",
+  "evidenceOrRepro": "During ATM-GOV-0243 closeout on 2026-07-29, `tasks renew --task ATM-GOV-0243 --actor codex-git-series-captain --json` returned currentActor and actorId both equal to codex-git-series-captain while holdingLaneSessionId differed from requestedLaneSessionId. Recovery succeeded only after binding ATM_LANE_SESSION_ID to lane-20260729211907-codex-git-series-captain-49242903e2.",
+  "followUp": "Open a lane-session UX/state-machine task to split lane-vs-actor mismatch codes, persist adopt decisions, and add regression coverage for renew/claim/close after long validators."
+}

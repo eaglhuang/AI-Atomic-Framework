@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.historicalWorkAdmissionAttestation.v1",
+  "title": "Historical Work Admission Attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "commitSha", "parentCommitSha", "treeSha", "provenance", "taskId", "laneSessionId", "attestedBy", "attestedAt", "digest"],
+  "properties": {
+    "schemaId": { "const": "atm.historicalWorkAdmissionAttestation.v1" },
+    "commitSha": { "type": "string", "pattern": "^[a-fA-F0-9]{7,64}$" },
+    "parentCommitSha": { "type": "string", "pattern": "^[a-fA-F0-9]{7,64}$" },
+    "treeSha": { "type": "string", "pattern": "^[a-fA-F0-9]{7,64}$" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "digest", "ref"],
+      "properties": {
+        "kind": { "enum": ["ticket", "emergency"] },
+        "digest": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+        "ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "taskId": { "type": "string", "minLength": 1 },
+    "laneSessionId": { "type": "string", "minLength": 1 },
+    "attestedBy": { "type": "string", "minLength": 1 },
+    "attestedAt": { "type": "string", "format": "date-time" },
+    "digest": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" }
+  }
+}

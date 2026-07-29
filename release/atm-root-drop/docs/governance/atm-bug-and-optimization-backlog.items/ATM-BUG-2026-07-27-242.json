@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-27-242",
+  "date": "2026-07-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Governance",
+  "finding": "`tasks renew` hard-fails with ATM_TASK_CLAIM_OWNER_MISMATCH ('claimed by X, not X') when the lane-session document has expired (30-minute lane-session TTL) even though the claim actor is unchanged and still the lifecycle owner. The renew path enforces a strict lane-id equality check, but each fresh CLI invocation mints a new lane session when the prior lane-session document has passed its 30-minute expiry, so the requested lane never matches the holding lane. Renewing a long-running claim is therefore impossible without falling back to `tasks claim` (idempotent same-actor reentry) to rebind a fresh lane.",
+  "expectedBehavior": "renew (and other strict-lane actions) should treat an expired-but-same-actor lane session as renewable: mint/rebind a lane session for the resolved owner and continue, or reconcile against claim.actorId when the lane-session document has merely expired. Owner-preserving renew must not require a claim reentry just because the 30-minute lane TTL elapsed.",
+  "evidenceOrRepro": "Task TASK-SKL-0029, actor claude-004-skl-0029-captain. Holding lane lane-20260726152355-...-4295db33f6 expired (created 15:23, >30 min prior); `node atm.mjs tasks renew --ttl-seconds 3600` returned ATM_TASK_CLAIM_OWNER_MISMATCH with requestedLaneSessionId freshly minted each call. resolveLaneSession (packages/cli/src/commands/lane-session/resolve.ts) mints on stale/expired env lane; renew's ownership comparison (claim-ownership.ts, comparisonMode 'lane-id') then mismatches. Workaround used: `tasks repair-claim` (diagnose) + `tasks claim --auto-intent` reentry.",
+  "followUp": "Allow renew to reclaim/rebind a lane session for the same resolved owner when the prior lane session is expired (not released/handed-off). Add a test: expire the lane session, renew as the same actor, expect success without reentry. Owner: claim/lane-session. Cross-ref lane-session TTL vs claim lease TTL alignment."
+}
