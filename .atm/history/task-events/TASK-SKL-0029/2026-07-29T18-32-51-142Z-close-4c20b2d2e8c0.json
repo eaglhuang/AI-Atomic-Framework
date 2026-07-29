@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T18-32-51-142Z-close-4c20b2d2e8c0",
+  "taskId": "TASK-SKL-0029",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0029.json",
+  "taskSha256": "sha256:7ad183b59440677b8a8105a153a95889f967d1384d3003576cf7eec85875ee43",
+  "createdAt": "2026-07-29T18:32:51.142Z",
+  "command": "node atm.mjs tasks reconcile --task TASK-SKL-0029 --actor codex-git-series-captain --delivery-commit a58b814fa49619ce2076bad4c72a5763c7f13cbd --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0029.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/autonomous-validator-review-lifecycle.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T18:32:51.132Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0029.*",
+        ".atm/history/task-events/TASK-SKL-0029/**",
+        ".atm/history/tasks/TASK-SKL-0029.json",
+        "packages/cli/src/commands/evidence/verbs/run.ts",
+        "packages/cli/src/commands/review-advisory.ts",
+        "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/tasks/contract-import-recovery.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "templates/skills/atm-evidence.skill.md",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/verbs/run.ts",
+        "packages/cli/src/commands/review-advisory.ts",
+        "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/tasks/contract-import-recovery.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

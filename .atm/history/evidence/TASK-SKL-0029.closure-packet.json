@@ -1,0 +1,199 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0029",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "bb6eb47b56cd6ed3c24f6e650851e434483efd81",
+  "governedTreeSha": "0c580dff40c58467db308c889999b9ad3ceda70c",
+  "targetCommitDelta": {
+    "currentCommitSha": "bb6eb47b56cd6ed3c24f6e650851e434483efd81",
+    "parentCommitShas": [
+      "bb6eb47b56cd6ed3c24f6e650851e434483efd81"
+    ],
+    "governedTreeSha": "0c580dff40c58467db308c889999b9ad3ceda70c",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0029.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-29T18-28-41-831Z-renew-a805bda411d9.json",
+      ".atm/history/tasks/TASK-SKL-0029.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/evidence/verbs/run.ts",
+      "packages/cli/src/commands/review-advisory.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/contract-import-recovery.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/autonomous-validator-review-lifecycle.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:21f3c95de4532f972cee0f9cc6b9fe889a0eaa16650cae4d3f16d0979b0f47af",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6999159bf88aaeae6c348c4576b93d3a161e88601c846c78566b12ef9341e0d8",
+      "stderrSha256": "sha256:dd02af85056bb2eea88f09c636f71e03d17ae18397a6f4084577c557e32935cd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a113fed632a347632b309f1c3e40e332caee140ce92ba5f7bc49abc0bfdaccf2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/autonomous-validator-review-lifecycle.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:skill-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T18:32:51.132Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0029.*",
+      ".atm/history/task-events/TASK-SKL-0029/**",
+      ".atm/history/tasks/TASK-SKL-0029.json",
+      "packages/cli/src/commands/evidence/verbs/run.ts",
+      "packages/cli/src/commands/review-advisory.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/contract-import-recovery.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/evidence/verbs/run.ts",
+      "packages/cli/src/commands/review-advisory.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/contract-import-recovery.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0029.json",
+  "closedAt": "2026-07-29T18:32:51.133Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "a58b814fa49619ce2076bad4c72a5763c7f13cbd",
+    "reconciledAt": "2026-07-29T18:32:43.456Z",
+    "reconciledByActor": "codex-git-series-captain",
+    "reconcileClassification": "local-closure-rewrite",
+    "reason": "Historical reconcile sync against commit a58b814fa49619ce2076bad4c72a5763c7f13cbd"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a58b814fa49619ce2076bad4c72a5763c7f13cbd",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/evidence/verbs/run.ts",
+      "packages/cli/src/commands/review-advisory.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/contract-import-recovery.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/cli/autonomous-validator-review-lifecycle.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T13-23-19-577Z-import-e5eeddedde81.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T13-25-57-155Z-reserve-4c47ea0e17dc.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T13-25-57-159Z-promote-fa58e963c55f.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T13-26-06-525Z-claim-0912d5022bd8.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T14-18-56-490Z-repair-claim-292f9cef8e6f.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T14-48-49-975Z-claim-e2d66e813d55.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T15-23-34-262Z-repair-claim-57342737ef7b.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T15-24-03-782Z-claim-4a99bc61183b.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T16-01-41-638Z-claim-d549ac92f6f4.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-26T16-02-22-238Z-scope-amendment-25ddee59e85e.json",
+      ".atm/history/task-events/TASK-SKL-0029/2026-07-27T06-11-50-646Z-scope-amendment-5b33f058dda3.json",
+      ".atm/history/tasks/TASK-SKL-0029.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
