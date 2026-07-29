@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T16-49-43-490Z-batch-skip-0e7f0e73c0ac",
+  "taskId": "ATM-GOV-0238",
+  "action": "batch-skip",
+  "actorId": "codex-git-series-captain",
+  "batchId": "batch-97d04a6e4bca",
+  "reason": "dependency ATM-GOV-0246 is missing/not done after planning-source re-seal; pause 0238 rather than bypassing its dashboard preflight prerequisite",
+  "batchIndex": 0,
+  "createdAt": "2026-07-29T16:49:43.490Z",
+  "command": "node atm.mjs batch skip --task ATM-GOV-0238 --batch batch-97d04a6e4bca --actor codex-git-series-captain --json"
+}

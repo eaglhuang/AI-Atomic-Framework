@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T16-50-12-703Z-batch-skip-8f39273f892d",
+  "taskId": "TASK-GIT-0028",
+  "action": "batch-skip",
+  "actorId": "codex-git-series-captain",
+  "batchId": "batch-97d04a6e4bca",
+  "reason": "dependency TASK-GIT-0027 is still running; pause GIT-0028 until GIT-0027/RFT-0101 close sequence is complete",
+  "batchIndex": 0,
+  "createdAt": "2026-07-29T16:50:12.703Z",
+  "command": "node atm.mjs batch skip --task TASK-GIT-0028 --batch batch-97d04a6e4bca --actor codex-git-series-captain --json"
+}
