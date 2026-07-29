@@ -111,6 +111,50 @@ export interface WipTransitionPlan {
   readonly reason: string;
 }
 
+/**
+ * Durable, path-bounded ownership retained after a lease is released.
+ *
+ * The task ledger stores this only when a release actually observes dirty WIP.
+ * It lets the original lane resume that WIP without treating every historical
+ * released claim as a perpetual owner.
+ */
+export interface RetainedWipOwnership {
+  readonly schemaId: 'atm.retainedWipOwnership.v1';
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly laneSessionId: string;
+  readonly dirtyPaths: readonly string[];
+  readonly retainedAt: string;
+  readonly transitionClass: 'release-wip-retained';
+}
+
+export function retainReleasedWipOwnership(input: {
+  readonly plan: WipTransitionPlan;
+  readonly actorId: string | null | undefined;
+  readonly laneSessionId: string | null | undefined;
+  readonly dirtyPaths: readonly string[];
+}): RetainedWipOwnership | null {
+  const actorId = normalize(input.actorId);
+  const laneSessionId = normalize(input.laneSessionId);
+  const dirtyPaths = dedupe(input.dirtyPaths);
+  if (
+    !input.plan.allowed
+    || input.plan.transitionClass !== 'release-wip-retained'
+    || !actorId
+    || !laneSessionId
+    || dirtyPaths.length === 0
+  ) return null;
+  return {
+    schemaId: 'atm.retainedWipOwnership.v1',
+    taskId: input.plan.taskId,
+    actorId,
+    laneSessionId,
+    dirtyPaths,
+    retainedAt: input.plan.journalEntry.at,
+    transitionClass: 'release-wip-retained'
+  };
+}
+
 function fingerprint(value: string | null | undefined, kind: string): string | null {
   if (typeof value !== 'string' || value.trim().length === 0) return null;
   const digest = createHash('sha256').update(`${kind}\n${value}`).digest('hex').slice(0, 16);
