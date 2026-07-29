@@ -169,7 +169,7 @@ export function recordBranchCommitQueueStaleCleanup(input: LegacyValue) {
 
 export function maybeCleanupStaleBranchCommitQueueLock(input: LegacyValue) {
   const record = readBranchCommitQueueLockRecord(input.lockPath);
-  if (!record || record.actorId !== input.actorId) {
+  if (!record) {
     return false;
   }
   const createdMs = Date.parse(record.createdAt);
@@ -177,14 +177,9 @@ export function maybeCleanupStaleBranchCommitQueueLock(input: LegacyValue) {
     ? Date.now() - createdMs
     : Number.POSITIVE_INFINITY;
   const ownerAlive = isBranchCommitQueueOwnerAlive(record.ownerPid);
-  const headMoved = Boolean(
-    record.headShaAtAcquire &&
-    input.currentHeadSha &&
-    record.headShaAtAcquire !== input.currentHeadSha,
-  );
   const staleEnough = ageMs >= branchCommitQueueStaleSelfHealMs;
   const ownerGoneOrLegacy = ownerAlive === false || ownerAlive === null;
-  if (!staleEnough || !ownerGoneOrLegacy || !headMoved) {
+  if (!staleEnough || !ownerGoneOrLegacy) {
     return false;
   }
   recordBranchCommitQueueStaleCleanup({
