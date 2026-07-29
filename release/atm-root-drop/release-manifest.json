@@ -4458,6 +4458,7 @@
     "release/atm-root-drop/tests/cli/first-layer-ux-routing.test.ts",
     "release/atm-root-drop/tests/cli/foreign-generated-residue-ticket-continuity.test.ts",
     "release/atm-root-drop/tests/cli/framework-temp-claim-lifecycle-parity.test.ts",
+    "release/atm-root-drop/tests/cli/framework-temp-lock-admission-parity.test.ts",
     "release/atm-root-drop/tests/cli/framework-temp-task-id-normalization.test.ts",
     "release/atm-root-drop/tests/cli/frontmatter-nested-object-list.test.ts",
     "release/atm-root-drop/tests/cli/gate-telemetry-coverage-repair.test.ts",
@@ -4694,7 +4695,10 @@
     "release/atm-root-drop/tests/cli/work-admission-coverage-gates.test.ts",
     "release/atm-root-drop/tests/cli/work-admission-cross-adapter-dogfood.test.ts",
     "release/atm-root-drop/tests/cli/work-admission-ticket-claim.test.ts",
+    "release/atm-root-drop/tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+    "release/atm-root-drop/tests/cli/work-admission-ticket-import-bundle-parity.test.ts",
     "release/atm-root-drop/tests/cli/work-admission-ticket-recovery.test.ts",
+    "release/atm-root-drop/tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
     "release/atm-root-drop/tests/cli/work-item-context-map.test.ts",
     "release/atm-root-drop/tests/cli/worktree-callsite-census.test.ts",
     "release/atm-root-drop/tests/cli/write-ticket-command-registration.test.ts",
@@ -4966,8 +4970,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 689,
-    "unchanged": 4242,
+    "copied": 694,
+    "unchanged": 4241,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6185,7 +6189,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:2af48e2455ec38751d058648cf306e70799de9b258858cbd51b15bd5cb577d8f"
+    "digest": "sha256:4c401021047e497f747bfd57c38a826b6db103b1f3aa12011111ad397038350b"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -10617,6 +10621,7 @@
       "release/atm-root-drop/tests/cli/first-layer-ux-routing.test.ts",
       "release/atm-root-drop/tests/cli/foreign-generated-residue-ticket-continuity.test.ts",
       "release/atm-root-drop/tests/cli/framework-temp-claim-lifecycle-parity.test.ts",
+      "release/atm-root-drop/tests/cli/framework-temp-lock-admission-parity.test.ts",
       "release/atm-root-drop/tests/cli/framework-temp-task-id-normalization.test.ts",
       "release/atm-root-drop/tests/cli/frontmatter-nested-object-list.test.ts",
       "release/atm-root-drop/tests/cli/gate-telemetry-coverage-repair.test.ts",
@@ -10853,7 +10858,10 @@
       "release/atm-root-drop/tests/cli/work-admission-coverage-gates.test.ts",
       "release/atm-root-drop/tests/cli/work-admission-cross-adapter-dogfood.test.ts",
       "release/atm-root-drop/tests/cli/work-admission-ticket-claim.test.ts",
+      "release/atm-root-drop/tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+      "release/atm-root-drop/tests/cli/work-admission-ticket-import-bundle-parity.test.ts",
       "release/atm-root-drop/tests/cli/work-admission-ticket-recovery.test.ts",
+      "release/atm-root-drop/tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
       "release/atm-root-drop/tests/cli/work-item-context-map.test.ts",
       "release/atm-root-drop/tests/cli/worktree-callsite-census.test.ts",
       "release/atm-root-drop/tests/cli/write-ticket-command-registration.test.ts",
@@ -11128,34 +11136,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:5c145b56eed2cd8f4e3ef94ab54692fab8116663c0abd8e6f659f1f543dcf45c",
-  "sealedSourceCommit": "85fa9da923dc02e91eee1add5ba4a0dc84a91fe9",
+  "buildInputsTreeHash": "sha256:9c3da4325de3c94b4ea434c5a387d9e3abe6020fbe3bd91e833b5f060de01363",
+  "sealedSourceCommit": "5977ec6bc19880006994375482ed14be2554de3f",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:ae9829f69a0251c9f61e4dbcc7fc89d18205df07a6ca1922012854dbb2d4e2c6",
-  "tsBuildCacheDigest": "sha256:01d951ebe895fac9e2fb9f4ca3b793932b6eb761c958dbebf536829882ea0079",
+  "incrementalPlanDigest": "sha256:ef5c87961abfcbec6f9ae7c77e8325b60267fefffe6c603cc939f38592fdcab8",
+  "tsBuildCacheDigest": "sha256:e6952ca4982816abbe171b3e93eee22377ff7c77369ecedfd1e7dde355de0d1f",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "typescriptBuild",
-    "dominantPhaseMs": 13023,
-    "totalElapsedMs": 40771,
-    "dominanceRatio": 0.3194,
-    "phaseMedianMs": 1561,
-    "phaseP95Ms": 13023,
+    "dominantPhaseMs": 15912,
+    "totalElapsedMs": 46957,
+    "dominanceRatio": 0.3389,
+    "phaseMedianMs": 1672,
+    "phaseP95Ms": 15912,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 384,
-    "skipDecision": 73,
-    "worktreeSetup": 10712,
-    "typescriptBuild": 13023,
-    "rootDropReleaseAssembly": 6225,
-    "onefileReleaseAssembly": 1561,
-    "artifactSync": 6059,
+    "inputHashCalculation": 46,
+    "skipDecision": 45,
+    "worktreeSetup": 11253,
+    "typescriptBuild": 15912,
+    "rootDropReleaseAssembly": 7415,
+    "onefileReleaseAssembly": 1672,
+    "artifactSync": 8279,
     "cleanup": 0,
-    "totalElapsed": 40771
+    "totalElapsed": 46957
   }
 }

@@ -1,6 +1,6 @@
 // TASK-RFT-0012: extracted verbatim from packages/cli/src/commands/tasks.ts.
 // The body of runTasksImport lives here; tasks.ts router re-exports it.
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message, relativePathFrom } from '../shared.js';
 import { readPluginRegistry } from '../../plugin-registry.js';
@@ -13,7 +13,7 @@ import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
 import { classifyForceImportAdmission } from './import-validation.js';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.js';
-import { validateWorkAdmissionImport } from './task-work-admission-import.js';
+import { issueTaskImportAdmissionTicket, validateWorkAdmissionImport } from './task-work-admission-import.js';
 import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
 export async function runTasksImport(argv) {
     const options = parseImportOptions(argv);
@@ -418,6 +418,13 @@ export async function runTasksImport(argv) {
                 }
             });
         }
+        attachTaskImportAdmissionTickets({
+            cwd: options.cwd,
+            tasks: parsed.tasks,
+            writtenPaths: result.writtenPaths,
+            importedAt: generatedAt,
+            sourceDigest: planningSourceSeal.contentDigest
+        });
         evidencePath = writeImportEvidence({
             cwd: options.cwd,
             tasks: parsed.tasks,
@@ -468,6 +475,29 @@ export async function runTasksImport(argv) {
             emergencyUse
         }
     });
+}
+function attachTaskImportAdmissionTickets(input) {
+    for (const task of input.tasks) {
+        const ledgerPath = `.atm/history/tasks/${task.workItemId}.json`;
+        const transitionPath = input.writtenPaths.find((entry) => entry.startsWith(`.atm/history/task-events/${task.workItemId}/`) && entry.includes('-import-'));
+        if (!input.writtenPaths.includes(ledgerPath) || !transitionPath)
+            continue;
+        const absoluteLedgerPath = path.join(input.cwd, ledgerPath);
+        try {
+            const ledger = JSON.parse(readFileSync(absoluteLedgerPath, 'utf8'));
+            ledger.workAdmissionTicket = issueTaskImportAdmissionTicket({
+                taskId: task.workItemId,
+                ledgerPath,
+                transitionPath,
+                importedAt: input.importedAt,
+                sourceDigest: input.sourceDigest
+            });
+            writeFileSync(absoluteLedgerPath, `${JSON.stringify(ledger, null, 2)}\n`, 'utf8');
+        }
+        catch {
+            // The existing import diagnostics remain the canonical failure surface.
+        }
+    }
 }
 function importPathUsageMessage() {
     return 'tasks import requires --from <path-to-task-card.md>. Example: node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json';

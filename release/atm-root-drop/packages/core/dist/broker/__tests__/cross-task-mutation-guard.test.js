@@ -4,6 +4,9 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFil
 import os from 'node:os';
 import path from 'node:path';
 import { detectCrossTaskMutation, readIncidentFlag, recordIncidentFlag, reconcileStaleIncidents } from '../cross-task-mutation-guard.js';
+import { classifyTerminalLifecycleOwnership } from '../historical-work-admission-attestation.js';
+assert.deepEqual(classifyTerminalLifecycleOwnership({ status: 'done', claimState: null, lockReleased: true }), { decision: 'terminal', reason: 'Legacy terminal task has no claim record and no active direction lock.' }, 'legacy terminal task records without claims must not remain active scope owners');
+assert.equal(classifyTerminalLifecycleOwnership({ status: 'done', claimState: null, lockReleased: false }).decision, 'inconsistent', 'a terminal task with an unreleased lock must remain fail-closed');
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-cross-task-guard-'));
 function writeJson(filePath, value) {
     mkdirSync(path.dirname(filePath), { recursive: true });
