@@ -12,6 +12,7 @@ export type WorkAdmissionRecoveryMode = 'auto' | 'enabled' | 'disabled';
 export type ResolvedWorkAdmissionRecoveryMode = Exclude<WorkAdmissionRecoveryMode, 'auto'>;
 export type WorkAdmissionGrantKind = 'file-write' | 'lifecycle-operation' | 'process-manifest';
 export type WorkAdmissionOperation = 'write' | 'stage' | 'commit' | 'close' | 'push';
+export type WorkAdmissionOrigin = 'claim' | 'task-import';
 
 export interface WorkAdmissionRunnerSelection {
   readonly runnerKind: 'frozen' | 'source-first';
@@ -43,6 +44,7 @@ export interface WorkAdmissionTicket {
   readonly ticketId: string;
   readonly ticketDigest: `sha256:${string}`;
   readonly taskId: string;
+  readonly origin: WorkAdmissionOrigin;
   readonly actorId: string;
   readonly laneSessionId: string | null;
   readonly claimGeneration: string;
@@ -129,6 +131,7 @@ export interface WorkAdmissionSnapshot {
 
 export function issueWorkAdmissionTicket(input: {
   readonly taskId: string;
+  readonly origin?: WorkAdmissionOrigin;
   readonly actorId: string;
   readonly laneSessionId?: string | null;
   readonly claimGeneration: string;
@@ -162,6 +165,7 @@ export function issueWorkAdmissionTicket(input: {
   const expiresAt = new Date(Date.parse(issuedAt) + ttlSeconds * 1000).toISOString();
   const ticketBasis = {
     taskId: input.taskId,
+    origin: input.origin ?? 'claim',
     actorId: input.actorId,
     laneSessionId: input.laneSessionId ?? null,
     claimGeneration: input.claimGeneration,
@@ -180,6 +184,7 @@ export function issueWorkAdmissionTicket(input: {
     ticketId: `wat-${ticketDigest.slice('sha256:'.length, 'sha256:'.length + 16)}`,
     ticketDigest,
     taskId: input.taskId,
+    origin: input.origin ?? 'claim',
     actorId: input.actorId,
     laneSessionId: input.laneSessionId ?? null,
     claimGeneration: input.claimGeneration,
@@ -219,6 +224,9 @@ export function checkWorkAdmissionTicket(input: {
     || (input.claimGeneration && ticket.claimGeneration !== input.claimGeneration)) {
     return deny('ATM_WORK_ADMISSION_DELIVERY_NOT_AUTHORIZED', 'Ticket identity does not match the current task, actor, lane, or claim generation.');
   }
+  if (ticket.origin === 'task-import' && input.operation !== 'write' && input.operation !== 'stage') {
+    return deny('ATM_WORK_ADMISSION_DELIVERY_NOT_AUTHORIZED', 'A task-import ticket can only authorize its imported ledger bundle.');
+  }
   if (Date.parse(ticket.expiresAt) <= Date.parse(input.now ?? new Date().toISOString())) {
     return deny('ATM_WRITE_TICKET_STALE', 'Ticket expiry requires a governed claim renewal and ticket reseal.');
   }
@@ -233,7 +241,7 @@ export function checkWorkAdmissionTicket(input: {
   // become unusable at the final commit boundary.
   const filesAreAuthorized = Boolean(fileGrant) && requestedFiles.every((file) =>
     fileGrant!.values.some((scope) => pathMatchesWriteScope(file, scope))
-    || isTaskManagedCloseLifecyclePath(input.taskId, input.operation, file)
+    || isTaskManagedLifecyclePath(input.taskId, file)
   );
   if (!filesAreAuthorized) {
     return deny('ATM_WRITE_TICKET_SCOPE_VIOLATION', 'Requested mutation path is outside the ticket file grant.');
@@ -245,12 +253,12 @@ export function checkWorkAdmissionTicket(input: {
 }
 
 /**
- * Taskflow owns these close records; a card should not need to list its own
- * generated ledger/evidence namespace as a delivery file. The exception is
- * deliberately narrow: it applies only to close and only to this task ID.
+ * ATM owns these task-local lifecycle records. They are never source delivery
+ * scope, and are safe only for the ticket's exact task namespace. Keeping this
+ * invariant in the authority preserves old tickets that predate lifecycle
+ * paths being materialized in claim scope.
  */
-function isTaskManagedCloseLifecyclePath(taskId: string, operation: WorkAdmissionOperation, file: string): boolean {
-  if (operation !== 'close') return false;
+function isTaskManagedLifecyclePath(taskId: string, file: string): boolean {
   const normalized = normalizeWritePathList([file])[0] ?? '';
   return normalized === `.atm/history/tasks/${taskId}.json`
     || normalized.startsWith(`.atm/history/evidence/${taskId}.`)

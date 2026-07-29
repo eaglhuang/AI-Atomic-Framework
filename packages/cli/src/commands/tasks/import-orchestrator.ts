@@ -1,6 +1,6 @@
 // TASK-RFT-0012: extracted verbatim from packages/cli/src/commands/tasks.ts.
 // The body of runTasksImport lives here; tasks.ts router re-exports it.
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { ParsedExternalTask } from '@ai-atomic-framework/plugin-sdk';
 import { CliError, makeResult, message, relativePathFrom } from '../shared.ts';
@@ -22,7 +22,7 @@ import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import { classifyForceImportAdmission } from './import-validation.ts';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.ts';
-import { validateWorkAdmissionImport } from './task-work-admission-import.ts';
+import { issueTaskImportAdmissionTicket, validateWorkAdmissionImport } from './task-work-admission-import.ts';
 import {
   type TaskImportManifest,
   classifyResetOpenImportForOptions,
@@ -460,6 +460,13 @@ export async function runTasksImport(argv: string[]) {
         }
       });
     }
+    attachTaskImportAdmissionTickets({
+      cwd: options.cwd,
+      tasks: parsed.tasks,
+      writtenPaths: result.writtenPaths,
+      importedAt: generatedAt,
+      sourceDigest: planningSourceSeal.contentDigest
+    });
     evidencePath = writeImportEvidence({
       cwd: options.cwd,
       tasks: parsed.tasks,
@@ -518,6 +525,36 @@ export async function runTasksImport(argv: string[]) {
       emergencyUse
     }
   });
+}
+
+function attachTaskImportAdmissionTickets(input: {
+  readonly cwd: string;
+  readonly tasks: readonly { readonly workItemId: string }[];
+  readonly writtenPaths: readonly string[];
+  readonly importedAt: string;
+  readonly sourceDigest: string;
+}): void {
+  for (const task of input.tasks) {
+    const ledgerPath = `.atm/history/tasks/${task.workItemId}.json`;
+    const transitionPath = input.writtenPaths.find((entry) =>
+      entry.startsWith(`.atm/history/task-events/${task.workItemId}/`) && entry.includes('-import-')
+    );
+    if (!input.writtenPaths.includes(ledgerPath) || !transitionPath) continue;
+    const absoluteLedgerPath = path.join(input.cwd, ledgerPath);
+    try {
+      const ledger = JSON.parse(readFileSync(absoluteLedgerPath, 'utf8')) as Record<string, unknown>;
+      ledger.workAdmissionTicket = issueTaskImportAdmissionTicket({
+        taskId: task.workItemId,
+        ledgerPath,
+        transitionPath,
+        importedAt: input.importedAt,
+        sourceDigest: input.sourceDigest
+      });
+      writeFileSync(absoluteLedgerPath, `${JSON.stringify(ledger, null, 2)}\n`, 'utf8');
+    } catch {
+      // The existing import diagnostics remain the canonical failure surface.
+    }
+  }
 }
 
 function importPathUsageMessage(): string {

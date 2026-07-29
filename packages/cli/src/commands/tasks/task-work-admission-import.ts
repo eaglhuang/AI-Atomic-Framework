@@ -1,4 +1,8 @@
-import type { WorkAdmissionRecoveryMode } from '../../../../core/src/broker/work-admission-ticket.ts';
+import {
+  issueWorkAdmissionTicket,
+  type WorkAdmissionRecoveryMode,
+  type WorkAdmissionTicket
+} from '../../../../core/src/broker/work-admission-ticket.ts';
 import type { TaskCardImportDiagnostic } from './result-contracts.ts';
 
 export interface ImportedWorkAdmissionPolicy {
@@ -8,6 +12,34 @@ export interface ImportedWorkAdmissionPolicy {
 export interface WorkAdmissionImportValidation {
   readonly policy: ImportedWorkAdmissionPolicy;
   readonly diagnostics: readonly TaskCardImportDiagnostic[];
+}
+
+/**
+ * Import gets a deliberately tiny ticket: one imported ledger and its matching
+ * transition. A later task claim replaces it with the normal write ticket.
+ */
+export function issueTaskImportAdmissionTicket(input: {
+  readonly taskId: string;
+  readonly ledgerPath: string;
+  readonly transitionPath: string;
+  readonly importedAt: string;
+  readonly sourceDigest: string;
+}): WorkAdmissionTicket {
+  return issueWorkAdmissionTicket({
+    taskId: input.taskId,
+    origin: 'task-import',
+    actorId: 'atm-import',
+    laneSessionId: null,
+    claimGeneration: input.sourceDigest,
+    allowedFiles: [input.ledgerPath, input.transitionPath],
+    requestedRecoveryMode: 'disabled',
+    runnerSelection: {
+      runnerKind: 'frozen',
+      runnerRef: 'tasks-import',
+      selectedAt: input.importedAt
+    },
+    now: input.importedAt
+  });
 }
 
 /**

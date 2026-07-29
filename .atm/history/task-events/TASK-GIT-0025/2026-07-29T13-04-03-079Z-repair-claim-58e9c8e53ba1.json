@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T13-04-03-079Z-repair-claim-58e9c8e53ba1",
+  "taskId": "TASK-GIT-0025",
+  "action": "repair-claim",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729014841-codex-git-series-captain-TASK-GIT-0025-1a79c805b9",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0025.json",
+  "taskSha256": "sha256:5f0627b66c08e52bed2b4da94c94b40b5b5dfacf5182db865b6879231b6cc2f5",
+  "createdAt": "2026-07-29T13:04:03.079Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-GIT-0025 --actor codex-git-series-captain --write --reason \"release expired lease while retaining observed in-scope dirty WIP under its original lane\" --json"
+}

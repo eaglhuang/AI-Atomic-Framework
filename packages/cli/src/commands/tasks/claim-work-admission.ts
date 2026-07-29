@@ -59,7 +59,7 @@ export async function completeTaskClaimWithWorkAdmission(input: {
       actorId: input.actorId,
       laneSessionId: input.laneSession.session.laneId,
       claimGeneration: String(claim.leaseId),
-      allowedFiles: taskScopeFiles(input.taskDocument, input.files),
+      allowedFiles: resolveTaskWorkAdmissionFiles(input.taskDocument, input.files),
       requestedRecoveryMode: readRequestedRecoveryMode(input.taskDocument),
       runnerSelection: {
         runnerKind: 'frozen',
@@ -160,7 +160,7 @@ export function resealWorkAdmissionTicketForRenewal(input: {
     actorId: input.actorId,
     laneSessionId: typeof laneSessionId === 'string' ? laneSessionId : null,
     claimGeneration: String(input.claim.leaseId),
-    allowedFiles: taskScopeFiles(input.taskDocument, []),
+    allowedFiles: resolveTaskWorkAdmissionFiles(input.taskDocument, []),
     requestedRecoveryMode: readRequestedRecoveryMode(input.taskDocument),
     runnerSelection: {
       runnerKind: 'frozen',
@@ -221,14 +221,29 @@ function producerDeclaresArtifactPath(cwd: string, taskId: string, artifactPath:
   } catch { return false; }
 }
 
-function taskScopeFiles(taskDocument: Record<string, unknown>, fallback: readonly string[]): readonly string[] {
+export function resolveTaskWorkAdmissionFiles(taskDocument: Record<string, unknown>, fallback: readonly string[]): readonly string[] {
   const directionLock = readRecord(taskDocument.taskDirectionLock);
-  if (Array.isArray(directionLock?.allowedFiles)) {
-    return directionLock.allowedFiles.map(String);
-  }
-  return Array.isArray(taskDocument.scopePaths)
+  const declaredFiles = Array.isArray(directionLock?.allowedFiles)
+    ? directionLock.allowedFiles.map(String)
+    : Array.isArray(taskDocument.scopePaths)
     ? taskDocument.scopePaths.map(String)
     : fallback;
+  const taskId = normalizeTaskId(taskDocument.workItemId ?? taskDocument.taskId);
+  return taskId
+    ? [...new Set([...declaredFiles, ...taskLifecycleArtifactPaths(taskId)])]
+    : declaredFiles;
+}
+
+function taskLifecycleArtifactPaths(taskId: string): readonly string[] {
+  return [
+    `.atm/history/evidence/${taskId}.*`,
+    `.atm/history/task-events/${taskId}/**`,
+    `.atm/history/tasks/${taskId}.json`
+  ];
+}
+
+function normalizeTaskId(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
 function readRequestedRecoveryMode(taskDocument: Record<string, unknown>): 'auto' | 'enabled' | 'disabled' {
@@ -238,7 +253,7 @@ function readRequestedRecoveryMode(taskDocument: Record<string, unknown>): 'auto
 }
 
 function assessElevatedRisk(taskDocument: Record<string, unknown>) {
-  const paths = taskScopeFiles(taskDocument, []);
+  const paths = resolveTaskWorkAdmissionFiles(taskDocument, []);
   return {
     complex: paths.length > 12,
     destructiveCapability: false,
