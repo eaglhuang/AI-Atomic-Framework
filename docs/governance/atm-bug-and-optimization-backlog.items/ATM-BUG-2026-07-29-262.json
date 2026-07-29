@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-262",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Runner-sync / sealed build queue lifecycle",
+  "finding": "A sealed runner-sync build that fails before publishing can leave the runner-sync steward queue held until TTL, even when the failed generation is no longer usable and a later generation has superseded it.",
+  "expectedBehavior": "Failed sealed builds should release or supersede their runner-sync queue hold through a governed failure receipt, with deterministic lineage from failed generation to replacement generation. A later valid generation should not be blocked by an expired or failed sealed-build reservation.",
+  "evidenceOrRepro": "Plan 3.1 Git recovery handoff recorded that a failed sealed build held the runner-sync queue until TTL during the 2026-07-29 recovery sequence. The operator had to treat a later frozen runner generation as separately published/released and avoid reusing the expired earlier queue.",
+  "followUp": "Add runner-sync failure receipts and queue supersession tests: failed sealed build, replacement generation, TTL expiry, explicit release, and close-time verification that stale failed generations are advisory rather than blocking."
+}
