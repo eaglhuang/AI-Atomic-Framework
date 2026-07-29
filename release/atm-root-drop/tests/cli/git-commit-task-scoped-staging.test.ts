@@ -103,10 +103,10 @@ try {
   // ATM-BUG-2026-07-13-177: framework temp-claim commits must not absorb ordinary-unowned staged files.
   const frameworkClaimedFile = 'docs/framework-claimed.md';
   const frameworkForeignStagedFile = 'packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts';
-  writeJson(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent.lock.json'), {
+  writeJson(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent-lane-lane-fixture-123.lock.json'), {
     schemaId: 'atm.governanceScopeLock',
     specVersion: '0.1.0',
-    workItemId: 'ATM-FRAMEWORK-TEMP-fixture-agent',
+    workItemId: 'ATM-FRAMEWORK-TEMP-fixture-agent-lane-lane-fixture-123',
     lockedBy: 'fixture-agent',
     actorId: 'fixture-agent',
     leaseId: 'lease-framework-fixture',
@@ -154,7 +154,7 @@ try {
   assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(frameworkForeignStagedFile), true, 'framework claim commits must leave out-of-claim staged files staged for their owner');
   runGit(tempDir, ['restore', '--staged', '--', frameworkForeignStagedFile]);
   rmSync(path.join(tempDir, frameworkForeignStagedFile), { force: true });
-  rmSync(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent.lock.json'), { force: true });
+  rmSync(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent-lane-lane-fixture-123.lock.json'), { force: true });
 
   // ATM-BUG-2026-07-14-182: unstaged out-of-claim release mirrors must not be absorbed.
   const narrowSkillClaimFile = '.cursor/rules/skills/atm-governance-router/SKILL.md';
