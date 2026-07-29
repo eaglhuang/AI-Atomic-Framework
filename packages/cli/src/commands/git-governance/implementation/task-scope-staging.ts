@@ -308,22 +308,23 @@ export function frameworkTempTaskId(actorId: LegacyValue) {
 }
 
 export function readActiveFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyValue) {
-  const lockPath = path.join(
-    cwd,
-    ".atm",
-    "runtime",
-    "locks",
-    `${frameworkTempTaskId(actorId)}.lock.json`,
-  );
-  if (!existsSync(lockPath)) {
-    return [];
+  const lockRoot = path.join(cwd, ".atm", "runtime", "locks");
+  const taskPrefix = frameworkTempTaskId(actorId);
+  if (!existsSync(lockRoot)) return [];
+  const claimedFiles = [];
+  for (const entry of readdirSync(lockRoot)) {
+    if (!entry.startsWith(`${taskPrefix}.`) && !entry.startsWith(`${taskPrefix}-lane-`)) continue;
+    if (!entry.endsWith('.lock.json')) continue;
+    try {
+      const parsed = JSON.parse(readFileSync(path.join(lockRoot, entry), "utf8"));
+      const lockActorId = typeof parsed.actorId === 'string' ? parsed.actorId.trim() : typeof parsed.lockedBy === 'string' ? parsed.lockedBy.trim() : '';
+      const expectedTaskId = entry.slice(0, -'.lock.json'.length);
+      const released = parsed.released === true || String(parsed.status ?? '').trim().toLowerCase() === 'released';
+      if (lockActorId !== actorId || parsed.workItemId !== expectedTaskId || released) continue;
+      claimedFiles.push(...extractStringList(parsed.files).map(normalizeRelativePath));
+    } catch {}
   }
-  try {
-    const parsed = JSON.parse(readFileSync(lockPath, "utf8"));
-    return extractStringList(parsed.files).map(normalizeRelativePath);
-  } catch {
-    return [];
-  }
+  return uniqueSorted(claimedFiles);
 }
 
 export function readReleaseGeneratedArtifactPaths(cwd: LegacyValue) {
