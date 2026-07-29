@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-261",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Runner-sync / Git governance",
+  "finding": "Runner-sync publication can reach ATM_RUNNER_PUBLICATION_PENDING after a successful coalesced build because the normal governed git commit surface for the task does not stage the release output inventory paths, while runner-sync release requires those paths to be clean/published before it will archive the receipt.",
+  "expectedBehavior": "ATM should provide a normal, receipt-backed runner publication command or governed commit lane that stages exactly the runner inventory dirty paths, verifies the staged set against the receipt, records publication provenance, and releases the runner-sync steward queue without requiring emergency pathspec Git.",
+  "evidenceOrRepro": "During ATM-GOV-0268, `broker runner-sync release --steward-work-id runner-sync-b1c0c496 --receipt-ref .atm/history/evidence/ATM-GOV-0268.runner-sync-receipt.json` failed with ATM_RUNNER_PUBLICATION_PENDING. `node atm.mjs git commit --task ATM-GOV-0268 --auto-stage --dry-run --json` staged only task evidence files and skipped release/atm-onefile and release/atm-root-drop inventory outputs, requiring emergency pathspec commit 99620abfebc11e66faed911b8899eee21ac3b2b8 before release could proceed.",
+  "followUp": "Add a runner-sync publication interface, or extend the governed commit bundle with an explicit runner-publication mode keyed by receipt inventory digest. Include tests for ignored-but-tracked release files, exact staged-set verification, and idempotent release after publication."
+}
