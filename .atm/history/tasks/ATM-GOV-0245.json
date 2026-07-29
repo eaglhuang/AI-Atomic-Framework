@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0245",
+  "title": "Plan 3.1 evidence aggregator and final verdict",
+  "status": "planned",
+  "milestone": "ATM-3.1-R5",
+  "dependencies": [
+    "ATM-GOV-0244",
+    "ATM-GOV-0253",
+    "ATM-GOV-0265",
+    "TASK-SKL-0029",
+    "TASK-SKL-0030"
+  ],
+  "acceptance": [
+    "Final verdict input is reconstructed from canonical sources and records unavailable receipts explicitly.",
+    "The caller can choose an evidence root/window but cannot inject `rollbackExercised`, parity, blocker lists, correctness zeros, admission labels, or any equivalent healthy assertion.",
+    "Any missing source, open blocker, non-terminal dogfood card, unmatched AB/BA cell, failed parity, or stale reset digest produces `remain-open` and queue-only.",
+    "Historical terminal task status is not semantic evidence. The aggregator preserves predecessor history, consumes each evidence disposition, and treats `superseded-for-plan-closure`, failed, unavailable, or inconclusive evidence as `remain-open` without reopening the predecessor.",
+    "A close verdict requires closed 0237/0238, overlapping actor intervals on one canonical worktree/base/HEAD, disjoint bounded intents on the declared same-file intersection, one compose batch, valid serializability proof, neutral-steward-only apply, shared-commit member attribution, valid red/green discrimination, matched performance, and all 0244 closeback gates.",
+    "The close verdict additionally requires command-backed semantic validation of the exact composed candidate before steward apply; missing, failed, unavailable, stale, or digest-mismatched validation is never inferred from serializability, a final build, or a healthy producer label.",
+    "Queue/wakeup evidence is read from the sealed true-conflict/stale fallback cell; the aggregator must accept zero queue residency in the primary safe-compose cell and must reject path-only serialization as a parallel success.",
+    "Any normal-development use of separate Git branch/worktree/index, worker direct-write to the shared file, missing adapter decision, or missing steward journal produces `remain-open` under `INV-ATM-010`.",
+    "Cross-captain post-run dashboard evidence is consumed only through its canonical digests and independently reproduced observations; dashboard display labels cannot close the plan.",
+    "Every closure-critical acceptance predicate is consumed from the 0252 evidence map with an adequate realness class and valid independent-verifier receipt; unavailable, failed, or inconclusive predicates keep the plan open.",
+    "Plan-global closure always consumes a pre-sealed locked-policy verifier receipt whose implementation, scenario/assertion, threshold, and evidence-window digests were fixed before producer work. Separate-actor review alone cannot satisfy the aggregate verdict.",
+    "The final verdict accepts global completion only from a completed 0253 cross-authority saga receipt. Target-only or planning-only completion is reported as `closeback-pending`, never as Plan 3 success.",
+    "If the 0253 authority manifest requires remote visibility, the aggregator independently verifies each exact authority commit is reachable from the declared remote/ref and that its push receipt matches the sealed SHA; a local-only commit or unavailable remote remains `closeback-pending`.",
+    "The verdict seals evidence window, watermark, runner/build/scenario digests, counters, timings, compact digest, and source availability.",
+    "Global close is rejected while any Plan 3.1 dogfood task can release with in-scope source dirty WIP that becomes ownerless, or while `ATM_CLAIM_FOREIGN_UNSTAGED_WIP` lacks a deterministic recoveryCommand for the next overlapping claim.",
+    "Global close treats non-delivery WIP commits as preservation evidence only: they prove interrupted work was saved and attributed, but they cannot count as task delivery, semantic validation, release artifact publication, or closeout evidence.",
+    "The verdict consumes `ATM-GOV-0258` evidence for broker-managed transactional stage/commit isolation and `ATM-BUG-2026-07-22-229` dirty-release recovery: queue ordering, request-owned staging, zero cross-actor staged-file leakage, post-close release artifact commit automation, runner receipt disposition, and manual captain intervention count.",
+    "The verdict consumes `ATM-GOV-0259` write-ticket/editor guard evidence: pre-write scope checks, amendment-required routing, unattached-WIP recording, true violation escalation, generated editor adapter instructions for Codex/Claude/Cursor/Gemini/Antigravity, and replay of the Antigravity/Gemini 3.6 out-of-scope counterexample.",
+    "The verdict consumes `ATM-GOV-0260` evidence proving line-budget and nested commit diagnostics are scoped to the admitted commit candidate rather than unrelated worktree residue, with the nested root cause and executable recovery surfaced at the top level.",
+    "The verdict consumes `ATM-GOV-0261` evidence proving normal delivery uses a VCS-neutral commit-candidate envelope and broker/steward admission before repository-adapter mutation. Direct native pathspec or other emergency commits are anomaly evidence and contribute zero autonomous-success samples.",
+    "The verdict consumes `ATM-GOV-0262` call-site inventory/red-green evidence and fails if any Broker overlap consumer uses divergent exact/glob/resource-dimension semantics.",
+    "The verdict consumes `ATM-GOV-0263` continuation receipts and reports emitted commands, usage errors, automatic continuations, terminal-task pruning, false stops, and manual captain interventions; normal delivery requires zero human command repair after dispatch.",
+    "The verdict consumes `TASK-LANE-0021` and `TASK-LANE-0022` evidence and fails if any normal Plan3.1 success sample required borrowed actor authority, reusable ticket disclosure, capability replay, ownerless dirty release, or non-executable WIP recovery.",
+    "The verdict consumes `ATM-GOV-0264` canonical-admission receipts and independently counts same-atom bounded-proposal requests, direct/compose admits, queue/revalidate outcomes, true conflicts, false blocks, and manual interventions. A bare atom-wide freeze, human release-order decision, caller-local verdict, or task-wide atom grant contributes zero autonomous-success samples.",
+    "The verdict consumes `ATM-GOV-0265` branch-finalization/publication evidence and fails if normal work required manual branch-lock deletion, framework-temp post-close hygiene, native pathspec, unarchived runner receipt, or dirty release surfaces.",
+    "Any performance pass consumes a pre-sealed A/A null-control receipt and dispersion statistic. The measured AB/BA gain must satisfy the existing 25% threshold and exceed the A/A noise bound; otherwise the performance predicate is `inconclusive`.",
+    "The final claim is bounded to the proven topology: two concurrent actors, one canonical worktree/base/HEAD, and same-file disjoint bounded intents. N greater than 2 fairness or arbitrary workload concurrency is reported as unproven and cannot be inferred from this verdict.",
+    "Plan status advances only after this verdict passes. Historical 0234/0235 records remain terminal and immutable; continuation evidence and the 0253 closeback saga carry the new closure truth. Remote SHA parity is checked after push by the implementing captain."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/broker/replay/final-closure-reader.ts",
+    "packages/cli/src/commands/broker/replay-actions.ts",
+    "tests/cli/atm-3-final-closure.test.ts",
+    "artifacts/generated/atm-plan3-final/verdict.json",
+    "docs/governance/atm-3-replay-evidence.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/replay/final-closure-reader.ts",
+    "packages/cli/src/commands/broker/replay-actions.ts",
+    "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+    "tests/cli/atm-3-final-closure.test.ts",
+    "tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+    "docs/governance/atm-3-replay-evidence.md",
+    "artifacts/generated/atm-plan3-final/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+    "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+    "node atm.mjs broker replay status --json",
+    "node atm.mjs doctor --json",
+    "npm run validate:standard -- --json",
+    "node atm.mjs hook pre-push --base origin/main --head HEAD --json"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "canonical-plan3-final-verdict",
+  "rollbackStrategy": "revert-commit-and-trip-queue-only",
+  "rollbackNotes": "Never rewrite historical evidence or convert a failed verdict into pass.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.parallel-replay",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.replay.final-closure-reader",
+        "pattern": "Evidence Aggregator",
+        "source": "packages/cli/src/commands/broker/replay/final-closure-reader.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 6 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0245-plan-3-1-evidence-aggregator-and-final-verdict.task.md",
+    "sectionTitle": "ATM-GOV-0245",
+    "headingLine": 76,
+    "hash": "72118d5a3bf9884e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0245-plan-3-1-evidence-aggregator-and-final-verdict.task.md",
+      "planningCommitSha": "10ef055c46c4d2b888417e7e3cd2b13b6f55fb51",
+      "contentDigest": "sha256:72118d5a3bf9884edeae26d69826789bb8744b5ddd0348b2933a35f72291c1a3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T22:40:38.106Z"
+    }
+  },
+  "importedAt": "2026-07-29T22:40:38.106Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.atm.3.final.closure.test.ts",
+      "command": "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.plan3.evidence.closure.diagnostic.test.ts",
+      "command": "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.broker.replay.status.json",
+      "command": "node atm.mjs broker replay status --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.doctor.json",
+      "command": "node atm.mjs doctor --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.standard.json",
+      "command": "npm run validate:standard -- --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.hook.pre.push.base.origin.main.head.head.json",
+      "command": "node atm.mjs hook pre-push --base origin/main --head HEAD --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T22-40-38-284Z-import-92b69f498953",
+  "lastTransitionAt": "2026-07-29T22:40:38.284Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
