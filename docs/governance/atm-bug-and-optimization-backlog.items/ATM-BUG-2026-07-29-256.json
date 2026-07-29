@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-256",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Batch queue / taskflow close",
+  "finding": "`taskflow close` can block an active task with `ATM_TASK_QUEUE_HEAD_REQUIRED` from a stale or abandoned batch/task queue even when `batch status` and `tasks queue status` both report no active queue.",
+  "expectedBehavior": "Close gating should derive queue-head requirements from one canonical active queue store. Completed, skipped, abandoned, or status-inactive batch runs must not block unrelated closeback, and official `batch skip` / `tasks queue abandon` receipts should be consumed consistently by every close gate.",
+  "evidenceOrRepro": "During TASK-GIT-0028 close on 2026-07-29, `taskflow close --historical-delivery 48c6111... --write` failed with `ATM_TASK_QUEUE_HEAD_REQUIRED` naming queue `queue-48d9469c580f56e6` and head `ATM-GOV-0237`. In the same state, `node atm.mjs batch status --actor codex-git-series-captain --batch batch-97d04a6e4bca --json` returned no active batch and `node atm.mjs tasks queue status --json` returned `ATM_TASK_QUEUE_EMPTY`. The completed `.atm/runtime/batch-runs/batch-97d04a6e4bca.json` also recorded all queue heads as skipped. Official `tasks queue abandon --queue queue-48d9469c580f56e6 --actor codex-git-series-captain --json` was required before close could proceed.",
+  "followUp": "Add a single queue-resolution facade used by next, batch status, tasks queue, and taskflow close. Regression should cover a completed batch with skipped heads plus done/released tasks retaining historical direction-lock queue metadata; close for a non-queued active task must not be blocked."
+}
