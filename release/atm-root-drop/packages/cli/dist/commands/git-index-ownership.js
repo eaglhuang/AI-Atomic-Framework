@@ -1,8 +1,65 @@
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 import { listActorWorkSessions } from './actor-session.js';
 import { readActiveTaskDirectionLocks } from './task-direction.js';
 import { isPathAllowedByScope } from './work-channels.js';
 export const ATM_INDEX_FOREIGN_ACTIVE_STAGED = 'ATM_INDEX_FOREIGN_ACTIVE_STAGED';
+/**
+ * Validates the capability against the live index before any foreign entry is
+ * parked.  The lease is intentionally content-bound: a path-only approval is
+ * not enough to move a later, different staged blob.
+ */
+export function authorizeGitIndexOverrideLease(input) {
+    const leaseId = String(input.leaseId ?? '').trim();
+    if (!leaseId) {
+        return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_REQUIRED', summary: 'Foreign protected staged entries require an explicit --stage-override-lease.' };
+    }
+    const leasePath = path.join(input.cwd, '.atm', 'runtime', 'git-index-leases', `${leaseId}.json`);
+    if (!existsSync(leasePath)) {
+        return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_NOT_FOUND', summary: `Stage override lease ${leaseId} was not found.` };
+    }
+    let lease;
+    try {
+        lease = JSON.parse(readFileSync(leasePath, 'utf8'));
+    }
+    catch {
+        return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_INVALID', summary: `Stage override lease ${leaseId} is not valid JSON.` };
+    }
+    if (lease.schemaId !== 'atm.gitIndexOverrideLease.v1' || lease.kind !== 'stage-override' || lease.permission !== 'git.index.stageOverride') {
+        return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_INVALID', summary: `Stage override lease ${leaseId} has the wrong authority shape.` };
+    }
+    if (lease.actorId !== input.actorId || normalizeTaskId(lease.taskId) !== normalizeTaskId(input.taskId)) {
+        return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_OWNER_MISMATCH', summary: `Stage override lease ${leaseId} does not belong to this actor and task.` };
+    }
+    if (lease.singleUse && lease.used) {
+        return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_ALREADY_USED', summary: `Stage override lease ${leaseId} is single-use and has already been consumed.` };
+    }
+    if (!Number.isFinite(Date.parse(lease.expiresAt)) || Date.parse(lease.expiresAt) <= Date.now()) {
+        return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_EXPIRED', summary: `Stage override lease ${leaseId} has expired.` };
+    }
+    // A released task's staged governance bundle remains protected until its
+    // owner commits or explicitly discards it. The capability is content-bound,
+    // so active and released foreign entries share the same authorization rule.
+    const liveEntries = input.report.entries.filter((entry) => entry.ownership === 'foreign-active-owned'
+        || entry.ownership === 'foreign-released-or-abandoned');
+    const expected = uniqueSorted((lease.stagedEntries ?? []).map((entry) => `${entry.stagedMode}:${entry.stagedBlobId}:${entry.path}`));
+    const actual = uniqueSorted(liveEntries.map((entry) => `${entry.stagedMode ?? 'missing'}:${entry.stagedBlobId ?? 'missing'}:${entry.path}`));
+    const paths = uniqueSorted(lease.paths ?? []);
+    if (expected.length === 0 || JSON.stringify(expected) !== JSON.stringify(actual) || JSON.stringify(paths) !== JSON.stringify(uniqueSorted(liveEntries.map((entry) => entry.path)))) {
+        return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT', summary: `Stage override lease ${leaseId} does not exactly match the live foreign staged entries.` };
+    }
+    const plan = buildGitIndexLeaseParkPlan({ report: input.report, expectedStageFiles: [], leaseId });
+    return {
+        ok: true,
+        lease,
+        plan: { ...plan, status: liveEntries.length === 0 ? 'not-needed' : 'park-and-restore', reason: 'Validated stage-override lease authorizes byte-identical park and restore of the current foreign staged entries.' }
+    };
+}
+export function consumeGitIndexOverrideLease(cwd, lease) {
+    const leasePath = path.join(cwd, '.atm', 'runtime', 'git-index-leases', `${lease.leaseId}.json`);
+    writeFileSync(leasePath, `${JSON.stringify({ ...lease, used: true, usedAt: new Date().toISOString() }, null, 2)}\n`, 'utf8');
+}
 export function inspectGitIndexOwnership(input) {
     const currentTaskId = normalizeTaskId(input.taskId ?? null);
     const stagedFiles = uniqueSorted(input.stagedFiles ?? readStagedFiles(input.cwd));
