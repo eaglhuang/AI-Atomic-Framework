@@ -7,11 +7,11 @@
     "actorId": "codex-git-series-captain",
     "source": "ATM_ACTOR_ID"
   },
-  "stewardWorkId": "runner-sync-f269ada3",
-  "sealedSourceSha": "5173867e1df9de85e034911cf09d629f048d1655",
+  "stewardWorkId": "runner-sync-81a90df8",
+  "sealedSourceSha": "3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
   "outputInventory": {
     "schemaId": "atm.runnerBuildOutputInventory.v1",
-    "sealedSourceSha": "5173867e1df9de85e034911cf09d629f048d1655",
+    "sealedSourceSha": "3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
     "entries": [
       {
         "path": ".atm/history/evidence/ATM-GOV-0253.runner-sync-receipt.json",
@@ -2763,6 +2763,18 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/commit-messages.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/cross-authority-closeback.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/cross-authority-closeback.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0253",
         "ownerActorId": null
@@ -12620,6 +12632,18 @@
         "ownerActorId": null
       },
       {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
         "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0253",
@@ -16653,6 +16677,12 @@
       },
       {
         "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-messages.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0253",
         "ownerActorId": null
@@ -24026,6 +24056,12 @@
         "ownerActorId": null
       },
       {
+        "path": "release/atm-root-drop/schemas/governance/cross-authority-closeback.schema.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
         "path": "release/atm-root-drop/schemas/governance/decomposition-plan.schema.json",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0253",
@@ -29672,6 +29708,30 @@
         "ownerActorId": null
       },
       {
+        "path": "release/atm-root-drop/tests/cli/taskflow-close-saga-plan-parity.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/tests/cli/taskflow-cross-authority-remote-durability.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/tests/cli/taskflow-cross-task-residue-recovery.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0253",
+        "ownerActorId": null
+      },
+      {
         "path": "release/atm-root-drop/tests/cli/taskflow-final-600.test.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0253",
@@ -31712,15 +31772,15 @@
         "ownerActorId": null
       }
     ],
-    "digest": "sha256:2a4803218c54d24306fb3931581bf152adeb6c8239b84bb192e6911bcf2f6be2"
+    "digest": "sha256:fbac366fde3fd76bddb719ddccc1b93eaf30eb12bf830081ea20c11fb0b1f24a"
   },
   "memberTaskIds": [
     "ATM-GOV-0253"
   ],
   "groupManifest": {
     "schemaId": "atm.runnerSyncCoalescedGroupManifest.v1",
-    "stewardWorkId": "runner-sync-f269ada3",
-    "sealedSourceSha": "5173867e1df9de85e034911cf09d629f048d1655",
+    "stewardWorkId": "runner-sync-81a90df8",
+    "sealedSourceSha": "3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
     "members": [
       {
         "taskId": "ATM-GOV-0253",
@@ -31731,29 +31791,29 @@
           "release/atm-onefile/atm.mjs",
           "release/atm-root-drop"
         ],
-        "requestDigest": "sha256:6cb58483865bad82470d0648dcc8e7ceb9dd691f846095fd7abc1b37373a314f"
+        "requestDigest": "sha256:f6ea3390635050751ab488c7671829539657462b01acd322d292379dfee82f89"
       }
     ],
     "memberTaskIds": [
       "ATM-GOV-0253"
     ],
-    "sharedSealedInputDigest": "sha256:829af1068f0a00b36fca95b17b873a75b32e7a6c96ff25ea29668a5b2f312bc7",
-    "sharedOutputDigest": "sha256:fd1db13b185152986ea2a33c0150b2e76af134a530e38f76480d122d72693d25",
-    "manifestDigest": "sha256:6db510ac38a3e443fb5e5eb9674ef71f4a83e8286e1be995b32c0b3af401d01b",
-    "createdAt": "2026-07-29T22:30:46.562Z"
+    "sharedSealedInputDigest": "sha256:6dbd2f8f6964f36db0049a75e6993d4b7be7820cfdbda84bd105b3d0636fc5c4",
+    "sharedOutputDigest": "sha256:809c0edf03897df4075f0a04b1cdb0c770116596a73c05e412930e1b85e2edac",
+    "manifestDigest": "sha256:afb6301f0a2ce26df04e01c497d92f3d9f5f8cde0f5bd443cc99718278af9d85",
+    "createdAt": "2026-07-29T22:35:46.902Z"
   },
   "childReceipts": [
     {
       "schemaId": "atm.runnerSyncChildReceipt.v1",
       "taskId": "ATM-GOV-0253",
-      "parentStewardWorkId": "runner-sync-f269ada3",
-      "groupManifestDigest": "sha256:6db510ac38a3e443fb5e5eb9674ef71f4a83e8286e1be995b32c0b3af401d01b",
-      "memberRequestDigest": "sha256:6cb58483865bad82470d0648dcc8e7ceb9dd691f846095fd7abc1b37373a314f",
-      "sealedSourceSha": "5173867e1df9de85e034911cf09d629f048d1655",
-      "sharedSealedInputDigest": "sha256:829af1068f0a00b36fca95b17b873a75b32e7a6c96ff25ea29668a5b2f312bc7",
-      "sharedOutputDigest": "sha256:fd1db13b185152986ea2a33c0150b2e76af134a530e38f76480d122d72693d25",
-      "receiptDigest": "sha256:0d4c46810e7f6402900c3f046a03bb5b7730a89df3a95a2bf3c4094014e7125f",
-      "issuedAt": "2026-07-29T22:30:46.562Z"
+      "parentStewardWorkId": "runner-sync-81a90df8",
+      "groupManifestDigest": "sha256:afb6301f0a2ce26df04e01c497d92f3d9f5f8cde0f5bd443cc99718278af9d85",
+      "memberRequestDigest": "sha256:f6ea3390635050751ab488c7671829539657462b01acd322d292379dfee82f89",
+      "sealedSourceSha": "3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
+      "sharedSealedInputDigest": "sha256:6dbd2f8f6964f36db0049a75e6993d4b7be7820cfdbda84bd105b3d0636fc5c4",
+      "sharedOutputDigest": "sha256:809c0edf03897df4075f0a04b1cdb0c770116596a73c05e412930e1b85e2edac",
+      "receiptDigest": "sha256:c360f7dbb00dce95d5d097f616ac1edfb90a19b3875a6acf7e61b7c06859de91",
+      "issuedAt": "2026-07-29T22:35:46.902Z"
     }
   ],
   "childAttribution": {
@@ -31764,7 +31824,7 @@
         "taskId": "ATM-GOV-0253",
         "actorId": "codex-git-series-captain",
         "laneFingerprint": null,
-        "childReceiptDigest": "sha256:0d4c46810e7f6402900c3f046a03bb5b7730a89df3a95a2bf3c4094014e7125f"
+        "childReceiptDigest": "sha256:c360f7dbb00dce95d5d097f616ac1edfb90a19b3875a6acf7e61b7c06859de91"
       }
     ],
     "missingTaskIds": []
@@ -31786,11 +31846,11 @@
     "finalizable": true,
     "recoveryCommand": null
   },
-  "runnerInputTreeHash": "sha256:829af1068f0a00b36fca95b17b873a75b32e7a6c96ff25ea29668a5b2f312bc7",
+  "runnerInputTreeHash": "sha256:6dbd2f8f6964f36db0049a75e6993d4b7be7820cfdbda84bd105b3d0636fc5c4",
   "runnerInputGraph": {
     "schemaId": "atm.runnerInputGraph.v1",
-    "sealedSourceSha": "5173867e1df9de85e034911cf09d629f048d1655",
-    "aggregateInputTreeHash": "sha256:829af1068f0a00b36fca95b17b873a75b32e7a6c96ff25ea29668a5b2f312bc7",
+    "sealedSourceSha": "3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
+    "aggregateInputTreeHash": "sha256:6dbd2f8f6964f36db0049a75e6993d4b7be7820cfdbda84bd105b3d0636fc5c4",
     "nodes": [
       {
         "segment": "packages",
@@ -31805,13 +31865,13 @@
           "tsconfig.build.json",
           "tsconfig.json"
         ],
-        "inputDigest": "sha256:829af1068f0a00b36fca95b17b873a75b32e7a6c96ff25ea29668a5b2f312bc7",
+        "inputDigest": "sha256:6dbd2f8f6964f36db0049a75e6993d4b7be7820cfdbda84bd105b3d0636fc5c4",
         "outputEntries": [
           "packages/cli/dist",
           "release/atm-onefile/atm.mjs",
           "release/atm-root-drop"
         ],
-        "outputDigest": "sha256:999296c4295e50fa0d212d1b403c9a5abfb28ef9a722890f685a70e6c2627783"
+        "outputDigest": "sha256:f5291c852591e9cfa12786e75e5bdd317b2655e1ebd43cc3a030bb261fabd342"
       }
     ]
   },
@@ -31821,167 +31881,30 @@
     "release/atm-root-drop"
   ],
   "buildTarget": "full",
-  "buildInputsTreeHash": "sha256:829af1068f0a00b36fca95b17b873a75b32e7a6c96ff25ea29668a5b2f312bc7",
+  "buildInputsTreeHash": "sha256:6dbd2f8f6964f36db0049a75e6993d4b7be7820cfdbda84bd105b3d0636fc5c4",
   "buildDecision": "incrementalBuild",
   "decisionReason": "diff planner selected 1 affected package(s)",
   "incrementalPlan": {
     "schemaId": "atm.runnerIncrementalBuildPlan.v1",
     "specVersion": "0.1.0",
-    "previousSealedSourceSha": "f67f9ecbcf8a3328d4e588418208016e8b4c5694",
-    "currentSealedSourceSha": "5173867e1df9de85e034911cf09d629f048d1655",
+    "previousSealedSourceSha": "5173867e1df9de85e034911cf09d629f048d1655",
+    "currentSealedSourceSha": "3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
     "changedPaths": [
-      "packages/cli/dist/atm.d.ts",
-      "packages/cli/dist/commands/broker/census/index.js",
-      "packages/cli/dist/commands/broker/migrate/implementation.js",
-      "packages/cli/dist/commands/broker/parallel-admission/closure-observation.d.ts",
-      "packages/cli/dist/commands/broker/parallel-admission/closure-observation.js",
-      "packages/cli/dist/commands/broker/parallel-admission/final-verdict.d.ts",
-      "packages/cli/dist/commands/broker/parallel-admission/final-verdict.js",
-      "packages/cli/dist/commands/broker/post-compose-semantic-validation.js",
-      "packages/cli/dist/commands/broker/reconcile/implementation.js",
-      "packages/cli/dist/commands/broker/replay-actions.js",
-      "packages/cli/dist/commands/broker/replay/closure-policy.js",
-      "packages/cli/dist/commands/broker/replay/command-backed-matrix.js",
-      "packages/cli/dist/commands/broker/replay/dashboard-lifecycle-observations.js",
-      "packages/cli/dist/commands/broker/replay/dashboard-ticket-observations.js",
-      "packages/cli/dist/commands/broker/replay/dashboard-view-model.js",
-      "packages/cli/dist/commands/broker/replay/dashboard.js",
-      "packages/cli/dist/commands/broker/replay/dogfood-orchestrator.js",
-      "packages/cli/dist/commands/broker/replay/implementation.js",
-      "packages/cli/dist/commands/broker/replay/run-manifest.js",
-      "packages/cli/dist/commands/broker/runner-sync-supersession.js",
-      "packages/cli/dist/commands/command-specs/write-ticket.spec.js",
-      "packages/cli/dist/commands/framework-development/framework-lock-context.js",
-      "packages/cli/dist/commands/framework-development/framework-temp-lock-projection.js",
-      "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
-      "packages/cli/dist/commands/framework-development/runner-sync-queue-ownership.js",
-      "packages/cli/dist/commands/git-governance/branch-commit-coordinator.js",
-      "packages/cli/dist/commands/git-governance/implementation/admission-command.js",
-      "packages/cli/dist/commands/git-governance/implementation/branch-commit-window.js",
-      "packages/cli/dist/commands/git-governance/implementation/broker-hook-bypass-preflight.js",
-      "packages/cli/dist/commands/git-governance/implementation/command-router.js",
-      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
-      "packages/cli/dist/commands/git-governance/implementation/commit-command.js",
-      "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
-      "packages/cli/dist/commands/git-governance/implementation/git-command-options.js",
-      "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
-      "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
-      "packages/cli/dist/commands/git-governance/implementation/git-process-port.js",
-      "packages/cli/dist/commands/git-governance/implementation/identity-check-command.js",
-      "packages/cli/dist/commands/git-governance/implementation/lease-command.js",
-      "packages/cli/dist/commands/git-governance/implementation/push-command.js",
-      "packages/cli/dist/commands/git-governance/implementation/record-bundle-inspection.js",
-      "packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
-      "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
-      "packages/cli/dist/commands/git-governance/protected-governance-state.js",
-      "packages/cli/dist/commands/git-governance/record-only-block-lifecycle-bridge.js",
-      "packages/cli/dist/commands/git-governance/task-scoped-commit-transaction.js",
-      "packages/cli/dist/commands/git-governance/work-admission-check.js",
-      "packages/cli/dist/commands/hook/pre-commit/framework-lock-context.js",
-      "packages/cli/dist/commands/lane-session/capability-authority.js",
-      "packages/cli/dist/commands/lane-session/mutation-authority-adapter.js",
-      "packages/cli/dist/commands/lane-session/mutation-status-command.js",
-      "packages/cli/dist/commands/lane-session/proxy-receipt.js",
-      "packages/cli/dist/commands/lane-session/redaction.js",
-      "packages/cli/dist/commands/next/__tests__/same-atom-proposal-admission.test.js",
-      "packages/cli/dist/commands/next/playbook-projection/task-reservation-projection.js",
-      "packages/cli/dist/commands/shared/command-manifest.js",
-      "packages/cli/dist/commands/shared/identity-normalization.js",
-      "packages/cli/dist/commands/taskflow/close-side-effect-reconcile.js",
-      "packages/cli/dist/commands/taskflow/runner-selection-evidence.js",
-      "packages/cli/dist/commands/tasks/acceptance-evidence-import.js",
-      "packages/cli/dist/commands/tasks/claim-work-admission.js",
-      "packages/cli/dist/commands/tasks/close-orchestrator/acceptance-evidence-gate.js",
-      "packages/cli/dist/commands/tasks/contract-import-recovery.js",
-      "packages/cli/dist/commands/tasks/read-projection.js",
-      "packages/cli/dist/commands/tasks/scope-amendment/implementation.js",
-      "packages/cli/dist/commands/tasks/scope-preflight/implementation.js",
-      "packages/cli/dist/commands/tasks/task-import-diagnostics.js",
-      "packages/cli/dist/commands/tasks/task-work-admission-import.js",
-      "packages/cli/dist/commands/team/proposal-workspace.js",
-      "packages/cli/dist/commands/write-ticket.js",
-      "packages/cli/dist/index.d.ts"
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "schemas/governance/cross-authority-closeback.schema.json"
     ],
     "affectedPackages": [
       "packages/cli"
     ],
     "affectedGroups": {
       "packages": [
-        "packages/cli/dist/atm.d.ts",
-        "packages/cli/dist/commands/broker/census/index.js",
-        "packages/cli/dist/commands/broker/migrate/implementation.js",
-        "packages/cli/dist/commands/broker/parallel-admission/closure-observation.d.ts",
-        "packages/cli/dist/commands/broker/parallel-admission/closure-observation.js",
-        "packages/cli/dist/commands/broker/parallel-admission/final-verdict.d.ts",
-        "packages/cli/dist/commands/broker/parallel-admission/final-verdict.js",
-        "packages/cli/dist/commands/broker/post-compose-semantic-validation.js",
-        "packages/cli/dist/commands/broker/reconcile/implementation.js",
-        "packages/cli/dist/commands/broker/replay-actions.js",
-        "packages/cli/dist/commands/broker/replay/closure-policy.js",
-        "packages/cli/dist/commands/broker/replay/command-backed-matrix.js",
-        "packages/cli/dist/commands/broker/replay/dashboard-lifecycle-observations.js",
-        "packages/cli/dist/commands/broker/replay/dashboard-ticket-observations.js",
-        "packages/cli/dist/commands/broker/replay/dashboard-view-model.js",
-        "packages/cli/dist/commands/broker/replay/dashboard.js",
-        "packages/cli/dist/commands/broker/replay/dogfood-orchestrator.js",
-        "packages/cli/dist/commands/broker/replay/implementation.js",
-        "packages/cli/dist/commands/broker/replay/run-manifest.js",
-        "packages/cli/dist/commands/broker/runner-sync-supersession.js",
-        "packages/cli/dist/commands/command-specs/write-ticket.spec.js",
-        "packages/cli/dist/commands/framework-development/framework-lock-context.js",
-        "packages/cli/dist/commands/framework-development/framework-temp-lock-projection.js",
-        "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
-        "packages/cli/dist/commands/framework-development/runner-sync-queue-ownership.js",
-        "packages/cli/dist/commands/git-governance/branch-commit-coordinator.js",
-        "packages/cli/dist/commands/git-governance/implementation/admission-command.js",
-        "packages/cli/dist/commands/git-governance/implementation/branch-commit-window.js",
-        "packages/cli/dist/commands/git-governance/implementation/broker-hook-bypass-preflight.js",
-        "packages/cli/dist/commands/git-governance/implementation/command-router.js",
-        "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
-        "packages/cli/dist/commands/git-governance/implementation/commit-command.js",
-        "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
-        "packages/cli/dist/commands/git-governance/implementation/git-command-options.js",
-        "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
-        "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
-        "packages/cli/dist/commands/git-governance/implementation/git-process-port.js",
-        "packages/cli/dist/commands/git-governance/implementation/identity-check-command.js",
-        "packages/cli/dist/commands/git-governance/implementation/lease-command.js",
-        "packages/cli/dist/commands/git-governance/implementation/push-command.js",
-        "packages/cli/dist/commands/git-governance/implementation/record-bundle-inspection.js",
-        "packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
-        "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
-        "packages/cli/dist/commands/git-governance/protected-governance-state.js",
-        "packages/cli/dist/commands/git-governance/record-only-block-lifecycle-bridge.js",
-        "packages/cli/dist/commands/git-governance/task-scoped-commit-transaction.js",
-        "packages/cli/dist/commands/git-governance/work-admission-check.js",
-        "packages/cli/dist/commands/hook/pre-commit/framework-lock-context.js",
-        "packages/cli/dist/commands/lane-session/capability-authority.js",
-        "packages/cli/dist/commands/lane-session/mutation-authority-adapter.js",
-        "packages/cli/dist/commands/lane-session/mutation-status-command.js",
-        "packages/cli/dist/commands/lane-session/proxy-receipt.js",
-        "packages/cli/dist/commands/lane-session/redaction.js",
-        "packages/cli/dist/commands/next/__tests__/same-atom-proposal-admission.test.js",
-        "packages/cli/dist/commands/next/playbook-projection/task-reservation-projection.js",
-        "packages/cli/dist/commands/shared/command-manifest.js",
-        "packages/cli/dist/commands/shared/identity-normalization.js",
-        "packages/cli/dist/commands/taskflow/close-side-effect-reconcile.js",
-        "packages/cli/dist/commands/taskflow/runner-selection-evidence.js",
-        "packages/cli/dist/commands/tasks/acceptance-evidence-import.js",
-        "packages/cli/dist/commands/tasks/claim-work-admission.js",
-        "packages/cli/dist/commands/tasks/close-orchestrator/acceptance-evidence-gate.js",
-        "packages/cli/dist/commands/tasks/contract-import-recovery.js",
-        "packages/cli/dist/commands/tasks/read-projection.js",
-        "packages/cli/dist/commands/tasks/scope-amendment/implementation.js",
-        "packages/cli/dist/commands/tasks/scope-preflight/implementation.js",
-        "packages/cli/dist/commands/tasks/task-import-diagnostics.js",
-        "packages/cli/dist/commands/tasks/task-work-admission-import.js",
-        "packages/cli/dist/commands/team/proposal-workspace.js",
-        "packages/cli/dist/commands/write-ticket.js",
-        "packages/cli/dist/index.d.ts"
+        "packages/cli/src/commands/taskflow/cross-authority-closeback.ts"
       ],
       "scripts": [],
       "templates": [],
-      "schemas": [],
+      "schemas": [
+        "schemas/governance/cross-authority-closeback.schema.json"
+      ],
       "atomicWorkbench": [],
       "rootConfig": [],
       "unknown": []
@@ -31989,7 +31912,7 @@
     "incrementalEligible": true,
     "unsafeReasons": []
   },
-  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-07-29T22-30-46-459Z-runner-sync.jsonl",
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-07-29T22-35-46-810Z-runner-sync.jsonl",
   "tsBuildCache": {
     "schemaId": "atm.runnerTsBuildCacheSummary.v1",
     "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
@@ -31997,7 +31920,7 @@
     "existedBefore": true,
     "existsAfter": true,
     "digestBefore": "sha256:7b05f99528e5922245d7866721d49211280b01c219112f135167294b8275873a",
-    "digestAfter": "sha256:7b05f99528e5922245d7866721d49211280b01c219112f135167294b8275873a",
+    "digestAfter": "sha256:3488f4ad605d8bcd3a44bbe25d726e89c6a7eb6bafd5a0a4f95ddc088aa745ab",
     "restoredBeforeBuild": true,
     "persistedAfterBuild": true,
     "gitPolicy": {
@@ -32006,7 +31929,7 @@
     }
   },
   "brokerTicket": {
-    "ticketId": "runner-sync-f269ada3:5173867e1df9de85e034911cf09d629f048d1655",
+    "ticketId": "runner-sync-81a90df8:3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
     "waitedMs": 0,
     "position": 1,
     "headOwner": "ATM-GOV-0253"
@@ -32014,11 +31937,11 @@
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 11447,
-    "totalElapsedMs": 37889,
-    "dominanceRatio": 0.3021,
-    "phaseMedianMs": 1678,
-    "phaseP95Ms": 11447,
+    "dominantPhaseMs": 9987,
+    "totalElapsedMs": 34852,
+    "dominanceRatio": 0.2866,
+    "phaseMedianMs": 1754,
+    "phaseP95Ms": 9987,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
@@ -32028,37 +31951,37 @@
     "buildDecision": "incrementalBuild",
     "decisionReason": "diff planner selected 1 affected package(s)",
     "brokerTicket": {
-      "ticketId": "runner-sync-f269ada3:5173867e1df9de85e034911cf09d629f048d1655",
+      "ticketId": "runner-sync-81a90df8:3cf1a3bc1f4ca62efc4ef150eba7a8448e804d70",
       "waitedMs": 0,
       "position": 1,
       "headOwner": "ATM-GOV-0253"
     },
-    "changedPathCount": 71,
+    "changedPathCount": 2,
     "affectedPackageCount": 1,
     "unsafeReasons": [],
     "dominantPhaseSummary": {
       "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
       "dominantPhase": "worktreeSetup",
-      "dominantPhaseMs": 11447,
-      "totalElapsedMs": 37889,
-      "dominanceRatio": 0.3021,
-      "phaseMedianMs": 1678,
-      "phaseP95Ms": 11447,
+      "dominantPhaseMs": 9987,
+      "totalElapsedMs": 34852,
+      "dominanceRatio": 0.2866,
+      "phaseMedianMs": 1754,
+      "phaseP95Ms": 9987,
       "measuredPhaseCount": 8,
       "optimizationVerdict": "inconclusive",
       "basis": "single-run"
     }
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 930,
-    "skipDecision": 76,
-    "worktreeSetup": 11447,
-    "typescriptBuild": 7659,
-    "rootDropReleaseAssembly": 6885,
-    "onefileReleaseAssembly": 1678,
-    "artifactSync": 5684,
+    "inputHashCalculation": 48,
+    "skipDecision": 42,
+    "worktreeSetup": 9987,
+    "typescriptBuild": 7788,
+    "rootDropReleaseAssembly": 6663,
+    "onefileReleaseAssembly": 1754,
+    "artifactSync": 6833,
     "cleanup": 0,
-    "totalElapsed": 37889
+    "totalElapsed": 34852
   },
   "atomicWrite": {
     "schemaId": "atm.runnerSyncAtomicWrite.v1",
@@ -32066,7 +31989,7 @@
     "platform": "win32",
     "maxAttempts": 4
   },
-  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"ATM-GOV-0253\" --steward-work-id \"runner-sync-f269ada3\" --receipt-ref \".atm/history/evidence/ATM-GOV-0253.runner-sync-receipt.json\" --json",
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"ATM-GOV-0253\" --steward-work-id \"runner-sync-81a90df8\" --receipt-ref \".atm/history/evidence/ATM-GOV-0253.runner-sync-receipt.json\" --json",
   "treatmentTelemetry": {
     "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
     "executionMode": "command-executed",
@@ -32075,18 +31998,18 @@
     "receiptValidity": "valid",
     "buildDecision": "incrementalBuild",
     "phaseTimingsMs": {
-      "inputHashCalculation": 930,
-      "skipDecision": 76,
-      "worktreeSetup": 11447,
-      "typescriptBuild": 7659,
-      "rootDropReleaseAssembly": 6885,
-      "onefileReleaseAssembly": 1678,
-      "artifactSync": 5684,
+      "inputHashCalculation": 48,
+      "skipDecision": 42,
+      "worktreeSetup": 9987,
+      "typescriptBuild": 7788,
+      "rootDropReleaseAssembly": 6663,
+      "onefileReleaseAssembly": 1754,
+      "artifactSync": 6833,
       "cleanup": 0,
-      "totalElapsed": 37889
+      "totalElapsed": 34852
     },
     "rawTelemetryPolicy": "gitignored-runtime-only",
-    "tsBuildCacheDigest": "sha256:1e01465f1c7cbcecef43fa558edd0ac2da0e49b1682e1a19b6c3acf45b135957"
+    "tsBuildCacheDigest": "sha256:5555e15fdb7df44b5dd654ce38219cbb39359128d2196cf35b18464b951759c0"
   },
-  "publishedAt": "2026-07-29T22:30:46.564Z"
+  "publishedAt": "2026-07-29T22:35:46.904Z"
 }
