@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.plan3DogfoodSurfaceReceipt.v1",
+  "taskId": "ATM-GOV-0237",
+  "surface": "dashboard-ticket-observations",
+  "sharedPhysicalFile": "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+  "privateObservationModule": "packages/cli/src/commands/broker/replay/dashboard-ticket-observations.ts",
+  "focusedTest": "tests/cli/plan3-dashboard-ticket-observations.test.ts",
+  "proposalRoot": ".atm/runtime/broker-proposals/ATM-GOV-0237",
+  "sameWorktreeRequired": true,
+  "separateGitWorktreeAllowed": false,
+  "observations": [
+    "ticket generation",
+    "ticket digest",
+    "queue position",
+    "waitedMs",
+    "release condition"
+  ],
+  "controlFlowBinding": "data-only",
+  "readOnly": true
+}
