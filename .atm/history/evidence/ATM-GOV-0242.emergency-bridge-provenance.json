@@ -1,0 +1,28 @@
+{
+  "schemaId": "atm.emergencyBridgeProvenance.v1",
+  "recordedAt": "2026-07-29T21:06:00.000Z",
+  "recordedBy": "codex-git-series-captain",
+  "reason": "ATM batch checkpoint requires frozen runner parity while uncommitted framework source changes make the frozen runner stale; bridge commits preserve verified deliverables before runner-sync.",
+  "policy": {
+    "pathBounded": true,
+    "noHistoryRewrite": true,
+    "genericFixRequired": true
+  },
+  "bridgeCommits": [
+    {
+      "taskId": "ATM-GOV-0237",
+      "commitSha": "ec63950aae38188b96f7da9ca5b8478adf958bd2",
+      "messageDigest": "sha256:852a22c5f316004a8c3944cd843d3320f1e56f893442b1c00f514e51061f9a8c"
+    },
+    {
+      "taskId": "ATM-GOV-0238",
+      "commitSha": "955afeb7807ebcfb48c809bf421e4ac708db7b66",
+      "messageDigest": "sha256:891b2d831964ba155620663a78c7f1baa64d5bc9fd8b38c94b29fd8841da8a61"
+    },
+    {
+      "taskId": "ATM-GOV-0242",
+      "commitSha": "822462f513199ae1933465361866fceb4c0165eb",
+      "messageDigest": "sha256:1adcacf5ddc396f311faae406550fc64138e9ea10c99999a8b0ae699b47c3806"
+    }
+  ]
+}
