@@ -19,7 +19,7 @@ try {
     claimGeneration: 'lease-gate-test',
     allowedFiles: ['packages/example.ts'],
     runnerSelection: { runnerKind: 'frozen', runnerRef: 'release/atm-onefile/atm.mjs', selectedAt: '2026-07-29T00:00:00.000Z' },
-    now: '2026-07-29T00:00:00.000Z'
+    now: '2026-07-29T13:00:00.000Z'
   });
   const ledgerDir = path.join(root, '.atm', 'history', 'tasks');
   mkdirSync(ledgerDir, { recursive: true });
@@ -39,14 +39,14 @@ try {
   const accepted = evaluateWorkAdmissionGate({
     cwd: root, taskId, actorId, laneSessionId, claimGeneration: 'lease-gate-test',
     operation: 'commit', files: ['packages/example.ts'], producingAtmCommand: 'node atm.mjs git commit',
-    now: '2026-07-29T00:01:00.000Z'
+    now: '2026-07-29T13:01:00.000Z'
   });
   assert.equal(accepted.decision.code, 'ATM_WORK_ADMISSION_OK');
   assert.equal(accepted.receipt?.operation, 'commit');
 
   const ledgerBound = evaluateTaskWorkAdmissionGate({
     cwd: root, taskId, operation: 'close', files: ['packages/example.ts'],
-    producingAtmCommand: 'node atm.mjs taskflow close', now: '2026-07-29T00:01:00.000Z'
+    producingAtmCommand: 'node atm.mjs taskflow close', now: '2026-07-29T13:01:00.000Z'
   });
   assert.equal(ledgerBound.decision.code, 'ATM_WORK_ADMISSION_OK');
   assert.equal(ledgerBound.receipt?.operation, 'close');
@@ -54,10 +54,22 @@ try {
   const rejected = evaluateWorkAdmissionGate({
     cwd: root, taskId, actorId, laneSessionId, claimGeneration: 'lease-gate-test',
     operation: 'push', files: ['packages/outside.ts'], producingAtmCommand: 'node atm.mjs git push',
-    now: '2026-07-29T00:01:00.000Z'
+    now: '2026-07-29T13:01:00.000Z'
   });
   assert.equal(rejected.decision.code, 'ATM_WRITE_TICKET_SCOPE_VIOLATION');
   assert.equal(rejected.receipt, null);
+
+  const tempTaskId = 'ATM-FRAMEWORK-TEMP-gate-test';
+  mkdirSync(path.join(root, '.atm', 'runtime', 'locks'), { recursive: true });
+  writeFileSync(path.join(root, '.atm', 'runtime', 'locks', `${tempTaskId}.lock.json`), JSON.stringify({
+    workItemId: tempTaskId, actorId, heartbeatAt: '2026-07-29T13:00:00.000Z', ttlSeconds: 300,
+    files: ['packages/example.ts']
+  }));
+  const tempAccepted = evaluateWorkAdmissionGate({
+    cwd: root, taskId: tempTaskId, actorId, operation: 'commit', files: ['packages/example.ts'],
+    producingAtmCommand: 'node atm.mjs git commit', now: '2026-07-29T13:01:00.000Z'
+  });
+  assert.equal(tempAccepted.decision.code, 'ATM_WORK_ADMISSION_OK');
 
   const facadeRejected = await runAtmGit([
     'commit', '--cwd', root, '--actor', actorId, '--task', taskId,

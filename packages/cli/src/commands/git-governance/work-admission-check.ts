@@ -1,8 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { readFrameworkTempLockProjection } from '../framework-development/framework-temp-lock-projection.ts';
 import {
   checkWorkAdmissionTicket,
   createWorkAdmissionCoverageReceipt,
+  issueWorkAdmissionTicket,
   type WorkAdmissionOperation,
   type WorkAdmissionTicket,
   type WorkAdmissionTicketDecision
@@ -30,7 +32,7 @@ export function evaluateWorkAdmissionGate(input: {
   readonly observedContent?: string;
   readonly now?: string;
 }): WorkAdmissionGateResult {
-  const ticket = readWorkAdmissionTicket(input.cwd, input.taskId);
+  const ticket = resolveWorkAdmissionTicket(input);
   const decision = checkWorkAdmissionTicket({
     ticket,
     taskId: input.taskId,
@@ -51,6 +53,45 @@ export function evaluateWorkAdmissionGate(input: {
     now: input.now
   });
   return { decision, receipt };
+}
+
+function issueFrameworkTempAdmissionTicket(input: Parameters<typeof evaluateWorkAdmissionGate>[0]): WorkAdmissionTicket | null {
+  const now = input.now ?? new Date().toISOString();
+  const nowMs = Date.parse(now);
+  const lock = readFrameworkTempLockProjection(input.cwd, nowMs).find((candidate) =>
+    candidate.workItemId === input.taskId
+    && candidate.actorId === input.actorId
+    && candidate.disposition === 'foreign-live'
+    && input.files.every((file) => candidate.files.some((scope) => file === scope || file.startsWith(`${scope.replace(/\*\*$/, '').replace(/\*$/, '')}`)))
+  );
+  if (!lock || lock.ttlSeconds === null || lock.heartbeatAt === null) return null;
+  const remainingSeconds = Math.max(1, Math.floor((Date.parse(lock.heartbeatAt) + lock.ttlSeconds * 1000 - nowMs) / 1000));
+  return issueWorkAdmissionTicket({
+    taskId: lock.workItemId,
+    actorId: lock.actorId,
+    laneSessionId: lock.laneSessionId,
+    claimGeneration: `framework-lock:${lock.heartbeatAt}`,
+    allowedFiles: lock.files,
+    runnerSelection: { runnerKind: 'frozen', runnerRef: 'framework-mode-lock', selectedAt: now },
+    now,
+    ttlSeconds: remainingSeconds
+  });
+}
+
+export function resolveWorkAdmissionTicket(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly laneSessionId?: string | null;
+  readonly claimGeneration?: string | null;
+  readonly operation: WorkAdmissionOperation;
+  readonly files: readonly string[];
+  readonly producingAtmCommand: string;
+  readonly observedContent?: string;
+  readonly now?: string;
+}): WorkAdmissionTicket | null {
+  return readWorkAdmissionTicket(input.cwd, input.taskId)
+    ?? issueFrameworkTempAdmissionTicket(input);
 }
 
 /**

@@ -9,6 +9,18 @@ import {
   recordIncidentFlag,
   reconcileStaleIncidents
 } from '../cross-task-mutation-guard.ts';
+import { classifyTerminalLifecycleOwnership } from '../historical-work-admission-attestation.ts';
+
+assert.deepEqual(
+  classifyTerminalLifecycleOwnership({ status: 'done', claimState: null, lockReleased: true }),
+  { decision: 'terminal', reason: 'Legacy terminal task has no claim record and no active direction lock.' },
+  'legacy terminal task records without claims must not remain active scope owners'
+);
+assert.equal(
+  classifyTerminalLifecycleOwnership({ status: 'done', claimState: null, lockReleased: false }).decision,
+  'inconsistent',
+  'a terminal task with an unreleased lock must remain fail-closed'
+);
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-cross-task-guard-'));
 

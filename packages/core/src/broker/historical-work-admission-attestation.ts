@@ -136,8 +136,13 @@ export function classifyTerminalLifecycleOwnership(input: {
       ? { decision: 'active', reason: 'Non-terminal task has an active claim.' }
       : { decision: 'inconsistent', reason: 'Non-terminal task has no active claim.' };
   }
-  if (claimState === 'released' && input.lockReleased) {
-    return { decision: 'terminal', reason: 'Terminal task has both a released claim and a released direction lock.' };
+  if (input.lockReleased && (claimState === 'released' || claimState.length === 0)) {
+    return {
+      decision: 'terminal',
+      reason: claimState === 'released'
+        ? 'Terminal task has both a released claim and a released direction lock.'
+        : 'Legacy terminal task has no claim record and no active direction lock.'
+    };
   }
   return { decision: 'inconsistent', reason: 'Terminal task must have a released claim and released direction lock.' };
 }

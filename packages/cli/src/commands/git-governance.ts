@@ -8,7 +8,7 @@ import {
   type HistoricalWorkAdmissionAttestation
 } from '../../../core/src/broker/historical-work-admission-attestation.ts';
 import { pathMatchesWriteScope } from '../../../core/src/broker/write-scope-policy.ts';
-import { evaluateTaskWorkAdmissionGate, readWorkAdmissionTicket } from './git-governance/work-admission-check.ts';
+import { evaluateTaskWorkAdmissionGate, evaluateWorkAdmissionGate, readWorkAdmissionTicket, resolveWorkAdmissionTicket } from './git-governance/work-admission-check.ts';
 import { makeResult, message } from './shared.ts';
 import {
   captureGitHeadEvidencePreparation,
@@ -49,18 +49,20 @@ export async function runAtmGit(argv: string[]) {
     return runAtmGitImplementation(argv);
   }
   const cwd = readOption(argv, '--cwd') ?? process.cwd();
-  const ticket = readWorkAdmissionTicket(cwd, taskId);
+  const actorId = readOption(argv, '--actor') ?? '';
+  const ticketInput = {
+    cwd, taskId, actorId, operation: action as 'commit' | 'push', files: [] as readonly string[],
+    producingAtmCommand: `node atm.mjs git ${action} --task ${taskId} --json`
+  };
+  const ledgerTicket = readWorkAdmissionTicket(cwd, taskId);
+  const initialTicket = ledgerTicket ?? resolveWorkAdmissionTicket(ticketInput);
   const files = action === 'commit'
-    ? selectTicketValidatedCommitFiles(readStagedFiles(cwd), ticket, argv.includes('--defer-foreign-staged'))
-    : ticket?.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
-  const gate = evaluateTaskWorkAdmissionGate({
-    cwd,
-    taskId,
-    operation: action,
-    files,
-    producingAtmCommand: `node atm.mjs git ${action} --task ${taskId} --json`,
-    observedContent: JSON.stringify({ action, files: [...files].sort() })
-  });
+    ? selectTicketValidatedCommitFiles(readStagedFiles(cwd), initialTicket, argv.includes('--defer-foreign-staged'))
+    : initialTicket?.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
+  const ticket = resolveWorkAdmissionTicket({ ...ticketInput, files });
+  const gate = ledgerTicket
+    ? evaluateTaskWorkAdmissionGate({ cwd, taskId, operation: action, files, producingAtmCommand: ticketInput.producingAtmCommand, observedContent: JSON.stringify({ action, files: [...files].sort() }) })
+    : evaluateWorkAdmissionGate({ ...ticketInput, files, observedContent: JSON.stringify({ action, files: [...files].sort() }) });
   if (!gate.decision.ok) {
     return makeResult({
       ok: false,
@@ -90,7 +92,7 @@ export async function runAtmGit(argv: string[]) {
  */
 export function selectTicketValidatedCommitFiles(
   stagedFiles: readonly string[],
-  ticket: ReturnType<typeof readWorkAdmissionTicket>,
+  ticket: ReturnType<typeof resolveWorkAdmissionTicket>,
   deferForeignStaged: boolean
 ): readonly string[] {
   if (!deferForeignStaged || !ticket) return stagedFiles;
