@@ -45,6 +45,31 @@ try {
   assert.deepEqual(blocked.foreignNonReleaseWip, ['packages/cli/src/commands/foreign-owned.ts']);
   assert.match(blocked.requiredCommand ?? '', /foreign non-release WIP/);
 
+  const cleanLanded = inspectRunnerSyncAdmission({
+    cwd: repo,
+    stewardActorId: 'release-steward',
+    envActorId: 'release-steward',
+    legacyEnvActorId: 'release-steward',
+    sealedSourceSha: '3'.repeat(40),
+    runnerSyncSteward: {
+      stewardWorkId: 'runner-sync-clean-landed',
+      queuePosition: 1,
+      suggestedNextAction: 'run runner sync',
+      requests: [{ taskId: 'TASK-RUNNER', actorId: 'release-steward', requestedSurfaces: ['release/atm-root-drop'] }]
+    },
+    dirtyFiles: ['release/atm-root-drop/release-manifest.json'],
+    foreignClaims: [{
+      taskId: 'TASK-FOREIGN',
+      actorId: 'foreign-agent',
+      claimedAt: '2026-07-21T00:00:00.000Z',
+      files: ['packages/cli/src/commands/foreign-owned.ts']
+    }],
+    landedFiles: ['packages/cli/src/commands/foreign-owned.ts']
+  });
+
+  assert.deepEqual(cleanLanded.foreignNonReleaseWip, []);
+  assert.doesNotMatch(cleanLanded.requiredCommand ?? '', /foreign non-release WIP/);
+
   writeJsonWithRetry({ filePath: manifestFile, value: { sealedSourceCommit: '3'.repeat(40) } });
   assert.equal(digest(foreignFile), before, 'runner-sync release-surface writes must not mutate foreign non-release WIP');
 

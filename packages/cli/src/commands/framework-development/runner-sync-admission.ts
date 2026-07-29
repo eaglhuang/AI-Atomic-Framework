@@ -410,13 +410,15 @@ function inspectForeignBuildInputConflicts(input: {
       ? intersectingFiles.filter((file) => explicitLandedFiles.has(file))
       : intersectingFiles.filter((file) => hasLandedSinceClaim(input.cwd, file, claim.claimedAt ?? null));
     if (landedIntersectingFiles.length === 0) continue;
+    const dirtyIntersectingFiles = intersectingFiles.filter((file) => dirtySet.has(file));
+    if (dirtyIntersectingFiles.length === 0) continue;
     conflicts.push({
       blockingTaskId: claim.taskId,
       blockingActorId: claim.actorId ?? null,
       blockingLaneSessionId: claim.laneSessionId ?? null,
       heartbeatAt: claim.heartbeatAt ?? null,
       intersectingFiles,
-      dirtyIntersectingFiles: intersectingFiles.filter((file) => dirtySet.has(file)),
+      dirtyIntersectingFiles,
       landedIntersectingFiles,
       reasonCode: 'landed-not-closed-build-input-risk'
     });
