@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-ceeedf38921d",
+  "recordedAt": "2026-07-29T12:35:57.705Z",
+  "actorId": "codex-git-series-captain",
+  "taskId": "TASK-RFT-0101",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-git-series-captain --task TASK-RFT-0101 --message \"build(runner): publish reservation supersession\n\nATM-Work-Admission: wat-cc970dc503952989 sha256:cc970dc50395298983ecffb87e589c0484ce06cbfec0f3eff69c3002d654f454\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-RFT-0101-4a84c8f34a",
+  "reason": "Publish sealed runner outputs after verified supersession CLI execution.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-29T12-35-57-703Z-EMG-TASK-RFT-0101-4a84c8f34a.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

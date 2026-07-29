@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { CliError, makeResult, message } from '../shared.js';
 import { cleanupRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue } from '../../../../core/dist/broker/runner-sync-steward-queue.js';
+import { supersedeRunnerSyncReservation } from './runner-sync-supersession.js';
 import { cleanupGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../../core/dist/broker/generated-projection-steward.js';
 import { readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward } from './persistence.js';
 import { appendLaneSessionEvent } from '../lane-session/events.js';
@@ -13,7 +14,8 @@ export function handleBrokerStewardQueues(options, context) {
     const runnerSyncQueuePath = context.runnerSyncQueuePath;
     const projectionStewardPath = context.projectionStewardPath;
     if (options.action === 'runner-sync') {
-        if (options.runnerSyncAction === 'enqueue') {
+        if (options.runnerSyncAction === 'enqueue' || options.runnerSyncAction === 'supersede') {
+            const action = options.runnerSyncAction;
             if (!options.task) {
                 throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires --task <task-id>.', { exitCode: 2 });
             }
@@ -28,7 +30,7 @@ export function handleBrokerStewardQueues(options, context) {
             }
             let result;
             try {
-                result = enqueueRunnerSyncStewardRequest(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
+                result = (action === 'supersede' ? supersedeRunnerSyncReservation : enqueueRunnerSyncStewardRequest)(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
                     taskId: options.task,
                     actorId: options.actorId,
                     sealedSourceSha: resolveFullGitCommitSha(options.cwd, options.sealedSourceSha),
@@ -48,14 +50,15 @@ export function handleBrokerStewardQueues(options, context) {
                 command: 'broker',
                 cwd: options.cwd,
                 messages: [
-                    message('info', 'ATM_BROKER_RUNNER_SYNC_ENQUEUED', `Runner-sync request is ${result.status} at position ${result.queuePosition} for steward work ${result.stewardWorkId}.`, {
+                    message('info', action === 'supersede' ? 'ATM_BROKER_RUNNER_SYNC_SUPERSEDED' : 'ATM_BROKER_RUNNER_SYNC_ENQUEUED', action === 'supersede' ? `Runner-sync reservation superseded ${result.supersededReservations.length} incompatible generation(s); new request is ${result.status} at position ${result.queuePosition}.` : `Runner-sync request is ${result.status} at position ${result.queuePosition} for steward work ${result.stewardWorkId}.`, {
                         status: result.status,
                         queuePosition: result.queuePosition,
                         queueHeadHealth: result.queueHeadHealth,
                         stewardWorkId: result.stewardWorkId,
                         waitingTasks: result.waitingTasks,
                         brokerTicket: result.brokerTicket,
-                        suggestedNextAction: result.suggestedNextAction
+                        suggestedNextAction: result.suggestedNextAction,
+                        supersededReservations: result.supersededReservations ?? []
                     })
                 ],
                 evidence: {
@@ -187,7 +190,7 @@ export function handleBrokerStewardQueues(options, context) {
                 throw toRunnerSyncQueueCliError(error);
             }
         }
-        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, status, cleanup, release, reconcile-receipt', { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, supersede, status, cleanup, release, reconcile-receipt', { exitCode: 2 });
     }
     if (options.action === 'projection') {
         if (options.projectionAction === 'enqueue') {

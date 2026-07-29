@@ -1051,6 +1051,8 @@
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/closure-policy.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/command-backed-matrix.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/implementation.js",
+    "release/atm-root-drop/packages/cli/dist/commands/broker/runner-sync-supersession.d.ts",
+    "release/atm-root-drop/packages/cli/dist/commands/broker/runner-sync-supersession.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/shared-surface.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/broker/shared-surface.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/steward-queues.d.ts",
@@ -2048,6 +2050,7 @@
     "release/atm-root-drop/packages/cli/src/commands/broker/replay/closure-policy.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/replay/implementation.ts",
+    "release/atm-root-drop/packages/cli/src/commands/broker/runner-sync-supersession.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/shared-surface.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/steward-queues.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/steward-runtime-actions.ts",
@@ -4961,8 +4964,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 680,
-    "unchanged": 4246,
+    "copied": 687,
+    "unchanged": 4242,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -5047,6 +5050,7 @@
       "packages/cli/src/commands/broker/replay/closure-policy.ts",
       "packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
       "packages/cli/src/commands/broker/replay/implementation.ts",
+      "packages/cli/src/commands/broker/runner-sync-supersession.ts",
       "packages/cli/src/commands/broker/shared-surface.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
       "packages/cli/src/commands/broker/steward-runtime-actions.ts",
@@ -6179,7 +6183,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:678a6bd61302fd2ded4075e59f509405b1e587df466a3927c1eb020f3dc95cc7"
+    "digest": "sha256:3ec095a8f2dd9e9b7f6a6aceb013a4bb54489cc6b13341c36e284fcb88fc9380"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -7204,6 +7208,8 @@
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/closure-policy.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/command-backed-matrix.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/runner-sync-supersession.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/runner-sync-supersession.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/shared-surface.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/broker/shared-surface.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/steward-queues.d.ts",
@@ -8201,6 +8207,7 @@
       "release/atm-root-drop/packages/cli/src/commands/broker/replay/closure-policy.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/replay/command-backed-matrix.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/replay/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/runner-sync-supersession.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/shared-surface.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/steward-queues.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/steward-runtime-actions.ts",
@@ -11117,34 +11124,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:02ed5ec8ea36507e69c948fc6dcaf7fd88b6829bdaa7e337ea7d65b3a05ff24a",
-  "sealedSourceCommit": "aefd1c5d9632741d3e7feb2502770c3c9d591336",
+  "buildInputsTreeHash": "sha256:96843467f7ef6ffc9611837ba587794c6e17749d955fecc1a28abdd32c66c959",
+  "sealedSourceCommit": "86ff94055a962dd6469e2798cf9cb6711d0af537",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:b6a6fa481e1b077c16e515f4edf88fe91fa5b210fc512f9e6578dbed6e5a8eaf",
-  "tsBuildCacheDigest": "sha256:eae7fc088abcfd02b6e831d2808089064d85d191d70f48e144784e4f36c5ff03",
+  "incrementalPlanDigest": "sha256:d93201a2f4528d85a699d7ae34357d110edde60d0fab2dce51bd0b2ed0abf941",
+  "tsBuildCacheDigest": "sha256:0d6488872db8e1e43627e27af9917ea677ce51e03be973071a6ba29c5e2c57a1",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 12761,
-    "totalElapsedMs": 41680,
-    "dominanceRatio": 0.3062,
-    "phaseMedianMs": 1580,
-    "phaseP95Ms": 12761,
+    "dominantPhase": "typescriptBuild",
+    "dominantPhaseMs": 10925,
+    "totalElapsedMs": 39608,
+    "dominanceRatio": 0.2758,
+    "phaseMedianMs": 1554,
+    "phaseP95Ms": 10925,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 55,
-    "skipDecision": 55,
-    "worktreeSetup": 12761,
-    "typescriptBuild": 10425,
-    "rootDropReleaseAssembly": 6860,
-    "onefileReleaseAssembly": 1580,
-    "artifactSync": 7662,
+    "inputHashCalculation": 67,
+    "skipDecision": 57,
+    "worktreeSetup": 10451,
+    "typescriptBuild": 10925,
+    "rootDropReleaseAssembly": 7151,
+    "onefileReleaseAssembly": 1554,
+    "artifactSync": 7156,
     "cleanup": 0,
-    "totalElapsed": 41680
+    "totalElapsed": 39608
   }
 }

@@ -23,6 +23,7 @@ import { planMutationBatch } from '../../../../core/src/broker/adapters/batch-pl
 import { computeCasResult, hashContent } from '../../../../core/src/broker/adapters/cas.ts';
 import { enqueueSharedSurface, planSharedSurfaceAcquisition, removeSharedSurfaceEntry, type SharedSurfaceQueue } from '../../../../core/src/broker/shared-surface-queue.ts';
 import { cleanupRunnerSyncStewardQueue, emptyRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue, type RunnerSyncStewardQueueDocument, type RunnerSyncTaskHealth, type RunnerSyncStewardRequest } from '../../../../core/src/broker/runner-sync-steward-queue.ts';
+import { supersedeRunnerSyncReservation } from './runner-sync-supersession.ts';
 import { cleanupGeneratedProjectionSteward, emptyGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild, type GeneratedProjectionStewardDocument } from '../../../../core/src/broker/generated-projection-steward.ts';
 import { acknowledgeFreeze, createFreezeSignal, resolveFreezeDecision, type FreezeAck, type FreezeResolution, type FreezeSignal } from '../../../../core/src/broker/freeze.ts';
 import type { ActiveWriteIntent, WriteBrokerRegistryDocument, BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent, ConflictKey, BrokerOperationRunRecord, ExplicitMutationIntentInputSummary, ExplicitMutationIntentKind, MutationIntentMissingInput } from '../../../../core/src/broker/types.ts';
@@ -40,7 +41,8 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
   const runnerSyncQueuePath = context.runnerSyncQueuePath;
   const projectionStewardPath = context.projectionStewardPath;
   if (options.action === 'runner-sync') {
-    if (options.runnerSyncAction === 'enqueue') {
+    if (options.runnerSyncAction === 'enqueue' || options.runnerSyncAction === 'supersede') {
+      const action = options.runnerSyncAction;
       if (!options.task) {
         throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires --task <task-id>.', { exitCode: 2 });
       }
@@ -55,7 +57,7 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
       }
       let result;
       try {
-        result = enqueueRunnerSyncStewardRequest(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
+        result = (action === 'supersede' ? supersedeRunnerSyncReservation : enqueueRunnerSyncStewardRequest)(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
           taskId: options.task,
           actorId: options.actorId,
           sealedSourceSha: resolveFullGitCommitSha(options.cwd, options.sealedSourceSha),
@@ -74,14 +76,15 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
         command: 'broker',
         cwd: options.cwd,
         messages: [
-          message('info', 'ATM_BROKER_RUNNER_SYNC_ENQUEUED', `Runner-sync request is ${result.status} at position ${result.queuePosition} for steward work ${result.stewardWorkId}.`, {
+          message('info', action === 'supersede' ? 'ATM_BROKER_RUNNER_SYNC_SUPERSEDED' : 'ATM_BROKER_RUNNER_SYNC_ENQUEUED', action === 'supersede' ? `Runner-sync reservation superseded ${result.supersededReservations.length} incompatible generation(s); new request is ${result.status} at position ${result.queuePosition}.` : `Runner-sync request is ${result.status} at position ${result.queuePosition} for steward work ${result.stewardWorkId}.`, {
             status: result.status,
             queuePosition: result.queuePosition,
             queueHeadHealth: result.queueHeadHealth,
             stewardWorkId: result.stewardWorkId,
             waitingTasks: result.waitingTasks,
             brokerTicket: result.brokerTicket,
-            suggestedNextAction: result.suggestedNextAction
+            suggestedNextAction: result.suggestedNextAction,
+            supersededReservations: result.supersededReservations ?? []
           })
         ],
         evidence: {
@@ -225,7 +228,7 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
       }
     }
 
-    throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, status, cleanup, release, reconcile-receipt', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, supersede, status, cleanup, release, reconcile-receipt', { exitCode: 2 });
   }
 
   if (options.action === 'projection') {
