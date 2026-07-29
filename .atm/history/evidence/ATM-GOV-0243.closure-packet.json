@@ -1,0 +1,172 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0243",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "ecf573c44b7b71fb3369f51547262fff69d02ac8",
+  "governedTreeSha": "b588316c4c5ba2d489462194d60f126f5dfb62ad",
+  "targetCommitDelta": {
+    "currentCommitSha": "ecf573c44b7b71fb3369f51547262fff69d02ac8",
+    "parentCommitShas": [
+      "ecf573c44b7b71fb3369f51547262fff69d02ac8"
+    ],
+    "governedTreeSha": "b588316c4c5ba2d489462194d60f126f5dfb62ad",
+    "changedFiles": [
+      "artifacts/generated/atm-ab-v4/cells.json",
+      "artifacts/generated/atm-ab-v4/summary.json",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "scripts/paired-ab-v4-cell-workload.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:35cfa767934b3f9af931745c59cda547e648eb2019d3f55707d117037b911e79",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/run-paired-ab-v4.ts --mode command-backed",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e98535084afbf6bfe4918e2233ac6323e19c7992118c2c2b91cf7040b68b634b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/run-paired-ab-v4.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e98535084afbf6bfe4918e2233ac6323e19c7992118c2c2b91cf7040b68b634b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a1dada5066b6d26370983ca7939b90484409382a676370f15911e11ad3d6a41f",
+      "stderrSha256": "sha256:6368d1737e4d7f01330defa73bbe98c9ae91147981fec98a64e06e7a1e151406",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types scripts/run-paired-ab-v4.ts --mode command-backed",
+    "node --strip-types scripts/run-paired-ab-v4.ts --mode validate",
+    "node --strip-types tests/performance/atm-3-paired-queue-compose.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T21:45:16.271Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0243.*",
+      ".atm/history/task-events/ATM-GOV-0243/**",
+      ".atm/history/tasks/ATM-GOV-0243.json",
+      "artifacts/generated/atm-ab-v4/**",
+      "artifacts/generated/atm-ab-v4/cells.json",
+      "artifacts/generated/atm-ab-v4/summary.json",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "scripts/paired-ab-v4-cell-workload.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/paired-ab-v4-cell-workload.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0243.json",
+  "closedAt": "2026-07-29T21:45:16.272Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729211906-codex-git-series-captain-ATM-GOV-0243-753175f4f8",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "ecf573c44b7b71fb3369f51547262fff69d02ac8",
+    "taskMatchedFiles": [
+      "artifacts/generated/atm-ab-v4/cells.json",
+      "artifacts/generated/atm-ab-v4/summary.json",
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "scripts/paired-ab-v4-cell-workload.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/run-paired-ab-v4.ts",
+      "tests/cli/paired-ab-v4-safety-controller.test.ts",
+      "tests/performance/atm-3-paired-queue-compose.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0243.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0243/2026-07-29T21-18-50-558Z-import-5a1d28b9f245.json",
+      ".atm/history/task-events/ATM-GOV-0243/2026-07-29T21-19-06-446Z-reserve-096ac9b35d51.json",
+      ".atm/history/task-events/ATM-GOV-0243/2026-07-29T21-19-06-451Z-promote-c919c57579f5.json",
+      ".atm/history/task-events/ATM-GOV-0243/2026-07-29T21-19-20-238Z-claim-18a87ef0736a.json",
+      ".atm/history/task-events/ATM-GOV-0243/2026-07-29T21-20-23-927Z-scope-amendment-c30ed0616ccb.json",
+      ".atm/history/task-events/ATM-GOV-0243/2026-07-29T21-24-21-010Z-scope-amendment-8b533c865ee9.json",
+      ".atm/history/task-events/ATM-GOV-0243/2026-07-29T21-38-35-461Z-renew-8ffb8b16b6b9.json",
+      ".atm/history/tasks/ATM-GOV-0243.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

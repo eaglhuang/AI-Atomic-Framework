@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0243",
   "title": "Matched AB BA governed workload benchmark",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R3",
   "dependencies": [
     "ATM-GOV-0240",
@@ -164,8 +164,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T21-38-35-461Z-renew-8ffb8b16b6b9",
-  "lastTransitionAt": "2026-07-29T21:38:35.461Z",
+  "lastTransitionId": "2026-07-29T21-45-16-278Z-close-13fa4977b776",
+  "lastTransitionAt": "2026-07-29T21:45:16.278Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T21:19:06.446Z",
@@ -174,7 +174,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-20d12cff97c4",
     "claimedAt": "2026-07-29T21:19:06.457Z",
-    "heartbeatAt": "2026-07-29T21:38:34.441Z",
+    "heartbeatAt": "2026-07-29T21:45:16.276Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0243.*",
@@ -188,13 +188,14 @@
       "tests/cli/paired-ab-v4-safety-controller.test.ts",
       "tests/performance/atm-3-paired-queue-compose.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260729211907-codex-git-series-captain-49242903e2",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729211907-codex-git-series-captain-49242903e2\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-29T21:19:06.457Z",
   "startedByActor": "codex-git-series-captain",
@@ -309,5 +310,9 @@
     },
     "createdAt": "2026-07-29T21:19:20.269Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-29T21:45:16.276Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729211906-codex-git-series-captain-ATM-GOV-0243-753175f4f8",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0243.closure-packet.json"
 }
