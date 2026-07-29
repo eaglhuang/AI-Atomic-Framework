@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T18-43-41-188Z-close-3606bb3d387e",
+  "taskId": "ATM-GOV-0240",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0240.json",
+  "taskSha256": "sha256:c956fa804b562fafc8814f55114beeb95cd19dd10e476059491c43c0ce00beae",
+  "createdAt": "2026-07-29T18:43:41.188Z",
+  "command": "node atm.mjs tasks reconcile --task ATM-GOV-0240 --actor codex-git-series-captain --delivery-commit 9faccadbdd379ddf4d846c9659701f37bee1cde8 --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0240.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
+      "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T18:43:41.178Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0240.*",
+        ".atm/history/task-events/ATM-GOV-0240/**",
+        ".atm/history/tasks/ATM-GOV-0240.json",
+        "artifacts/generated/atm-plan3-red-green/**",
+        "artifacts/generated/atm-plan3-red-green/summary.json",
+        "packages/core/src/broker/replay/**",
+        "packages/core/src/schemas/parallel-replay-scenario.ts",
+        "scripts/run-plan3-red-green-discrimination.ts",
+        "tests/cli/atm-3-red-baseline-discrimination.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/replay/**",
+        "packages/core/src/schemas/parallel-replay-scenario.ts",
+        "scripts/run-plan3-red-green-discrimination.ts",
+        "tests/cli/atm-3-red-baseline-discrimination.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

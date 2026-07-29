@@ -1,11 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0240",
-  "updatedAt": "2026-07-26T16:26:06.184Z",
-  "updatedBy": "cursor-003-plan31-0240",
+  "updatedAt": "2026-07-29T18:42:25.374Z",
+  "updatedBy": "codex-git-series-captain",
   "freshValidationPasses": [
     "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
-    "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts"
+    "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -39,6 +42,54 @@
       "durationMs": 443,
       "runnerKind": "dev-source",
       "sourceCommit": "f85eca8b41127234203f5a303eb811dc4bf6ade4",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-29T18:38:58.284Z",
+      "startedAt": "2026-07-29T18:38:44.925Z",
+      "finishedAt": "2026-07-29T18:38:58.284Z",
+      "durationMs": 13359,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-29T18:40:23.957Z",
+      "startedAt": "2026-07-29T18:38:44.920Z",
+      "finishedAt": "2026-07-29T18:40:23.957Z",
+      "durationMs": 99037,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cc0d2b68a950a467e1ff1684cf297168eafd24650930a689291c93317379c1bf",
+      "stderrSha256": "sha256:0095ad971930e63f09005a83d9a29eaf54567cb9d7617d245dce2cc865217471",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-29T18:42:25.372Z",
+      "startedAt": "2026-07-29T18:41:37.273Z",
+      "finishedAt": "2026-07-29T18:42:25.372Z",
+      "durationMs": 48099,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

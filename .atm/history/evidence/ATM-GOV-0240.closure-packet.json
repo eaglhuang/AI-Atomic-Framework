@@ -1,0 +1,181 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0240",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "641733b98dd620fa749977e37ab790d4a41721e8",
+  "governedTreeSha": "7a1c7fa1dec0fc88cd942ad1a437883f0e684e6a",
+  "targetCommitDelta": {
+    "currentCommitSha": "641733b98dd620fa749977e37ab790d4a41721e8",
+    "parentCommitShas": [
+      "641733b98dd620fa749977e37ab790d4a41721e8"
+    ],
+    "governedTreeSha": "7a1c7fa1dec0fc88cd942ad1a437883f0e684e6a",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0240.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0240.json",
+      ".atm/history/task-events/ATM-GOV-0240/2026-07-29T18-42-50-893Z-renew-47d2ecf5cd0e.json",
+      ".atm/history/tasks/ATM-GOV-0240.json",
+      "artifacts/generated/atm-plan3-red-green/fixtures/current-runner.mjs",
+      "artifacts/generated/atm-plan3-red-green/fixtures/historical-runner.mjs",
+      "artifacts/generated/atm-plan3-red-green/scenario.json",
+      "artifacts/generated/atm-plan3-red-green/summary.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/core/src/broker/replay/index.ts",
+      "packages/core/src/broker/replay/runner-discrimination.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "packages/core/src/schemas/parallel-replay-scenario.ts",
+      "scripts/run-plan3-red-green-discrimination.ts",
+      "tests/cli/atm-3-red-baseline-discrimination.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:17edb0f45f15604416e480267a0c0defb64f133e9d8b1fcbc6067a8082293f68",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e0bbca4144a58ba8a1e1fdc9937b41f854580d603f5eba6600580f58494bf241",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cc0d2b68a950a467e1ff1684cf297168eafd24650930a689291c93317379c1bf",
+      "stderrSha256": "sha256:0095ad971930e63f09005a83d9a29eaf54567cb9d7617d245dce2cc865217471",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types scripts/run-plan3-red-green-discrimination.ts --mode validate",
+    "node --strip-types tests/cli/atm-3-red-baseline-discrimination.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T18:43:41.178Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0240.*",
+      ".atm/history/task-events/ATM-GOV-0240/**",
+      ".atm/history/tasks/ATM-GOV-0240.json",
+      "artifacts/generated/atm-plan3-red-green/**",
+      "artifacts/generated/atm-plan3-red-green/summary.json",
+      "packages/core/src/broker/replay/**",
+      "packages/core/src/schemas/parallel-replay-scenario.ts",
+      "scripts/run-plan3-red-green-discrimination.ts",
+      "tests/cli/atm-3-red-baseline-discrimination.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/replay/**",
+      "packages/core/src/schemas/parallel-replay-scenario.ts",
+      "scripts/run-plan3-red-green-discrimination.ts",
+      "tests/cli/atm-3-red-baseline-discrimination.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0240.json",
+  "closedAt": "2026-07-29T18:43:41.179Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "9faccadbdd379ddf4d846c9659701f37bee1cde8",
+    "reconciledAt": "2026-07-29T18:43:35.071Z",
+    "reconciledByActor": "codex-git-series-captain",
+    "reconcileClassification": "local-closure-rewrite",
+    "reason": "Historical reconcile sync against commit 9faccadbdd379ddf4d846c9659701f37bee1cde8"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9faccadbdd379ddf4d846c9659701f37bee1cde8",
+    "taskMatchedFiles": [
+      "artifacts/generated/atm-plan3-red-green/fixtures/current-runner.mjs",
+      "artifacts/generated/atm-plan3-red-green/fixtures/historical-runner.mjs",
+      "artifacts/generated/atm-plan3-red-green/scenario.json",
+      "artifacts/generated/atm-plan3-red-green/summary.json",
+      "packages/core/src/broker/replay/index.ts",
+      "packages/core/src/broker/replay/runner-discrimination.ts",
+      "packages/core/src/schemas/parallel-replay-scenario.ts",
+      "scripts/run-plan3-red-green-discrimination.ts",
+      "tests/cli/atm-3-red-baseline-discrimination.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0240.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0240/2026-07-26T16-18-30-607Z-import-6b4e27676f14.json",
+      ".atm/history/task-events/ATM-GOV-0240/2026-07-26T16-18-47-653Z-reserve-94a10825b37c.json",
+      ".atm/history/task-events/ATM-GOV-0240/2026-07-26T16-18-47-657Z-promote-6b27c26794b8.json",
+      ".atm/history/task-events/ATM-GOV-0240/2026-07-26T16-19-00-162Z-claim-8a910cd0d488.json",
+      ".atm/history/tasks/ATM-GOV-0240.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
