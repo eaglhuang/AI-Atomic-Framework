@@ -1,13 +1,15 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0252",
-  "updatedAt": "2026-07-29T19:48:03.095Z",
+  "updatedAt": "2026-07-29T19:56:32.578Z",
   "updatedBy": "codex-git-series-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/closure-acceptance-evidence-gate.test.ts",
     "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
     "node --strip-types tests/cli/taskflow-close-readiness-parity.test.ts",
     "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:schemas"
   ],
   "staleValidationPasses": [],
@@ -90,6 +92,38 @@
       "durationMs": 11023,
       "runnerKind": "dev-source",
       "sourceCommit": "30cf204a3810d6e7c65fb56161cf2d9b3da3e8f5",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cb5f412bb62012af0289df64193bb8643bbfc56a21211a2bf45dc44768e07d94",
+      "stderrSha256": "sha256:6c6db832db92a51883130795e875c0d4afbc1a40edf462c7cde5f33af434ad4d",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-29T19:54:40.524Z",
+      "startedAt": "2026-07-29T19:53:46.073Z",
+      "finishedAt": "2026-07-29T19:54:40.524Z",
+      "durationMs": 54451,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56a506b3ea5bb6c4df187cc247d543525e8da169",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-29T19:56:32.577Z",
+      "startedAt": "2026-07-29T19:54:52.525Z",
+      "finishedAt": "2026-07-29T19:56:32.577Z",
+      "durationMs": 100052,
+      "runnerKind": "dev-source",
+      "sourceCommit": "56a506b3ea5bb6c4df187cc247d543525e8da169",
       "cached": false
     }
   ],

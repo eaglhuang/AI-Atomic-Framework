@@ -1,0 +1,178 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0252",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e491455cb99053349990d8b198138d72eeaa619b",
+  "governedTreeSha": "01fbfdabd1e2f80f4abfdde112626c8d172a42af",
+  "targetCommitDelta": {
+    "currentCommitSha": "e491455cb99053349990d8b198138d72eeaa619b",
+    "parentCommitShas": [
+      "e491455cb99053349990d8b198138d72eeaa619b"
+    ],
+    "governedTreeSha": "01fbfdabd1e2f80f4abfdde112626c8d172a42af",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0252.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0252.json",
+      "packages/cli/src/commands/tasks/close-orchestrator/acceptance-evidence-gate.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+      "tests/cli/closure-acceptance-evidence-gate.test.ts",
+      "tests/cli/taskflow-close-readiness-parity.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:68fc80f9c22eb41382faa227133369c33567386c2cb48b5c88fb4874439f14da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-readiness-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7101577f32f62ad97f22777af8ee3ff06beab7db7f5506a6f3161757ca1c736e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/closure-acceptance-evidence-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5eb2dbb895b0eea530408b2d42d5a2d3434a2a28128ca29fb13233460ebe5201",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89a438cfc9b9f4bc1b58bd59cb4af58e1e453164f89f7498216d9ae8d2f6041f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cb5f412bb62012af0289df64193bb8643bbfc56a21211a2bf45dc44768e07d94",
+      "stderrSha256": "sha256:6c6db832db92a51883130795e875c0d4afbc1a40edf462c7cde5f33af434ad4d",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/closure-acceptance-evidence-gate.test.ts",
+    "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+    "node --strip-types tests/cli/taskflow-close-readiness-parity.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T20:02:15.360Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0252.*",
+      ".atm/history/task-events/ATM-GOV-0252/**",
+      ".atm/history/tasks/ATM-GOV-0252.json",
+      "packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts",
+      "packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/acceptance-evidence-gate.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+      "schemas/governance/closure-packet.schema.json",
+      "tests/cli/closure-acceptance-evidence-gate.test.ts",
+      "tests/cli/closure-required-gates-contract.test.ts",
+      "tests/cli/taskflow-close-readiness-parity.test.ts",
+      "tests/fixtures/plan3-fake-green/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts",
+      "packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/acceptance-evidence-gate.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+      "schemas/governance/closure-packet.schema.json",
+      "tests/cli/closure-acceptance-evidence-gate.test.ts",
+      "tests/cli/closure-required-gates-contract.test.ts",
+      "tests/cli/taskflow-close-readiness-parity.test.ts",
+      "tests/fixtures/plan3-fake-green/**"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0252.json",
+  "closedAt": "2026-07-29T20:02:15.362Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729194356-codex-git-series-captain-ATM-GOV-0252-4ba9355573",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "56a506b3ea5bb6c4df187cc247d543525e8da169",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/tasks/close-orchestrator/acceptance-evidence-gate.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+      "tests/cli/closure-acceptance-evidence-gate.test.ts",
+      "tests/cli/taskflow-close-readiness-parity.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0252.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0252/2026-07-29T19-43-36-298Z-import-ebdc7ac3ca5c.json",
+      ".atm/history/task-events/ATM-GOV-0252/2026-07-29T19-43-56-466Z-reserve-b489ed296e9d.json",
+      ".atm/history/task-events/ATM-GOV-0252/2026-07-29T19-43-56-470Z-promote-32cece6b1582.json",
+      ".atm/history/task-events/ATM-GOV-0252/2026-07-29T19-44-19-525Z-claim-1b855b2b5272.json",
+      ".atm/history/tasks/ATM-GOV-0252.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

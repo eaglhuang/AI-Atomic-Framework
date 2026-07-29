@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0252",
   "title": "Independent acceptance closure gate and two-key verifier",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0",
   "dependencies": [
     "ATM-GOV-0251",
@@ -179,8 +179,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T19-44-19-525Z-claim-1b855b2b5272",
-  "lastTransitionAt": "2026-07-29T19:44:19.525Z",
+  "lastTransitionId": "2026-07-29T20-02-15-374Z-close-fe38299357e1",
+  "lastTransitionAt": "2026-07-29T20:02:15.374Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T19:43:56.466Z",
@@ -189,7 +189,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-c1435d1d0bc3",
     "claimedAt": "2026-07-29T19:43:56.477Z",
-    "heartbeatAt": "2026-07-29T19:43:56.477Z",
+    "heartbeatAt": "2026-07-29T20:02:15.368Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0252.json",
@@ -204,14 +204,14 @@
       "tests/cli/taskflow-close-readiness-parity.test.ts",
       "tests/fixtures/plan3-fake-green/**"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260729194356-codex-git-series-captain-32ec092189",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729194356-codex-git-series-captain-32ec092189\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-29T19:43:56.477Z",
   "startedByActor": "codex-git-series-captain",
@@ -325,5 +325,9 @@
     },
     "createdAt": "2026-07-29T19:44:19.523Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-29T20:02:15.368Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729194356-codex-git-series-captain-ATM-GOV-0252-4ba9355573",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0252.closure-packet.json"
 }

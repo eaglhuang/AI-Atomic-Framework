@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T20-02-15-374Z-close-fe38299357e1",
+  "taskId": "ATM-GOV-0252",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729194356-codex-git-series-captain-ATM-GOV-0252-4ba9355573",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0252.json",
+  "taskSha256": "sha256:f8e98f4628fdec451783c8fa3231a200a14ae8b1d1ec9fbf66a37ac020b28074",
+  "createdAt": "2026-07-29T20:02:15.374Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0252 --actor codex-git-series-captain --status done --historical-delivery 56a506b3ea5bb6c4df187cc247d543525e8da169",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260729194356-codex-git-series-captain-ATM-GOV-0252-4ba9355573",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0252.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/closure-acceptance-evidence-gate.test.ts",
+      "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+      "node --strip-types tests/cli/taskflow-close-readiness-parity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T20:02:15.360Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0252.*",
+        ".atm/history/task-events/ATM-GOV-0252/**",
+        ".atm/history/tasks/ATM-GOV-0252.json",
+        "packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts",
+        "packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/acceptance-evidence-gate.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+        "schemas/governance/closure-packet.schema.json",
+        "tests/cli/closure-acceptance-evidence-gate.test.ts",
+        "tests/cli/closure-required-gates-contract.test.ts",
+        "tests/cli/taskflow-close-readiness-parity.test.ts",
+        "tests/fixtures/plan3-fake-green/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts",
+        "packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/acceptance-evidence-gate.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+        "schemas/governance/closure-packet.schema.json",
+        "tests/cli/closure-acceptance-evidence-gate.test.ts",
+        "tests/cli/closure-required-gates-contract.test.ts",
+        "tests/cli/taskflow-close-readiness-parity.test.ts",
+        "tests/fixtures/plan3-fake-green/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
