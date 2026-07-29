@@ -117,3 +117,16 @@ Plan 3.1 dogfood surface B lifecycle observations:
   path-level conflict label.
 - Focused receipt:
   - `node --strip-types tests/cli/plan3-dashboard-lifecycle-observations.test.ts`
+
+Plan 3.1 two-card dogfood orchestrator:
+
+- ATM-GOV-0242 adds a replay dogfood orchestrator that consumes the two real
+  participant artifacts (`ATM-GOV-0237`, `ATM-GOV-0238`), the canonical task
+  ledgers, git head/base, and dashboard snapshot. It emits safe-compose and
+  sealed fallback cells from data instead of provider/task labels.
+- Safe compose records one neutral-steward canonical write with complete
+  attribution and zero wait only when both participant artifacts and the
+  declared shared surface are present. The fallback cell is fail-closed with
+  `canonicalWriteCount: 0`, positive wait, and a revalidation release condition.
+- Focused receipt:
+  - `node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts`

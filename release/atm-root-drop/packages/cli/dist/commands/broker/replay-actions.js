@@ -3,6 +3,7 @@ import { inspectCommandBackedMatrix } from './replay/command-backed-matrix.js';
 import { evaluatePlan3SemanticClosure } from './replay/closure-policy.js';
 import { runFrozenParallelReplay, runRuntimeDogfoodLifecycle, selectRuntimeDogfoodTasks } from './replay/implementation.js';
 import { brokerReplayDashboard } from './replay/dashboard.js';
+import { buildPlan3DogfoodOrchestratorEvidence } from './replay/dogfood-orchestrator.js';
 import { brokerReplayRunManifest } from './replay/run-manifest.js';
 const defaultIntersection = ['docs/governance/atm-3-replay-evidence.md'];
 export async function handleBrokerReplayActions(options) {
@@ -111,6 +112,10 @@ async function brokerReplayRun(options) {
 async function brokerReplayDogfood(options) {
     const requiredIntersection = requiredReplayIntersection(options);
     try {
+        const orchestratorEvidence = buildPlan3DogfoodOrchestratorEvidence({
+            cwd: options.cwd,
+            requiredIntersection
+        });
         const dogfood = await runRuntimeDogfoodLifecycle({
             cwd: options.cwd,
             requiredIntersection,
@@ -129,6 +134,7 @@ async function brokerReplayDogfood(options) {
             ],
             evidence: {
                 action: 'replay-dogfood',
+                orchestratorEvidence,
                 dogfoodEvidence: dogfood.evidence,
                 workerReceipts: dogfood.workerReceipts
             }

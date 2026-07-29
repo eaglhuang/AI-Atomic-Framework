@@ -1060,6 +1060,8 @@
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dashboard-view-model.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dashboard.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dashboard.js",
+    "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dogfood-orchestrator.d.ts",
+    "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dogfood-orchestrator.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/implementation.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/implementation.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/replay/run-manifest.d.ts",
@@ -1861,6 +1863,7 @@
     "release/atm-root-drop/packages/cli/src/commands/broker/replay/dashboard-ticket-observations.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/replay/dashboard.ts",
+    "release/atm-root-drop/packages/cli/src/commands/broker/replay/dogfood-orchestrator.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/replay/implementation.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/replay/run-manifest.ts",
     "release/atm-root-drop/packages/cli/src/commands/broker/runner-sync-supersession.ts",
@@ -4777,7 +4780,7 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 489,
+    "copied": 492,
     "unchanged": 4253,
     "removed": 0
   },
@@ -4866,6 +4869,7 @@
       "packages/cli/src/commands/broker/replay/dashboard-ticket-observations.ts",
       "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
       "packages/cli/src/commands/broker/replay/dashboard.ts",
+      "packages/cli/src/commands/broker/replay/dogfood-orchestrator.ts",
       "packages/cli/src/commands/broker/replay/implementation.ts",
       "packages/cli/src/commands/broker/replay/run-manifest.ts",
       "packages/cli/src/commands/broker/runner-sync-supersession.ts",
@@ -6012,7 +6016,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:d49dee40e5af4472f0fe74788234d20001e9dcf5bd275dbd2dd72586eb4e5189"
+    "digest": "sha256:f0d0210a5d62b98a40a9d79f01829934f4cc8a08a6d2f0c8a54737adc6bd53f7"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -7046,6 +7050,8 @@
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dashboard-view-model.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dashboard.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dashboard.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dogfood-orchestrator.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/broker/replay/dogfood-orchestrator.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/implementation.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/implementation.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/replay/run-manifest.d.ts",
@@ -7847,6 +7853,7 @@
       "release/atm-root-drop/packages/cli/src/commands/broker/replay/dashboard-ticket-observations.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/replay/dashboard.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker/replay/dogfood-orchestrator.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/replay/implementation.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/replay/run-manifest.ts",
       "release/atm-root-drop/packages/cli/src/commands/broker/runner-sync-supersession.ts",
@@ -10766,34 +10773,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:332a79492ddd8c7b0341e9e40848d162e091ea5ddac67d25c90fd846ebe46e3c",
-  "sealedSourceCommit": "955afeb7807ebcfb48c809bf421e4ac708db7b66",
+  "buildInputsTreeHash": "sha256:1301d70bbdedea7dfd5f0f90fa7996be469ae0322a144e802595183a00f1c5c6",
+  "sealedSourceCommit": "822462f513199ae1933465361866fceb4c0165eb",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:9d557e390fe23671e77fd5aac6b9a1eed121e02ceea913524c677a9ea63b8a97",
-  "tsBuildCacheDigest": "sha256:ee6cfaed869bacbc256ce30f3c66e75c898bb84f394657d3d3f80c79843d3871",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:18acd5fb21fef01f8b4ae9696bb3156a657c3a0b4856e3055e7369f34c05271c",
+  "tsBuildCacheDigest": "sha256:77917aa37b6aeb1fd40cefddca03bc2205e93668879c15cfea1476321e8df768",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "typescriptBuild",
-    "dominantPhaseMs": 13892,
-    "totalElapsedMs": 46012,
-    "dominanceRatio": 0.3019,
-    "phaseMedianMs": 1599,
-    "phaseP95Ms": 13892,
+    "dominantPhase": "worktreeSetup",
+    "dominantPhaseMs": 11701,
+    "totalElapsedMs": 42383,
+    "dominanceRatio": 0.2761,
+    "phaseMedianMs": 1655,
+    "phaseP95Ms": 11701,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 49,
-    "skipDecision": 54,
-    "worktreeSetup": 11816,
-    "typescriptBuild": 13892,
-    "rootDropReleaseAssembly": 7198,
-    "onefileReleaseAssembly": 1599,
-    "artifactSync": 8433,
+    "inputHashCalculation": 56,
+    "skipDecision": 56,
+    "worktreeSetup": 11701,
+    "typescriptBuild": 10648,
+    "rootDropReleaseAssembly": 7810,
+    "onefileReleaseAssembly": 1655,
+    "artifactSync": 8452,
     "cleanup": 0,
-    "totalElapsed": 46012
+    "totalElapsed": 42383
   }
 }

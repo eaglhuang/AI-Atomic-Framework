@@ -8,6 +8,7 @@ import {
   selectRuntimeDogfoodTasks
 } from './replay/implementation.ts';
 import { brokerReplayDashboard } from './replay/dashboard.ts';
+import { buildPlan3DogfoodOrchestratorEvidence } from './replay/dogfood-orchestrator.ts';
 import { brokerReplayRunManifest } from './replay/run-manifest.ts';
 
 const defaultIntersection = ['docs/governance/atm-3-replay-evidence.md'];
@@ -115,6 +116,10 @@ async function brokerReplayRun(options: ParsedBrokerOptions) {
 async function brokerReplayDogfood(options: ParsedBrokerOptions) {
   const requiredIntersection = requiredReplayIntersection(options);
   try {
+    const orchestratorEvidence = buildPlan3DogfoodOrchestratorEvidence({
+      cwd: options.cwd,
+      requiredIntersection
+    });
     const dogfood = await runRuntimeDogfoodLifecycle({
       cwd: options.cwd,
       requiredIntersection,
@@ -133,6 +138,7 @@ async function brokerReplayDogfood(options: ParsedBrokerOptions) {
       ],
       evidence: {
         action: 'replay-dogfood',
+        orchestratorEvidence,
         dogfoodEvidence: dogfood.evidence,
         workerReceipts: dogfood.workerReceipts
       }
