@@ -186,8 +186,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T12-41-28-677Z-scope-amendment-2eb88b025382",
-  "lastTransitionAt": "2026-07-29T12:41:28.677Z",
+  "lastTransitionId": "2026-07-29T12-55-17-366Z-renew-2c7f972a1353",
+  "lastTransitionAt": "2026-07-29T12:55:17.366Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T03:05:33.686Z",
@@ -196,7 +196,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-0f597e023a88",
     "claimedAt": "2026-07-29T03:05:33.692Z",
-    "heartbeatAt": "2026-07-29T12:24:08.420Z",
+    "heartbeatAt": "2026-07-29T12:55:16.466Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain-lane-lane-20260729030534-codex-git-series-captain-f9342714d3.runner-sync-receipt.json",
@@ -252,19 +252,19 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-cc970dc503952989",
-    "ticketDigest": "sha256:cc970dc50395298983ecffb87e589c0484ce06cbfec0f3eff69c3002d654f454",
+    "ticketId": "wat-7a42d1c13f3e58e5",
+    "ticketDigest": "sha256:7a42d1c13f3e58e52e30581ed5ed7a66db019b25921f7fb9b4a1837634f4ccd8",
     "taskId": "TASK-RFT-0101",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260729030534-codex-git-series-captain-f9342714d3",
     "claimGeneration": "lease-0f597e023a88",
-    "issuedAt": "2026-07-29T12:24:08.420Z",
-    "expiresAt": "2026-07-29T12:54:08.420Z",
-    "scopeDigest": "sha256:dfcc5c50aaffcc39fb0fa46c4cf5c406c37ff1176ff82b3cdd38101686cbc26f",
+    "issuedAt": "2026-07-29T12:55:16.466Z",
+    "expiresAt": "2026-07-29T13:25:16.466Z",
+    "scopeDigest": "sha256:f8fd609fb3c6a27d59e9049212bd1d7768f47c25551f743faee1da210d9af923",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-29T12:24:08.420Z"
+      "selectedAt": "2026-07-29T12:55:16.466Z"
     },
     "grants": [
       {
@@ -292,13 +292,17 @@
           "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
           "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
           "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
           "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+          "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
           "packages/cli/src/commands/tasks/close-orchestrator.ts",
           "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
           "packages/core/src/broker/runner-sync-steward-queue.ts",
+          "packages/core/src/lane/wip-ownership-transition.ts",
           "release/atm-onefile/**",
           "release/atm-root-drop/**",
           "tests/cli-fixtures/help-snapshots/broker.json",
+          "tests/cli/claim-repair-wip-ownership-continuity.test.ts",
           "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
           "tests/cli/git-commit-task-scoped-staging.test.ts",
           "tests/cli/git-commit-task-scoped-staging/**",
@@ -306,7 +310,7 @@
           "tests/cli/runner-sync-build-source-preservation.test.ts",
           "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
         ],
-        "digest": "sha256:cfe274dde71604d1be22797cdab4712a1bdb5d41ec63559f7c7e3173a884af9c"
+        "digest": "sha256:77fbdbfd120f48a4ccc1f664bccab96874fa2edce758f94dbb7d7cecba577693"
       },
       {
         "kind": "lifecycle-operation",

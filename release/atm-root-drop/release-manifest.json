@@ -2860,6 +2860,7 @@
     "release/atm-root-drop/packages/core/dist/index.js",
     "release/atm-root-drop/packages/core/dist/lane/lane-capability-provider.js",
     "release/atm-root-drop/packages/core/dist/lane/lifecycle.js",
+    "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.d.ts",
     "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.js",
     "release/atm-root-drop/packages/core/dist/manager/atom-generator.d.ts",
     "release/atm-root-drop/packages/core/dist/manager/atom-generator.js",
@@ -4426,6 +4427,7 @@
     "release/atm-root-drop/tests/cli/causal-validator-selector.test.ts",
     "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
     "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
+    "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
     "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
     "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
     "release/atm-root-drop/tests/cli/close-orchestrator-final-600.test.ts",
@@ -4964,7 +4966,7 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 687,
+    "copied": 689,
     "unchanged": 4242,
     "removed": 0
   },
@@ -6183,7 +6185,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:3ec095a8f2dd9e9b7f6a6aceb013a4bb54489cc6b13341c36e284fcb88fc9380"
+    "digest": "sha256:2af48e2455ec38751d058648cf306e70799de9b258858cbd51b15bd5cb577d8f"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -9017,6 +9019,7 @@
       "release/atm-root-drop/packages/core/dist/index.js",
       "release/atm-root-drop/packages/core/dist/lane/lane-capability-provider.js",
       "release/atm-root-drop/packages/core/dist/lane/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.d.ts",
       "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.js",
       "release/atm-root-drop/packages/core/dist/manager/atom-generator.d.ts",
       "release/atm-root-drop/packages/core/dist/manager/atom-generator.js",
@@ -10583,6 +10586,7 @@
       "release/atm-root-drop/tests/cli/causal-validator-selector.test.ts",
       "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
       "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
       "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
       "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
       "release/atm-root-drop/tests/cli/close-orchestrator-final-600.test.ts",
@@ -11124,34 +11128,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:96843467f7ef6ffc9611837ba587794c6e17749d955fecc1a28abdd32c66c959",
-  "sealedSourceCommit": "86ff94055a962dd6469e2798cf9cb6711d0af537",
+  "buildInputsTreeHash": "sha256:5c145b56eed2cd8f4e3ef94ab54692fab8116663c0abd8e6f659f1f543dcf45c",
+  "sealedSourceCommit": "85fa9da923dc02e91eee1add5ba4a0dc84a91fe9",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:d93201a2f4528d85a699d7ae34357d110edde60d0fab2dce51bd0b2ed0abf941",
-  "tsBuildCacheDigest": "sha256:0d6488872db8e1e43627e27af9917ea677ce51e03be973071a6ba29c5e2c57a1",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:ae9829f69a0251c9f61e4dbcc7fc89d18205df07a6ca1922012854dbb2d4e2c6",
+  "tsBuildCacheDigest": "sha256:01d951ebe895fac9e2fb9f4ca3b793932b6eb761c958dbebf536829882ea0079",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "typescriptBuild",
-    "dominantPhaseMs": 10925,
-    "totalElapsedMs": 39608,
-    "dominanceRatio": 0.2758,
-    "phaseMedianMs": 1554,
-    "phaseP95Ms": 10925,
+    "dominantPhaseMs": 13023,
+    "totalElapsedMs": 40771,
+    "dominanceRatio": 0.3194,
+    "phaseMedianMs": 1561,
+    "phaseP95Ms": 13023,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 67,
-    "skipDecision": 57,
-    "worktreeSetup": 10451,
-    "typescriptBuild": 10925,
-    "rootDropReleaseAssembly": 7151,
-    "onefileReleaseAssembly": 1554,
-    "artifactSync": 7156,
+    "inputHashCalculation": 384,
+    "skipDecision": 73,
+    "worktreeSetup": 10712,
+    "typescriptBuild": 13023,
+    "rootDropReleaseAssembly": 6225,
+    "onefileReleaseAssembly": 1561,
+    "artifactSync": 6059,
     "cleanup": 0,
-    "totalElapsed": 39608
+    "totalElapsed": 40771
   }
 }

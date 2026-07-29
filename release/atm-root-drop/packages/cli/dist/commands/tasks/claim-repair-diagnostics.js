@@ -1,11 +1,14 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { planWipTransition, retainReleasedWipOwnership } from '../../../../core/dist/lane/wip-ownership-transition.js';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.js';
 import { CliError, resolveValue } from '../shared.js';
 import { diagnoseTaskDirectionLockAllowedFiles } from '../task-direction.js';
 import { isClaimExpired, parseClaimRecord } from './task-ledger-readers.js';
 import { compareClaimLifecycleOwners } from '../next/claim-admission.js';
+import { pathMatchesTaskScope, uniqueSorted } from '../git-governance/commit-scope-policy.js';
 import { classifyTerminalLifecycleOwnership } from '../../../../core/dist/broker/historical-work-admission-attestation.js';
 const CLOSEOUT_OWNER_RULE = 'Only the active lifecycle owner may mutate deliverables or run taskflow close --write. During lane migration, compare lane ids when both lifecycle records have them; otherwise fall back to claim.actorId with a valid lease and work session.';
 function normalizeTaskStatus(value) {
@@ -319,6 +322,16 @@ export async function applyClaimRepairWrite(input) {
             repairActions.push('cleared-embedded-direction-lock');
         }
     }
+    const retainedWip = buildRepairRetainedWipOwnership({
+        cwd: root,
+        taskId: input.taskId,
+        claim: beforeClaim,
+        nowIso
+    });
+    if (retainedWip) {
+        taskDocument.wipOwnership = retainedWip;
+        repairActions.push('retained-dirty-wip-ownership');
+    }
     const governanceLock = readGovernanceLock(root, input.taskId);
     const lockPath = path.join(root, '.atm', 'runtime', 'locks', `${input.taskId}.lock.json`);
     const sidecarPath = path.join(root, '.atm', 'runtime', 'task-direction-locks', `${input.taskId}.json`);
@@ -387,4 +400,47 @@ export async function applyClaimRepairWrite(input) {
         repairActions,
         taskDocument
     };
+}
+function buildRepairRetainedWipOwnership(input) {
+    const claim = input.claim;
+    const laneSessionId = readLaneSessionId(claim);
+    const files = claim?.files ?? [];
+    const dirtyPaths = readDirtyPathsInScope(input.cwd, files);
+    if (!claim || !laneSessionId || dirtyPaths.length === 0)
+        return null;
+    const plan = planWipTransition({
+        kind: 'release',
+        taskId: input.taskId,
+        requestingLaneId: laneSessionId,
+        actorId: claim.actorId,
+        dirtyPaths,
+        now: input.nowIso
+    }, {
+        taskId: input.taskId,
+        ownerLaneId: laneSessionId,
+        recordedDirtyPaths: dirtyPaths,
+        journalHead: 0
+    });
+    return retainReleasedWipOwnership({
+        plan,
+        actorId: claim.actorId,
+        laneSessionId,
+        dirtyPaths
+    });
+}
+function readDirtyPathsInScope(cwd, scopes) {
+    if (scopes.length === 0)
+        return [];
+    const paths = [
+        ...readGitPathList(cwd, ['diff', '--name-only', '--cached']),
+        ...readGitPathList(cwd, ['diff', '--name-only']),
+        ...readGitPathList(cwd, ['ls-files', '--others', '--exclude-standard'])
+    ];
+    return uniqueSorted(paths.filter((file) => scopes.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file))));
+}
+function readGitPathList(cwd, args) {
+    const result = spawnSync('git', args, { cwd, encoding: 'utf8', windowsHide: true });
+    if (result.status !== 0)
+        return [];
+    return String(result.stdout ?? '').split(/\r?\n/).map((value) => value.trim().replace(/\\/g, '/')).filter(Boolean);
 }

@@ -101,23 +101,44 @@ function findDirtyPathOwner(cwd, file) {
         try {
             const task = parseJsonText(readFileSync(path.join(taskDir, entry), 'utf8'));
             const claim = task.claim && typeof task.claim === 'object' && !Array.isArray(task.claim) ? task.claim : null;
-            if (!claim || claim.state !== 'active')
-                continue;
-            const files = Array.isArray(claim.files) ? claim.files.map((value) => normalizeWorkPath(String(value))).filter(Boolean) : [];
-            if (!files.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file)))
-                continue;
-            const actorId = typeof claim.actorId === 'string' ? claim.actorId.trim() : '';
-            if (!actorId)
-                continue;
             const taskId = String(task.workItemId ?? task.id ?? entry.replace(/\.json$/i, '')).trim();
-            const leaseId = typeof claim.leaseId === 'string' ? claim.leaseId.trim() : null;
-            const session = leaseId ? resolveActorWorkSession(cwd, { claimLeaseId: leaseId, includeNonActive: true }) : null;
-            const laneSession = claim.laneSession && typeof claim.laneSession === 'object' && !Array.isArray(claim.laneSession) ? claim.laneSession : null;
-            return { taskId, actorId, sessionId: session?.sessionId ?? null, laneSessionId: typeof laneSession?.laneSessionId === 'string' ? laneSession.laneSessionId : session?.guidanceSessionId ?? null };
+            const activeOwner = readActiveClaimOwner(cwd, taskId, claim, file);
+            if (activeOwner)
+                return activeOwner;
+            const retainedOwner = readRetainedWipOwner(task, taskId, file);
+            if (retainedOwner)
+                return retainedOwner;
         }
         catch { }
     }
     return null;
+}
+function readActiveClaimOwner(cwd, taskId, claim, file) {
+    if (!claim || claim.state !== 'active')
+        return null;
+    const files = Array.isArray(claim.files) ? claim.files.map((value) => normalizeWorkPath(String(value))).filter(Boolean) : [];
+    if (!files.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file)))
+        return null;
+    const actorId = typeof claim.actorId === 'string' ? claim.actorId.trim() : '';
+    if (!actorId)
+        return null;
+    const leaseId = typeof claim.leaseId === 'string' ? claim.leaseId.trim() : null;
+    const session = leaseId ? resolveActorWorkSession(cwd, { claimLeaseId: leaseId, includeNonActive: true }) : null;
+    const laneSession = claim.laneSession && typeof claim.laneSession === 'object' && !Array.isArray(claim.laneSession) ? claim.laneSession : null;
+    return { taskId, actorId, sessionId: session?.sessionId ?? null, laneSessionId: typeof laneSession?.laneSessionId === 'string' ? laneSession.laneSessionId : session?.guidanceSessionId ?? null };
+}
+function readRetainedWipOwner(task, taskId, file) {
+    const retention = task.wipOwnership && typeof task.wipOwnership === 'object' && !Array.isArray(task.wipOwnership)
+        ? task.wipOwnership
+        : null;
+    if (!retention || retention.schemaId !== 'atm.retainedWipOwnership.v1' || retention.taskId !== taskId)
+        return null;
+    const actorId = typeof retention.actorId === 'string' ? retention.actorId.trim() : '';
+    const laneSessionId = typeof retention.laneSessionId === 'string' ? retention.laneSessionId.trim() : '';
+    const dirtyPaths = Array.isArray(retention.dirtyPaths) ? retention.dirtyPaths.map((value) => normalizeWorkPath(String(value))).filter(Boolean) : [];
+    if (!actorId || !laneSessionId || !dirtyPaths.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file)))
+        return null;
+    return { taskId, actorId, sessionId: null, laneSessionId };
 }
 function isOwnedByRequestingLane(owner, actorId, laneSessionId) {
     if (!owner || owner.actorId !== actorId)
