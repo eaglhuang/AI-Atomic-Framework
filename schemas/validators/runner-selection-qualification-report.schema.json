@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/runner-selection-qualification-report.schema.json",
+  "title": "ATM Runner Selection Qualification Report",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "generatedAt",
+    "policyVersion",
+    "caseCount",
+    "verdictCounts",
+    "metrics",
+    "promotionPreconditions",
+    "results"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.runnerSelectionQualificationReport.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "generatedAt": { "type": "string" },
+    "policyVersion": { "type": "string" },
+    "caseCount": { "type": "integer", "minimum": 0 },
+    "verdictCounts": {
+      "type": "object",
+      "required": ["qualified", "unqualified", "pending-contract", "revalidation-required"],
+      "properties": {
+        "qualified": { "type": "integer", "minimum": 0 },
+        "unqualified": { "type": "integer", "minimum": 0 },
+        "pending-contract": { "type": "integer", "minimum": 0 },
+        "revalidation-required": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "selectionAgeMs",
+        "latestVersionGapMax",
+        "revalidationRate",
+        "fallbackRate",
+        "falseRejectRate",
+        "falseCompatibleRate",
+        "perCapabilityCoverage",
+        "pendingContractFieldGapCounts"
+      ],
+      "properties": {
+        "selectionAgeMs": {
+          "type": "object",
+          "required": ["min", "max", "average"],
+          "properties": {
+            "min": { "type": ["number", "null"], "minimum": 0 },
+            "max": { "type": ["number", "null"], "minimum": 0 },
+            "average": { "type": ["number", "null"], "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "latestVersionGapMax": { "type": "integer", "minimum": 0 },
+        "revalidationRate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "fallbackRate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "falseRejectRate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "falseCompatibleRate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "perCapabilityCoverage": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "pendingContractFieldGapCounts": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "promotionPreconditions": {
+      "type": "object",
+      "required": [
+        "sealedIndependentReport",
+        "zeroFalseCompatible",
+        "explicitCounterfactualCoverage",
+        "zeroPendingContract",
+        "ownerApprovedPromotionRecord",
+        "promotionAllowed"
+      ],
+      "properties": {
+        "sealedIndependentReport": { "type": "boolean" },
+        "zeroFalseCompatible": { "type": "boolean" },
+        "explicitCounterfactualCoverage": { "type": "boolean" },
+        "zeroPendingContract": { "type": "boolean" },
+        "ownerApprovedPromotionRecord": { "type": "boolean" },
+        "promotionAllowed": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "caseId",
+          "verdict",
+          "expectedVerdict",
+          "selectedRunner",
+          "selectionOutcome",
+          "selectionAgeMs",
+          "latestVersionGap",
+          "coverageTags",
+          "findings"
+        ],
+        "properties": {
+          "caseId": { "type": "string" },
+          "verdict": { "enum": ["qualified", "unqualified", "pending-contract", "revalidation-required"] },
+          "expectedVerdict": { "type": ["string", "null"] },
+          "selectedRunner": { "type": ["string", "null"] },
+          "selectionOutcome": { "type": ["string", "null"] },
+          "selectionAgeMs": { "type": ["number", "null"], "minimum": 0 },
+          "latestVersionGap": { "type": "integer", "minimum": 0 },
+          "coverageTags": { "type": "array", "items": { "type": "string" } },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["code", "message"],
+              "properties": {
+                "code": { "type": "string" },
+                "message": { "type": "string" },
+                "field": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
