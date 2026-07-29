@@ -25,6 +25,8 @@ export async function runBatch(argv) {
         return runBatchPlanJournal(argv);
     const batchHistoricalDeliveryRefs = action === 'checkpoint' ? parseBatchHistoricalDeliveryRefs(argv) : [];
     const batchHistoricalBatchRefs = action === 'checkpoint' ? parseBatchHistoricalBatchRefs(argv) : [];
+    const batchHistoricalDeliveryWaiver = action === 'checkpoint' ? parseBatchHistoricalDeliveryWaiver(argv) : null;
+    const batchEmergencyApproval = action === 'checkpoint' ? parseBatchEmergencyApproval(argv) : null;
     const batchDeliverAndCloseExtras = action === 'deliver-and-close' ? parseBatchDeliverAndCloseExtras(argv) : null;
     const checkpointReadinessInput = action === 'checkpoint-readiness' ? parseBatchCheckpointReadinessArgs(argv) : null;
     const autoBatch = parseAutoBatchControls(argv);
@@ -99,7 +101,7 @@ export async function runBatch(argv) {
             });
         }
         const capturedHeadBeforeClose = readGitHead(options.cwd);
-        const closeResult = await runTasks(['close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), '--json']);
+        const closeResult = await runTasks(['close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), ...(batchHistoricalDeliveryWaiver?.enabled ? ['--waiver-out-of-scope-delivery', '--reason', batchHistoricalDeliveryWaiver.reason] : []), ...(batchEmergencyApproval ? ['--emergency-approval', batchEmergencyApproval] : []), '--json']);
         if (!closeResult.ok) {
             const closeCategory = categorizeCheckpointCloseFailure(closeResult, currentTaskId, resolvedActor.actorId, options.cwd);
             return makeResult({ ok: false, command: 'batch', cwd: options.cwd, messages: [message('error', 'ATM_BATCH_CHECKPOINT_CLOSE_FAILED', closeCategory.tldr ?? `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, { batchId: active.batchId, closedTaskId: currentTaskId,
@@ -374,13 +376,51 @@ function stripBatchCheckpointCloseArgs(argv) {
     const stripped = [];
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
-        if (arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit' || arg === '--historical-batch') {
+        if (arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit' || arg === '--historical-batch' || arg === '--reason' || arg === '--emergency-approval') {
             index += 1;
+            continue;
+        }
+        if (arg === '--waiver-out-of-scope-delivery' || arg === '--waive-out-of-scope') {
             continue;
         }
         stripped.push(arg);
     }
     return stripped;
+}
+function parseBatchHistoricalDeliveryWaiver(argv) {
+    let enabled = false;
+    let reason = null;
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg === '--waiver-out-of-scope-delivery' || arg === '--waive-out-of-scope') {
+            enabled = true;
+            continue;
+        }
+        if (arg === '--reason' && index + 1 < argv.length) {
+            reason = argv[index + 1]?.trim() || null;
+            index += 1;
+            continue;
+        }
+    }
+    if (!enabled)
+        return null;
+    if (!reason) {
+        throw new CliError('ATM_BATCH_CHECKPOINT_WAIVER_REASON_REQUIRED', 'batch checkpoint --waiver-out-of-scope-delivery requires --reason <text>.', { exitCode: 2 });
+    }
+    return { enabled: true, reason };
+}
+function parseBatchEmergencyApproval(argv) {
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg !== '--emergency-approval')
+            continue;
+        const value = argv[index + 1];
+        if (!value || value.startsWith('--')) {
+            throw new CliError('ATM_CLI_USAGE', 'batch checkpoint --emergency-approval requires a lease id.', { exitCode: 2 });
+        }
+        return value.trim();
+    }
+    return null;
 }
 function parseBatchDeliverAndCloseExtras(argv) {
     let deliveryCommit = null;

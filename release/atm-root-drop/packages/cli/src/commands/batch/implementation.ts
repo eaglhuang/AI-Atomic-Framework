@@ -34,6 +34,8 @@ if (action === 'plan-start') return runBatchPlanStart(argv);
 if (action === 'plan-journal') return runBatchPlanJournal(argv);
 const batchHistoricalDeliveryRefs = action === 'checkpoint' ? parseBatchHistoricalDeliveryRefs(argv) : [];
 const batchHistoricalBatchRefs = action === 'checkpoint' ? parseBatchHistoricalBatchRefs(argv) : [];
+const batchHistoricalDeliveryWaiver = action === 'checkpoint' ? parseBatchHistoricalDeliveryWaiver(argv) : null;
+const batchEmergencyApproval = action === 'checkpoint' ? parseBatchEmergencyApproval(argv) : null;
 const batchDeliverAndCloseExtras = action === 'deliver-and-close' ? parseBatchDeliverAndCloseExtras(argv) : null;
 const checkpointReadinessInput = action === 'checkpoint-readiness' ? parseBatchCheckpointReadinessArgs(argv) : null;
 const autoBatch = parseAutoBatchControls(argv);
@@ -91,7 +93,7 @@ const completed = releaseBatchRun(options.cwd, active, 'completed'); return make
 });
 }
 const capturedHeadBeforeClose = readGitHead(options.cwd);
-const closeResult = await runTasks([ 'close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), '--json' ]); if (!closeResult.ok) {
+const closeResult = await runTasks([ 'close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), ...(batchHistoricalDeliveryWaiver?.enabled ? ['--waiver-out-of-scope-delivery', '--reason', batchHistoricalDeliveryWaiver.reason] : []), ...(batchEmergencyApproval ? ['--emergency-approval', batchEmergencyApproval] : []), '--json' ]); if (!closeResult.ok) {
 const closeCategory = categorizeCheckpointCloseFailure(closeResult, currentTaskId, resolvedActor.actorId, options.cwd); return makeResult({ ok: false, command: 'batch', cwd: options.cwd, messages: [message('error', 'ATM_BATCH_CHECKPOINT_CLOSE_FAILED', closeCategory.tldr ?? `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, { batchId: active.batchId, closedTaskId: currentTaskId,
 category: closeCategory.category, reason: closeCategory.reason, requiredCommand: closeCategory.requiredCommand, tldr: closeCategory.tldr, missingValidationPasses: closeCategory.missingValidationPasses, blockingFindings: closeCategory.blockingFindings })], evidence: { action: 'checkpoint', actorId: resolvedActor.actorId, closedTaskId: currentTaskId, held: holdNextClaim,
 historicalDeliveryRefs: batchHistoricalDeliveryRefs, historicalBatchRefs: batchHistoricalBatchRefs, closeHeadCapture: { schemaId: 'atm.batchCheckpointHeadCapture.v1', taskId: currentTaskId, batchId: active.batchId, headBeforeClose: capturedHeadBeforeClose, headAfterClose: readGitHead(options.cwd) }, closeResult: closeResult.evidence, failureCategory: closeCategory }
@@ -276,9 +278,32 @@ const taskCount = finiteNumber(completedTaskCount);
 const makespanMs = finiteNumber(batchMakespanMs); if (taskCount <= 0 || makespanMs <= 0) return 0; return taskCount / (makespanMs / 60000); }
 function stripBatchCheckpointCloseArgs(argv: readonly string[]) {
 const stripped: string[] = []; for (let index = 0; index < argv.length; index += 1) {
-const arg = argv[index]; if ( arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit' || arg === '--historical-batch' ) { index += 1; continue; }
+const arg = argv[index]; if ( arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit' || arg === '--historical-batch' || arg === '--reason' || arg === '--emergency-approval' ) { index += 1; continue; }
+if (arg === '--waiver-out-of-scope-delivery' || arg === '--waive-out-of-scope') { continue; }
 stripped.push(arg); }
 return stripped; }
+function parseBatchHistoricalDeliveryWaiver(argv: readonly string[]): { enabled: boolean; reason: string } | null {
+let enabled = false;
+let reason: string | null = null;
+for (let index = 0; index < argv.length; index += 1) {
+const arg = argv[index];
+if (arg === '--waiver-out-of-scope-delivery' || arg === '--waive-out-of-scope') { enabled = true; continue; }
+if (arg === '--reason' && index + 1 < argv.length) { reason = argv[index + 1]?.trim() || null; index += 1; continue; }
+}
+if (!enabled) return null;
+if (!reason) { throw new CliError('ATM_BATCH_CHECKPOINT_WAIVER_REASON_REQUIRED', 'batch checkpoint --waiver-out-of-scope-delivery requires --reason <text>.', { exitCode: 2 }); }
+return { enabled: true, reason };
+}
+function parseBatchEmergencyApproval(argv: readonly string[]): string | null {
+for (let index = 0; index < argv.length; index += 1) {
+const arg = argv[index];
+if (arg !== '--emergency-approval') continue;
+const value = argv[index + 1];
+if (!value || value.startsWith('--')) { throw new CliError('ATM_CLI_USAGE', 'batch checkpoint --emergency-approval requires a lease id.', { exitCode: 2 }); }
+return value.trim();
+}
+return null;
+}
 function parseBatchDeliverAndCloseExtras(argv: readonly string[]): { deliveryCommit: string | null; deliveryMessage: string | null; reason: string | null } {
 let deliveryCommit: string | null = null;
 let deliveryMessage: string | null = null;
