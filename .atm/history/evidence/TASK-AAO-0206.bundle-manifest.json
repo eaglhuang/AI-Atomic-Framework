@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0206",
+  "updatedAt": "2026-07-29T14:25:37.163Z",
+  "updatedBy": "claude-005-aao-0206",
+  "freshValidationPasses": [
+    "node --strip-types --test tests/cli/tasks-audit-read-projection.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types --test tests/cli/tasks-audit-read-projection.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c1e44ec21481157a1953051a912f4c54cf61167d42b84bfd68cbea8b9cbced2f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types --test tests/cli/tasks-audit-read-projection.test.ts"
+      ],
+      "generatedAt": "2026-07-29T14:22:10.455Z",
+      "startedAt": "2026-07-29T14:22:00.261Z",
+      "finishedAt": "2026-07-29T14:22:10.455Z",
+      "durationMs": 10194,
+      "runnerKind": "dev-source",
+      "sourceCommit": "45e62a332112cddd5027a025a7ebd4ebd81aa9f5",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-29T14:23:23.594Z",
+      "startedAt": "2026-07-29T14:23:03.914Z",
+      "finishedAt": "2026-07-29T14:23:23.594Z",
+      "durationMs": 19680,
+      "runnerKind": "dev-source",
+      "sourceCommit": "45e62a332112cddd5027a025a7ebd4ebd81aa9f5",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:84bf4259016a107e38318cff3f6e3e55e3b95541dcfa8b0aed13676940c917e6",
+      "stderrSha256": "sha256:41f37c867251ca39c6b56609bc02df15f36b63f7c86cda470b2c1862276e1047",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-29T14:25:37.161Z",
+      "startedAt": "2026-07-29T14:24:16.093Z",
+      "finishedAt": "2026-07-29T14:25:37.161Z",
+      "durationMs": 81068,
+      "runnerKind": "dev-source",
+      "sourceCommit": "53bcfa02a704149d3c02105d50fa5550cc22ee6b",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -1,4 +1,5 @@
 import { CliError, type CommandResult } from '../shared.ts';
+import { hasTaskReadProjectionRequest, runTasksReadProjection } from './read-projection.ts';
 
 export type TaskCommandHandler = (argv: string[]) => CommandResult | Promise<CommandResult>;
 
@@ -61,6 +62,11 @@ export async function dispatchTasksAction(argv: readonly string[], handlers: Tas
     case 'mirror':
       return await handlers.mirror(rest);
     case 'audit':
+      // Read-only projection is a separate surface from the findings audit; it never
+      // reaches the mutation-capable handler table.
+      if (hasTaskReadProjectionRequest(rest)) {
+        return runTasksReadProjection(rest);
+      }
       return await handlers.audit(rest);
     case 'queue':
       return await handlers.queue(rest);

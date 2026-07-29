@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T12-51-31-677Z-repair-claim-e4f6a66b29e4",
+  "taskId": "TASK-AAO-0206",
+  "action": "repair-claim",
+  "actorId": "claude-005-aao-0206",
+  "sessionId": "session-20260729031110-claude-005-aao-0206-TASK-AAO-0206-978c29da01",
+  "fromStatus": "ready",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0206.json",
+  "taskSha256": "sha256:22f1f892bd173de616366fe86004106d6f989e0e2838fb256c399978a3d8002f",
+  "createdAt": "2026-07-29T12:51:31.677Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-AAO-0206 --actor claude-005-aao-0206 --write --reason \"retain observed in-scope dirty WIP under the original lane after claim-drift repair\" --json"
+}

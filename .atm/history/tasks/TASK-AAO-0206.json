@@ -1,0 +1,319 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0206",
+  "title": "Controlled multi-task read-only projection for tasks audit",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-MAO-0044"
+  ],
+  "acceptance": [
+    "Compact projection for an explicit multi-task selection (`--tasks A,B`).",
+    "`--series` filtering returns only that prefix, sorted stably by `taskId`.",
+    "`--fields` allowlist accepts every registered field.",
+    "Unknown `--fields` entry is rejected fail-closed with a usage error.",
+    "Rejects selector forms other than `--tasks` / `--series` / `--all`.",
+    "Ledger, `.atm/runtime/**`, and `git status` are byte-identical before and after the command; no claim, evidence write, validator run, lock change, broker start, or task-status change occurs.",
+    "Regression: existing `node atm.mjs tasks audit --json` output is unchanged (699 inspected tasks, findings-shaped envelope).",
+    "`node --strip-types --test tests/cli/tasks-audit-read-projection.test.ts`",
+    "`npm run typecheck`",
+    "`npm run validate:cli`"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/read-projection.ts",
+    "packages/cli/src/commands/tasks/command-dispatch.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "tests/cli/tasks-audit-read-projection.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/read-projection.ts",
+    "packages/cli/src/commands/tasks/command-dispatch.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "tests/cli/tasks-audit-read-projection.test.ts",
+    "tests/cli-fixtures/help-snapshots/command-list.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "node --strip-types --test tests/cli/tasks-audit-read-projection.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Changing the GIT-0016 raw-interpreter deny policy or relaxing node -e",
+    "Any behaviour change to existing tasks audit --json or --staged",
+    "New ErrorCodes, registries, tickets, leases, or policy owners",
+    "Write, repair, or mutation paths of any kind",
+    "TASK-GIT-0024 through TASK-GIT-0028, Plan3.1, TMP, and all foreign WIP"
+  ],
+  "nonGoals": [
+    "Do not duplicate lifecycle or status determination; reuse buildTaskViewDashboard() and output-projection.ts only",
+    "Do not accept arbitrary user-supplied expressions as a selector or field",
+    "Do not change exit codes for existing invocations"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Additive flags and one new pure module; reverting removes the projection mode and leaves tasks audit --json untouched.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/read-projection.ts",
+        "packages/cli/src/commands/tasks/command-dispatch.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "tests/cli/tasks-audit-read-projection.test.ts",
+        "tests/cli-fixtures/help-snapshots/command-list.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": "`parseAuditOptions` in `task-option-parsers/misc-claim-options.ts` already\nthrows `ATM_CLI_USAGE` on any unrecognised flag, and `tasks audit` currently\nrejects both `--summary` and `--fields`. There is therefore no collision with\nthe CLI-wide `--summary`/`--fields` envelope projection applied in\n`shared/command-spec-output.ts`; this card defines row-level semantics for\nthose flag names on this one action.\n\nDispatch branches inside `dispatchTasksAction` (`command-dispatch.ts`) by\ndirect import of the new pure module, so the injected\n`TaskCommandDispatchTable` is unchanged and\n`packages/cli/src/commands/tasks/legacy/implementation.ts` is not touched.\n\n`buildTaskViewDashboard()` runs a residue diagnosis per task, so `--all` over\n~699 tasks must be measured during implementation. `--tasks` and `--series`\nare the normal paths.",
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0206-controlled-multi-task-read-only-projection-for-tasks-audit.task.md",
+    "sectionTitle": "TASK-AAO-0206",
+    "headingLine": 70,
+    "hash": "db1ebed32de2c4ea",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-agent-first-operability/tasks/TASK-AAO-0206-controlled-multi-task-read-only-projection-for-tasks-audit.task.md",
+      "planningCommitSha": "1282fff8e9ca3e5f9f8ff73b6682f21964ea6479",
+      "contentDigest": "sha256:db1ebed32de2c4ea0a6811e24707655c163c3edfca58269549763919abdbfd7b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T03:10:44.576Z"
+    }
+  },
+  "importedAt": "2026-07-29T03:10:44.576Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.test.tests.cli.tasks.audit.read.projection.test.ts",
+      "command": "node --strip-types --test tests/cli/tasks-audit-read-projection.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T14-21-04-366Z-renew-6f60d2763122",
+  "lastTransitionAt": "2026-07-29T14:21:04.366Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-07-29T03:11:10.487Z",
+  "promotedAt": "2026-07-29T03:11:10.490Z",
+  "claim": {
+    "actorId": "claude-005-aao-0206",
+    "leaseId": "lease-c461a4c70a22",
+    "claimedAt": "2026-07-29T12:51:50.586Z",
+    "heartbeatAt": "2026-07-29T14:21:03.380Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0206.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/read-projection.ts",
+      "tests/cli-fixtures/help-snapshots/command-list.json",
+      "tests/cli/tasks-audit-read-projection.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260729125151-claude-005-aao-0206-67ad6ef1dd",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729125151-claude-005-aao-0206-67ad6ef1dd\""
+    }
+  },
+  "startedAt": "2026-07-29T03:11:10.494Z",
+  "startedByActor": "claude-005-aao-0206",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c77a66ca19e06bd8",
+    "ticketDigest": "sha256:c77a66ca19e06bd8789bb92d5e51f2fa4385b7594a9b21373794e401dbfc917b",
+    "taskId": "TASK-AAO-0206",
+    "origin": "claim",
+    "actorId": "claude-005-aao-0206",
+    "laneSessionId": "lane-20260729125151-claude-005-aao-0206-67ad6ef1dd",
+    "claimGeneration": "lease-c461a4c70a22",
+    "issuedAt": "2026-07-29T14:21:03.380Z",
+    "expiresAt": "2026-07-29T14:51:03.380Z",
+    "scopeDigest": "sha256:b8608ee72b09ab69ab6752b00cbf05f60c5c69cf32db7217d917a3fe3f932aeb",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T14:21:03.380Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-AAO-0206.*",
+          ".atm/history/task-events/TASK-AAO-0206/**",
+          ".atm/history/tasks/TASK-AAO-0206.json",
+          "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+          "packages/cli/src/commands/command-specs/tasks.spec.ts",
+          "packages/cli/src/commands/tasks/command-dispatch.ts",
+          "packages/cli/src/commands/tasks/read-projection.ts",
+          "tests/cli-fixtures/help-snapshots/command-list.json",
+          "tests/cli/tasks-audit-read-projection.test.ts"
+        ],
+        "digest": "sha256:7317d2121348e803a946236d74681474f41b3ac89030b59b1e066e4c44a06903"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:3b09034b576f26e8321df7261d6e042f868b3bc19d699d2b5641c44caea73079",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:ac249182061e9147ec9bba16419a7d79c8b9b3feab160454f1ba59279fa1aec2"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260729125150-claude-005-aao-0206-TASK-AAO-0206-6110f6302f",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "TASK-AAO-0206",
+    "actorId": "claude-005-aao-0206",
+    "laneSessionId": "lane-20260729031110-claude-005-aao-0206-3eb71540a4",
+    "dirtyPaths": [
+      ".atm/history/tasks/TASK-AAO-0206.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/read-projection.ts",
+      "tests/cli/tasks-audit-read-projection.test.ts"
+    ],
+    "retainedAt": "2026-07-29T12:51:29.634Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "claude-005-aao-0206",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0206",
+    "batchId": null,
+    "scopeKey": "tasks-401a430e2aae",
+    "queueId": "queue-48d9469c580f56e6",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0206.*",
+      ".atm/history/task-events/TASK-AAO-0206/**",
+      ".atm/history/tasks/TASK-AAO-0206.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/read-projection.ts",
+      "tests/cli-fixtures/help-snapshots/command-list.json",
+      "tests/cli/tasks-audit-read-projection.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0d991ad0fc3620907dda53778ff7294a33a04cb9b7b6437ba0b2a3438ebe84a0",
+    "actorId": "claude-005-aao-0206",
+    "sessionId": "session-20260729125150-claude-005-aao-0206-TASK-AAO-0206-6110f6302f",
+    "laneSession": {
+      "laneSessionId": "lane-20260729125151-claude-005-aao-0206-67ad6ef1dd",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729125151-claude-005-aao-0206-67ad6ef1dd\""
+    },
+    "createdAt": "2026-07-29T12:52:09.856Z",
+    "status": "active"
+  }
+}

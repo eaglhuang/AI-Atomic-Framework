@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T03-47-13-146Z-repair-claim-75e7a3beeb69",
+  "taskId": "TASK-AAO-0206",
+  "action": "repair-claim",
+  "actorId": "claude-005-aao-0206",
+  "sessionId": "session-20260729031110-claude-005-aao-0206-TASK-AAO-0206-978c29da01",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0206.json",
+  "taskSha256": "sha256:364ced754c0ec1b5113350bd46f079d91de4a229eeace152a16f72a7fe9c7ce2",
+  "createdAt": "2026-07-29T03:47:13.146Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-AAO-0206 --actor claude-005-aao-0206 --write --reason \"Own claim lease expired during long-running validator evidence runs; reclaiming same actor and lane to complete delivery commit and close.\" --json"
+}
