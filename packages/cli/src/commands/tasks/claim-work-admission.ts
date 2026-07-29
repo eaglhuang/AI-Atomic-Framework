@@ -236,6 +236,7 @@ export function resolveTaskWorkAdmissionFiles(taskDocument: Record<string, unkno
 
 function taskLifecycleArtifactPaths(taskId: string): readonly string[] {
   return [
+    '.atm/history/evidence/git-head.jsonl',
     `.atm/history/evidence/${taskId}.*`,
     `.atm/history/task-events/${taskId}/**`,
     `.atm/history/tasks/${taskId}.json`

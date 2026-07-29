@@ -260,7 +260,8 @@ export function checkWorkAdmissionTicket(input: {
  */
 function isTaskManagedLifecyclePath(taskId: string, file: string): boolean {
   const normalized = normalizeWritePathList([file])[0] ?? '';
-  return normalized === `.atm/history/tasks/${taskId}.json`
+  return normalized === '.atm/history/evidence/git-head.jsonl'
+    || normalized === `.atm/history/tasks/${taskId}.json`
     || normalized.startsWith(`.atm/history/evidence/${taskId}.`)
     || normalized.startsWith(`.atm/history/task-events/${taskId}/`);
 }

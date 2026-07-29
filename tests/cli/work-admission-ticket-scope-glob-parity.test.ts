@@ -67,4 +67,8 @@ assert.equal(checkWorkAdmissionTicket({
   ticket: legacyTicket, taskId: 'TASK-GIT-0025', actorId: 'fixture-actor', laneSessionId: 'lane-fixture', claimGeneration: 'claim-fixture',
   files: ['.atm/history/evidence/TASK-GIT-0025.closure-packet.json'], operation: 'commit', now: '2026-07-29T00:01:00.000Z'
 }).ok, true, 'legacy tickets must retain authority over their own lifecycle records');
+assert.equal(checkWorkAdmissionTicket({
+  ticket: legacyTicket, taskId: 'TASK-GIT-0025', actorId: 'fixture-actor', laneSessionId: 'lane-fixture', claimGeneration: 'claim-fixture',
+  files: ['.atm/history/evidence/git-head.jsonl'], operation: 'commit', now: '2026-07-29T00:01:00.000Z'
+}).ok, true, 'every ticket must authorize the shared governed commit provenance record');
 console.log('[work-admission-ticket-scope-glob-parity.test] ok');
