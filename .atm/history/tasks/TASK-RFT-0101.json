@@ -186,8 +186,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T10-22-28-963Z-scope-amendment-e39fa32c1828",
-  "lastTransitionAt": "2026-07-29T10:22:28.963Z",
+  "lastTransitionId": "2026-07-29T10-34-33-342Z-renew-e750a7f6c5d9",
+  "lastTransitionAt": "2026-07-29T10:34:33.342Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T03:05:33.686Z",
@@ -196,7 +196,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-0f597e023a88",
     "claimedAt": "2026-07-29T03:05:33.692Z",
-    "heartbeatAt": "2026-07-29T10:17:00.776Z",
+    "heartbeatAt": "2026-07-29T10:34:32.271Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-RFT-0101.*",
@@ -237,19 +237,19 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-78139389fac983c3",
-    "ticketDigest": "sha256:78139389fac983c397145bcc475fa210a9e8ff8371a750dc5013325c18acb07f",
+    "ticketId": "wat-48916f7e1104d3b3",
+    "ticketDigest": "sha256:48916f7e1104d3b3828fe16e5b9e1a46288194119ad301709a86fd22de181e02",
     "taskId": "TASK-RFT-0101",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260729030534-codex-git-series-captain-f9342714d3",
     "claimGeneration": "lease-0f597e023a88",
-    "issuedAt": "2026-07-29T10:17:00.776Z",
-    "expiresAt": "2026-07-29T10:47:00.776Z",
-    "scopeDigest": "sha256:e4d5be8049bd4c7e5504eeb7e1e8005fa65bc5636ac6b7b2b1d6c9cd294e3431",
+    "issuedAt": "2026-07-29T10:34:32.271Z",
+    "expiresAt": "2026-07-29T11:04:32.271Z",
+    "scopeDigest": "sha256:0f10713f541746252164f4e527d07ead3d4c6e9ea2622f29f8972cbaed564661",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-29T10:17:00.776Z"
+      "selectedAt": "2026-07-29T10:34:32.271Z"
     },
     "grants": [
       {
@@ -261,6 +261,7 @@
           "atomic_workbench/atomization-coverage/path-to-atom-map.json",
           "docs/reports/git-governance-transaction-atomic-map.md",
           "packages/cli/dist/**",
+          "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
           "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
           "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
           "packages/cli/src/commands/git-governance/implementation.ts",
@@ -275,9 +276,11 @@
           "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
           "tests/cli/git-commit-task-scoped-staging.test.ts",
           "tests/cli/git-commit-task-scoped-staging/**",
-          "tests/cli/git-index-override-lease-consumption.test.ts"
+          "tests/cli/git-index-override-lease-consumption.test.ts",
+          "tests/cli/runner-sync-build-source-preservation.test.ts",
+          "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
         ],
-        "digest": "sha256:1444541ad3bb894063d17ba645627a98aa7ad9c120e30aff75e8e32d58137e7a"
+        "digest": "sha256:3d6396fab08e246d39ad62fd8ffe96a176bc6c19b9fec922c5fde74e54294563"
       },
       {
         "kind": "lifecycle-operation",
