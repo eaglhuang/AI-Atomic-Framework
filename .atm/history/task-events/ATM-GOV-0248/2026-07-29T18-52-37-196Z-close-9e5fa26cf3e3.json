@@ -1,0 +1,87 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T18-52-37-196Z-close-9e5fa26cf3e3",
+  "taskId": "ATM-GOV-0248",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0248.json",
+  "taskSha256": "sha256:13774d321da11caab08c8dcbac8650a2f66c5d4b29ce0f9139d3ffac01190e26",
+  "createdAt": "2026-07-29T18:52:37.196Z",
+  "command": "node atm.mjs tasks reconcile --task ATM-GOV-0248 --actor codex-git-series-captain --delivery-commit 185a39d035c2a3d33d7fa72ad8793fbb9f697f5e --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0248.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/team-contribution-composer.test.ts",
+      "node --strip-types tests/cli/team-plan-contract.test.ts",
+      "node --strip-types tests/cli/team-proposal-workspace.test.ts",
+      "node --strip-types tests/cli/team-shadow-workspace.test.ts",
+      "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T18:52:37.187Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0248.*",
+        ".atm/history/task-events/ATM-GOV-0248/**",
+        ".atm/history/tasks/ATM-GOV-0248.json",
+        "packages/cli/src/commands/team-wave.ts",
+        "packages/cli/src/commands/team/proposal-workspace.ts",
+        "packages/cli/src/commands/team/scheduler.ts",
+        "packages/cli/src/commands/team/shadow-plan.ts",
+        "packages/cli/src/commands/team/shadow-workspace.ts",
+        "scripts/validate-worktree-callsite-census.ts",
+        "tests/cli/team-contribution-composer.test.ts",
+        "tests/cli/team-plan-contract.test.ts",
+        "tests/cli/team-proposal-workspace.test.ts",
+        "tests/cli/team-shadow-workspace.test.ts",
+        "tests/cli/worktree-callsite-census.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team-wave.ts",
+        "packages/cli/src/commands/team/proposal-workspace.ts",
+        "packages/cli/src/commands/team/scheduler.ts",
+        "packages/cli/src/commands/team/shadow-plan.ts",
+        "packages/cli/src/commands/team/shadow-workspace.ts",
+        "scripts/validate-worktree-callsite-census.ts",
+        "tests/cli/team-contribution-composer.test.ts",
+        "tests/cli/team-plan-contract.test.ts",
+        "tests/cli/team-proposal-workspace.test.ts",
+        "tests/cli/team-shadow-workspace.test.ts",
+        "tests/cli/worktree-callsite-census.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

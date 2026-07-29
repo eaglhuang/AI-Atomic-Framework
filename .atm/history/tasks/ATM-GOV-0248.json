@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0248",
   "title": "Non-Git proposal workspace provider and steward write-path migration",
-  "status": "blocked",
+  "status": "done",
   "milestone": "ATM-3.1-R0",
   "dependencies": [
     "ATM-GOV-0247"
@@ -200,17 +200,17 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-27T08-56-56-792Z-block-66203ec059c5",
-  "lastTransitionAt": "2026-07-27T08:56:56.792Z",
+  "lastTransitionId": "2026-07-29T18-52-37-196Z-close-9e5fa26cf3e3",
+  "lastTransitionAt": "2026-07-29T18:52:37.196Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-004-skl-0029-captain",
+  "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-27T07:04:33.967Z",
   "promotedAt": "2026-07-27T07:04:33.969Z",
   "claim": {
     "actorId": "claude-004-skl-0029-captain",
     "leaseId": "lease-8af94347c707",
     "claimedAt": "2026-07-27T07:04:33.973Z",
-    "heartbeatAt": "2026-07-27T08:56:56.790Z",
+    "heartbeatAt": "2026-07-29T18:52:37.194Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0248.json",
@@ -229,13 +229,13 @@
       "tests/cli/worktree-callsite-census.test.ts"
     ],
     "state": "released",
+    "reason": "reconciled",
     "laneSession": {
       "laneSessionId": "lane-20260727070434-claude-004-skl-0029-captain-2a784b4791",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260727070434-claude-004-skl-0029-captain-2a784b4791\""
-    },
-    "reason": "Parked for ATM-GOV-0266 governed recovery: coalesced runner-sync receipt/reconcile lifecycle repair; preserve responsibility chain, lock, and recovery evidence."
+    }
   },
   "startedAt": "2026-07-26T16:19:31.605Z",
   "startedByActor": "codex-002-plan31-0248",
@@ -279,8 +279,95 @@
     "createdAt": "2026-07-27T07:04:41.266Z",
     "status": "active"
   },
-  "closedAt": "2026-07-27T08:56:56.790Z",
-  "closedByActor": "claude-004-skl-0029-captain",
-  "closedBySessionId": "session-20260727070433-claude-004-skl-0029-captain-ATM-GOV-0248-5ad7fe0fa7",
-  "closeReason": "Parked for ATM-GOV-0266 governed recovery: coalesced runner-sync receipt/reconcile lifecycle repair; preserve responsibility chain, lock, and recovery evidence."
+  "closedAt": "2026-07-29T18:52:37.194Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 185a39d035c2a3d33d7fa72ad8793fbb9f697f5e",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-2880c83bc4328506",
+    "ticketDigest": "sha256:2880c83bc4328506fe96aa659535b34135c7d72d649de8f7ab8b4306283f8c9c",
+    "taskId": "ATM-GOV-0248",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260727070434-claude-004-skl-0029-captain-2a784b4791",
+    "claimGeneration": "lease-8af94347c707",
+    "issuedAt": "2026-07-29T18:51:43.522Z",
+    "expiresAt": "2026-07-29T19:21:43.522Z",
+    "scopeDigest": "sha256:d1bcf20f1476264913b32bc1688098b03881085ec53db9ba42d1e43f0ef23a0b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T18:51:43.522Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0248.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0248/**",
+          ".atm/history/tasks/ATM-GOV-0248.json",
+          "packages/cli/src/commands/team-wave.ts",
+          "packages/cli/src/commands/team/proposal-workspace.ts",
+          "packages/cli/src/commands/team/scheduler.ts",
+          "packages/cli/src/commands/team/shadow-plan.ts",
+          "packages/cli/src/commands/team/shadow-workspace.ts",
+          "scripts/validate-worktree-callsite-census.ts",
+          "tests/cli/team-contribution-composer.test.ts",
+          "tests/cli/team-plan-contract.test.ts",
+          "tests/cli/team-proposal-workspace.test.ts",
+          "tests/cli/team-shadow-workspace.test.ts",
+          "tests/cli/worktree-callsite-census.test.ts"
+        ],
+        "digest": "sha256:9a4df8fe8cf7c034a4303928ac8fc39f52efd4b5167fc2f2c74fb4a013172496"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:3b09034b576f26e8321df7261d6e042f868b3bc19d699d2b5641c44caea73079",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:ac249182061e9147ec9bba16419a7d79c8b9b3feab160454f1ba59279fa1aec2"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0248.closure-packet.json"
 }

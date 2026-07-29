@@ -1,0 +1,224 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0248",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4ecd5f21a48e324f3d1d18e7bc3aeee54efdb5bf",
+  "governedTreeSha": "f463e705c946d3840db057290c5d72b7bc1e8df8",
+  "targetCommitDelta": {
+    "currentCommitSha": "4ecd5f21a48e324f3d1d18e7bc3aeee54efdb5bf",
+    "parentCommitShas": [
+      "4ecd5f21a48e324f3d1d18e7bc3aeee54efdb5bf"
+    ],
+    "governedTreeSha": "f463e705c946d3840db057290c5d72b7bc1e8df8",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0248.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0248.json",
+      ".atm/history/task-events/ATM-GOV-0248/2026-07-29T18-51-44-003Z-renew-4e1863c0f59b.json",
+      ".atm/history/tasks/ATM-GOV-0248.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/proposal-workspace.ts",
+      "packages/cli/src/commands/team/scheduler.ts",
+      "packages/cli/src/commands/team/shadow-plan.ts",
+      "packages/cli/src/commands/team/shadow-workspace.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "scripts/validate-worktree-callsite-census.ts",
+      "tests/cli/team-contribution-composer.test.ts",
+      "tests/cli/team-plan-contract.test.ts",
+      "tests/cli/team-proposal-workspace.test.ts",
+      "tests/cli/team-shadow-workspace.test.ts",
+      "tests/cli/worktree-callsite-census.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-proposal-workspace.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d664ed0e08e8d7fd23ea6bfd6e1226d465b116e98526310447530a44044e0513",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-shadow-workspace.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8dd766202b7e5f150c1271e90b12b316138d86abede8d4f6f5b8afd15df07460",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-plan-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e9b9837fe4bc2c616b29efe147c0746c3a5fa50c292c6f4a5504cd28c2b39477",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-contribution-composer.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9ec2f196d24126d8542b815e0d8bd9ef21ac1c4552074fd6603616cc8b0264bd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:155111bc46227e6ae0cb8701a1ca11ab317c8c620ea676050b86eef13deca8d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:663b67414237e750e84161e91dd5e582a63d6d40be6f3371f627643e2b2135ed",
+      "stderrSha256": "sha256:50157838a88aaeaa423fe901342f0e9edf8d73be0a7ccea65d497694001ce56b",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/team-contribution-composer.test.ts",
+    "node --strip-types tests/cli/team-plan-contract.test.ts",
+    "node --strip-types tests/cli/team-proposal-workspace.test.ts",
+    "node --strip-types tests/cli/team-shadow-workspace.test.ts",
+    "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T18:52:37.187Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0248.*",
+      ".atm/history/task-events/ATM-GOV-0248/**",
+      ".atm/history/tasks/ATM-GOV-0248.json",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/proposal-workspace.ts",
+      "packages/cli/src/commands/team/scheduler.ts",
+      "packages/cli/src/commands/team/shadow-plan.ts",
+      "packages/cli/src/commands/team/shadow-workspace.ts",
+      "scripts/validate-worktree-callsite-census.ts",
+      "tests/cli/team-contribution-composer.test.ts",
+      "tests/cli/team-plan-contract.test.ts",
+      "tests/cli/team-proposal-workspace.test.ts",
+      "tests/cli/team-shadow-workspace.test.ts",
+      "tests/cli/worktree-callsite-census.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/proposal-workspace.ts",
+      "packages/cli/src/commands/team/scheduler.ts",
+      "packages/cli/src/commands/team/shadow-plan.ts",
+      "packages/cli/src/commands/team/shadow-workspace.ts",
+      "scripts/validate-worktree-callsite-census.ts",
+      "tests/cli/team-contribution-composer.test.ts",
+      "tests/cli/team-plan-contract.test.ts",
+      "tests/cli/team-proposal-workspace.test.ts",
+      "tests/cli/team-shadow-workspace.test.ts",
+      "tests/cli/worktree-callsite-census.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0248.json",
+  "closedAt": "2026-07-29T18:52:37.187Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "185a39d035c2a3d33d7fa72ad8793fbb9f697f5e",
+    "reconciledAt": "2026-07-29T18:52:31.623Z",
+    "reconciledByActor": "codex-git-series-captain",
+    "reconcileClassification": "local-closure-rewrite",
+    "reason": "Historical reconcile sync against commit 185a39d035c2a3d33d7fa72ad8793fbb9f697f5e"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "185a39d035c2a3d33d7fa72ad8793fbb9f697f5e",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team/proposal-workspace.ts",
+      "packages/cli/src/commands/team/scheduler.ts",
+      "packages/cli/src/commands/team/shadow-plan.ts",
+      "packages/cli/src/commands/team/shadow-workspace.ts",
+      "scripts/validate-worktree-callsite-census.ts",
+      "tests/cli/team-contribution-composer.test.ts",
+      "tests/cli/team-plan-contract.test.ts",
+      "tests/cli/team-proposal-workspace.test.ts",
+      "tests/cli/team-shadow-workspace.test.ts",
+      "tests/cli/worktree-callsite-census.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0248.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0248/2026-07-26T16-19-11-712Z-import-cf2cf43dffd4.json",
+      ".atm/history/task-events/ATM-GOV-0248/2026-07-26T16-19-31-593Z-reserve-f65d7687fd4d.json",
+      ".atm/history/task-events/ATM-GOV-0248/2026-07-26T16-19-31-597Z-promote-1b711a3e5b83.json",
+      ".atm/history/task-events/ATM-GOV-0248/2026-07-26T16-20-03-657Z-claim-22bfc76f1f84.json",
+      ".atm/history/tasks/ATM-GOV-0248.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
