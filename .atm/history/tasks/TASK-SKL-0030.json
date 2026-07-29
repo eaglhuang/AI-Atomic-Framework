@@ -1,0 +1,272 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0030",
+  "title": "Historical A-B replay verdict and migration guide",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.8",
+  "dependencies": [
+    "TASK-SKL-0029"
+  ],
+  "acceptance": [
+    "Replay compares the same candidates, test versions and environment seals.",
+    "Report includes task latency p50/p95, selected ratio, cache reuse, phase detection, false blocks, flaky cases and escaped-defect delta.",
+    "Runtime improvement cannot pass if defect detection regresses.",
+    "No-op/zero-test false greens and stale receipt reuse are demonstrated as rejected counterexamples.",
+    "Provider swap and all supported adapter projections pass conformance.",
+    "Migration guide supports shadow mode, canary promotion, full rollback and Plan 3.1 final-verdict consumption."
+  ],
+  "deliverables": [
+    "scripts/validate-validator-governance-verdict.ts",
+    "tests/fixtures/validator-governance-replay/**",
+    "artifacts/generated/atm-validator-governance-verdict.json",
+    "docs/governance/validator-governance.md",
+    "tests/cli/validator-governance-verdict.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/validate-validator-governance-verdict.ts",
+    "tests/fixtures/validator-governance-replay/**",
+    "artifacts/generated/atm-validator-governance-verdict.json",
+    "docs/governance/validator-governance.md",
+    "tests/cli/validator-governance-verdict.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validator-governance-verdict.test.ts",
+    "node --strip-types scripts/validate-validator-governance-verdict.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "validator-governance-historical-ab-verdict",
+  "rollbackStrategy": "revert-commit-and-retain-legacy-all-run-default",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-runtime",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-governance-verdict",
+        "pattern": "Measured Verdict",
+        "source": "scripts/validate-validator-governance-verdict.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0030-historical-a-b-replay-verdict-and-migration-guide.task.md",
+    "sectionTitle": "TASK-SKL-0030",
+    "headingLine": 46,
+    "hash": "1db3c27aa0d7b195",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0030-historical-a-b-replay-verdict-and-migration-guide.task.md",
+      "planningCommitSha": "8e3e5d4ddddc4cf9a31339224429ef6f2fcead5a",
+      "contentDigest": "sha256:1db3c27aa0d7b195217429d4d697b12291b877cb70e441ef18bdeef66e0a9086",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T22:44:24.370Z"
+    }
+  },
+  "importedAt": "2026-07-29T22:44:24.370Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.validator.governance.verdict.test.ts",
+      "command": "node --strip-types tests/cli/validator-governance-verdict.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.validator.governance.verdict.ts",
+      "command": "node --strip-types scripts/validate-validator-governance-verdict.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T22-44-47-682Z-claim-ea00364e9fc2",
+  "lastTransitionAt": "2026-07-29T22:44:47.682Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T22:44:35.446Z",
+  "promotedAt": "2026-07-29T22:44:35.448Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-c2df2538cf30",
+    "claimedAt": "2026-07-29T22:44:35.451Z",
+    "heartbeatAt": "2026-07-29T22:44:35.451Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0030.json",
+      "artifacts/generated/atm-validator-governance-verdict.json",
+      "docs/governance/validator-governance.md",
+      "scripts/validate-validator-governance-verdict.ts",
+      "tests/cli/validator-governance-verdict.test.ts",
+      "tests/fixtures/validator-governance-replay/**"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260729224435-codex-git-series-captain-4d3a5a99c0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729224435-codex-git-series-captain-4d3a5a99c0\""
+    }
+  },
+  "startedAt": "2026-07-29T22:44:35.451Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d8925a7935b950ad",
+    "ticketDigest": "sha256:d8925a7935b950ad919637f9164e3a5325804d66057cceab7ffebf0160649747",
+    "taskId": "TASK-SKL-0030",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729224435-codex-git-series-captain-4d3a5a99c0",
+    "claimGeneration": "lease-c2df2538cf30",
+    "issuedAt": "2026-07-29T22:44:35.451Z",
+    "expiresAt": "2026-07-29T23:14:35.451Z",
+    "scopeDigest": "sha256:10db59f4be19fd755a75a67a595a137ae98663d84dc8f33d14c2569aaf85277f",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T22:44:35.451Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0030.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-SKL-0030/**",
+          ".atm/history/tasks/TASK-SKL-0030.json",
+          "artifacts/generated/atm-validator-governance-verdict.json",
+          "docs/governance/validator-governance.md",
+          "scripts/validate-validator-governance-verdict.ts",
+          "tests/cli/validator-governance-verdict.test.ts",
+          "tests/fixtures/validator-governance-replay/**"
+        ],
+        "digest": "sha256:516923843001c13cd0e628b442f4d8efc9d1e81b7e4d670e64f16bde025b95d2"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260729224435-codex-git-series-captain-TASK-SKL-0030-bbf9943de4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0030",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0030.*",
+      ".atm/history/task-events/TASK-SKL-0030/**",
+      ".atm/history/tasks/TASK-SKL-0030.json",
+      "artifacts/generated/atm-validator-governance-verdict.json",
+      "docs/governance/validator-governance.md",
+      "scripts/validate-validator-governance-verdict.ts",
+      "tests/cli/validator-governance-verdict.test.ts",
+      "tests/fixtures/validator-governance-replay/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "09c75c55593f8f695a238c66361e88958cdbf2b666a1fd0b08411a4c70bfd00a",
+    "actorId": "codex-git-series-captain",
+    "sessionId": "session-20260729224435-codex-git-series-captain-TASK-SKL-0030-bbf9943de4",
+    "laneSession": {
+      "laneSessionId": "lane-20260729224435-codex-git-series-captain-4d3a5a99c0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729224435-codex-git-series-captain-4d3a5a99c0\""
+    },
+    "createdAt": "2026-07-29T22:44:47.681Z",
+    "status": "active"
+  }
+}

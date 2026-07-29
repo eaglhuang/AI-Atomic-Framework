@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.validatorGovernanceVerdict.v1",
+  "specVersion": "0.1.0",
+  "fixturePath": "tests/fixtures/validator-governance-replay/historical-ab-candidates.json",
+  "environmentSeal": {
+    "nodeMajor": 24,
+    "catalogVersion": "TASK-SKL-0029.closed",
+    "fixtureDigest": "sha256:historical-ab-replay-v1",
+    "candidateSet": "plan3-validator-governance-historical"
+  },
+  "legacy": {
+    "latencyP50Ms": 198000,
+    "latencyP95Ms": 244000,
+    "selectedRatio": 1,
+    "cacheReuseRatio": 0,
+    "phaseDetectionRatio": 0.5,
+    "falseBlocks": 1,
+    "flakyCases": 1,
+    "detectedDefects": 2,
+    "escapedDefects": 0
+  },
+  "causal": {
+    "latencyP50Ms": 43000,
+    "latencyP95Ms": 76000,
+    "selectedRatio": 0.5,
+    "cacheReuseRatio": 0.75,
+    "phaseDetectionRatio": 0.75,
+    "falseBlocks": 1,
+    "flakyCases": 0,
+    "detectedDefects": 2,
+    "escapedDefects": 0
+  },
+  "deltas": {
+    "latencyP50ImprovementRatio": 0.7828,
+    "latencyP95ImprovementRatio": 0.6885,
+    "selectedRatioDelta": -0.5,
+    "cacheReuseRatioDelta": 0.75,
+    "phaseDetectionRatioDelta": 0.25,
+    "falseBlockDelta": 0,
+    "flakyCaseDelta": -1,
+    "escapedDefectDelta": 0
+  },
+  "counterexamples": [
+    {
+      "id": "zero-test-false-green",
+      "acceptedByVerdict": false,
+      "rejectionCode": "ATM_VALIDATOR_GOVERNANCE_ZERO_TEST_FALSE_GREEN"
+    },
+    {
+      "id": "stale-receipt-reuse",
+      "acceptedByVerdict": false,
+      "rejectionCode": "ATM_VALIDATOR_GOVERNANCE_STALE_RECEIPT_REUSE"
+    }
+  ],
+  "adapterConformance": [
+    { "adapter": "codex", "projection": "skill", "status": "pass" },
+    { "adapter": "claude-code", "projection": "skill", "status": "pass" },
+    { "adapter": "cursor", "projection": "markdown", "status": "pass" },
+    { "adapter": "copilot", "projection": "instructions-md", "status": "pass" },
+    { "adapter": "gemini", "projection": "toml", "status": "pass" },
+    { "adapter": "antigravity", "projection": "markdown", "status": "pass" }
+  ],
+  "verdict": {
+    "status": "pass",
+    "summary": "Causal validator selection improves latency and selection cost without increasing escaped defects; stale receipts and zero-test false greens are rejected.",
+    "migrationRecommendation": "promote-causal-selector-through-shadow-canary"
+  }
+}
