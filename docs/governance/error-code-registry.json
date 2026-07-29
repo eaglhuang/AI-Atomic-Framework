@@ -2258,7 +2258,7 @@
       "remediation": ["Review the immutable commit and its contemporaneous provenance.", "Create one governed forward attestation, commit it, then retry the protected push."],
       "retryable": true,
       "requiresHumanApproval": false,
-      "relatedCommands": ["node atm.mjs git attest --commit <sha> --task <task-id> --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-digest sha256:<digest> --json"],
+      "relatedCommands": ["node atm.mjs git attest --commit <sha> --task <task-id> --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-ref git:<sha> --provenance-digest sha256:<digest> --json"],
       "sourceOwner": "packages/core/src/broker/historical-work-admission-attestation.ts"
     },
     {
@@ -2269,7 +2269,7 @@
       "remediation": ["Do not edit historical commits or force-push.", "Remove the invalid forward record through governed recovery and create one exact attestation from the immutable commit metadata."],
       "retryable": false,
       "requiresHumanApproval": true,
-      "relatedCommands": ["node atm.mjs git attest --commit <sha> --task <task-id> --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-digest sha256:<digest> --json"],
+      "relatedCommands": ["node atm.mjs git attest --commit <sha> --task <task-id> --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-ref git:<sha> --provenance-digest sha256:<digest> --json"],
       "sourceOwner": "packages/core/src/broker/historical-work-admission-attestation.ts"
     },
     {
