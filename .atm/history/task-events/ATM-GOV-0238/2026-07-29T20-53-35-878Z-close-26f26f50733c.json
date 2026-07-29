@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T20-53-35-878Z-close-26f26f50733c",
+  "taskId": "ATM-GOV-0238",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729204303-codex-git-series-captain-ATM-GOV-0238-83b29a568f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0238.json",
+  "taskSha256": "sha256:20a07ef30be6b3b3053aebd1c9db0e09e846aeb523d6a8009ef9fbc7b6fa9d99",
+  "createdAt": "2026-07-29T20:53:35.878Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0238 --actor codex-git-series-captain --status done --from-batch-checkpoint --batch batch-655d05340102",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-655d05340102",
+    "sessionId": "session-20260729204303-codex-git-series-captain-ATM-GOV-0238-83b29a568f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0238.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/plan3-dashboard-lifecycle-observations.test.ts",
+      "node atm.mjs broker replay dashboard --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T20:53:35.871Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0238.*",
+        ".atm/history/task-events/ATM-GOV-0238/**",
+        ".atm/history/tasks/ATM-GOV-0238.json",
+        "artifacts/generated/atm-plan3-dogfood/ATM-GOV-0238.json",
+        "docs/governance/atm-3-replay-evidence.md",
+        "packages/cli/src/commands/broker/replay/dashboard-lifecycle-observations.ts",
+        "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+        "tests/cli/plan3-dashboard-lifecycle-observations.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/replay/dashboard-lifecycle-observations.ts",
+        "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+        "tests/cli/plan3-dashboard-lifecycle-observations.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
