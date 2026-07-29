@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0242",
+  "updatedAt": "2026-07-29T21:04:19.533Z",
+  "updatedBy": "codex-git-series-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts",
+    "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json",
+    "node atm.mjs broker replay status --json",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74d54297e8029d14aef45fce81edc05fd58c182bc6908446b639dd0cd11d3df5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts"
+      ],
+      "generatedAt": "2026-07-29T21:00:29.387Z",
+      "startedAt": "2026-07-29T21:00:28.783Z",
+      "finishedAt": "2026-07-29T21:00:29.387Z",
+      "durationMs": 604,
+      "runnerKind": "dev-source",
+      "sourceCommit": "afef1e0e9c1139102d243cfdd2e55e7d1651a418",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3ca3f01c507d4613b46bd593b7a0fd53923a8a7e3c4b010328b8aa57603c2131",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json"
+      ],
+      "generatedAt": "2026-07-29T21:00:41.630Z",
+      "startedAt": "2026-07-29T21:00:32.076Z",
+      "finishedAt": "2026-07-29T21:00:41.630Z",
+      "durationMs": 9554,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs broker replay status --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:09258a8a3ff0e144060764b5bd74d1749de3618ab143ec62dd88e0e276a5438c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs broker replay status --json"
+      ],
+      "generatedAt": "2026-07-29T21:00:49.756Z",
+      "startedAt": "2026-07-29T21:00:45.586Z",
+      "finishedAt": "2026-07-29T21:00:49.756Z",
+      "durationMs": 4170,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-29T21:01:05.569Z",
+      "startedAt": "2026-07-29T21:00:53.175Z",
+      "finishedAt": "2026-07-29T21:01:05.569Z",
+      "durationMs": 12394,
+      "runnerKind": "dev-source",
+      "sourceCommit": "afef1e0e9c1139102d243cfdd2e55e7d1651a418",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cb5f412bb62012af0289df64193bb8643bbfc56a21211a2bf45dc44768e07d94",
+      "stderrSha256": "sha256:d23871d15108a68591ee5aac479db48d4430b061b3cdd79d98b7eb2ebebea277",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-29T21:02:36.446Z",
+      "startedAt": "2026-07-29T21:01:41.458Z",
+      "finishedAt": "2026-07-29T21:02:36.446Z",
+      "durationMs": 54988,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-29T21:04:19.531Z",
+      "startedAt": "2026-07-29T21:02:39.358Z",
+      "finishedAt": "2026-07-29T21:04:19.531Z",
+      "durationMs": 100173,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
