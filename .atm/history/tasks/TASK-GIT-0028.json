@@ -1,0 +1,311 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0028",
+  "title": "Task-scoped commit transaction adapter extraction and index lease bridge",
+  "status": "running",
+  "milestone": "G7.2",
+  "dependencies": [
+    "TASK-GIT-0015",
+    "TASK-GIT-0027",
+    "TASK-RFT-0101"
+  ],
+  "acceptance": [
+    "Normal governed commit and close-bundle callers use the same transaction adapter and the same G7.1 authorization decision.",
+    "A valid explicit lease parks only its exact foreign entries; successful and failed commits both restore path/blob/mode identically before returning.",
+    "Missing, expired, used, owner-mismatched, partial or drifted leases fail before index mutation. Restore failure creates durable receipt evidence and a specific diagnostic.",
+    "`implementation.ts` remains a CLI parser/adapter: it neither parses nor consumes lease storage, parks/restores index entries, nor recomputes the filtered bundle. The transaction policy has one public interface and two real adapters.",
+    "Focused tests, typecheck and CLI validation pass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "tests/cli/git-index-override-lease-consumption.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "tests/cli/git-index-override-lease-consumption.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-boundary-admission",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/git-index-override-lease-consumption.test.ts",
+        "One TaskScopedCommitTransaction deep module that hides temporary-index commit execution, exact foreign-entry park/restore, and outcome receipt construction behind a small interface.",
+        "Two adapters only: ordinary task-scoped governed commit and taskflow close-bundle assembly; both consume GitIndexLeaseAuthority rather than re-parsing lease JSON or running ad hoc Git index operations.",
+        "A thin git-governance implementation adapter with no duplicated lease, blob, mode, restore, or incident policy.",
+        "Failure-safe rollback that restores every authorized foreign index entry before returning a commit failure; durable receipt and explicit error if restoration itself fails."
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0028-task-scoped-commit-transaction-adapter-extraction-and-index-lease-bridge.task.md",
+    "sectionTitle": "TASK-GIT-0028",
+    "headingLine": 84,
+    "hash": "a0fae0cbc2104695",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0028-task-scoped-commit-transaction-adapter-extraction-and-index-lease-bridge.task.md",
+      "planningCommitSha": "305493c15a281e6f23678030343613fe80b74dc9",
+      "contentDigest": "sha256:a0fae0cbc210469588cbc1492aa7bcf6e48f447540576ca60fc0889a6911b07d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T17:14:31.073Z"
+    }
+  },
+  "importedAt": "2026-07-29T17:14:31.073Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_int_git_index_lease_transaction",
+      "targetGroupId": null,
+      "semanticKey": null,
+      "coversAcceptance": [
+        "acceptance-1",
+        "acceptance-2",
+        "acceptance-3"
+      ],
+      "coversImpactEdges": [
+        "validated-lease-to-restored-index"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": "git-index-lease-transaction",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_git_commit_transaction_adapter",
+      "targetGroupId": null,
+      "semanticKey": null,
+      "coversAcceptance": [
+        "acceptance-4",
+        "acceptance-5"
+      ],
+      "coversImpactEdges": [
+        "validated lease -> isolated task commit -> byte-identical foreign index restoration"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": "task-scoped-commit-adapter",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_int_git_index_lease_transaction",
+    "test_task_git_commit_transaction_adapter"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T17-32-57-558Z-scope-amendment-a1b3ac21eecc",
+  "lastTransitionAt": "2026-07-29T17:32:57.558Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T17:14:54.760Z",
+  "promotedAt": "2026-07-29T17:14:54.764Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-bd364afc445e",
+    "claimedAt": "2026-07-29T17:14:54.770Z",
+    "heartbeatAt": "2026-07-29T17:14:54.770Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0028.*",
+      ".atm/history/task-events/TASK-GIT-0028/**",
+      ".atm/history/tasks/TASK-GIT-0028.json",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260729171454-codex-git-series-captain-ee62834fd8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729171454-codex-git-series-captain-ee62834fd8\""
+    }
+  },
+  "startedAt": "2026-07-29T17:14:54.770Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-ca164bb0b505b5ad",
+    "ticketDigest": "sha256:ca164bb0b505b5ad2aff813a7768623f136c3feb57befb6b52e7efbf68cec167",
+    "taskId": "TASK-GIT-0028",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729171454-codex-git-series-captain-ee62834fd8",
+    "claimGeneration": "lease-bd364afc445e",
+    "issuedAt": "2026-07-29T17:14:54.770Z",
+    "expiresAt": "2026-07-29T17:44:54.770Z",
+    "scopeDigest": "sha256:5a540d060143def71d5ede53ceb172e2dae90799f896f9a4c3d24ffc022be2e2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T17:14:54.770Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0028.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-GIT-0028/**",
+          ".atm/history/tasks/TASK-GIT-0028.json",
+          "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+          "packages/cli/src/commands/git-governance/implementation.ts",
+          "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+          "packages/cli/src/commands/git-index-ownership.ts",
+          "tests/cli/git-commit-task-scoped-staging.test.ts",
+          "tests/cli/git-index-override-lease-consumption.test.ts"
+        ],
+        "digest": "sha256:d438da350e16d6059f30876abcc699290bacb5204b7201c9bc63df71c43c0320"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:3b09034b576f26e8321df7261d6e042f868b3bc19d699d2b5641c44caea73079",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:ac249182061e9147ec9bba16419a7d79c8b9b3feab160454f1ba59279fa1aec2"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260729171454-codex-git-series-captain-TASK-GIT-0028-2dc5df82e8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0028",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0028.*",
+      ".atm/history/task-events/TASK-GIT-0028/**",
+      ".atm/history/tasks/TASK-GIT-0028.json",
+      "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0028-task-scoped-commit-transaction-adapter-extraction-and-index-lease-bridge.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/git-boundary-admission/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0028-task-scoped-commit-transaction-adapter-extraction-and-index-lease-bridge.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "d6a127d9f59a6c524ef38f85225a2f024dc45446467037cee54ce108944c3562",
+    "actorId": "codex-git-series-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260729171454-codex-git-series-captain-ee62834fd8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729171454-codex-git-series-captain-ee62834fd8\""
+    },
+    "createdAt": "2026-07-29T17:15:21.087Z",
+    "status": "active"
+  }
+}

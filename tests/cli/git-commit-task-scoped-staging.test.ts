@@ -208,7 +208,8 @@ try {
     branchRef,
     branchName: branchRef.replace(/^refs\/heads\//, ''),
     headShaAtAcquire: runGit(tempDir, ['rev-parse', '--verify', 'HEAD']).trim(),
-    createdAt: '2026-06-18T00:00:00.000Z'
+    ownerPid: process.pid,
+    createdAt: new Date().toISOString()
   };
   assertBranchCommitQueueSchema(busyLockRecord, 'busy branch queue lock record');
   writeJson(path.join(branchQueueLockPath, 'record.json'), busyLockRecord);
