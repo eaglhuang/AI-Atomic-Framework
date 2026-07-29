@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T22-57-53-905Z-close-73a1d2f7905f",
+  "taskId": "TASK-SKL-0030",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729224435-codex-git-series-captain-TASK-SKL-0030-bbf9943de4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0030.json",
+  "taskSha256": "sha256:9d1afa45bcfa5993969ee9f560813259f19c2d5f60f6e6bd4417f2e0bd3134f4",
+  "createdAt": "2026-07-29T22:57:53.905Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0030 --actor codex-git-series-captain --status done --historical-delivery ea8b818202e01d44e07a45e15b6577e5ea991a75",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260729224435-codex-git-series-captain-TASK-SKL-0030-bbf9943de4",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0030.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/validator-governance-verdict.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:validator-governance-verdict"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T22:57:53.894Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0030.*",
+        ".atm/history/task-events/TASK-SKL-0030/**",
+        ".atm/history/tasks/TASK-SKL-0030.json",
+        "artifacts/generated/atm-validator-governance-verdict.json",
+        "docs/governance/validator-governance.md",
+        "scripts/validate-validator-governance-verdict.ts",
+        "tests/cli/validator-governance-verdict.test.ts",
+        "tests/fixtures/validator-governance-replay/**"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-validator-governance-verdict.ts",
+        "tests/cli/validator-governance-verdict.test.ts",
+        "tests/fixtures/validator-governance-replay/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

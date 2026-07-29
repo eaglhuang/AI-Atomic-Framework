@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-SKL-0030",
   "title": "Historical A-B replay verdict and migration guide",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-SKL-VG-R0.8",
   "dependencies": [
     "TASK-SKL-0029"
@@ -138,8 +138,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T22-44-47-682Z-claim-ea00364e9fc2",
-  "lastTransitionAt": "2026-07-29T22:44:47.682Z",
+  "lastTransitionId": "2026-07-29T22-57-53-905Z-close-73a1d2f7905f",
+  "lastTransitionAt": "2026-07-29T22:57:53.905Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T22:44:35.446Z",
@@ -148,7 +148,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-c2df2538cf30",
     "claimedAt": "2026-07-29T22:44:35.451Z",
-    "heartbeatAt": "2026-07-29T22:44:35.451Z",
+    "heartbeatAt": "2026-07-29T22:57:53.902Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-SKL-0030.json",
@@ -158,14 +158,14 @@
       "tests/cli/validator-governance-verdict.test.ts",
       "tests/fixtures/validator-governance-replay/**"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260729224435-codex-git-series-captain-4d3a5a99c0",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729224435-codex-git-series-captain-4d3a5a99c0\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-29T22:44:35.451Z",
   "startedByActor": "codex-git-series-captain",
@@ -268,5 +268,9 @@
     },
     "createdAt": "2026-07-29T22:44:47.681Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-29T22:57:53.902Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729224435-codex-git-series-captain-TASK-SKL-0030-bbf9943de4",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0030.closure-packet.json"
 }

@@ -1,0 +1,148 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0030",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "7459dc1aab7079d1a1e5988c17b73cd075363070",
+  "governedTreeSha": "977a44141cec2f0928489556827331aa12d1eaae",
+  "targetCommitDelta": {
+    "currentCommitSha": "7459dc1aab7079d1a1e5988c17b73cd075363070",
+    "parentCommitShas": [
+      "7459dc1aab7079d1a1e5988c17b73cd075363070"
+    ],
+    "governedTreeSha": "977a44141cec2f0928489556827331aa12d1eaae",
+    "changedFiles": [
+      "artifacts/generated/atm-validator-governance-verdict.json",
+      "docs/governance/validator-governance.md",
+      "scripts/validate-validator-governance-verdict.ts",
+      "tests/cli/validator-governance-verdict.test.ts",
+      "tests/fixtures/validator-governance-replay/historical-ab-candidates.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-validator-governance-verdict.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3b5f5ecacc59926fe3d25d22623fd1d42e5769e01a5b72214b2341fccaa626e4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/validator-governance-verdict.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e01ee3a495435b0cccbe8d44432ff52917ecb7bc2dd0a6609aa3dbf1b36c18b7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:30df4c76831f6d276aedcfb0e0af7b47768c8202502ce3177a1fc4cce071ea9a",
+      "stderrSha256": "sha256:b95ba62330b74c0ab5b158643b013d0369a4d96766886d4aff2da8892893a932",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/validator-governance-verdict.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:validator-governance-verdict"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T22:57:53.894Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0030.*",
+      ".atm/history/task-events/TASK-SKL-0030/**",
+      ".atm/history/tasks/TASK-SKL-0030.json",
+      "artifacts/generated/atm-validator-governance-verdict.json",
+      "docs/governance/validator-governance.md",
+      "scripts/validate-validator-governance-verdict.ts",
+      "tests/cli/validator-governance-verdict.test.ts",
+      "tests/fixtures/validator-governance-replay/**"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-validator-governance-verdict.ts",
+      "tests/cli/validator-governance-verdict.test.ts",
+      "tests/fixtures/validator-governance-replay/**"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0030.json",
+  "closedAt": "2026-07-29T22:57:53.895Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729224435-codex-git-series-captain-TASK-SKL-0030-bbf9943de4",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "ea8b818202e01d44e07a45e15b6577e5ea991a75",
+    "taskMatchedFiles": [
+      "artifacts/generated/atm-validator-governance-verdict.json",
+      "docs/governance/validator-governance.md",
+      "scripts/validate-validator-governance-verdict.ts",
+      "tests/cli/validator-governance-verdict.test.ts",
+      "tests/fixtures/validator-governance-replay/historical-ab-candidates.json"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0030.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0030/2026-07-29T22-44-24-530Z-import-38e539415fcb.json",
+      ".atm/history/task-events/TASK-SKL-0030/2026-07-29T22-44-35-446Z-reserve-fe56d3d98151.json",
+      ".atm/history/task-events/TASK-SKL-0030/2026-07-29T22-44-35-448Z-promote-8a5b3acd3527.json",
+      ".atm/history/task-events/TASK-SKL-0030/2026-07-29T22-44-47-682Z-claim-ea00364e9fc2.json",
+      ".atm/history/tasks/TASK-SKL-0030.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
