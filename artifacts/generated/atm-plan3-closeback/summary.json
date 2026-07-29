@@ -1,0 +1,48 @@
+{
+  "schemaId": "atm.plan3ClosebackSummary.v1",
+  "taskId": "ATM-GOV-0244",
+  "generatedAt": "2026-07-29T21:55:00.000Z",
+  "dispositionCounts": {
+    "inserted": 0,
+    "absorbed-by-existing-card": 4,
+    "external-owner": 4,
+    "deferred-with-reason": 1,
+    "terminal": 3
+  },
+  "consumedEvidence": {
+    "ATM-BUG-213": "absorbed-by-existing-card: ATM-GOV-0262/ATM-GOV-0263 follow-up evidence",
+    "ATM-BUG-219": "absorbed-by-existing-card: Plan 3 routing recovery evidence",
+    "ATM-BUG-222": "terminal: fixed by recovery repair focused regressions",
+    "ATM-BUG-223": "terminal: resolved by resource-aware validator scheduling",
+    "ATM-BUG-227": "absorbed-by-existing-card: guidance-command parity follow-up",
+    "ATM-BUG-237": "deferred-with-reason: dispatch audit remains non-blocking task-card work"
+  },
+  "retainedOwners": {
+    "ATM-BUG-214": "external-owner: existing ATM-GOV-0218/ERR owner retained",
+    "ATM-BUG-215": "external-owner: existing ATM-GOV-0218/ERR owner retained",
+    "ATM-BUG-217": "external-owner: existing SKL/ERR owner retained",
+    "ATM-BUG-218": "external-owner: existing SKL/ERR owner retained"
+  },
+  "runtimeParity": {
+    "sourceFrozenReleaseEquivalent": true,
+    "canonicalObservationSurfaces": [
+      "source",
+      "frozen-onefile",
+      "package-dist",
+      "release-adopter-projection"
+    ]
+  },
+  "rollbackDrill": {
+    "restoresPriorSafeState": true,
+    "usesDirectRuntimeJsonEdits": false,
+    "exactlyOnceOnRetry": true
+  },
+  "replay": {
+    "healthyUnexpectedTrips": 0,
+    "healthyQueueOnlyResidency": 0,
+    "injectedFailureTripsQueueOnly": true,
+    "resetRequiresNewerPassingDigest": true
+  },
+  "itemsLackingUniqueConsumer": [],
+  "openBlockerIds": []
+}
