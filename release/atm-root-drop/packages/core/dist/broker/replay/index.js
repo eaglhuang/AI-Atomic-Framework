@@ -1,6 +1,7 @@
 import { sha256Digest } from '../census/index.js';
 export * from './lifecycle-receipts.js';
 export * from './runner-discrimination.js';
+export * from './dashboard.js';
 export function buildParallelReplayScenario(input) {
     const generatedAt = input.generatedAt ?? new Date(0).toISOString();
     const historicalInputDigest = sha256Digest(input.historicalInputs);

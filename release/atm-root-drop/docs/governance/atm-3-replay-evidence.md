@@ -69,3 +69,27 @@ Final closure verdict:
 - Final verdict receipts:
   - `node --strip-types tests/cli/atm-3-final-closure.test.ts`
   - `node --strip-types tests/cli/parallel-admission-circuit-breaker.test.ts`
+
+Plan 3.1 dual-captain dashboard and run manifest:
+
+- `broker replay manifest` seals a pre-run manifest before payload reveal. The
+  manifest records the run id, participant cards, provider/role scenario data,
+  runtime actors and process ids, canonical worktree root, base/head/build/runner
+  digests, the shared physical file, logical intent digests, private output
+  digests, validator policy/union/selection-input digests, the negative-control
+  reveal timestamp, thresholds, time window, and stop rule.
+- `broker replay dashboard` projects the same canonical evidence into JSON and a
+  human summary. The digest belongs to the canonical JSON snapshot; display text
+  is not a separate source of truth.
+- Readiness is fail-closed. It requires at least two participants, distinct
+  actors and process ids, a single canonical worktree/root/base/head/build/runner
+  view, at least two distinct logical intent digests on the shared file, sealed
+  validator policy/union/selection digests, a negative-control reveal timestamp,
+  an unmutated validator union, the admission facade marked required, no cleanup
+  or manual recovery requirement, no true conflict, and no stale fallback.
+- Provider names, producer labels, task ids, actor ids, dates, and local paths
+  are data only. They are allowed to appear in observations but must not control
+  readiness. Tests prove that producer labels cannot override canonical evidence
+  and that incomplete setup fails closed.
+- Focused receipt:
+  - `node --strip-types tests/cli/plan3-dual-captain-dashboard.test.ts`

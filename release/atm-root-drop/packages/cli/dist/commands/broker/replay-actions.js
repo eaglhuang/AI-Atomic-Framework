@@ -2,6 +2,8 @@ import { makeResult, message } from '../shared.js';
 import { inspectCommandBackedMatrix } from './replay/command-backed-matrix.js';
 import { evaluatePlan3SemanticClosure } from './replay/closure-policy.js';
 import { runFrozenParallelReplay, runRuntimeDogfoodLifecycle, selectRuntimeDogfoodTasks } from './replay/implementation.js';
+import { brokerReplayDashboard } from './replay/dashboard.js';
+import { brokerReplayRunManifest } from './replay/run-manifest.js';
 const defaultIntersection = ['docs/governance/atm-3-replay-evidence.md'];
 export async function handleBrokerReplayActions(options) {
     if (options.action !== 'replay')
@@ -13,13 +15,17 @@ export async function handleBrokerReplayActions(options) {
         return brokerReplayRun(options);
     if (action === 'dogfood')
         return brokerReplayDogfood(options);
+    if (action === 'dashboard')
+        return brokerReplayDashboard(options, requiredReplayIntersection(options));
+    if (action === 'manifest')
+        return brokerReplayRunManifest(options, requiredReplayIntersection(options));
     return makeResult({
         ok: false,
         command: 'broker',
         cwd: options.cwd,
         messages: [
-            message('error', 'ATM_CLI_USAGE', 'broker replay supports: status, run, dogfood.', {
-                supportedActions: ['status', 'run', 'dogfood']
+            message('error', 'ATM_CLI_USAGE', 'broker replay supports: status, run, dogfood, dashboard, manifest.', {
+                supportedActions: ['status', 'run', 'dogfood', 'dashboard', 'manifest']
             })
         ],
         evidence: { action: 'replay-usage' }
