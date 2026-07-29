@@ -19,6 +19,8 @@ import { CliError, quoteCliValue } from '../shared.js';
 import { isPathAllowedByScope } from '../work-channels.js';
 import { normalizeMarkdownPathDeclaration } from './markdown-paths.js';
 import { buildGitIndexLeaseParkPlan, inspectGitIndexOwnership, parkGitIndexLease, restoreGitIndexLease } from '../git-index-ownership.js';
+import { executeTaskScopedCommitTransaction } from '../git-governance/task-scoped-commit-transaction.js';
+import { recordGitIndexRestoreFailure } from '../git-governance/implementation/git-index-transaction.js';
 import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.js';
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
@@ -445,22 +447,15 @@ function stageRepoBundle(repo, taskId) {
     runGitOrThrow(repo.repoRoot, ['add', '-A', '-f', '--', ...existingFiles]);
     return { ...repo, stageFiles: existingFiles, status: 'staged' };
 }
+function commitRepoWithTaskScopedIndexLease(input) { executeTaskScopedCommitTransaction({ taskId: input.taskId, leaseId: input.leaseId, foreignEntries: input.indexLease.parkEntries.map((entry) => ({ path: entry.path, mode: String(entry.stagedMode ?? ''), blobId: String(entry.stagedBlobId ?? '') })) }, { park: () => { parkGitIndexLease(input.repoRoot, input.indexLease); }, commitCurrentTaskBundle: () => { input.commit(); return null; }, restore: () => { restoreGitIndexLease(input.repoRoot, input.indexLease); }, recordRestoreFailure: (failure) => { recordGitIndexRestoreFailure(input.repoRoot, failure); } }); }
 async function commitTaskflowBundle(input) {
     const targetStageFiles = existingBundleFiles(input.bundle.targetRepo);
     const targetPreStagedFiles = input.bundle.targetRepo.repoRoot ? readStagedFiles(input.bundle.targetRepo.repoRoot) : [];
     const targetPreflight = input.bundle.targetRepo.repoRoot ? buildIndexIsolation(input.bundle.targetRepo, targetPreStagedFiles, input.taskId) : null;
     const laneSessionId = input.bundle.targetRepo.repoRoot ? resolveTaskflowCommitLaneSessionId({ repoRoot: input.bundle.targetRepo.repoRoot, actorId: input.actorId, taskId: input.taskId }) : null;
     if (input.bundle.targetRepo.repoRoot && targetPreflight) {
-        parkGitIndexLease(input.bundle.targetRepo.repoRoot, targetPreflight.indexLease);
-    }
-    try {
-        commitRepoWithTemporaryIndex({ repoRoot: input.bundle.targetRepo.repoRoot ?? '', stageFiles: targetStageFiles,
-            args: ['commit', '-m', appendSealTrailers(input.bundle.targetRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'target', laneSessionId)], actorId: input.actorId, taskId: input.taskId, laneSessionId });
-    }
-    finally {
-        if (input.bundle.targetRepo.repoRoot && targetPreflight) {
-            restoreGitIndexLease(input.bundle.targetRepo.repoRoot, targetPreflight.indexLease);
-        }
+        commitRepoWithTaskScopedIndexLease({ repoRoot: input.bundle.targetRepo.repoRoot, taskId: input.taskId, leaseId: targetPreflight.indexLease.leaseId, indexLease: targetPreflight.indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot: input.bundle.targetRepo.repoRoot ?? '', stageFiles: targetStageFiles,
+                args: ['commit', '-m', appendSealTrailers(input.bundle.targetRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'target', laneSessionId)], actorId: input.actorId, taskId: input.taskId, laneSessionId }) });
     }
     const targetCommitSha = input.bundle.targetRepo.repoRoot
         ? tryGitScalar(input.bundle.targetRepo.repoRoot, ['rev-parse', '--verify', 'HEAD']) : null;
@@ -470,20 +465,15 @@ async function commitTaskflowBundle(input) {
         if (!planningRepo.repoRoot) {
             throw new Error('planning repo root missing');
         }
+        const planningRepoRoot = planningRepo.repoRoot;
         const planningStageFiles = existingBundleFiles(planningRepo);
-        const planningPreStagedFiles = readStagedFiles(planningRepo.repoRoot);
+        const planningPreStagedFiles = readStagedFiles(planningRepoRoot);
         const planningPreflight = buildIndexIsolation(planningRepo, planningPreStagedFiles, input.taskId);
-        parkGitIndexLease(planningRepo.repoRoot, planningPreflight.indexLease);
         const planningMessage = [
             appendSealTrailers(planningRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'planning', laneSessionId), '', `ATM-Actor: ${input.actorId}`, `ATM-Task: ${input.taskId}`, 'ATM-Surface: taskflow-close-planning-bundle'
         ].join('\n');
-        try {
-            commitRepoWithTemporaryIndex({ repoRoot: planningRepo.repoRoot, stageFiles: planningStageFiles, args: ['commit', '-m', planningMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId });
-        }
-        finally {
-            restoreGitIndexLease(planningRepo.repoRoot, planningPreflight.indexLease);
-        }
-        planningRepo = { ...planningRepo, commitSha: tryGitScalar(planningRepo.repoRoot, ['rev-parse', '--verify', 'HEAD']), status: 'committed', indexIsolation: planningPreflight };
+        commitRepoWithTaskScopedIndexLease({ repoRoot: planningRepoRoot, taskId: input.taskId, leaseId: planningPreflight.indexLease.leaseId, indexLease: planningPreflight.indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot: planningRepoRoot, stageFiles: planningStageFiles, args: ['commit', '-m', planningMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId }) });
+        planningRepo = { ...planningRepo, commitSha: tryGitScalar(planningRepoRoot, ['rev-parse', '--verify', 'HEAD']), status: 'committed', indexIsolation: planningPreflight };
     }
     catch (error) {
         planningRepo = { ...planningRepo, status: 'failed', reason: error instanceof Error ? error.message : String(error) };
@@ -558,14 +548,8 @@ async function finalizeTaskflowCommitBundleWithSeal(input) {
         const laneSessionId = resolveTaskflowCommitLaneSessionId({ repoRoot, actorId: input.actorId, taskId: input.taskId });
         const preStagedFiles = readStagedFiles(repoRoot);
         const sharedIndexIsolation = buildIndexIsolation(preflightShared, preStagedFiles, input.taskId);
-        parkGitIndexLease(repoRoot, sharedIndexIsolation.indexLease);
         const sharedMessage = [appendSealTrailers(sealedInputBundle.targetRepo.commitMessage, sealedInputBundle.sealAndCommitReceipt, 'shared', laneSessionId), '', `ATM-Actor: ${input.actorId}`, `ATM-Task: ${input.taskId}`, 'ATM-Surface: taskflow-close-shared-repo-bundle', `ATM-Planning-Commit-Message: ${sealedInputBundle.planningRepo.commitMessage}`].join('\n');
-        try {
-            commitRepoWithTemporaryIndex({ repoRoot, stageFiles: sharedStageFiles, args: ['commit', '-m', sharedMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId });
-        }
-        finally {
-            restoreGitIndexLease(repoRoot, sharedIndexIsolation.indexLease);
-        }
+        commitRepoWithTaskScopedIndexLease({ repoRoot, taskId: input.taskId, leaseId: sharedIndexIsolation.indexLease.leaseId, indexLease: sharedIndexIsolation.indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot, stageFiles: sharedStageFiles, args: ['commit', '-m', sharedMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId }) });
         const commitSha = tryGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
         return { ...sealedInputBundle, targetRepo: { ...sealedInputBundle.targetRepo, commitSha,
                 status: 'committed', indexIsolation: sharedIndexIsolation }, planningRepo: { ...sealedInputBundle.planningRepo, commitSha, status: 'committed', indexIsolation: sharedIndexIsolation }, failClosed: false, recoveryCommand: null };
