@@ -1235,6 +1235,8 @@
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet/validator-contract.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/critical-path-gate.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/critical-path-gate.js",
+    "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-lock-context.d.ts",
+    "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-lock-context.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-temp-lock-projection.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-temp-lock-projection.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/historical-delivery-provenance.d.ts",
@@ -2185,6 +2187,7 @@
     "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/critical-path-gate.ts",
+    "release/atm-root-drop/packages/cli/src/commands/framework-development/framework-lock-context.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/historical-delivery-provenance.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/path-classification.ts",
@@ -4958,8 +4961,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 679,
-    "unchanged": 4244,
+    "copied": 683,
+    "unchanged": 4243,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -5183,6 +5186,7 @@
       "packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts",
       "packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts",
       "packages/cli/src/commands/framework-development/critical-path-gate.ts",
+      "packages/cli/src/commands/framework-development/framework-lock-context.ts",
       "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
       "packages/cli/src/commands/framework-development/historical-delivery-provenance.ts",
       "packages/cli/src/commands/framework-development/path-classification.ts",
@@ -6175,7 +6179,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:36f9786ef47893e948d3fde65df6108c738b02ceafe2ef7ad7d9faf5b77edefc"
+    "digest": "sha256:a8b9ec31c3cb532223385eab27d5685be3ac10c67c68f3b36f10f3fec52ef550"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -7384,6 +7388,8 @@
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet/validator-contract.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/critical-path-gate.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/critical-path-gate.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-lock-context.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-lock-context.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-temp-lock-projection.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-temp-lock-projection.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/historical-delivery-provenance.d.ts",
@@ -8334,6 +8340,7 @@
       "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/critical-path-gate.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/framework-lock-context.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/historical-delivery-provenance.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/path-classification.ts",
@@ -11110,34 +11117,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:e7b38a757f2a2f3089be459ec2e040cced0c212d79ec0102a1a28967837649c8",
-  "sealedSourceCommit": "799a775ed72107b808e0625181b93fb906f5c356",
+  "buildInputsTreeHash": "sha256:143ccd407e91aa53e182824deceecc55d9234e9f7bc6104a1254cc84843b2b3e",
+  "sealedSourceCommit": "348f1a6bd940dd950999ba6d98aa8e710fddd026",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:4d7e48c3841327759cf4b25daeba3c54707fe0f73dae967efb785aa56cf8a5a7",
-  "tsBuildCacheDigest": "sha256:7ef742c29eb1b33a69d167b1a4c4cc25d6faffbbe250135a5115deb728910d4f",
+  "incrementalPlanDigest": "sha256:651c013c84c3b3bae83898de449c8cc88cd06248a216c9f564a3ff0e419c9a03",
+  "tsBuildCacheDigest": "sha256:175bc7b6869169b69e44fdad728053bbfc11c4d73b711bb27585d59b3dcf2c73",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 13482,
-    "totalElapsedMs": 45967,
-    "dominanceRatio": 0.2933,
-    "phaseMedianMs": 1540,
-    "phaseP95Ms": 13482,
+    "dominantPhaseMs": 12834,
+    "totalElapsedMs": 46335,
+    "dominanceRatio": 0.277,
+    "phaseMedianMs": 2086,
+    "phaseP95Ms": 12834,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 1540,
-    "skipDecision": 730,
-    "worktreeSetup": 13482,
-    "typescriptBuild": 8405,
-    "rootDropReleaseAssembly": 7558,
-    "onefileReleaseAssembly": 1417,
-    "artifactSync": 8792,
+    "inputHashCalculation": 80,
+    "skipDecision": 69,
+    "worktreeSetup": 12834,
+    "typescriptBuild": 10856,
+    "rootDropReleaseAssembly": 7760,
+    "onefileReleaseAssembly": 2086,
+    "artifactSync": 9369,
     "cleanup": 0,
-    "totalElapsed": 45967
+    "totalElapsed": 46335
   }
 }

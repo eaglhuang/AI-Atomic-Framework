@@ -30,6 +30,7 @@ import {
   evaluateFrameworkDeliveryWindow,
   readDeferredForeignStagedFilesForActiveCloseWindow
 } from './close-helpers/close-window-diagnostics.ts';
+import { buildTaskFrameworkLockContext } from '../framework-development/framework-lock-context.ts';
 import {
   extractTaskCloseDeclaredFiles,
   extractTaskDeliverableFiles,
@@ -231,6 +232,7 @@ export async function runTasksClose(argv: string[]) {
       historicalBatchCloseReady: historicalBatchSlice?.okToCloseTask === true
     })
     : null;
+  const frameworkLockContext = frameworkStatus ? buildTaskFrameworkLockContext({ blockers: frameworkStatus.blockers, staleLocks: frameworkStatus.staleLocks, taskId: options.taskId, actorId }) : null;
   let closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
     ? buildCloseScopedDiffIsolation({
       cwd: options.cwd,
@@ -336,9 +338,10 @@ export async function runTasksClose(argv: string[]) {
         }
       });
     }
+    const frameworkBlockers = frameworkLockContext?.blockers ?? frameworkStatus.blockers;
     const effectiveFrameworkBlockers = frameworkDeliveryWindow?.ok === true
-      ? frameworkStatus.blockers.filter((entry) => !frameworkDeliveryWindow.allowedBlockers.includes(entry))
-      : frameworkStatus.blockers;
+      ? frameworkBlockers.filter((entry) => !frameworkDeliveryWindow.allowedBlockers.includes(entry))
+      : frameworkBlockers;
     if ((frameworkStatus.mode === 'required' || frameworkStatus.mode === 'cross-repo-target-required') && effectiveFrameworkBlockers.length > 0) {
       // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
       const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
@@ -346,9 +349,7 @@ export async function runTasksClose(argv: string[]) {
         details: {
           taskId: options.taskId,
           blockers: effectiveFrameworkBlockers,
-          suppressedBlockers: frameworkDeliveryWindow?.ok === true
-            ? frameworkStatus.blockers.filter((entry) => frameworkDeliveryWindow.allowedBlockers.includes(entry))
-            : [],
+          suppressedBlockers: frameworkStatus.blockers.filter((entry) => !effectiveFrameworkBlockers.includes(entry)),
           frameworkDeliveryWindow,
           closeScopedDiffIsolation,
           criticalChangedFiles: frameworkStatus.criticalChangedFiles,

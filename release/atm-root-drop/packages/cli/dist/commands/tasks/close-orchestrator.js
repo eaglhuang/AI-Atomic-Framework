@@ -16,6 +16,7 @@ import { attachDirtyGuardToScopedDiffIsolation, buildCloseScopedDiffIsolation, e
 import { parseClaimRecord } from './task-ledger-readers.js';
 import { normalizeRelativePath, taskPathFor } from './task-file-io-helpers.js';
 import { evaluateFrameworkDeliveryWindow, readDeferredForeignStagedFilesForActiveCloseWindow } from './close-helpers/close-window-diagnostics.js';
+import { buildTaskFrameworkLockContext } from '../framework-development/framework-lock-context.js';
 import { extractTaskCloseDeclaredFiles, extractTaskDeliverableFiles, evaluateTaskDeliverableGate, existingTaskCloseArtifacts, stageTaskCloseArtifacts, taskDeliveryPrincipleText } from './close-helpers/close-artifact-staging.js';
 import { createClosureTransitionMetadata } from './close-helpers/task-transition-writer.js';
 import { uniqueStrings, isCliErrorWithCode, recordStaleRunnerOverride, recordFailedEmergencyUseAttempt } from '../tasks.js';
@@ -196,6 +197,7 @@ export async function runTasksClose(argv) {
                 historicalBatchCloseReady: historicalBatchSlice?.okToCloseTask === true
             })
             : null;
+        const frameworkLockContext = frameworkStatus ? buildTaskFrameworkLockContext({ blockers: frameworkStatus.blockers, staleLocks: frameworkStatus.staleLocks, taskId: options.taskId, actorId }) : null;
         let closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
             ? buildCloseScopedDiffIsolation({
                 cwd: options.cwd,
@@ -293,9 +295,10 @@ export async function runTasksClose(argv) {
                     }
                 });
             }
+            const frameworkBlockers = frameworkLockContext?.blockers ?? frameworkStatus.blockers;
             const effectiveFrameworkBlockers = frameworkDeliveryWindow?.ok === true
-                ? frameworkStatus.blockers.filter((entry) => !frameworkDeliveryWindow.allowedBlockers.includes(entry))
-                : frameworkStatus.blockers;
+                ? frameworkBlockers.filter((entry) => !frameworkDeliveryWindow.allowedBlockers.includes(entry))
+                : frameworkBlockers;
             if ((frameworkStatus.mode === 'required' || frameworkStatus.mode === 'cross-repo-target-required') && effectiveFrameworkBlockers.length > 0) {
                 // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
                 const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
@@ -303,9 +306,7 @@ export async function runTasksClose(argv) {
                     details: {
                         taskId: options.taskId,
                         blockers: effectiveFrameworkBlockers,
-                        suppressedBlockers: frameworkDeliveryWindow?.ok === true
-                            ? frameworkStatus.blockers.filter((entry) => frameworkDeliveryWindow.allowedBlockers.includes(entry))
-                            : [],
+                        suppressedBlockers: frameworkStatus.blockers.filter((entry) => !effectiveFrameworkBlockers.includes(entry)),
                         frameworkDeliveryWindow,
                         closeScopedDiffIsolation,
                         criticalChangedFiles: frameworkStatus.criticalChangedFiles,
