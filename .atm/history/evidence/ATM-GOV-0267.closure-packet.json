@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0267",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "549c1b6abc03d7e896adb7fde76f2a43354a54f9",
+  "governedTreeSha": "170234caf47b7877bad73a94293c3635ca57a2ea",
+  "targetCommitDelta": {
+    "currentCommitSha": "549c1b6abc03d7e896adb7fde76f2a43354a54f9",
+    "parentCommitShas": [
+      "549c1b6abc03d7e896adb7fde76f2a43354a54f9"
+    ],
+    "governedTreeSha": "170234caf47b7877bad73a94293c3635ca57a2ea",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0267.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0267.json",
+      "packages/core/src/broker/runner-selection-verification-ports.ts",
+      "packages/core/src/broker/runner-version-selection-verifier.ts",
+      "schemas/validators/runner-selection-qualification-report.schema.json",
+      "scripts/runner-version-selection-replay.ts",
+      "tests/cli/runner-selection-counterfactual-replay.test.ts",
+      "tests/core/runner-version-selection-verifier.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/runner-version-selection-verifier.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:badecdd46a9b72b22e6d8d70be141ecb3164c6cfb20d51310d77d3f86105215d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-selection-counterfactual-replay.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:64505ad56b928cd1ba6467db29ce267a174f9fde2625438bd3da5043a738ea4f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-version-selection.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ce7ccb9f3bb0335ee26335f999685ef76f73a7a7dbb56aa5ddc9d398f5f0e00e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cc0d2b68a950a467e1ff1684cf297168eafd24650930a689291c93317379c1bf",
+      "stderrSha256": "sha256:c2e210de24601ce6bd3eb78d4ec4485550177f8ec96ecb16fc29f45459c3d41d",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/runner-selection-counterfactual-replay.test.ts",
+    "node --strip-types tests/cli/runner-version-selection.test.ts",
+    "node --strip-types tests/core/runner-version-selection-verifier.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T19:36:36.578Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0267.*",
+      ".atm/history/task-events/ATM-GOV-0267/**",
+      ".atm/history/tasks/ATM-GOV-0267.json",
+      "packages/core/src/broker/runner-selection-verification-ports.ts",
+      "packages/core/src/broker/runner-version-selection-verifier.ts",
+      "schemas/validators/runner-selection-qualification-report.schema.json",
+      "scripts/runner-version-selection-replay.ts",
+      "tests/cli/runner-selection-counterfactual-replay.test.ts",
+      "tests/core/runner-version-selection-verifier.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/runner-selection-verification-ports.ts",
+      "packages/core/src/broker/runner-version-selection-verifier.ts",
+      "schemas/validators/runner-selection-qualification-report.schema.json",
+      "scripts/runner-version-selection-replay.ts",
+      "tests/cli/runner-selection-counterfactual-replay.test.ts",
+      "tests/core/runner-version-selection-verifier.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0267.json",
+  "closedAt": "2026-07-29T19:36:36.579Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729192316-codex-git-series-captain-ATM-GOV-0267-d1eba4bde9",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "36093ba8ad0984aa53462f81d720e1193a2ddd3f",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/runner-selection-verification-ports.ts",
+      "packages/core/src/broker/runner-version-selection-verifier.ts",
+      "schemas/validators/runner-selection-qualification-report.schema.json",
+      "scripts/runner-version-selection-replay.ts",
+      "tests/cli/runner-selection-counterfactual-replay.test.ts",
+      "tests/core/runner-version-selection-verifier.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0267.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0267/2026-07-29T19-23-06-372Z-import-b011bd068f80.json",
+      ".atm/history/task-events/ATM-GOV-0267/2026-07-29T19-23-16-984Z-reserve-309966721a97.json",
+      ".atm/history/task-events/ATM-GOV-0267/2026-07-29T19-23-16-988Z-promote-c516dbd95f3b.json",
+      ".atm/history/task-events/ATM-GOV-0267/2026-07-29T19-23-32-360Z-claim-a6d3052f7fca.json",
+      ".atm/history/tasks/ATM-GOV-0267.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

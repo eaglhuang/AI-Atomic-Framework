@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0267",
   "title": "Runner version selection qualification and feedback loop",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-3.1-R0Q.5",
   "dependencies": [
     "ATM-GOV-0268"
@@ -116,8 +116,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T19-23-32-360Z-claim-a6d3052f7fca",
-  "lastTransitionAt": "2026-07-29T19:23:32.360Z",
+  "lastTransitionId": "2026-07-29T19-36-36-589Z-close-6fb9e6d94683",
+  "lastTransitionAt": "2026-07-29T19:36:36.589Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T19:23:16.984Z",
@@ -126,7 +126,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-7cd41f07c5a5",
     "claimedAt": "2026-07-29T19:23:16.992Z",
-    "heartbeatAt": "2026-07-29T19:23:16.992Z",
+    "heartbeatAt": "2026-07-29T19:36:36.586Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0267.json",
@@ -137,14 +137,14 @@
       "tests/cli/runner-selection-counterfactual-replay.test.ts",
       "tests/core/runner-version-selection-verifier.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260729192317-codex-git-series-captain-3b48348c61",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729192317-codex-git-series-captain-3b48348c61\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-29T19:23:16.992Z",
   "startedByActor": "codex-git-series-captain",
@@ -249,5 +249,9 @@
     },
     "createdAt": "2026-07-29T19:23:32.359Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-29T19:36:36.586Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729192316-codex-git-series-captain-ATM-GOV-0267-d1eba4bde9",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0267.closure-packet.json"
 }

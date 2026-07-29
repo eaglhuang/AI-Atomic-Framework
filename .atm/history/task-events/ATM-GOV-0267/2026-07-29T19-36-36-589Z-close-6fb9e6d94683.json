@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T19-36-36-589Z-close-6fb9e6d94683",
+  "taskId": "ATM-GOV-0267",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729192316-codex-git-series-captain-ATM-GOV-0267-d1eba4bde9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0267.json",
+  "taskSha256": "sha256:81f81b2bc1924263f4365c110d1ee780d32b39326eb958fe11d39ba9ab2b16bc",
+  "createdAt": "2026-07-29T19:36:36.589Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0267 --actor codex-git-series-captain --status done --historical-delivery 36093ba8ad0984aa53462f81d720e1193a2ddd3f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260729192316-codex-git-series-captain-ATM-GOV-0267-d1eba4bde9",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0267.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/runner-selection-counterfactual-replay.test.ts",
+      "node --strip-types tests/cli/runner-version-selection.test.ts",
+      "node --strip-types tests/core/runner-version-selection-verifier.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T19:36:36.578Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0267.*",
+        ".atm/history/task-events/ATM-GOV-0267/**",
+        ".atm/history/tasks/ATM-GOV-0267.json",
+        "packages/core/src/broker/runner-selection-verification-ports.ts",
+        "packages/core/src/broker/runner-version-selection-verifier.ts",
+        "schemas/validators/runner-selection-qualification-report.schema.json",
+        "scripts/runner-version-selection-replay.ts",
+        "tests/cli/runner-selection-counterfactual-replay.test.ts",
+        "tests/core/runner-version-selection-verifier.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/runner-selection-verification-ports.ts",
+        "packages/core/src/broker/runner-version-selection-verifier.ts",
+        "schemas/validators/runner-selection-qualification-report.schema.json",
+        "scripts/runner-version-selection-replay.ts",
+        "tests/cli/runner-selection-counterfactual-replay.test.ts",
+        "tests/core/runner-version-selection-verifier.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
