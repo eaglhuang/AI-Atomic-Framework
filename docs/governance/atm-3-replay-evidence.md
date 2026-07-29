@@ -105,3 +105,15 @@ Plan 3.1 dogfood surface A ticket observations:
   carry a positive event-derived wait and a release condition.
 - Focused receipt:
   - `node --strip-types tests/cli/plan3-dashboard-ticket-observations.test.ts`
+
+Plan 3.1 dogfood surface B lifecycle observations:
+
+- ATM-GOV-0238 adds a read-only lifecycle-observation segment for the dashboard
+  view model. The segment derives claim, proposal, compose, publish, wakeup,
+  validation, and close from canonical digests/events.
+- The zero-wait path is eligible only when two or more complete observations
+  share one compose batch. Distinct compose batches or missing close packets
+  fail back to non-zero-wait eligibility instead of being hidden behind a
+  path-level conflict label.
+- Focused receipt:
+  - `node --strip-types tests/cli/plan3-dashboard-lifecycle-observations.test.ts`

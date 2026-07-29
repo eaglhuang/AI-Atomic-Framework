@@ -1,0 +1,22 @@
+{
+  "schemaId": "atm.plan3DogfoodArtifact.v1",
+  "taskId": "ATM-GOV-0238",
+  "surface": "dashboard-lifecycle-observations",
+  "generatedBy": "codex-git-series-captain",
+  "controls": {
+    "taskSpecificBranches": false,
+    "actorSpecificBranches": false,
+    "localPathSpecificBranches": false
+  },
+  "observations": [
+    "claim",
+    "proposal",
+    "compose",
+    "publish",
+    "wakeup",
+    "validation",
+    "close"
+  ],
+  "safeComposeRule": "zero wait is eligible only when two or more complete lifecycle observations share one compose batch",
+  "fallbackRule": "distinct compose batch ids or missing close digests fail zero-wait eligibility"
+}

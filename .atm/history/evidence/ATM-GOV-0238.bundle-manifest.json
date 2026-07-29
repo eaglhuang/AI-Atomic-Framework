@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0238",
+  "updatedAt": "2026-07-29T20:48:16.105Z",
+  "updatedBy": "codex-git-series-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/plan3-dashboard-lifecycle-observations.test.ts",
+    "node atm.mjs broker replay dashboard --json",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan3-dashboard-lifecycle-observations.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2044c44486479b5bf966227478997469dfe98034be70f1f45ff9d31a59f5dc11",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan3-dashboard-lifecycle-observations.test.ts"
+      ],
+      "generatedAt": "2026-07-29T20:47:42.130Z",
+      "startedAt": "2026-07-29T20:47:41.668Z",
+      "finishedAt": "2026-07-29T20:47:42.130Z",
+      "durationMs": 462,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ec2c4c42811d3a7eef5b547556daf9a2c58247c",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs broker replay dashboard --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b777d0b194d697cbe47b82e5e4f6889ab03e9ebc701c071bbd8f7d6999d10443",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs broker replay dashboard --json"
+      ],
+      "generatedAt": "2026-07-29T20:47:54.194Z",
+      "startedAt": "2026-07-29T20:47:50.157Z",
+      "finishedAt": "2026-07-29T20:47:54.194Z",
+      "durationMs": 4037,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ec2c4c42811d3a7eef5b547556daf9a2c58247c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-29T20:48:11.167Z",
+      "startedAt": "2026-07-29T20:47:59.616Z",
+      "finishedAt": "2026-07-29T20:48:11.167Z",
+      "durationMs": 11551,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ec2c4c42811d3a7eef5b547556daf9a2c58247c",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-29T20:48:16.104Z",
+      "startedAt": "2026-07-29T20:48:15.170Z",
+      "finishedAt": "2026-07-29T20:48:16.104Z",
+      "durationMs": 934,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ec2c4c42811d3a7eef5b547556daf9a2c58247c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

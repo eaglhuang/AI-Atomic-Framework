@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0238",
   "title": "Plan 3 real dogfood shared replay surface B",
-  "status": "planned",
+  "status": "running",
   "milestone": "ATM-3.1-R3",
   "dependencies": [
     "ATM-GOV-0246"
@@ -95,7 +95,9 @@
   },
   "importedAt": "2026-07-29T16:49:28.596Z",
   "workAdmission": {
-    "recoveryMode": "auto"
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
   },
   "testContributions": [],
   "requiredTestCaseIds": [],
@@ -153,7 +155,135 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T16-49-29-347Z-import-1bfb0bde4b91",
-  "lastTransitionAt": "2026-07-29T16:49:29.347Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-29T20-43-22-841Z-claim-a657ba5e813d",
+  "lastTransitionAt": "2026-07-29T20:43:22.841Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T20:43:03.689Z",
+  "promotedAt": "2026-07-29T20:43:03.691Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-d04a944fbd68",
+    "claimedAt": "2026-07-29T20:43:03.695Z",
+    "heartbeatAt": "2026-07-29T20:43:03.695Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0238.json",
+      "artifacts/generated/atm-plan3-dogfood/ATM-GOV-0238.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay/dashboard-lifecycle-observations.ts",
+      "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+      "tests/cli/plan3-dashboard-lifecycle-observations.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260729203201-codex-git-series-captain-e7d4150fc2",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729203201-codex-git-series-captain-e7d4150fc2\""
+    }
+  },
+  "startedAt": "2026-07-29T20:43:03.695Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-70222aff83c4bb6b",
+    "ticketDigest": "sha256:70222aff83c4bb6b654a73c43a53f55ae6106dd46379ab4685a79df2fcdabbbd",
+    "taskId": "ATM-GOV-0238",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729203201-codex-git-series-captain-e7d4150fc2",
+    "claimGeneration": "lease-d04a944fbd68",
+    "issuedAt": "2026-07-29T20:43:03.695Z",
+    "expiresAt": "2026-07-29T21:13:03.695Z",
+    "scopeDigest": "sha256:a6decfc61fe2037f68c25595b0f70d477c5520f0da073dab3b28aa00312a07c9",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T20:43:03.695Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0238.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0238/**",
+          ".atm/history/tasks/ATM-GOV-0238.json",
+          "artifacts/generated/atm-plan3-dogfood/ATM-GOV-0238.json",
+          "docs/governance/atm-3-replay-evidence.md",
+          "packages/cli/src/commands/broker/replay/dashboard-lifecycle-observations.ts",
+          "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+          "tests/cli/plan3-dashboard-lifecycle-observations.test.ts"
+        ],
+        "digest": "sha256:e5bc51c6c4e9bf98b7703a411ef13e84c4a3d45d4dcee0663b37dee9f5e56813"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260729204303-codex-git-series-captain-ATM-GOV-0238-83b29a568f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0238",
+    "batchId": "batch-655d05340102",
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-7e8f5c68f4f40297",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0238.*",
+      ".atm/history/task-events/ATM-GOV-0238/**",
+      ".atm/history/tasks/ATM-GOV-0238.json",
+      "artifacts/generated/atm-plan3-dogfood/ATM-GOV-0238.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay/dashboard-lifecycle-observations.ts",
+      "packages/cli/src/commands/broker/replay/dashboard-view-model.ts",
+      "tests/cli/plan3-dashboard-lifecycle-observations.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d0a64a0817aaaf773719d933b454d2bb2e919245398d819837546f6e2523792b",
+    "actorId": "codex-git-series-captain",
+    "sessionId": "session-20260729204303-codex-git-series-captain-ATM-GOV-0238-83b29a568f",
+    "laneSession": {
+      "laneSessionId": "lane-20260729203201-codex-git-series-captain-e7d4150fc2",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729203201-codex-git-series-captain-e7d4150fc2\""
+    },
+    "createdAt": "2026-07-29T20:43:22.840Z",
+    "status": "active"
+  }
 }
