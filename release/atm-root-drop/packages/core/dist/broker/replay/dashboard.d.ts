@@ -16,6 +16,9 @@ export interface ReplayDashboardParticipant {
     readonly selectedTaskIds?: readonly string[];
     readonly queuedTaskIds?: readonly string[];
     readonly ticketDigest?: string | null;
+    readonly logicalIntentDigest?: string | null;
+    readonly publicationDigest?: string | null;
+    readonly closePacketDigest?: string | null;
     readonly ticketGeneration?: string | number | null;
     readonly waitedMs?: number;
     readonly wakeup?: 'auto' | 'manual' | 'none';

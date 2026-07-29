@@ -8,6 +8,7 @@ export interface ReplayDashboardViewModelOptions {
 export declare function buildReplayDashboardViewModel(options: ReplayDashboardViewModelOptions): {
     snapshot: import("packages/core/src/broker/replay/index.ts").ReplayDashboardSnapshot;
     ticketObservations: import("./dashboard-ticket-observations.ts").ReplayDashboardTicketObservationSummary;
+    lifecycleObservations: import("./dashboard-lifecycle-observations.ts").ReplayDashboardLifecycleObservationSummary;
     human: null;
 };
 export declare function buildReplayRunManifestViewModel(options: ReplayDashboardViewModelOptions): ReplayDashboardRunManifest;

@@ -8,6 +8,7 @@ import {
   type ReplayDashboardInput,
   type ReplayDashboardRunManifest
 } from '../../../../../core/src/broker/replay/dashboard.ts';
+import { summarizeLifecycleObservations } from './dashboard-lifecycle-observations.ts';
 import { summarizeTicketObservations } from './dashboard-ticket-observations.ts';
 
 export interface ReplayDashboardViewModelOptions {
@@ -31,9 +32,31 @@ export function buildReplayDashboardViewModel(options: ReplayDashboardViewModelO
     releaseCondition: participant.queuedTaskIds && participant.queuedTaskIds.length > 0 ? 'queue-head-release' : 'safe-compose-selected',
     eventDigests: [participant.ticketDigest ?? ''].filter(Boolean)
   })));
+  const lifecycleObservations = summarizeLifecycleObservations(input.participants.map((participant) => ({
+    participantId: participant.participantId,
+    taskId: participant.taskId ?? input.runId,
+    actorId: participant.actorId,
+    claimDigest: participant.ticketDigest,
+    proposalDigest: participant.logicalIntentDigest,
+    composeBatchId: input.safeCompose ? input.validatorSeal.selectionInputDigest : null,
+    publishDigest: participant.publicationDigest,
+    wakeup: participant.wakeup,
+    validationDigest: input.validatorSeal.currentUnionDigest,
+    closeDigest: participant.closePacketDigest,
+    lifecycleEvents: [
+      { phase: 'claim', digest: participant.ticketDigest, status: participant.ticketDigest ? 'observed' : 'not-observed' },
+      { phase: 'proposal', digest: participant.logicalIntentDigest, status: participant.logicalIntentDigest ? 'observed' : 'not-observed' },
+      { phase: 'compose', digest: input.validatorSeal.selectionInputDigest, status: input.safeCompose ? 'observed' : 'not-observed' },
+      { phase: 'publish', digest: participant.publicationDigest, status: participant.publicationDigest ? 'observed' : 'not-observed' },
+      { phase: 'wakeup', digest: participant.wakeup, status: participant.wakeup ? 'observed' : 'not-observed' },
+      { phase: 'validation', digest: input.validatorSeal.currentUnionDigest, status: input.validatorSeal.currentUnionDigest ? 'observed' : 'not-observed' },
+      { phase: 'close', digest: participant.closePacketDigest, status: participant.closePacketDigest ? 'observed' : 'not-observed' }
+    ]
+  })));
   return {
     snapshot: buildReplayDashboardSnapshot(input),
     ticketObservations,
+    lifecycleObservations,
     human: null
   };
 }
@@ -98,6 +121,9 @@ export function buildReplayDashboardInput(options: ReplayDashboardViewModelOptio
         selectedTaskIds: [taskId],
         queuedTaskIds: [],
         ticketDigest: digestText(`${taskId}:ticket:a`),
+        logicalIntentDigest: logicalIntents[0]?.digest ?? null,
+        publicationDigest: digestText(`${taskId}:publish:a`),
+        closePacketDigest: digestText(`${taskId}:close:a`),
         ticketGeneration: 1,
         waitedMs: 0,
         wakeup: 'auto',
@@ -120,6 +146,9 @@ export function buildReplayDashboardInput(options: ReplayDashboardViewModelOptio
         selectedTaskIds: [],
         queuedTaskIds: [taskId],
         ticketDigest: digestText(`${taskId}:ticket:b`),
+        logicalIntentDigest: logicalIntents[1]?.digest ?? null,
+        publicationDigest: digestText(`${taskId}:publish:b`),
+        closePacketDigest: digestText(`${taskId}:close:b`),
         ticketGeneration: 1,
         waitedMs: 1,
         wakeup: 'auto',
