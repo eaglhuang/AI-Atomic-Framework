@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T21-50-33-114Z-scope-amendment-48cbecf3f0a9",
+  "taskId": "ATM-GOV-0244",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0244.json",
+  "taskSha256": "sha256:0ee70d86a153db46d51b3797e4a90aeef67197410de22a83ad8dd1241e6b7df7",
+  "createdAt": "2026-07-29T21:50:33.114Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0244 --actor codex-git-series-captain --add scripts/diagnose-plan3-evidence-closure.ts --reason \"Closure validator declared by ATM-GOV-0244 still reads the legacy 420-cell matrix and must be updated to consume the current ATM-GOV-0243 paired AB/BA 70-cell evidence schema.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Closure validator declared by ATM-GOV-0244 still reads the legacy 420-cell matrix and must be updated to consume the current ATM-GOV-0243 paired AB/BA 70-cell evidence schema."
+  }
+}

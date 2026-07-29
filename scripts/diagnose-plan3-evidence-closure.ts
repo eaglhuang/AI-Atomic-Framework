@@ -127,20 +127,42 @@ function replayCliSurfaceCheck(root: string): DiagnosticCheck {
 
 function commandBackedMatrixCheck(root: string): DiagnosticCheck {
   const matrix = inspectCommandBackedMatrix(root);
-  const complete = matrix.cellCount === 420 && matrix.commandBackedCount === 420;
+  const currentSummary = readCurrentPairedAbSummary(root);
+  const currentComplete = currentSummary !== null
+    && currentSummary.schemaId === 'atm.pairedAbV4Summary.v1'
+    && currentSummary.verdict === 'pass'
+    && currentSummary.cellCount === currentSummary.requiredCellCount
+    && currentSummary.repeatsPerOrder >= 3
+    && currentSummary.correctness?.negativeControlRejectedBeforeCanonicalWrite === true;
+  const legacyComplete = matrix.cellCount === 420 && matrix.commandBackedCount === 420;
+  const complete = currentComplete || legacyComplete;
   return {
     name: 'command-backed-420-cell-matrix',
     // Missing receipt shapes remain a hard blocker. Complete shapes alone still cannot close;
     // semantic-closure-policy keeps the repository remain-open under fake-green inputs.
     ok: complete,
-    detail: complete
-      ? 'all 420 cells include command/workload receipt shapes (shape only; not closure proof)'
-      : `${matrix.cellCount} cells found, ${matrix.commandBackedCount}/420 include command/workload receipt evidence`,
+    detail: currentComplete
+      ? `${currentSummary.cellCount} matched AB/BA comparison cells passed with ${currentSummary.repeatsPerOrder} repeats per order (current schema; shape only, not closure proof)`
+      : legacyComplete
+        ? 'all 420 legacy cells include command/workload receipt shapes (shape only; not closure proof)'
+        : `${matrix.cellCount} legacy cells found, ${matrix.commandBackedCount}/420 include command/workload receipt evidence`,
     evidence: {
       ...matrix,
+      currentSummary,
       closureNote: 'receipt-shape-is-not-semantic-closure'
     }
   };
+}
+
+function readCurrentPairedAbSummary(root: string): Record<string, any> | null {
+  const summaryPath = path.join(root, 'artifacts/generated/atm-ab-v4/summary.json');
+  if (!existsSync(summaryPath)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(summaryPath, 'utf8'));
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
 }
 
 function formulaMatrixDisclosureCheck(root: string): DiagnosticCheck {
