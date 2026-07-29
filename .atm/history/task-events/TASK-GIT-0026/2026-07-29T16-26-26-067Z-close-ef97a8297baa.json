@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T16-26-26-067Z-close-ef97a8297baa",
+  "taskId": "TASK-GIT-0026",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729160751-codex-git-series-captain-TASK-GIT-0026-b562cf3f5f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0026.json",
+  "taskSha256": "sha256:9d59618ecf52182b70466b5cc2825d4e1bae01657d9c376e00bbcbf44a2f5c7f",
+  "createdAt": "2026-07-29T16:26:26.067Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0026 --actor codex-git-series-captain --status done --from-batch-checkpoint --batch batch-97d04a6e4bca --historical-delivery 91fcf80a5 --historical-delivery dff658e7a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-97d04a6e4bca",
+    "sessionId": "session-20260729160751-codex-git-series-captain-TASK-GIT-0026-b562cf3f5f",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0026.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+      "node --strip-types tests/cli/pre-commit-evidence-context-parity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T16:26:26.044Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0026.*",
+        ".atm/history/task-events/TASK-GIT-0026/**",
+        ".atm/history/tasks/TASK-GIT-0026.json",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "tests/cli/historical-work-admission-attestation.test.ts",
+        "tests/cli/pre-commit-evidence-context-parity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "tests/cli/historical-work-admission-attestation.test.ts",
+        "tests/cli/pre-commit-evidence-context-parity.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

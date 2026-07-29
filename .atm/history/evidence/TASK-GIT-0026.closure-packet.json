@@ -1,0 +1,182 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0026",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d1c77258ffebf8cd21352101b06e323470853fd8",
+  "governedTreeSha": "71190bdadbbc7db41540e44ceab463a5663c2b9c",
+  "targetCommitDelta": {
+    "currentCommitSha": "d1c77258ffebf8cd21352101b06e323470853fd8",
+    "parentCommitShas": [
+      "d1c77258ffebf8cd21352101b06e323470853fd8"
+    ],
+    "governedTreeSha": "71190bdadbbc7db41540e44ceab463a5663c2b9c",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0026.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-28T23-34-24-184Z-import-158c679e3e35.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-28T23-37-58-472Z-import-4f0c7feb049d.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-28T23-39-35-596Z-reserve-54aeb0f874aa.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-28T23-39-35-599Z-promote-91cd8359f8f3.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-28T23-39-47-512Z-claim-cba95a4ce2c1.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-29T00-04-14-179Z-renew-cb921ff86911.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-29T00-36-02-149Z-renew-60fba6e92c93.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-29T01-12-08-452Z-repair-claim-cede938d34c8.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-29T16-07-38-328Z-import-21ce0c62af7d.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-29T16-07-51-939Z-reserve-2b856f15574f.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-29T16-07-51-941Z-promote-e7b6867d0071.json",
+      ".atm/history/task-events/TASK-GIT-0026/2026-07-29T16-08-01-461Z-claim-9ee0fb9ecafc.json",
+      ".atm/history/tasks/TASK-GIT-0024.json",
+      ".atm/history/tasks/TASK-GIT-0026.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts",
+      "tests/cli/pre-commit-evidence-context-parity.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/pre-commit-evidence-context-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ea58b939ae2797b69cda107ad6ae0c97d71beddd87fa9fe3e465d93675fddafc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:59b6b3d80415528af01ee76f91af48533cc8083c95acb7d86333718dcc4526c3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:30df4c76831f6d276aedcfb0e0af7b47768c8202502ce3177a1fc4cce071ea9a",
+      "stderrSha256": "sha256:be24d29653c639c0dd913b3806e507b3aae09b89cba8f48443ff28e54753a0f2",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+    "node --strip-types tests/cli/pre-commit-evidence-context-parity.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T16:26:26.044Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0026.*",
+      ".atm/history/task-events/TASK-GIT-0026/**",
+      ".atm/history/tasks/TASK-GIT-0026.json",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts",
+      "tests/cli/pre-commit-evidence-context-parity.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts",
+      "tests/cli/pre-commit-evidence-context-parity.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-GIT-0026.json",
+  "closedAt": "2026-07-29T16:26:26.044Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729160751-codex-git-series-captain-TASK-GIT-0026-b562cf3f5f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "91fcf80a5855f5b00abb0cdc86c256401885475d",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/historical-work-admission-attestation.schema.json"
+    ],
+    "waivedOutOfScopeFiles": [
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/historical-work-admission-attestation.schema.json"
+    ],
+    "waiverReason": "TASK-GIT-0026 deliverables are fully matched in historical mixed commits; batch checkpoint consumes the same governed historical-delivery waiver supported by taskflow close."
+  },
+  "teamSummary": null
+}

@@ -1,0 +1,299 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0026",
+  "title": "Evidence context bundle atomicity correction",
+  "status": "done",
+  "milestone": "G11.1",
+  "dependencies": [
+    "TASK-GIT-0019",
+    "TASK-GIT-0025"
+  ],
+  "acceptance": [
+    "Same-task evidence + ledger, and same-task evidence + transition event, both pass the protected-state context check when staged in one bundle.",
+    "Evidence-only, mismatched-task, and multi-task-ambiguous bundles fail closed with `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT`.",
+    "The hook implementation consumes the shared classifier result; it has no duplicate task-id or filename policy.",
+    "Focused tests, historical-attestation regression, typecheck, and `validate:cli` pass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook/pre-commit/support.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "tests/cli/pre-commit-evidence-context-parity.test.ts",
+    "tests/cli/historical-work-admission-attestation.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook/pre-commit/support.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "tests/cli/pre-commit-evidence-context-parity.test.ts",
+    "tests/cli/historical-work-admission-attestation.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/pre-commit-evidence-context-parity.test.ts",
+    "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "tests/cli/pre-commit-evidence-context-parity.test.ts",
+        "tests/cli/historical-work-admission-attestation.test.ts",
+        "One task-scoped staged-bundle classifier that proves a protected evidence file travels with the same task's ledger and/or transition event before the hook permits it.",
+        "Fail-closed handling for mismatched task IDs, evidence-only bundles, and multi-task ambiguity; no task-id, actor, or filename allowlist."
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0026-evidence-context-bundle-atomicity-correction.task.md",
+    "sectionTitle": "TASK-GIT-0026",
+    "headingLine": 49,
+    "hash": "813bf8150065ef59",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0026-evidence-context-bundle-atomicity-correction.task.md",
+      "planningCommitSha": "a15a2d3f9b82f85fd01e01e4363734471baeb441",
+      "contentDigest": "sha256:813bf8150065ef590b769df887e2e27ee5cd119571e175ec74f0f28581c80dde",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T16:07:38.190Z"
+    }
+  },
+  "importedAt": "2026-07-29T16:07:38.190Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.pre.commit.evidence.context.parity.test.ts",
+      "command": "node --strip-types tests/cli/pre-commit-evidence-context-parity.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.historical.work.admission.attestation.test.ts",
+      "command": "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T16-26-26-250Z-lock-cleanup-5f893d94adbe",
+  "lastTransitionAt": "2026-07-29T16:26:26.250Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T16:07:51.938Z",
+  "promotedAt": "2026-07-29T16:07:51.941Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-a2eddac6090f",
+    "claimedAt": "2026-07-29T16:07:51.945Z",
+    "heartbeatAt": "2026-07-29T16:26:26.064Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0026.json",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts",
+      "tests/cli/pre-commit-evidence-context-parity.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260729160752-codex-git-series-captain-4362e54a74",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729160752-codex-git-series-captain-4362e54a74\""
+    },
+    "reason": "TASK-GIT-0026 deliverables are fully matched in historical mixed commits; batch checkpoint consumes the same governed historical-delivery waiver supported by taskflow close."
+  },
+  "startedAt": "2026-07-29T16:07:51.945Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-67fff949d04a0f50",
+    "ticketDigest": "sha256:67fff949d04a0f5073e385be489f11a80a0576c9a91ce123d310c7d3418a38cd",
+    "taskId": "TASK-GIT-0026",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729160752-codex-git-series-captain-4362e54a74",
+    "claimGeneration": "lease-a2eddac6090f",
+    "issuedAt": "2026-07-29T16:07:51.945Z",
+    "expiresAt": "2026-07-29T16:37:51.945Z",
+    "scopeDigest": "sha256:8659a530ee1adaccca76e940e5a026956dbc80af2fce64c8825cf87744150ef7",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T16:07:51.945Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0026.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-GIT-0026/**",
+          ".atm/history/tasks/TASK-GIT-0026.json",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/hook/pre-commit/support.ts",
+          "tests/cli/historical-work-admission-attestation.test.ts",
+          "tests/cli/pre-commit-evidence-context-parity.test.ts"
+        ],
+        "digest": "sha256:1fc9096a8d376c91eee1af8cd6386283f2039d1aad13dffeef7987f639463b96"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:3b09034b576f26e8321df7261d6e042f868b3bc19d699d2b5641c44caea73079",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:ac249182061e9147ec9bba16419a7d79c8b9b3feab160454f1ba59279fa1aec2"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260729160751-codex-git-series-captain-TASK-GIT-0026-b562cf3f5f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0026",
+    "batchId": null,
+    "scopeKey": "tasks-401a430e2aae",
+    "queueId": "queue-48d9469c580f56e6",
+    "queueIndex": 1,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0026.*",
+      ".atm/history/task-events/TASK-GIT-0026/**",
+      ".atm/history/tasks/TASK-GIT-0026.json",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts",
+      "tests/cli/pre-commit-evidence-context-parity.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "935284ef57b5adc4a5741a515d6c57ad97dba2019b8bb9f9663359024d00727f",
+    "actorId": "codex-git-series-captain",
+    "sessionId": "session-20260729160751-codex-git-series-captain-TASK-GIT-0026-b562cf3f5f",
+    "laneSession": {
+      "laneSessionId": "lane-20260729160752-codex-git-series-captain-4362e54a74",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729160752-codex-git-series-captain-4362e54a74\""
+    },
+    "createdAt": "2026-07-29T16:08:01.460Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-29T16:26:26.245Z",
+    "releasedBy": "codex-git-series-captain"
+  },
+  "closedAt": "2026-07-29T16:26:26.064Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729160751-codex-git-series-captain-TASK-GIT-0026-b562cf3f5f",
+  "closeReason": "TASK-GIT-0026 deliverables are fully matched in historical mixed commits; batch checkpoint consumes the same governed historical-delivery waiver supported by taskflow close.",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0026.closure-packet.json"
+}
