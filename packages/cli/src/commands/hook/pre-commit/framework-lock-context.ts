@@ -1,4 +1,9 @@
-// @ts-nocheck
+type FrameworkLockCandidate = {
+  readonly kind?: unknown;
+  readonly linkedTaskId?: unknown;
+  readonly lockTaskId?: unknown;
+  readonly actorId?: unknown;
+};
 
 function normalizeText(value: unknown): string | null {
   const text = typeof value === 'string' ? value.trim() : '';
@@ -17,7 +22,11 @@ function actorIdsMatch(lockActorId: unknown, commitActorId: unknown): boolean {
   return commitActor === null || lockActor === null || lockActor === commitActor;
 }
 
-function isCurrentCommitTaskActiveLock(staleLock: any, commitTaskId: unknown, commitActorId: unknown): boolean {
+function isCurrentCommitTaskActiveLock(
+  staleLock: FrameworkLockCandidate,
+  commitTaskId: unknown,
+  commitActorId: unknown,
+): boolean {
   return staleLock?.kind === 'still-active'
     && taskIdsMatch(staleLock.linkedTaskId ?? staleLock.lockTaskId, commitTaskId)
     && actorIdsMatch(staleLock.actorId, commitActorId);
@@ -25,10 +34,10 @@ function isCurrentCommitTaskActiveLock(staleLock: any, commitTaskId: unknown, co
 
 export function buildCommitTaskFrameworkLockContext(input: {
   readonly blockers: readonly string[];
-  readonly staleLocks: readonly any[];
+  readonly staleLocks: readonly FrameworkLockCandidate[];
   readonly commitTaskId: unknown;
   readonly commitActorId: unknown;
-}): { readonly blockers: readonly string[]; readonly staleLocks: readonly any[] } {
+}): { readonly blockers: readonly string[]; readonly staleLocks: readonly FrameworkLockCandidate[] } {
   const staleLocks = input.staleLocks.filter((lock) => !isCurrentCommitTaskActiveLock(lock, input.commitTaskId, input.commitActorId));
   const blockers = input.blockers.filter((blocker) => {
     if (blocker !== 'framework-stale-lock-cleanup-required') return true;
