@@ -1,14 +1,16 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0268",
-  "updatedAt": "2026-07-29T19:05:54.411Z",
+  "updatedAt": "2026-07-29T19:12:28.411Z",
   "updatedBy": "codex-git-series-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/runner-version-selection.test.ts",
     "node --strip-types tests/core/runner-execution-attestation.test.ts",
     "node --strip-types tests/core/runner-registry-snapshot.test.ts",
     "node --strip-types tests/core/runner-shadow-feedback-sink.test.ts",
-    "typecheck"
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -90,6 +92,38 @@
       "durationMs": 10711,
       "runnerKind": "dev-source",
       "sourceCommit": "743dd417687df1a9b564f02d866cc37d1ebae927",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:309aa971da26b957f87b39449d721f629a9bcebbae53ab30a2e1e1fbd12e7362",
+      "stderrSha256": "sha256:c81b8acebc3e3f47c7beccdba7c67d28b98b57b9a2ae99529b7d2b38ecb55044",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-29T19:10:38.843Z",
+      "startedAt": "2026-07-29T19:09:53.648Z",
+      "finishedAt": "2026-07-29T19:10:38.843Z",
+      "durationMs": 45195,
+      "runnerKind": "dev-source",
+      "sourceCommit": "598bb8118ce2f8622b886dcbf243c409a45e6380",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-29T19:12:28.410Z",
+      "startedAt": "2026-07-29T19:10:48.173Z",
+      "finishedAt": "2026-07-29T19:12:28.410Z",
+      "durationMs": 100237,
+      "runnerKind": "dev-source",
+      "sourceCommit": "598bb8118ce2f8622b886dcbf243c409a45e6380",
       "cached": false
     }
   ],
