@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-267",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Claim / lane session lifecycle",
+  "finding": "Claim renewal can report actor-vs-actor `ATM_TASK_CLAIM_OWNER_MISMATCH` when the actual mismatch is between lane session ids under `ownershipMode: lane-id`; additionally, an `ATM_LANE_SESSION_ID` fallback pointing at an expired lane is silently rejected and a fresh lane is minted until the user manually runs lane adopt.",
+  "expectedBehavior": "Lane-owned claims need lane-vs-lane error codes and copy, plus a stable adopt/rebind path. If an environment-provided lane is expired but otherwise authorized, the CLI should either adopt/rebind it or emit a precise stale-lane recovery command instead of quietly minting an incompatible session.",
+  "evidenceOrRepro": "TASK-AAO-0206 close recovery on 2026-07-29: `tasks renew` showed currentActor and actorId both as `claude-005-aao-0206`, while detailed data showed different holding/requested laneSessionId values. Later retry with `ATM_LANE_SESSION_ID` still failed until `lane adopt` re-bound the stale TTL lane.",
+  "followUp": "Split OWNER_MISMATCH by ownership mode, add stale-lane adopt semantics to `resolveLaneSession`, and cover renew/close recovery with regression tests for expired-but-adoptable lane ids."
+}

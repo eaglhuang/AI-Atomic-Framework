@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-270",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Next routing / batch claim",
+  "finding": "`next --claim` can fail with an unhandled CLI exception instead of a governed ATM error when routing batch work.",
+  "expectedBehavior": "Batch-route claim failures must return structured ATM diagnostics, a playbook, and a safe next action. Internal helper lookup failures should be covered by tests and never surface as `ATM_CLI_UNHANDLED`.",
+  "evidenceOrRepro": "During Plan 3.1 GOV batch continuation, `node atm.mjs next --claim ... --json` returned `ATM_CLI_UNHANDLED: findActiveTaskQueue is not defined`, requiring a manual governed workaround before continuing the imported queue.",
+  "followUp": "Add a regression for batch claim route resolution and fix the missing helper binding/import so `next --claim` remains the stable deterministic entrypoint."
+}
