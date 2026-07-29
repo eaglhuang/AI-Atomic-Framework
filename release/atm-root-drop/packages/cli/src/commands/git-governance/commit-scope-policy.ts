@@ -42,7 +42,7 @@ export function inspectTouchedPhysicalLineBudget(
     .filter((file) => existsSync(path.join(cwd, file)));
   const maxLines = readConfiguredPhysicalLineBudget(cwd, 'maxLines', DEFAULT_PHYSICAL_LINE_BUDGET_MAX);
   const softLines = readConfiguredPhysicalLineBudget(cwd, 'softLines', DEFAULT_PHYSICAL_LINE_BUDGET_SOFT);
-  const rows = files.map((file) => ({ file, lines: countCandidatePhysicalLines(cwd, file) }))
+  const rows = files.map((file) => ({ file, lines: countCandidatePhysicalLines(cwd, file, maxLines) }))
     .sort((left, right) => right.lines - left.lines || left.file.localeCompare(right.file));
   const hardViolations = rows.filter((entry) => entry.lines > maxLines);
   const softWarnings = rows.filter((entry) => entry.lines > softLines && entry.lines <= maxLines);
@@ -94,10 +94,28 @@ function countPhysicalLines(filePath: string): number {
   return content.split(/\r?\n/).length - (content.endsWith('\n') ? 1 : 0);
 }
 
-function countCandidatePhysicalLines(cwd: string, file: string): number {
-  const stagedLines = countStagedDiffPhysicalLines(cwd, file);
-  if (stagedLines !== null) return stagedLines;
-  return countPhysicalLines(path.join(cwd, file));
+function countCandidatePhysicalLines(cwd: string, file: string, maxLines: number): number {
+  const finalLines = countPhysicalLines(path.join(cwd, file));
+  const baselineLines = countHeadPhysicalLines(cwd, file);
+  if (finalLines <= maxLines) return finalLines;
+  if (baselineLines !== null && baselineLines > maxLines && finalLines <= baselineLines) {
+    return countStagedDiffPhysicalLines(cwd, file) ?? finalLines;
+  }
+  return finalLines;
+}
+
+function countHeadPhysicalLines(cwd: string, file: string): number | null {
+  try {
+    const content = execFileSync('git', ['show', `HEAD:${normalizeRelativePath(file)}`], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
+    if (content.length === 0) return 0;
+    return content.split(/\r?\n/).length - (content.endsWith('\n') ? 1 : 0);
+  } catch {
+    return null;
+  }
 }
 
 function countStagedDiffPhysicalLines(cwd: string, file: string): number | null {

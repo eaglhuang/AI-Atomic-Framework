@@ -5,7 +5,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import { issueWorkAdmissionTicket } from '../../../packages/core/src/broker/work-admission-ticket.ts';
 import { runAtmGit } from '../../../packages/cli/src/commands/git-governance.ts';
+import { issueTaskImportAdmissionTicket } from '../../../packages/cli/src/commands/tasks/task-work-admission-import.ts';
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 export const tempDir = path.resolve(root, '.atm-temp-test-git-commit-task-scoped-staging');
@@ -80,6 +82,17 @@ export async function createFixtureRepository(): Promise<FixtureContext> {
   const scopedFile = 'src/task-scoped-staging.ts';
   const sessionId = 'session-git-staging-0141';
   const leaseId = 'lease-git-staging-0141';
+  const workAdmissionTicket = issueWorkAdmissionTicket({
+    taskId,
+    actorId: 'fixture-agent',
+    claimGeneration: leaseId,
+    allowedFiles: [scopedFile],
+    runnerSelection: {
+      runnerKind: 'frozen',
+      runnerRef: 'fixture',
+      selectedAt: new Date().toISOString()
+    }
+  });
   const taskDocument = {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: taskId,
@@ -93,7 +106,8 @@ export async function createFixtureRepository(): Promise<FixtureContext> {
       leaseId,
       state: 'active',
       files: [scopedFile]
-    }
+    },
+    workAdmissionTicket
   };
   writeJson(path.join(tempDir, '.atm/history/tasks', `${taskId}.json`), taskDocument);
   writeJson(path.join(tempDir, '.atm/runtime/sessions', `${sessionId}.json`), {
@@ -143,6 +157,16 @@ export async function createFixtureRepository(): Promise<FixtureContext> {
   runGit(tempDir, ['commit', '-m', 'chore: add unrelated active direction lock fixture']);
 
   const importedTaskId = 'TASK-OPEN-0001';
+  const importedAt = new Date().toISOString();
+  const importedLedgerPath = `.atm/history/tasks/${importedTaskId}.json`;
+  const importTransitionPath = `.atm/history/task-events/${importedTaskId}/2026-06-18T00-00-00-000Z-import-fixture.json`;
+  const importTicket = issueTaskImportAdmissionTicket({
+    taskId: importedTaskId,
+    ledgerPath: importedLedgerPath,
+    transitionPath: importTransitionPath,
+    importedAt,
+    sourceDigest: 'sha256:imported-planned-task-fixture'
+  });
   writeJson(path.join(tempDir, '.atm/history/tasks', `${importedTaskId}.json`), {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: importedTaskId,
@@ -153,7 +177,8 @@ export async function createFixtureRepository(): Promise<FixtureContext> {
       sectionTitle: importedTaskId,
       headingLine: 1,
       hash: 'imported-planned-task-fixture'
-    }
+    },
+    workAdmissionTicket: importTicket
   });
   writeJson(path.join(tempDir, '.atm/history/task-events', importedTaskId, '2026-06-18T00-00-00-000Z-import-fixture.json'), {
     schemaId: 'atm.taskTransition.v1',
@@ -175,13 +200,13 @@ export async function createFixtureRepository(): Promise<FixtureContext> {
     '--message', 'chore(task): import planned task fixture',
     '--json'
   ]);
-  assert.equal(importCommit.ok, true, 'ATM git wrapper must commit task import bundles without claiming the new planned task');
-  assert.equal(typeof importCommit.evidence?.commitSha, 'string');
-  assert.equal((importCommit.evidence as any).branchCommitQueue?.serializedBy, 'branch-commit-queue');
-  assert.equal((importCommit.evidence as any).branchCommitQueue?.retryableRaceCode, 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE');
-  assert.equal((importCommit.evidence as any).branchCommitQueue?.headShaAtCommitStart, (importCommit.evidence as any).branchCommitQueue?.headShaAtAcquire);
-  assertBranchCommitQueueSchema((importCommit.evidence as any).branchCommitQueue, 'import commit branch queue evidence');
-  assert.equal(runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']).includes('.atm/history/evidence/git-head.jsonl'), true, 'task-scoped ledger-boundary commit must include git-head evidence in the same commit');
+  assert.equal(importCommit.ok, false, 'task-import admission must not authorize a generic planned-task commit');
+  assert.equal(
+    importCommit.messages.some((entry) => entry.code === 'ATM_WORK_ADMISSION_DELIVERY_NOT_AUTHORIZED'),
+    true,
+    'task-import commit denial must use the canonical work-admission code'
+  );
+  runGit(tempDir, ['commit', '-m', 'chore: seed imported task fixture']);
 
   return { taskId, foreignTaskId, foreignActiveTaskId, scopedFile, sessionId, leaseId, taskDocument };
 }

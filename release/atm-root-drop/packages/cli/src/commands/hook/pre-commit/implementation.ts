@@ -60,7 +60,8 @@ import {
   readJsonText,
   readStagedTreeWithoutEvidence
 } from '../commit-range-guard.ts';
-import { checkStageTimeCrossFileConsistency } from './cross-file-consistency.ts';
+import { buildBrokerResolutionDependencyDeferral, checkStageTimeCrossFileConsistency } from './cross-file-consistency.ts';
+import { buildCommitTaskFrameworkLockContext } from './framework-lock-context.ts';
 import { buildPreCommitBlockingFindings, buildPreCommitFailureEnvelope, isPreCommitBaselineFinding, isPreCommitEnvironmentFinding, selectActionableResidueFindings, summarizePreCommitFailureEnvelope } from './failure-envelope.ts';
 import { inspectTaskCardStatusChanges, readStagedChangedLineCount, readStagedFiles, scanEncoding, shouldWriteGitHeadEvidenceForStagedCommit, writeStagedGitHeadEvidence } from './input-state.ts';
 import {
@@ -283,12 +284,19 @@ export function runPreCommitHook(cwd: string) {
     && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles));
   const directionLockCoversFrameworkCriticalFiles = frameworkStatus.criticalChangedFiles.length > 0
     && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, directionLockAllowedFiles));
-  const blockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => {
+  const rawBlockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => {
     if (entry === 'git-head-evidence-missing') return false;
     if (entry === 'active-framework-claim-required' && (checkpointCoversFrameworkCriticalFiles || directionLockCoversFrameworkCriticalFiles)) return false;
     if (entry === 'closure-authority-belongs-to-target-repo' && allowAdopterInfrastructureSync) return false;
     return true;
   });
+  const frameworkLockContext = buildCommitTaskFrameworkLockContext({
+    blockers: rawBlockingFrameworkIssues,
+    staleLocks: frameworkStatus.staleLocks,
+    commitTaskId: process.env.ATM_COMMIT_TASK_ID,
+    commitActorId: process.env.ATM_COMMIT_ACTOR_ID
+  });
+  const blockingFrameworkIssues = frameworkLockContext.blockers;
   const frameworkTempClaimAllowedFiles = relevantDirectionLocks.length > 0
     ? collectFrameworkTempClaimAllowedFiles(root)
     : [];
@@ -327,7 +335,7 @@ export function runPreCommitHook(cwd: string) {
   const quickfixLineLimitExceeded = activeQuickfixLock
     ? quickfixChangedLineCount > activeQuickfixLock.maxChangedLines
     : false;
-  const isBrokerResolutionAuthorizedDependencyDeferral = () => false;
+  const isBrokerResolutionAuthorizedDependencyDeferral = buildBrokerResolutionDependencyDeferral(root, process.env.ATM_COMMIT_TASK_ID ?? null, process.env.ATM_COMMIT_BROKER_CONFLICT_RESOLUTION);
   const protectedStateReport = inspectProtectedAtmStateChanges(root, stagedFiles);
   const emergencyUseAuditReport = inspectEmergencyUseAudit(root, stagedFiles);
   const taskCardStatusReport = inspectTaskCardStatusChanges(root, stagedFiles);
@@ -362,8 +370,9 @@ export function runPreCommitHook(cwd: string) {
   // recursively invoking validators through the same hook surface.
   const isWipCommit = process.env.ATM_COMMIT_WIP === '1' || process.env.ATM_COMMIT_WIP === 'true';
   const canRunFrameworkValidators = commitAttributionReport.ok && protectedStateReport.ok && !isWipCommit;
+  const frameworkValidatorGates = frameworkStatus.requiredGates.filter((gate) => gate !== 'framework-development');
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0 && canRunFrameworkValidators
-    ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
+    ? runRequiredFrameworkValidators(root, frameworkValidatorGates)
     : [];
   const validatorRunTriage = triageForeignTaskflowValidatorRuns({
     cwd: root,
@@ -372,7 +381,7 @@ export function runPreCommitHook(cwd: string) {
     failedRuns: commandRuns.filter((entry) => entry.exitCode !== 0)
   });
   const failedValidatorRuns = validatorRunTriage.blockingRuns;
-  const staleLocks = frameworkStatus.staleLocks;
+  const staleLocks = frameworkLockContext.staleLocks;
   const releasableStaleLock = staleLocks.find(isFrameworkStaleLockReleasable) ?? null;
   const baseClaimCommand = buildFrameworkTempClaimCommand(frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit', releasableStaleLock?.actorId ?? null);
   const frameworkClaimCommand = blockingFrameworkIssues.includes('active-framework-claim-required')

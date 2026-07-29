@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { quoteCliValue, relativePathFrom } from '../../shared.js';
 import { readGitObjectText } from '../commit-range-guard.js';
@@ -102,7 +102,9 @@ export function checkStageTimeCrossFileConsistency(input) {
                         missingSymbols.push(sym);
                     }
                 }
-                if (missingSymbols.length > 0 && !isBrokerResolutionAuthorizedDependencyDeferral(root, resolvedFile)) {
+                if (missingSymbols.length > 0 &&
+                    stagedImporterTouchesImport(root, stagedFile, imp.path, imp.symbols) &&
+                    !isBrokerResolutionAuthorizedDependencyDeferral(root, resolvedFile)) {
                     findings.push({
                         code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
                         source: 'cross-file-consistency',
@@ -117,6 +119,75 @@ export function checkStageTimeCrossFileConsistency(input) {
         }
     }
     return findings;
+}
+export function buildBrokerResolutionDependencyDeferral(root, currentTaskId, resolutionPath) {
+    const normalizedTaskId = normalizeTaskId(currentTaskId);
+    const resolutions = readBrokerConflictResolutions(root, resolutionPath);
+    const sharedPaths = new Set();
+    for (const resolution of resolutions) {
+        if (normalizeTaskId(resolution.currentAllowedTaskId) !== normalizedTaskId)
+            continue;
+        for (const entry of readStringArray(resolution.sharedPaths)) {
+            sharedPaths.add(normalizeRelativePath(entry));
+        }
+    }
+    return (_cwd, dependencyPath) => {
+        if (!normalizedTaskId)
+            return false;
+        return sharedPaths.has(normalizeRelativePath(dependencyPath));
+    };
+}
+function stagedImporterTouchesImport(root, stagedFile, importPath, symbols) {
+    const diffLines = runGitLines(root, ['diff', '--cached', '--', stagedFile]);
+    if (diffLines.length === 0)
+        return true;
+    const importNeedles = [importPath, ...symbols.filter((symbol) => symbol !== '*')];
+    return diffLines.some((line) => {
+        if (!(line.startsWith('+') || line.startsWith('-')) || line.startsWith('+++') || line.startsWith('---'))
+            return false;
+        return importNeedles.some((needle) => needle.length > 0 && line.includes(needle));
+    });
+}
+function readBrokerConflictResolution(root, resolutionPath) {
+    const normalized = normalizeRelativePath(String(resolutionPath ?? '').trim());
+    if (!normalized)
+        return null;
+    const absolutePath = path.isAbsolute(normalized) ? normalized : path.join(root, normalized);
+    try {
+        const parsed = JSON.parse(readFileSync(absolutePath, 'utf8'));
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+    }
+    catch {
+        return null;
+    }
+}
+function readBrokerConflictResolutions(root, resolutionPath) {
+    const keyed = new Map();
+    const add = (candidatePath) => {
+        const resolution = readBrokerConflictResolution(root, candidatePath);
+        if (!resolution)
+            return;
+        const key = typeof resolution.resolutionId === 'string' ? resolution.resolutionId : String(candidatePath ?? keyed.size);
+        keyed.set(key, resolution);
+    };
+    add(resolutionPath);
+    const dir = path.join(root, '.atm', 'runtime', 'broker-conflict-resolutions');
+    try {
+        for (const entry of readdirSync(dir)) {
+            if (entry.endsWith('.json'))
+                add(path.join(dir, entry));
+        }
+    }
+    catch {
+        // Missing broker-resolution runtime state simply means no deferral authority.
+    }
+    return [...keyed.values()];
+}
+function readStringArray(value) {
+    return Array.isArray(value) ? value.filter((entry) => typeof entry === 'string' && entry.trim().length > 0) : [];
+}
+function normalizeTaskId(value) {
+    return typeof value === 'string' && value.trim().length > 0 ? value.trim().toUpperCase() : null;
 }
 function escapeRegExp(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

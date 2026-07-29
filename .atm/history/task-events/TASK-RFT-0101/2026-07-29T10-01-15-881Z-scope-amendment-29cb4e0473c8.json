@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T10-01-15-881Z-scope-amendment-29cb4e0473c8",
+  "taskId": "TASK-RFT-0101",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0101.json",
+  "taskSha256": "sha256:f69392db87445216fbdd55f88afb4be68ee036af078374661ceb0cdd48216588",
+  "createdAt": "2026-07-29T10:01:15.881Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0101 --actor codex-git-series-captain --add \"packages/cli/dist/**,release/atm-onefile/**,release/atm-root-drop/**\" --reason \"Add generic runner-sync output surfaces to TASK-RFT-0101 scope so the receipt-owned frozen-runner publication can land without enumerating build artifacts.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add generic runner-sync output surfaces to TASK-RFT-0101 scope so the receipt-owned frozen-runner publication can land without enumerating build artifacts."
+  }
+}
