@@ -1,4 +1,5 @@
 import { CliError } from '../shared.js';
+import { hasTaskReadProjectionRequest, runTasksReadProjection } from './read-projection.js';
 export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new | realign-plan-source).';
 export function normalizeTasksArgv(argv) {
     const cleanArgv = [];
@@ -29,6 +30,11 @@ export async function dispatchTasksAction(argv, handlers) {
         case 'mirror':
             return await handlers.mirror(rest);
         case 'audit':
+            // Read-only projection is a separate surface from the findings audit; it never
+            // reaches the mutation-capable handler table.
+            if (hasTaskReadProjectionRequest(rest)) {
+                return runTasksReadProjection(rest);
+            }
             return await handlers.audit(rest);
         case 'queue':
             return await handlers.queue(rest);

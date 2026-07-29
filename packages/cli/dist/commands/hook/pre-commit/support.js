@@ -243,6 +243,92 @@ function collectStringArrayField(value, output) {
 function isPlainObject(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
+/**
+ * Evaluates protected evidence as a task-scoped bundle. Evidence filenames are
+ * intentionally not an authority: append-only evidence commonly carries a
+ * semantic suffix, so identity must come from the staged ledger, transition,
+ * or the evidence payload itself.
+ */
+export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
+    const contexts = new Map();
+    const evidenceByPath = new Map();
+    const linkedRunnerReceiptTaskId = (file, evidence, taskId) => {
+        if (evidence?.schemaId !== 'atm.runnerSyncReceipt.v1' || !taskId)
+            return taskId;
+        const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
+        for (const entry of existsSync(lockRoot) ? readdirSync(lockRoot) : []) {
+            if (!entry.endsWith('.lock.json'))
+                continue;
+            const lock = readJsonFile(path.join(lockRoot, entry));
+            const declaredFiles = Array.isArray(lock?.files) ? lock.files.map(normalizeRelativePath) : [];
+            if (lock?.workItemId === taskId && declaredFiles.includes(file) && lock?.actorId === evidence?.actorId) {
+                const context = contexts.get(taskId) ?? { ledger: false, event: false };
+                context.event = true;
+                contexts.set(taskId, context);
+                return taskId;
+            }
+        }
+        return taskId;
+    };
+    const markContext = (taskId, field) => {
+        const normalizedTaskId = normalizeOptionalText(taskId);
+        if (!normalizedTaskId)
+            return;
+        const context = contexts.get(normalizedTaskId) ?? { ledger: false, event: false };
+        context[field] = true;
+        contexts.set(normalizedTaskId, context);
+    };
+    for (const entry of stagedFiles) {
+        const normalized = normalizeRelativePath(entry);
+        const lower = normalized.toLowerCase();
+        const absolutePath = path.join(cwd, normalized);
+        const ledgerMatch = normalized.match(/^\.atm\/history\/tasks\/([^/]+)\.json$/i);
+        if (ledgerMatch) {
+            const ledger = readJsonFile(absolutePath);
+            markContext(typeof ledger?.workItemId === 'string' ? ledger.workItemId : ledgerMatch[1], 'ledger');
+            continue;
+        }
+        const eventMatch = normalized.match(/^\.atm\/history\/task-events\/([^/]+)\//i);
+        if (eventMatch) {
+            const event = readJsonFile(absolutePath);
+            markContext(typeof event?.taskId === 'string' ? event.taskId : eventMatch[1], 'event');
+            continue;
+        }
+        if (!lower.startsWith('.atm/history/evidence/') || lower.startsWith('.atm/history/evidence/historical-batches/'))
+            continue;
+        const evidence = readJsonFile(absolutePath);
+        const taskIds = new Set();
+        if (typeof evidence?.taskId === 'string')
+            taskIds.add(linkedRunnerReceiptTaskId(normalized, evidence, evidence.taskId));
+        if (Array.isArray(evidence?.attestations))
+            for (const attestation of evidence.attestations)
+                if (typeof attestation?.taskId === 'string')
+                    taskIds.add(attestation.taskId);
+        if (Array.isArray(evidence?.tasks))
+            for (const task of evidence.tasks)
+                if (typeof task?.taskId === 'string')
+                    taskIds.add(task.taskId);
+        evidenceByPath.set(lower, [...taskIds].sort((left, right) => left.localeCompare(right)));
+    }
+    const decisions = new Map();
+    const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat()]);
+    for (const [file, taskIds] of evidenceByPath) {
+        if (bundleTaskIds.size > 1) {
+            decisions.set(file, { ok: false, taskId: null, reason: 'bundle-with-ambiguous-task-ids' });
+            continue;
+        }
+        if (taskIds.length !== 1) {
+            decisions.set(file, { ok: false, taskId: null, reason: taskIds.length === 0 ? 'evidence-without-semantic-task-id' : 'evidence-with-ambiguous-task-ids' });
+            continue;
+        }
+        const taskId = taskIds[0];
+        const context = contexts.get(taskId);
+        decisions.set(file, context?.ledger || context?.event
+            ? { ok: true, taskId, reason: null }
+            : { ok: false, taskId, reason: 'evidence-without-staged-task-context' });
+    }
+    return { contexts, decisions };
+}
 export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
     const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry) || isStaticEvidenceArtifactPath(entry));
     const findings = [];
@@ -266,10 +352,18 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
     const singleStagedTaskId = stagedTaskIds.length === 1 ? stagedTaskIds[0] : null;
     const effectiveSingleStagedTaskId = singleStagedTaskId ?? pendingBatchCheckpointWindow?.taskId ?? null;
     const pendingBatchCheckpointAllowedFiles = pendingBatchCheckpointWindow ? uniqueSorted([...pendingBatchCheckpointWindow.commitFiles, ...pendingBatchCheckpointWindow.changedFiles]) : [];
+    const protectedEvidenceBundle = classifyProtectedEvidenceBundle(cwd, stagedFiles);
     for (const file of protectedFiles) {
         const normalized = normalizeRelativePath(file);
         const lower = normalized.toLowerCase();
         const absolutePath = path.join(cwd, normalized);
+        if (lower.startsWith('.atm/history/evidence/') && !lower.startsWith('.atm/history/evidence/historical-batches/')) {
+            const decision = protectedEvidenceBundle.decisions.get(lower);
+            if (!decision?.ok) {
+                findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: `Evidence updates must carry one semantic task identity and a matching staged task ledger or transition event (${decision?.reason ?? 'missing-evidence-decision'}).` });
+            }
+            continue;
+        }
         if (isProtectedAtmRuntimeStatePath(normalized)) {
             findings.push({ file: normalized, reason: 'runtime-state-must-not-be-committed', detail: 'Runtime lock, queue, or active-session state must stay ephemeral and must not be committed.' });
             continue;
@@ -609,11 +703,6 @@ export function inferTaskIdsFromStagedFiles(stagedFiles) {
         const bundleManifestMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.bundle-manifest\.json$/i);
         if (bundleManifestMatch) {
             taskIds.add(bundleManifestMatch[1]);
-            continue;
-        }
-        const evidenceMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.json$/i);
-        if (evidenceMatch) {
-            taskIds.add(evidenceMatch[1]);
             continue;
         }
         const eventMatch = normalized.match(/^\.atm\/history\/task-events\/([^/]+)\//i);
