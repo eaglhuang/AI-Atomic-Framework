@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { buildAtm3FinalClosureVerdictFromEvidence } from '../../packages/cli/src/commands/broker/parallel-admission/final-verdict.ts';
+import { buildPlan3FinalClosureVerdict } from '../../packages/cli/src/commands/broker/replay/final-closure-reader.ts';
 import { buildParallelReplayDogfoodEvidence, buildParallelReplayEvidence, buildParallelReplayScenario } from '../../packages/core/src/broker/replay/index.ts';
 
 const scenario = buildParallelReplayScenario({
@@ -114,6 +115,23 @@ const noReceiptVerdict = buildAtm3FinalClosureVerdictFromEvidence({
 });
 assert.equal(noReceiptVerdict.decision, 'remain-open');
 assert.equal(noReceiptVerdict.blockers.some((entry) => entry.includes('real multiprocess replay evidence missing')), true);
+
+const plan31Verdict = buildPlan3FinalClosureVerdict({
+  cwd: process.cwd(),
+  generatedAt: '2026-07-29T00:00:00.000Z',
+  requiredIntersection: ['docs/governance/atm-3-replay-evidence.md']
+});
+assert.equal(plan31Verdict.schemaId, 'atm.plan3FinalClosureVerdict.v1');
+assert.equal(plan31Verdict.immutableHistoryPolicy.historicalTerminalStatusIsSemanticEvidence, false);
+assert.equal(plan31Verdict.immutableHistoryPolicy.producerHealthyLabelsTrusted, false);
+assert.match(plan31Verdict.digest, /^sha256:[a-f0-9]{64}$/);
+assert.ok(plan31Verdict.sourceAvailability.some((source) => source.id === 'validator-governance-verdict'));
+assert.ok(plan31Verdict.counters.sourcesTotal >= plan31Verdict.counters.sourcesAvailable);
+assert.equal(
+  plan31Verdict.verdict === 'close',
+  plan31Verdict.blockers.length === 0,
+  'Plan 3.1 close verdict must be derived from canonical blockers, not caller-provided healthy flags'
+);
 
 console.log('atm 3 final closure verdict ok');
 

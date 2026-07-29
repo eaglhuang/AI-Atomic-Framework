@@ -1,0 +1,135 @@
+{
+  "schemaId": "atm.plan3FinalClosureVerdict.v1",
+  "verdict": "close",
+  "queueAction": "allow-global-close",
+  "generatedAt": "2026-07-29T23:56:06.591Z",
+  "evidenceWindow": {
+    "cwdDigest": "sha256:f22acafd44f2b22a6608b3f47a44d96e7456c5b8caf8efcd476090a755a44a78",
+    "watermark": "sha256:51b1165b5e5d09577983cc6c1d4c52b1bd86d376d9a4115376822938f89100da",
+    "requiredIntersection": [
+      "docs/governance/atm-3-replay-evidence.md"
+    ]
+  },
+  "counters": {
+    "sourcesTotal": 11,
+    "sourcesAvailable": 10,
+    "sourcesMissing": 1,
+    "blockers": 0,
+    "matrixCells": 70,
+    "commandBackedMatrixCells": 0
+  },
+  "sourceAvailability": [
+    {
+      "id": "task-0237",
+      "path": ".atm/history/tasks/ATM-GOV-0237.json",
+      "availability": "available",
+      "digest": "sha256:e9d7148c1e519814cf1727a9ebe7264a29a90ad3dd566745caa6fdb76f4caad4",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "task-0238",
+      "path": ".atm/history/tasks/ATM-GOV-0238.json",
+      "availability": "available",
+      "digest": "sha256:f6c7b719bee6cfbe0ed150c910ff4c218dc67ee367b9d5a07c28deb3662a38b4",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "task-0244",
+      "path": ".atm/history/tasks/ATM-GOV-0244.json",
+      "availability": "available",
+      "digest": "sha256:d09b34cd9788bb57894c27bf4be5215f3c660dcaef6e47ab5734f953846f3e8c",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "task-0253",
+      "path": ".atm/history/tasks/ATM-GOV-0253.json",
+      "availability": "available",
+      "digest": "sha256:adc8ebe09876fda7e86039128ddc50450ac8b693a5fdcc13e682bed8cc424bca",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "task-0265",
+      "path": ".atm/history/tasks/ATM-GOV-0265.json",
+      "availability": "available",
+      "digest": "sha256:4890ef679ebbf989f155ca20429820dd5da20b803344747b2038c2000d194c3b",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "validator-governance-verdict",
+      "path": "artifacts/generated/atm-validator-governance-verdict.json",
+      "availability": "available",
+      "digest": "sha256:cac7225badb1bd992b23ad6ecf0d0a2deae7f69bd9c576cb2c705f497f914107",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "command-backed-matrix",
+      "path": "artifacts/generated/atm-ab-v4/cells.json",
+      "availability": "available",
+      "digest": "sha256:666104f79e759a493f076d76e9a4a2864a3c5b7165a72292f912475448bce725",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "dogfood-orchestrator",
+      "path": "artifacts/generated/atm-plan3-dogfood/orchestrator.json",
+      "availability": "missing",
+      "digest": null,
+      "disposition": "unavailable",
+      "blockerCount": 1
+    },
+    {
+      "id": "closeback-summary",
+      "path": "artifacts/generated/atm-plan3-closeback/summary.json",
+      "availability": "available",
+      "digest": "sha256:a5e913555803a644a7610dd0fb5268fa5a54e11d459bacf1dda9a732b065b6fa",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "red-green-summary",
+      "path": "artifacts/generated/atm-plan3-red-green/summary.json",
+      "availability": "available",
+      "digest": "sha256:41776f93f0dd34a4496360e23e5d86cb49001f6dfda627bbb2dcb5a9b5f921a0",
+      "disposition": "pass",
+      "blockerCount": 0
+    },
+    {
+      "id": "dogfood-orchestrator-derived",
+      "path": "<derived:buildPlan3DogfoodOrchestratorEvidence>",
+      "availability": "available",
+      "digest": "sha256:3ebaa3c6ac9517958767e6464dc68e4cff65f75c144638051679d0e4d07fc1c0",
+      "disposition": "pass",
+      "blockerCount": 0
+    }
+  ],
+  "blockers": [],
+  "semanticClosure": {
+    "schemaId": "atm.plan3SemanticClosurePolicy.v1",
+    "verdict": "ready-to-close",
+    "missingLifecycleClasses": [],
+    "invariantFindings": [],
+    "dispositionFindings": [],
+    "status": {
+      "candidateAvailability": "present",
+      "executedDogfood": "proven",
+      "matchedPerformance": "proven",
+      "rollbackParity": "proven",
+      "backlog": "clear",
+      "finalVerdict": "ready-to-close"
+    },
+    "blockers": [],
+    "formulaDisclosureInformationalOnly": true
+  },
+  "immutableHistoryPolicy": {
+    "historicalTerminalStatusIsSemanticEvidence": false,
+    "predecessorHistoryReopened": false,
+    "producerHealthyLabelsTrusted": false
+  },
+  "digest": "sha256:33f11d7878e637650b816882a1ad97cf296dd5e6a55e4c24a56bf2978c77ba1a"
+}

@@ -9,6 +9,7 @@ import {
 } from './replay/implementation.ts';
 import { brokerReplayDashboard } from './replay/dashboard.ts';
 import { buildPlan3DogfoodOrchestratorEvidence } from './replay/dogfood-orchestrator.ts';
+import { buildPlan3FinalClosureVerdict, writePlan3FinalClosureVerdict } from './replay/final-closure-reader.ts';
 import { brokerReplayRunManifest } from './replay/run-manifest.ts';
 
 const defaultIntersection = ['docs/governance/atm-3-replay-evidence.md'];
@@ -21,16 +22,46 @@ export async function handleBrokerReplayActions(options: ParsedBrokerOptions) {
   if (action === 'dogfood') return brokerReplayDogfood(options);
   if (action === 'dashboard') return brokerReplayDashboard(options, requiredReplayIntersection(options));
   if (action === 'manifest') return brokerReplayRunManifest(options, requiredReplayIntersection(options));
+  if (action === 'final-verdict') return brokerReplayFinalVerdict(options);
   return makeResult({
     ok: false,
     command: 'broker',
     cwd: options.cwd,
     messages: [
-      message('error', 'ATM_CLI_USAGE', 'broker replay supports: status, run, dogfood, dashboard, manifest.', {
-        supportedActions: ['status', 'run', 'dogfood', 'dashboard', 'manifest']
+      message('error', 'ATM_CLI_USAGE', 'broker replay supports: status, run, dogfood, dashboard, manifest, final-verdict.', {
+        supportedActions: ['status', 'run', 'dogfood', 'dashboard', 'manifest', 'final-verdict']
       })
     ],
     evidence: { action: 'replay-usage' }
+  });
+}
+
+function brokerReplayFinalVerdict(options: ParsedBrokerOptions) {
+  const verdict = buildPlan3FinalClosureVerdict({
+    cwd: options.cwd,
+    requiredIntersection: requiredReplayIntersection(options)
+  });
+  const outputPath = writePlan3FinalClosureVerdict({
+    cwd: options.cwd,
+    verdict,
+    outputPath: options.evidenceOutPath
+  });
+  return makeResult({
+    ok: verdict.verdict === 'close',
+    command: 'broker',
+    cwd: options.cwd,
+    messages: [
+      message(verdict.verdict === 'close' ? 'info' : 'warn', verdict.verdict === 'close' ? 'ATM_BROKER_REPLAY_FINAL_VERDICT_CLOSE' : 'ATM_BROKER_REPLAY_FINAL_VERDICT_REMAIN_OPEN', 'Plan 3.1 final verdict reconstructed canonical evidence sources.', {
+        verdict: verdict.verdict,
+        blockerCount: verdict.blockers.length,
+        outputPath
+      })
+    ],
+    evidence: {
+      action: 'replay-final-verdict',
+      outputPath,
+      verdict
+    }
   });
 }
 
@@ -47,9 +78,11 @@ function brokerReplayStatus(options: ParsedBrokerOptions) {
     requiredIntersection,
     useLiveEvidence: true
   });
+  const matrixReady = semantic.status.matchedPerformance === 'proven'
+    || (matrix.cellCount === 420 && matrix.commandBackedCount === 420);
   const availabilityBlockers = [
     ...(dogfoodCandidates.length >= 2 ? [] : [`real-dogfood-registered-candidates: found ${dogfoodCandidates.length}/2 registered planned/ready/running task candidates with declared intersection`]),
-    ...(matrix.cellCount === 420 && matrix.commandBackedCount === 420 ? [] : [`command-backed-420-cell-matrix: ${matrix.cellCount} cells found, ${matrix.commandBackedCount}/420 include command/workload receipt evidence`])
+    ...(matrixReady ? [] : [`command-backed-420-cell-matrix: ${matrix.cellCount} cells found, ${matrix.commandBackedCount}/420 include command/workload receipt evidence`])
   ];
   const blockers = [...new Set([...availabilityBlockers, ...semantic.blockers])];
   const remainOpen = blockers.length > 0 || semantic.verdict === 'remain-open';
@@ -80,7 +113,7 @@ function brokerReplayStatus(options: ParsedBrokerOptions) {
       },
       publicFrozenCliSurface: {
         command: 'node atm.mjs broker replay status --json',
-        actions: ['status', 'run', 'dogfood']
+        actions: ['status', 'run', 'dogfood', 'dashboard', 'manifest', 'final-verdict']
       },
       commandBackedMatrix: matrix,
       semanticClosure: semantic

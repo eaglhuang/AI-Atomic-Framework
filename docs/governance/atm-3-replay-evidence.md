@@ -118,6 +118,29 @@ Plan 3.1 dogfood surface B lifecycle observations:
 - Focused receipt:
   - `node --strip-types tests/cli/plan3-dashboard-lifecycle-observations.test.ts`
 
+Plan 3.1 final verdict:
+
+- `broker replay final-verdict` reconstructs the aggregate close/remain-open
+  decision from canonical task ledgers, replay artifacts, semantic closure
+  policy, and derived dogfood/orchestrator evidence. The caller may choose the
+  evidence surface/window, but cannot inject healthy booleans, empty blocker
+  lists, parity claims, rollback claims, or correctness counters.
+- The immutable verdict artifact is written to
+  `artifacts/generated/atm-plan3-final/verdict.json` and records source
+  availability explicitly. Missing optional producer artifacts may be reported
+  as unavailable while a derived canonical reader still proves the same
+  predicate; missing or failed semantic predicates keep the verdict
+  `remain-open` or `closeback-pending`.
+- Historical terminal task status is retained as provenance only. It is not
+  semantic evidence, does not reopen predecessor history, and cannot override
+  unavailable, failed, inconclusive, stale, or superseded evidence dispositions.
+
+Validation:
+
+- `node --strip-types tests/cli/atm-3-final-closure.test.ts`
+- `node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts`
+- `node atm.mjs broker replay final-verdict --json`
+
 Plan 3.1 two-card dogfood orchestrator:
 
 - ATM-GOV-0242 adds a replay dogfood orchestrator that consumes the two real
