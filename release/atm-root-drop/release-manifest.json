@@ -4537,6 +4537,7 @@
     "release/atm-root-drop/tests/cli/post-close-zero-release-residue.test.ts",
     "release/atm-root-drop/tests/cli/post-compose-semantic-validation-error-contract.test.ts",
     "release/atm-root-drop/tests/cli/post-compose-semantic-validation.test.ts",
+    "release/atm-root-drop/tests/cli/pre-commit-evidence-context-parity.test.ts",
     "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
@@ -4970,8 +4971,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 694,
-    "unchanged": 4241,
+    "copied": 691,
+    "unchanged": 4245,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6189,7 +6190,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:4c401021047e497f747bfd57c38a826b6db103b1f3aa12011111ad397038350b"
+    "digest": "sha256:ef557bb2b5861768ed03847a66496a8c4949b7ceb2f2f65981563f926d56102a"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -10700,6 +10701,7 @@
       "release/atm-root-drop/tests/cli/post-close-zero-release-residue.test.ts",
       "release/atm-root-drop/tests/cli/post-compose-semantic-validation-error-contract.test.ts",
       "release/atm-root-drop/tests/cli/post-compose-semantic-validation.test.ts",
+      "release/atm-root-drop/tests/cli/pre-commit-evidence-context-parity.test.ts",
       "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
@@ -11136,34 +11138,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:9c3da4325de3c94b4ea434c5a387d9e3abe6020fbe3bd91e833b5f060de01363",
-  "sealedSourceCommit": "5977ec6bc19880006994375482ed14be2554de3f",
+  "buildInputsTreeHash": "sha256:6ba995f3b7bcdc89c080aea7d81690fa6ea84d1aabb9b9a8436fc7bbbc73c30e",
+  "sealedSourceCommit": "53bcfa02a704149d3c02105d50fa5550cc22ee6b",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:ef5c87961abfcbec6f9ae7c77e8325b60267fefffe6c603cc939f38592fdcab8",
-  "tsBuildCacheDigest": "sha256:e6952ca4982816abbe171b3e93eee22377ff7c77369ecedfd1e7dde355de0d1f",
+  "incrementalPlanDigest": "sha256:8a5c8d9ddf3346d825559367603c627189140392ba76e1f0a1985c50c9ea8eea",
+  "tsBuildCacheDigest": "sha256:67bc76d7b53ee881c3629fc31c3515ad81aff004ab347b3ab26272e0289bb3c6",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "typescriptBuild",
-    "dominantPhaseMs": 15912,
-    "totalElapsedMs": 46957,
-    "dominanceRatio": 0.3389,
-    "phaseMedianMs": 1672,
-    "phaseP95Ms": 15912,
+    "dominantPhaseMs": 15272,
+    "totalElapsedMs": 55936,
+    "dominanceRatio": 0.273,
+    "phaseMedianMs": 2828,
+    "phaseP95Ms": 15272,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 46,
-    "skipDecision": 45,
-    "worktreeSetup": 11253,
-    "typescriptBuild": 15912,
-    "rootDropReleaseAssembly": 7415,
-    "onefileReleaseAssembly": 1672,
-    "artifactSync": 8279,
+    "inputHashCalculation": 386,
+    "skipDecision": 84,
+    "worktreeSetup": 14393,
+    "typescriptBuild": 15272,
+    "rootDropReleaseAssembly": 8779,
+    "onefileReleaseAssembly": 2828,
+    "artifactSync": 10560,
     "cleanup": 0,
-    "totalElapsed": 46957
+    "totalElapsed": 55936
   }
 }
