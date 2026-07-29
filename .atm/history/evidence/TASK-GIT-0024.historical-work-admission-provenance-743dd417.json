@@ -1,0 +1,12 @@
+{
+  "schemaId": "atm.historicalWorkAdmissionProvenance.v1",
+  "commitSha": "743dd417687df1a9b564f02d866cc37d1ebae927",
+  "actorId": "codex-git-series-captain",
+  "taskId": "TASK-GIT-0024",
+  "reason": "Forward attestation for a projection-refresh commit created before ATM-GOV-0268 claim admission. The commit updated generated governance projections and recorded ATM-BUG-2026-07-29-260 after validating projection consistency, but it lacked a normal ATM-Work-Admission trailer and is now protected by the pre-push historical attestation gate.",
+  "validation": [
+    "node --strip-types scripts/validate-governance-projections.ts --write",
+    "node --strip-types scripts/validate-governance-projections.ts"
+  ],
+  "followUp": "ATM-BUG-2026-07-29-260 tracks the underlying generator check/write naming gap."
+}
