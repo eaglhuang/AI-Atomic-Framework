@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T10-51-34-720Z-scope-amendment-a2b04a042fda",
+  "taskId": "TASK-RFT-0101",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0101.json",
+  "taskSha256": "sha256:e2579e4a665b91daf72a57cfed1bc59858c0519f9d045f768f436718a47db761",
+  "createdAt": "2026-07-29T10:51:34.720Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0101 --actor codex-git-series-captain --add \"packages/cli/src/commands/framework-development/framework-lock-context.ts,packages/cli/src/commands/tasks/close-orchestrator.ts,packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

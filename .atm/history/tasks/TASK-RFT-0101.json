@@ -186,8 +186,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T10-34-33-342Z-renew-e750a7f6c5d9",
-  "lastTransitionAt": "2026-07-29T10:34:33.342Z",
+  "lastTransitionId": "2026-07-29T10-55-40-467Z-renew-1944566fa536",
+  "lastTransitionAt": "2026-07-29T10:55:40.467Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T03:05:33.686Z",
@@ -196,7 +196,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-0f597e023a88",
     "claimedAt": "2026-07-29T03:05:33.692Z",
-    "heartbeatAt": "2026-07-29T10:34:32.271Z",
+    "heartbeatAt": "2026-07-29T10:55:39.502Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-RFT-0101.*",
@@ -205,6 +205,7 @@
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "docs/reports/git-governance-transaction-atomic-map.md",
       "packages/cli/dist/**",
+      "packages/cli/src/commands/framework-development/framework-lock-context.ts",
       "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
       "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
       "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
@@ -215,6 +216,8 @@
       "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
       "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
       "release/atm-onefile/**",
       "release/atm-root-drop/**",
       "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
@@ -237,19 +240,19 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-48916f7e1104d3b3",
-    "ticketDigest": "sha256:48916f7e1104d3b3828fe16e5b9e1a46288194119ad301709a86fd22de181e02",
+    "ticketId": "wat-0b5e67d04641da89",
+    "ticketDigest": "sha256:0b5e67d04641da89000ae447000861c17ff3c392f911157be1d5e392cc79fe90",
     "taskId": "TASK-RFT-0101",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260729030534-codex-git-series-captain-f9342714d3",
     "claimGeneration": "lease-0f597e023a88",
-    "issuedAt": "2026-07-29T10:34:32.271Z",
-    "expiresAt": "2026-07-29T11:04:32.271Z",
-    "scopeDigest": "sha256:0f10713f541746252164f4e527d07ead3d4c6e9ea2622f29f8972cbaed564661",
+    "issuedAt": "2026-07-29T10:55:39.502Z",
+    "expiresAt": "2026-07-29T11:25:39.502Z",
+    "scopeDigest": "sha256:71e84e0572299f6fe949ec9c393704edae7d017f7dfd0456ecd348d7819b0954",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-29T10:34:32.271Z"
+      "selectedAt": "2026-07-29T10:55:39.502Z"
     },
     "grants": [
       {
@@ -261,6 +264,7 @@
           "atomic_workbench/atomization-coverage/path-to-atom-map.json",
           "docs/reports/git-governance-transaction-atomic-map.md",
           "packages/cli/dist/**",
+          "packages/cli/src/commands/framework-development/framework-lock-context.ts",
           "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
           "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
           "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
@@ -271,6 +275,8 @@
           "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
           "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
           "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator.ts",
           "release/atm-onefile/**",
           "release/atm-root-drop/**",
           "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
@@ -280,7 +286,7 @@
           "tests/cli/runner-sync-build-source-preservation.test.ts",
           "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
         ],
-        "digest": "sha256:3d6396fab08e246d39ad62fd8ffe96a176bc6c19b9fec922c5fde74e54294563"
+        "digest": "sha256:285374932e484f668455609bce32e36d302c7a0b6f21e9a2475d8b7207fd7487"
       },
       {
         "kind": "lifecycle-operation",
@@ -339,6 +345,7 @@
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "docs/reports/git-governance-transaction-atomic-map.md",
       "packages/cli/dist/**",
+      "packages/cli/src/commands/framework-development/framework-lock-context.ts",
       "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
       "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
       "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
@@ -349,6 +356,8 @@
       "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
       "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
       "release/atm-onefile/**",
       "release/atm-root-drop/**",
       "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
