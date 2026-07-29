@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/validators/runner-registry-snapshot.schema.json",
+  "title": "ATM Runner Registry Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "generatedAt", "policyVersion", "versions", "snapshotDigest"],
+  "properties": {
+    "schemaId": { "const": "atm.runnerRegistrySnapshot.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "policyVersion": { "type": "string", "minLength": 1 },
+    "versions": { "type": "array", "items": { "type": "object" } },
+    "snapshotDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0268",
+  "updatedAt": "2026-07-29T19:05:54.411Z",
+  "updatedBy": "codex-git-series-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/runner-version-selection.test.ts",
+    "node --strip-types tests/core/runner-execution-attestation.test.ts",
+    "node --strip-types tests/core/runner-registry-snapshot.test.ts",
+    "node --strip-types tests/core/runner-shadow-feedback-sink.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/runner-registry-snapshot.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9f9f1da62fc09675cc7a790c1977fba87a90f0a64f93c7f24158b100664261f0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/runner-registry-snapshot.test.ts"
+      ],
+      "generatedAt": "2026-07-29T19:05:10.085Z",
+      "startedAt": "2026-07-29T19:05:09.422Z",
+      "finishedAt": "2026-07-29T19:05:10.085Z",
+      "durationMs": 663,
+      "runnerKind": "dev-source",
+      "sourceCommit": "743dd417687df1a9b564f02d866cc37d1ebae927",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/runner-execution-attestation.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0110216e522ae9a371da0a9cbf7de9517846bbe752959022ab7eacf6b6e2cd94",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/runner-execution-attestation.test.ts"
+      ],
+      "generatedAt": "2026-07-29T19:05:18.608Z",
+      "startedAt": "2026-07-29T19:05:18.275Z",
+      "finishedAt": "2026-07-29T19:05:18.608Z",
+      "durationMs": 333,
+      "runnerKind": "dev-source",
+      "sourceCommit": "743dd417687df1a9b564f02d866cc37d1ebae927",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/runner-shadow-feedback-sink.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9a7c59b45d247598030938dd87ff0566ddb2933f56f199c1b3eb5e634f47ac8f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/runner-shadow-feedback-sink.test.ts"
+      ],
+      "generatedAt": "2026-07-29T19:05:28.826Z",
+      "startedAt": "2026-07-29T19:05:28.510Z",
+      "finishedAt": "2026-07-29T19:05:28.826Z",
+      "durationMs": 316,
+      "runnerKind": "dev-source",
+      "sourceCommit": "743dd417687df1a9b564f02d866cc37d1ebae927",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-version-selection.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ce7ccb9f3bb0335ee26335f999685ef76f73a7a7dbb56aa5ddc9d398f5f0e00e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/runner-version-selection.test.ts"
+      ],
+      "generatedAt": "2026-07-29T19:05:35.876Z",
+      "startedAt": "2026-07-29T19:05:35.558Z",
+      "finishedAt": "2026-07-29T19:05:35.876Z",
+      "durationMs": 318,
+      "runnerKind": "dev-source",
+      "sourceCommit": "743dd417687df1a9b564f02d866cc37d1ebae927",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-29T19:05:54.410Z",
+      "startedAt": "2026-07-29T19:05:43.699Z",
+      "finishedAt": "2026-07-29T19:05:54.410Z",
+      "durationMs": 10711,
+      "runnerKind": "dev-source",
+      "sourceCommit": "743dd417687df1a9b564f02d866cc37d1ebae927",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

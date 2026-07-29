@@ -145,15 +145,32 @@ export interface RunnerVersionSelection {
   readonly sealedSourceSha: string;
   readonly aggregateInputTreeHash: string | null;
   readonly selectedSurfaces: readonly string[];
+  readonly orderedCandidates?: readonly RunnerVersionSelectionCandidate[];
   readonly errorCode: RunnerSyncErrorCode | null;
   readonly reason: string;
 }
 
+export interface RunnerVersionSelectionCandidate {
+  readonly sealedSourceSha: string;
+  readonly aggregateInputTreeHash: string;
+  readonly lifecycleState: RunnerVersionLifecycleState;
+  readonly publishedAt: string;
+  readonly compatibilityKey: string;
+  readonly trusted: boolean;
+  readonly compatible: boolean;
+  readonly coversRequiredSurfaces: boolean;
+  readonly missingValidatorCapabilities: readonly string[];
+  readonly missingSchemaCapabilities: readonly string[];
+  readonly rejectionReason: string | null;
+}
+
 export interface RunnerVersionSelectionReceipt {
   readonly schemaId: typeof RUNNER_VERSION_SELECTION_RECEIPT_SCHEMA;
-  readonly specVersion: '0.1.0';
+  readonly specVersion: '0.1.0' | '0.2.0';
   readonly requirement: RunnerVersionRequirement;
   readonly selection: RunnerVersionSelection;
+  readonly policyVersion?: string;
+  readonly registrySnapshotDigest?: string;
   readonly selectionDigest: string;
   readonly issuedAt: string;
 }
@@ -210,6 +227,7 @@ export interface SealContinuityInput {
 export interface SealContinuityResult {
   readonly continuous: boolean;
   readonly revalidationRequired: boolean;
+  readonly revalidationBoundaryGeneration?: string | null;
   readonly errorCode: RunnerSyncErrorCode | null;
   /** Graph node segments whose closure must be rebuilt+revalidated. */
   readonly affectedClosure: readonly RunnerInputSegment[];
@@ -261,17 +279,25 @@ export function computeAggregateInputTreeHash(nodes: readonly RunnerInputGraphNo
 export function buildRunnerVersionSelectionReceipt(
   requirement: RunnerVersionRequirement,
   selection: RunnerVersionSelection,
-  issuedAt: string
+  issuedAt: string,
+  options: {
+    readonly policyVersion?: string;
+    readonly registrySnapshotDigest?: string;
+  } = {}
 ): RunnerVersionSelectionReceipt {
+  const policyVersion = options.policyVersion?.trim();
+  const registrySnapshotDigest = options.registrySnapshotDigest?.trim();
   const core = {
     schemaId: RUNNER_VERSION_SELECTION_RECEIPT_SCHEMA,
-    specVersion: '0.1.0' as const,
+    specVersion: (policyVersion || registrySnapshotDigest ? '0.2.0' : '0.1.0') as '0.1.0' | '0.2.0',
     requirement: {
       ...requirement,
       requiredSurfaces: sortedUnique(requirement.requiredSurfaces),
       aggregateInputTreeHash: requirement.aggregateInputTreeHash ?? null
     },
-    selection: { ...selection, selectedSurfaces: sortedUnique(selection.selectedSurfaces) }
+    selection: { ...selection, selectedSurfaces: sortedUnique(selection.selectedSurfaces) },
+    ...(policyVersion ? { policyVersion } : {}),
+    ...(registrySnapshotDigest ? { registrySnapshotDigest } : {})
   };
   const selectionDigest = `sha256:${createHash('sha256').update(JSON.stringify(core)).digest('hex')}`;
   return { ...core, selectionDigest, issuedAt };

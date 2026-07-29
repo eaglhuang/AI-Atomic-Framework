@@ -3,6 +3,8 @@ import {
   selectRunnerVersionWithReceipt,
   type PublishedRunnerVersion
 } from '../../../../core/src/broker/runner-version-registry.ts';
+import { type RunnerRegistrySnapshot } from '../../../../core/src/broker/runner-registry-snapshot.ts';
+import { type RunnerShadowFeedbackSink } from '../../../../core/src/broker/runner-shadow-feedback-sink.ts';
 import {
   RUNNER_SYNC_ERROR_CODES,
   type RunnerVersionRequirement,
@@ -20,6 +22,8 @@ export interface RunnerSelectionEvidenceInput {
   readonly taskId: string;
   readonly requirement: RunnerVersionRequirement;
   readonly publishedVersions: readonly PublishedRunnerVersion[];
+  readonly registrySnapshot?: RunnerRegistrySnapshot;
+  readonly shadowFeedbackSink?: RunnerShadowFeedbackSink;
   readonly issuedAt: string;
 }
 
@@ -34,8 +38,12 @@ export interface RunnerSelectionEvidence {
 }
 
 export function buildRunnerSelectionEvidence(input: RunnerSelectionEvidenceInput): RunnerSelectionEvidence {
-  const registry = createRunnerVersionRegistry(input.publishedVersions);
-  const receipt = selectRunnerVersionWithReceipt(registry, input.requirement, input.issuedAt);
+  const registry = createRunnerVersionRegistry(input.registrySnapshot?.versions ?? input.publishedVersions);
+  const receipt = selectRunnerVersionWithReceipt(registry, input.requirement, input.issuedAt, {
+    policyVersion: input.registrySnapshot?.policyVersion,
+    registrySnapshotDigest: input.registrySnapshot?.snapshotDigest,
+    shadowFeedbackSink: input.shadowFeedbackSink
+  });
   const selection = receipt.selection;
   const closeReady = selection.errorCode === null && (selection.outcome === 'exact-seal-match' || selection.outcome === 'aggregate-hash-match');
   const requiredCommand = closeReady

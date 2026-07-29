@@ -1,0 +1,270 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0268",
+  "title": "Runner selection producer contract and snapshot provider",
+  "status": "running",
+  "milestone": "ATM-3.1-R0Q.5",
+  "dependencies": [],
+  "acceptance": [
+    "`RunnerRegistrySnapshot` is an immutable, serializable, order-stable value: a sorted published-version list plus a `snapshotDigest` over canonical JSON. `createRunnerVersionRegistry(snapshot.versions)` reproduces the identical index, and `snapshot -> JSON -> snapshot` round-trips to the same digest.",
+    "A `RunnerRegistrySnapshotSource` provider produces a snapshot from the durable published set. Reading is the provider's job; every consumer of a snapshot receives a plain value and performs no IO of its own.",
+    "`RunnerVersionSelectionReceipt` gains `policyVersion` and the embedded `registrySnapshotDigest` it was decided against. `specVersion` becomes `0.2.0`; a receipt without these fields is still accepted and is reported as `pending-contract` by downstream consumers rather than as invalid.",
+    "Selection ordering is explicit and total: a documented, pure comparator resolves multiple trusted compatible candidates to exactly one selected version, and the receipt records both the selected version and the ordered candidate list with a per-candidate rejection reason. \"Highest trusted compatible version\" becomes a recomputable claim rather than prose.",
+    "`SealContinuityResult` gains an explicit revalidation boundary: the boundary generation the seal was valid within, so that \"expired revalidation boundary\" is a representable, testable state instead of an inference from a boolean.",
+    "`RunnerExecutionAttestation` exists as a type, a schema, and a producer. It binds the selected runner receipt digest to command-backed validator results, frozen entrypoint/output digests, the task change digest, and any runner transition observed during execution. It is a pure record builder; it does not itself gate close.",
+    "`ShadowFeedbackSink` is an interface plus an in-memory default that is structurally incapable of influencing admission: it exposes only append and read, it receives no registry or lifecycle handle, and a test proves that running a full selection with a recording sink attached yields a byte-identical receipt to running it with no sink.",
+    "No new `ATM_*` error code is introduced by this card. Producer-side failures reuse the existing `RUNNER_SYNC_ERROR_CODES`; enforcement paths that would need a new code belong to the later integration card, and any such code must go through the shared error-code skill with the canonical registry and generated docs in that card's scope.",
+    "Every ATM-GOV-0266 validator listed in this card's `validators` still passes, and the `0.1.0` receipt fixtures still select identically."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-registry-snapshot.ts",
+    "packages/core/src/broker/runner-execution-attestation.ts",
+    "packages/core/src/broker/runner-shadow-feedback-sink.ts",
+    "schemas/validators/runner-registry-snapshot.schema.json",
+    "schemas/validators/runner-execution-attestation.schema.json",
+    "tests/core/runner-registry-snapshot.test.ts",
+    "tests/core/runner-execution-attestation.test.ts",
+    "tests/core/runner-shadow-feedback-sink.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-version-contract.ts",
+    "packages/core/src/broker/runner-version-registry.ts",
+    "packages/core/src/broker/runner-registry-snapshot.ts",
+    "packages/core/src/broker/runner-execution-attestation.ts",
+    "packages/core/src/broker/runner-shadow-feedback-sink.ts",
+    "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+    "schemas/validators/runner-version-selection-receipt.schema.json",
+    "schemas/validators/runner-registry-snapshot.schema.json",
+    "schemas/validators/runner-execution-attestation.schema.json",
+    "tests/cli/runner-version-selection.test.ts",
+    "tests/core/runner-registry-snapshot.test.ts",
+    "tests/core/runner-execution-attestation.test.ts",
+    "tests/core/runner-shadow-feedback-sink.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/core/runner-registry-snapshot.test.ts",
+    "node --strip-types tests/core/runner-execution-attestation.test.ts",
+    "node --strip-types tests/core/runner-shadow-feedback-sink.test.ts",
+    "node --strip-types tests/cli/runner-version-selection.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "runner-selection-producer-contract-report",
+  "rollbackStrategy": "revert the additive contract fields and the three new provider modules; the ATM-GOV-0266 selection behaviour must remain byte-identical when the new fields are absent",
+  "rollbackNotes": "Every field introduced here is additive and optional-by-absence. If rollback is needed, no already-published receipt may become invalid, because absence must keep meaning exactly what it meant before this card.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-version-selection",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0268-runner-selection-producer-contract-and-snapshot-provider.task.md",
+    "sectionTitle": "ATM-GOV-0268",
+    "headingLine": 103,
+    "hash": "30b21427dffea3e5",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0268-runner-selection-producer-contract-and-snapshot-provider.task.md",
+      "planningCommitSha": "590cf2a2ffba0445bd30fc9c891e24f6c94de398",
+      "contentDigest": "sha256:30b21427dffea3e5f40ffe20d7370153661ade560b499b16b690e402d66f6e09",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T18:57:50.453Z"
+    }
+  },
+  "importedAt": "2026-07-29T18:57:50.453Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [
+    "test_int_runner_registry_snapshot_roundtrip",
+    "test_int_runner_execution_attestation_contract",
+    "test_int_runner_selection_ordering_and_boundary",
+    "test_int_runner_shadow_feedback_sink_boundary"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [
+    "test_cmd_typecheck"
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T18-59-43-532Z-claim-12c61d60faaf",
+  "lastTransitionAt": "2026-07-29T18:59:43.532Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T18:59:23.264Z",
+  "promotedAt": "2026-07-29T18:59:23.267Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-d6edf79cab97",
+    "claimedAt": "2026-07-29T18:59:23.272Z",
+    "heartbeatAt": "2026-07-29T18:59:23.272Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0268.json",
+      "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+      "packages/core/src/broker/runner-execution-attestation.ts",
+      "packages/core/src/broker/runner-registry-snapshot.ts",
+      "packages/core/src/broker/runner-shadow-feedback-sink.ts",
+      "packages/core/src/broker/runner-version-contract.ts",
+      "packages/core/src/broker/runner-version-registry.ts",
+      "schemas/validators/runner-execution-attestation.schema.json",
+      "schemas/validators/runner-registry-snapshot.schema.json",
+      "schemas/validators/runner-version-selection-receipt.schema.json",
+      "tests/cli/runner-version-selection.test.ts",
+      "tests/core/runner-execution-attestation.test.ts",
+      "tests/core/runner-registry-snapshot.test.ts",
+      "tests/core/runner-shadow-feedback-sink.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260729185925-codex-git-series-captain-b0cf81ce67",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729185925-codex-git-series-captain-b0cf81ce67\""
+    }
+  },
+  "startedAt": "2026-07-29T18:59:23.272Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f56a8b28651ed566",
+    "ticketDigest": "sha256:f56a8b28651ed5666da3782ba5d3ae9c33581a5e7d0686e45a80acb12f4f06e0",
+    "taskId": "ATM-GOV-0268",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729185925-codex-git-series-captain-b0cf81ce67",
+    "claimGeneration": "lease-d6edf79cab97",
+    "issuedAt": "2026-07-29T18:59:23.272Z",
+    "expiresAt": "2026-07-29T19:29:23.272Z",
+    "scopeDigest": "sha256:43dc354751d6845f1b731a07736f6318316fe80b1cf057e5cb6ca814bb4b1f21",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T18:59:23.272Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0268.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0268/**",
+          ".atm/history/tasks/ATM-GOV-0268.json",
+          "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+          "packages/core/src/broker/runner-execution-attestation.ts",
+          "packages/core/src/broker/runner-registry-snapshot.ts",
+          "packages/core/src/broker/runner-shadow-feedback-sink.ts",
+          "packages/core/src/broker/runner-version-contract.ts",
+          "packages/core/src/broker/runner-version-registry.ts",
+          "schemas/validators/runner-execution-attestation.schema.json",
+          "schemas/validators/runner-registry-snapshot.schema.json",
+          "schemas/validators/runner-version-selection-receipt.schema.json",
+          "tests/cli/runner-version-selection.test.ts",
+          "tests/core/runner-execution-attestation.test.ts",
+          "tests/core/runner-registry-snapshot.test.ts",
+          "tests/core/runner-shadow-feedback-sink.test.ts"
+        ],
+        "digest": "sha256:68aaba15cdb4b3643c10527f4cfc00545fcf62f98968aceb444d62357ef1653e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260729185923-codex-git-series-captain-ATM-GOV-0268-52ac40cf12",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0268",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0268.*",
+      ".atm/history/task-events/ATM-GOV-0268/**",
+      ".atm/history/tasks/ATM-GOV-0268.json",
+      "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+      "packages/core/src/broker/runner-execution-attestation.ts",
+      "packages/core/src/broker/runner-registry-snapshot.ts",
+      "packages/core/src/broker/runner-shadow-feedback-sink.ts",
+      "packages/core/src/broker/runner-version-contract.ts",
+      "packages/core/src/broker/runner-version-registry.ts",
+      "schemas/validators/runner-execution-attestation.schema.json",
+      "schemas/validators/runner-registry-snapshot.schema.json",
+      "schemas/validators/runner-version-selection-receipt.schema.json",
+      "tests/cli/runner-version-selection.test.ts",
+      "tests/core/runner-execution-attestation.test.ts",
+      "tests/core/runner-registry-snapshot.test.ts",
+      "tests/core/runner-shadow-feedback-sink.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4acfb968b5fff4ce4f37dcd291f08e894fa53626ac94661bf73a5cbe3ed93ec3",
+    "actorId": "codex-git-series-captain",
+    "sessionId": "session-20260729185923-codex-git-series-captain-ATM-GOV-0268-52ac40cf12",
+    "laneSession": {
+      "laneSessionId": "lane-20260729185925-codex-git-series-captain-b0cf81ce67",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729185925-codex-git-series-captain-b0cf81ce67\""
+    },
+    "createdAt": "2026-07-29T18:59:43.531Z",
+    "status": "active"
+  }
+}

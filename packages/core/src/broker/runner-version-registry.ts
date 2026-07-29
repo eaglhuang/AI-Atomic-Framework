@@ -4,11 +4,14 @@ import {
   RUNNER_SYNC_ERROR_CODES,
   sortedUnique,
   type RunnerVersionCapabilityProof,
+  type RunnerVersionSelectionCandidate,
   type RunnerVersionLifecycleState,
   type RunnerVersionRequirement,
   type RunnerVersionSelection,
   type RunnerVersionSelectionReceipt
 } from './runner-version-contract.ts';
+import { type RunnerRegistrySnapshot } from './runner-registry-snapshot.ts';
+import { type RunnerShadowFeedbackSink } from './runner-shadow-feedback-sink.ts';
 
 /**
  * Deterministic registry of published runner versions (ATM-GOV-0266).
@@ -43,6 +46,7 @@ export interface RunnerVersionRegistry {
   readonly schemaId: 'atm.runnerVersionRegistry.v1';
   readonly bySeal: ReadonlyMap<string, PublishedRunnerVersion>;
   readonly byAggregate: ReadonlyMap<string, PublishedRunnerVersion>;
+  readonly versions: readonly PublishedRunnerVersion[];
 }
 
 export function createRunnerVersionRegistry(
@@ -60,7 +64,7 @@ export function createRunnerVersionRegistry(
     bySeal.set(normalized.sealedSourceSha, normalized);
     byAggregate.set(normalized.aggregateInputTreeHash, normalized);
   }
-  return { schemaId: 'atm.runnerVersionRegistry.v1', bySeal, byAggregate };
+  return { schemaId: 'atm.runnerVersionRegistry.v1', bySeal, byAggregate, versions: [...bySeal.values()].sort(compareRunnerVersions) };
 }
 
 function coversSurfaces(
@@ -101,6 +105,52 @@ function fallbackGateFailure(
   return null;
 }
 
+function compareRunnerVersions(a: PublishedRunnerVersion, b: PublishedRunnerVersion): number {
+  return (
+    b.publishedAt.localeCompare(a.publishedAt) ||
+    a.sealedSourceSha.localeCompare(b.sealedSourceSha) ||
+    a.aggregateInputTreeHash.localeCompare(b.aggregateInputTreeHash)
+  );
+}
+
+function candidateFor(version: PublishedRunnerVersion, requirement: RunnerVersionRequirement): RunnerVersionSelectionCandidate {
+  const haveValidators = new Set(version.capabilityProof?.validators ?? []);
+  const haveSchemas = new Set(version.capabilityProof?.schemas ?? []);
+  const missingValidatorCapabilities = (requirement.requiredValidatorCapabilities ?? []).filter((cap) => !haveValidators.has(cap));
+  const missingSchemaCapabilities = (requirement.requiredSchemaCapabilities ?? []).filter((cap) => !haveSchemas.has(cap));
+  const trusted = isTrustedRunnerVersionLifecycleState(version.lifecycleState);
+  const compatible = !requirement.compatibilityKey || version.compatibilityKey === requirement.compatibilityKey;
+  const coversRequiredSurfaces = coversSurfaces(version, requirement.requiredSurfaces);
+  const rejectionReason = !trusted
+    ? `candidate lifecycle state '${version.lifecycleState}' is not trusted/published`
+    : !compatible
+      ? `candidate compatibility identity '${version.compatibilityKey}' does not match required '${requirement.compatibilityKey}'`
+      : !coversRequiredSurfaces
+        ? 'candidate does not cover every required surface'
+        : missingValidatorCapabilities.length > 0
+          ? `candidate is missing required validator capability proof: ${missingValidatorCapabilities.join(', ')}`
+          : missingSchemaCapabilities.length > 0
+            ? `candidate is missing required schema capability proof: ${missingSchemaCapabilities.join(', ')}`
+            : null;
+  return {
+    sealedSourceSha: version.sealedSourceSha,
+    aggregateInputTreeHash: version.aggregateInputTreeHash,
+    lifecycleState: version.lifecycleState,
+    publishedAt: version.publishedAt,
+    compatibilityKey: version.compatibilityKey,
+    trusted,
+    compatible,
+    coversRequiredSurfaces,
+    missingValidatorCapabilities,
+    missingSchemaCapabilities,
+    rejectionReason
+  };
+}
+
+function orderedCandidates(registry: RunnerVersionRegistry, requirement: RunnerVersionRequirement): readonly RunnerVersionSelectionCandidate[] {
+  return registry.versions.map((version) => candidateFor(version, requirement));
+}
+
 function failClosed(
   registry: RunnerVersionRegistry,
   requirement: RunnerVersionRequirement,
@@ -112,6 +162,7 @@ function failClosed(
     sealedSourceSha: requirement.sealedSourceSha,
     aggregateInputTreeHash: requirement.aggregateInputTreeHash ?? null,
     selectedSurfaces: [],
+    orderedCandidates: orderedCandidates(registry, requirement),
     errorCode: RUNNER_SYNC_ERROR_CODES.sealRevalidationRequired,
     reason
   };
@@ -141,6 +192,7 @@ export function selectRunnerVersion(
       sealedSourceSha: exact.sealedSourceSha,
       aggregateInputTreeHash: exact.aggregateInputTreeHash,
       selectedSurfaces: exact.publishedSurfaces,
+      orderedCandidates: orderedCandidates(registry, requirement),
       errorCode: null,
       reason: 'Exact sealed-source runner version is trusted and covers all required surfaces.'
     };
@@ -156,6 +208,7 @@ export function selectRunnerVersion(
           sealedSourceSha: byHash.sealedSourceSha,
           aggregateInputTreeHash: byHash.aggregateInputTreeHash,
           selectedSurfaces: byHash.publishedSurfaces,
+          orderedCandidates: orderedCandidates(registry, requirement),
           errorCode: null,
           reason: 'Aggregate input-tree-hash matches a trusted, compatibility- and capability-verified published version.'
         };
@@ -180,7 +233,33 @@ export function selectRunnerVersion(
 export function selectRunnerVersionWithReceipt(
   registry: RunnerVersionRegistry,
   requirement: RunnerVersionRequirement,
-  issuedAt: string
+  issuedAt: string,
+  options: {
+    readonly policyVersion?: string;
+    readonly registrySnapshotDigest?: string;
+    readonly shadowFeedbackSink?: RunnerShadowFeedbackSink;
+  } = {}
 ): RunnerVersionSelectionReceipt {
-  return buildRunnerVersionSelectionReceipt(requirement, selectRunnerVersion(registry, requirement), issuedAt);
+  const selection = selectRunnerVersion(registry, requirement);
+  const receipt = buildRunnerVersionSelectionReceipt(requirement, selection, issuedAt, options);
+  options.shadowFeedbackSink?.append({
+    observedAt: issuedAt,
+    kind: 'runner-version-selection',
+    runnerReceiptDigest: receipt.selectionDigest,
+    details: { outcome: selection.outcome, selectedRunner: selection.sealedSourceSha }
+  });
+  return receipt;
+}
+
+export function selectRunnerVersionFromSnapshot(
+  snapshot: RunnerRegistrySnapshot,
+  requirement: RunnerVersionRequirement,
+  issuedAt: string,
+  options: { readonly shadowFeedbackSink?: RunnerShadowFeedbackSink } = {}
+): RunnerVersionSelectionReceipt {
+  return selectRunnerVersionWithReceipt(createRunnerVersionRegistry(snapshot.versions), requirement, issuedAt, {
+    policyVersion: snapshot.policyVersion,
+    registrySnapshotDigest: snapshot.snapshotDigest,
+    shadowFeedbackSink: options.shadowFeedbackSink
+  });
 }

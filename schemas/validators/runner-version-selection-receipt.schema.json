@@ -18,7 +18,15 @@
       "const": "atm.runnerVersionSelectionReceipt.v1"
     },
     "specVersion": {
-      "const": "0.1.0"
+      "enum": ["0.1.0", "0.2.0"]
+    },
+    "policyVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "registrySnapshotDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
     },
     "requirement": {
       "type": "object",
@@ -60,6 +68,45 @@
         "selectedSurfaces": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 }
+        },
+        "orderedCandidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sealedSourceSha",
+              "aggregateInputTreeHash",
+              "lifecycleState",
+              "publishedAt",
+              "compatibilityKey",
+              "trusted",
+              "compatible",
+              "coversRequiredSurfaces",
+              "missingValidatorCapabilities",
+              "missingSchemaCapabilities",
+              "rejectionReason"
+            ],
+            "properties": {
+              "sealedSourceSha": { "type": "string", "minLength": 1 },
+              "aggregateInputTreeHash": { "type": "string", "minLength": 1 },
+              "lifecycleState": { "type": "string", "minLength": 1 },
+              "publishedAt": { "type": "string" },
+              "compatibilityKey": { "type": "string" },
+              "trusted": { "type": "boolean" },
+              "compatible": { "type": "boolean" },
+              "coversRequiredSurfaces": { "type": "boolean" },
+              "missingValidatorCapabilities": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "missingSchemaCapabilities": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "rejectionReason": { "type": ["string", "null"] }
+            }
+          }
         },
         "errorCode": {
           "type": ["string", "null"],
