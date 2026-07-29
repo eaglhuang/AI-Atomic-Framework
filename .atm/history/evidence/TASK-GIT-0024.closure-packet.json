@@ -1,0 +1,175 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0024",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5e0bb05474f6ac50269067207cc2fb1d9d76162d",
+  "governedTreeSha": "fb0bdbeaae6f4783ed0e547a7c07aa0ae9c2f7b8",
+  "targetCommitDelta": {
+    "currentCommitSha": "5e0bb05474f6ac50269067207cc2fb1d9d76162d",
+    "parentCommitShas": [
+      "5e0bb05474f6ac50269067207cc2fb1d9d76162d"
+    ],
+    "governedTreeSha": "fb0bdbeaae6f4783ed0e547a7c07aa0ae9c2f7b8",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0024.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T23-17-19-033Z-renew-3162a3dab3e3.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T23-30-18-387Z-renew-b05903cb8152.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T23-45-56-620Z-block-f305900e4af9.json",
+      ".atm/history/tasks/TASK-GIT-0024.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/historical-work-admission-attestation.schema.json",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git show 91fcf80a5855f5b00abb0cdc86c256401885475d",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:92e1560e5347c349096744b837eef7332eb784f33c580abfa89eca6df45051bf",
+      "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T18:03:47.444Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0024.*",
+      ".atm/history/task-events/TASK-GIT-0024/**",
+      ".atm/history/tasks/TASK-GIT-0024.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/hook/pre-push/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/historical-work-admission-attestation.schema.json",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/hook/pre-push/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/historical-work-admission-attestation.schema.json",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-GIT-0024.json",
+  "closedAt": "2026-07-29T18:03:47.444Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "91fcf80a5855f5b00abb0cdc86c256401885475d",
+    "reconciledAt": "2026-07-29T18:03:41.414Z",
+    "reconciledByActor": "codex-git-series-captain",
+    "reconcileClassification": "local-closure-rewrite",
+    "reason": "Historical reconcile sync against commit 91fcf80a5855f5b00abb0cdc86c256401885475d"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "91fcf80a5855f5b00abb0cdc86c256401885475d",
+    "taskMatchedFiles": [
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/historical-work-admission-attestation.schema.json",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T22-49-33-612Z-import-644cbf2f1dff.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T22-49-44-477Z-reserve-94b3b48cebca.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T22-49-44-480Z-promote-a2aefc4b8750.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T22-49-50-106Z-claim-23539d927109.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T22-52-38-657Z-import-351a121ded85.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T22-52-47-041Z-scope-amendment-1f46c69f8086.json",
+      ".atm/history/task-events/TASK-GIT-0024/2026-07-28T23-04-25-298Z-renew-8d893a0beafd.json",
+      ".atm/history/tasks/TASK-GIT-0024.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

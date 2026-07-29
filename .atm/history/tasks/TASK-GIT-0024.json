@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0024",
   "title": "Historical work-admission attestation and terminal ownership convergence",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-GIT-0022",
@@ -231,7 +231,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-242ccba91c4f",
     "claimedAt": "2026-07-28T22:49:44.482Z",
-    "heartbeatAt": "2026-07-28T23:04:24.869Z",
+    "heartbeatAt": "2026-07-28T23:45:56.619Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-GIT-0024.*",
@@ -255,13 +255,14 @@
       "schemas/governance/historical-work-admission-attestation.schema.json",
       "tests/cli/historical-work-admission-attestation.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260728224944-codex-git-series-captain-18981af7ea",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728224944-codex-git-series-captain-18981af7ea\""
-    }
+    },
+    "reason": "Blocked pending TASK-GIT-0026 G11.1 protected-bundle classifier delivery; preserve staged historical-attestation packet for normal replay."
   },
   "owner": "codex-git-series-captain",
   "startedAt": "2026-07-28T22:49:44.482Z",
@@ -316,27 +317,30 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260728224944-codex-git-series-captain-18981af7ea\""
     },
     "createdAt": "2026-07-28T22:49:50.129Z",
-    "status": "active"
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-29T17:00:34.109Z",
+    "releasedBy": "codex-git-series-captain"
   },
-  "lastTransitionId": "2026-07-28T23-04-25-298Z-renew-8d893a0beafd",
-  "lastTransitionAt": "2026-07-28T23:04:25.298Z",
+  "lastTransitionId": "2026-07-29T18-03-47-456Z-close-fc3ff2279add",
+  "lastTransitionAt": "2026-07-29T18:03:47.456Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-e396355f52166743",
-    "ticketDigest": "sha256:e396355f52166743fb06d3db7cbedcf6e93f59bd117b310b0d1260ef222a3b41",
+    "ticketId": "wat-98607a3d9acb3776",
+    "ticketDigest": "sha256:98607a3d9acb377638d576798dfadfa03ce1e69689c247c83614ee45990ff1b1",
     "taskId": "TASK-GIT-0024",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260728224944-codex-git-series-captain-18981af7ea",
     "claimGeneration": "lease-242ccba91c4f",
-    "issuedAt": "2026-07-28T23:04:24.869Z",
-    "expiresAt": "2026-07-28T23:34:24.869Z",
+    "issuedAt": "2026-07-28T23:30:18.035Z",
+    "expiresAt": "2026-07-29T00:00:18.035Z",
     "scopeDigest": "sha256:b0e53faab592e7c63a15c955af6eeb36ae3cb7b40d61fb856681918c2cb9dcbb",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-28T23:04:24.869Z"
+      "selectedAt": "2026-07-28T23:30:18.035Z"
     },
     "grants": [
       {
@@ -406,5 +410,10 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  }
+  },
+  "closedAt": "2026-07-29T18:03:47.453Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 91fcf80a5855f5b00abb0cdc86c256401885475d",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0024.closure-packet.json"
 }

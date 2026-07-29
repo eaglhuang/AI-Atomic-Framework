@@ -1,0 +1,92 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T18-03-47-456Z-close-fc3ff2279add",
+  "taskId": "TASK-GIT-0024",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "blocked",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0024.json",
+  "taskSha256": "sha256:79d5473a3d43f5ec1c6a49db5518142f0bd7455401764924bf0c58f4af8a1901",
+  "createdAt": "2026-07-29T18:03:47.456Z",
+  "command": "node atm.mjs tasks reconcile --task TASK-GIT-0024 --actor codex-git-series-captain --delivery-commit 91fcf80a5855f5b00abb0cdc86c256401885475d --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0024.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T18:03:47.444Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0024.*",
+        ".atm/history/task-events/TASK-GIT-0024/**",
+        ".atm/history/tasks/TASK-GIT-0024.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/hook/pre-push/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "packages/core/src/broker/historical-work-admission-attestation.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/error-code-registry.generated.ts",
+        "schemas/governance/historical-work-admission-attestation.schema.json",
+        "tests/cli/historical-work-admission-attestation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/hook/pre-push/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "packages/core/src/broker/historical-work-admission-attestation.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/error-code-registry.generated.ts",
+        "schemas/governance/historical-work-admission-attestation.schema.json",
+        "tests/cli/historical-work-admission-attestation.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
