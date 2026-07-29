@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.plan3DogfoodArtifact.v1",
+  "taskId": "ATM-GOV-0242",
+  "surface": "two-card-dogfood-orchestrator",
+  "participants": [
+    "ATM-GOV-0237",
+    "ATM-GOV-0238"
+  ],
+  "safeComposeCell": {
+    "canonicalWriteCount": 1,
+    "waitedMs": 0,
+    "releaseCondition": "compose-batch-selected"
+  },
+  "fallbackCell": {
+    "canonicalWriteCount": 0,
+    "waitedMs": "positive",
+    "releaseCondition": "revalidate-after-predecessor-or-stale-base"
+  },
+  "controls": {
+    "manualInterventionAllowed": false,
+    "emergencyBypassAllowed": false,
+    "taskSpecificControlFlow": false,
+    "actorSpecificControlFlow": false
+  }
+}

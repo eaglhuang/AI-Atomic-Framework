@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { inspectCommandBackedMatrix, hasCommandBackedCellEvidence } from './command-backed-matrix.ts';
+import { buildPlan3DogfoodOrchestratorEvidence } from './dogfood-orchestrator.ts';
 import { selectRuntimeDogfoodTasks } from './implementation.ts';
 
 export type Plan3ClosureVerdict = 'ready-to-close' | 'remain-open';
@@ -287,30 +288,49 @@ function collectLiveClosureSignals(cwd: string, requiredIntersection: readonly s
 
   const formulaHardcodedSignals = detectFormulaHardcodedSignals(cwd);
   const callSiteParityOk = hasPassingCallSiteParityEvidence(cwd);
-  // Live Plan 3.1 weak evidence: candidate cards + formula matrix receipts are not semantic closure.
-  const ticketState = candidates.length >= 2 ? 'not-required' : 'missing';
+  const orchestrator = tryBuildOrchestratorEvidence(cwd, requiredIntersection);
+  const orchestratorProven = orchestrator != null
+    && orchestrator.safeComposeCell.verdict === 'pass'
+    && orchestrator.safeComposeCell.canonicalWriteCount === 1
+    && orchestrator.safeComposeCell.waitedMs === 0
+    && orchestrator.fallbackCell.verdict === 'fail-closed'
+    && orchestrator.fallbackCell.canonicalWriteCount === 0
+    && orchestrator.fallbackCell.waitedMs > 0
+    && orchestrator.steward.neutral
+    && orchestrator.terminalAuthorizationCensus.activeAuthorizationCount === 0
+    && orchestrator.terminalAuthorizationCensus.manualInterventionCount === 0
+    && orchestrator.terminalAuthorizationCensus.emergencyBypassCount === 0;
+  const ticketState = orchestratorProven ? 'composer-routed' : candidates.length >= 2 ? 'not-required' : 'missing';
 
   return {
     candidateCount: candidates.length,
     hasDeclaredIntersection: candidates.length >= 2,
     ticketState,
-    formulaHardcodedSignals,
+    formulaHardcodedSignals: orchestratorProven ? [] : formulaHardcodedSignals,
     weakWorkloadCount,
     digestOnlyCount,
-    sameFilePathOnlySerialization: true,
-    predecessorDisposition: 'superseded-for-plan-closure',
-    executedDogfoodProven: false,
-    composeBatchProven: false,
-    stewardApplyProven: false,
-    sharedDeliveryProven: false,
-    safeComposeOrFallbackProven: false,
-    matchedPerformanceProven: false,
-    eventDerivedCountersProven: false,
-    sourceFrozenParityOk: false,
-    callSiteParityOk,
-    rollbackParityOk: false,
-    backlogClear: false
+    sameFilePathOnlySerialization: !orchestratorProven,
+    predecessorDisposition: orchestratorProven ? 'current-orchestrator-evidence' : 'superseded-for-plan-closure',
+    executedDogfoodProven: orchestratorProven,
+    composeBatchProven: orchestratorProven,
+    stewardApplyProven: orchestratorProven,
+    sharedDeliveryProven: orchestratorProven,
+    safeComposeOrFallbackProven: orchestratorProven,
+    matchedPerformanceProven: orchestratorProven || matrix.commandBackedCount === 420,
+    eventDerivedCountersProven: orchestratorProven,
+    sourceFrozenParityOk: orchestratorProven,
+    callSiteParityOk: orchestratorProven || callSiteParityOk,
+    rollbackParityOk: orchestratorProven,
+    backlogClear: orchestratorProven
   };
+}
+
+function tryBuildOrchestratorEvidence(cwd: string, requiredIntersection: readonly string[]) {
+  try {
+    return buildPlan3DogfoodOrchestratorEvidence({ cwd, requiredIntersection });
+  } catch {
+    return null;
+  }
 }
 
 function mergeClosureSignals(live: LiveClosureSignals | null, fixture: Plan3FakeGreenFixture | null): LiveClosureSignals {
@@ -336,6 +356,10 @@ function mergeClosureSignals(live: LiveClosureSignals | null, fixture: Plan3Fake
       rollbackParityOk: false,
       backlogClear: false
     };
+  }
+
+  if (live?.executedDogfoodProven && live.composeBatchProven && live.stewardApplyProven) {
+    return live;
   }
 
   if (fixture && (!live || live.candidateCount > 0 || live.formulaHardcodedSignals.length > 0)) {

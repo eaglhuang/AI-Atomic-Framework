@@ -1,0 +1,292 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0242",
+  "title": "Real two-card compose-first and fallback dogfood orchestrator",
+  "status": "running",
+  "milestone": "ATM-3.1-R3",
+  "dependencies": [
+    "ATM-GOV-0240",
+    "ATM-GOV-0241",
+    "ATM-GOV-0246"
+  ],
+  "acceptance": [
+    "ATM-GOV-0246 dashboard preflight is ready and the sealed run manifest exists before either claim.",
+    "ATM-GOV-0261 has command-backed passing evidence for the normal VCS-neutral commit-candidate lane. The dogfood must not depend on a direct native pathspec commit, alternate index, manual staging arbitration, or another emergency/anomaly delivery path.",
+    "ATM-GOV-0263 has passing emitted-command and batch-continuation evidence; both worker lanes follow task-card/playbook output without a captain repairing status/recovery commands or manually pruning terminal queue heads.",
+    "TASK-LANE-0021 has passing borrowed-actor hard-gate evidence; the dogfood cannot rely on a captain using another worker actor's lease, ticket, or close/write authority.",
+    "ATM-GOV-0264 has passing canonical-admission evidence. Both claims consume the same sealed façade decision; same atom identity cannot be treated as a task-wide grant or freeze before bounded proposal comparison.",
+    "Codex/0237 and Claude/0238 use two explicit actors and OS processes but the same canonical worktree/base/HEAD/build; their active intervals overlap, and no task lane creates or switches a Git branch, worktree, or index.",
+    "Both cards preserve `dashboard-view-model.ts` throughout the run and declare disjoint semantic anchors/bounded ranges within it; neither narrows scope to avoid arbitration.",
+    "Both workers produce bounded patch/mutation proposals without directly writing the shared file. Existing format adapters and transactional composer select both requests in one mutation batch and emit a serializability proof.",
+    "Safe-cell success requires the exact composed candidate to pass the sealed union of both cards' declared validators, the resolved language adapter's fast static checks, and catalog-selected targeted tests before steward apply.",
+    "A locked adversarial cell uses disjoint anchors/ranges whose individually applicable proposals produce a semantically broken combined candidate. It must fail or remain inconclusive with `canonicalWriteCount: 0`; serializability alone must never be reported as compose success.",
+    "The orchestrator proves validator-policy/union sealing precedes producer access to the locked adversarial payload. A union changed after reveal invalidates the run; the harness cannot quietly regenerate a more convenient negative control.",
+    "Every validation observation is command-backed and binds the candidate digest, validator reference, executable/argv/cwd, runner/build digest, timestamps, exit status, and derived result. Caller-provided success labels or missing-to-pass defaults are rejected.",
+    "Neutral steward is the only shared-file writer, applies the composed result once, and creates one shared-delivery receipt/commit with complete attribution to both cards. Private files remain attributable to their owning card.",
+    "The primary safe-compose cell may record zero queue residency and must fail if path equality alone causes serialization. `not-required`, direct-write, separate-worktree, or missing compose/steward evidence is invalid.",
+    "A separate sealed cell uses the same generic workload adapter but introduces a real logical collision or stale base; only this cell must reach canonical queue/revalidation and, if queued, positive `waitedMs` plus automatic successor wakeup.",
+    "Both target ledger cards close, active authorization returns to zero, and no manual wakeup, bypass, emergency edit, or direct `.atm` mutation occurs.",
+    "Manual captain intervention count is zero after the sealed run starts; a genuine task-card error or owner-only stop invalidates the run instead of being silently repaired in chat.",
+    "Dashboard post-run view is retained and reconstructs the same run digest from canonical sources; provider/task ids never alter orchestration control flow."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/broker/replay/dogfood-orchestrator.ts",
+    "tests/e2e/atm-3-real-task-dogfood.test.ts",
+    "artifacts/generated/atm-plan3-dogfood/ATM-GOV-0237.json",
+    "artifacts/generated/atm-plan3-dogfood/ATM-GOV-0238.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/replay/**",
+    "tests/e2e/atm-3-real-task-dogfood.test.ts",
+    "docs/governance/atm-3-replay-evidence.md",
+    "artifacts/generated/atm-plan3-dogfood/**"
+  ],
+  "validators": [
+    "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts",
+    "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json",
+    "node atm.mjs broker replay status --json",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "real-two-card-command-event-receipts",
+  "rollbackStrategy": "abandon-or-reopen-card",
+  "rollbackNotes": "Preserve failed receipts and return policy to queue-only without direct runtime edits.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.parallel-replay",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.replay.dogfood-orchestrator",
+        "pattern": "Orchestrator",
+        "source": "packages/cli/src/commands/broker/replay/dogfood-orchestrator.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0242-real-two-card-queued-dogfood-orchestrator.task.md",
+    "sectionTitle": "ATM-GOV-0242",
+    "headingLine": 66,
+    "hash": "b891fddbf1aec6ce",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0242-real-two-card-queued-dogfood-orchestrator.task.md",
+      "planningCommitSha": "10ef055c46c4d2b888417e7e3cd2b13b6f55fb51",
+      "contentDigest": "sha256:b891fddbf1aec6ce0a29862714f64b59372da137e172f0fd400aa0e90ff50779",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T19:41:48.484Z"
+    }
+  },
+  "importedAt": "2026-07-29T19:41:48.484Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.e2e.atm.3.real.task.dogfood.test.ts",
+      "command": "node --strip-types tests/e2e/atm-3-real-task-dogfood.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.broker.replay.dogfood.surface.docs.governance.atm.3.replay.evidence.md.json",
+      "command": "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.broker.replay.status.json",
+      "command": "node atm.mjs broker replay status --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T20-54-04-100Z-claim-affc82a9bddd",
+  "lastTransitionAt": "2026-07-29T20:54:04.100Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T20:53:42.094Z",
+  "promotedAt": "2026-07-29T20:53:42.097Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-4803409d0697",
+    "claimedAt": "2026-07-29T20:53:42.103Z",
+    "heartbeatAt": "2026-07-29T20:53:42.103Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0242.json",
+      "artifacts/generated/atm-plan3-dogfood/**",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay/**",
+      "tests/e2e/atm-3-real-task-dogfood.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260729203201-codex-git-series-captain-e7d4150fc2",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729203201-codex-git-series-captain-e7d4150fc2\""
+    }
+  },
+  "startedAt": "2026-07-29T20:53:42.103Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-dedeac660b25ad0a",
+    "ticketDigest": "sha256:dedeac660b25ad0a15230fcae12959dd2b1fd40457305d58e3572c378fcf79a1",
+    "taskId": "ATM-GOV-0242",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729203201-codex-git-series-captain-e7d4150fc2",
+    "claimGeneration": "lease-4803409d0697",
+    "issuedAt": "2026-07-29T20:53:42.103Z",
+    "expiresAt": "2026-07-29T21:23:42.103Z",
+    "scopeDigest": "sha256:e1722c0a1c91eb85d77e62d8257f92bd6ea22b6fb7a1966b8af13b73e567e93c",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T20:53:42.103Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0242.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0242/**",
+          ".atm/history/tasks/ATM-GOV-0242.json",
+          "artifacts/generated/atm-plan3-dogfood/**",
+          "docs/governance/atm-3-replay-evidence.md",
+          "packages/cli/src/commands/broker/replay/**",
+          "tests/e2e/atm-3-real-task-dogfood.test.ts"
+        ],
+        "digest": "sha256:03d48f38dca67f1c2fb03191011be4d47779209ec741829909320c1b323889a0"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260729205342-codex-git-series-captain-ATM-GOV-0242-0702651920",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0242",
+    "batchId": "batch-655d05340102",
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-8f1264f3bbf11b3d",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0242.*",
+      ".atm/history/task-events/ATM-GOV-0242/**",
+      ".atm/history/tasks/ATM-GOV-0242.json",
+      "artifacts/generated/atm-plan3-dogfood/**",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay/**",
+      "tests/e2e/atm-3-real-task-dogfood.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5e12dcfdbc7966260f76c2f1ad2772f5b3e15ae6cb2366ed906a70f6f6e761fb",
+    "actorId": "codex-git-series-captain",
+    "sessionId": "session-20260729205342-codex-git-series-captain-ATM-GOV-0242-0702651920",
+    "laneSession": {
+      "laneSessionId": "lane-20260729203201-codex-git-series-captain-e7d4150fc2",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729203201-codex-git-series-captain-e7d4150fc2\""
+    },
+    "createdAt": "2026-07-29T20:54:04.099Z",
+    "status": "active"
+  }
+}

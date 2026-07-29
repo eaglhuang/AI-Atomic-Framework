@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { buildPlan3DogfoodOrchestratorEvidence } from '../../packages/cli/src/commands/broker/replay/dogfood-orchestrator.ts';
 import { selectRuntimeDogfoodTasks } from '../../packages/cli/src/commands/broker/replay/implementation.ts';
 import { buildParallelReplayDogfoodEvidence } from '../../packages/core/src/broker/replay/index.ts';
 
@@ -57,5 +58,22 @@ assert.equal(dogfood.preservedIntersection, true);
 assert.equal(dogfood.terminalRefusalCount, 0);
 assert.equal(dogfood.manualWakeupCount, 0);
 assert.equal(dogfood.traces.every((trace) => trace.lifecycle.includes('close-packet:sealed')), true);
+
+const orchestrator = buildPlan3DogfoodOrchestratorEvidence({
+  cwd: process.cwd(),
+  requiredIntersection: ['docs/governance/atm-3-replay-evidence.md']
+});
+
+assert.deepEqual(orchestrator.taskIds, ['ATM-GOV-0237', 'ATM-GOV-0238']);
+assert.equal(orchestrator.safeComposeCell.verdict, 'pass');
+assert.equal(orchestrator.safeComposeCell.waitedMs, 0);
+assert.equal(orchestrator.safeComposeCell.canonicalWriteCount, 1);
+assert.equal(orchestrator.fallbackCell.verdict, 'fail-closed');
+assert.equal(orchestrator.fallbackCell.canonicalWriteCount, 0);
+assert.equal(orchestrator.fallbackCell.waitedMs > 0, true);
+assert.equal(orchestrator.steward.neutral, true);
+assert.equal(orchestrator.terminalAuthorizationCensus.activeAuthorizationCount, 0);
+assert.equal(orchestrator.terminalAuthorizationCensus.manualInterventionCount, 0);
+assert.ok(orchestrator.digest.startsWith('sha256:'));
 
 console.log('[atm-3-real-task-dogfood.test] ok');
