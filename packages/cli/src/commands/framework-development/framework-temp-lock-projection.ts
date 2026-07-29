@@ -1,5 +1,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { pathMatchesWriteScope } from '../../../../core/src/broker/write-scope-policy.ts';
+
+export type FrameworkTempLockDisposition = 'foreign-live' | 'stale-recovery-input';
 
 export interface FrameworkTempLockProjection {
   readonly workItemId: string;
@@ -7,6 +10,9 @@ export interface FrameworkTempLockProjection {
   readonly heartbeatAt: string | null;
   readonly ttlSeconds: number | null;
   readonly leaseFresh: boolean | null;
+  readonly disposition: FrameworkTempLockDisposition;
+  readonly linkedTaskId: string | null;
+  readonly laneSessionId: string | null;
   readonly files: readonly string[];
 }
 
@@ -33,6 +39,11 @@ export function readFrameworkTempLockProjection(cwd: string, now = Date.now()): 
           leaseFresh: heartbeatAt && ttlSeconds !== null && Number.isFinite(heartbeatMs)
             ? now - heartbeatMs <= ttlSeconds * 1000
             : null,
+          disposition: heartbeatAt && ttlSeconds !== null && Number.isFinite(heartbeatMs) && now - heartbeatMs <= ttlSeconds * 1000
+            ? 'foreign-live'
+            : 'stale-recovery-input',
+          linkedTaskId: text(parsed.linkedTaskId ?? parsed.taskId),
+          laneSessionId: text(parsed.laneSessionId),
           files: uniqueStrings(Array.isArray(parsed.files) ? parsed.files : [])
         }];
       } catch {
@@ -45,8 +56,7 @@ export function frameworkTempLockOwnsPath(
   locks: readonly FrameworkTempLockProjection[],
   filePath: string
 ): FrameworkTempLockProjection | null {
-  const normalized = normalizePath(filePath);
-  return locks.find((lock) => lock.files.some((entry) => normalized === entry || normalized.startsWith(`${entry}/`))) ?? null;
+  return locks.find((lock) => lock.files.some((entry) => pathMatchesWriteScope(filePath, entry))) ?? null;
 }
 
 function text(value: unknown): string | null {

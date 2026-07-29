@@ -48,6 +48,13 @@ export interface ActiveWorkSummary {
     readonly leaseFresh: boolean | null;
     readonly files: readonly string[];
   }[];
+  readonly staleRecoveryLocks: readonly {
+    readonly workItemId: string;
+    readonly actorId: string;
+    readonly heartbeatAt: string | null;
+    readonly ttlSeconds: number | null;
+    readonly files: readonly string[];
+  }[];
   readonly freshReservationCount: number;
   readonly freshReservations: readonly {
     readonly taskId: string;
@@ -85,7 +92,7 @@ export function buildActiveWorkSummary(cwd: string, currentActorId?: string | nu
   const currentActor = currentActorId?.trim() || null;
   const normalizedOwnFiles = uniqueSorted(ownFiles.map(normalizeWorkPath).filter(Boolean));
   const activeClaims = readActiveClaimRecords(cwd, now);
-  const activeLocks = readActiveLockRecords(cwd, now);
+  const { activeLocks, staleRecoveryLocks } = readFrameworkLockRecords(cwd, now);
   const freshReservations = readFreshTaskReservations(cwd, now);
   const stagedFiles = readStagedFiles(cwd);
   const currentSession = resolveActorWorkSession(cwd, {});
@@ -143,12 +150,14 @@ export function buildActiveWorkSummary(cwd: string, currentActorId?: string | nu
   const ownedDirtySet = new Set(foreignDirtyFiles);
   for (const claim of activeClaims) for (const file of claim.files) if (dirtyFiles.includes(file)) ownedDirtySet.add(file);
   for (const lock of activeLocks) for (const file of lock.files) if (dirtyFiles.includes(file)) ownedDirtySet.add(file);
+  for (const lock of staleRecoveryLocks) for (const file of lock.files) if (dirtyFiles.includes(file)) ownedDirtySet.add(file);
   const unownedDirtyFiles = dirtyFiles.filter((file) => !ownedDirtySet.has(file));
   const hasForeignActiveWork = foreignActors.length > 0 || foreignSessionIds.length > 0 || stagedFiles.length > 0 || unownedDirtyFiles.length > 0;
   const teamLevelRecommendation = buildTeamLevelRecommendation({
     ownFiles: normalizedOwnFiles,
     activeClaims,
     activeLocks,
+    staleRecoveryLocks,
     freshReservations,
     stagedFiles,
     foreignDirtyFiles,
@@ -171,6 +180,7 @@ export function buildActiveWorkSummary(cwd: string, currentActorId?: string | nu
     activeActors,
     activeClaims,
     activeLocks,
+    staleRecoveryLocks,
     freshReservationCount: freshReservations.length,
     freshReservations,
     stagedFiles,
@@ -541,8 +551,11 @@ function readActiveClaimRecords(cwd: string, now: number): ActiveWorkSummary['ac
     });
 }
 
-function readActiveLockRecords(cwd: string, now: number): ActiveWorkSummary['activeLocks'] {
-  return readFrameworkTempLockProjection(cwd, now).map((lock) => ({
+function readFrameworkLockRecords(cwd: string, now: number): {
+  readonly activeLocks: ActiveWorkSummary['activeLocks'];
+  readonly staleRecoveryLocks: ActiveWorkSummary['staleRecoveryLocks'];
+} {
+  const records = readFrameworkTempLockProjection(cwd, now).map((lock) => ({
     workItemId: lock.workItemId,
     actorId: lock.actorId,
     heartbeatAt: lock.heartbeatAt,
@@ -551,6 +564,12 @@ function readActiveLockRecords(cwd: string, now: number): ActiveWorkSummary['act
     leaseFresh: lock.leaseFresh,
     files: uniqueSorted(lock.files.map(normalizeWorkPath))
   }));
+  return {
+    activeLocks: records.filter((lock) => lock.leaseFresh === true),
+    staleRecoveryLocks: records
+      .filter((lock) => lock.leaseFresh !== true)
+      .map(({ workItemId, actorId, heartbeatAt, ttlSeconds, files }) => ({ workItemId, actorId, heartbeatAt, ttlSeconds, files }))
+  };
 }
 
 function normalizeOptionalNumber(value: unknown): number | null {

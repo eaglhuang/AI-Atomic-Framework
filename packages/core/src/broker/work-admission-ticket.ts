@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { deflateSync } from 'node:zlib';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { computeWriteScopeDigest, normalizeWritePathList } from './write-scope-policy.ts';
+import { computeWriteScopeDigest, normalizeWritePathList, pathMatchesWriteScope } from './write-scope-policy.ts';
 import type { ForeignGeneratedResidueProvenance } from './foreign-generated-residue-disposition.ts';
 
 export const WORK_ADMISSION_TICKET_SCHEMA_ID = 'atm.workAdmissionTicket.v1';
@@ -228,8 +228,12 @@ export function checkWorkAdmissionTicket(input: {
   const fileGrant = ticket.grants.find((grant) => grant.kind === 'file-write');
   const operationGrant = ticket.grants.find((grant) => grant.kind === 'lifecycle-operation');
   const requestedFiles = normalizeWritePathList(input.files);
+  // Ticket grants are minted from the same scoped path vocabulary as task cards.
+  // Reuse the canonical matcher so a grant such as `evidence/TASK.*` does not
+  // become unusable at the final commit boundary.
   const filesAreAuthorized = Boolean(fileGrant) && requestedFiles.every((file) =>
-    fileGrant!.values.includes(file) || isTaskManagedCloseLifecyclePath(input.taskId, input.operation, file)
+    fileGrant!.values.some((scope) => pathMatchesWriteScope(file, scope))
+    || isTaskManagedCloseLifecyclePath(input.taskId, input.operation, file)
   );
   if (!filesAreAuthorized) {
     return deny('ATM_WRITE_TICKET_SCOPE_VIOLATION', 'Requested mutation path is outside the ticket file grant.');

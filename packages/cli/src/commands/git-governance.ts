@@ -7,6 +7,7 @@ import {
   HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH,
   type HistoricalWorkAdmissionAttestation
 } from '../../../core/src/broker/historical-work-admission-attestation.ts';
+import { pathMatchesWriteScope } from '../../../core/src/broker/write-scope-policy.ts';
 import { evaluateTaskWorkAdmissionGate, readWorkAdmissionTicket } from './git-governance/work-admission-check.ts';
 import { makeResult, message } from './shared.ts';
 import {
@@ -50,7 +51,7 @@ export async function runAtmGit(argv: string[]) {
   const cwd = readOption(argv, '--cwd') ?? process.cwd();
   const ticket = readWorkAdmissionTicket(cwd, taskId);
   const files = action === 'commit'
-    ? readStagedFiles(cwd)
+    ? selectTicketValidatedCommitFiles(readStagedFiles(cwd), ticket, argv.includes('--defer-foreign-staged'))
     : ticket?.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
   const gate = evaluateTaskWorkAdmissionGate({
     cwd,
@@ -80,6 +81,21 @@ export async function runAtmGit(argv: string[]) {
       workAdmission: { decision: gate.decision, receipt: gate.receipt }
     }
   };
+}
+
+/**
+ * `--defer-foreign-staged` promises that the governed commit will preserve
+ * foreign index entries. Admission must therefore see the same filtered
+ * bundle, rather than reject the current task for paths it will not mutate.
+ */
+export function selectTicketValidatedCommitFiles(
+  stagedFiles: readonly string[],
+  ticket: ReturnType<typeof readWorkAdmissionTicket>,
+  deferForeignStaged: boolean
+): readonly string[] {
+  if (!deferForeignStaged || !ticket) return stagedFiles;
+  const fileScopes = ticket.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
+  return stagedFiles.filter((file) => fileScopes.some((scope) => pathMatchesWriteScope(file, scope)));
 }
 
 function recordHistoricalWorkAdmissionAttestation(argv: readonly string[]) {
