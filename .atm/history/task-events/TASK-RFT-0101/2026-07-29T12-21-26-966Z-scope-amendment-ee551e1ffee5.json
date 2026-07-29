@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T12-21-26-966Z-scope-amendment-ee551e1ffee5",
+  "taskId": "TASK-RFT-0101",
+  "action": "scope-amendment",
+  "actorId": "codex-git-series-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0101.json",
+  "taskSha256": "sha256:0b5307b518cb21b3d07a741980ffe412c5cefda3dba9da579866174831077700",
+  "createdAt": "2026-07-29T12:21:26.966Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0101 --actor codex-git-series-captain --add \"packages/core/src/broker/runner-sync-steward-queue.ts,packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts,packages/cli/src/commands/broker/parser.ts,packages/cli/src/commands/broker/steward-queues.ts,packages/cli/src/commands/command-specs/broker.spec.ts,tests/cli-fixtures/help-snapshots/broker.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -108,7 +108,7 @@
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
   },
   "testContributions": [],
   "requiredTestCaseIds": [],
@@ -186,8 +186,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-29T12-18-26-068Z-scope-amendment-df808b0dc25a",
-  "lastTransitionAt": "2026-07-29T12:18:26.068Z",
+  "lastTransitionId": "2026-07-29T12-24-09-045Z-renew-72ae02867c31",
+  "lastTransitionAt": "2026-07-29T12:24:09.045Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-git-series-captain",
   "reservedAt": "2026-07-29T03:05:33.686Z",
@@ -196,7 +196,7 @@
     "actorId": "codex-git-series-captain",
     "leaseId": "lease-0f597e023a88",
     "claimedAt": "2026-07-29T03:05:33.692Z",
-    "heartbeatAt": "2026-07-29T12:16:55.136Z",
+    "heartbeatAt": "2026-07-29T12:24:08.420Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain-lane-lane-20260729030534-codex-git-series-captain-f9342714d3.runner-sync-receipt.json",
@@ -206,6 +206,10 @@
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "docs/reports/git-governance-transaction-atomic-map.md",
       "packages/cli/dist/**",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/runner-sync-supersession.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
       "packages/cli/src/commands/framework-development/framework-lock-context.ts",
       "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
       "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
@@ -219,8 +223,11 @@
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
       "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
       "release/atm-onefile/**",
       "release/atm-root-drop/**",
+      "tests/cli-fixtures/help-snapshots/broker.json",
       "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
       "tests/cli/git-commit-task-scoped-staging.test.ts",
       "tests/cli/git-commit-task-scoped-staging/**",
@@ -241,30 +248,35 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-530760d74e3dd884",
-    "ticketDigest": "sha256:530760d74e3dd88481c52dfd4ea9bf2a6cdf4163b3bfa1038b83e7e0f1a93f0a",
+    "ticketId": "wat-cc970dc503952989",
+    "ticketDigest": "sha256:cc970dc50395298983ecffb87e589c0484ce06cbfec0f3eff69c3002d654f454",
     "taskId": "TASK-RFT-0101",
     "actorId": "codex-git-series-captain",
     "laneSessionId": "lane-20260729030534-codex-git-series-captain-f9342714d3",
     "claimGeneration": "lease-0f597e023a88",
-    "issuedAt": "2026-07-29T12:16:55.136Z",
-    "expiresAt": "2026-07-29T12:46:55.136Z",
-    "scopeDigest": "sha256:71e84e0572299f6fe949ec9c393704edae7d017f7dfd0456ecd348d7819b0954",
+    "issuedAt": "2026-07-29T12:24:08.420Z",
+    "expiresAt": "2026-07-29T12:54:08.420Z",
+    "scopeDigest": "sha256:dfcc5c50aaffcc39fb0fa46c4cf5c406c37ff1176ff82b3cdd38101686cbc26f",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-29T12:16:55.136Z"
+      "selectedAt": "2026-07-29T12:24:08.420Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
+          ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-git-series-captain-lane-lane-20260729030534-codex-git-series-captain-f9342714d3.runner-sync-receipt.json",
           ".atm/history/evidence/TASK-RFT-0101.*",
           ".atm/history/task-events/TASK-RFT-0101/**",
           ".atm/history/tasks/TASK-RFT-0101.json",
           "atomic_workbench/atomization-coverage/path-to-atom-map.json",
           "docs/reports/git-governance-transaction-atomic-map.md",
           "packages/cli/dist/**",
+          "packages/cli/src/commands/broker/parser.ts",
+          "packages/cli/src/commands/broker/runner-sync-supersession.ts",
+          "packages/cli/src/commands/broker/steward-queues.ts",
+          "packages/cli/src/commands/command-specs/broker.spec.ts",
           "packages/cli/src/commands/framework-development/framework-lock-context.ts",
           "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
           "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
@@ -278,8 +290,11 @@
           "packages/cli/src/commands/hook/pre-commit/implementation.ts",
           "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
           "packages/cli/src/commands/tasks/close-orchestrator.ts",
+          "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+          "packages/core/src/broker/runner-sync-steward-queue.ts",
           "release/atm-onefile/**",
           "release/atm-root-drop/**",
+          "tests/cli-fixtures/help-snapshots/broker.json",
           "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
           "tests/cli/git-commit-task-scoped-staging.test.ts",
           "tests/cli/git-commit-task-scoped-staging/**",
@@ -287,7 +302,7 @@
           "tests/cli/runner-sync-build-source-preservation.test.ts",
           "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
         ],
-        "digest": "sha256:285374932e484f668455609bce32e36d302c7a0b6f21e9a2475d8b7207fd7487"
+        "digest": "sha256:cfe274dde71604d1be22797cdab4712a1bdb5d41ec63559f7c7e3173a884af9c"
       },
       {
         "kind": "lifecycle-operation",
@@ -320,14 +335,15 @@
       "requestedMode": "auto",
       "resolvedMode": "enabled",
       "reasons": [
-        "complex-task"
+        "complex-task",
+        "shared-surface"
       ],
       "maxSavePoints": 2,
       "perTaskByteBudget": 16777216,
       "repositoryByteBudget": 268435456,
       "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   },
   "startedBySessionId": "session-20260729030533-codex-git-series-captain-TASK-RFT-0101-555f251d79",
@@ -347,6 +363,10 @@
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "docs/reports/git-governance-transaction-atomic-map.md",
       "packages/cli/dist/**",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/runner-sync-supersession.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
       "packages/cli/src/commands/framework-development/framework-lock-context.ts",
       "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
       "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
@@ -360,8 +380,11 @@
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
       "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
       "release/atm-onefile/**",
       "release/atm-root-drop/**",
+      "tests/cli-fixtures/help-snapshots/broker.json",
       "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
       "tests/cli/git-commit-task-scoped-staging.test.ts",
       "tests/cli/git-commit-task-scoped-staging/**",
