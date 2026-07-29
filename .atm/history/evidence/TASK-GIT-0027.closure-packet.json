@@ -1,0 +1,140 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0027",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "43e938266f464190f53a46292c193bc14e45ed1b",
+  "governedTreeSha": "349756c7024cd29fa58ae30d130e43d88c46c535",
+  "targetCommitDelta": {
+    "currentCommitSha": "43e938266f464190f53a46292c193bc14e45ed1b",
+    "parentCommitShas": [
+      "43e938266f464190f53a46292c193bc14e45ed1b"
+    ],
+    "governedTreeSha": "349756c7024cd29fa58ae30d130e43d88c46c535",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0027.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-28T23-54-23-736Z-import-1db34e96bbd7.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-28T23-55-09-469Z-reserve-f3c71fb4a605.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-28T23-55-09-472Z-promote-4dfebe9f43da.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-28T23-55-21-163Z-claim-5d3f808bc8bd.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-29T00-04-17-181Z-renew-1af539f4001a.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-29T01-00-43-996Z-repair-claim-6a86f26e3be1.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-29T01-02-21-370Z-release-09873e815c12.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-29T02-04-04-546Z-import-05455998ae60.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-29T02-04-12-289Z-reserve-622b79024aad.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-29T02-04-12-291Z-promote-22b42edfc3db.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-29T02-04-27-128Z-claim-ec79bdf2b32c.json",
+      ".atm/history/task-events/TASK-GIT-0027/2026-07-29T17-12-26-538Z-renew-7867763053ff.json",
+      ".atm/history/tasks/TASK-GIT-0024.json",
+      ".atm/history/tasks/TASK-GIT-0027.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fae507da5c4d26488bb32108c726ecfb212770945d8a425c32ab644fb639dc27",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5fcbb38fa94d28688beca2dbc9a3bc683419f39c8884ae94b6659ad5197267ec",
+      "stderrSha256": "sha256:52ffe1dbbd5029d0c82a952f030d05f7d2f3026cd8086b902f462311ead1502e",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-29T17:13:16.277Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0027.*",
+      ".atm/history/task-events/TASK-GIT-0027/**",
+      ".atm/history/tasks/TASK-GIT-0027.json",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-GIT-0027.json",
+  "closedAt": "2026-07-29T17:13:16.278Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729020412-codex-git-series-captain-TASK-GIT-0027-2004bee5d6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0de8db0a413c65ee017a020fde6c22e25c6f1cf2",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

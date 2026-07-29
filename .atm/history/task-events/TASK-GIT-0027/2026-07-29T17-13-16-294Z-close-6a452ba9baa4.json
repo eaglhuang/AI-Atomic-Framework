@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-29T17-13-16-294Z-close-6a452ba9baa4",
+  "taskId": "TASK-GIT-0027",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729020412-codex-git-series-captain-TASK-GIT-0027-2004bee5d6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0027.json",
+  "taskSha256": "sha256:488d5b6b081c53349fd49520b67da3db9c241e52948736a26d5c9556ee0c5df3",
+  "createdAt": "2026-07-29T17:13:16.294Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0027 --actor codex-git-series-captain --status done --historical-delivery 0de8db0a413c65ee017a020fde6c22e25c6f1cf2",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260729020412-codex-git-series-captain-TASK-GIT-0027-2004bee5d6",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0027.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-29T17:13:16.277Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0027.*",
+        ".atm/history/task-events/TASK-GIT-0027/**",
+        ".atm/history/tasks/TASK-GIT-0027.json",
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "tests/cli/git-index-override-lease-consumption.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "tests/cli/git-index-override-lease-consumption.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

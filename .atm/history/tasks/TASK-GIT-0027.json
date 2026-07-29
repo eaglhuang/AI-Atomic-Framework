@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0027",
+  "title": "Index lease consumption and atomic staged-bundle parking",
+  "status": "done",
+  "milestone": "G7.1",
+  "dependencies": [
+    "TASK-GIT-0015"
+  ],
+  "acceptance": [
+    "A valid lease authorizes exactly its foreign staged entries by path, blob ID and mode, without mutating the index.",
+    "Missing, expired, already-consumed, partial, path-mismatched, blob-mismatched, and mode-mismatched leases fail before any index mutation.",
+    "The authority contains no TASK-GIT incident ID, actor ID, date, or hard-coded path policy. GIT-0028 exclusively owns park/restore, caller adapters, and commit-failure receipt lifecycle.",
+    "Focused lease-consumption, typecheck, and CLI validation pass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "tests/cli/git-index-override-lease-consumption.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "tests/cli/git-index-override-lease-consumption.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "tests/cli/git-index-override-lease-consumption.test.ts",
+        "One GitIndexLeaseAuthority interface that authorizes and single-use consumes a non-expired stage-override lease only when its actor, task, normalized paths, staged blob IDs, and staged modes exactly match the live foreign index entries.",
+        "An immutable exact-entry authorization result for TASK-GIT-0028; this card never parks, restores, commits, or wires a caller.",
+        "Fail-closed diagnostics for missing, expired, consumed, partial, mismatched-path, mismatched-blob, or mismatched-mode leases; no raw Git recovery instruction and no task/actor/path incident allowlist."
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0027-index-lease-consumption-and-atomic-staged-bundle-parking.task.md",
+    "sectionTitle": "TASK-GIT-0027",
+    "headingLine": 46,
+    "hash": "7d7d7c37fd8a81a2",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0027-index-lease-consumption-and-atomic-staged-bundle-parking.task.md",
+      "planningCommitSha": "b3fd7a438b2b22a776f703c552ffa808808c4eb6",
+      "contentDigest": "sha256:7d7d7c37fd8a81a2ef40149cc6438213a8ecec81a45423a272d2b4cfdf2d5570",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-29T02:04:04.399Z"
+    }
+  },
+  "importedAt": "2026-07-29T02:04:04.399Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.git.index.override.lease.consumption.test.ts",
+      "command": "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-29T17-13-16-294Z-close-6a452ba9baa4",
+  "lastTransitionAt": "2026-07-29T17:13:16.294Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-git-series-captain",
+  "reservedAt": "2026-07-29T02:04:12.289Z",
+  "promotedAt": "2026-07-29T02:04:12.291Z",
+  "claim": {
+    "actorId": "codex-git-series-captain",
+    "leaseId": "lease-782882cf6a89",
+    "claimedAt": "2026-07-29T02:04:12.294Z",
+    "heartbeatAt": "2026-07-29T17:13:16.289Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0027.json",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260729020412-codex-git-series-captain-f998e3cbaf",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729020412-codex-git-series-captain-f998e3cbaf\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-29T02:04:12.294Z",
+  "startedByActor": "codex-git-series-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-71c5ec031d586824",
+    "ticketDigest": "sha256:71c5ec031d586824b6e3c23dc844c9f8f29406ebd8a55077b7cf7a1769e9ec09",
+    "taskId": "TASK-GIT-0027",
+    "origin": "claim",
+    "actorId": "codex-git-series-captain",
+    "laneSessionId": "lane-20260729020412-codex-git-series-captain-f998e3cbaf",
+    "claimGeneration": "lease-782882cf6a89",
+    "issuedAt": "2026-07-29T17:12:25.008Z",
+    "expiresAt": "2026-07-29T17:42:25.008Z",
+    "scopeDigest": "sha256:6ffa0701e94c252f606c3d66783a958d3a38f6a21a3534014ec7de0022e58b69",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-29T17:12:25.008Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0027.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-GIT-0027/**",
+          ".atm/history/tasks/TASK-GIT-0027.json",
+          "packages/cli/src/commands/git-index-ownership.ts",
+          "tests/cli/git-index-override-lease-consumption.test.ts"
+        ],
+        "digest": "sha256:6cfadbdaf1e54dc394e67622a927bb40a7aeebaa0abd450679dac58c0b18147d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:3b09034b576f26e8321df7261d6e042f868b3bc19d699d2b5641c44caea73079",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:ac249182061e9147ec9bba16419a7d79c8b9b3feab160454f1ba59279fa1aec2"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260729020412-codex-git-series-captain-TASK-GIT-0027-2004bee5d6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0027",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0027.*",
+      ".atm/history/task-events/TASK-GIT-0027/**",
+      ".atm/history/tasks/TASK-GIT-0027.json",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "25c69e7b4e2e13cad5d52e6bc2138d316941a4b216b14e2b1f474b1f46d80217",
+    "actorId": "codex-git-series-captain",
+    "sessionId": "session-20260729020412-codex-git-series-captain-TASK-GIT-0027-2004bee5d6",
+    "laneSession": {
+      "laneSessionId": "lane-20260729020412-codex-git-series-captain-f998e3cbaf",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729020412-codex-git-series-captain-f998e3cbaf\""
+    },
+    "createdAt": "2026-07-29T02:04:27.127Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-29T17:00:34.239Z",
+    "releasedBy": "codex-git-series-captain"
+  },
+  "closedAt": "2026-07-29T17:13:16.289Z",
+  "closedByActor": "codex-git-series-captain",
+  "closedBySessionId": "session-20260729020412-codex-git-series-captain-TASK-GIT-0027-2004bee5d6",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0027.closure-packet.json"
+}
