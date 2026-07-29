@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-29-255",
+  "date": "2026-07-29",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Batch governance / pre-commit",
+  "finding": "Official batch recovery records produced by tasks import and batch skip can be rejected by the pre-commit cross-task mutation guard as ordinary cross-task edits, forcing a governed operator to use an emergency hook bypass even when every staged file is the exact audit trail for dependency-blocked queue-head triage.",
+  "expectedBehavior": "Pre-commit should recognize and validate official batch skip/import audit bundles as a first-class governed mutation class, with exact task/event/file constraints, so dependency-blocked batch triage can be committed without raw hook bypass.",
+  "evidenceOrRepro": "After re-sealing ATM-GOV-0237/ATM-GOV-0238 and skipping dependency-blocked ATM-GOV-0237, ATM-GOV-0238, and TASK-GIT-0028 in batch batch-97d04a6e4bca, normal git commit failed with ATM_CROSS_TASK_MUTATION_BLOCKED. Emergency lease EMG-GLOBAL-f3cc76ae22 was required for commit e68d54dd4.",
+  "followUp": "Add a batch-skip-audit or batch-recovery-audit classification to the pre-commit guard, require the corresponding batch/task event files and task ledger transitions, and add a regression test covering dependency-blocked queue-head skip commits without --no-verify."
+}
