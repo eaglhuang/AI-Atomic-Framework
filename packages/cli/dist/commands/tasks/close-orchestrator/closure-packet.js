@@ -5,6 +5,7 @@ import { computeMissingValidatorReport } from '../../evidence.js';
 import { createClosurePacket, requiredValidationPassesForClosure, validateClosurePacket } from '../../framework-development.js';
 import { buildHistoricalDeliveryProvenance } from '../historical-delivery.js';
 import { uniqueStrings } from '../../tasks.js';
+import { assertAcceptanceEvidenceClosureGate } from './acceptance-evidence-gate.js';
 export function prepareClosurePacket(input) {
     const { options, taskDocument, actorId, activeSession, frameworkStatus, deliverableGate, taskDeclaredFiles, historicalBatchSlice } = input;
     const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
@@ -53,6 +54,7 @@ export function prepareClosurePacket(input) {
         };
     }
     const closePacketChangedFiles = deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles;
+    assertAcceptanceEvidenceClosureGate({ taskId: options.taskId, taskDocument });
     const pendingClosurePacket = createClosurePacket({
         cwd: options.cwd,
         taskId: options.taskId,
