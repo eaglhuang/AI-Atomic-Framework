@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T17-50-08-070Z-scope-amendment-3648407a7d97",
+  "taskId": "TASK-SKL-0032",
+  "action": "scope-amendment",
+  "actorId": "codex-skl-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0032.json",
+  "taskSha256": "sha256:dbb2a02b566abcb204ec067eaf8cd3fd2ebb30ebe8e7d5a68e489100867e41cd",
+  "createdAt": "2026-07-30T17:50:08.070Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0032 --actor codex-skl-captain --add scripts/validate-schemas/context.ts --reason \"TASK-SKL-0032 adds integration schemas that must be included in npm run validate:schemas rather than leaving new schemas unverified\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-SKL-0032 adds integration schemas that must be included in npm run validate:schemas rather than leaving new schemas unverified"
+  }
+}

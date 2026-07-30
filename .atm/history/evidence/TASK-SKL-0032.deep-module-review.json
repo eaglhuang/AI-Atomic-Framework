@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.deepModuleReviewReport.v1",
+  "providerContract": "atm.deepModuleRefactorProvider.v1",
+  "providerId": "matt-pocock-deep-module-reference",
+  "providerVersion": "2026-07-24.ed37663",
+  "generatedAt": "1970-01-01T00:00:00.000Z",
+  "taskId": "TASK-SKL-0032",
+  "status": "pass",
+  "candidate": {
+    "moduleId": "atm.editor-skill-overlay",
+    "sourcePaths": [
+      "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+      "packages/integrations-core/src/distribution/editor-global-overlay.ts"
+    ],
+    "ownerAtomOrMap": "atm.editor-skill-overlay",
+    "publicInterface": "loadExternalSkillCatalog -> federateExternalSkillCatalog -> createEditorGlobalOverlayPlan/applyEditorGlobalOverlayPlan",
+    "rollback": "Revert TASK-SKL-0032 delivery commit and disable editor-global overlay profile; repo-local integration manifests remain separate.",
+    "causalValidators": [
+      "node --strip-types tests/cli/editor-global-skill-federation.test.ts",
+      "node --strip-types tests/cli/editor-global-overlay-collision.test.ts",
+      "npm run validate:schemas",
+      "npm run typecheck",
+      "npm run validate:cli"
+    ]
+  },
+  "triggerVerdict": {
+    "actionableTriggers": [
+      "duplicated-policy",
+      "caller-complexity",
+      "missing-test-seam"
+    ],
+    "fileLengthAdvisoryOnly": true
+  },
+  "seam": {
+    "proposedInterface": "loadExternalSkillCatalog -> federateExternalSkillCatalog -> createEditorGlobalOverlayPlan/applyEditorGlobalOverlayPlan",
+    "requiresTwoAdapters": true,
+    "proposedAdapters": [
+      "codex editor-global overlay",
+      "claude-code editor-global overlay"
+    ],
+    "deletionTest": "If this module is deleted, the policy and caller complexity must reappear across callers; otherwise the module is too shallow.",
+    "interfaceTest": "Replace internals through the proposed interface and assert observable behavior through that interface only."
+  },
+  "hiddenComplexity": {
+    "depth": "high",
+    "leverage": "Concentrate repeated policy behind one interface so callers gain more behavior per fact learned.",
+    "locality": "Keep fixes, rollback, and causal validator updates inside the owner atom or map."
+  },
+  "dependencyClass": [
+    "in-process",
+    "local-substitutable"
+  ],
+  "replaceDontLayerTest": "Replace old private-internal tests with tests through the proposed interface once the adapters exist; do not layer tests over old shallow modules.",
+  "rollback": "Revert TASK-SKL-0032 delivery commit and disable editor-global overlay profile; repo-local integration manifests remain separate.",
+  "causalValidators": [
+    "node --strip-types tests/cli/editor-global-skill-federation.test.ts",
+    "node --strip-types tests/cli/editor-global-overlay-collision.test.ts",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "confidence": "high",
+  "receiptFingerprint": "deep-module-review:486624f8"
+}

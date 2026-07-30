@@ -1,0 +1,303 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0032",
+  "title": "Editor-global skill source federation and overlay manifests",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R1.0",
+  "dependencies": [
+    "TASK-SKL-0031"
+  ],
+  "acceptance": [
+    "External source descriptors record source root/provider, skill ID, content digest, provenance, license when known, and supported source format without embedding machine-specific paths in production policy.",
+    "ATM-owned IDs and namespaces cannot be silently overridden by an external source. Conflicts produce a deterministic preserve, select, or fail-closed decision with source attribution.",
+    "Overlay planning uses the `TASK-SKL-0031` public interface and does not create a second ATM skill registry, compiler, or install lifecycle.",
+    "User-global manifests are separate from repo-local ATM integration manifests and record only files managed by the selected overlay profile.",
+    "Dry-run reports additions, updates, fallbacks, skipped invalid sources, collisions, stale managed files, and preserved unmanaged files before apply.",
+    "Apply and verify are hash-bound and idempotent. Modified or unmanaged editor files are preserved unless a separately governed explicit action authorizes replacement or removal.",
+    "At least Codex and Claude Code global roots are covered by real adapters; other editors either implement the same contract or emit structured unsupported-capability evidence.",
+    "Tests use temporary fixture roots and cover incomplete source directories, companion files, duplicate IDs, source priority, stale manifests, and rollback without touching a real user profile.",
+    "The 2026-07-26 Claude sync manifest is retained only as migration evidence, not imported as canonical runtime configuration."
+  ],
+  "deliverables": [
+    "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+    "packages/integrations-core/src/distribution/editor-global-overlay.ts",
+    "schemas/integrations/external-skill-catalog.schema.json",
+    "schemas/integrations/editor-global-skill-manifest.schema.json",
+    "docs/AGENT_PACK_ONBOARDING.md",
+    "tests/cli/editor-global-skill-federation.test.ts",
+    "tests/cli/editor-global-overlay-collision.test.ts"
+  ],
+  "scopePaths": [
+    "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+    "packages/integrations-core/src/distribution/editor-global-overlay.ts",
+    "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+    "packages/integrations-core/src/manifest/types.ts",
+    "packages/integrations-core/src/index.ts",
+    "packages/cli/src/commands/integration/**",
+    "schemas/integrations/external-skill-catalog.schema.json",
+    "schemas/integrations/editor-global-skill-manifest.schema.json",
+    "docs/AGENT_PACK_ONBOARDING.md",
+    "tests/catalog/groups/test_group_editor_skill_overlay.shard.json",
+    "tests/cli/editor-global-skill-federation.test.ts",
+    "tests/cli/editor-global-overlay-collision.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/editor-global-skill-federation.test.ts",
+    "node --strip-types tests/cli/editor-global-overlay-collision.test.ts",
+    "npm run validate:schemas",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Moving personal or third-party skill bodies into templates/skills.",
+    "Treating an external overlay catalog as ATM product or runtime authority.",
+    "Reading or mutating real user home directories in automated tests."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-external-source-provenance-and-overlay-safety",
+  "rollbackStrategy": "revert-commit-and-disable-editor-global-overlay-profile",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.editor-skill-overlay",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.external-skill-catalog-adapter",
+        "pattern": "Adapter",
+        "source": "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0032-editor-global-skill-source-federation-and-overlay-manifests.task.md",
+    "sectionTitle": "TASK-SKL-0032",
+    "headingLine": 85,
+    "hash": "934dc90f009c1ef6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0032-editor-global-skill-source-federation-and-overlay-manifests.task.md",
+      "planningCommitSha": "949f05d94d869d02bb744fb02f892d7c0b3ddaec",
+      "contentDigest": "sha256:934dc90f009c1ef67c37b1c45f3f3b459fbf3851ef39703d5f785216a23320e6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T15:59:45.812Z"
+    }
+  },
+  "importedAt": "2026-07-30T15:59:45.812Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-SKL-0031"
+    ],
+    "startConditions": [
+      "TASK-SKL-0031 is done and the skill-distribution public interface is sealed."
+    ],
+    "softRelations": [
+      "Claude global skill sync manifest from the 2026-07-26 migration probe"
+    ],
+    "changedPublicSeams": [
+      "External skill source catalog ingestion",
+      "Editor-global overlay planning and verification"
+    ],
+    "causalImpactEdges": [
+      "external source provenance -> overlay catalog",
+      "overlay catalog plus ATM profile -> collision-aware installation plan",
+      "installation plan -> editor-global managed manifest"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "node --strip-types tests/cli/editor-global-skill-federation.test.ts",
+      "node --strip-types tests/cli/editor-global-overlay-collision.test.ts"
+    ],
+    "phaseOwner": "atm-integrations"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [
+    "test_task_skl_0032_global_federation_43bfb7c2",
+    "test_task_skl_0032_overlay_collision_f9f565a0"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "lastTransitionId": "2026-07-30T18-08-58-183Z-renew-a2848a54f090",
+  "lastTransitionAt": "2026-07-30T18:08:58.183Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-30T17:47:51.666Z",
+  "promotedAt": "2026-07-30T17:47:51.670Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-578b2717c52c",
+    "claimedAt": "2026-07-30T17:47:51.675Z",
+    "heartbeatAt": "2026-07-30T18:08:57.928Z",
+    "ttlSeconds": 3600,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0032.*",
+      ".atm/history/task-events/TASK-SKL-0032/**",
+      ".atm/history/tasks/TASK-SKL-0032.json",
+      "docs/AGENT_PACK_ONBOARDING.md",
+      "packages/cli/src/commands/integration/**",
+      "packages/integrations-core/src/distribution/editor-global-overlay.ts",
+      "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+      "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+      "packages/integrations-core/src/index.ts",
+      "packages/integrations-core/src/manifest/types.ts",
+      "schemas/integrations/editor-global-skill-manifest.schema.json",
+      "schemas/integrations/external-skill-catalog.schema.json",
+      "scripts/validate-schemas/context.ts",
+      "tests/catalog/groups/test_group_editor_skill_overlay.shard.json",
+      "tests/cli/editor-global-overlay-collision.test.ts",
+      "tests/cli/editor-global-skill-federation.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260730174752-codex-skl-captain-82ea32cb88",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730174752-codex-skl-captain-82ea32cb88\""
+    }
+  },
+  "startedAt": "2026-07-30T17:47:51.675Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-5fd6b44454ff1833",
+    "ticketDigest": "sha256:5fd6b44454ff183373bb5824eae4497eca5a781bd0afbc33c0f115da690bf7b1",
+    "taskId": "TASK-SKL-0032",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260730174752-codex-skl-captain-82ea32cb88",
+    "claimGeneration": "lease-578b2717c52c",
+    "issuedAt": "2026-07-30T18:08:57.928Z",
+    "expiresAt": "2026-07-30T19:08:57.928Z",
+    "scopeDigest": "sha256:d3f3ad2b03c76914dce8f2032d3a502c3cec57882c15a9517a3cba9899c4289a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T18:08:57.928Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0032.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-SKL-0032/**",
+          ".atm/history/tasks/TASK-SKL-0032.json",
+          "docs/AGENT_PACK_ONBOARDING.md",
+          "packages/cli/src/commands/integration/**",
+          "packages/integrations-core/src/distribution/editor-global-overlay.ts",
+          "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+          "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+          "packages/integrations-core/src/index.ts",
+          "packages/integrations-core/src/manifest/types.ts",
+          "schemas/integrations/editor-global-skill-manifest.schema.json",
+          "schemas/integrations/external-skill-catalog.schema.json",
+          "scripts/validate-schemas/context.ts",
+          "tests/catalog/groups/test_group_editor_skill_overlay.shard.json",
+          "tests/cli/editor-global-overlay-collision.test.ts",
+          "tests/cli/editor-global-skill-federation.test.ts"
+        ],
+        "digest": "sha256:b8ed5fa14458866915e47062b9554d90371d4193dbe6aa56b705224fa5d18fba"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260730174751-codex-skl-captain-TASK-SKL-0032-4e1119fc7a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0032",
+    "batchId": "batch-3ba305961a32",
+    "scopeKey": "TASK-SKL",
+    "queueId": "queue-5a4e0443a890abe4",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0032.*",
+      ".atm/history/task-events/TASK-SKL-0032/**",
+      ".atm/history/tasks/TASK-SKL-0032.json",
+      "docs/AGENT_PACK_ONBOARDING.md",
+      "packages/cli/src/commands/integration/**",
+      "packages/integrations-core/src/distribution/editor-global-overlay.ts",
+      "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+      "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+      "packages/integrations-core/src/index.ts",
+      "packages/integrations-core/src/manifest/types.ts",
+      "schemas/integrations/editor-global-skill-manifest.schema.json",
+      "schemas/integrations/external-skill-catalog.schema.json",
+      "scripts/validate-schemas/context.ts",
+      "tests/catalog/groups/test_group_editor_skill_overlay.shard.json",
+      "tests/cli/editor-global-overlay-collision.test.ts",
+      "tests/cli/editor-global-skill-federation.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0032-editor-global-skill-source-federation-and-overlay-manifests.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0032-editor-global-skill-source-federation-and-overlay-manifests.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "3675e2379b0b54490d27b108c8066b8c189f0b8e1d3047d84125494bc5c3f364",
+    "actorId": "codex-skl-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730174752-codex-skl-captain-82ea32cb88",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730174752-codex-skl-captain-82ea32cb88\""
+    },
+    "createdAt": "2026-07-30T17:48:31.349Z",
+    "status": "active"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/integrations/editor-global-skill-manifest.schema.json",
+  "title": "ATM Editor Global Skill Manifest v0.1",
+  "description": "Hash-bound manifest for files managed by an editor-global ATM skill overlay.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "adapterId", "overlayProfileId", "targetRootRef", "targetDir", "generatedAt", "sourceCatalogDigest", "planDigest", "files"],
+  "properties": {
+    "schemaId": { "const": "atm.editorGlobalSkillManifest.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": { "$ref": "#/$defs/migration" },
+    "adapterId": { "type": "string", "minLength": 1 },
+    "overlayProfileId": { "type": "string", "minLength": 1 },
+    "targetRootRef": { "type": "string", "minLength": 1 },
+    "targetDir": { "$ref": "#/$defs/safePath" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "sourceCatalogDigest": { "$ref": "#/$defs/sha256" },
+    "planDigest": { "$ref": "#/$defs/sha256" },
+    "files": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file" }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "enum": ["none", "additive", "breaking"] },
+        "fromVersion": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "safePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))(?!.*:).+"
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "sizeBytes", "sourceSkillId", "sourceDigest", "fileFormat"],
+      "properties": {
+        "path": { "$ref": "#/$defs/safePath" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "sizeBytes": { "type": "integer", "minimum": 0 },
+        "sourceSkillId": { "type": "string", "minLength": 1 },
+        "sourceDigest": { "$ref": "#/$defs/sha256" },
+        "fileFormat": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
