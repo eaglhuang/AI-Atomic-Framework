@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-002",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Closure repair / write-ticket commit adapter",
+  "finding": "tasks repair-closure can successfully stage a closure-packet repair bundle and return a governed git commit command, but the returned git commit path can still fail with ATM_WRITE_TICKET_STALE. A fresh write-ticket acquired through write-ticket acquire is emitted in stdout but is not persisted or accepted by git commit because the commit facade exposes no --ticket bridge.",
+  "expectedBehavior": "A successful repair-closure mutation should either mint and persist the exact write-ticket required by its returned commit command, or return a copyable reseal/commit command that the git commit adapter can consume without manual native-git fallback.",
+  "evidenceOrRepro": "During TASK-SKL-0036 pre-push repair, node atm.mjs tasks repair-closure --task TASK-SKL-0036 --scope TASK-SKL-0036 --actor codex-skl-captain --emergency-approval EMG-TASK-SKL-0036-32cd011820 --json staged .atm/history/evidence/TASK-SKL-0036.closure-packet.json, .atm/history/evidence/git-head.jsonl, a repair-closure event, and .atm/history/tasks/TASK-SKL-0036.json. The returned node atm.mjs git commit command failed with ATM_WRITE_TICKET_STALE. Running node atm.mjs write-ticket acquire for the exact staged files succeeded, but a second git commit attempt still failed with ATM_WRITE_TICKET_STALE because the acquired ticket was not connected to the commit wrapper.",
+  "followUp": "Add adapter-level regression coverage for repair-closure -> fresh write-ticket -> governed commit. Prefer a deep-module fix where repair-closure, write-ticket acquire/check, and git commit share one durable ticket authority instead of exchanging transient stdout-only ticket objects."
+}
