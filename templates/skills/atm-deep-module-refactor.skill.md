@@ -78,6 +78,12 @@ governed follow-up unless a test seam is required for the fix.
 Read `references/deepening.md` only when dependency classification or
 replace-don't-layer testing is the decision point.
 
+When a repository declares a module boundary policy and a supported source
+discovery adapter is available, run the module-boundary topology validator before
+promoting a deep-module refactor. If the language is unsupported, report the
+unsupported-language advisory explicitly and keep the refactor recommendation
+manual-review until an adapter exists.
+
 Read `references/design-it-twice.md` only when the user asks for alternative
 interfaces or the first proposed interface is too shallow. Do not load report
 scaffolding or broad codebase history by default.

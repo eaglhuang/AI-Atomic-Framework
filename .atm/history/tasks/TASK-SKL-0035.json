@@ -1,0 +1,297 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0035",
+  "title": "Deep module boundary topology validator",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R1.2",
+  "dependencies": [
+    "TASK-SKL-0027",
+    "TASK-SKL-0031"
+  ],
+  "acceptance": [
+    "A schema declares modules, public entrypoints, allowed consumers, exceptions with expiry, and adapter-specific source discovery.",
+    "The core evaluator consumes a provider-neutral dependency graph; the initial TypeScript scanner is an adapter, not embedded core policy.",
+    "Positive fixtures prove legal root-entry imports and multiple real adapters; negative fixtures prove deep imports, cycles, undeclared cross-package edges and expired exceptions fail.",
+    "Validation emits source/config/candidate digests and exact offending edges suitable for TASK-SKL-0029 evidence freshness.",
+    "The deep-module skill uses the validator when available and reports an explicit unsupported-language advisory otherwise.",
+    "The gate is opt-in per declared boundary until shadow evidence supports wider promotion; no repository-wide policy is inferred automatically."
+  ],
+  "deliverables": [
+    "schemas/validators/module-boundary-policy.schema.json",
+    "packages/core/src/architecture/module-boundary.ts",
+    "scripts/validate-module-boundaries/implementation.ts",
+    "scripts/module-boundaries.config.json",
+    "tests/cli/module-boundary-topology.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/validators/module-boundary-policy.schema.json",
+    "packages/core/src/architecture/module-boundary.ts",
+    "packages/core/src/architecture/index.ts",
+    "scripts/validate-module-boundaries/implementation.ts",
+    "scripts/module-boundaries.config.json",
+    "templates/skills/atm-deep-module-refactor.skill.md",
+    "templates/skills/atm-deep-module-refactor.files/references/**",
+    "tests/catalog/groups/test_group_module_boundaries.shard.json",
+    "tests/fixtures/module-boundaries/**",
+    "tests/cli/module-boundary-topology.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/module-boundary-topology.test.ts",
+    "npm run validate:schemas",
+    "npm run validate:skill-templates",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "A TypeScript-only hard dependency in provider-neutral ATM core.",
+    "Automatically rewriting imports or package entrypoints.",
+    "Treating every internal import as a violation without declared policy."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-module-boundary-policy-and-negative-fixture-receipt",
+  "rollbackStrategy": "revert-commit-and-disable-module-boundary-validator",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.architecture-review",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.module-boundary-topology",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/architecture/module-boundary.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0035-deep-module-boundary-topology-validator.task.md",
+    "sectionTitle": "TASK-SKL-0035",
+    "headingLine": 79,
+    "hash": "ba41ec658d57c610",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0035-deep-module-boundary-topology-validator.task.md",
+      "planningCommitSha": "f3d85ac5253e655f177cba2eb58411ca1c5eddd5",
+      "contentDigest": "sha256:ba41ec658d57c610d0c5b4bd8468fa017f808f3d33eb2dff6369445ad334219a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T16:00:10.493Z"
+    }
+  },
+  "importedAt": "2026-07-30T16:00:10.493Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-SKL-0027",
+      "TASK-SKL-0031"
+    ],
+    "startConditions": [
+      "TASK-SKL-0031 is done and the deep-module skill projection is current."
+    ],
+    "softRelations": [
+      "Matt Pocock setup-ts-deep-modules is an in-progress reference provider only."
+    ],
+    "changedPublicSeams": [
+      "Module boundary policy",
+      "Import topology receipt"
+    ],
+    "causalImpactEdges": [
+      "declared public entrypoint -> allowed dependency topology",
+      "observed imports -> deterministic boundary findings"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "node --strip-types tests/cli/module-boundary-topology.test.ts"
+    ],
+    "phaseOwner": "atm-architecture"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [
+    "test_task_skl_0035_module_boundary_topology_b6c94fb2"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "lastTransitionId": "2026-07-30T19-27-36-652Z-scope-amendment-a71d5e682da6",
+  "lastTransitionAt": "2026-07-30T19:27:36.652Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-30T19:24:21.385Z",
+  "promotedAt": "2026-07-30T19:24:21.388Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-d0c9b49d24cd",
+    "claimedAt": "2026-07-30T19:24:21.392Z",
+    "heartbeatAt": "2026-07-30T19:24:21.392Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0035.*",
+      ".atm/history/task-events/TASK-SKL-0035/**",
+      ".atm/history/tasks/TASK-SKL-0035.json",
+      "packages/core/src/architecture/index.ts",
+      "packages/core/src/architecture/module-boundary.ts",
+      "schemas/validators/module-boundary-policy.schema.json",
+      "scripts/module-boundaries.config.json",
+      "scripts/validate-module-boundaries/implementation.ts",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-deep-module-refactor.files/references/**",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "tests/catalog/groups/test_group_module_boundaries.shard.json",
+      "tests/cli/module-boundary-topology.test.ts",
+      "tests/fixtures/module-boundaries/**"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260730192421-codex-skl-captain-22516253c0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730192421-codex-skl-captain-22516253c0\""
+    }
+  },
+  "startedAt": "2026-07-30T19:24:21.392Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f1ad8a304770e261",
+    "ticketDigest": "sha256:f1ad8a304770e2613c3b5c3b67c9d31a61774fb56f3006d457f2538ddeee1819",
+    "taskId": "TASK-SKL-0035",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260730192421-codex-skl-captain-22516253c0",
+    "claimGeneration": "lease-d0c9b49d24cd",
+    "issuedAt": "2026-07-30T19:24:21.392Z",
+    "expiresAt": "2026-07-30T19:54:21.392Z",
+    "scopeDigest": "sha256:82e8814d0cd4ba9404f68ee76cd3860cb3ecd9268c430322a1c26e12d9608587",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T19:24:21.392Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0035.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-SKL-0035/**",
+          ".atm/history/tasks/TASK-SKL-0035.json",
+          "packages/core/src/architecture/index.ts",
+          "packages/core/src/architecture/module-boundary.ts",
+          "schemas/validators/module-boundary-policy.schema.json",
+          "scripts/module-boundaries.config.json",
+          "scripts/validate-module-boundaries/implementation.ts",
+          "templates/skills/atm-deep-module-refactor.files/references/**",
+          "templates/skills/atm-deep-module-refactor.skill.md",
+          "tests/catalog/groups/test_group_module_boundaries.shard.json",
+          "tests/cli/module-boundary-topology.test.ts",
+          "tests/fixtures/module-boundaries/**"
+        ],
+        "digest": "sha256:c8e22ec57b0e09118ee3408be721a15e76bfd1f9f5d1901c7472f83f0b6201d1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:18bac014d8c6540f21e92123a4a48d60a586d3878d1f6b3e3b4786cd34dba9d8",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:9718a90eb70c235fa286c52c48999a8af01d80f9ad0071279cde6aba7c41e329"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260730192421-codex-skl-captain-TASK-SKL-0035-a0ad4843e6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0035",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0035.*",
+      ".atm/history/task-events/TASK-SKL-0035/**",
+      ".atm/history/tasks/TASK-SKL-0035.json",
+      "packages/core/src/architecture/index.ts",
+      "packages/core/src/architecture/module-boundary.ts",
+      "schemas/validators/module-boundary-policy.schema.json",
+      "scripts/module-boundaries.config.json",
+      "scripts/validate-module-boundaries/implementation.ts",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-deep-module-refactor.files/references/**",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "tests/catalog/groups/test_group_module_boundaries.shard.json",
+      "tests/cli/module-boundary-topology.test.ts",
+      "tests/fixtures/module-boundaries/**"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0035-deep-module-boundary-topology-validator.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0035-deep-module-boundary-topology-validator.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "987ad710d3ed7cc0b00a22dfb1a4c97fc800e774dba83c36ddfb85ad0e3c8606",
+    "actorId": "codex-skl-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730192421-codex-skl-captain-22516253c0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730192421-codex-skl-captain-22516253c0\""
+    },
+    "createdAt": "2026-07-30T19:24:42.996Z",
+    "status": "active"
+  }
+}
