@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 /** The stable output family of a sealed ATM runner build. */
@@ -27,8 +28,9 @@ export function deriveRunnerBuildOutputInventory(input) {
  * not infer it from a dirty Git diff, which may contain another lane's work.
  */
 export function scanSealedRunnerBuildOutputInventory(input) {
-    const outputPaths = publicationRoots(input.cwd, input.buildTarget)
-        .flatMap((root) => listFiles(input.cwd, root));
+    const roots = publicationRoots(input.cwd, input.buildTarget);
+    const outputPaths = roots.flatMap((root) => listFiles(input.cwd, root));
+    outputPaths.push(...listTrackedFiles(input.cwd, roots));
     if (input.taskId)
         outputPaths.push(`.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`);
     return deriveRunnerBuildOutputInventory({
@@ -195,4 +197,19 @@ function listFiles(cwd, relativeRoot) {
     };
     visit(absoluteRoot);
     return files;
+}
+function listTrackedFiles(cwd, relativeRoots) {
+    if (relativeRoots.length === 0)
+        return [];
+    const result = spawnSync('git', ['ls-files', '--', ...relativeRoots.map(normalizePath)], {
+        cwd,
+        encoding: 'utf8',
+        maxBuffer: 16 * 1024 * 1024
+    });
+    if ((result.status ?? 1) !== 0)
+        return [];
+    return String(result.stdout ?? '')
+        .split(/\r?\n/)
+        .map(normalizePath)
+        .filter(Boolean);
 }

@@ -1,0 +1,143 @@
+{
+  "schemaId": "atm.validatorGovernanceReplayFixture.v1",
+  "specVersion": "0.1.0",
+  "environmentSeal": {
+    "nodeMajor": 24,
+    "catalogVersion": "TASK-SKL-0029.closed",
+    "fixtureDigest": "sha256:historical-ab-replay-v1",
+    "candidateSet": "plan3-validator-governance-historical"
+  },
+  "strategies": [
+    {
+      "id": "legacy-all-run",
+      "description": "Legacy baseline: every declared validator in the card is executed for every candidate.",
+      "adapterProjection": "legacy.allRunPerCard.v1"
+    },
+    {
+      "id": "causal-phase",
+      "description": "Causal selector plus phase-suite ownership from the SKL validator governance contract.",
+      "adapterProjection": "atm.validationContractEvaluation.v1"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "selector-low-risk-docs",
+      "taskId": "TASK-SKL-0026",
+      "changedFiles": ["docs/governance/validator-governance.md"],
+      "defectPresent": false,
+      "legacy": {
+        "selectedCaseIds": ["typecheck", "validate:cli", "selector-contract", "phase-suite", "adapter-conformance"],
+        "latencyMs": 182000,
+        "cacheHit": false,
+        "phaseDetected": true,
+        "falseBlock": false,
+        "flaky": false,
+        "defectDetected": false
+      },
+      "causal": {
+        "selectedCaseIds": ["selector-contract", "adapter-conformance"],
+        "latencyMs": 43000,
+        "cacheHit": true,
+        "phaseDetected": true,
+        "falseBlock": false,
+        "flaky": false,
+        "defectDetected": false
+      }
+    },
+    {
+      "id": "selector-high-risk-runtime",
+      "taskId": "TASK-SKL-0029",
+      "changedFiles": ["packages/core/src/evidence/validation-contract.ts"],
+      "defectPresent": true,
+      "legacy": {
+        "selectedCaseIds": ["typecheck", "validate:cli", "selector-contract", "phase-suite", "adapter-conformance", "stale-receipt-negative"],
+        "latencyMs": 244000,
+        "cacheHit": false,
+        "phaseDetected": true,
+        "falseBlock": false,
+        "flaky": false,
+        "defectDetected": true
+      },
+      "causal": {
+        "selectedCaseIds": ["selector-contract", "phase-suite", "adapter-conformance", "stale-receipt-negative"],
+        "latencyMs": 76000,
+        "cacheHit": true,
+        "phaseDetected": true,
+        "falseBlock": false,
+        "flaky": false,
+        "defectDetected": true
+      }
+    },
+    {
+      "id": "adapter-projection-swap",
+      "taskId": "TASK-SKL-0028",
+      "changedFiles": ["packages/cli/src/commands/batch/plan-executor.ts"],
+      "defectPresent": true,
+      "legacy": {
+        "selectedCaseIds": ["typecheck", "validate:cli", "batch-adapter", "runner-adapter", "provider-swap"],
+        "latencyMs": 211000,
+        "cacheHit": false,
+        "phaseDetected": false,
+        "falseBlock": true,
+        "flaky": true,
+        "defectDetected": true
+      },
+      "causal": {
+        "selectedCaseIds": ["batch-adapter", "runner-adapter", "provider-swap"],
+        "latencyMs": 69000,
+        "cacheHit": true,
+        "phaseDetected": true,
+        "falseBlock": false,
+        "flaky": false,
+        "defectDetected": true
+      }
+    },
+    {
+      "id": "unknown-boundary-fail-closed",
+      "taskId": "TASK-SKL-0027",
+      "changedFiles": ["packages/unknown/new-adapter.ts"],
+      "defectPresent": false,
+      "legacy": {
+        "selectedCaseIds": ["typecheck", "validate:cli"],
+        "latencyMs": 198000,
+        "cacheHit": false,
+        "phaseDetected": false,
+        "falseBlock": false,
+        "flaky": false,
+        "defectDetected": false
+      },
+      "causal": {
+        "selectedCaseIds": [],
+        "latencyMs": 12000,
+        "cacheHit": false,
+        "phaseDetected": false,
+        "falseBlock": true,
+        "flaky": false,
+        "defectDetected": false,
+        "failClosed": true
+      }
+    }
+  ],
+  "counterexamples": [
+    {
+      "id": "zero-test-false-green",
+      "description": "A no-op required set cannot be accepted as green when a task declares closure-critical validators.",
+      "acceptedByVerdict": false,
+      "rejectionCode": "ATM_VALIDATOR_GOVERNANCE_ZERO_TEST_FALSE_GREEN"
+    },
+    {
+      "id": "stale-receipt-reuse",
+      "description": "A stale receipt from a different git head cannot satisfy the replay verdict.",
+      "acceptedByVerdict": false,
+      "rejectionCode": "ATM_VALIDATOR_GOVERNANCE_STALE_RECEIPT_REUSE"
+    }
+  ],
+  "adapterConformance": [
+    { "adapter": "codex", "projection": "skill", "status": "pass" },
+    { "adapter": "claude-code", "projection": "skill", "status": "pass" },
+    { "adapter": "cursor", "projection": "markdown", "status": "pass" },
+    { "adapter": "copilot", "projection": "instructions-md", "status": "pass" },
+    { "adapter": "gemini", "projection": "toml", "status": "pass" },
+    { "adapter": "antigravity", "projection": "markdown", "status": "pass" }
+  ]
+}

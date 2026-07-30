@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atm.local/schemas/governance/cross-authority-closeback.schema.json",
+  "title": "ATM Cross-Authority Closeback Saga",
+  "oneOf": [
+    { "$ref": "#/$defs/plan" },
+    { "$ref": "#/$defs/receipt" }
+  ],
+  "$defs": {
+    "authorityName": {
+      "enum": ["target", "planning"]
+    },
+    "phase": {
+      "enum": ["prepared", "target-committed", "planning-committed", "both-committed", "closeback-pending"]
+    },
+    "authoritySnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "repoRoot", "head", "writeable"],
+      "properties": {
+        "name": { "$ref": "#/$defs/authorityName" },
+        "repoRoot": { "type": "string", "minLength": 1 },
+        "head": { "type": ["string", "null"] },
+        "sourceDigest": { "type": ["string", "null"] },
+        "writeable": { "type": "boolean" },
+        "remoteVisibilityRequired": { "type": "boolean" },
+        "canonicalRemote": { "type": ["string", "null"] },
+        "canonicalRef": { "type": ["string", "null"] },
+        "remoteReachableCommit": { "type": ["string", "null"] }
+      }
+    },
+    "sideEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "authority", "kind", "idempotencyKey", "status"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "authority": { "$ref": "#/$defs/authorityName" },
+        "kind": {
+          "enum": ["commit", "receipt", "notification", "broker-release", "planning-closeback"]
+        },
+        "idempotencyKey": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["pending", "completed", "failed"] },
+        "commitSha": { "type": ["string", "null"] }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "authority", "kind", "idempotencyKey", "recoveryCommand"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "authority": { "$ref": "#/$defs/authorityName" },
+        "kind": { "enum": ["prepare", "commit", "receipt", "remote-visibility", "finalize"] },
+        "idempotencyKey": { "type": "string", "minLength": 1 },
+        "recoveryCommand": { "type": "string", "minLength": 1 }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "taskId",
+        "sourceIdentity",
+        "target",
+        "planning",
+        "targetBundleDigest",
+        "planningPatchDigest",
+        "planStatusTransition",
+        "acceptanceEvidenceDigest",
+        "phase",
+        "sideEffectJournal",
+        "receiptDigest"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.crossAuthorityClosebackReceipt.v1" },
+        "taskId": { "type": "string", "minLength": 1 },
+        "sourceIdentity": { "type": "string", "minLength": 1 },
+        "target": { "$ref": "#/$defs/authoritySnapshot" },
+        "planning": { "$ref": "#/$defs/authoritySnapshot" },
+        "targetBundleDigest": { "type": "string", "pattern": "^sha256:" },
+        "planningPatchDigest": { "type": "string", "pattern": "^sha256:" },
+        "planStatusTransition": { "type": ["string", "null"] },
+        "acceptanceEvidenceDigest": { "type": ["string", "null"] },
+        "phase": { "$ref": "#/$defs/phase" },
+        "sideEffectJournal": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sideEffect" }
+        },
+        "receiptDigest": { "type": "string", "pattern": "^sha256:" }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "taskId",
+        "sourceIdentity",
+        "phase",
+        "globalCompletion",
+        "blockers",
+        "expectedFiles",
+        "authorityCas",
+        "steps",
+        "compensations",
+        "receipt",
+        "recoveryCommand"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.crossAuthorityClosebackPlan.v1" },
+        "taskId": { "type": "string", "minLength": 1 },
+        "sourceIdentity": { "type": "string", "minLength": 1 },
+        "phase": { "$ref": "#/$defs/phase" },
+        "globalCompletion": { "enum": ["complete", "closeback-pending"] },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "summary", "recoveryCommand"],
+            "properties": {
+              "code": { "type": "string", "minLength": 1 },
+              "summary": { "type": "string", "minLength": 1 },
+              "recoveryCommand": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "expectedFiles": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target", "planning"],
+          "properties": {
+            "target": { "type": "array", "items": { "type": "string" } },
+            "planning": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "authorityCas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["targetHead", "planningHead", "targetSourceDigest", "planningSourceDigest"],
+          "properties": {
+            "targetHead": { "type": ["string", "null"] },
+            "planningHead": { "type": ["string", "null"] },
+            "targetSourceDigest": { "type": ["string", "null"] },
+            "planningSourceDigest": { "type": ["string", "null"] }
+          }
+        },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/step" }
+        },
+        "compensations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "receipt": { "$ref": "#/$defs/receipt" },
+        "recoveryCommand": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
