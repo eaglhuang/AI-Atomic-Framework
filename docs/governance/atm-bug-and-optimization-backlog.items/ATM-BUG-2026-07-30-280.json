@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-30-280",
+  "date": "2026-07-30",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Runner Sync / Protected Evidence Hooks",
+  "finding": "Runner-sync receipt publication can deadlock with protected evidence hooks: the receipt is required for provenance, but committing the receipt is blocked as protected evidence missing task context, forcing emergency path-bounded no-verify commits.",
+  "expectedBehavior": "Framework-temp runner-sync receipts should carry enough task/session context for normal governed commit hooks, or runner-sync should provide a dedicated publication command that commits the receipt and runner bundle atomically.",
+  "evidenceOrRepro": "During ATM-GOV-0245, runner publication commits `1cabac72e0c24bb8c7ea3820f7832c1de88d0b4d` and `fa64ef7ba2c7b1b669055b7dbbc5d73390e5c824` required emergency path-bounded commits and later forward attestations because normal hooks rejected runner-sync receipt evidence context.",
+  "followUp": "Add runner-sync receipt commit coverage tests and a normal governed receipt publication path; retire the emergency/no-verify workaround."
+}

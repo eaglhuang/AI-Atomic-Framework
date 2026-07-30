@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-30-276",
+  "date": "2026-07-30",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Validator Scheduler",
+  "finding": "`npm run validate:standard -- --json` can exceed 30 minutes without emitting a bounded terminal summary or a clearly discoverable run id for the timed-out invocation.",
+  "expectedBehavior": "Long validator profiles should always emit progress, run id, currently running validator, failed validator summary, and a resume/status command before or at timeout. Evidence capture should never need another manual forensic pass to identify the blocking validator set.",
+  "evidenceOrRepro": "During ATM-GOV-0245 close evidence refresh, `node atm.mjs evidence run --command \"npm run validate:standard -- --json\"` timed out after about 1,804 seconds with no JSON summary. `.atm/runtime/validator-runs/atm-gov-0245-standard/summary.partial.json` later showed 13 failed validators and one running validator.",
+  "followUp": "Make run-validators/evidence-run cooperate on heartbeat output, terminal timeout envelopes, and automatic status artifact attachment for long profiles."
+}

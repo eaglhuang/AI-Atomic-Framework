@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-30-277",
+  "date": "2026-07-30",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Lane Session / Claim Lifecycle",
+  "finding": "Lane-owned claim renewals can fail with an actor-vs-same-actor `ATM_TASK_CLAIM_OWNER_MISMATCH` because the effective mismatch is lane-session identity, not actor identity.",
+  "expectedBehavior": "When `ownershipMode` is `lane-id`, the error code and message should name lane-vs-lane mismatch, and an expired `ATM_LANE_SESSION_ID` fallback should either adopt/rebind explicitly or fail with the adopt command before minting a competing lane.",
+  "evidenceOrRepro": "ATM-GOV-0245 renew failed with currentActor and actorId both `codex-git-series-captain`, holding lane `lane-20260729225909-...`, requested lane `lane-20260730011541-...`, and `ownershipMode: lane-id`. Running `lane adopt` then renew succeeded.",
+  "followUp": "Split lane mismatch from actor mismatch, add stale-lane env fallback semantics, and persist adoption so subsequent CLI invocations do not silently mint a new lane."
+}
