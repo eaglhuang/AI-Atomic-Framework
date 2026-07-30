@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T18-20-37-794Z-close-4b64b9e35c2b",
+  "taskId": "TASK-SKL-0032",
+  "action": "close",
+  "actorId": "codex-skl-captain",
+  "sessionId": "session-20260730174751-codex-skl-captain-TASK-SKL-0032-4e1119fc7a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0032.json",
+  "taskSha256": "sha256:6cbf287dcd4c0ec2f2bdf38fa9b426a99a8aafd00087f7b4b0390aaa3e00edba",
+  "createdAt": "2026-07-30T18:20:37.794Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0032 --actor codex-skl-captain --status done --from-batch-checkpoint --batch batch-3ba305961a32",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-3ba305961a32",
+    "sessionId": "session-20260730174751-codex-skl-captain-TASK-SKL-0032-4e1119fc7a",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0032.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/editor-global-overlay-collision.test.ts",
+      "node --strip-types tests/cli/editor-global-skill-federation.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-30T18:20:37.781Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0032.*",
+        ".atm/history/task-events/TASK-SKL-0032/**",
+        ".atm/history/tasks/TASK-SKL-0032.json",
+        "docs/AGENT_PACK_ONBOARDING.md",
+        "packages/cli/src/commands/integration/**",
+        "packages/integrations-core/src/distribution/editor-global-overlay.ts",
+        "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+        "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+        "packages/integrations-core/src/index.ts",
+        "packages/integrations-core/src/manifest/types.ts",
+        "schemas/integrations/editor-global-skill-manifest.schema.json",
+        "schemas/integrations/external-skill-catalog.schema.json",
+        "scripts/validate-schemas/context.ts",
+        "tests/catalog/groups/test_group_editor_skill_overlay.shard.json",
+        "tests/cli/editor-global-overlay-collision.test.ts",
+        "tests/cli/editor-global-skill-federation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/integration/**",
+        "packages/integrations-core/src/distribution/editor-global-overlay.ts",
+        "packages/integrations-core/src/distribution/external-skill-catalog.ts",
+        "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+        "packages/integrations-core/src/index.ts",
+        "packages/integrations-core/src/manifest/types.ts",
+        "schemas/integrations/editor-global-skill-manifest.schema.json",
+        "schemas/integrations/external-skill-catalog.schema.json",
+        "scripts/validate-schemas/context.ts",
+        "tests/catalog/groups/test_group_editor_skill_overlay.shard.json",
+        "tests/cli/editor-global-overlay-collision.test.ts",
+        "tests/cli/editor-global-skill-federation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
