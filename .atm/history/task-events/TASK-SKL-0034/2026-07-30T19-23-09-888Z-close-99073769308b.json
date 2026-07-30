@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T19-23-09-888Z-close-99073769308b",
+  "taskId": "TASK-SKL-0034",
+  "action": "close",
+  "actorId": "codex-skl-captain",
+  "sessionId": "session-20260730185803-codex-skl-captain-TASK-SKL-0034-6836c4eb17",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0034.json",
+  "taskSha256": "sha256:d49ff9ce187e6ab47e14776c93e0251c485d3e562e544f09f7e7742e7608885b",
+  "createdAt": "2026-07-30T19:23:09.888Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0034 --actor codex-skl-captain --status done --historical-delivery 1bcc5324a15de28961d5a009c084db4e8c6fa665",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260730185803-codex-skl-captain-TASK-SKL-0034-6836c4eb17",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0034.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/engineering-change-method-profiles.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-30T19:23:09.877Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0034.*",
+        ".atm/history/task-events/TASK-SKL-0034/**",
+        ".atm/history/tasks/TASK-SKL-0034.json",
+        "packages/core/src/skills/engineering-change-method.ts",
+        "packages/core/src/skills/index.ts",
+        "schemas/skills/engineering-change-method-profile.schema.json",
+        "scripts/engineering-change-method-profiles.json",
+        "scripts/validate-schemas/context.ts",
+        "templates/skills/atm-deep-module-refactor.skill.md",
+        "templates/skills/atm-evidence.skill.md",
+        "templates/skills/atm-plan-authoring.skill.md",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "tests/catalog/groups/test_group_engineering_method_profiles.shard.json",
+        "tests/cli/engineering-change-method-profiles.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/skills/engineering-change-method.ts",
+        "packages/core/src/skills/index.ts",
+        "schemas/skills/engineering-change-method-profile.schema.json",
+        "scripts/engineering-change-method-profiles.json",
+        "scripts/validate-schemas/context.ts",
+        "tests/catalog/groups/test_group_engineering_method_profiles.shard.json",
+        "tests/cli/engineering-change-method-profiles.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
