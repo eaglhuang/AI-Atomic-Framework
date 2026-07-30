@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0272",
+  "title": "Public forward and emergency attestation authority",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0271"
+  ],
+  "acceptance": [
+    "Public CLI/API exposes dry-run, write, status, and validate for forward attestations.",
+    "pre-push reports the exact public command when attestation is missing.",
+    "Emergency use requires reason, scope, immutable commit metadata, and evidence references; no hidden command is required.",
+    "Existing historical attestation files remain readable.",
+    "Implementation is generic across task ids, actors, commits, and repos."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/historical-work-admission-attestation.ts",
+    "packages/cli/src/commands/hook/pre-push.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "tests/cli/historical-work-admission-attestation.test.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/historical-work-admission-attestation.ts",
+    "packages/cli/src/commands/hook/pre-push.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "packages/cli/src/commands/command-specs/hook.spec.ts",
+    "tests/cli/historical-work-admission-attestation.test.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert public command surface and attestation validator together; existing immutable attestations remain readable.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.attestation-authority",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.forward-attestation-authority",
+        "pattern": "Authority Facade",
+        "source": "packages/core/src/broker/historical-work-admission-attestation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/historical-work-admission-attestation.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/command-specs/hook.spec.ts",
+        "tests/cli/historical-work-admission-attestation.test.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0272-public-forward-and-emergency-attestation-authority.task.md",
+    "sectionTitle": "ATM-GOV-0272",
+    "headingLine": 70,
+    "hash": "1fc877eb23be99cb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0272-public-forward-and-emergency-attestation-authority.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:1fc877eb23be99cb7db45e34e878a1539893b9f277b403e36e3baad9169f6f94",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T03:39:15.367Z"
+    }
+  },
+  "importedAt": "2026-07-30T03:39:15.367Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.historical.work.admission.attestation.test.ts",
+      "command": "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.hook.tests.pre.push.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-30T03-39-15-637Z-import-92cadc7f3bec",
+  "lastTransitionAt": "2026-07-30T03:39:15.637Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
