@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-001",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in 1017873b3 / 58cd0dfbc",
+  "area": "Next routing / batch claim readiness",
+  "finding": "Prompt-scoped batch routing reported a dependency-blocked queue head as task-queue-ready, so the operator received a batch claim playbook that failed only after next --claim.",
+  "expectedBehavior": "next --prompt must apply the same queue-head claim-readiness dependency check as next --claim and fail closed with ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED before suggesting implementation, checkpoint, or batch advancement.",
+  "evidenceOrRepro": "TASK-SKL-0037 depended on missing ATM-GOV-0305. Before the fix, node atm.mjs next --prompt for the SKL batch returned task-queue-ready; node atm.mjs next --claim then returned ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED. Focused regression: node --strip-types tests/cli/next-batch-dependency-readiness.test.ts.",
+  "followUp": "Keep claim-readiness as a shared interface between prompt and claim paths. Add similar parity checks for import-required, review-closeout-only, and active-batch repair routes if future dogfood exposes another prompt/claim split."
+}
