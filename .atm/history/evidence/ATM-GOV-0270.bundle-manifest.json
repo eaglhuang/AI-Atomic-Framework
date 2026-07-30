@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0270",
+  "updatedAt": "2026-07-30T21:51:38.575Z",
+  "updatedBy": "codex-skl-captain",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6346a0bc4060b275d2f9192c267b048c79a553223e6208c9cd1ff874d9840318",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/evidence/__tests__/validators.spec.ts"
+      ],
+      "generatedAt": "2026-07-30T21:50:56.428Z",
+      "startedAt": "2026-07-30T21:50:51.081Z",
+      "finishedAt": "2026-07-30T21:50:56.428Z",
+      "durationMs": 5347,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2da593d43858e826923ab05f8f44b10f7750b125",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d9e99874468df630d4bc72036721b56fd31bcdd7c3e972af4023debafaa7dae7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts"
+      ],
+      "generatedAt": "2026-07-30T21:51:22.132Z",
+      "startedAt": "2026-07-30T21:51:01.455Z",
+      "finishedAt": "2026-07-30T21:51:22.132Z",
+      "durationMs": 20677,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2da593d43858e826923ab05f8f44b10f7750b125",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-30T21:51:38.574Z",
+      "startedAt": "2026-07-30T21:51:26.247Z",
+      "finishedAt": "2026-07-30T21:51:38.574Z",
+      "durationMs": 12327,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2da593d43858e826923ab05f8f44b10f7750b125",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
