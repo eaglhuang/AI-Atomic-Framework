@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0270",
   "title": "Evidence freshness engine for incremental close validation",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0269"
@@ -163,8 +163,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-30T21-41-19-580Z-claim-c3ef7ff4d6d7",
-  "lastTransitionAt": "2026-07-30T21:41:19.580Z",
+  "lastTransitionId": "2026-07-30T22-04-24-401Z-close-212ce431aecd",
+  "lastTransitionAt": "2026-07-30T22:04:24.401Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-skl-captain",
   "reservedAt": "2026-07-30T21:41:00.865Z",
@@ -173,7 +173,7 @@
     "actorId": "codex-skl-captain",
     "leaseId": "lease-b04d170f3878",
     "claimedAt": "2026-07-30T21:41:00.872Z",
-    "heartbeatAt": "2026-07-30T21:41:00.872Z",
+    "heartbeatAt": "2026-07-30T22:04:24.398Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0270.json",
@@ -187,14 +187,14 @@
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
       "packages/cli/src/commands/taskflow/close-preflight.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260730214101-codex-skl-captain-f998150ce0",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730214101-codex-skl-captain-f998150ce0\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-30T21:41:00.872Z",
   "startedByActor": "codex-skl-captain",
@@ -314,5 +314,9 @@
     },
     "createdAt": "2026-07-30T21:41:19.578Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-30T22:04:24.398Z",
+  "closedByActor": "codex-skl-captain",
+  "closedBySessionId": "session-20260730214100-codex-skl-captain-ATM-GOV-0270-b2c3774c96",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0270.closure-packet.json"
 }

@@ -1,0 +1,171 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0270",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d939ece33fde2187985fe6717c0badda21bf2b93",
+  "governedTreeSha": "6836774b6064b68e70ac164d314db7721ab1deed",
+  "targetCommitDelta": {
+    "currentCommitSha": "d939ece33fde2187985fe6717c0badda21bf2b93",
+    "parentCommitShas": [
+      "d939ece33fde2187985fe6717c0badda21bf2b93"
+    ],
+    "governedTreeSha": "6836774b6064b68e70ac164d314db7721ab1deed",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0270.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0270.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/cli/dist/commands/evidence/__tests__/validators.spec.js",
+      "packages/cli/dist/commands/evidence/missing-report.js",
+      "packages/cli/dist/commands/taskflow/__tests__/close-gates-focused.spec.js",
+      "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/validators.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/missing-report.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/close-gates-focused.spec.js",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/missing-report.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6346a0bc4060b275d2f9192c267b048c79a553223e6208c9cd1ff874d9840318",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d9e99874468df630d4bc72036721b56fd31bcdd7c3e972af4023debafaa7dae7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c85c3703c43d1a476145aeeeaca8bb833fc3dc10c8e2530a97eb027e75713db",
+      "stderrSha256": "sha256:11eda2b671f37e08c9ddd7209282ec065476a99d4a8786b237ccb1cdb6b2fa9f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-30T22:04:24.392Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0270.*",
+      ".atm/history/task-events/ATM-GOV-0270/**",
+      ".atm/history/tasks/ATM-GOV-0270.json",
+      "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "packages/cli/src/commands/evidence/evidence-store.ts",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/evidence/validator-classification.ts",
+      "packages/cli/src/commands/evidence/verbs/validators.ts",
+      "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "packages/cli/src/commands/evidence/evidence-store.ts",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/evidence/validator-classification.ts",
+      "packages/cli/src/commands/evidence/verbs/validators.ts",
+      "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0270.json",
+  "closedAt": "2026-07-30T22:04:24.393Z",
+  "closedByActor": "codex-skl-captain",
+  "sessionId": "session-20260730214100-codex-skl-captain-ATM-GOV-0270-b2c3774c96",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d939ece33fde2187985fe6717c0badda21bf2b93",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0270.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0270/2026-07-30T21-41-00-865Z-reserve-f2103e61e3bb.json",
+      ".atm/history/task-events/ATM-GOV-0270/2026-07-30T21-41-00-868Z-promote-cebd849c66ac.json",
+      ".atm/history/task-events/ATM-GOV-0270/2026-07-30T21-41-19-580Z-claim-c3ef7ff4d6d7.json",
+      ".atm/history/tasks/ATM-GOV-0270.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

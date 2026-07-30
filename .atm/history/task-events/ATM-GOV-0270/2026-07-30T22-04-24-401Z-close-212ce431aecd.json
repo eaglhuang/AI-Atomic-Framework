@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T22-04-24-401Z-close-212ce431aecd",
+  "taskId": "ATM-GOV-0270",
+  "action": "close",
+  "actorId": "codex-skl-captain",
+  "sessionId": "session-20260730214100-codex-skl-captain-ATM-GOV-0270-b2c3774c96",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0270.json",
+  "taskSha256": "sha256:e6d7c77b7b0178a8570da8dfc19eca247e4a4415cad46e03b3c8ad1801015680",
+  "createdAt": "2026-07-30T22:04:24.401Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0270 --actor codex-skl-captain --status done --historical-delivery d939ece33fde2187985fe6717c0badda21bf2b93",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260730214100-codex-skl-captain-ATM-GOV-0270-b2c3774c96",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0270.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-30T22:04:24.392Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0270.*",
+        ".atm/history/task-events/ATM-GOV-0270/**",
+        ".atm/history/tasks/ATM-GOV-0270.json",
+        "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+        "packages/cli/src/commands/evidence/evidence-store.ts",
+        "packages/cli/src/commands/evidence/missing-report.ts",
+        "packages/cli/src/commands/evidence/validator-classification.ts",
+        "packages/cli/src/commands/evidence/verbs/validators.ts",
+        "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+        "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+        "packages/cli/src/commands/evidence/evidence-store.ts",
+        "packages/cli/src/commands/evidence/missing-report.ts",
+        "packages/cli/src/commands/evidence/validator-classification.ts",
+        "packages/cli/src/commands/evidence/verbs/validators.ts",
+        "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+        "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
