@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T19-48-05-157Z-close-f33d1bbd9743",
+  "taskId": "TASK-SKL-0035",
+  "action": "close",
+  "actorId": "codex-skl-captain",
+  "sessionId": "session-20260730192421-codex-skl-captain-TASK-SKL-0035-a0ad4843e6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0035.json",
+  "taskSha256": "sha256:80e7097230fe32ae98cbdb7e3ff6f3efe9099fcf004821ef202fc722647201f8",
+  "createdAt": "2026-07-30T19:48:05.157Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0035 --actor codex-skl-captain --status done --historical-delivery d9496313218e803693af4520526ef374fa95978f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260730192421-codex-skl-captain-TASK-SKL-0035-a0ad4843e6",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0035.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/module-boundary-topology.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-30T19:48:05.146Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0035.*",
+        ".atm/history/task-events/TASK-SKL-0035/**",
+        ".atm/history/tasks/TASK-SKL-0035.json",
+        "packages/core/src/architecture/index.ts",
+        "packages/core/src/architecture/module-boundary.ts",
+        "schemas/validators/module-boundary-policy.schema.json",
+        "scripts/module-boundaries.config.json",
+        "scripts/validate-module-boundaries/implementation.ts",
+        "scripts/validate-schemas/context.ts",
+        "templates/skills/atm-deep-module-refactor.files/references/**",
+        "templates/skills/atm-deep-module-refactor.skill.md",
+        "tests/catalog/groups/test_group_module_boundaries.shard.json",
+        "tests/cli/module-boundary-topology.test.ts",
+        "tests/fixtures/module-boundaries/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/architecture/index.ts",
+        "packages/core/src/architecture/module-boundary.ts",
+        "schemas/validators/module-boundary-policy.schema.json",
+        "scripts/module-boundaries.config.json",
+        "scripts/validate-module-boundaries/implementation.ts",
+        "scripts/validate-schemas/context.ts",
+        "templates/skills/atm-deep-module-refactor.files/references/**",
+        "tests/catalog/groups/test_group_module_boundaries.shard.json",
+        "tests/cli/module-boundary-topology.test.ts",
+        "tests/fixtures/module-boundaries/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

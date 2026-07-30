@@ -1,0 +1,201 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0035",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e48386a670531878f29b0914309b87207c7e83dc",
+  "governedTreeSha": "504898964d8c544d988624e069e6ba1351330cff",
+  "targetCommitDelta": {
+    "currentCommitSha": "e48386a670531878f29b0914309b87207c7e83dc",
+    "parentCommitShas": [
+      "e48386a670531878f29b0914309b87207c7e83dc"
+    ],
+    "governedTreeSha": "504898964d8c544d988624e069e6ba1351330cff",
+    "changedFiles": [
+      ".atm/history/tasks/ATM-GOV-0269.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/core/src/architecture/index.ts",
+      "packages/core/src/architecture/module-boundary.ts",
+      "schemas/validators/module-boundary-policy.schema.json",
+      "scripts/module-boundaries.config.json",
+      "scripts/validate-module-boundaries/implementation.ts",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "tests/catalog/groups/test_group_module_boundaries.shard.json",
+      "tests/cli/module-boundary-topology.test.ts",
+      "tests/fixtures/module-boundaries/failing/modules/a/index.ts",
+      "tests/fixtures/module-boundaries/failing/modules/b/index.ts",
+      "tests/fixtures/module-boundaries/failing/modules/consumer/deep.ts",
+      "tests/fixtures/module-boundaries/failing/modules/public-api/index.ts",
+      "tests/fixtures/module-boundaries/failing/modules/public-api/internal.ts",
+      "tests/fixtures/module-boundaries/failing/modules/unlisted/index.ts",
+      "tests/fixtures/module-boundaries/passing/modules/adapter-a/index.ts",
+      "tests/fixtures/module-boundaries/passing/modules/adapter-b/index.ts",
+      "tests/fixtures/module-boundaries/passing/modules/consumer/index.ts",
+      "tests/fixtures/module-boundaries/passing/modules/public-api/index.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/module-boundary-topology.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:63081b7c8259a041f6598e168e5e8af130e9bcef3dca4e9ca0a71688bf10f079",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:54d53afd10a23fda79e8bace52cd6651241d866a610ac0e6850518ce52ae54df",
+      "stderrSha256": "sha256:d53d6b081912aa87c170fd1313f514d21b04a1553b9ba0670b2c2414529a27c3",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:273d454a778c73e01a653012a8b4eee4f1b3cd4a94a8872add849c695817a51f",
+      "stderrSha256": "sha256:39f1f6a63aa2d1cfefa50e903e544ed3b4e209df27132e8b25e6cbedaca92b96",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/module-boundary-topology.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas",
+    "validate:skill-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-30T19:48:05.146Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0035.*",
+      ".atm/history/task-events/TASK-SKL-0035/**",
+      ".atm/history/tasks/TASK-SKL-0035.json",
+      "packages/core/src/architecture/index.ts",
+      "packages/core/src/architecture/module-boundary.ts",
+      "schemas/validators/module-boundary-policy.schema.json",
+      "scripts/module-boundaries.config.json",
+      "scripts/validate-module-boundaries/implementation.ts",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-deep-module-refactor.files/references/**",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "tests/catalog/groups/test_group_module_boundaries.shard.json",
+      "tests/cli/module-boundary-topology.test.ts",
+      "tests/fixtures/module-boundaries/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/architecture/index.ts",
+      "packages/core/src/architecture/module-boundary.ts",
+      "schemas/validators/module-boundary-policy.schema.json",
+      "scripts/module-boundaries.config.json",
+      "scripts/validate-module-boundaries/implementation.ts",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-deep-module-refactor.files/references/**",
+      "tests/catalog/groups/test_group_module_boundaries.shard.json",
+      "tests/cli/module-boundary-topology.test.ts",
+      "tests/fixtures/module-boundaries/**"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0035.json",
+  "closedAt": "2026-07-30T19:48:05.147Z",
+  "closedByActor": "codex-skl-captain",
+  "sessionId": "session-20260730192421-codex-skl-captain-TASK-SKL-0035-a0ad4843e6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d9496313218e803693af4520526ef374fa95978f",
+    "taskMatchedFiles": [
+      "packages/core/src/architecture/index.ts",
+      "packages/core/src/architecture/module-boundary.ts",
+      "schemas/validators/module-boundary-policy.schema.json",
+      "scripts/module-boundaries.config.json",
+      "scripts/validate-module-boundaries/implementation.ts",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "tests/catalog/groups/test_group_module_boundaries.shard.json",
+      "tests/cli/module-boundary-topology.test.ts",
+      "tests/fixtures/module-boundaries/failing/modules/a/index.ts",
+      "tests/fixtures/module-boundaries/failing/modules/b/index.ts",
+      "tests/fixtures/module-boundaries/failing/modules/consumer/deep.ts",
+      "tests/fixtures/module-boundaries/failing/modules/public-api/index.ts",
+      "tests/fixtures/module-boundaries/failing/modules/public-api/internal.ts",
+      "tests/fixtures/module-boundaries/failing/modules/unlisted/index.ts",
+      "tests/fixtures/module-boundaries/passing/modules/adapter-a/index.ts",
+      "tests/fixtures/module-boundaries/passing/modules/adapter-b/index.ts",
+      "tests/fixtures/module-boundaries/passing/modules/consumer/index.ts",
+      "tests/fixtures/module-boundaries/passing/modules/public-api/index.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0035.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0035/2026-07-30T16-00-11-263Z-import-4bb55cbfe438.json",
+      ".atm/history/task-events/TASK-SKL-0035/2026-07-30T19-24-21-385Z-reserve-e8010de6c28f.json",
+      ".atm/history/task-events/TASK-SKL-0035/2026-07-30T19-24-21-388Z-promote-65ff9d1f3292.json",
+      ".atm/history/task-events/TASK-SKL-0035/2026-07-30T19-24-42-973Z-claim-6cae30398ff7.json",
+      ".atm/history/task-events/TASK-SKL-0035/2026-07-30T19-27-36-652Z-scope-amendment-a71d5e682da6.json",
+      ".atm/history/tasks/TASK-SKL-0035.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
