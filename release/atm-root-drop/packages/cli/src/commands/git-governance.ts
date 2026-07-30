@@ -57,7 +57,12 @@ export async function runAtmGit(argv: string[]) {
   const ledgerTicket = readWorkAdmissionTicket(cwd, taskId);
   const initialTicket = ledgerTicket ?? resolveWorkAdmissionTicket(ticketInput);
   const files = action === 'commit'
-    ? selectTicketValidatedCommitFiles(readStagedFiles(cwd), initialTicket, argv.includes('--defer-foreign-staged'))
+    ? selectTicketValidatedCommitFiles(
+      readStagedFiles(cwd),
+      initialTicket,
+      argv.includes('--defer-foreign-staged'),
+      argv.includes('--auto-stage')
+    )
     : initialTicket?.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
   const ticket = resolveWorkAdmissionTicket({ ...ticketInput, files });
   const gate = ledgerTicket
@@ -93,11 +98,15 @@ export async function runAtmGit(argv: string[]) {
 export function selectTicketValidatedCommitFiles(
   stagedFiles: readonly string[],
   ticket: ReturnType<typeof resolveWorkAdmissionTicket>,
-  deferForeignStaged: boolean
+  deferForeignStaged: boolean,
+  useTicketScopeWhenDeferredIndexIsEmpty = false
 ): readonly string[] {
   if (!deferForeignStaged || !ticket) return stagedFiles;
   const fileScopes = ticket.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
-  return stagedFiles.filter((file) => fileScopes.some((scope) => pathMatchesWriteScope(file, scope)));
+  const filtered = stagedFiles.filter((file) => fileScopes.some((scope) => pathMatchesWriteScope(file, scope)));
+  return filtered.length > 0 || !useTicketScopeWhenDeferredIndexIsEmpty
+    ? filtered
+    : fileScopes;
 }
 
 function recordHistoricalWorkAdmissionAttestation(argv: readonly string[]) {

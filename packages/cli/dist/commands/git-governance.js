@@ -32,7 +32,7 @@ export async function runAtmGit(argv) {
     const ledgerTicket = readWorkAdmissionTicket(cwd, taskId);
     const initialTicket = ledgerTicket ?? resolveWorkAdmissionTicket(ticketInput);
     const files = action === 'commit'
-        ? selectTicketValidatedCommitFiles(readStagedFiles(cwd), initialTicket, argv.includes('--defer-foreign-staged'))
+        ? selectTicketValidatedCommitFiles(readStagedFiles(cwd), initialTicket, argv.includes('--defer-foreign-staged'), argv.includes('--auto-stage'))
         : initialTicket?.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
     const ticket = resolveWorkAdmissionTicket({ ...ticketInput, files });
     const gate = ledgerTicket
@@ -64,11 +64,14 @@ export async function runAtmGit(argv) {
  * foreign index entries. Admission must therefore see the same filtered
  * bundle, rather than reject the current task for paths it will not mutate.
  */
-export function selectTicketValidatedCommitFiles(stagedFiles, ticket, deferForeignStaged) {
+export function selectTicketValidatedCommitFiles(stagedFiles, ticket, deferForeignStaged, useTicketScopeWhenDeferredIndexIsEmpty = false) {
     if (!deferForeignStaged || !ticket)
         return stagedFiles;
     const fileScopes = ticket.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
-    return stagedFiles.filter((file) => fileScopes.some((scope) => pathMatchesWriteScope(file, scope)));
+    const filtered = stagedFiles.filter((file) => fileScopes.some((scope) => pathMatchesWriteScope(file, scope)));
+    return filtered.length > 0 || !useTicketScopeWhenDeferredIndexIsEmpty
+        ? filtered
+        : fileScopes;
 }
 function recordHistoricalWorkAdmissionAttestation(argv) {
     const cwd = readOption(argv, '--cwd') ?? process.cwd();

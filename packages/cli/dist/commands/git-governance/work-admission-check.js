@@ -55,7 +55,44 @@ function issueFrameworkTempAdmissionTicket(input) {
 }
 export function resolveWorkAdmissionTicket(input) {
     return readWorkAdmissionTicket(input.cwd, input.taskId)
+        ?? issueLegacyActiveTaskAdmissionTicket(input)
         ?? issueFrameworkTempAdmissionTicket(input);
+}
+function issueLegacyActiveTaskAdmissionTicket(input) {
+    const task = readTaskDocument(input.cwd, input.taskId);
+    const claim = task?.claim;
+    if (!claim || typeof claim !== 'object' || Array.isArray(claim))
+        return null;
+    const record = claim;
+    if (String(record.state ?? '').trim().toLowerCase() !== 'active')
+        return null;
+    const actorId = typeof record.actorId === 'string' ? record.actorId.trim() : '';
+    const claimGeneration = typeof record.leaseId === 'string' ? record.leaseId.trim() : '';
+    if (!actorId || actorId !== input.actorId || !claimGeneration)
+        return null;
+    const allowedFiles = resolveLegacyTaskAdmissionFiles(task, input.taskId);
+    if (allowedFiles.length === 0)
+        return null;
+    const lane = record.laneSession && typeof record.laneSession === 'object'
+        ? record.laneSession
+        : null;
+    const laneSessionId = typeof lane?.laneSessionId === 'string'
+        ? lane.laneSessionId
+        : (typeof lane?.laneId === 'string' ? lane.laneId : null);
+    return issueWorkAdmissionTicket({
+        taskId: input.taskId,
+        actorId,
+        laneSessionId,
+        claimGeneration,
+        allowedFiles,
+        runnerSelection: {
+            runnerKind: 'frozen',
+            runnerRef: 'legacy-active-claim',
+            selectedAt: input.now ?? new Date().toISOString()
+        },
+        now: input.now,
+        ttlSeconds: positiveInteger(record.ttlSeconds, 3600)
+    });
 }
 /**
  * Normal boundary entrypoint.  Claim identity comes from the ledger sealed by
@@ -101,7 +138,36 @@ function readTaskDocument(cwd, taskId) {
         return null;
     }
 }
+function resolveLegacyTaskAdmissionFiles(task, taskId) {
+    const directionLock = task.taskDirectionLock && typeof task.taskDirectionLock === 'object' && !Array.isArray(task.taskDirectionLock)
+        ? task.taskDirectionLock
+        : null;
+    const claim = task.claim && typeof task.claim === 'object' && !Array.isArray(task.claim)
+        ? task.claim
+        : null;
+    const declaredFiles = Array.isArray(directionLock?.allowedFiles)
+        ? directionLock.allowedFiles.map(String)
+        : Array.isArray(task.scopePaths)
+            ? task.scopePaths.map(String)
+            : Array.isArray(task.deliverables)
+                ? task.deliverables.map(String)
+                : Array.isArray(claim?.files)
+                    ? claim.files.map(String)
+                    : [];
+    return [...new Set([
+            ...declaredFiles.map((entry) => entry.trim()).filter(Boolean),
+            '.atm/history/evidence/git-head.jsonl',
+            `.atm/history/evidence/${taskId}.*`,
+            `.atm/history/task-events/${taskId}/**`,
+            `.atm/history/tasks/${taskId}.json`
+        ])];
+}
 function isTicket(value) {
     return Boolean(value && typeof value === 'object'
         && value.schemaId === 'atm.workAdmissionTicket.v1');
+}
+function positiveInteger(value, fallback) {
+    return typeof value === 'number' && Number.isFinite(value) && value > 0
+        ? Math.floor(value)
+        : fallback;
 }

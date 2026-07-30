@@ -183,11 +183,12 @@ export async function runTasksImport(argv) {
     let contractRecovery = null;
     if (parsed.tasks.length === 1) {
         const task = parsed.tasks[0];
+        const causalGraph = normalizeTaskCausalGraphContract(causalFrontmatter?.causalGraph ?? causalFrontmatter?.causal_graph);
         const causalValidation = validateCausalValidatorContractImport({
             frontmatter: causalFrontmatter,
             validators: task.validators ?? [],
             acceptance: task.acceptance ?? [],
-            causalImpactEdges: normalizeTaskCausalGraphContract(causalFrontmatter?.causalGraph ?? causalFrontmatter?.causal_graph).causalImpactEdges
+            causalImpactEdges: causalGraph.causalImpactEdges
         });
         contractRecovery = buildContractImportRecoveryManifest({
             validation: causalValidation,
@@ -208,6 +209,7 @@ export async function runTasksImport(argv) {
             ...parsed,
             tasks: parsed.tasks.map((entry) => ({
                 ...entry,
+                causalGraph,
                 testContributions: causalValidation.fields.testContributions,
                 requiredTestCaseIds: causalValidation.fields.requiredTestCaseIds,
                 phaseTestCaseIds: causalValidation.fields.phaseTestCaseIds,

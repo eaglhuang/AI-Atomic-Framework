@@ -92,7 +92,41 @@ export function resolveWorkAdmissionTicket(input: {
   readonly now?: string;
 }): WorkAdmissionTicket | null {
   return readWorkAdmissionTicket(input.cwd, input.taskId)
+    ?? issueLegacyActiveTaskAdmissionTicket(input)
     ?? issueFrameworkTempAdmissionTicket(input);
+}
+
+function issueLegacyActiveTaskAdmissionTicket(input: Parameters<typeof evaluateWorkAdmissionGate>[0]): WorkAdmissionTicket | null {
+  const task = readTaskDocument(input.cwd, input.taskId);
+  const claim = task?.claim;
+  if (!claim || typeof claim !== 'object' || Array.isArray(claim)) return null;
+  const record = claim as Record<string, unknown>;
+  if (String(record.state ?? '').trim().toLowerCase() !== 'active') return null;
+  const actorId = typeof record.actorId === 'string' ? record.actorId.trim() : '';
+  const claimGeneration = typeof record.leaseId === 'string' ? record.leaseId.trim() : '';
+  if (!actorId || actorId !== input.actorId || !claimGeneration) return null;
+  const allowedFiles = resolveLegacyTaskAdmissionFiles(task, input.taskId);
+  if (allowedFiles.length === 0) return null;
+  const lane = record.laneSession && typeof record.laneSession === 'object'
+    ? record.laneSession as Record<string, unknown>
+    : null;
+  const laneSessionId = typeof lane?.laneSessionId === 'string'
+    ? lane.laneSessionId
+    : (typeof lane?.laneId === 'string' ? lane.laneId : null);
+  return issueWorkAdmissionTicket({
+    taskId: input.taskId,
+    actorId,
+    laneSessionId,
+    claimGeneration,
+    allowedFiles,
+    runnerSelection: {
+      runnerKind: 'frozen',
+      runnerRef: 'legacy-active-claim',
+      selectedAt: input.now ?? new Date().toISOString()
+    },
+    now: input.now,
+    ttlSeconds: positiveInteger(record.ttlSeconds, 3600)
+  });
 }
 
 /**
@@ -138,17 +172,65 @@ function readTaskAdmissionContext(cwd: string, taskId: string): { actorId: strin
   };
 }
 
-function readTaskDocument(cwd: string, taskId: string): { workAdmissionTicket?: unknown; claim?: unknown } | null {
+function readTaskDocument(cwd: string, taskId: string): {
+  workAdmissionTicket?: unknown;
+  claim?: unknown;
+  taskDirectionLock?: unknown;
+  scopePaths?: unknown;
+  deliverables?: unknown;
+} | null {
   const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
   if (!existsSync(taskPath)) return null;
   try {
-    return JSON.parse(readFileSync(taskPath, 'utf8')) as { workAdmissionTicket?: unknown; claim?: unknown };
+    return JSON.parse(readFileSync(taskPath, 'utf8')) as {
+      workAdmissionTicket?: unknown;
+      claim?: unknown;
+      taskDirectionLock?: unknown;
+      scopePaths?: unknown;
+      deliverables?: unknown;
+    };
   } catch {
     return null;
   }
 }
 
+function resolveLegacyTaskAdmissionFiles(task: {
+  taskDirectionLock?: unknown;
+  scopePaths?: unknown;
+  deliverables?: unknown;
+  claim?: unknown;
+}, taskId: string): readonly string[] {
+  const directionLock = task.taskDirectionLock && typeof task.taskDirectionLock === 'object' && !Array.isArray(task.taskDirectionLock)
+    ? task.taskDirectionLock as Record<string, unknown>
+    : null;
+  const claim = task.claim && typeof task.claim === 'object' && !Array.isArray(task.claim)
+    ? task.claim as Record<string, unknown>
+    : null;
+  const declaredFiles = Array.isArray(directionLock?.allowedFiles)
+    ? directionLock.allowedFiles.map(String)
+    : Array.isArray(task.scopePaths)
+      ? task.scopePaths.map(String)
+      : Array.isArray(task.deliverables)
+        ? task.deliverables.map(String)
+        : Array.isArray(claim?.files)
+          ? claim.files.map(String)
+          : [];
+  return [...new Set([
+    ...declaredFiles.map((entry) => entry.trim()).filter(Boolean),
+    '.atm/history/evidence/git-head.jsonl',
+    `.atm/history/evidence/${taskId}.*`,
+    `.atm/history/task-events/${taskId}/**`,
+    `.atm/history/tasks/${taskId}.json`
+  ])];
+}
+
 function isTicket(value: unknown): value is WorkAdmissionTicket {
   return Boolean(value && typeof value === 'object'
     && (value as { schemaId?: unknown }).schemaId === 'atm.workAdmissionTicket.v1');
+}
+
+function positiveInteger(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0
+    ? Math.floor(value)
+    : fallback;
 }

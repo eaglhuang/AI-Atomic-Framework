@@ -19,7 +19,7 @@ export function normalizeTaskCausalGraphContract(value) {
         for (const key of keys) {
             const candidate = record[key];
             if (Array.isArray(candidate))
-                return [...new Set(candidate.filter((entry) => typeof entry === 'string').map(normalizeYamlScalar))];
+                return [...new Set(candidate.map(normalizeCausalGraphListEntry).filter((entry) => Boolean(entry)))];
             if (typeof candidate === 'string' && candidate.trim())
                 return [...new Set(parseYamlList(candidate))];
         }
@@ -35,6 +35,28 @@ export function normalizeTaskCausalGraphContract(value) {
         validatorReferences: list('validatorReferences', 'validator_references', 'validators'),
         phaseOwner: normalizeOptionalString(record.phaseOwner ?? record.phase_owner)
     };
+}
+// ─── 類型定義（共享自 tasks.ts 的 FrontMatter 介面） ─────────────────────────
+function normalizeCausalGraphListEntry(value) {
+    if (typeof value === 'string')
+        return normalizeYamlScalar(value);
+    if (!value || typeof value !== 'object' || Array.isArray(value))
+        return null;
+    const record = value;
+    const source = normalizeOptionalString(record.source);
+    const target = normalizeOptionalString(record.target);
+    const reason = normalizeOptionalString(record.reason);
+    if (source && target) {
+        return reason ? `${source} -> ${target}: ${reason}` : `${source} -> ${target}`;
+    }
+    const parts = Object.keys(record)
+        .sort()
+        .map((key) => {
+        const normalized = normalizeOptionalString(record[key]);
+        return normalized ? `${key}=${normalized}` : null;
+    })
+        .filter((entry) => Boolean(entry));
+    return parts.length > 0 ? parts.join('; ') : null;
 }
 // ─── 搬移的 9 個純函式（behavior-preserving，簽章/行為完全不變） ──────────
 /**
@@ -75,7 +97,10 @@ export function extractFrontMatter(text) {
         // Nested fields/lists on a top-level object-array item
         // (for example testContributions[i].coversAcceptance).
         const nestedObjectFieldMatch = /^\s{2,}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
-        if (currentObjectListItem && nestedObjectFieldMatch && !/^\s*-\s+/.test(line)) {
+        if (currentObjectListItem
+            && nestedObjectFieldMatch
+            && !/^\s*-\s+/.test(line)
+            && (!currentObjectKey || Array.isArray(data[currentObjectKey]))) {
             const key = nestedObjectFieldMatch[1];
             const value = nestedObjectFieldMatch[2].trim();
             currentObjectListItem[key] = value.length === 0 ? [] : normalizeYamlScalar(value);
@@ -125,7 +150,7 @@ export function extractFrontMatter(text) {
             continue;
         }
         const objectListObjectFieldMatch = /^ {6}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
-        if (currentObjectKey && currentObjectListKey && currentObjectListItem && objectListObjectFieldMatch) {
+        if (currentObjectKey && (currentObjectListKey || currentObjectArrayKey) && currentObjectListItem && objectListObjectFieldMatch) {
             const key = objectListObjectFieldMatch[1];
             const value = normalizeYamlScalar(objectListObjectFieldMatch[2]);
             currentObjectListItem[key] = value;
@@ -145,6 +170,23 @@ export function extractFrontMatter(text) {
                     : [value];
             data[currentObjectKey] = objectRecord;
             currentObjectListItem = null;
+            continue;
+        }
+        if (currentObjectKey && currentObjectArrayKey && /^ {4}-\s+/.test(line)) {
+            const objectRecord = data[currentObjectKey];
+            if (Array.isArray(objectRecord)) {
+                continue;
+            }
+            const value = line.replace(/^ {4}-\s+/, '').trim();
+            const existing = objectRecord[currentObjectArrayKey];
+            objectRecord[currentObjectArrayKey] = Array.isArray(existing)
+                ? [...existing, value]
+                : typeof existing === 'string' && existing.length > 0
+                    ? [existing, value]
+                    : [value];
+            data[currentObjectKey] = objectRecord;
+            currentObjectListItem = null;
+            currentObjectListKey = null;
             continue;
         }
         if (currentKey && /^\s*-\s+/.test(line)) {
