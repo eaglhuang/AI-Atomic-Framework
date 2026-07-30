@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T01-18-09-038Z-close-3a2401093c0d",
+  "taskId": "ATM-GOV-0245",
+  "action": "close",
+  "actorId": "codex-git-series-captain",
+  "sessionId": "session-20260729225909-codex-git-series-captain-ATM-GOV-0245-b569a5fa8a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0245.json",
+  "taskSha256": "sha256:b74941ed448b0dd4f4a0510b797ee106f5793741fdc7f4bbc82babef335b9ac7",
+  "createdAt": "2026-07-30T01:18:09.038Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0245 --actor codex-git-series-captain --status done --historical-delivery 4813c4464a517a10d4f2351b9ab58d369c086934 --historical-delivery ccb5413e4ef6b212d178d7354252966b046d35d1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260729225909-codex-git-series-captain-ATM-GOV-0245-b569a5fa8a",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0245.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "node atm.mjs broker replay final-verdict --json",
+      "node atm.mjs broker replay status --json",
+      "node atm.mjs hook pre-push --base origin/main --head HEAD --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-30T01:18:09.018Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0245.*",
+        ".atm/history/task-events/ATM-GOV-0245/**",
+        ".atm/history/tasks/ATM-GOV-0245.json",
+        "artifacts/generated/atm-plan3-final/**",
+        "artifacts/generated/atm-plan3-final/verdict.json",
+        "docs/governance/atm-3-replay-evidence.md",
+        "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+        "packages/cli/src/commands/broker/replay-actions.ts",
+        "packages/cli/src/commands/broker/replay/final-closure-reader.ts",
+        "tests/cli/atm-3-final-closure.test.ts",
+        "tests/cli/plan3-evidence-closure-diagnostic.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+        "packages/cli/src/commands/broker/replay-actions.ts",
+        "packages/cli/src/commands/broker/replay/final-closure-reader.ts",
+        "tests/cli/atm-3-final-closure.test.ts",
+        "tests/cli/plan3-evidence-closure-diagnostic.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

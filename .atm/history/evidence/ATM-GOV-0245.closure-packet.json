@@ -1,0 +1,198 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0245",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4813c4464a517a10d4f2351b9ab58d369c086934",
+  "governedTreeSha": "3a14dbb45da97abca45a30e6d91677bd35ecc5cd",
+  "targetCommitDelta": {
+    "currentCommitSha": "4813c4464a517a10d4f2351b9ab58d369c086934",
+    "parentCommitShas": [
+      "4813c4464a517a10d4f2351b9ab58d369c086934"
+    ],
+    "governedTreeSha": "3a14dbb45da97abca45a30e6d91677bd35ecc5cd",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0245.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0245.json",
+      ".atm/history/task-events/ATM-GOV-0245/2026-07-30T01-16-04-612Z-renew-2fdb1a6af827.json",
+      ".atm/history/tasks/ATM-GOV-0245.json",
+      "artifacts/generated/atm-plan3-final/verdict.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/final-closure-reader.ts",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6ed39ddf4f46ea5436c20985ad6fe5c16e5261462c16384426ffd72a12e203e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a784c7fa4699e4598a0a6af26f5457be9b239f9a6b5b5a8f34c20701bc9aa436",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.dev.mjs broker replay status --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:73d973e985cb5ebfffb7447faea3a5193823d770bd91bea7e18c90b774d91d2a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.dev.mjs broker replay final-verdict --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:54374316d362d1a023c49d8b8dea73551b1dd7daba6c9bc1bbccec3b07e4e974",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a88cbe2991fb185bf99cb1a287ed95d1524da00323aee060b66ec66a4620b110",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs broker replay status --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:73d973e985cb5ebfffb7447faea3a5193823d770bd91bea7e18c90b774d91d2a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs hook pre-push --base origin/main --head HEAD --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:679583fd80ed80238b9f82e0c874fe8ccba7b7c01d230906ab4079b5d1191bbc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cc0d2b68a950a467e1ff1684cf297168eafd24650930a689291c93317379c1bf",
+      "stderrSha256": "sha256:a1e3049fa811f307f49a13ca05c866c2c6eb12fff633902bc09c79123560691a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs broker replay final-verdict --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3e2b475e0380161e72d7c593c93a5bbc61d737c90068a8c417714050b44082a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+    "node --strip-types tests/cli/plan3-evidence-closure-diagnostic.test.ts",
+    "node atm.mjs broker replay final-verdict --json",
+    "node atm.mjs broker replay status --json",
+    "node atm.mjs hook pre-push --base origin/main --head HEAD --json",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-30T01:18:09.018Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0245.*",
+      ".atm/history/task-events/ATM-GOV-0245/**",
+      ".atm/history/tasks/ATM-GOV-0245.json",
+      "artifacts/generated/atm-plan3-final/**",
+      "artifacts/generated/atm-plan3-final/verdict.json",
+      "docs/governance/atm-3-replay-evidence.md",
+      "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/final-closure-reader.ts",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/parallel-admission/final-verdict.ts",
+      "packages/cli/src/commands/broker/replay-actions.ts",
+      "packages/cli/src/commands/broker/replay/final-closure-reader.ts",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/cli/plan3-evidence-closure-diagnostic.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0245.json",
+  "closedAt": "2026-07-30T01:18:09.019Z",
+  "closedByActor": "codex-git-series-captain",
+  "sessionId": "session-20260729225909-codex-git-series-captain-ATM-GOV-0245-b569a5fa8a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "4813c4464a517a10d4f2351b9ab58d369c086934",
+    "taskMatchedFiles": [
+      "artifacts/generated/atm-plan3-final/verdict.json"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
