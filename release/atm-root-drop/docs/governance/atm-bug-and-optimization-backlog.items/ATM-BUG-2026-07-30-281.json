@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-30-281",
+  "date": "2026-07-30",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in 24f1525116b11c740b0c31057121097818382032",
+  "area": "Runner Sync / Build Output Inventory",
+  "finding": "Runner-sync build-output inventory omitted tracked files that were deleted by the build, causing release publication to report inventory-incomplete for legitimate stale-output deletion.",
+  "expectedBehavior": "Publication inventory should include tracked files under release output roots before and after build so deleted stale outputs are classified as owned-current release changes instead of missing from the inventory.",
+  "evidenceOrRepro": "ATM-GOV-0245 runner-sync release failed until `packages/core/src/broker/runner-build-output-inventory.ts` was fixed to include `git ls-files` under publication roots. Commit `24f1525116b11c740b0c31057121097818382032` implemented the generic tracked-file inventory.",
+  "followUp": "Keep regression coverage around tracked-deleted output inventory and ensure release admission diagnostics distinguish deleted tracked outputs from out-of-scope files."
+}

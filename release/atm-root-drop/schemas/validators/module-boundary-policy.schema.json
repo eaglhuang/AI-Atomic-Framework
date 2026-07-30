@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/validators/module-boundary-policy.schema.json",
+  "schemaId": "atm.moduleBoundaryPolicy.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial opt-in module boundary policy schema."
+  },
+  "type": "object",
+  "required": ["schemaId", "specVersion", "migration", "mode", "modules", "exceptions", "sourceDiscovery"],
+  "properties": {
+    "schemaId": { "const": "atm.moduleBoundaryPolicy.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": {
+      "type": "object",
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "enum": ["none", "additive", "breaking"] },
+        "fromVersion": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "mode": { "enum": ["shadow", "enforce"] },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "roots", "publicEntrypoints", "allowedConsumers"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "roots": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "publicEntrypoints": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "allowedConsumers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "allowedDependencies": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "adapterLanguages": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "fromModule", "toModule", "reason", "expiresOn"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "fromModule": { "type": "string", "minLength": 1 },
+          "toModule": { "type": "string", "minLength": 1 },
+          "match": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 },
+          "expiresOn": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "sourceDiscovery": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["adapterId", "language", "roots", "extensions"],
+        "properties": {
+          "adapterId": { "type": "string", "minLength": 1 },
+          "language": { "type": "string", "minLength": 1 },
+          "roots": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "extensions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

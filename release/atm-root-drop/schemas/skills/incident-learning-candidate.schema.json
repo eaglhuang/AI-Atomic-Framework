@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/skills/incident-learning-candidate.schema.json",
+  "schemaId": "atm.incidentLearningCandidate.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial evidence-bounded incident learning candidate schema."
+  },
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "candidateId",
+    "sourceIncident",
+    "symptom",
+    "evidence",
+    "publicSeam",
+    "stateTransition",
+    "observedFactors",
+    "breadthHypotheses",
+    "depthHypotheses",
+    "disposition",
+    "authorityLimits"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.incidentLearningCandidate.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": {
+      "type": "object",
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "const": "none" },
+        "fromVersion": { "type": "null" },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "candidateId": { "type": "string", "pattern": "^ilc-[a-f0-9]{16}$" },
+    "sourceIncident": {
+      "type": "object",
+      "required": ["reportedAt", "repo", "backlogItemId", "taskId"],
+      "properties": {
+        "reportedAt": { "type": "string", "format": "date-time" },
+        "repo": { "type": "string", "minLength": 1 },
+        "backlogItemId": { "type": ["string", "null"] },
+        "taskId": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "symptom": { "type": "string", "minLength": 1 },
+    "evidence": {
+      "type": "object",
+      "required": ["availability", "reproductionRefs", "receiptRefs", "invariantRefs", "acceptanceRefs"],
+      "properties": {
+        "availability": { "enum": ["available", "partial", "unavailable", "conflicting"] },
+        "reproductionRefs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "receiptRefs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "invariantRefs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "acceptanceRefs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "publicSeam": { "type": ["string", "null"] },
+    "stateTransition": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": ["string", "null"] },
+        "to": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "observedFactors": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "breadthHypotheses": {
+      "type": "object",
+      "required": ["upstreamDownstream", "samePolicyCallers", "siblingAdapters", "adjacentTransitions", "sharedInvariants"],
+      "properties": {
+        "upstreamDownstream": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "samePolicyCallers": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "siblingAdapters": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "adjacentTransitions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "sharedInvariants": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "depthHypotheses": {
+      "type": "object",
+      "required": ["boundary", "negative", "rollback", "retry", "concurrency", "mutation", "propertyMetamorphic", "independentOracle"],
+      "properties": {
+        "boundary": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "negative": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "rollback": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "retry": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "concurrency": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "mutation": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "propertyMetamorphic": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "independentOracle": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "disposition": {
+      "type": "object",
+      "required": ["rootCauseHint", "familyHint", "recommendedAction", "unknowns"],
+      "properties": {
+        "rootCauseHint": { "type": ["string", "null"] },
+        "familyHint": { "type": ["string", "null"] },
+        "recommendedAction": { "enum": ["open-task-card", "attach-to-existing-task", "record-only", "needs-more-evidence"] },
+        "unknowns": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "authorityLimits": {
+      "type": "object",
+      "required": ["cannotAuthorizeMerge", "cannotDeclareFixSuccess", "cannotExcludeTests", "cannotCloseTask", "doesNotCreateSecondBacklog"],
+      "properties": {
+        "cannotAuthorizeMerge": { "const": true },
+        "cannotDeclareFixSuccess": { "const": true },
+        "cannotExcludeTests": { "const": true },
+        "cannotCloseTask": { "const": true },
+        "doesNotCreateSecondBacklog": { "const": true }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/evidence/diagnostic-loop-receipt.schema.json",
+  "title": "ATM Diagnostic Loop Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "taskId",
+    "symptom",
+    "severity",
+    "reproducer",
+    "symptomObserved",
+    "reproductionRate",
+    "minimizedFixture",
+    "candidateDigest",
+    "environmentDigest",
+    "hypotheses",
+    "winningHypothesisId",
+    "regressionCaseId",
+    "greenEvidence",
+    "temporaryInstrumentation",
+    "emergencyRationale",
+    "valid",
+    "admission",
+    "reasons",
+    "receiptDigest",
+    "createdAt"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.diagnosticLoopReceipt.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "const": "none" },
+        "fromVersion": { "type": "null" },
+        "notes": { "type": "string" }
+      }
+    },
+    "taskId": { "type": "string", "minLength": 1 },
+    "symptom": { "type": "string", "minLength": 1 },
+    "severity": { "enum": ["blocking", "non-blocking"] },
+    "reproducer": { "$ref": "#/$defs/commandObservation" },
+    "symptomObserved": { "type": "boolean" },
+    "reproductionRate": { "type": "number", "minimum": 0, "maximum": 1 },
+    "minimizedFixture": { "type": "string", "minLength": 1 },
+    "candidateDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "environmentDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/hypothesis" }
+    },
+    "winningHypothesisId": { "type": "string", "minLength": 1 },
+    "regressionCaseId": { "type": "string", "minLength": 1 },
+    "greenEvidence": { "$ref": "#/$defs/commandObservation" },
+    "temporaryInstrumentation": { "enum": ["removed", "promoted", "none"] },
+    "emergencyRationale": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["reason", "expiresAt"],
+      "properties": {
+        "reason": { "type": "string", "minLength": 1 },
+        "expiresAt": { "type": "string", "minLength": 1 }
+      }
+    },
+    "valid": { "type": "boolean" },
+    "admission": { "enum": ["admit-repair", "fail-closed"] },
+    "reasons": { "type": "array", "items": { "type": "string" } },
+    "receiptDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "createdAt": { "type": "string" }
+  },
+  "$defs": {
+    "commandObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "exitCode", "stdoutSha256", "stderrSha256"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "exitCode": { "type": "integer" },
+        "stdoutSha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "stderrSha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "summary", "predictedObservation", "experimentCommand", "experimentResult"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string" },
+        "predictedObservation": { "type": "string", "minLength": 1 },
+        "experimentCommand": { "type": "string", "minLength": 1 },
+        "experimentResult": { "enum": ["matched", "falsified", "inconclusive"] }
+      }
+    }
+  }
+}

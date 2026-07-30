@@ -122,6 +122,7 @@ export function validateGovernanceProjections(repoRoot: string): { ok: boolean; 
   for (const item of items) {
     if (ids.has(item.id)) errors.push(`duplicate backlog item id: ${item.id}`);
     ids.add(item.id);
+    errors.push(...assertGovernanceBacklogItemReadable(item).map((error) => `item ${item.id}: ${error}`));
   }
   const projection = readFileSync(projectionPath, 'utf8');
   if (!projection.includes(ATM_BACKLOG_GENERATED_MARKER)) {
@@ -138,6 +139,15 @@ export function validateGovernanceProjections(repoRoot: string): { ok: boolean; 
     errors.push(`projection is stale; run node --strip-types scripts/validate-governance-projections.ts --write`);
   }
   return { ok: errors.length === 0, errors, itemCount: items.length };
+}
+
+export function assertGovernanceBacklogItemReadable(item: GovernanceBacklogItem): readonly string[] {
+  const errors: string[] = [];
+  if (item.schemaId !== 'atm.governanceBacklogItem.v1') errors.push('invalid schemaId');
+  for (const field of ['id', 'date', 'repo', 'type', 'severity', 'status', 'area', 'finding', 'expectedBehavior', 'evidenceOrRepro', 'followUp'] as const) {
+    if (!String(item[field] ?? '').trim()) errors.push(`missing ${field}`);
+  }
+  return errors;
 }
 
 export function writeGovernanceBacklogItems(repoRoot: string, items: readonly GovernanceBacklogItem[]): void {

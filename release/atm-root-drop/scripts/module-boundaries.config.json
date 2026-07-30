@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.moduleBoundaryPolicy.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial opt-in repository module boundary policy."
+  },
+  "mode": "shadow",
+  "modules": [],
+  "exceptions": [],
+  "sourceDiscovery": [
+    {
+      "adapterId": "typescript-static-imports",
+      "language": "typescript",
+      "roots": ["packages", "scripts", "tests"],
+      "extensions": [".ts", ".tsx"]
+    }
+  ]
+}

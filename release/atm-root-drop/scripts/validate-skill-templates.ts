@@ -27,6 +27,7 @@ const requiredTemplateIds = [
   'atm-internal-build-sync',
   'atm-framework-temp-claim',
   'atm-atom-map-refactor',
+  'atm-bug-backlog',
   'atm-memory-consolidate'
 ];
 

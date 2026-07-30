@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.engineeringChangeMethodProfiles.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial ATM engineering change method profile catalog."
+  },
+  "profiles": [
+    {
+      "schemaId": "atm.engineeringChangeMethodProfile.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial profile." },
+      "id": "expand-contract",
+      "title": "Expand / contract migration",
+      "triggerEvidence": ["contract migration", "schema migration", "old form", "zero caller"],
+      "applicability": ["Broad public contract changes where old and new forms must coexist temporarily."],
+      "requiredObservations": ["expand step", "independently green migration batch", "old-form usage query", "zero-caller contract gate"],
+      "counterexamples": ["single private callsite", "pure documentation change"],
+      "completionEvidence": ["old-form usage query", "zero-caller contract gate"],
+      "rollback": ["contract-compatible revert path"],
+      "guardrails": ["Do not remove old callers before proving zero remaining usage."]
+    },
+    {
+      "schemaId": "atm.engineeringChangeMethodProfile.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial profile." },
+      "id": "tdd-oracle-fidelity",
+      "title": "TDD oracle fidelity",
+      "triggerEvidence": ["tdd", "expected value", "oracle", "red green"],
+      "applicability": ["Behavior work where expected values can be derived independently of the implementation."],
+      "requiredObservations": ["independent oracle source", "red case proves behavior gap", "green case reuses same case id"],
+      "counterexamples": ["private method", "internal mock", "tautological"],
+      "completionEvidence": ["red evidence", "green evidence", "candidate digest"],
+      "rollback": ["revert candidate while retaining red fixture"],
+      "guardrails": ["Expected values must not be copied from the implementation under test."]
+    },
+    {
+      "schemaId": "atm.engineeringChangeMethodProfile.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial profile." },
+      "id": "review-smell-heuristics",
+      "title": "Replaceable review smell heuristics",
+      "triggerEvidence": ["review smell", "heuristic", "code smell", "review advisory"],
+      "applicability": ["Advisory review patterns that should inform, not outrank, repository standards."],
+      "requiredObservations": ["replaceable heuristic policy", "standards axis separated", "spec axis separated"],
+      "counterexamples": ["universal hard gate", "vendor-specific rule"],
+      "completionEvidence": ["heuristic policy reference", "non-blocking finding evidence"],
+      "rollback": ["disable heuristic without removing standards/spec checks"],
+      "guardrails": ["Smells remain evidence selectors below Standards and Spec findings."]
+    },
+    {
+      "schemaId": "atm.engineeringChangeMethodProfile.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial profile." },
+      "id": "merge-conflict-intent",
+      "title": "Merge conflict intent provenance",
+      "triggerEvidence": ["merge conflict", "both-side intent", "conflicting goals"],
+      "applicability": ["Conflict repair where both sides may encode valid but incompatible goals."],
+      "requiredObservations": ["both-side intent provenance", "safe abort or fail closed"],
+      "counterexamples": ["ours/theirs"],
+      "completionEvidence": ["both-side intent receipt", "post-merge validator"],
+      "rollback": ["abort merge or revert conflict-resolution commit"],
+      "guardrails": ["Never mandate ours/theirs as a general policy."]
+    },
+    {
+      "schemaId": "atm.engineeringChangeMethodProfile.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial profile." },
+      "id": "deep-module-refactor",
+      "title": "Deep module refactor",
+      "triggerEvidence": ["deep module", "shotgun change", "duplicated policy", "missing test seam"],
+      "applicability": ["Refactors that reduce caller complexity behind a stable interface."],
+      "requiredObservations": ["public interface", "adapter boundary", "rollback path", "causal validators"],
+      "counterexamples": ["file length only", "one-off helper extraction"],
+      "completionEvidence": ["deep-module review receipt", "interface-level tests"],
+      "rollback": ["revert module extraction without changing caller contract"],
+      "guardrails": ["File length is advisory; depth comes from removed caller complexity."]
+    }
+  ]
+}
