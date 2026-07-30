@@ -1,0 +1,84 @@
+{
+  "schemaId": "atm.forwardHistoricalWorkAdmissionProvenance.v1",
+  "generatedAt": "2026-07-30T20:53:00.000Z",
+  "generatedBy": "codex-skl-captain",
+  "reason": "Pre-push commit-range guard requires forward work-admission attestations for critical commits created before the current write-ticket trailer enforcement converged. The commits were reviewed as immutable ancestors of HEAD and are being attested without rewriting history.",
+  "scope": {
+    "base": "origin/main",
+    "head": "HEAD",
+    "protectedBranch": "main",
+    "blockingCode": "ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED"
+  },
+  "reviewedCommits": [
+    {
+      "commitSha": "f4ec6f73eb19e0b3aeda1c88b68c4679b23de899",
+      "parentCommitSha": "d02be744d3726f8ffd4b30f7e377f77483315d94",
+      "treeSha": "488b123d7ad6b8b83650cbc67f7e139b295b3c06",
+      "taskId": "ATM-GOV-0276",
+      "subject": "fix(gov): preserve causal graph during task import",
+      "classification": "historical-governed-delivery-without-work-admission-trailer"
+    },
+    {
+      "commitSha": "3ae96d5d14d575864ac53f6ab9fdcc21f9b1c53f",
+      "parentCommitSha": "f4ec6f73eb19e0b3aeda1c88b68c4679b23de899",
+      "treeSha": "c598efffa28446923ec11ee33d0f0028a28ab374",
+      "taskId": "ATM-GOV-0276",
+      "subject": "build(gov): sync frozen runner for task import fidelity",
+      "classification": "historical-runner-publication-without-work-admission-trailer"
+    },
+    {
+      "commitSha": "258dfa14c84c0a8a091a273431bb2b213f38796e",
+      "parentCommitSha": "7014a658accfae52c6a648dbf7e5a66d63e0aa65",
+      "treeSha": "b8fd5b25e0d5e68baeab27ef54715797615bc99c",
+      "taskId": "ATM-GOV-0276",
+      "subject": "build(gov): publish ATM-GOV-0276 runner sync",
+      "classification": "historical-runner-publication-without-work-admission-trailer"
+    },
+    {
+      "commitSha": "84b2cc364c2da1c91a35f1cf749118164cb00d17",
+      "parentCommitSha": "42bb218b6a8d7b68bb1c74bedf33cdda40793ba4",
+      "treeSha": "c9efb82019780f9df58683eb3763ea4d6d5ffcb5",
+      "taskId": "TASK-SKL-0032",
+      "subject": "build(skl): publish diagnostic feedback runner",
+      "classification": "historical-runner-publication-without-work-admission-trailer"
+    },
+    {
+      "commitSha": "cd26a5d8ae2a591dc413a27d83b846e408d6d511",
+      "parentCommitSha": "1bcc5324a15de28961d5a009c084db4e8c6fa665",
+      "treeSha": "e2021c47b5963cfe55d46a75ceff48617da9ca0d",
+      "taskId": "TASK-SKL-0034",
+      "subject": "build(skl): sync runner for engineering method profiles",
+      "classification": "historical-runner-publication-without-work-admission-trailer"
+    },
+    {
+      "commitSha": "aec29641f47f9d35b1d10875bd3e89a52809980e",
+      "parentCommitSha": "c5be7b9bcfedf44541ee1911c11605e0bd50b3fd",
+      "treeSha": "f696ab647046aa2a24caabbe87c4f222efd03aec",
+      "taskId": "TASK-SKL-0036",
+      "subject": "feat(skl): add incident learning backlog intake",
+      "classification": "historical-governed-delivery-without-work-admission-trailer"
+    },
+    {
+      "commitSha": "1017873b36954ceefc51acadd8d9ac2a8b1672ee",
+      "parentCommitSha": "9dd5e120eb0e433282f7161d9679bb8b25c710f2",
+      "treeSha": "ccb77c500c918fa4f3f2b1bd771a0c9a3571c7c3",
+      "taskId": "ATM-FRAMEWORK-TEMP-codex-skl-captain",
+      "subject": "fix(next): block batch prompt on queue-head dependencies",
+      "classification": "emergency-framework-repair-without-work-admission-trailer"
+    },
+    {
+      "commitSha": "58cd0dfbc5f35fa5e95cdf2aad875677289e4a37",
+      "parentCommitSha": "1017873b36954ceefc51acadd8d9ac2a8b1672ee",
+      "treeSha": "aa828ed039903e04c96d92f3e0a6f947aa357173",
+      "taskId": "ATM-FRAMEWORK-TEMP-codex-skl-captain",
+      "subject": "build(next): sync runner for queue-head dependency blocking",
+      "classification": "emergency-runner-publication-without-work-admission-trailer"
+    }
+  ],
+  "attestationPolicy": {
+    "mode": "forward-attestation",
+    "historyRewrite": false,
+    "provenanceKind": "emergency",
+    "provenanceRef": ".atm/history/evidence/TASK-GIT-0024.forward-provenance-2026-07-31-skl-plan4.json"
+  }
+}
