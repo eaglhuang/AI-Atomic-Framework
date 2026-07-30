@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0270",
+  "title": "Evidence freshness engine for incremental close validation",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0269"
+  ],
+  "acceptance": [
+    "Freshness verdict reports `fresh`, `stale`, `partially-stale`, or `missing` with path/command/hash reasons.",
+    "Close path receives an explicit rerun plan instead of a blanket validator list.",
+    "Heavyweight validators are not closure-required unless their causal impact edge is touched or the task declares them as release-lane evidence.",
+    "Ignored declared artifacts can be freshness-checked and included by an explicit deliverable policy instead of disappearing from close bundles.",
+    "The implementation is data-driven and contains no card-specific shortcut."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/evidence/verbs/validators.ts",
+    "packages/cli/src/commands/evidence/missing-report.ts",
+    "packages/cli/src/commands/evidence/validator-classification.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+    "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence/verbs/validators.ts",
+    "packages/cli/src/commands/evidence/missing-report.ts",
+    "packages/cli/src/commands/evidence/validator-classification.ts",
+    "packages/cli/src/commands/evidence/evidence-store.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+    "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert freshness verdict and taskflow consumers together; stale evidence must remain fail-closed on rollback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-freshness",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.evidence-freshness-engine",
+        "pattern": "Policy Object / Deep Module",
+        "source": "packages/cli/src/commands/evidence/missing-report.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/evidence/verbs/validators.ts",
+        "packages/cli/src/commands/evidence/missing-report.ts",
+        "packages/cli/src/commands/evidence/validator-classification.ts",
+        "packages/cli/src/commands/evidence/evidence-store.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+        "packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0270-evidence-freshness-engine-for-incremental-close-validation.task.md",
+    "sectionTitle": "ATM-GOV-0270",
+    "headingLine": 74,
+    "hash": "be72130f4d68ac94",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0270-evidence-freshness-engine-for-incremental-close-validation.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:be72130f4d68ac94d9c23dd1b4b295861640c77e0e089a9661b9bf735461a981",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T03:38:57.002Z"
+    }
+  },
+  "importedAt": "2026-07-30T03:38:57.002Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.evidence.tests.validators.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/validators.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.close.gates.focused.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-30T03-38-58-382Z-import-d6895ba7e4eb",
+  "lastTransitionAt": "2026-07-30T03:38:58.382Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
