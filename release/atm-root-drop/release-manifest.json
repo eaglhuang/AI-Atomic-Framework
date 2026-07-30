@@ -1038,9 +1038,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/broker/implementation.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/migrate/implementation.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/mutation-helpers.js",
-    "release/atm-root-drop/packages/cli/dist/commands/broker/parallel-admission/closure-observation.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/broker/parallel-admission/closure-observation.js",
-    "release/atm-root-drop/packages/cli/dist/commands/broker/parallel-admission/final-verdict.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/broker/parallel-admission/final-verdict.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/parser.js",
     "release/atm-root-drop/packages/cli/dist/commands/broker/persistence.js",
@@ -1147,6 +1145,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/doctor/lifecycle.js",
     "release/atm-root-drop/packages/cli/dist/commands/doctor/policy.js",
     "release/atm-root-drop/packages/cli/dist/commands/doctor/readiness.js",
+    "release/atm-root-drop/packages/cli/dist/commands/doctor/run-doctor.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/doctor/run-doctor.js",
     "release/atm-root-drop/packages/cli/dist/commands/doctor/types.js",
     "release/atm-root-drop/packages/cli/dist/commands/doctor/utilities.js",
@@ -4652,9 +4651,9 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 23,
-    "unchanged": 4592,
-    "removed": 2
+    "copied": 3,
+    "unchanged": 4613,
+    "removed": 0
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -5892,7 +5891,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:601b60f64f214e6b46b82b06a018defdbec161f4e7a9e8202dcdf03b310bcdfb"
+    "digest": "sha256:2b256c419be9c9b2504a1a1b9049ac521b2fcb20db12df67a832a36c61d5e8d9"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -6904,9 +6903,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/broker/implementation.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/migrate/implementation.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/mutation-helpers.js",
-      "release/atm-root-drop/packages/cli/dist/commands/broker/parallel-admission/closure-observation.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/broker/parallel-admission/closure-observation.js",
-      "release/atm-root-drop/packages/cli/dist/commands/broker/parallel-admission/final-verdict.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/broker/parallel-admission/final-verdict.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/parser.js",
       "release/atm-root-drop/packages/cli/dist/commands/broker/persistence.js",
@@ -7013,6 +7010,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/doctor/lifecycle.js",
       "release/atm-root-drop/packages/cli/dist/commands/doctor/policy.js",
       "release/atm-root-drop/packages/cli/dist/commands/doctor/readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/doctor/run-doctor.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/doctor/run-doctor.js",
       "release/atm-root-drop/packages/cli/dist/commands/doctor/types.js",
       "release/atm-root-drop/packages/cli/dist/commands/doctor/utilities.js",
@@ -10521,34 +10519,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:e220c6ea11466931b6939f40c743f4515c8961944042a3c2413caf7cd5628921",
-  "sealedSourceCommit": "24f1525116b11c740b0c31057121097818382032",
+  "buildInputsTreeHash": "sha256:1ccca7d3374cfd5529734b89298b6328731128f73aee8c4b802febc3a4566bd0",
+  "sealedSourceCommit": "2660aaee24195f66c3bdb636fb8fc744d5359af2",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:6fc016bef00ccc1e22bc372ee624719e7694c81ba9d8127c5abab93f4a598706",
-  "tsBuildCacheDigest": "sha256:78f2f33c505745e531941565d221b8f70be252c0c696296721e3349da7b3758c",
+  "incrementalPlanDigest": "sha256:63b17da6ff4af56d4ea5a81843c91e050c2ef9430196b8e8f84db9e8750ef690",
+  "tsBuildCacheDigest": "sha256:2b91d0b243c305639910c5e36262d841bf834b947867e659747bb7ba9ddab979",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 9619,
-    "totalElapsedMs": 30998,
-    "dominanceRatio": 0.3103,
-    "phaseMedianMs": 1952,
-    "phaseP95Ms": 9619,
+    "dominantPhaseMs": 9949,
+    "totalElapsedMs": 32893,
+    "dominanceRatio": 0.3025,
+    "phaseMedianMs": 1198,
+    "phaseP95Ms": 9949,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 47,
-    "skipDecision": 45,
-    "worktreeSetup": 9619,
-    "typescriptBuild": 4990,
-    "rootDropReleaseAssembly": 6314,
-    "onefileReleaseAssembly": 1952,
-    "artifactSync": 6380,
+    "inputHashCalculation": 46,
+    "skipDecision": 48,
+    "worktreeSetup": 9949,
+    "typescriptBuild": 8193,
+    "rootDropReleaseAssembly": 6318,
+    "onefileReleaseAssembly": 1198,
+    "artifactSync": 5297,
     "cleanup": 0,
-    "totalElapsed": 30998
+    "totalElapsed": 32893
   }
 }

@@ -189,13 +189,13 @@ export async function runDoctor(argv: readonly string[]) {
     governanceEntryReadiness,
     backlogSyncCheck,
     createCheck('cross-task-mutation-incident', (() => {
-      const activeTaskId = runtime.currentTaskId ?? null;
+      const activeTaskId = runtime.currentTaskId ?? process.env.ATM_TASK_ID ?? null;
       const block = detectCrossTaskMutation(root, activeTaskId, 'doctor');
       const incident = readIncidentFlag(root);
       return !block && !incident;
     })(), {
       incident: readIncidentFlag(root),
-      conflict: detectCrossTaskMutation(root, runtime.currentTaskId ?? null, 'doctor')
+      conflict: detectCrossTaskMutation(root, runtime.currentTaskId ?? process.env.ATM_TASK_ID ?? null, 'doctor')
     })
   ];
   const ok = checks.every((check) => check.ok);
