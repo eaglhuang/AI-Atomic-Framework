@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-30-284",
+  "date": "2026-07-30",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Governance / Runner sync / Commit adapter",
+  "finding": "After ATM-GOV-0270 taskflow close succeeded, runner-sync outputs and .atm/history/evidence/ATM-GOV-0270.runner-sync-receipt.json remained uncommitted. A normal native git commit was blocked by ATM_CROSS_TASK_MUTATION_BLOCKED, and node atm.mjs git commit --task ATM-GOV-0270 was blocked by ATM_WRITE_TICKET_SCOPE_VIOLATION because the receipt and release artifacts were outside the closed task ticket grant.",
+  "expectedBehavior": "Runner-sync closeback should provide a normal governed commit path for the exact generated runner receipt and release surfaces, or taskflow close should include the runner-sync receipt in the governed close bundle when the runner gate was required and accepted.",
+  "evidenceOrRepro": "ATM-GOV-0270: taskflow close --write --historical-delivery d939ece33fde2187985fe6717c0badda21bf2b93 succeeded and committed target bundle 2ead162c5932d0c5b4e33b7e877f7b932d9c8f5f, but left .atm/history/evidence/ATM-GOV-0270.runner-sync-receipt.json and release outputs dirty. Native git commit failed with ATM_CROSS_TASK_MUTATION_BLOCKED; governed git commit failed with ATM_WRITE_TICKET_SCOPE_VIOLATION. Owner-approved emergency pathspec commit 34cc7cdf2 was required.",
+  "followUp": "Open a GOV task to add a first-class runner-sync closeback commit path and regression tests for source delivery commit -> runner-sync enqueue/build -> receipt publication -> taskflow close -> no dirty runner receipt/release residue without emergency commit."
+}
