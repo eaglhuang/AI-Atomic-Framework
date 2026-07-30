@@ -1,0 +1,315 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0034",
+  "title": "Engineering change method profiles and fidelity receipts",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R1.2",
+  "dependencies": [
+    "TASK-SKL-0031"
+  ],
+  "acceptance": [
+    "Profiles declare trigger evidence, applicability, required observations, counterexamples, completion evidence and rollback without embedding task IDs, vendors or repository paths in control flow.",
+    "Expand-contract activates only for broad contract migrations and requires an expand step, independently green migration batches, an old-form usage query and a zero-caller contract gate.",
+    "TDD oracle fidelity proves expected values come from an independent source and flags private-method, internal-mock and tautological tests.",
+    "Review smells remain replaceable heuristics beneath repository standards; Standards and Spec findings remain separate TASK-SKL-0021 axes.",
+    "Merge-conflict guidance records both-side intent provenance and may fail closed or abort safely when goals conflict; it never mandates ours/theirs.",
+    "Existing `atm-plan-authoring`, `atm-task-card-authoring`, `atm-evidence` and deep-module routes consume profiles without creating a parallel lifecycle or registry."
+  ],
+  "deliverables": [
+    "schemas/skills/engineering-change-method-profile.schema.json",
+    "packages/core/src/skills/engineering-change-method.ts",
+    "scripts/engineering-change-method-profiles.json",
+    "tests/cli/engineering-change-method-profiles.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/skills/engineering-change-method-profile.schema.json",
+    "packages/core/src/skills/engineering-change-method.ts",
+    "packages/core/src/skills/index.ts",
+    "scripts/engineering-change-method-profiles.json",
+    "templates/skills/atm-plan-authoring.skill.md",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "templates/skills/atm-evidence.skill.md",
+    "templates/skills/atm-deep-module-refactor.skill.md",
+    "tests/catalog/groups/test_group_engineering_method_profiles.shard.json",
+    "tests/cli/engineering-change-method-profiles.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/engineering-change-method-profiles.test.ts",
+    "npm run validate:schemas",
+    "npm run validate:skill-templates",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "A second task graph, review lifecycle, TDD lifecycle, or Git conflict engine.",
+    "Promoting smell heuristics into universal hard gates.",
+    "Copying upstream provider prose verbatim into ATM runtime."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-method-profile-selection-and-fidelity-receipt",
+  "rollbackStrategy": "revert-commit-and-retain-existing-skill-guidance",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.skill-provider-policy",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.engineering-change-method-profile",
+        "pattern": "Strategy",
+        "source": "packages/core/src/skills/engineering-change-method.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "schemas/skills/engineering-change-method-profile.schema.json",
+        "packages/core/src/skills/engineering-change-method.ts",
+        "packages/core/src/skills/index.ts",
+        "scripts/engineering-change-method-profiles.json",
+        "templates/skills/atm-plan-authoring.skill.md",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "templates/skills/atm-evidence.skill.md",
+        "templates/skills/atm-deep-module-refactor.skill.md",
+        "tests/catalog/groups/test_group_engineering_method_profiles.shard.json",
+        "tests/cli/engineering-change-method-profiles.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0034-engineering-change-method-profiles-and-fidelity-receipts.task.md",
+    "sectionTitle": "TASK-SKL-0034",
+    "headingLine": 78,
+    "hash": "a54129e8d5d3d107",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0034-engineering-change-method-profiles-and-fidelity-receipts.task.md",
+      "planningCommitSha": "ece2f91725f9d589a7198cbddbdb67287035d23d",
+      "contentDigest": "sha256:a54129e8d5d3d1079ebc0dc8a7b16f432a191c45d52905b2a206de493d49ac58",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T16:00:01.460Z"
+    }
+  },
+  "importedAt": "2026-07-30T16:00:01.460Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-SKL-0031"
+    ],
+    "startConditions": [
+      "TASK-SKL-0031 is done and canonical method-profile metadata can be projected consistently."
+    ],
+    "softRelations": [
+      "TASK-SKL-0020 causal task graph",
+      "TASK-SKL-0021 Standards and Spec review",
+      "TASK-SKL-0025 TDD receipt lifecycle"
+    ],
+    "changedPublicSeams": [
+      "Engineering change method profile selection",
+      "Advisory method-fidelity receipt"
+    ],
+    "causalImpactEdges": [
+      "change shape -> selected method profile",
+      "method profile -> required and advisory fidelity checks"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "node --strip-types tests/cli/engineering-change-method-profiles.test.ts"
+    ],
+    "phaseOwner": "atm-agent-skills"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [
+    "test_task_skl_0034_method_profile_fidelity_19e253da"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "lastTransitionId": "2026-07-30T19-06-56-723Z-scope-amendment-c8f00231ab3a",
+  "lastTransitionAt": "2026-07-30T19:06:56.723Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-30T18:58:03.493Z",
+  "promotedAt": "2026-07-30T18:58:03.498Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-3448dc8ba3e9",
+    "claimedAt": "2026-07-30T18:58:03.503Z",
+    "heartbeatAt": "2026-07-30T18:58:03.503Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0034.*",
+      ".atm/history/task-events/TASK-SKL-0034/**",
+      ".atm/history/tasks/TASK-SKL-0034.json",
+      "packages/core/src/skills/engineering-change-method.ts",
+      "packages/core/src/skills/index.ts",
+      "schemas/skills/engineering-change-method-profile.schema.json",
+      "scripts/engineering-change-method-profiles.json",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-plan-authoring.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/catalog/groups/test_group_engineering_method_profiles.shard.json",
+      "tests/cli/engineering-change-method-profiles.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260730185803-codex-skl-captain-cec9b4d6a0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730185803-codex-skl-captain-cec9b4d6a0\""
+    }
+  },
+  "startedAt": "2026-07-30T18:58:03.503Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c28f69d8347d0790",
+    "ticketDigest": "sha256:c28f69d8347d07905f51b2351900591202a1ac53766e6be45998eb02ab571d4a",
+    "taskId": "TASK-SKL-0034",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260730185803-codex-skl-captain-cec9b4d6a0",
+    "claimGeneration": "lease-3448dc8ba3e9",
+    "issuedAt": "2026-07-30T18:58:03.503Z",
+    "expiresAt": "2026-07-30T19:28:03.503Z",
+    "scopeDigest": "sha256:f29db79d1e1283d3857f191a537b5b6c322c0bec985c9924ec388caa305bbdfd",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T18:58:03.503Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0034.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-SKL-0034/**",
+          ".atm/history/tasks/TASK-SKL-0034.json",
+          "packages/core/src/skills/engineering-change-method.ts",
+          "packages/core/src/skills/index.ts",
+          "schemas/skills/engineering-change-method-profile.schema.json",
+          "scripts/engineering-change-method-profiles.json",
+          "templates/skills/atm-deep-module-refactor.skill.md",
+          "templates/skills/atm-evidence.skill.md",
+          "templates/skills/atm-plan-authoring.skill.md",
+          "templates/skills/atm-task-card-authoring.skill.md",
+          "tests/catalog/groups/test_group_engineering_method_profiles.shard.json",
+          "tests/cli/engineering-change-method-profiles.test.ts"
+        ],
+        "digest": "sha256:622f83e0e41f581d4867fa33f72a82f103d8d984a57374a20e953fbe31fa6d9e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:703c25db88a14df3cdee690de78fb5b579bba82daf90937bfd19f6a1e805d4e8",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:49a4377b6baf707f21946b7d31aa8e5a5e727dda00b52d982a3bb89f718c8c80"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260730185803-codex-skl-captain-TASK-SKL-0034-6836c4eb17",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0034",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0034.*",
+      ".atm/history/task-events/TASK-SKL-0034/**",
+      ".atm/history/tasks/TASK-SKL-0034.json",
+      "packages/core/src/skills/engineering-change-method.ts",
+      "packages/core/src/skills/index.ts",
+      "schemas/skills/engineering-change-method-profile.schema.json",
+      "scripts/engineering-change-method-profiles.json",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-plan-authoring.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tests/catalog/groups/test_group_engineering_method_profiles.shard.json",
+      "tests/cli/engineering-change-method-profiles.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0034-engineering-change-method-profiles-and-fidelity-receipts.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0034-engineering-change-method-profiles-and-fidelity-receipts.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "3a87349032448244ce1b6ba990bfb0c2f36e135c07ab5aa5069093d436873269",
+    "actorId": "codex-skl-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730185803-codex-skl-captain-cec9b4d6a0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730185803-codex-skl-captain-cec9b4d6a0\""
+    },
+    "createdAt": "2026-07-30T18:58:24.352Z",
+    "status": "active"
+  }
+}

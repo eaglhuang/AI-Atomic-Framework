@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/skills/engineering-change-method-profile.schema.json",
+  "schemaId": "atm.engineeringChangeMethodProfiles.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial engineering change method profile schema."
+  },
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "profiles"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.engineeringChangeMethodProfiles.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": {
+      "type": "object",
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "const": "none" },
+        "fromVersion": { "type": "null" },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "schemaId",
+          "specVersion",
+          "migration",
+          "id",
+          "title",
+          "triggerEvidence",
+          "applicability",
+          "requiredObservations",
+          "counterexamples",
+          "completionEvidence",
+          "rollback",
+          "guardrails"
+        ],
+        "properties": {
+          "schemaId": { "const": "atm.engineeringChangeMethodProfile.v1" },
+          "specVersion": { "const": "0.1.0" },
+          "migration": {
+            "type": "object",
+            "required": ["strategy", "fromVersion", "notes"],
+            "properties": {
+              "strategy": { "const": "none" },
+              "fromVersion": { "type": "null" },
+              "notes": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "id": {
+            "enum": [
+              "expand-contract",
+              "tdd-oracle-fidelity",
+              "review-smell-heuristics",
+              "merge-conflict-intent",
+              "deep-module-refactor"
+            ]
+          },
+          "title": { "type": "string", "minLength": 1 },
+          "triggerEvidence": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "applicability": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "requiredObservations": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "counterexamples": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "completionEvidence": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "rollback": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "guardrails": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

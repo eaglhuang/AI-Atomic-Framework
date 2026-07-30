@@ -38,6 +38,13 @@ Callers submit one bounded refactor candidate plus observed friction. The
 provider returns one `atm.deepModuleReviewReport.v1` receipt. Callers do not
 copy deep-module rules into production logic.
 
+Before turning the review into implementation instructions, select the
+`deep-module-refactor` engineering change method profile from
+`scripts/engineering-change-method-profiles.json` and preserve the selected
+trigger evidence, required observations, counterexamples, completion evidence,
+and rollback expectation in the review receipt. If the profile cannot be loaded,
+degrade with evidence instead of embedding a private copy of the rules here.
+
 The review uses the vocabulary `module`, `interface`, `seam`, `adapter`,
 `depth`, `leverage`, and `locality`.
 
