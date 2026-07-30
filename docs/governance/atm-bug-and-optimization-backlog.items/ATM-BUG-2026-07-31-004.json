@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-004",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Git governance",
+  "finding": "`node atm.mjs git commit --dry-run --auto-stage` reported and created commit `393d65a3b07b2715aa178d3aa546ed503bdbbf9c` during ATM-GOV-0271 closeout instead of remaining non-mutating.",
+  "expectedBehavior": "The dry-run path must not create commits, advance HEAD, stage new files, or mutate git-head evidence. It should only resolve and report the task-scoped commit bundle.",
+  "evidenceOrRepro": "Command: `node atm.mjs git commit --actor codex-skl-captain --task ATM-GOV-0271 --message \"feat(taskflow): add close saga recovery lanes\" --auto-stage --dry-run --json`; output included `ATM_GIT_COMMIT_OK` and commit `393d65a3b07b2715aa178d3aa546ed503bdbbf9c`.",
+  "followUp": "Add a regression test for git commit dry-run non-mutation, including HEAD-before/after equality and empty commit creation assertions."
+}

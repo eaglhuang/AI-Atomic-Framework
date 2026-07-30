@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-005",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Runner sync governance",
+  "finding": "Runner-sync temp framework claims can build and write `.atm/history/evidence/<temp-task>.runner-sync-receipt.json`, but the governed git commit wrapper rejects the temp task with `ATM_TASK_NOT_FOUND`, and native pre-commit rejects the receipt with `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT` because no matching task ledger/event exists.",
+  "expectedBehavior": "A runner-sync steward lane must have a normal governed publication route for release artifacts and its receipt, either through a temp-task ledger record or an explicit runner-sync publication commit adapter.",
+  "evidenceOrRepro": "ATM-GOV-0271 runner sync: `node atm.mjs git commit --task ATM-FRAMEWORK-TEMP-codex-skl-captain --auto-stage --json` returned `ATM_TASK_NOT_FOUND`; native path-bounded commit without `--no-verify` returned `ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED` with `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT`.",
+  "followUp": "Create a GOV/SKL task to give framework temp claims a task-context projection or add a dedicated `runner-sync publish` adapter that commits receipt and release surfaces without emergency hook bypass."
+}
