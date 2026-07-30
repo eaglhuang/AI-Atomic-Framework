@@ -1,0 +1,300 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0275",
+  "title": "Preserve foreign work during dual-captain governed commit",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`--auto-stage --defer-foreign-staged` commits only active task scope.",
+    "Foreign staged blob identity remains byte-identical and remains staged.",
+    "Foreign unstaged content remains byte-identical and remains dirty.",
+    "Active task deliverable is included in the governed commit.",
+    "`tests/cli/pre-team-dual-captain-e2e.test.ts` passes.",
+    "`tests/cli/work-admission-ticket-deferred-index-parity.test.ts` passes.",
+    "`tests/core/transactional-steward-single-write.test.ts` passes.",
+    "`tests/cli/parallel-proposal-lane-admission.test.ts` passes."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/implementation/",
+    "tests/cli/pre-team-dual-captain-e2e.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/implementation/",
+    "tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+    "tests/core/transactional-steward-single-write.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+    "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+    "node --strip-types tests/cli/parallel-proposal-lane-admission.test.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "mailboxAssignee": "Claude-005",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.work-coordination-authority",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.work-coordination-authority",
+        "pattern": "Commit Adapter / Neutral Steward Facade",
+        "source": "packages/cli/src/commands/git-governance/implementation.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0275-preserve-foreign-work-during-dual-captain-governed-commit.task.md",
+    "sectionTitle": "ATM-GOV-0275",
+    "headingLine": 78,
+    "hash": "f03a84ff4196bb69",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0275-preserve-foreign-work-during-dual-captain-governed-commit.task.md",
+      "planningCommitSha": "023fee871f763bc753c31ccb69db28622323bd67",
+      "contentDigest": "sha256:f03a84ff4196bb6983990a320918772296aabfbcfef55f1bce40b54f62ba0346",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T08:38:46.098Z"
+    }
+  },
+  "importedAt": "2026-07-30T08:38:46.098Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.pre.team.dual.captain.e2e.test.ts",
+      "command": "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.work.admission.ticket.deferred.index.parity.test.ts",
+      "command": "node --strip-types tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.core.transactional.steward.single.write.test.ts",
+      "command": "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.parallel.proposal.lane.admission.test.ts",
+      "command": "node --strip-types tests/cli/parallel-proposal-lane-admission.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-30T09-02-06-584Z-renew-a1825846420f",
+  "lastTransitionAt": "2026-07-30T09:02:06.584Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-07-30T08:41:11.419Z",
+  "promotedAt": "2026-07-30T08:41:11.422Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-597533d90f9a",
+    "claimedAt": "2026-07-30T08:41:11.426Z",
+    "heartbeatAt": "2026-07-30T09:02:05.829Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0275.*",
+      ".atm/history/task-events/ATM-GOV-0275/**",
+      ".atm/history/tasks/ATM-GOV-0275.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260730084111-codex-captain-cafd27923d",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730084111-codex-captain-cafd27923d\""
+    }
+  },
+  "startedAt": "2026-07-30T08:41:11.426Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-0945001a22b5ac2f",
+    "ticketDigest": "sha256:0945001a22b5ac2ff8650cddd0336a94d9a27abeb1041da86ac621d7e5dc53cd",
+    "taskId": "ATM-GOV-0275",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260730084111-codex-captain-cafd27923d",
+    "claimGeneration": "lease-597533d90f9a",
+    "issuedAt": "2026-07-30T09:02:05.829Z",
+    "expiresAt": "2026-07-30T09:32:05.829Z",
+    "scopeDigest": "sha256:e7fa1efc159447a1ef64dab8e90c9c585eec798441f5bc01a3c52336620dde53",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T09:02:05.829Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0275.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0275/**",
+          ".atm/history/tasks/ATM-GOV-0275.json",
+          "packages/cli/src/commands/git-governance.ts",
+          "packages/cli/src/commands/git-governance/implementation.ts",
+          "packages/cli/src/commands/git-governance/implementation/",
+          "packages/cli/src/commands/git-governance/work-admission-check.ts",
+          "tests/cli/pre-team-dual-captain-e2e.test.ts",
+          "tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+          "tests/core/transactional-steward-single-write.test.ts"
+        ],
+        "digest": "sha256:e91b7d61bca55979bc09cbd7aa20c078c56e9b21993e321f72f0d83232766787"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260730084111-codex-captain-ATM-GOV-0275-9cc1d95e6c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0275",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0275.*",
+      ".atm/history/task-events/ATM-GOV-0275/**",
+      ".atm/history/tasks/ATM-GOV-0275.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0275-preserve-foreign-work-during-dual-captain-governed-commit.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0275-preserve-foreign-work-during-dual-captain-governed-commit.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "e668bcd17daecc38b3b691a15c257c9e67435ddc27b324245bac8a61743918f3",
+    "actorId": "codex-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730084111-codex-captain-cafd27923d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730084111-codex-captain-cafd27923d\""
+    },
+    "createdAt": "2026-07-30T08:41:26.660Z",
+    "status": "active"
+  }
+}

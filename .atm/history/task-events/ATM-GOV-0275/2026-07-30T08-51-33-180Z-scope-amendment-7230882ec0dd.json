@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T08-51-33-180Z-scope-amendment-7230882ec0dd",
+  "taskId": "ATM-GOV-0275",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0275.json",
+  "taskSha256": "sha256:79a2e8e5616e7a0b25fce4accd029b628f79ee60abd23056fd2cff7e328e6df9",
+  "createdAt": "2026-07-30T08:51:33.180Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0275 --actor codex-captain --add \"packages/cli/src/commands/git-governance.ts,packages/cli/src/commands/git-governance/work-admission-check.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
