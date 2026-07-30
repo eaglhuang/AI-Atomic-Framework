@@ -18,6 +18,7 @@ import {
   findActiveTaskQueueForIntent
 } from './route-resolution.ts';
 import { quoteCliValue } from './view-projections.ts';
+import { diagnoseClaimReadinessForTasks } from './claim-readiness.ts';
 
 export function createNextProfiler(header = 'ATM_NEXT_PROFILE') {
   const enabled = process.env.ATM_NEXT_PROFILE === '1';
@@ -148,6 +149,79 @@ export function buildPromptScopeQueueResult(input: {
     queueHeadTaskId
   };
   const queueHeadImport = input.queueHeadTask ? buildPlanningCardImportRequirement(input.queueHeadTask) : null;
+  const claimReadiness = input.queueHeadTask && !queueHeadImport
+    ? diagnoseClaimReadinessForTasks(input.cwd, [input.queueHeadTask], 'write')
+    : null;
+  if (claimReadiness?.primaryBlocker) {
+    const blocker = claimReadiness.primaryBlocker;
+    const nextAction = {
+      status: 'task-queue-head-claim-blocked',
+      command: blocker.requiredCommand ?? `node atm.mjs tasks status --task ${blocker.taskId} --json`,
+      reason: blocker.blockerSummary,
+      recommendedChannel: 'batch',
+      riskLevel: 'high',
+      requiredCommand: blocker.requiredCommand ?? `node atm.mjs tasks status --task ${blocker.taskId} --json`,
+      selectedTasks: input.selectedTasks,
+      taskQueue: activeBatchQueue ?? queuePreview,
+      queueId: activeBatchQueue?.queueId ?? null,
+      batchId: activeBatch?.batchId ?? null,
+      scopeKey: activeBatch?.scopeKey ?? null,
+      queueHeadTaskId,
+      queueSize: input.selectedTasks.length,
+      claimReadiness,
+      batchInstruction: 'This batch queue head is not claimable. Do not edit, checkpoint, or advance the batch until the named blocker is resolved.',
+      playbook: buildChannelPlaybook({
+        channel: 'batch',
+        taskId: queueHeadTaskId ?? undefined,
+        queueHeadTaskId,
+        originalPrompt: queuePrompt,
+        batchId: activeBatch?.batchId ?? null,
+        batchState: 'repair-required'
+      }),
+      governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
+        channel: 'batch',
+        prompt: queuePrompt,
+        actorId: input.actor,
+        taskId: queueHeadTaskId
+      }),
+      allowedCommands: [
+        blocker.requiredCommand ?? `node atm.mjs tasks status --task ${blocker.taskId} --json`,
+        ...allowedGuidanceBootstrapCommands()
+      ],
+      blockedCommands: [
+        ...blockedMutationCommands(),
+        'batch queue-head implementation while claim readiness is blocked',
+        'batch checkpoint while queue head dependency is unresolved'
+      ]
+    };
+    return makeResult({
+      ok: false,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction,
+        null,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
+        message('error', blocker.blockerCode, blocker.blockerSummary, {
+          taskId: blocker.taskId,
+          blockingTaskIds: blocker.dependencyBlockers.map((entry) => entry.taskId),
+          requiredCommand: nextAction.requiredCommand,
+          dependencyStatuses: blocker.dependencyBlockers
+        })
+      ),
+      evidence: {
+        nextAction,
+        recommendedChannel: 'batch',
+        taskQueue: activeBatchQueue ?? queuePreview,
+        claimReadiness,
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
   const queueClaimCommand = buildPromptScopedQueueClaimCommand({
     queueHeadTaskPresent: Boolean(input.queueHeadTask),
     queuePrompt,
