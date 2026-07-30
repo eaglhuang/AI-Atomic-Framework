@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0269",
   "title": "Validation plan observability and resumable standard gate",
-  "status": "planned",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -112,7 +112,9 @@
   },
   "importedAt": "2026-07-30T03:38:51.295Z",
   "workAdmission": {
-    "recoveryMode": "auto"
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
   },
   "testContributions": [],
   "requiredTestCaseIds": [],
@@ -160,7 +162,161 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-30T03-38-51-505Z-import-80da7f143f8d",
-  "lastTransitionAt": "2026-07-30T03:38:51.505Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-30T21-38-18-156Z-close-502ca9eee194",
+  "lastTransitionAt": "2026-07-30T21:38:18.156Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-30T10:18:39.994Z",
+  "promotedAt": "2026-07-30T10:18:39.997Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-f3186b299d73",
+    "claimedAt": "2026-07-30T21:23:28.449Z",
+    "heartbeatAt": "2026-07-30T21:38:18.152Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0269.json",
+      "packages/cli/src/commands/command-specs/validate.spec.ts",
+      "packages/cli/src/commands/validate.ts",
+      "scripts/lib/validator-envelope.ts",
+      "scripts/lib/validator-harness.ts",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/implementation.ts",
+      "scripts/validators.config.json",
+      "tests/cli/run-validators-final-600.test.ts",
+      "tests/cli/validator-run-resume-and-status.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260730212329-codex-skl-captain-9c70f6a455",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730212329-codex-skl-captain-9c70f6a455\""
+    },
+    "reason": "ATM-GOV-0269 was historically delivered across older validator-runner commits; task-scoped files are fully covered, while unrelated files in those commits are waived as historical mixed-delivery evidence only."
+  },
+  "startedAt": "2026-07-30T21:23:28.449Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-b62448df3c459513",
+    "ticketDigest": "sha256:b62448df3c459513d090c028136b50700e7224db8e937e43cad1160517c87a83",
+    "taskId": "ATM-GOV-0269",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260730212329-codex-skl-captain-9c70f6a455",
+    "claimGeneration": "lease-f3186b299d73",
+    "issuedAt": "2026-07-30T21:23:28.449Z",
+    "expiresAt": "2026-07-30T21:53:28.449Z",
+    "scopeDigest": "sha256:56b570f02ca43c3478598176a513790a105ff67d55510517594f883b90ffb29f",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T21:23:28.449Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0269.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0269/**",
+          ".atm/history/tasks/ATM-GOV-0269.json",
+          "packages/cli/src/commands/command-specs/validate.spec.ts",
+          "packages/cli/src/commands/validate.ts",
+          "scripts/lib/validator-envelope.ts",
+          "scripts/lib/validator-harness.ts",
+          "scripts/run-validators.ts",
+          "scripts/run-validators/implementation.ts",
+          "scripts/validators.config.json",
+          "tests/cli/run-validators-final-600.test.ts",
+          "tests/cli/validator-run-resume-and-status.test.ts"
+        ],
+        "digest": "sha256:2d55784dcf9354e168180407dd04104e2a649860ea647d1c68f53c0da484f000"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260730212328-codex-skl-captain-ATM-GOV-0269-7b37ad952b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0269",
+    "batchId": null,
+    "scopeKey": "tasks-7e9df11ec655",
+    "queueId": "queue-1103c96e91a164e5",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0269.*",
+      ".atm/history/task-events/ATM-GOV-0269/**",
+      ".atm/history/tasks/ATM-GOV-0269.json",
+      "packages/cli/src/commands/command-specs/validate.spec.ts",
+      "packages/cli/src/commands/validate.ts",
+      "scripts/lib/validator-envelope.ts",
+      "scripts/lib/validator-harness.ts",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/implementation.ts",
+      "scripts/validators.config.json",
+      "tests/cli/run-validators-final-600.test.ts",
+      "tests/cli/validator-run-resume-and-status.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7e0eec5ef47d39d7966a712f006b6abd6aa109e35dba4d55bf3b03ddc33e8f40",
+    "actorId": "codex-skl-captain",
+    "sessionId": "session-20260730212328-codex-skl-captain-ATM-GOV-0269-7b37ad952b",
+    "laneSession": {
+      "laneSessionId": "lane-20260730212329-codex-skl-captain-9c70f6a455",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730212329-codex-skl-captain-9c70f6a455\""
+    },
+    "createdAt": "2026-07-30T21:23:54.909Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-30T21:38:18.152Z",
+  "closedByActor": "codex-skl-captain",
+  "closedBySessionId": "session-20260730212328-codex-skl-captain-ATM-GOV-0269-7b37ad952b",
+  "closeReason": "ATM-GOV-0269 was historically delivered across older validator-runner commits; task-scoped files are fully covered, while unrelated files in those commits are waived as historical mixed-delivery evidence only.",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0269.closure-packet.json"
 }

@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0269",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a6f2f0a1ae877d61386e7d59bcb1f6c389cbeb04",
+  "governedTreeSha": "64e5ad36792fe5596b062c368a7e113aa3a3adca",
+  "targetCommitDelta": {
+    "currentCommitSha": "a6f2f0a1ae877d61386e7d59bcb1f6c389cbeb04",
+    "parentCommitShas": [
+      "a6f2f0a1ae877d61386e7d59bcb1f6c389cbeb04"
+    ],
+    "governedTreeSha": "64e5ad36792fe5596b062c368a7e113aa3a3adca",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0269.json",
+      ".atm/history/task-events/ATM-GOV-0269/2026-07-30T10-18-39-994Z-reserve-9782670103dd.json",
+      ".atm/history/task-events/ATM-GOV-0269/2026-07-30T10-18-39-997Z-promote-1bc260039b57.json",
+      ".atm/history/task-events/ATM-GOV-0269/2026-07-30T21-23-54-910Z-claim-abf33cb394b1.json",
+      ".atm/history/tasks/ATM-GOV-0269.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/src/commands/command-specs/validate.spec.ts",
+      "packages/cli/src/commands/validate.ts",
+      "scripts/lib/validator-envelope.ts",
+      "scripts/lib/validator-harness.ts",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/implementation.ts",
+      "scripts/validators.config.json",
+      "tests/cli/run-validators-final-600.test.ts",
+      "tests/cli/validator-run-resume-and-status.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/run-validators-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:496b49ca10ac54f6f4dbbbe347194460f39db76bbc36def7a6bcdeb45e78a916",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/validator-run-resume-and-status.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:374ff6bcc0a30fd6cd8c5e7eb85be63b3cb6098735eb61b8c1b574ec24ecb442",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:494c14af24a8cd48c2699949414c729c2b4bda3cf80ad33018b9b7e8d369c8e1",
+      "stderrSha256": "sha256:095be93701944b743138932b6e277cb2dd52a2a0bf121795d5b3215934d419ff",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/run-validators-final-600.test.ts",
+    "node --strip-types tests/cli/validator-run-resume-and-status.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-30T21:38:18.145Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0269.*",
+      ".atm/history/task-events/ATM-GOV-0269/**",
+      ".atm/history/tasks/ATM-GOV-0269.json",
+      "packages/cli/src/commands/command-specs/validate.spec.ts",
+      "packages/cli/src/commands/validate.ts",
+      "scripts/lib/validator-envelope.ts",
+      "scripts/lib/validator-harness.ts",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/implementation.ts",
+      "scripts/validators.config.json",
+      "tests/cli/run-validators-final-600.test.ts",
+      "tests/cli/validator-run-resume-and-status.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/validate.spec.ts",
+      "packages/cli/src/commands/validate.ts",
+      "scripts/lib/validator-envelope.ts",
+      "scripts/lib/validator-harness.ts",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/implementation.ts",
+      "scripts/validators.config.json",
+      "tests/cli/run-validators-final-600.test.ts",
+      "tests/cli/validator-run-resume-and-status.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0269.json",
+  "closedAt": "2026-07-30T21:38:18.146Z",
+  "closedByActor": "codex-skl-captain",
+  "sessionId": "session-20260730212328-codex-skl-captain-ATM-GOV-0269-7b37ad952b",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0b5f5bab76dfbd9543823282d10e5d3b17c4326d",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/command-specs/validate.spec.ts",
+      "packages/cli/src/commands/validate.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "docs/testing-strategy.md",
+      "scripts/validate-cli.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "docs/testing-strategy.md",
+      "scripts/validate-cli.ts"
+    ],
+    "waiverReason": "ATM-GOV-0269 was historically delivered across older validator-runner commits; task-scoped files are fully covered, while unrelated files in those commits are waived as historical mixed-delivery evidence only."
+  },
+  "teamSummary": null
+}
