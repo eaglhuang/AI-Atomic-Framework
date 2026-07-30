@@ -1,0 +1,151 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0271",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c32a6aa66aad64abbfd63e71f364ce13ddb36a37",
+  "governedTreeSha": "1ebd5a7f028747c081e16fa4e9161db953efc8dc",
+  "targetCommitDelta": {
+    "currentCommitSha": "c32a6aa66aad64abbfd63e71f364ce13ddb36a37",
+    "parentCommitShas": [
+      "c32a6aa66aad64abbfd63e71f364ce13ddb36a37"
+    ],
+    "governedTreeSha": "1ebd5a7f028747c081e16fa4e9161db953efc8dc",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-skl-captain.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0271.json",
+      ".atm/history/task-events/ATM-GOV-0271/2026-07-30T22-13-04-672Z-reserve-a7e9d3481b5f.json",
+      ".atm/history/task-events/ATM-GOV-0271/2026-07-30T22-13-04-676Z-promote-effce86fff9f.json",
+      ".atm/history/task-events/ATM-GOV-0271/2026-07-30T22-13-27-832Z-claim-632ce6ca2a8d.json",
+      ".atm/history/task-events/ATM-GOV-0271/2026-07-30T22-14-39-003Z-scope-amendment-7e433807a19e.json",
+      ".atm/history/tasks/ATM-GOV-0271.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a3758b8bced69ad2219dc2a2cba146cac3c373969f7988549453121d08d4a79",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e4cc18d9245759420799692fdcbb2ae18b107b79daa933f19ea23868b80b96b9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:84bf4259016a107e38318cff3f6e3e55e3b95541dcfa8b0aed13676940c917e6",
+      "stderrSha256": "sha256:094a83708b227ee08bb13de76b531d4961bf807c4898e777fab1eca25a958173",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/taskflow-close-saga-plan-parity.test.ts",
+    "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-30T22:30:15.500Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0271.*",
+      ".atm/history/task-events/ATM-GOV-0271/**",
+      ".atm/history/tasks/ATM-GOV-0271.json",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "tests/cli/taskflow-cross-authority-closeback-saga.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0271.json",
+  "closedAt": "2026-07-30T22:30:15.500Z",
+  "closedByActor": "codex-skl-captain",
+  "sessionId": "session-20260730221304-codex-skl-captain-ATM-GOV-0271-69e9ce20f2",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
