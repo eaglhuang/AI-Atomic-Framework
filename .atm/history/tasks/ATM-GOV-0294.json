@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0294",
+  "title": "Causal neighborhood compiler and factor combination generator",
+  "status": "planned",
+  "milestone": "ATM-GOV-PLAN4-R1",
+  "dependencies": [
+    "ATM-GOV-0280",
+    "ATM-GOV-0293"
+  ],
+  "acceptance": [
+    "ACC-1: compiler derives causal neighborhood from fingerprint, public seam, impact edges, validator refs, and changed files.",
+    "ACC-2: adjacent factors sharing the same root mechanism are included as candidate regression cases.",
+    "ACC-3: factor combinations are bounded by declared constraints and deterministic ordering.",
+    "ACC-4: excluded factors record explicit non-claim reasons.",
+    "ACC-5: tests cover expansion, bounding, ordering, and exclusion evidence."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/causal-neighborhood.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/causal-neighborhood.schema.json",
+    "tests/catalog/groups/test_group_plan4_causal_neighborhood.shard.json",
+    "tests/cli/plan4-causal-neighborhood-compiler.test.ts",
+    "tests/cli/plan4-factor-combination-generator.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/causal-neighborhood.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/causal-neighborhood.schema.json",
+    "tests/catalog/groups/test_group_plan4_causal_neighborhood.shard.json",
+    "tests/cli/plan4-causal-neighborhood-compiler.test.ts",
+    "tests/cli/plan4-factor-combination-generator.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-causal-neighborhood-compiler.test.ts",
+    "node --strip-types tests/cli/plan4-factor-combination-generator.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-neighborhood-and-factor-generation",
+  "rollbackStrategy": "revert-commit-and-disable-plan4-factor-expansion",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.causal-neighborhood-compiler",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/causal-neighborhood.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/causal-neighborhood.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/causal-neighborhood.schema.json",
+        "tests/catalog/groups/test_group_plan4_causal_neighborhood.shard.json",
+        "tests/cli/plan4-causal-neighborhood-compiler.test.ts",
+        "tests/cli/plan4-factor-combination-generator.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0294-causal-neighborhood-compiler-and-factor-combination-generator.task.md",
+    "sectionTitle": "ATM-GOV-0294",
+    "headingLine": 110,
+    "hash": "cef64ee3b894f02c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0294-causal-neighborhood-compiler-and-factor-combination-generator.task.md",
+      "planningCommitSha": "e05645d4417eb2b6314a7e9726570215fac5a278",
+      "contentDigest": "sha256:cef64ee3b894f02ccbdec9c1317d284144e47158f8090b5f7c976981ed2dae9d",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-30T21:15:16.420Z"
+    }
+  },
+  "importedAt": "2026-07-30T21:15:16.420Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0280",
+      "ATM-GOV-0293"
+    ],
+    "startConditions": [
+      "ATM-GOV-0280 is done and exposes causal graph/test coverage gap inputs.",
+      "ATM-GOV-0293 is done and exposes stable fault fingerprints and family candidates."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "ATM-GOV-0305 cumulative regression family store"
+    ],
+    "changedPublicSeams": [
+      "atm.causalNeighborhood.v1",
+      "atm.factorCombinationPlan.v1",
+      "atm.regressionCaseExpansion.v1"
+    ],
+    "causalImpactEdges": [
+      "fault fingerprint -> causal neighborhood lookup",
+      "adjacent public seams -> candidate factor dimensions",
+      "factor constraints -> bounded combination set",
+      "excluded combinations -> explicit non-claim reasons"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0280 coverage gap evidence",
+      "ATM-GOV-0293 fault fingerprint and family match result"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-causal-neighborhood-compiler.test.ts",
+      "node --strip-types tests/cli/plan4-factor-combination-generator.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "plan4-causal-neighborhood"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0294_causal_neighborhood_from_fingerprint_23b6ac8e",
+      "targetGroupId": "test_group_plan4_causal_neighborhood",
+      "semanticKey": "plan4_causal_neighborhood_from_fingerprint",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "fault fingerprint -> causal neighborhood lookup",
+        "adjacent public seams -> candidate factor dimensions"
+      ],
+      "expectedRedPredicate": "Compiler only records the observed counterexample and omits adjacent seams sharing the same causal mechanism.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-causal-neighborhood-compiler",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_atm_gov_0294_bounded_factor_combination_plan_f9c70518",
+      "targetGroupId": "test_group_plan4_causal_neighborhood",
+      "semanticKey": "plan4_bounded_factor_combination_plan",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "factor constraints -> bounded combination set",
+        "excluded combinations -> explicit non-claim reasons"
+      ],
+      "expectedRedPredicate": "Generator explodes into unbounded Cartesian products or silently drops excluded combinations.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-factor-combination-generator",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0294_causal_neighborhood_from_fingerprint_23b6ac8e",
+    "test_atm_gov_0294_bounded_factor_combination_plan_f9c70518"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-30T21-15-16-593Z-import-ea2169baa648",
+  "lastTransitionAt": "2026-07-30T21:15:16.593Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
