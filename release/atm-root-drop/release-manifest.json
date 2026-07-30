@@ -541,6 +541,7 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-281.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-282.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-283.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-284.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-002.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-003.json",
@@ -1567,6 +1568,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-messages.js",
+    "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
@@ -4900,7 +4902,7 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 183,
+    "copied": 185,
     "unchanged": 4682,
     "removed": 0
   },
@@ -6155,7 +6157,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:cd16167615f376db055146ebc39d1933438d70b4d1606b55d18eb1e0f3339fd2"
+    "digest": "sha256:78d7989f5dd88d387e41e6a81e83cd62e61873125bd3ea01beb127422186d34b"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -6670,6 +6672,7 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-281.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-282.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-283.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-284.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-002.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-003.json",
@@ -7696,6 +7699,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-messages.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
@@ -11032,34 +11036,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:fe44fe82e7cfa33ffb09f612d86f1f3c7ee200692fc7bcae08e21163dc582430",
-  "sealedSourceCommit": "d939ece33fde2187985fe6717c0badda21bf2b93",
+  "buildInputsTreeHash": "sha256:1d2b8964f5f907451cbcbfd72f8cf3b38a70f8722bc05b12b6c1225d5fed0879",
+  "sealedSourceCommit": "84a57b9e6894bcc6e827a9b3f2ad684881d21c34",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:e6b37aa5a60affef49a33218bd85d20c5a3ce0d49e96a12b2047d85033307894",
-  "tsBuildCacheDigest": "sha256:122afb850923ffaacc9d58aad4d77264fa36d55ff51f0d2fdd5e2d30c02c4e3c",
+  "incrementalPlanDigest": "sha256:a7fc45bf73c769d5f293bbe06b2d9e41842c3f8a5ed7f57c297c62999f9bf604",
+  "tsBuildCacheDigest": "sha256:6babea8606fe978e23af813d16eb0310d3d8ed77b0e2bcf133bd07498e5205ca",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 13656,
-    "totalElapsedMs": 44188,
-    "dominanceRatio": 0.309,
-    "phaseMedianMs": 1909,
-    "phaseP95Ms": 13656,
+    "dominantPhaseMs": 13827,
+    "totalElapsedMs": 43083,
+    "dominanceRatio": 0.3209,
+    "phaseMedianMs": 1868,
+    "phaseP95Ms": 13827,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 462,
-    "skipDecision": 52,
-    "worktreeSetup": 13656,
-    "typescriptBuild": 11314,
-    "rootDropReleaseAssembly": 7288,
-    "onefileReleaseAssembly": 1909,
-    "artifactSync": 7904,
+    "inputHashCalculation": 50,
+    "skipDecision": 51,
+    "worktreeSetup": 13827,
+    "typescriptBuild": 10842,
+    "rootDropReleaseAssembly": 8215,
+    "onefileReleaseAssembly": 1868,
+    "artifactSync": 6378,
     "cleanup": 0,
-    "totalElapsed": 44188
+    "totalElapsed": 43083
   }
 }

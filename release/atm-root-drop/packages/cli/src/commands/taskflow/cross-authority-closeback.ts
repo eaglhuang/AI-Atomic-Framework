@@ -8,6 +8,15 @@ export type CrossAuthorityClosebackPhase =
   | 'closeback-pending';
 
 export type CrossAuthorityClosebackAuthorityName = 'target' | 'planning';
+export type CrossAuthorityClosebackRecoveryDisposition = 'execute-now' | 'queue' | 'recover' | 'wait' | 'human-required';
+export type CrossAuthorityClosebackRecoveryOwner =
+  | CrossAuthorityClosebackAuthorityName
+  | 'runner-sync'
+  | 'pre-push'
+  | 'evidence'
+  | 'close'
+  | 'human'
+  | 'global';
 
 export interface CrossAuthorityClosebackAuthoritySnapshot {
   readonly name: CrossAuthorityClosebackAuthorityName;
@@ -19,6 +28,15 @@ export interface CrossAuthorityClosebackAuthoritySnapshot {
   readonly canonicalRemote?: string | null;
   readonly canonicalRef?: string | null;
   readonly remoteReachableCommit?: string | null;
+}
+
+export interface CrossAuthorityClosebackRecoveryLane {
+  readonly disposition: CrossAuthorityClosebackRecoveryDisposition;
+  readonly owner: CrossAuthorityClosebackRecoveryOwner;
+  readonly command: string | null;
+  readonly reason: string;
+  readonly forbiddenActions: readonly string[];
+  readonly emergency: boolean;
 }
 
 export interface CrossAuthorityClosebackStep {
@@ -36,6 +54,18 @@ export interface CrossAuthorityClosebackSideEffect {
   readonly idempotencyKey: string;
   readonly status: 'pending' | 'completed' | 'failed';
   readonly commitSha?: string | null;
+}
+
+export interface CrossAuthorityClosebackRecoveryObservation {
+  readonly owner: 'runner-sync' | 'pre-push' | 'evidence' | 'close';
+  readonly blockedBy: readonly ('runner-sync' | 'pre-push' | 'evidence' | 'close')[];
+  readonly summary?: string | null;
+}
+
+export interface CrossAuthorityClosebackRecoveryCycle {
+  readonly nodes: readonly CrossAuthorityClosebackRecoveryObservation['owner'][];
+  readonly summary: string;
+  readonly nextLegalRecoveryLane: CrossAuthorityClosebackRecoveryLane;
 }
 
 export interface CrossAuthorityClosebackReceipt {
@@ -62,6 +92,9 @@ export interface CrossAuthorityClosebackPlan {
   readonly blockers: readonly {
     readonly code: string;
     readonly summary: string;
+    readonly owner: CrossAuthorityClosebackRecoveryOwner;
+    readonly recoveryLane: CrossAuthorityClosebackRecoveryLane;
+    readonly forbiddenActions: readonly string[];
     readonly recoveryCommand: string;
   }[];
   readonly expectedFiles: {
@@ -78,6 +111,11 @@ export interface CrossAuthorityClosebackPlan {
   readonly compensations: readonly string[];
   readonly receipt: CrossAuthorityClosebackReceipt;
   readonly recoveryCommand: string;
+  readonly legalRecoveryLanes: readonly CrossAuthorityClosebackRecoveryLane[];
+  readonly nextLegalRecoveryLane: CrossAuthorityClosebackRecoveryLane;
+  readonly forbiddenActions: readonly string[];
+  readonly recoveryCycles: readonly CrossAuthorityClosebackRecoveryCycle[];
+  readonly emergencyLanes: readonly CrossAuthorityClosebackRecoveryLane[];
 }
 
 type CrossAuthorityClosebackBlocker = CrossAuthorityClosebackPlan['blockers'][number];
@@ -98,18 +136,24 @@ export interface CrossAuthorityClosebackSnapshot {
   readonly target: CrossAuthorityClosebackAuthoritySnapshot;
   readonly planning: CrossAuthorityClosebackAuthoritySnapshot;
   readonly completedSideEffects?: readonly CrossAuthorityClosebackSideEffect[];
+  readonly recoveryObservations?: readonly CrossAuthorityClosebackRecoveryObservation[];
 }
 
 export interface CrossAuthorityClosebackPorts {
   readonly recoveryCommandFor?: (input: {
     readonly taskId: string;
-    readonly authority: CrossAuthorityClosebackAuthorityName | 'global';
+    readonly authority: CrossAuthorityClosebackRecoveryOwner;
     readonly phase: CrossAuthorityClosebackPhase;
-  }) => string;
+    readonly disposition?: CrossAuthorityClosebackRecoveryDisposition;
+  }) => string | null;
 }
 
 function uniqueSorted(values: readonly string[]): string[] {
   return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function uniqueStrings(values: readonly string[]): string[] {
+  return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
 
 function sha256Json(value: unknown): string {
@@ -140,10 +184,60 @@ function defaultRecoveryCommand(taskId: string): string {
 function recoveryCommand(
   ports: CrossAuthorityClosebackPorts,
   taskId: string,
-  authority: CrossAuthorityClosebackAuthorityName | 'global',
-  phase: CrossAuthorityClosebackPhase
-): string {
-  return ports.recoveryCommandFor?.({ taskId, authority, phase }) ?? defaultRecoveryCommand(taskId);
+  authority: CrossAuthorityClosebackRecoveryOwner,
+  phase: CrossAuthorityClosebackPhase,
+  disposition?: CrossAuthorityClosebackRecoveryDisposition
+): string | null {
+  return ports.recoveryCommandFor?.({ taskId, authority, phase, disposition }) ?? defaultRecoveryCommand(taskId);
+}
+
+function defaultForbiddenActions(owner: CrossAuthorityClosebackRecoveryOwner): string[] {
+  return [
+    `Do not bypass the ${owner} gate with raw git commands.`,
+    'Do not use --force, --no-verify, or manual .atm edits unless an explicit emergency lane says so.',
+    'Do not mutate another authority while this blocker owns the recovery lane.'
+  ];
+}
+
+function recoveryLane(input: {
+  readonly taskId: string;
+  readonly owner: CrossAuthorityClosebackRecoveryOwner;
+  readonly phase: CrossAuthorityClosebackPhase;
+  readonly disposition: CrossAuthorityClosebackRecoveryDisposition;
+  readonly reason: string;
+  readonly ports: CrossAuthorityClosebackPorts;
+  readonly emergency?: boolean;
+  readonly command?: string | null;
+}): CrossAuthorityClosebackRecoveryLane {
+  const command = input.command === undefined
+    ? recoveryCommand(input.ports, input.taskId, input.owner, input.phase, input.disposition)
+    : input.command;
+  return {
+    disposition: input.disposition,
+    owner: input.owner,
+    command,
+    reason: input.reason,
+    forbiddenActions: defaultForbiddenActions(input.owner),
+    emergency: input.emergency === true
+  };
+}
+
+function addBlocker(
+  blockers: CrossAuthorityClosebackBlocker[],
+  input: {
+    readonly code: string;
+    readonly summary: string;
+    readonly lane: CrossAuthorityClosebackRecoveryLane;
+  }
+): void {
+  blockers.push({
+    code: input.code,
+    summary: input.summary,
+    owner: input.lane.owner,
+    recoveryLane: input.lane,
+    forbiddenActions: input.lane.forbiddenActions,
+    recoveryCommand: input.lane.command ?? ''
+  });
 }
 
 function completedCommitFor(
@@ -167,9 +261,7 @@ function derivePhase(input: {
   if (input.targetCommit && input.planningCommit && input.targetRemoteVisible && input.planningRemoteVisible) {
     return 'both-committed';
   }
-  if (input.targetCommit && input.planningCommit) {
-    return 'closeback-pending';
-  }
+  if (input.targetCommit && input.planningCommit) return 'closeback-pending';
   if (input.targetCommit) return 'target-committed';
   if (input.planningCommit) return 'planning-committed';
   return 'prepared';
@@ -190,8 +282,76 @@ function buildStep(input: {
     authority: input.authority,
     kind: input.kind,
     idempotencyKey: idempotencyKey(input),
-    recoveryCommand: recoveryCommand(input.ports, input.taskId, input.authority, input.phase)
+    recoveryCommand: recoveryCommand(input.ports, input.taskId, input.authority, input.phase) ?? defaultRecoveryCommand(input.taskId)
   };
+}
+
+function uniqueRecoveryLanes(lanes: readonly CrossAuthorityClosebackRecoveryLane[]): CrossAuthorityClosebackRecoveryLane[] {
+  const seen = new Set<string>();
+  const result: CrossAuthorityClosebackRecoveryLane[] = [];
+  for (const lane of lanes) {
+    const key = `${lane.owner}:${lane.disposition}:${lane.command ?? '<none>'}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(lane);
+  }
+  return result;
+}
+
+function detectRecoveryCycles(input: {
+  readonly taskId: string;
+  readonly phase: CrossAuthorityClosebackPhase;
+  readonly observations: readonly CrossAuthorityClosebackRecoveryObservation[];
+  readonly ports: CrossAuthorityClosebackPorts;
+}): CrossAuthorityClosebackRecoveryCycle[] {
+  const graph = new Map<CrossAuthorityClosebackRecoveryObservation['owner'], Set<CrossAuthorityClosebackRecoveryObservation['owner']>>();
+  for (const observation of input.observations) {
+    graph.set(observation.owner, new Set(observation.blockedBy));
+  }
+  for (const [owner] of graph) {
+    const stack: CrossAuthorityClosebackRecoveryObservation['owner'][] = [];
+    const seen = new Set<CrossAuthorityClosebackRecoveryObservation['owner']>();
+    const visit = (node: CrossAuthorityClosebackRecoveryObservation['owner']): CrossAuthorityClosebackRecoveryCycle | null => {
+      if (stack.includes(node)) {
+        const nodes = stack.slice(stack.indexOf(node));
+        return {
+          nodes,
+          summary: `Recovery cycle detected among ${nodes.join(' -> ')}.`,
+          nextLegalRecoveryLane: recoveryLane({
+            taskId: input.taskId,
+            owner: 'runner-sync',
+            phase: input.phase,
+            disposition: 'recover',
+            reason: 'Break close recovery cycles by making the frozen runner match source before pre-push, evidence, or close retries.',
+            ports: input.ports
+          })
+        };
+      }
+      if (seen.has(node)) return null;
+      seen.add(node);
+      stack.push(node);
+      for (const next of graph.get(node) ?? []) {
+        const cycle = visit(next);
+        if (cycle) return cycle;
+      }
+      stack.pop();
+      return null;
+    };
+    const cycle = visit(owner);
+    if (cycle) return [cycle];
+  }
+  return [];
+}
+
+function closeReadyLane(taskId: string, phase: CrossAuthorityClosebackPhase, ports: CrossAuthorityClosebackPorts): CrossAuthorityClosebackRecoveryLane {
+  return recoveryLane({
+    taskId,
+    owner: 'global',
+    phase,
+    disposition: 'execute-now',
+    reason: 'All closeback authorities are ready; execute the next idempotent saga step.',
+    ports
+  });
 }
 
 export function executeTaskCloseSaga(
@@ -208,37 +368,91 @@ export function executeTaskCloseSaga(
   const planningRemoteVisible = authorityRemoteVisible(snapshot.planning, planningCommit);
   const phase = derivePhase({ targetCommit, planningCommit, targetRemoteVisible, planningRemoteVisible });
   const blockers: CrossAuthorityClosebackBlocker[] = [];
+  const recoveryLanes: CrossAuthorityClosebackRecoveryLane[] = [];
 
   if (!snapshot.target.writeable) {
-    blockers.push({
+    const lane = recoveryLane({
+      taskId: request.taskId,
+      owner: 'target',
+      phase,
+      disposition: 'human-required',
+      reason: 'Target authority is not writeable; an operator must restore or choose the authority before close can proceed.',
+      ports,
+      command: null
+    });
+    recoveryLanes.push(lane);
+    addBlocker(blockers, {
       code: 'ATM_TASKFLOW_CROSS_AUTHORITY_CLOSEBACK_PENDING',
       summary: 'Target authority is not writeable at prepare time.',
-      recoveryCommand: recoveryCommand(ports, request.taskId, 'target', phase)
+      lane
     });
   }
   if (!snapshot.planning.writeable) {
-    blockers.push({
+    const lane = recoveryLane({
+      taskId: request.taskId,
+      owner: 'planning',
+      phase,
+      disposition: 'human-required',
+      reason: 'Planning authority is not writeable; an operator must restore or choose the authority before close can proceed.',
+      ports,
+      command: null
+    });
+    recoveryLanes.push(lane);
+    addBlocker(blockers, {
       code: 'ATM_TASKFLOW_CROSS_AUTHORITY_CLOSEBACK_PENDING',
       summary: 'Planning authority is not writeable at prepare time.',
-      recoveryCommand: recoveryCommand(ports, request.taskId, 'planning', phase)
+      lane
     });
   }
   if (snapshot.target.remoteVisibilityRequired === true && targetCommit && !targetRemoteVisible) {
-    blockers.push({
+    const lane = recoveryLane({
+      taskId: request.taskId,
+      owner: 'target',
+      phase,
+      disposition: 'wait',
+      reason: 'Target authority commit exists locally; wait for canonical remote visibility before replaying closeback.',
+      ports
+    });
+    recoveryLanes.push(lane);
+    addBlocker(blockers, {
       code: 'ATM_TASKFLOW_CROSS_AUTHORITY_CLOSEBACK_PENDING',
       summary: 'Target authority commit is local-durable but not remote-visible on the canonical ref.',
-      recoveryCommand: recoveryCommand(ports, request.taskId, 'target', phase)
+      lane
     });
   }
   if (snapshot.planning.remoteVisibilityRequired === true && planningCommit && !planningRemoteVisible) {
-    blockers.push({
+    const lane = recoveryLane({
+      taskId: request.taskId,
+      owner: 'planning',
+      phase,
+      disposition: 'wait',
+      reason: 'Planning authority commit exists locally; wait for canonical remote visibility before replaying closeback.',
+      ports
+    });
+    recoveryLanes.push(lane);
+    addBlocker(blockers, {
       code: 'ATM_TASKFLOW_CROSS_AUTHORITY_CLOSEBACK_PENDING',
       summary: 'Planning authority commit is local-durable but not remote-visible on the canonical ref.',
-      recoveryCommand: recoveryCommand(ports, request.taskId, 'planning', phase)
+      lane
     });
   }
 
   const effectivePhase: CrossAuthorityClosebackPhase = blockers.length > 0 && phase === 'both-committed' ? 'closeback-pending' : phase;
+  const recoveryCycles = detectRecoveryCycles({
+    taskId: request.taskId,
+    phase: effectivePhase,
+    observations: snapshot.recoveryObservations ?? [],
+    ports
+  });
+  for (const cycle of recoveryCycles) {
+    recoveryLanes.push(cycle.nextLegalRecoveryLane);
+    addBlocker(blockers, {
+      code: 'ATM_TASKFLOW_CLOSE_RECOVERY_CYCLE',
+      summary: cycle.summary,
+      lane: cycle.nextLegalRecoveryLane
+    });
+  }
+
   const steps = [
     buildStep({ taskId: request.taskId, authority: 'target', kind: 'prepare', head: snapshot.target.head, digest: snapshot.target.sourceDigest ?? null, phase: effectivePhase, ports }),
     buildStep({ taskId: request.taskId, authority: 'planning', kind: 'prepare', head: snapshot.planning.head, digest: snapshot.planning.sourceDigest ?? null, phase: effectivePhase, ports }),
@@ -267,6 +481,12 @@ export function executeTaskCloseSaga(
     receiptDigest: sha256Json(receiptWithoutDigest)
   };
   const globalCompletion = effectivePhase === 'both-committed' && blockers.length === 0 ? 'complete' : 'closeback-pending';
+  const legalRecoveryLanes = uniqueRecoveryLanes([
+    ...recoveryLanes,
+    ...(blockers.length === 0 ? [closeReadyLane(request.taskId, effectivePhase, ports)] : [])
+  ]);
+  const nextLegalRecoveryLane = blockers[0]?.recoveryLane ?? legalRecoveryLanes[0] ?? closeReadyLane(request.taskId, effectivePhase, ports);
+  const forbiddenActions = uniqueStrings(legalRecoveryLanes.flatMap((lane) => lane.forbiddenActions));
   return {
     schemaId: 'atm.crossAuthorityClosebackPlan.v1',
     taskId: request.taskId,
@@ -291,6 +511,11 @@ export function executeTaskCloseSaga(
       'If rollback is required, reconcile the existing saga before reverting code.'
     ],
     receipt,
-    recoveryCommand: recoveryCommand(ports, request.taskId, 'global', effectivePhase)
+    recoveryCommand: nextLegalRecoveryLane.command ?? defaultRecoveryCommand(request.taskId),
+    legalRecoveryLanes,
+    nextLegalRecoveryLane,
+    forbiddenActions,
+    recoveryCycles,
+    emergencyLanes: legalRecoveryLanes.filter((lane) => lane.emergency)
   };
 }

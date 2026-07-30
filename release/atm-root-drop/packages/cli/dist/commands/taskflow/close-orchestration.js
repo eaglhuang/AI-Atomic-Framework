@@ -53,6 +53,18 @@ function buildTasksRepairClosureCommand(taskId, actorId) { const parts = ['node 
 } return parts.join(' '); }
 function buildTasksStatusCommand(taskId) { return `node atm.mjs tasks status --task ${taskId} --json`; }
 function buildRosterClosebackCommand(input) { return `node atm.mjs tasks roster update --index ${input.indexPath} --from ${input.fromPath} --json`; }
+function buildTaskflowCloseRecoveryLane(input) { return { owner: input.owner, disposition: input.disposition, command: input.command, reason: input.reason, forbiddenActions: [`Do not bypass the ${input.owner} gate with raw git commands.`, 'Do not use --force, --no-verify, or manual .atm edits unless an explicit emergency lane says so.', 'Do not mutate another authority while this blocker owns the recovery lane.'], emergency: input.emergency === true }; }
+function buildTaskflowCloseRecoveryLanes(input) { const lanes = []; if (input.closebackPathResolution && !['source-plan-path', 'task-direction-fallback', 'profile-root-fallback', 'ledger-only-target'].includes(input.closebackPathResolution.route)) {
+    lanes.push(buildTaskflowCloseRecoveryLane({ owner: 'planning', disposition: 'recover', command: input.closebackPathResolution.planningMirrorPath ? buildTasksImportCommand(input.closebackPathResolution.planningMirrorPath) : null, reason: input.closebackPathResolution.diagnostics.messages.join(' ') || 'Recover the planning closeback path before writing close state.' }));
+} if (input.historicalDeliveryRequired) {
+    lanes.push(buildTaskflowCloseRecoveryLane({ owner: 'evidence', disposition: 'queue', command: input.backendCommand, reason: 'Historical delivery evidence is required before taskflow close --write can proceed.' }));
+} if (input.planningAuthorityDeliveryGate.required && !input.planningAuthorityDeliveryGate.ok) {
+    lanes.push(buildTaskflowCloseRecoveryLane({ owner: 'planning', disposition: 'recover', command: input.backendCommand, reason: input.planningAuthorityDeliveryGate.reason ?? 'Planning authority delivery gate is not satisfied.' }));
+} if (input.closeMode === 'ambiguous-manual-review') {
+    lanes.push(buildTaskflowCloseRecoveryLane({ owner: 'human', disposition: 'human-required', command: null, reason: 'Ambiguous residue must be classified by an operator before any close writer runs.' }));
+} if (lanes.length === 0) {
+    lanes.push(buildTaskflowCloseRecoveryLane({ owner: 'close', disposition: 'execute-now', command: input.backendCommand, reason: 'Closeback prerequisites are satisfied; execute the selected close backend.' }));
+} const forbiddenActions = [...new Set(lanes.flatMap((lane) => lane.forbiddenActions))].sort((a, b) => a.localeCompare(b)); return { legalRecoveryLanes: lanes, nextLegalRecoveryLane: lanes[0], forbiddenActions }; }
 export function buildClosebackPlan(input) {
     const closeMode = resolveTaskflowCloseMode({ bucket: input.diagnosis.bucket, liveStatus: input.diagnosis.triangulation.liveLedger.status,
         planningStatus: input.diagnosis.triangulation.planningFrontmatter.status, historicalDeliveryRefs: input.historicalDeliveryRefs, planningAuthorityDeliveryOk: input.planningAuthorityDeliveryGate?.ok === true, divergenceCount: input.diagnosis.triangulation.divergence.length });
@@ -100,12 +112,14 @@ export function buildClosebackPlan(input) {
     if (closeMode === 'historical-delivery-close' || closeMode === 'normal-close') {
         evidenceValidators.push(taskflowCloseGovernanceEvidenceValidator);
     }
+    const planningAuthorityDeliveryGate = input.planningAuthorityDeliveryGate ?? { required: false, ok: false, repoRoot: null, matchedFiles: [], reason: null };
+    const closeRecovery = buildTaskflowCloseRecoveryLanes({ closeMode, backendSurface, backendCommand, historicalDeliveryRequired: historicalDeliveryRequired && input.historicalDeliveryRefs.length === 0 && backendSurface === 'tasks-close', planningAuthorityDeliveryGate, closebackPathResolution: input.closebackPathResolution });
     return { closeMode, backendSurface, backendCommand, followUpSteps, writerBoundary: { adopterAware: true,
             planningMirrorPath, writerSurface: 'planning-mirror-adopter-flow', generationSurface: 'tasks-new', rosterSyncPolicy: input.delegationContract.policy.rosterSyncPolicy, rosterIndexPath, rosterClosebackCommand, closebackNote: 'Planning-mirror closeback reuses tasks import and tasks roster update inside the same adopter-aware flow; ATM does not add a second closeback writer.' }, historicalDeliveryGate: {
             required: historicalDeliveryRequired && input.historicalDeliveryRefs.length === 0 && backendSurface === 'tasks-close', refs: input.historicalDeliveryRefs, validatorSurfaces: ['atm.frameworkDeliveryWindow.v1', 'tasks close scoped-diff isolation']
-        }, planningAuthorityDeliveryGate: input.planningAuthorityDeliveryGate ?? { required: false, ok: false, repoRoot: null, matchedFiles: [], reason: null },
+        }, planningAuthorityDeliveryGate,
         waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true, waiverReason: input.waiverReason ?? null, evidenceValidators, residue: { bucket: input.diagnosis.bucket, truth: input.diagnosis.truth, residue: input.diagnosis.residue, reason: input.diagnosis.reason, nextCommand: input.diagnosis.nextCommand }, amendmentHistory: [...(input.diagnosis.triangulation.amendmentHistory ?? [])],
-        closebackPathResolution: input.closebackPathResolution };
+        closebackPathResolution: input.closebackPathResolution, legalRecoveryLanes: closeRecovery.legalRecoveryLanes, nextLegalRecoveryLane: closeRecovery.nextLegalRecoveryLane, forbiddenActions: closeRecovery.forbiddenActions };
 }
 export function buildTaskflowCloseDiagnostics(input) {
     const codes = [];
