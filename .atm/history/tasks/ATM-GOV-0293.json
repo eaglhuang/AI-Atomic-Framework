@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0293",
+  "title": "Fault fingerprint and semantic family matching policy",
+  "status": "planned",
+  "milestone": "ATM-GOV-PLAN4-R1",
+  "dependencies": [
+    "ATM-GOV-0279",
+    "ATM-GOV-0292"
+  ],
+  "acceptance": [
+    "ACC-1: equivalent incidents normalize to stable fingerprints.",
+    "ACC-2: family matching uses public seam, error/recovery class, causal impact, and mutation lineage; it does not rely on task id or actor.",
+    "ACC-3: low-confidence or conflicting matches fail closed with mapping review, not silent merge.",
+    "ACC-4: mutation survivor/equivalence evidence can strengthen or weaken confidence without becoming the sole authority.",
+    "ACC-5: tests cover exact match, new-family proposal, conflicting match, and low-confidence review route."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/fault-fingerprint.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/fault-fingerprint.schema.json",
+    "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+    "tests/cli/plan4-fault-fingerprint.test.ts",
+    "tests/cli/plan4-semantic-family-match.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/fault-fingerprint.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/fault-fingerprint.schema.json",
+    "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+    "tests/cli/plan4-fault-fingerprint.test.ts",
+    "tests/cli/plan4-semantic-family-match.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-fault-fingerprint.test.ts",
+    "node --strip-types tests/cli/plan4-semantic-family-match.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-fingerprint-and-confidence-gate",
+  "rollbackStrategy": "revert-commit-and-disable-plan4-family-matching-policy",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.fault-fingerprint-policy",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/fault-fingerprint.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/fault-fingerprint.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/fault-fingerprint.schema.json",
+        "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+        "tests/cli/plan4-fault-fingerprint.test.ts",
+        "tests/cli/plan4-semantic-family-match.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0293-fault-fingerprint-and-semantic-family-matching-policy.task.md",
+    "sectionTitle": "ATM-GOV-0293",
+    "headingLine": 110,
+    "hash": "dadda013877866c5",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0293-fault-fingerprint-and-semantic-family-matching-policy.task.md",
+      "planningCommitSha": "e05645d4417eb2b6314a7e9726570215fac5a278",
+      "contentDigest": "sha256:dadda013877866c59013b741f822d9cc16acf9a629d1bc3d4757ca3f55c36198",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-30T21:15:09.951Z"
+    }
+  },
+  "importedAt": "2026-07-30T21:15:09.951Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0279",
+      "ATM-GOV-0292"
+    ],
+    "startConditions": [
+      "ATM-GOV-0279 is done and exposes confirmed incident observation inputs.",
+      "ATM-GOV-0292 is done and exposes mutation lineage and equivalence governance."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "TASK-SKL-0036 incident-learning candidate schema"
+    ],
+    "changedPublicSeams": [
+      "atm.faultFingerprint.v1",
+      "atm.semanticRegressionFamilyMatch.v1",
+      "atm.familyMatchConfidence.v1"
+    ],
+    "causalImpactEdges": [
+      "incident symptoms -> normalized fault fingerprint",
+      "public seam and error class -> semantic family candidate",
+      "confidence threshold -> exact match, new family proposal, or human mapping review",
+      "mutation lineage -> survivor/equivalence matching evidence"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-SKL-0036 incidentLearningCandidate schema",
+      "ATM-GOV-0292 mutation lineage outputs"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-fault-fingerprint.test.ts",
+      "node --strip-types tests/cli/plan4-semantic-family-match.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "plan4-fingerprint-policy"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0293_stable_fault_fingerprint_6f0a31bb",
+      "targetGroupId": "test_group_plan4_fault_fingerprint",
+      "semanticKey": "plan4_stable_fault_fingerprint",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "incident symptoms -> normalized fault fingerprint",
+        "mutation lineage -> survivor/equivalence matching evidence"
+      ],
+      "expectedRedPredicate": "Equivalent incidents produce unstable fingerprints or omit mutation-lineage discriminators.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-fault-fingerprint",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_atm_gov_0293_family_match_confidence_gate_4ae90c25",
+      "targetGroupId": "test_group_plan4_fault_fingerprint",
+      "semanticKey": "plan4_family_match_confidence_gate",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "public seam and error class -> semantic family candidate",
+        "confidence threshold -> exact match, new family proposal, or human mapping review"
+      ],
+      "expectedRedPredicate": "Low-confidence or conflicting family match is accepted as exact.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-family-match-confidence",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0293_stable_fault_fingerprint_6f0a31bb",
+    "test_atm_gov_0293_family_match_confidence_gate_4ae90c25"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-30T21-15-10-585Z-import-8dd4e7c1194c",
+  "lastTransitionAt": "2026-07-30T21:15:10.585Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
