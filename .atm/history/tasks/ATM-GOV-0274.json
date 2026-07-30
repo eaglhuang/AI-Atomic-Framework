@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0274",
   "title": "Enforce same-task different-lane claim rejection",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -140,8 +140,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-30T08-39-15-945Z-claim-f12258bd2928",
-  "lastTransitionAt": "2026-07-30T08:39:15.945Z",
+  "lastTransitionId": "2026-07-30T09-06-15-327Z-close-97e706493690",
+  "lastTransitionAt": "2026-07-30T09:06:15.327Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-07-30T08:39:00.300Z",
@@ -150,7 +150,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-323724c94ea8",
     "claimedAt": "2026-07-30T08:39:00.306Z",
-    "heartbeatAt": "2026-07-30T08:39:00.306Z",
+    "heartbeatAt": "2026-07-30T09:06:15.325Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0274.json",
@@ -159,14 +159,14 @@
       "tests/cli/lane-claim-conflict-matrix.test.ts",
       "tests/cli/lane-dual-session-e2e.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260730083900-codex-captain-524c8dd8c7",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730083900-codex-captain-524c8dd8c7\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-30T08:39:00.306Z",
   "startedByActor": "codex-captain",
@@ -267,5 +267,9 @@
     },
     "createdAt": "2026-07-30T08:39:15.944Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-30T09:06:15.325Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260730083900-codex-captain-ATM-GOV-0274-cb32c605b7",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0274.closure-packet.json"
 }
