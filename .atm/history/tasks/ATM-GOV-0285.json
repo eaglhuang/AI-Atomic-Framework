@@ -1,0 +1,218 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0285",
+  "title": "Validator catalog selection bridge and resumable probe scheduler",
+  "status": "planned",
+  "milestone": "ATM-GOV-PLAN4-R1",
+  "dependencies": [
+    "ATM-GOV-0284",
+    "ATM-GOV-0269"
+  ],
+  "acceptance": [
+    "ACC-1: selection consumes task `requiredTestCaseIds`, validator references, public seams, and causal impact edges.",
+    "ACC-2: unrelated validators/tests are omitted with explicit reason codes.",
+    "ACC-3: probe schedule is resumable and records completed, pending, unavailable, and failed probes.",
+    "ACC-4: missing catalog mapping fails closed with a repair command.",
+    "ACC-5: validators cover both fresh execution and resume behavior."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/validator-catalog-selection.ts",
+    "packages/core/src/evidence/index.ts",
+    "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+    "tests/cli/plan4-validator-catalog-selection.test.ts",
+    "tests/cli/plan4-resumable-probe-scheduler.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/validator-catalog-selection.ts",
+    "packages/core/src/evidence/test-case-catalog.ts",
+    "packages/core/src/evidence/index.ts",
+    "packages/cli/src/commands/test-catalog.ts",
+    "scripts/lib/test-catalog.ts",
+    "scripts/test-catalog.config.json",
+    "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+    "tests/cli/plan4-validator-catalog-selection.test.ts",
+    "tests/cli/plan4-resumable-probe-scheduler.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-validator-catalog-selection.test.ts",
+    "node --strip-types tests/cli/plan4-resumable-probe-scheduler.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-selector-and-resume-receipts",
+  "rollbackStrategy": "revert-commit-and-disable-plan4-validator-selection-adapter",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-catalog-selection",
+        "pattern": "Strategy",
+        "source": "packages/core/src/evidence/validator-catalog-selection.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/validator-catalog-selection.ts",
+        "packages/core/src/evidence/test-case-catalog.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/cli/src/commands/test-catalog.ts",
+        "scripts/lib/test-catalog.ts",
+        "scripts/test-catalog.config.json",
+        "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+        "tests/cli/plan4-validator-catalog-selection.test.ts",
+        "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0285-validator-catalog-selection-bridge-and-resumable-probe-scheduler.task.md",
+    "sectionTitle": "ATM-GOV-0285",
+    "headingLine": 113,
+    "hash": "5074c6cef011987c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0285-validator-catalog-selection-bridge-and-resumable-probe-scheduler.task.md",
+      "planningCommitSha": "e05645d4417eb2b6314a7e9726570215fac5a278",
+      "contentDigest": "sha256:5074c6cef011987c4da8d393277338882df4eec0c723345e8af66a556e155edc",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-30T21:15:05.671Z"
+    }
+  },
+  "importedAt": "2026-07-30T21:15:05.671Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0284",
+      "ATM-GOV-0269"
+    ],
+    "startConditions": [
+      "ATM-GOV-0284 is done and exposes QualityGauntlet / ClosureAssuranceMachine events.",
+      "ATM-GOV-0269 is done and validation-plan observability is stable enough to schedule probes."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "scripts/test-catalog.config.json",
+      "packages/core/src/evidence/test-case-catalog.ts"
+    ],
+    "changedPublicSeams": [
+      "atm.validatorCatalogSelection.v1",
+      "atm.resumableProbeSchedule.v1",
+      "atm.validationPlanOrchestrator.v1"
+    ],
+    "causalImpactEdges": [
+      "task acceptance/test ids -> catalog query inputs",
+      "impact cone -> selected validator/test groups",
+      "probe cursor -> resumable validation execution",
+      "unavailable probe data -> fail-closed evidence request"
+    ],
+    "parallelFrontierInputs": [
+      "Plan 3.2 ATM-GOV-0269 validation plan progress seam",
+      "Plan 4.0 QualityGauntlet event stream"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-validator-catalog-selection.test.ts",
+      "node --strip-types tests/cli/plan4-resumable-probe-scheduler.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "plan4-validator-selection"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0285_catalog_selection_by_impact_cone_b4a67e10",
+      "targetGroupId": "test_group_plan4_validator_selection",
+      "semanticKey": "plan4_catalog_selection_by_impact_cone",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "task acceptance/test ids -> catalog query inputs",
+        "impact cone -> selected validator/test groups"
+      ],
+      "expectedRedPredicate": "Selector ignores required test ids or impact cone and returns unrelated or empty validators.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-validator-catalog-selection",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_atm_gov_0285_resumable_probe_cursor_91d4c7e2",
+      "targetGroupId": "test_group_plan4_validator_selection",
+      "semanticKey": "plan4_resumable_probe_cursor",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "probe cursor -> resumable validation execution",
+        "unavailable probe data -> fail-closed evidence request"
+      ],
+      "expectedRedPredicate": "A resumed probe duplicates completed work, skips pending work, or passes without unavailable-data evidence.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-resumable-probe-scheduler",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0285_catalog_selection_by_impact_cone_b4a67e10",
+    "test_atm_gov_0285_resumable_probe_cursor_91d4c7e2"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-30T21-15-05-802Z-import-0bf652887027",
+  "lastTransitionAt": "2026-07-30T21:15:05.802Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
