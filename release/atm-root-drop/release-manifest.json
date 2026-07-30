@@ -4813,8 +4813,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 206,
-    "unchanged": 4572,
+    "copied": 165,
+    "unchanged": 4613,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6053,7 +6053,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:0f4cf3f1cbd4904577a38592f54c1f1561fc803633ba7b1a5bac8356f4ad7a4a"
+    "digest": "sha256:f22530dd58023a8618bc3100d433b158b91d0f4f6b1b4c1b1be49cc4f668ca3a"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -10843,34 +10843,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:e0184def97b790b7394d059cefb8275ebc742cb23fe7943c59808132cab5b8f0",
-  "sealedSourceCommit": "7a1a545c5ed0d2ee9a6f66b836798244d5475065",
-  "buildDecision": "cacheHitSkip",
-  "buildDecisionReason": "build input tree hash matches release manifests",
-  "incrementalPlanDigest": null,
-  "tsBuildCacheDigest": null,
+  "buildInputsTreeHash": "sha256:beb5ab0fa1681281d6c9f576bf49517902af367983e073683bcccba75154ae5b",
+  "sealedSourceCommit": "ed1ec449f511fca408ea370ced8d39ae1ea00c98",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:5a5253e2443b0cc6147ff34d5d35b26785b9675d17d1d76638e78dbbc803115d",
+  "tsBuildCacheDigest": "sha256:baf8381a4c07f25ae6d08a26c8750f50d6d048b9d686d2b0d563117bc0000fb4",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "inputHashCalculation",
-    "dominantPhaseMs": 481,
-    "totalElapsedMs": 3077,
-    "dominanceRatio": 0.1563,
-    "phaseMedianMs": 0,
-    "phaseP95Ms": 481,
+    "dominantPhase": "worktreeSetup",
+    "dominantPhaseMs": 17060,
+    "totalElapsedMs": 55657,
+    "dominanceRatio": 0.3065,
+    "phaseMedianMs": 2223,
+    "phaseP95Ms": 17060,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 481,
-    "skipDecision": 89,
-    "worktreeSetup": 0,
-    "typescriptBuild": 0,
-    "rootDropReleaseAssembly": 0,
-    "onefileReleaseAssembly": 0,
-    "artifactSync": 0,
+    "inputHashCalculation": 83,
+    "skipDecision": 483,
+    "worktreeSetup": 17060,
+    "typescriptBuild": 10024,
+    "rootDropReleaseAssembly": 9621,
+    "onefileReleaseAssembly": 2223,
+    "artifactSync": 10348,
     "cleanup": 0,
-    "totalElapsed": 3077
+    "totalElapsed": 55657
   }
 }

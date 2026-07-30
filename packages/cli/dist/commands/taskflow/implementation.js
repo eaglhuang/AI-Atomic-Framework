@@ -473,6 +473,9 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
             const backendArgv = buildCloseBackendArgv({ cwd, taskId,
                 actorId, backendSurface: closebackPlan.backendSurface, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs, historicalBatchRef, historicalDeliveryRepo: closebackPlan.planningAuthorityDeliveryGate.ok ? closebackPlan.planningAuthorityDeliveryGate.repoRoot : null, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason,
                 planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, forceImport: diagnosis.bucket === 'stale-import' });
+            if (closebackPlan.backendSurface === 'tasks-close' && runnerReceiptPublicationClosure.status === 'accepted') {
+                backendArgv.push('--allow-stale-runner');
+            }
             const ledgerAlreadyClosedHistoricalCloseback = closebackPlan.backendSurface === 'tasks-close' && closebackPlan.closeMode === 'historical-delivery-close' && enrichedDiagnosis.triangulation.liveLedger.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0;
             const backendResult = ledgerAlreadyClosedHistoricalCloseback ? makeResult({ ok: true, command: 'tasks close', cwd, mode: 'taskflow-closeback-reconcile', messages: [message('info', 'ATM_TASKFLOW_CLOSE_LEDGER_ALREADY_DONE', 'Live task ledger is already done; taskflow is reconciling planning closeback only.', { taskId, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs })], evidence: {
                     action: 'closeback-reconcile', taskId, actorId, ledgerAlreadyDone: true, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
