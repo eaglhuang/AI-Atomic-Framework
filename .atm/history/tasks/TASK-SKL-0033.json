@@ -1,0 +1,297 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0033",
+  "title": "Diagnostic feedback loop provider and causal repair receipt",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R1.1",
+  "dependencies": [
+    "TASK-SKL-0031"
+  ],
+  "acceptance": [
+    "A versioned receipt binds exact symptom, reproducer command, candidate and environment digest, reproduction rate, minimized fixture, hypotheses, experiments, winning hypothesis, regression case and green evidence.",
+    "Admission fails closed when the command cannot reproduce the declared symptom; \"no crash\", broad logs and unrelated red failures do not qualify.",
+    "Hypotheses carry predicted observations and one-variable experiment results. A model explanation alone cannot authorize repair.",
+    "The regression case reuses TASK-SKL-0025 case-ID semantics and the receipt freshness lifecycle sealed by TASK-SKL-0029.",
+    "Emergency or trivial compile-failure paths require a bounded, expiring rationale rather than weakening the default diagnostic contract.",
+    "Temporary instrumentation is removed or explicitly promoted as a maintained observability seam before close.",
+    "The specialist skill is provider-neutral and distributed through TASK-SKL-0031 profiles; ATM runtime does not import upstream prose."
+  ],
+  "deliverables": [
+    "schemas/evidence/diagnostic-loop-receipt.schema.json",
+    "packages/core/src/evidence/diagnostic-loop.ts",
+    "packages/cli/src/commands/evidence/verbs/diagnose.ts",
+    "templates/skills/atm-diagnostic-loop.skill.md",
+    "tests/cli/diagnostic-feedback-loop.test.ts",
+    "tests/core/causal-repair-receipt.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/evidence/diagnostic-loop-receipt.schema.json",
+    "packages/core/src/evidence/diagnostic-loop.ts",
+    "packages/core/src/evidence/index.ts",
+    "packages/cli/src/commands/evidence/verbs/diagnose.ts",
+    "packages/cli/src/commands/evidence/implementation.ts",
+    "templates/skills/atm-diagnostic-loop.skill.md",
+    "templates/skills/atm-diagnostic-loop.files/**",
+    "tests/catalog/groups/test_group_diagnostic_loop.shard.json",
+    "tests/cli/diagnostic-feedback-loop.test.ts",
+    "tests/core/causal-repair-receipt.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/diagnostic-feedback-loop.test.ts",
+    "node --strip-types tests/core/causal-repair-receipt.test.ts",
+    "npm run validate:schemas",
+    "npm run validate:skill-templates",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Language-specific debugger implementations.",
+    "Treating a hypothesis or model explanation as repair evidence.",
+    "Replacing the ATM bug backlog or TDD lifecycle."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-red-reproducer-hypothesis-and-repair-receipt",
+  "rollbackStrategy": "revert-commit-and-disable-diagnostic-provider-route",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-lifecycle",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.diagnostic-feedback-loop",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/diagnostic-loop.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0033-diagnostic-feedback-loop-provider-and-causal-repair-receipt.task.md",
+    "sectionTitle": "TASK-SKL-0033",
+    "headingLine": 83,
+    "hash": "b4a043d1bec5850e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0033-diagnostic-feedback-loop-provider-and-causal-repair-receipt.task.md",
+      "planningCommitSha": "ece2f91725f9d589a7198cbddbdb67287035d23d",
+      "contentDigest": "sha256:b4a043d1bec5850eede39f80c1cb6ef491bccd895b67243ec22ba66b100d7db3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T15:59:51.741Z"
+    }
+  },
+  "importedAt": "2026-07-30T15:59:51.741Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-SKL-0031"
+    ],
+    "startConditions": [
+      "TASK-SKL-0031 is done and the diagnostic specialist can be distributed by the complete corpus profile."
+    ],
+    "softRelations": [
+      "Matt Pocock diagnosing-bugs at ed37663cc5fbef691ddfecd080dff42f7e7e350d"
+    ],
+    "changedPublicSeams": [
+      "Diagnostic provider contract",
+      "Causal repair receipt",
+      "Evidence lifecycle diagnostic admission"
+    ],
+    "causalImpactEdges": [
+      "exact symptom -> red-capable reproducer",
+      "minimized reproducer -> falsifiable hypothesis experiment",
+      "winning hypothesis -> regression case and green repair evidence"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "node --strip-types tests/cli/diagnostic-feedback-loop.test.ts",
+      "node --strip-types tests/core/causal-repair-receipt.test.ts"
+    ],
+    "phaseOwner": "atm-agent-skills"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [
+    "test_task_skl_0033_diagnostic_loop_4cc1c8b1",
+    "test_task_skl_0033_causal_repair_receipt_01c82ab4"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "lastTransitionId": "2026-07-30T18-36-16-091Z-scope-amendment-0bfdb280342c",
+  "lastTransitionAt": "2026-07-30T18:36:16.091Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-30T18:25:24.759Z",
+  "promotedAt": "2026-07-30T18:25:24.763Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-40f8c4a1d1ee",
+    "claimedAt": "2026-07-30T18:25:24.768Z",
+    "heartbeatAt": "2026-07-30T18:25:24.768Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0033.*",
+      ".atm/history/task-events/TASK-SKL-0033/**",
+      ".atm/history/tasks/TASK-SKL-0033.json",
+      "packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/evidence/implementation.ts",
+      "packages/cli/src/commands/evidence/verbs/diagnose.ts",
+      "packages/core/src/evidence/diagnostic-loop.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/diagnostic-loop-receipt.schema.json",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-diagnostic-loop.files/**",
+      "templates/skills/atm-diagnostic-loop.skill.md",
+      "tests/catalog/groups/test_group_diagnostic_loop.shard.json",
+      "tests/cli/diagnostic-feedback-loop.test.ts",
+      "tests/core/causal-repair-receipt.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260730182524-codex-skl-captain-8ee37008fd",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730182524-codex-skl-captain-8ee37008fd\""
+    }
+  },
+  "startedAt": "2026-07-30T18:25:24.768Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-71506f9404458a9a",
+    "ticketDigest": "sha256:71506f9404458a9a2a02f6b635c7056f1bd3ab0fd89524271439a990e266768b",
+    "taskId": "TASK-SKL-0033",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260730182524-codex-skl-captain-8ee37008fd",
+    "claimGeneration": "lease-40f8c4a1d1ee",
+    "issuedAt": "2026-07-30T18:25:24.768Z",
+    "expiresAt": "2026-07-30T18:55:24.768Z",
+    "scopeDigest": "sha256:7984d2f316427510b274e6afffca86074398837223d1de25bb2b707a545b6ceb",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T18:25:24.768Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0033.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-SKL-0033/**",
+          ".atm/history/tasks/TASK-SKL-0033.json",
+          "packages/cli/src/commands/evidence/implementation.ts",
+          "packages/cli/src/commands/evidence/verbs/diagnose.ts",
+          "packages/core/src/evidence/diagnostic-loop.ts",
+          "packages/core/src/evidence/index.ts",
+          "schemas/evidence/diagnostic-loop-receipt.schema.json",
+          "templates/skills/atm-diagnostic-loop.files/**",
+          "templates/skills/atm-diagnostic-loop.skill.md",
+          "tests/catalog/groups/test_group_diagnostic_loop.shard.json",
+          "tests/cli/diagnostic-feedback-loop.test.ts",
+          "tests/core/causal-repair-receipt.test.ts"
+        ],
+        "digest": "sha256:8eab70fb5b1f863807549bf411105f184cae5e0a160abc4807693126a3d7353a"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260730182524-codex-skl-captain-TASK-SKL-0033-afa048f5a4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0033",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0033.*",
+      ".atm/history/task-events/TASK-SKL-0033/**",
+      ".atm/history/tasks/TASK-SKL-0033.json",
+      "packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/evidence/implementation.ts",
+      "packages/cli/src/commands/evidence/verbs/diagnose.ts",
+      "packages/core/src/evidence/diagnostic-loop.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/diagnostic-loop-receipt.schema.json",
+      "scripts/validate-schemas/context.ts",
+      "templates/skills/atm-diagnostic-loop.files/**",
+      "templates/skills/atm-diagnostic-loop.skill.md",
+      "tests/catalog/groups/test_group_diagnostic_loop.shard.json",
+      "tests/cli/diagnostic-feedback-loop.test.ts",
+      "tests/core/causal-repair-receipt.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0033-diagnostic-feedback-loop-provider-and-causal-repair-receipt.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0033-diagnostic-feedback-loop-provider-and-causal-repair-receipt.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "919d5012895ca7cc636283d6286d9a9f466a9abec2fdd724e44a679dd471cbc5",
+    "actorId": "codex-skl-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730182524-codex-skl-captain-8ee37008fd",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730182524-codex-skl-captain-8ee37008fd\""
+    },
+    "createdAt": "2026-07-30T18:25:55.540Z",
+    "status": "active"
+  }
+}

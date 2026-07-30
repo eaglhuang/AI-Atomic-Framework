@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T18-27-18-364Z-scope-amendment-4169e0c1d9ec",
+  "taskId": "TASK-SKL-0033",
+  "action": "scope-amendment",
+  "actorId": "codex-skl-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0033.json",
+  "taskSha256": "sha256:7c1b56d5a39ebff8ba18116fbffc49b9786754eda360f56166c94a6542f2f4c4",
+  "createdAt": "2026-07-30T18:27:18.364Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0033 --actor codex-skl-captain --add packages/cli/src/commands/command-specs/evidence.spec.ts --reason \"TASK-SKL-0033 adds evidence diagnose as a public evidence verb and must update the command spec/help surface.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-SKL-0033 adds evidence diagnose as a public evidence verb and must update the command spec/help surface."
+  }
+}

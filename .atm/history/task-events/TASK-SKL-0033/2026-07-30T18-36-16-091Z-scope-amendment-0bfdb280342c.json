@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T18-36-16-091Z-scope-amendment-0bfdb280342c",
+  "taskId": "TASK-SKL-0033",
+  "action": "scope-amendment",
+  "actorId": "codex-skl-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0033.json",
+  "taskSha256": "sha256:1db7d84a79c1d507afc580cb904fd8825d52262ad0fdace7d2099c1964689222",
+  "createdAt": "2026-07-30T18:36:16.091Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0033 --actor codex-skl-captain --add \"packages/cli/src/commands/evidence.ts,scripts/validate-schemas/context.ts\" --reason \"TASK-SKL-0033 adds the evidence diagnose verb and diagnostic-loop schema; the CLI dispatcher and schema validation registry are required public integration seams for the scoped implementation.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-SKL-0033 adds the evidence diagnose verb and diagnostic-loop schema; the CLI dispatcher and schema validation registry are required public integration seams for the scoped implementation."
+  }
+}
