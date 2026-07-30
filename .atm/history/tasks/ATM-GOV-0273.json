@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0273",
+  "title": "Target planning and runner closeback boundary split",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0271",
+    "ATM-GOV-0272"
+  ],
+  "acceptance": [
+    "Target close, planning closeback, and runner publication each have independent dry-run/write/explain/recover results.",
+    "Planning closeback drift cannot cause a misleading target-ledger reconcile transition that leaves `stale-import` unchanged.",
+    "Runner publication cannot force unrelated close validation reruns.",
+    "The saga composes the three boundaries without hiding partial completion.",
+    "Re-running each boundary is idempotent and evidence-backed."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+    "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+    "packages/cli/src/commands/internal-release/publication.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "tests/cli/runner-publication-disposition-gate.test.ts",
+    "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+    "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+    "packages/cli/src/commands/internal-release/publication.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "tests/cli/runner-publication-disposition-gate.test.ts",
+    "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "node --strip-types tests/cli/runner-publication-disposition-gate.test.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert closeback facades and adapters together; cross-repo close must remain fail-closed if boundaries disagree.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.closeback-boundary-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.target-closure-facade",
+        "pattern": "Boundary Facade",
+        "source": "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.runner-publication-boundary",
+        "pattern": "Boundary Facade",
+        "source": "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+        "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+        "packages/cli/src/commands/internal-release/publication.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+        "tests/cli/runner-publication-disposition-gate.test.ts",
+        "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0273-target-planning-and-runner-closeback-boundary-split.task.md",
+    "sectionTitle": "ATM-GOV-0273",
+    "headingLine": 88,
+    "hash": "0d30d69963bb1fb9",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0273-target-planning-and-runner-closeback-boundary-split.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:0d30d69963bb1fb9a00204dd7a5b69221e8a9e3abc7097ee233272e591aba379",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T03:39:19.315Z"
+    }
+  },
+  "importedAt": "2026-07-30T03:39:19.315Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.taskflow.cross.authority.closeback.saga.test.ts",
+      "command": "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.runner.publication.disposition.gate.test.ts",
+      "command": "node --strip-types tests/cli/runner-publication-disposition-gate.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.closeback.orchestration.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-30T03-39-19-577Z-import-ad2318e48fb5",
+  "lastTransitionAt": "2026-07-30T03:39:19.577Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
