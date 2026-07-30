@@ -12,6 +12,7 @@
 | `ATM-CORE-0004` | `atom.core-atom-generator` | Atom Generator: Unified atom provisioning facade for allocating IDs, scaffolding workbench files, running validation, and registering atoms. | `core` | `bootstrap-self` | `active` | `atomic_workbench/atoms/ATM-CORE-0004/atom.spec.json` |
 | `ATM-CORE-0005` | `atom.core-atomic-spec-semantic-fingerprint` | AtomicSpecSemanticFingerprint: Readable atom wrapper around packages/core/src/registry/semantic-fingerprint.ts#createAtomicSpecSemanticFingerprint. | `core` | `atomize` | `active` | `atomic_workbench/atoms/ATM-CORE-0005/atom.spec.json` |
 | `ATM-FIXTURE-0001` | `atom.fixture-generator-dogfood` | GeneratorDogfood: Proof that generator can produce a compliant atom. | `generated / provisioning` | `generated` | `active` | `atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json` |
+| `ATM-GOV-0001` | `atom.work-coordination-authority-planning-source-seal` | PlanningSourceSealPolicy: Classify planning-source seal identity deltas as unchanged, benign seal upgrade, governed amendment, or blocking drift. | `generated / provisioning` | `generated` | `active` | `atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json` |
 
 ## Maps
 

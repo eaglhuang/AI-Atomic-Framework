@@ -6,6 +6,7 @@ import path from 'node:path';
 import { runTasksImport } from '../../packages/cli/src/commands/tasks/import-orchestrator.ts';
 import { runTasksClaimLifecycle } from '../../packages/cli/src/commands/tasks/claim-orchestrator.ts';
 import { validatePlanningSourceSeal } from '../../packages/cli/src/commands/tasks/import-task.ts';
+import { prepareImportedTaskForClaim } from '../../packages/cli/src/commands/next/claim-helpers.ts';
 import { assertClosebackPlanningPathReady, resolveClosebackPlanningPath } from '../../packages/cli/src/commands/taskflow/close-orchestration.ts';
 import { buildDelegationContract } from '../../packages/cli/src/commands/taskflow/profile-loader.ts';
 import { toStoredPlanningPath } from '../../packages/cli/src/commands/planning-repo-root.ts';
@@ -205,5 +206,120 @@ assert.doesNotThrow(() => assertClosebackPlanningPathReady(ledgerOnlyResolution,
   profileSupplied: false,
   requirePlanningPath: true
 }));
+
+// ── Benign seal upgrade ────────────────────────────────────────────────────
+// A card imported while still untracked seals `planningCommitSha: null`.
+// Committing that identical card later must not read as planning drift, and must
+// not require an amendment epoch to unblock the claim.
+
+const benignTaskId = 'TASK-SEAL-0002';
+const benignCardPath = path.join(planningRepo, 'docs/tasks/TASK-SEAL-0002.task.md');
+writeTaskCard(benignCardPath, {
+  taskId: benignTaskId,
+  title: 'Benign seal upgrade fixture',
+  amendmentEpoch: 0
+});
+
+const untrackedImport = await runTasksImport([
+  '--cwd', targetRepo,
+  '--from', benignCardPath,
+  '--write',
+  '--json'
+]) as any;
+assert.equal(untrackedImport.ok, true);
+
+const benignTaskPath = path.join(targetRepo, '.atm/history/tasks/TASK-SEAL-0002.json');
+const benignTask = JSON.parse(readFileSync(benignTaskPath, 'utf8')) as Record<string, unknown>;
+assert.equal(
+  ((benignTask.source as any).planningSourceSeal as any).planningCommitSha,
+  null,
+  'a card imported while untracked must seal a null planning commit sha'
+);
+
+commitAll(planningRepo, 'commit the previously untracked card unchanged');
+
+const benignValidation = validatePlanningSourceSeal({ cwd: targetRepo, taskDocument: benignTask });
+assert.equal(benignValidation.status, 'benign-seal-upgrade');
+assert.equal(benignValidation.ok, true);
+assert.notEqual(benignValidation.status, 'governed-amendment', 'a benign seal upgrade must not be reported as a governed amendment');
+assert.deepEqual(benignValidation.driftKinds, [], 'a benign seal upgrade must not report blocking drift kinds');
+assert.deepEqual(benignValidation.benignUpgradeKinds, ['commit']);
+assert.ok(benignValidation.diagnostics.codes.includes('ATM_PLANNING_SOURCE_SEAL_BENIGN_UPGRADE'));
+assert.equal(
+  benignValidation.current!.contentDigest,
+  benignValidation.sealed!.contentDigest,
+  'the benign classification only applies while content is byte identical'
+);
+assert.equal(
+  benignValidation.current!.amendmentEpoch,
+  benignValidation.sealed!.amendmentEpoch,
+  'a benign seal upgrade must not require an amendment epoch bump'
+);
+
+// The claim that was blocked before the upgrade classification existed must now
+// pass its seal gate and record the benign classification as claim evidence.
+await prepareImportedTaskForClaim({
+  cwd: targetRepo,
+  task: { workItemId: benignTaskId, status: 'planned', title: 'Benign seal upgrade fixture' } as any,
+  actorId: 'validator'
+});
+const benignClaim = await runTasksClaimLifecycle('claim', [
+  '--cwd', targetRepo,
+  '--task', benignTaskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(benignClaim.ok, true);
+assert.equal(benignClaim.evidence.planningSourceSealValidation.status, 'benign-seal-upgrade');
+assert.deepEqual(benignClaim.evidence.planningSourceSealValidation.benignUpgradeKinds, ['commit']);
+
+// ── Negative seal upgrade ──────────────────────────────────────────────────
+// The same `null -> sha` shape must still block when the card content moved,
+// so a rewritten card can never ride in on the benign classification.
+
+const negativeTaskId = 'TASK-SEAL-0003';
+const negativeCardPath = path.join(planningRepo, 'docs/tasks/TASK-SEAL-0003.task.md');
+writeTaskCard(negativeCardPath, {
+  taskId: negativeTaskId,
+  title: 'Negative seal upgrade fixture',
+  amendmentEpoch: 0
+});
+
+const negativeImport = await runTasksImport([
+  '--cwd', targetRepo,
+  '--from', negativeCardPath,
+  '--write',
+  '--json'
+]) as any;
+assert.equal(negativeImport.ok, true);
+const negativeTask = JSON.parse(
+  readFileSync(path.join(targetRepo, '.atm/history/tasks/TASK-SEAL-0003.json'), 'utf8')
+) as Record<string, unknown>;
+assert.equal(((negativeTask.source as any).planningSourceSeal as any).planningCommitSha, null);
+
+writeTaskCard(negativeCardPath, {
+  taskId: negativeTaskId,
+  title: 'Negative seal upgrade fixture',
+  amendmentEpoch: 0,
+  extraAcceptance: 'Content changed while the card was first committed.'
+});
+commitAll(planningRepo, 'commit a card whose content also changed');
+
+const negativeValidation = validatePlanningSourceSeal({ cwd: targetRepo, taskDocument: negativeTask });
+assert.equal(negativeValidation.status, 'drift', 'null -> sha with changed content must remain blocking drift');
+assert.equal(negativeValidation.ok, false);
+assert.deepEqual(negativeValidation.benignUpgradeKinds, []);
+assert.ok(negativeValidation.driftKinds.includes('content'));
+assert.ok(negativeValidation.driftKinds.includes('commit'));
+
+await assert.rejects(
+  () => runTasksClaimLifecycle('claim', [
+    '--cwd', targetRepo,
+    '--task', negativeTaskId,
+    '--actor', 'validator',
+    '--json'
+  ]),
+  (err: any) => err.code === 'ATM_PLANNING_SOURCE_IDENTITY_DRIFT'
+);
 
 console.log('[planning-source-seal:test] ok');

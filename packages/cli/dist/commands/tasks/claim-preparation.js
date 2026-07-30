@@ -5,6 +5,7 @@ import { toStoredPlanningPath } from '../planning-repo-root.js';
 import { evaluateTaskPromotionAdmission } from './lifecycle-state.js';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.js';
 import { taskPathFor } from './task-file-io-helpers.js';
+import { assertPlanningSourceSealValid } from './import-task.js';
 function normalizeTaskStatus(value) {
     return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
 }
@@ -27,6 +28,15 @@ export function prepareTaskForClaim(input) {
         importEvidencePath = imported.evidencePath;
     }
     const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+    // ATM-GOV-0276: planning-source identity is validated before the first ledger
+    // mutation. Reserve and promote both rewrite status/owner and append lifecycle
+    // events, so validating later would leave a half-prepared task behind whenever
+    // the seal check fails.
+    const planningSourceSealValidation = assertPlanningSourceSealValid({
+        cwd: input.cwd,
+        taskDocument,
+        surface: 'claim'
+    });
     const currentStatus = normalizeTaskStatus(taskDocument.status);
     const claimRecord = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
         ? taskDocument.claim
@@ -106,7 +116,8 @@ export function prepareTaskForClaim(input) {
         taskId: input.taskId,
         originalStatus,
         finalStatus: normalizeTaskStatus(taskDocument.status),
-        steps
+        steps,
+        planningSourceSealValidation
     };
 }
 function importPlanningTaskForReservation(input) {

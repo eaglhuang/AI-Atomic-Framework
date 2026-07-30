@@ -7,7 +7,7 @@
     "notes": "Phase B1 seed governance registry."
   },
   "registryId": "registry.seed",
-  "generatedAt": "2026-05-20T15:08:15.683Z",
+  "generatedAt": "2026-07-30T16:39:36.611Z",
   "entries": [
     {
       "atomId": "ATM-CORE-0001",
@@ -489,6 +489,78 @@
           "tests": [
             "atomic_workbench/atoms/ATM-CORE-0005/atom.test.ts",
             "scripts/validate-core-spec-parser.ts"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ATM-GOV-0001",
+      "atomId": "ATM-GOV-0001",
+      "logicalName": "atom.work-coordination-authority-planning-source-seal",
+      "atomVersion": "0.1.0",
+      "currentVersion": "0.1.0",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "specHash": "sha256:d99f7c5b4b5ad5e8d1784923a3c3ad8a8cc72335d888f861cb2769d6b5300d2e",
+          "codeHash": "sha256:efccb5f05e2d4fbdac0d16c50e148d257c1e9d0430963419d168cc6bfb565fc1",
+          "testHash": "sha256:e486e7d6db626ac71f8fe33f190ffa200834b8ffd085b8e92915ca1d91f01908",
+          "timestamp": "2026-07-30T16:39:36.610Z",
+          "semanticFingerprint": "sf:sha256:96a975fd592841eabb90b8a1f9628054c1b6a5763c9fc565cea2a97a20e28a18"
+        }
+      ],
+      "schemaId": "atm.atomicSpec",
+      "specVersion": "0.1.0",
+      "schemaPath": "schemas/atomic-spec.schema.json",
+      "specPath": "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "hashLock": {
+        "algorithm": "sha256",
+        "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "canonicalization": "json-stable-v1"
+      },
+      "owner": {
+        "name": "ATM maintainers",
+        "contact": "maintainers@example.invalid"
+      },
+      "status": "active",
+      "governance": {
+        "tier": "standard"
+      },
+      "semanticFingerprint": "sf:sha256:96a975fd592841eabb90b8a1f9628054c1b6a5763c9fc565cea2a97a20e28a18",
+      "location": {
+        "specPath": "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+        "codePaths": [
+          "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs"
+        ],
+        "testPaths": [
+          "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts"
+        ],
+        "reportPath": "atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
+        "workbenchPath": "atomic_workbench/atoms/ATM-GOV-0001"
+      },
+      "compatibility": {
+        "coreVersion": "0.1.0",
+        "registryVersion": "0.1.0",
+        "languageAdapter": "language-js"
+      },
+      "evidence": [
+        "generator-provenance:generated",
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json"
+      ],
+      "selfVerification": {
+        "legacyPlanningId": null,
+        "specHash": "sha256:d99f7c5b4b5ad5e8d1784923a3c3ad8a8cc72335d888f861cb2769d6b5300d2e",
+        "codeHash": "sha256:efccb5f05e2d4fbdac0d16c50e148d257c1e9d0430963419d168cc6bfb565fc1",
+        "testHash": "sha256:e486e7d6db626ac71f8fe33f190ffa200834b8ffd085b8e92915ca1d91f01908",
+        "sourcePaths": {
+          "spec": "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+          "code": [
+            "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs"
+          ],
+          "tests": [
+            "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts"
           ]
         }
       }

@@ -9,6 +9,7 @@ import { assertRunnerFreshForWriteAction } from '../framework-development.js';
 import { assertEmergencyApproval } from '../emergency/gate.js';
 import { buildExtractionFirstPatrolDiagnostics, extractFrontMatter, normalizeTaskCausalGraphContract, parseAcceptanceEvidenceMap, validateCausalValidatorContractImport, validateDeliverablesList } from './task-import-validators.js';
 import { buildContractImportRecoveryManifest } from './contract-import-recovery.js';
+import { buildTaskFrontmatterFidelityDiagnostics } from './task-frontmatter-fidelity.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
 import { classifyForceImportAdmission } from './import-validation.js';
@@ -222,6 +223,20 @@ export async function runTasksImport(argv) {
                     ...causalValidation.diagnostics
                 ]
             }))
+        };
+        // ATM-GOV-0276: a card's machine-readable declarations must round-trip into
+        // the record both surfaces share, or import fails closed here — before the
+        // dry-run manifest is reported and before any ledger file is written.
+        const fidelity = buildTaskFrontmatterFidelityDiagnostics({
+            frontmatter: causalFrontmatter,
+            record: parsed.tasks[0],
+            planText,
+            workItemId: task.workItemId
+        });
+        parsed.diagnostics.push(...fidelity.diagnostics);
+        parsed = {
+            ...parsed,
+            tasks: parsed.tasks.map((entry) => ({ ...entry, frontmatterFidelity: fidelity.report }))
         };
     }
     const enrichedParsed = enrichParsedTasksFromSiblingTaskCards({

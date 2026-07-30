@@ -5,6 +5,7 @@ import path from 'node:path';
 import { CliError } from '../shared.js';
 import { resolvePlanAbsoluteFromStored, toStoredPlanningPath } from '../planning-repo-root.js';
 import { extractFrontMatter } from './task-import-validators.js';
+import { classifyPlanningSourceSeal } from './planning-source-seal-policy.js';
 function sha256(text) {
     return `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;
 }
@@ -93,6 +94,7 @@ export function validatePlanningSourceSeal(input) {
             ok: true,
             status: 'match',
             driftKinds: [],
+            benignUpgradeKinds: [],
             sealed: null,
             current: null,
             diagnostics: {
@@ -111,6 +113,7 @@ export function validatePlanningSourceSeal(input) {
             ok: false,
             status: 'drift',
             driftKinds: ['path'],
+            benignUpgradeKinds: [],
             sealed,
             current: null,
             diagnostics: {
@@ -124,39 +127,15 @@ export function validatePlanningSourceSeal(input) {
         planAbsolute,
         sealedAt: sealed.sealedAt
     });
-    const driftKinds = [];
-    if (current.taskCardPath !== sealed.taskCardPath || sourcePlanPath !== sealed.taskCardPath)
-        driftKinds.push('path');
-    if (current.repoIdentity !== sealed.repoIdentity)
-        driftKinds.push('repo-identity');
-    if (current.planningCommitSha !== sealed.planningCommitSha)
-        driftKinds.push('commit');
-    if (current.contentDigest !== sealed.contentDigest)
-        driftKinds.push('content');
-    if (current.amendmentEpoch !== sealed.amendmentEpoch)
-        driftKinds.push('amendment-epoch');
-    const governedAmendment = driftKinds.every((kind) => kind === 'commit' || kind === 'content' || kind === 'amendment-epoch')
-        && current.amendmentEpoch > sealed.amendmentEpoch;
-    const ok = driftKinds.length === 0 || governedAmendment;
-    const status = driftKinds.length === 0
-        ? 'match'
-        : governedAmendment
-            ? 'governed-amendment'
-            : 'drift';
+    const classification = classifyPlanningSourceSeal({ sealed, current, sourcePlanPath });
     return {
-        ok,
-        status,
-        driftKinds,
+        ok: classification.ok,
+        status: classification.status,
+        driftKinds: classification.driftKinds,
+        benignUpgradeKinds: classification.benignUpgradeKinds,
         sealed,
         current,
-        diagnostics: {
-            codes: driftKinds.length === 0
-                ? ['ATM_PLANNING_SOURCE_SEAL_MATCH']
-                : driftKinds.map((kind) => `ATM_PLANNING_SOURCE_DRIFT_${kind.toUpperCase().replace(/-/g, '_')}`),
-            messages: driftKinds.length === 0
-                ? ['Planning-source seal matches the current external task card.']
-                : [`Planning-source seal ${status}: ${driftKinds.join(', ')}.`]
-        }
+        diagnostics: classification.diagnostics
     };
 }
 export function assertPlanningSourceSealValid(input) {
