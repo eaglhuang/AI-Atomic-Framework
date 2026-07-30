@@ -1,0 +1,345 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0036",
+  "title": "Incident-learning intake and backlog skill contract",
+  "status": "done",
+  "milestone": "ATM-SKL-PLAN4-R0",
+  "dependencies": [
+    "TASK-SKL-0031",
+    "TASK-SKL-0033"
+  ],
+  "acceptance": [
+    "ACC-1: `atm.incidentLearningCandidate.v1` preserves symptom, invariant/acceptance refs, reproduction and receipt refs, public seam, state/transition, observed factors, source availability and disposition.",
+    "ACC-2: breadth hypotheses cover upstream/downstream, same-policy callers, sibling adapters, adjacent transitions and shared invariants; depth hypotheses cover boundary, negative, rollback, retry, concurrency, mutation, property/metamorphic and independent-oracle gaps.",
+    "ACC-3: the canonical source is `templates/skills/atm-bug-backlog.skill.md`; installed copies are derived, and refresh/reinstall cannot erase the incident-learning contract.",
+    "ACC-4: missing or conflicting evidence remains `unknown/unavailable`; root-cause and family hints are candidate-only and cannot authorize merge, fix success, test exclusion or close.",
+    "ACC-5: Existing `atm.governanceBacklogItem.v1` records remain readable and the Markdown projection remains generated rather than directly authored.",
+    "ACC-6: No second backlog, task lifecycle, test catalog or evidence authority is introduced."
+  ],
+  "deliverables": [
+    "schemas/skills/incident-learning-candidate.schema.json",
+    "packages/core/src/skills/incident-learning-candidate.ts",
+    "templates/skills/atm-bug-backlog.skill.md",
+    "tests/catalog/groups/test_group_incident_learning_skill.shard.json",
+    "tests/cli/incident-learning-backlog-skill.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/skills/incident-learning-candidate.schema.json",
+    "packages/core/src/skills/incident-learning-candidate.ts",
+    "packages/core/src/skills/index.ts",
+    "templates/skills/atm-bug-backlog.skill.md",
+    "scripts/validate-governance-projections.ts",
+    "scripts/validate-skill-templates.ts",
+    "tests/catalog/groups/test_group_incident_learning_skill.shard.json",
+    "tests/cli/incident-learning-backlog-skill.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/incident-learning-backlog-skill.test.ts",
+    "npm run validate:schemas",
+    "npm run validate:skill-templates",
+    "npm run validate:governance-projections",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-candidate-schema-template-and-projection-proof",
+  "rollbackStrategy": "revert-commit-and-retain-record-only-backlog-routing",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.skill-growth",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.incident-learning-intake",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/skills/incident-learning-candidate.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0036-incident-learning-intake-and-backlog-skill-contract.task.md",
+    "sectionTitle": "TASK-SKL-0036",
+    "headingLine": 113,
+    "hash": "f72acbcde4a16113",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0036-incident-learning-intake-and-backlog-skill-contract.task.md",
+      "planningCommitSha": "242e236306fecb4be37db0f2b9dd628561f0957c",
+      "contentDigest": "sha256:f72acbcde4a161139a9350de18f88d8f99b0a2abb337bb00ee3d7da4a087247a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T16:00:20.389Z"
+    }
+  },
+  "importedAt": "2026-07-30T16:00:20.389Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-SKL-0031",
+      "TASK-SKL-0033"
+    ],
+    "startConditions": [
+      "TASK-SKL-0031 is done and canonical skill templates are distributable.",
+      "TASK-SKL-0033 is done and command-backed diagnostic receipts are available."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "ATM-GOV-0293 fault fingerprint and semantic family policy"
+    ],
+    "changedPublicSeams": [
+      "atm.incidentLearningCandidate.v1",
+      "ATM bug backlog skill intake",
+      "First-layer incident intent routing"
+    ],
+    "causalImpactEdges": [
+      "reported defect -> evidence-bounded incident learning candidate",
+      "candidate breadth/depth hypotheses -> task and evidence obligations",
+      "missing or conflicting data -> explicit unknown/unavailable disposition"
+    ],
+    "parallelFrontierInputs": [
+      "Plan 4.0 section 14.6 through 14.8",
+      "Existing atm.governanceBacklogItem.v1 projection contract"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/incident-learning-backlog-skill.test.ts",
+      "npm run validate:schemas",
+      "npm run validate:skill-templates",
+      "npm run validate:governance-projections"
+    ],
+    "phaseOwner": "atm-captain-skill-lane"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_skl_0036_incident_candidate_7c3e0d41",
+      "targetGroupId": "test_group_incident_learning_skill",
+      "semanticKey": "incident_learning_candidate_intake",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "reported defect -> evidence-bounded incident learning candidate",
+        "candidate breadth/depth hypotheses -> task and evidence obligations"
+      ],
+      "expectedRedPredicate": "Legacy backlog intake cannot preserve typed breadth and depth learning hypotheses.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "incident-learning-intake",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_skl_0036_unknown_safe_2fb64c98",
+      "targetGroupId": "test_group_incident_learning_skill",
+      "semanticKey": "incident_learning_unknown_safe",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "missing or conflicting data -> explicit unknown/unavailable disposition"
+      ],
+      "expectedRedPredicate": "Missing evidence is guessed, promoted, or treated as confirmed.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "incident-learning-unknown-safety",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_skl_0036_incident_candidate_7c3e0d41",
+    "test_task_skl_0036_unknown_safe_2fb64c98"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "lastTransitionId": "2026-07-30T20-12-21-760Z-lock-cleanup-c89ae4140e2c",
+  "lastTransitionAt": "2026-07-30T20:12:21.760Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-30T19:49:19.776Z",
+  "promotedAt": "2026-07-30T19:49:19.780Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-7181fe62c6f4",
+    "claimedAt": "2026-07-30T19:49:19.784Z",
+    "heartbeatAt": "2026-07-30T20:12:21.622Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0036.*",
+      ".atm/history/task-events/TASK-SKL-0036/**",
+      ".atm/history/tasks/TASK-SKL-0036.json",
+      "packages/core/src/skills/incident-learning-candidate.ts",
+      "packages/core/src/skills/index.ts",
+      "schemas/skills/incident-learning-candidate.schema.json",
+      "scripts/validate-governance-projections.ts",
+      "scripts/validate-schemas/context.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-bug-backlog.skill.md",
+      "tests/catalog/groups/test_group_incident_learning_skill.shard.json",
+      "tests/cli/incident-learning-backlog-skill.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260730194919-codex-skl-captain-fa954c2d74",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730194919-codex-skl-captain-fa954c2d74\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-30T19:49:19.784Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c371a45d87a8a538",
+    "ticketDigest": "sha256:c371a45d87a8a538870bb681b66b237be39291c5e07fd4b848ef6d521e4247e8",
+    "taskId": "TASK-SKL-0036",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260730194919-codex-skl-captain-fa954c2d74",
+    "claimGeneration": "lease-7181fe62c6f4",
+    "issuedAt": "2026-07-30T19:59:43.435Z",
+    "expiresAt": "2026-07-30T20:29:43.435Z",
+    "scopeDigest": "sha256:10dc7055cbb55cd9ab4baff758c6b62476f9ca5b910d460244f1373c240f19d0",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T19:59:43.435Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0036.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-SKL-0036/**",
+          ".atm/history/tasks/TASK-SKL-0036.json",
+          "packages/core/src/skills/incident-learning-candidate.ts",
+          "packages/core/src/skills/index.ts",
+          "schemas/skills/incident-learning-candidate.schema.json",
+          "scripts/validate-governance-projections.ts",
+          "scripts/validate-schemas/context.ts",
+          "scripts/validate-skill-templates.ts",
+          "templates/skills/atm-bug-backlog.skill.md",
+          "tests/catalog/groups/test_group_incident_learning_skill.shard.json",
+          "tests/cli/incident-learning-backlog-skill.test.ts"
+        ],
+        "digest": "sha256:91cfc4120ff1048579c5d005ffb725ad7093044692c9336ade3ea8e5e69ea85d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260730194919-codex-skl-captain-TASK-SKL-0036-1c964c644b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0036",
+    "batchId": "batch-a6483d24f976",
+    "scopeKey": "TASK-SKL",
+    "queueId": "queue-e9f408bb095f75c4",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0036.*",
+      ".atm/history/task-events/TASK-SKL-0036/**",
+      ".atm/history/tasks/TASK-SKL-0036.json",
+      "packages/core/src/skills/incident-learning-candidate.ts",
+      "packages/core/src/skills/index.ts",
+      "schemas/skills/incident-learning-candidate.schema.json",
+      "scripts/validate-governance-projections.ts",
+      "scripts/validate-schemas/context.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-bug-backlog.skill.md",
+      "tests/catalog/groups/test_group_incident_learning_skill.shard.json",
+      "tests/cli/incident-learning-backlog-skill.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0036-incident-learning-intake-and-backlog-skill-contract.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0036-incident-learning-intake-and-backlog-skill-contract.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "b50f9629be51b6cb3b445096f76d22dff7a7857a906fe5bbf4523787a07a01c4",
+    "actorId": "codex-skl-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730194919-codex-skl-captain-fa954c2d74",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730194919-codex-skl-captain-fa954c2d74\""
+    },
+    "createdAt": "2026-07-30T19:49:39.720Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-30T20:12:21.756Z",
+    "releasedBy": "codex-skl-captain"
+  },
+  "closedAt": "2026-07-30T20:12:21.622Z",
+  "closedByActor": "codex-skl-captain",
+  "closedBySessionId": "session-20260730194919-codex-skl-captain-TASK-SKL-0036-1c964c644b",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0036.closure-packet.json"
+}

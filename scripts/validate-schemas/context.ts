@@ -56,6 +56,7 @@ export const schemaEntries: Record<string, string> = {
   'version-index': 'schemas/registry/version-index.schema.json',
   'regression-matrix': 'schemas/regression-matrix.schema.json',
   'skill-engineering-change-method-profile': 'schemas/skills/engineering-change-method-profile.schema.json',
+  'skill-incident-learning-candidate': 'schemas/skills/incident-learning-candidate.schema.json',
   'validator-module-boundary-policy': 'schemas/validators/module-boundary-policy.schema.json',
   'test-report': 'schemas/test-report.schema.json',
   'behavior-proposal': 'schemas/behavior/behavior-proposal.schema.json',

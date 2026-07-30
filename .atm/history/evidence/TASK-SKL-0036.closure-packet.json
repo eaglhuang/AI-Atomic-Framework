@@ -1,0 +1,170 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0036",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c5be7b9bcfedf44541ee1911c11605e0bd50b3fd",
+  "governedTreeSha": "ca93b1d5f41e1a8002297eeb3c864b83eca4189e",
+  "targetCommitDelta": {
+    "currentCommitSha": "c5be7b9bcfedf44541ee1911c11605e0bd50b3fd",
+    "parentCommitShas": [
+      "c5be7b9bcfedf44541ee1911c11605e0bd50b3fd"
+    ],
+    "governedTreeSha": "ca93b1d5f41e1a8002297eeb3c864b83eca4189e",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0036.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0036.json",
+      ".atm/history/evidence/TASK-SKL-0036.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-SKL-0036/2026-07-30T16-00-20-580Z-import-3507f8cbe7df.json",
+      ".atm/history/task-events/TASK-SKL-0036/2026-07-30T19-49-19-776Z-reserve-afd6ff635eb1.json",
+      ".atm/history/task-events/TASK-SKL-0036/2026-07-30T19-49-19-780Z-promote-3d46764c37a1.json",
+      ".atm/history/task-events/TASK-SKL-0036/2026-07-30T19-49-39-713Z-claim-a46a52cea857.json",
+      ".atm/history/task-events/TASK-SKL-0036/2026-07-30T19-56-32-410Z-scope-amendment-3f21639ecc22.json",
+      ".atm/history/task-events/TASK-SKL-0036/2026-07-30T19-59-43-579Z-renew-12107a54dbf3.json",
+      ".atm/history/tasks/ATM-GOV-0269.json",
+      ".atm/history/tasks/TASK-SKL-0036.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/core/src/skills/incident-learning-candidate.ts",
+      "packages/core/src/skills/index.ts",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/skills/incident-learning-candidate.schema.json",
+      "scripts/validate-governance-projections.ts",
+      "scripts/validate-schemas/context.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-bug-backlog.skill.md",
+      "tests/catalog/groups/test_group_incident_learning_skill.shard.json",
+      "tests/cli/incident-learning-backlog-skill.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/incident-learning-backlog-skill.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8381bfd04045a6578a5b7e018f05140eed1b4a4943a631f3dba011bf64b01a0d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:78a567787877dd9c3240b6fce4406cc41f72eac97afa97da9f808b27ec7dace3",
+      "stderrSha256": "sha256:ecbf6b4777072ee9d6edc21117b83c2caffa340505d3218a70c4884096a60d19",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:governance-projections",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:96d33e8bcba9a2c5b4f611842a931657d2269494c3d5868b7a9fd33280a20d9a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1824e01e202f54e9bbb499fba32aacab39500104406fbe770ce7fbc3f5ecdfb7",
+      "stderrSha256": "sha256:127f8495f533f6f4e556cc4f1b98a5479806d0edc52b25c633e8b481589a2cb5",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/incident-learning-backlog-skill.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections",
+    "validate:schemas",
+    "validate:skill-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-30T20:12:21.612Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0036.*",
+      ".atm/history/task-events/TASK-SKL-0036/**",
+      ".atm/history/tasks/TASK-SKL-0036.json",
+      "packages/core/src/skills/incident-learning-candidate.ts",
+      "packages/core/src/skills/index.ts",
+      "schemas/skills/incident-learning-candidate.schema.json",
+      "scripts/validate-governance-projections.ts",
+      "scripts/validate-schemas/context.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-bug-backlog.skill.md",
+      "tests/catalog/groups/test_group_incident_learning_skill.shard.json",
+      "tests/cli/incident-learning-backlog-skill.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/skills/incident-learning-candidate.ts",
+      "packages/core/src/skills/index.ts",
+      "schemas/skills/incident-learning-candidate.schema.json",
+      "scripts/validate-governance-projections.ts",
+      "scripts/validate-schemas/context.ts",
+      "scripts/validate-skill-templates.ts",
+      "tests/catalog/groups/test_group_incident_learning_skill.shard.json",
+      "tests/cli/incident-learning-backlog-skill.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0036.json",
+  "closedAt": "2026-07-30T20:12:21.613Z",
+  "closedByActor": "codex-skl-captain",
+  "sessionId": "session-20260730194919-codex-skl-captain-TASK-SKL-0036-1c964c644b",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
