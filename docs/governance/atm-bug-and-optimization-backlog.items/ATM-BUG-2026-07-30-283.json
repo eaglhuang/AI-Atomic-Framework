@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-30-283",
+  "date": "2026-07-30",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Framework temp claim / runner-sync publication",
+  "finding": "A framework-temp runner-sync publication can deadlock after a governed task delivery commit: `broker runner-sync release` requires the runner-sync receipt and generated release inventory to be published first, but normal `git commit` is blocked because framework-temp claims do not have a normal task ledger/work session context for `.atm/history/evidence/ATM-FRAMEWORK-TEMP-*.runner-sync-receipt.json`, and `node atm.mjs git commit` reports `ATM_WRITE_TICKET_MISSING` for the temp task.",
+  "expectedBehavior": "Framework-temp runner-sync should provide a governed commit/publication route that pre-commit accepts without native `git commit --no-verify`, either by minting a task-context receipt, creating a work-admission ticket for the temp claim, or routing release publication through a dedicated runner-sync commit surface.",
+  "evidenceOrRepro": "During TASK-SKL-0036 close on 2026-07-30, frozen runner sync for delivery commit `aec29641f` required framework-temp claim `ATM-FRAMEWORK-TEMP-codex-skl-captain`. `node atm.mjs broker runner-sync release --steward-work-id runner-sync-2378c257 ...` failed with `ATM_RUNNER_PUBLICATION_PENDING`; native commit without bypass failed with `ATM_COMMIT_SESSION_MISSING` and `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT`; `node atm.mjs git commit --task ATM-FRAMEWORK-TEMP-codex-skl-captain ... --no-verify` failed with `ATM_WRITE_TICKET_MISSING`. Owner-approved emergency path-bounded native `git commit --no-verify` produced `8ae7ee722` and the steward release then succeeded.",
+  "followUp": "Add a focused regression for framework-temp runner-sync publication after a task delivery commit, then implement a normal governed route that records emergency-free receipt publication and release without requiring hook bypass."
+}
