@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T17-28-19-138Z-scope-amendment-92636899d3d6",
+  "taskId": "TASK-SKL-0031",
+  "action": "scope-amendment",
+  "actorId": "codex-skl-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0031.json",
+  "taskSha256": "sha256:b4dcda81ded8c223222d3e357b5c02b3338f1b86c23de0a239e211a3727ed58a",
+  "createdAt": "2026-07-30T17:28:19.138Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0031 --actor codex-skl-captain --add packages/cli/src/commands/taskflow/implementation.ts --reason \"Emergency close-adapter fix required to complete TASK-SKL-0031 after runner receipt publication; path-bounded and validated\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Emergency close-adapter fix required to complete TASK-SKL-0031 after runner receipt publication; path-bounded and validated"
+  }
+}
