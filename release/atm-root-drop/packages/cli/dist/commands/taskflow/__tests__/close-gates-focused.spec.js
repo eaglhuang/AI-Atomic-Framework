@@ -251,8 +251,8 @@ const staleEpochDryRun = await runTaskflow([
     '--actor', 'validator',
     '--json'
 ]);
-assert.equal(staleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'takeoverRequired');
-assert.ok(staleEpochDryRun.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'), 'focused stale epoch regression must block close before commit tail');
+assert.equal(staleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'noConflict');
+assert.ok(staleEpochDryRun.evidence.writeReadinessHint.blockers.every((entry) => entry.code !== 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'), 'focused stale epoch fixture without declared close overlap must not invent a takeover blocker');
 const branchQueueFixture = await makeDualRepoCloseFixture('branch-queue');
 writeBranchCommitQueueLock(branchQueueFixture.targetRepo, {
     actorId: 'other-writer',

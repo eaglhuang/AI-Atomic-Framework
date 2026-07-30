@@ -5,6 +5,146 @@ import { canonicalizeValidatorIdentity, classifyValidatorTier, resolveValidatorE
 import { collectRecordCommandRuns, readRecordValidationPasses, readRecordFreshness, uniqueStrings } from './command-runs.js';
 import { isRecord, isCommandRunProof } from './shared-utils.js';
 import { readEvidenceBundle, readTaskDocument, buildAutoEvidenceRequiredCommand } from './evidence-store.js';
+function normalizeEvidencePath(value) {
+    return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+function readRecordArtifactPaths(record) {
+    const paths = new Set();
+    const collect = (value) => {
+        if (!Array.isArray(value))
+            return;
+        for (const entry of value) {
+            if (typeof entry === 'string' && entry.trim())
+                paths.add(normalizeEvidencePath(entry));
+        }
+    };
+    collect(record.artifactPaths);
+    if (isRecord(record.details))
+        collect(record.details.artifactPaths);
+    return [...paths].sort((a, b) => a.localeCompare(b));
+}
+function commandRunMatchesValidator(run, validator, expectedCommand) {
+    const runValidators = Array.isArray(run.validators)
+        ? (run.validators)
+            .filter((entry) => typeof entry === 'string')
+            .map((entry) => canonicalizeValidatorIdentity(entry))
+        : [];
+    const command = typeof run.command === 'string' ? run.command : '';
+    return runValidators.includes(validator)
+        || canonicalizeValidatorIdentity(command) === validator
+        || canonicalizeValidatorIdentity(command) === canonicalizeValidatorIdentity(expectedCommand);
+}
+function readStringField(record, key) {
+    const value = record[key];
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+function hasTouchedArtifact(recordArtifactPaths, touchedFiles) {
+    const touched = new Set(touchedFiles.map(normalizeEvidencePath));
+    return recordArtifactPaths.some((artifactPath) => touched.has(artifactPath));
+}
+export function assessEvidenceFreshness(input) {
+    const touchedFiles = uniqueStrings((input.touchedFiles ?? []).map(normalizeEvidencePath));
+    const declaredArtifacts = uniqueStrings((input.declaredArtifacts ?? []).map(normalizeEvidencePath));
+    const evidenceArtifacts = uniqueStrings(input.validatorReceipts.flatMap((record) => readRecordArtifactPaths(record)));
+    const artifactChecks = uniqueStrings([...declaredArtifacts, ...evidenceArtifacts]).map((artifactPath) => ({
+        path: artifactPath,
+        declared: declaredArtifacts.includes(artifactPath),
+        referencedByEvidence: evidenceArtifacts.includes(artifactPath),
+        touched: touchedFiles.includes(artifactPath)
+    }));
+    const decisions = [];
+    for (const validator of input.validators) {
+        const matchingRecords = input.validatorReceipts.filter((record) => readRecordValidationPasses(record).includes(validator.name)
+            || collectRecordCommandRuns(record).some((run) => commandRunMatchesValidator(run, validator.name, validator.expectedCommand)));
+        const observedCommands = uniqueStrings(matchingRecords.flatMap((record) => collectRecordCommandRuns(record)
+            .filter((run) => commandRunMatchesValidator(run, validator.name, validator.expectedCommand))
+            .map((run) => typeof run.command === 'string' ? run.command.trim() : '')));
+        const artifactPaths = uniqueStrings(matchingRecords.flatMap((record) => readRecordArtifactPaths(record)));
+        const reasons = [];
+        if (matchingRecords.length === 0 || validator.evidenceState === 'absent') {
+            reasons.push('no matching command-backed validator evidence');
+            decisions.push({
+                validator: validator.name,
+                status: 'missing',
+                tier: validator.tier,
+                closureRequired: validator.closureRequired,
+                expectedCommand: validator.expectedCommand,
+                observedCommands,
+                artifactPaths,
+                reasons
+            });
+            continue;
+        }
+        if (validator.evidenceState === 'failed-run')
+            reasons.push('latest matching command run has non-zero exit code');
+        if (validator.evidenceState === 'diagnostic-only')
+            reasons.push('matching evidence lacks stdout/stderr hash and exit-code proof');
+        if (validator.evidenceState === 'stale')
+            reasons.push('matching evidence is marked historical-reference or draft');
+        if (observedCommands.length > 0 && !observedCommands.some((command) => canonicalizeValidatorIdentity(command) === canonicalizeValidatorIdentity(validator.expectedCommand)
+            || canonicalizeValidatorIdentity(command) === validator.name)) {
+            reasons.push('observed command identity does not match expected validator command');
+        }
+        if (input.deliveryCommit) {
+            const sourceCommits = uniqueStrings(matchingRecords.flatMap((record) => collectRecordCommandRuns(record)
+                .filter((run) => commandRunMatchesValidator(run, validator.name, validator.expectedCommand))
+                .map((run) => readStringField(run, 'sourceCommit') ?? '')));
+            if (sourceCommits.length > 0 && !sourceCommits.includes(input.deliveryCommit)) {
+                reasons.push('command-run source commit differs from delivery commit');
+            }
+        }
+        if (hasTouchedArtifact(artifactPaths, touchedFiles)) {
+            reasons.push('validator evidence references an artifact touched by this delivery');
+        }
+        decisions.push({
+            validator: validator.name,
+            status: reasons.length === 0 && validator.evidenceState === 'pass' ? 'fresh' : 'stale',
+            tier: validator.tier,
+            closureRequired: validator.closureRequired,
+            expectedCommand: validator.expectedCommand,
+            observedCommands,
+            artifactPaths,
+            reasons
+        });
+    }
+    const required = decisions.filter((entry) => entry.closureRequired);
+    const rerunValidators = required.filter((entry) => entry.status !== 'fresh');
+    const skippedHeavyweightValidators = decisions
+        .filter((entry) => !entry.closureRequired && (entry.tier === 'batch' || entry.tier === 'milestone' || entry.tier === 'release'))
+        .map((entry) => entry.validator);
+    const status = required.length === 0
+        ? 'fresh'
+        : required.every((entry) => entry.status === 'fresh')
+            ? 'fresh'
+            : required.every((entry) => entry.status === 'missing')
+                ? 'missing'
+                : required.some((entry) => entry.status === 'fresh')
+                    ? 'partially-stale'
+                    : 'stale';
+    const requiredCommands = rerunValidators.map((entry) => buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, entry.expectedCommand, entry.validator, input.runnerKind));
+    const rerunPlan = {
+        schemaId: 'atm.closeValidatorRerunPlan.v1',
+        taskId: input.taskId,
+        validators: rerunValidators.map((entry) => entry.validator),
+        commands: rerunValidators.map((entry) => entry.expectedCommand),
+        requiredCommands,
+        skippedHeavyweightValidators,
+        reason: rerunValidators.length === 0
+            ? 'All closure-required validator evidence is fresh.'
+            : `Rerun ${rerunValidators.length} closure-required validator(s) with stale or missing evidence.`
+    };
+    return {
+        schemaId: 'atm.evidenceFreshnessVerdict.v1',
+        taskId: input.taskId,
+        deliveryCommit: input.deliveryCommit ?? null,
+        touchedFiles,
+        status,
+        reasons: uniqueStrings(rerunValidators.flatMap((entry) => entry.reasons.map((reason) => `${entry.validator}: ${reason}`))),
+        validators: decisions,
+        artifactChecks,
+        rerunPlan
+    };
+}
 export function classifyValidatorEvidenceState(bundle, gate) {
     const rank = { pass: 3, stale: 2, 'diagnostic-only': 1 };
     let bestPositive = null;
@@ -179,6 +319,16 @@ export function computeMissingValidatorReport(cwd, taskId, actorId) {
     // 7. blockingFindings = closure-required 中的 absent + failed-run
     //    （stale 和 diagnostic-only 是 closure-required 中的警告，非硬封鎖；advisory 全部排除）
     const blockingFindings = requiredFindings.filter((f) => f.category === 'absent' || f.category === 'failed-run');
+    const freshnessVerdict = assessEvidenceFreshness({
+        taskId: resolvedTaskId,
+        deliveryCommit: null,
+        touchedFiles: declaredChangedFiles,
+        validators: catalogEntries,
+        validatorReceipts: bundleRecords,
+        actorId,
+        runnerKind: runnerArbitration.preferredRunnerKind,
+        declaredArtifacts: declaredChangedFiles
+    });
     return {
         schemaId: 'atm.missingValidatorReport.v1',
         taskId: resolvedTaskId,
@@ -191,6 +341,8 @@ export function computeMissingValidatorReport(cwd, taskId, actorId) {
         missingValidationPasses: requiredFindings,
         blockingFindings,
         advisoryFindings,
-        validators: catalogEntries
+        validators: catalogEntries,
+        freshnessVerdict,
+        rerunPlan: freshnessVerdict.rerunPlan
     };
 }
