@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'git',
   summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts with a fresh admission rerun, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt plus live branch queue and stuck stdin pathspec staging diagnostics, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
   positional: [
-    { name: 'action', summary: 'prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status', required: true }
+    { name: 'action', summary: 'prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status | attest', required: true }
   ],
   options: [
     commonCwdOption,
@@ -40,6 +40,17 @@ export default defineCommandSpec({
     { flag: '--reason', value: 'text', summary: 'Human-readable reason for the governed hook bypass when using --no-verify.' },
     { flag: '--no-trailers', summary: 'Skip trailer checks in git check (identity/owner checks still run).' },
     { flag: '--timeout-ms', value: 'ms', summary: 'For git commit: override the default 420000ms timeout for the underlying git commit spawn (also settable via ATM_GIT_COMMIT_TIMEOUT_MS); a hung pre-commit hook fails as a retryable timeout instead of hanging forever. Commit also fails fast when a git add --pathspec-from-file=- helper is already waiting on stdin.' },
+    { flag: '--commit', value: 'sha', summary: 'For git attest: immutable historical commit to cover with a forward attestation.' },
+    { flag: '--lane', value: 'lane-id', summary: 'For git attest: lane/session id that reviewed and produced the forward attestation.' },
+    { flag: '--provenance-kind', value: 'ticket|emergency', summary: 'For git attest: provenance class for the forward attestation.' },
+    { flag: '--provenance-ref', value: 'ref', summary: 'For git attest: immutable evidence file or git:<sha> commit message used as provenance.' },
+    { flag: '--provenance-digest', value: 'sha256:<digest>', summary: 'For git attest: digest of the provenance reference.' },
+    { flag: '--reason', value: 'text', summary: 'For git attest emergency writes: human-readable reason for the forward attestation.' },
+    { flag: '--emergency-class', value: 'class', summary: 'For git attest emergency writes: emergency class such as runner-sync-publication or protected-push-recovery.' },
+    { flag: '--scope', value: 'path', summary: 'For git attest emergency writes: repeatable or comma-separated path scope covered by the attestation.' },
+    { flag: '--evidence-ref', value: 'ref', summary: 'For git attest emergency writes: repeatable or comma-separated supporting evidence reference.' },
+    { flag: '--status', summary: 'For git attest: inspect the append-only attestation ledger without writing.' },
+    { flag: '--validate', summary: 'For git attest: validate existing attestation ledger records without writing.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -63,6 +74,9 @@ export default defineCommandSpec({
     'node atm.mjs git commit --actor codex-main --task TASK-AAO-0141 --message "feat: scoped deliverable" --auto-stage --timeout-ms 30000 --json',
     'node atm.mjs git record-commit --actor codex-main --message "atm: sync imported task records" --dry-run --json',
     'node atm.mjs git record-commit --actor codex-main --message "atm: sync imported task records" --json',
-    'node atm.mjs git commit-status --actor codex-main --task TASK-AAO-0141 --json'
+    'node atm.mjs git commit-status --actor codex-main --task TASK-AAO-0141 --json',
+    'node atm.mjs git attest --status --json',
+    'node atm.mjs git attest --validate --json',
+    'node atm.mjs git attest --commit <sha> --task TASK-GIT-0024 --actor codex-main --lane <lane-id> --provenance-kind emergency --provenance-ref git:<sha> --provenance-digest sha256:<digest> --reason "<reason>" --emergency-class protected-push-recovery --scope packages/cli/src --evidence-ref git:<sha> --dry-run --json'
   ]
 });

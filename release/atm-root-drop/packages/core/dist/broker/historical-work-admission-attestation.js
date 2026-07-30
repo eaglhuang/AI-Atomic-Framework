@@ -12,8 +12,17 @@ export const HISTORICAL_WORK_ADMISSION_ERROR_CODES = {
 function normalized(value) {
     return String(value ?? '').trim();
 }
+function normalizeOptionalField(value) {
+    const text = normalized(value);
+    return text.length > 0 ? text : null;
+}
+function normalizeStringList(value) {
+    if (!Array.isArray(value))
+        return [];
+    return [...new Set(value.map((entry) => normalized(entry)).filter(Boolean))];
+}
 function canonicalPayload(record) {
-    return JSON.stringify({
+    const payload = {
         schemaId: record.schemaId,
         commitSha: record.commitSha,
         parentCommitSha: record.parentCommitSha,
@@ -23,14 +32,51 @@ function canonicalPayload(record) {
         laneSessionId: record.laneSessionId,
         attestedBy: record.attestedBy,
         attestedAt: record.attestedAt
-    });
+    };
+    if (record.reason !== undefined)
+        payload.reason = normalizeOptionalField(record.reason);
+    if (record.evidenceRefs !== undefined)
+        payload.evidenceRefs = normalizeStringList(record.evidenceRefs);
+    if (record.emergencyClass !== undefined)
+        payload.emergencyClass = normalizeOptionalField(record.emergencyClass);
+    if (record.scope !== undefined)
+        payload.scope = normalizeStringList(record.scope);
+    return JSON.stringify(payload);
 }
 export function digestHistoricalWorkAdmissionAttestation(record) {
     return `sha256:${createHash('sha256').update(canonicalPayload(record)).digest('hex')}`;
 }
 export function createHistoricalWorkAdmissionAttestation(input) {
-    const record = { schemaId: HISTORICAL_WORK_ADMISSION_ATTESTATION_SCHEMA, ...input };
-    return { ...record, digest: digestHistoricalWorkAdmissionAttestation(record) };
+    const record = {
+        schemaId: HISTORICAL_WORK_ADMISSION_ATTESTATION_SCHEMA,
+        ...input
+    };
+    if (input.reason !== undefined)
+        record.reason = normalizeOptionalField(input.reason) ?? undefined;
+    if (input.evidenceRefs !== undefined)
+        record.evidenceRefs = normalizeStringList(input.evidenceRefs);
+    if (input.emergencyClass !== undefined)
+        record.emergencyClass = normalizeOptionalField(input.emergencyClass) ?? undefined;
+    if (input.scope !== undefined)
+        record.scope = normalizeStringList(input.scope);
+    const unsigned = record;
+    return { ...unsigned, digest: digestHistoricalWorkAdmissionAttestation(unsigned) };
+}
+export function createForwardAttestation(input) {
+    return createHistoricalWorkAdmissionAttestation({
+        commitSha: input.commit.commitSha,
+        parentCommitSha: input.commit.parentCommitSha,
+        treeSha: input.commit.treeSha,
+        provenance: input.provenance,
+        reason: input.reason ?? undefined,
+        evidenceRefs: input.evidenceRefs,
+        emergencyClass: input.emergencyClass ?? undefined,
+        scope: input.scope,
+        taskId: input.taskId,
+        laneSessionId: input.laneSessionId,
+        attestedBy: input.attestedBy,
+        attestedAt: input.attestedAt
+    });
 }
 function isWellFormed(record) {
     const { digest: _digest, ...unsigned } = record;
@@ -46,6 +92,41 @@ function isWellFormed(record) {
         && normalized(record.attestedBy).length > 0
         && !Number.isNaN(Date.parse(record.attestedAt))
         && record.digest === digestHistoricalWorkAdmissionAttestation(unsigned);
+}
+export function validateHistoricalWorkAdmissionAttestationRecord(record) {
+    if (!isWellFormed(record)) {
+        return {
+            decision: 'invalid',
+            code: HISTORICAL_WORK_ADMISSION_ERROR_CODES.invalid,
+            reason: 'Historical attestation is malformed or its digest no longer matches the canonical payload.',
+            attestation: null
+        };
+    }
+    if (record.provenance.kind === 'emergency') {
+        const missing = [];
+        if (!normalizeOptionalField(record.reason))
+            missing.push('reason');
+        if (normalizeStringList(record.evidenceRefs).length === 0)
+            missing.push('evidenceRefs');
+        if (!normalizeOptionalField(record.emergencyClass))
+            missing.push('emergencyClass');
+        if (normalizeStringList(record.scope).length === 0)
+            missing.push('scope');
+        if (missing.length > 0) {
+            return {
+                decision: 'invalid',
+                code: HISTORICAL_WORK_ADMISSION_ERROR_CODES.invalid,
+                reason: `Emergency forward attestation is missing required field(s): ${missing.join(', ')}.`,
+                attestation: null
+            };
+        }
+    }
+    return {
+        decision: 'covered',
+        code: null,
+        reason: 'Historical attestation record is well formed.',
+        attestation: record
+    };
 }
 /**
  * Single fail-closed authority shared by the correction command and range gate.
