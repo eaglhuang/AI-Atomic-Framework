@@ -41,7 +41,7 @@ export function normalizeTaskCausalGraphContract(value: unknown): TaskCausalGrap
   const list = (...keys: string[]): readonly string[] => {
     for (const key of keys) {
       const candidate = record[key];
-      if (Array.isArray(candidate)) return [...new Set(candidate.filter((entry): entry is string => typeof entry === 'string').map(normalizeYamlScalar))];
+      if (Array.isArray(candidate)) return [...new Set(candidate.map(normalizeCausalGraphListEntry).filter((entry): entry is string => Boolean(entry)))];
       if (typeof candidate === 'string' && candidate.trim()) return [...new Set(parseYamlList(candidate))];
     }
     return [];
@@ -59,6 +59,26 @@ export function normalizeTaskCausalGraphContract(value: unknown): TaskCausalGrap
 }
 
 // ─── 類型定義（共享自 tasks.ts 的 FrontMatter 介面） ─────────────────────────
+
+function normalizeCausalGraphListEntry(value: unknown): string | null {
+  if (typeof value === 'string') return normalizeYamlScalar(value);
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  const source = normalizeOptionalString(record.source);
+  const target = normalizeOptionalString(record.target);
+  const reason = normalizeOptionalString(record.reason);
+  if (source && target) {
+    return reason ? `${source} -> ${target}: ${reason}` : `${source} -> ${target}`;
+  }
+  const parts = Object.keys(record)
+    .sort()
+    .map((key) => {
+      const normalized = normalizeOptionalString(record[key]);
+      return normalized ? `${key}=${normalized}` : null;
+    })
+    .filter((entry): entry is string => Boolean(entry));
+  return parts.length > 0 ? parts.join('; ') : null;
+}
 
 export interface FrontMatter {
   readonly data: Record<string, unknown>;
@@ -105,7 +125,12 @@ export function extractFrontMatter(text: string): FrontMatter | null {
     // Nested fields/lists on a top-level object-array item
     // (for example testContributions[i].coversAcceptance).
     const nestedObjectFieldMatch = /^\s{2,}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
-    if (currentObjectListItem && nestedObjectFieldMatch && !/^\s*-\s+/.test(line)) {
+    if (
+      currentObjectListItem
+      && nestedObjectFieldMatch
+      && !/^\s*-\s+/.test(line)
+      && (!currentObjectKey || Array.isArray(data[currentObjectKey]))
+    ) {
       const key = nestedObjectFieldMatch[1];
       const value = nestedObjectFieldMatch[2].trim();
       currentObjectListItem[key] = value.length === 0 ? [] : normalizeYamlScalar(value);
@@ -155,7 +180,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
       continue;
     }
     const objectListObjectFieldMatch = /^ {6}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
-    if (currentObjectKey && currentObjectListKey && currentObjectListItem && objectListObjectFieldMatch) {
+    if (currentObjectKey && (currentObjectListKey || currentObjectArrayKey) && currentObjectListItem && objectListObjectFieldMatch) {
       const key = objectListObjectFieldMatch[1];
       const value = normalizeYamlScalar(objectListObjectFieldMatch[2]);
       currentObjectListItem[key] = value;
@@ -175,6 +200,23 @@ export function extractFrontMatter(text: string): FrontMatter | null {
           : [value];
       data[currentObjectKey] = objectRecord;
       currentObjectListItem = null;
+      continue;
+    }
+    if (currentObjectKey && currentObjectArrayKey && /^ {4}-\s+/.test(line)) {
+      const objectRecord = data[currentObjectKey] as Record<string, unknown>;
+      if (Array.isArray(objectRecord)) {
+        continue;
+      }
+      const value = line.replace(/^ {4}-\s+/, '').trim();
+      const existing = objectRecord[currentObjectArrayKey];
+      objectRecord[currentObjectArrayKey] = Array.isArray(existing)
+        ? [...existing, value]
+        : typeof existing === 'string' && existing.length > 0
+          ? [existing, value]
+          : [value];
+      data[currentObjectKey] = objectRecord;
+      currentObjectListItem = null;
+      currentObjectListKey = null;
       continue;
     }
     if (currentKey && /^\s*-\s+/.test(line)) {
