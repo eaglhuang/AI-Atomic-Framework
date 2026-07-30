@@ -540,6 +540,7 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-280.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-281.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-282.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-283.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
     "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
     "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -1369,6 +1370,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection/task-routing.js",
     "release/atm-root-drop/packages/cli/dist/commands/next/profiler.js",
     "release/atm-root-drop/packages/cli/dist/commands/next/prompt-guidance-result.js",
+    "release/atm-root-drop/packages/cli/dist/commands/next/prompt-result-contracts.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/next/prompt-result-contracts.js",
     "release/atm-root-drop/packages/cli/dist/commands/next/prompt-results.js",
     "release/atm-root-drop/packages/cli/dist/commands/next/prompt-scope-resolution.js",
@@ -4233,6 +4235,7 @@
     "release/atm-root-drop/tests/cli/managed-plan-executor.test.ts",
     "release/atm-root-drop/tests/cli/model-price-refresh.test.ts",
     "release/atm-root-drop/tests/cli/module-boundary-topology.test.ts",
+    "release/atm-root-drop/tests/cli/next-batch-dependency-readiness.test.ts",
     "release/atm-root-drop/tests/cli/next-claim-orphaned-in-progress.test.ts",
     "release/atm-root-drop/tests/cli/next-command-facade-final-600.test.ts",
     "release/atm-root-drop/tests/cli/next-command-router-extraction.test.ts",
@@ -4725,8 +4728,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 72,
-    "unchanged": 4618,
+    "copied": 6,
+    "unchanged": 4687,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -5980,7 +5983,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:eda5147cf41e8e0c3b36d5e8580d52212927b8cea1469ac7741eab9d25548c8b"
+    "digest": "sha256:9f2eba27fd053d15253fe4c435a782b686bc44e43309061e4ffe9d97f737d582"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -6494,6 +6497,7 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-280.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-281.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-282.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-283.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
       "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
       "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -7323,6 +7327,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection/task-routing.js",
       "release/atm-root-drop/packages/cli/dist/commands/next/profiler.js",
       "release/atm-root-drop/packages/cli/dist/commands/next/prompt-guidance-result.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/prompt-result-contracts.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/next/prompt-result-contracts.js",
       "release/atm-root-drop/packages/cli/dist/commands/next/prompt-results.js",
       "release/atm-root-drop/packages/cli/dist/commands/next/prompt-scope-resolution.js",
@@ -10187,6 +10192,7 @@
       "release/atm-root-drop/tests/cli/managed-plan-executor.test.ts",
       "release/atm-root-drop/tests/cli/model-price-refresh.test.ts",
       "release/atm-root-drop/tests/cli/module-boundary-topology.test.ts",
+      "release/atm-root-drop/tests/cli/next-batch-dependency-readiness.test.ts",
       "release/atm-root-drop/tests/cli/next-claim-orphaned-in-progress.test.ts",
       "release/atm-root-drop/tests/cli/next-command-facade-final-600.test.ts",
       "release/atm-root-drop/tests/cli/next-command-router-extraction.test.ts",
@@ -10682,34 +10688,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:362de40774f850767841c82cc0c76899c8750195fe042794a42f7b87d81ba4c1",
-  "sealedSourceCommit": "aec29641f47f9d35b1d10875bd3e89a52809980e",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:a3581a84ee675442b858981882488e12624e407659ebae1595617c945a4febd9",
-  "tsBuildCacheDigest": "sha256:2b4956371fa0e309743b42536d4d46499a35a0db9c01a251f43da612ecc3d739",
+  "buildInputsTreeHash": "sha256:bab3a3e621b46398dfa73c6a1eba033dab5b1faaa6a61e832a937a755eacca26",
+  "sealedSourceCommit": "1017873b36954ceefc51acadd8d9ac2a8b1672ee",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:8bac643bc28172a546e5823aa9a2b55ada0674ad304308a60eb5a3d82440ab35",
+  "tsBuildCacheDigest": "sha256:df7336fbb8384b32117cefef3f195795cde7ceee44662a7911ffbaa8bcf31f40",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 15822,
-    "totalElapsedMs": 48988,
-    "dominanceRatio": 0.323,
-    "phaseMedianMs": 1866,
-    "phaseP95Ms": 15822,
+    "dominantPhaseMs": 16393,
+    "totalElapsedMs": 47371,
+    "dominanceRatio": 0.3461,
+    "phaseMedianMs": 2073,
+    "phaseP95Ms": 16393,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 58,
-    "skipDecision": 52,
-    "worktreeSetup": 15822,
-    "typescriptBuild": 13183,
-    "rootDropReleaseAssembly": 10507,
-    "onefileReleaseAssembly": 1866,
-    "artifactSync": 7173,
+    "inputHashCalculation": 74,
+    "skipDecision": 65,
+    "worktreeSetup": 16393,
+    "typescriptBuild": 8933,
+    "rootDropReleaseAssembly": 9275,
+    "onefileReleaseAssembly": 2073,
+    "artifactSync": 8633,
     "cleanup": 0,
-    "totalElapsed": 48988
+    "totalElapsed": 47371
   }
 }
