@@ -1,0 +1,271 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0274",
+  "title": "Enforce same-task different-lane claim rejection",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Same actor plus same lane remains idempotent.",
+    "Same actor plus different lane rejects with `ATM_LOCK_CONFLICT`.",
+    "Rejection details include `holdingLaneSessionId`, `requestedLaneSessionId`, `laneAdoptCommand`, and `recoveryHint`.",
+    "Legacy actor fallback is preserved only when at least one side lacks a lane id.",
+    "`tests/cli/lane-claim-conflict-matrix.test.ts` passes.",
+    "`tests/cli/lane-dual-session-e2e.test.ts` passes.",
+    "`tests/cli/broker-parallel-admission-policy.test.ts` passes."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/claim-ownership.ts",
+    "packages/cli/src/commands/next/claim-admission.ts",
+    "tests/cli/lane-claim-conflict-matrix.test.ts",
+    "tests/cli/lane-dual-session-e2e.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/claim-ownership.ts",
+    "packages/cli/src/commands/next/claim-admission.ts",
+    "tests/cli/lane-claim-conflict-matrix.test.ts",
+    "tests/cli/lane-dual-session-e2e.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/lane-claim-conflict-matrix.test.ts",
+    "node --strip-types tests/cli/lane-dual-session-e2e.test.ts",
+    "node --strip-types tests/cli/broker-parallel-admission-policy.test.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "mailboxAssignee": "Cursor",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.work-coordination-authority",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.work-coordination-authority",
+        "pattern": "Policy Authority / Adapter Facade",
+        "source": "packages/cli/src/commands/tasks/claim-ownership.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0274-enforce-same-task-different-lane-claim-rejection.task.md",
+    "sectionTitle": "ATM-GOV-0274",
+    "headingLine": 77,
+    "hash": "b03a9a2d135711bc",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0274-enforce-same-task-different-lane-claim-rejection.task.md",
+      "planningCommitSha": "023fee871f763bc753c31ccb69db28622323bd67",
+      "contentDigest": "sha256:b03a9a2d135711bc032f782abeac0e4e93bd1a43c15f41c6e9481d3b6d119b8d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T08:38:45.603Z"
+    }
+  },
+  "importedAt": "2026-07-30T08:38:45.603Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.lane.claim.conflict.matrix.test.ts",
+      "command": "node --strip-types tests/cli/lane-claim-conflict-matrix.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.lane.dual.session.e2e.test.ts",
+      "command": "node --strip-types tests/cli/lane-dual-session-e2e.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.broker.parallel.admission.policy.test.ts",
+      "command": "node --strip-types tests/cli/broker-parallel-admission-policy.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-30T08-39-15-945Z-claim-f12258bd2928",
+  "lastTransitionAt": "2026-07-30T08:39:15.945Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-07-30T08:39:00.300Z",
+  "promotedAt": "2026-07-30T08:39:00.303Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-323724c94ea8",
+    "claimedAt": "2026-07-30T08:39:00.306Z",
+    "heartbeatAt": "2026-07-30T08:39:00.306Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0274.json",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/tasks/claim-ownership.ts",
+      "tests/cli/lane-claim-conflict-matrix.test.ts",
+      "tests/cli/lane-dual-session-e2e.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260730083900-codex-captain-524c8dd8c7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730083900-codex-captain-524c8dd8c7\""
+    }
+  },
+  "startedAt": "2026-07-30T08:39:00.306Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-5feafce613bedbe8",
+    "ticketDigest": "sha256:5feafce613bedbe83f4c4e2328bec5bca5127cd8b19adba7a72acc52722e7d0e",
+    "taskId": "ATM-GOV-0274",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260730083900-codex-captain-524c8dd8c7",
+    "claimGeneration": "lease-323724c94ea8",
+    "issuedAt": "2026-07-30T08:39:00.306Z",
+    "expiresAt": "2026-07-30T09:09:00.306Z",
+    "scopeDigest": "sha256:4c6a4bc639d8d1bfc64b81578d75ad2137511446b1c976744bb046032b486ada",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T08:39:00.306Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0274.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0274/**",
+          ".atm/history/tasks/ATM-GOV-0274.json",
+          "packages/cli/src/commands/next/claim-admission.ts",
+          "packages/cli/src/commands/tasks/claim-ownership.ts",
+          "tests/cli/lane-claim-conflict-matrix.test.ts",
+          "tests/cli/lane-dual-session-e2e.test.ts"
+        ],
+        "digest": "sha256:a506caab60c96d0fba6615676dbc129a42b75051e4b699757e91ab5dfad630a6"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260730083900-codex-captain-ATM-GOV-0274-cb32c605b7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0274",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0274.*",
+      ".atm/history/task-events/ATM-GOV-0274/**",
+      ".atm/history/tasks/ATM-GOV-0274.json",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/tasks/claim-ownership.ts",
+      "tests/cli/lane-claim-conflict-matrix.test.ts",
+      "tests/cli/lane-dual-session-e2e.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4a6b5a2f60a82fd5b95a08ed3fed498cf76a79f4f3dd3bbc4b0f4e7e90f8e52e",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260730083900-codex-captain-ATM-GOV-0274-cb32c605b7",
+    "laneSession": {
+      "laneSessionId": "lane-20260730083900-codex-captain-524c8dd8c7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730083900-codex-captain-524c8dd8c7\""
+    },
+    "createdAt": "2026-07-30T08:39:15.944Z",
+    "status": "active"
+  }
+}
