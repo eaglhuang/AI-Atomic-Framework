@@ -24,6 +24,10 @@ export interface HistoricalWorkAdmissionAttestation {
     readonly digest: string;
     readonly ref: string;
   };
+  readonly reason?: string;
+  readonly evidenceRefs?: readonly string[];
+  readonly emergencyClass?: string;
+  readonly scope?: readonly string[];
   readonly taskId: string;
   readonly laneSessionId: string;
   readonly attestedBy: string;
@@ -45,6 +49,29 @@ export interface HistoricalAdmissionEvaluation {
   readonly attestation: HistoricalWorkAdmissionAttestation | null;
 }
 
+export interface ForwardAttestationCommitInput {
+  readonly commitSha: string;
+  readonly parentCommitSha: string;
+  readonly treeSha: string;
+}
+
+export interface ForwardAttestationInput {
+  readonly taskId: string;
+  readonly commit: ForwardAttestationCommitInput;
+  readonly provenance: {
+    readonly kind: 'ticket' | 'emergency';
+    readonly digest: string;
+    readonly ref: string;
+  };
+  readonly laneSessionId: string;
+  readonly attestedBy: string;
+  readonly attestedAt: string;
+  readonly reason?: string | null;
+  readonly evidenceRefs?: readonly string[];
+  readonly emergencyClass?: string | null;
+  readonly scope?: readonly string[];
+}
+
 export interface TerminalLifecycleOwnership {
   readonly decision: 'active' | 'terminal' | 'inconsistent';
   readonly reason: string;
@@ -54,8 +81,18 @@ function normalized(value: unknown): string {
   return String(value ?? '').trim();
 }
 
+function normalizeOptionalField(value: unknown): string | null {
+  const text = normalized(value);
+  return text.length > 0 ? text : null;
+}
+
+function normalizeStringList(value: unknown): readonly string[] {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.map((entry) => normalized(entry)).filter(Boolean))];
+}
+
 function canonicalPayload(record: Omit<HistoricalWorkAdmissionAttestation, 'digest'>): string {
-  return JSON.stringify({
+  const payload: Record<string, unknown> = {
     schemaId: record.schemaId,
     commitSha: record.commitSha,
     parentCommitSha: record.parentCommitSha,
@@ -65,7 +102,12 @@ function canonicalPayload(record: Omit<HistoricalWorkAdmissionAttestation, 'dige
     laneSessionId: record.laneSessionId,
     attestedBy: record.attestedBy,
     attestedAt: record.attestedAt
-  });
+  };
+  if (record.reason !== undefined) payload.reason = normalizeOptionalField(record.reason);
+  if (record.evidenceRefs !== undefined) payload.evidenceRefs = normalizeStringList(record.evidenceRefs);
+  if (record.emergencyClass !== undefined) payload.emergencyClass = normalizeOptionalField(record.emergencyClass);
+  if (record.scope !== undefined) payload.scope = normalizeStringList(record.scope);
+  return JSON.stringify(payload);
 }
 
 export function digestHistoricalWorkAdmissionAttestation(record: Omit<HistoricalWorkAdmissionAttestation, 'digest'>): string {
@@ -73,8 +115,33 @@ export function digestHistoricalWorkAdmissionAttestation(record: Omit<Historical
 }
 
 export function createHistoricalWorkAdmissionAttestation(input: Omit<HistoricalWorkAdmissionAttestation, 'schemaId' | 'digest'>): HistoricalWorkAdmissionAttestation {
-  const record = { schemaId: HISTORICAL_WORK_ADMISSION_ATTESTATION_SCHEMA, ...input } as Omit<HistoricalWorkAdmissionAttestation, 'digest'>;
-  return { ...record, digest: digestHistoricalWorkAdmissionAttestation(record) };
+  const record: Record<string, unknown> = {
+    schemaId: HISTORICAL_WORK_ADMISSION_ATTESTATION_SCHEMA,
+    ...input
+  };
+  if (input.reason !== undefined) record.reason = normalizeOptionalField(input.reason) ?? undefined;
+  if (input.evidenceRefs !== undefined) record.evidenceRefs = normalizeStringList(input.evidenceRefs);
+  if (input.emergencyClass !== undefined) record.emergencyClass = normalizeOptionalField(input.emergencyClass) ?? undefined;
+  if (input.scope !== undefined) record.scope = normalizeStringList(input.scope);
+  const unsigned = record as Omit<HistoricalWorkAdmissionAttestation, 'digest'>;
+  return { ...unsigned, digest: digestHistoricalWorkAdmissionAttestation(unsigned) };
+}
+
+export function createForwardAttestation(input: ForwardAttestationInput): HistoricalWorkAdmissionAttestation {
+  return createHistoricalWorkAdmissionAttestation({
+    commitSha: input.commit.commitSha,
+    parentCommitSha: input.commit.parentCommitSha,
+    treeSha: input.commit.treeSha,
+    provenance: input.provenance,
+    reason: input.reason ?? undefined,
+    evidenceRefs: input.evidenceRefs,
+    emergencyClass: input.emergencyClass ?? undefined,
+    scope: input.scope,
+    taskId: input.taskId,
+    laneSessionId: input.laneSessionId,
+    attestedBy: input.attestedBy,
+    attestedAt: input.attestedAt
+  });
 }
 
 function isWellFormed(record: HistoricalWorkAdmissionAttestation): boolean {
@@ -91,6 +158,38 @@ function isWellFormed(record: HistoricalWorkAdmissionAttestation): boolean {
     && normalized(record.attestedBy).length > 0
     && !Number.isNaN(Date.parse(record.attestedAt))
     && record.digest === digestHistoricalWorkAdmissionAttestation(unsigned);
+}
+
+export function validateHistoricalWorkAdmissionAttestationRecord(record: HistoricalWorkAdmissionAttestation): HistoricalAdmissionEvaluation {
+  if (!isWellFormed(record)) {
+    return {
+      decision: 'invalid',
+      code: HISTORICAL_WORK_ADMISSION_ERROR_CODES.invalid,
+      reason: 'Historical attestation is malformed or its digest no longer matches the canonical payload.',
+      attestation: null
+    };
+  }
+  if (record.provenance.kind === 'emergency') {
+    const missing: string[] = [];
+    if (!normalizeOptionalField(record.reason)) missing.push('reason');
+    if (normalizeStringList(record.evidenceRefs).length === 0) missing.push('evidenceRefs');
+    if (!normalizeOptionalField(record.emergencyClass)) missing.push('emergencyClass');
+    if (normalizeStringList(record.scope).length === 0) missing.push('scope');
+    if (missing.length > 0) {
+      return {
+        decision: 'invalid',
+        code: HISTORICAL_WORK_ADMISSION_ERROR_CODES.invalid,
+        reason: `Emergency forward attestation is missing required field(s): ${missing.join(', ')}.`,
+        attestation: null
+      };
+    }
+  }
+  return {
+    decision: 'covered',
+    code: null,
+    reason: 'Historical attestation record is well formed.',
+    attestation: record
+  };
 }
 
 /**

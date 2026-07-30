@@ -50,11 +50,7 @@ interface CommitClosurePacketInspection {
   readonly commitSha: string;
   readonly packetPath: string;
   readonly taskId: string | null;
-  readonly findings: readonly {
-    readonly code: string;
-    readonly detail: string;
-    readonly suggestedFix?: string;
-  }[];
+  readonly findings: readonly { readonly code: string; readonly detail: string; readonly suggestedFix?: string }[];
 }
 
 const protectedBranchPatterns = ['main', 'master', 'trunk', 'release/*'] as const;
@@ -88,10 +84,6 @@ export function createCommitRangeGuardReport(cwd: string, base: string, head: st
   const enforcedCriticalCommits = legacyBaseline
     ? criticalCommits.filter((entry) => !isAcceptedByLegacyBaseline(entry.commitSha))
     : criticalCommits;
-  // Git-head records are still valuable for same-commit provenance and
-  // closeout/repair checks, but missing records on ordinary historical critical
-  // commits are diagnostic only. Do not reintroduce a per-critical-commit push
-  // gate here.
   const evidenceMatches = criticalCommits.map((entry) => inspectCommitGitHeadEvidence(root, entry.commitSha, entry.criticalChangedFiles, head));
   const closurePacketInspections = enforcedCriticalCommits.flatMap((entry) => {
     const match = evidenceMatches.find((candidate) => candidate.commitSha === entry.commitSha);
@@ -99,6 +91,7 @@ export function createCommitRangeGuardReport(cwd: string, base: string, head: st
   });
   const historicalAttestations = readHistoricalWorkAdmissionAttestations(root);
   const workAdmissionCoverageFindings = enforcedCriticalCommits.flatMap((entry) => {
+    const suggestedFix = buildForwardAttestationCommandSuggestion(root, entry.commitSha);
     const evaluation = evaluateHistoricalWorkAdmission({
       commit: readHistoricalCommitIdentity(root, entry.commitSha, head),
       hasNormalWorkAdmissionTrailer: hasWorkAdmissionCommitCoverage(root, entry.commitSha),
@@ -109,7 +102,8 @@ export function createCommitRangeGuardReport(cwd: string, base: string, head: st
       level: 'error' as const,
       code: evaluation.code ?? 'ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED',
       commitSha: entry.commitSha,
-      detail: evaluation.reason
+      detail: evaluation.reason,
+      suggestedFix
     }];
   });
   const missingEvidenceMatches = evidenceMatches
@@ -181,6 +175,15 @@ function provenanceReferenceMatches(cwd: string, record: HistoricalWorkAdmission
   } catch {
     return false;
   }
+}
+
+function buildForwardAttestationCommandSuggestion(cwd: string, commitSha: string): string {
+  const message = runGitScalar(cwd, ['log', '-1', '--format=%B', commitSha]) ?? '';
+  if (message.includes('ATM-Emergency-Reason:')) {
+    const digest = `sha256:${createHash('sha256').update(message).digest('hex')}`;
+    return `node atm.mjs git attest --commit ${commitSha} --task TASK-GIT-0024 --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-ref git:${commitSha} --provenance-digest ${digest} --reason "<reason>" --emergency-class "<class>" --scope "<path>" --evidence-ref "git:${commitSha}" --dry-run --json`;
+  }
+  return `node atm.mjs git attest --commit ${commitSha} --task TASK-GIT-0024 --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-ref <immutable-evidence-file> --provenance-digest sha256:<digest> --reason "<reason>" --emergency-class "<class>" --scope "<path>" --evidence-ref "<evidence-ref>" --dry-run --json`;
 }
 
 function readHistoricalCommitIdentity(cwd: string, commitSha: string, head: string) {

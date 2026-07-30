@@ -1,0 +1,191 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0272",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f90064fb7c84c1d5ab5a057fad87271780bb8f9d",
+  "governedTreeSha": "782afbefc6405a06dc97e47672e5a195b0918f0c",
+  "targetCommitDelta": {
+    "currentCommitSha": "f90064fb7c84c1d5ab5a057fad87271780bb8f9d",
+    "parentCommitShas": [
+      "f90064fb7c84c1d5ab5a057fad87271780bb8f9d"
+    ],
+    "governedTreeSha": "782afbefc6405a06dc97e47672e5a195b0918f0c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-skl-captain.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0272.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0272.deep-module-review.json",
+      ".atm/history/evidence/ATM-GOV-0272.json",
+      ".atm/history/task-events/ATM-GOV-0272/2026-07-30T22-48-14-102Z-reserve-c365bd6c7f20.json",
+      ".atm/history/task-events/ATM-GOV-0272/2026-07-30T22-48-14-105Z-promote-99b9bdb6eb18.json",
+      ".atm/history/task-events/ATM-GOV-0272/2026-07-30T22-48-35-411Z-claim-628a1afe83a7.json",
+      ".atm/history/task-events/ATM-GOV-0272/2026-07-30T22-51-51-637Z-scope-amendment-907761e3e149.json",
+      ".atm/history/task-events/ATM-GOV-0272/2026-07-30T22-56-24-124Z-scope-amendment-939531496d98.json",
+      ".atm/history/tasks/ATM-GOV-0272.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:59b6b3d80415528af01ee76f91af48533cc8083c95acb7d86333718dcc4526c3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/core/src/broker/historical-work-admission-attestation.ts packages/cli/src/commands/git-governance.ts packages/cli/src/commands/hook/commit-range-guard/implementation.ts packages/cli/src/commands/command-specs/git.spec.ts tests/cli/historical-work-admission-attestation.test.ts packages/cli/src/commands/hook/__tests__/pre-push.spec.ts .atm/history/evidence/ATM-GOV-0272.deep-module-review.json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36fadafab780dae49ec7582340bb90c9819e9d045d607a7f99089b29720274d0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3485437398965c330d131beacd66f95485b0471867f47bd2b2350de2a8c2bb94",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.dev.mjs git attest --status --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5835cc7ffa30ab7b1c74fcb65c7c97a0ba8662dfc6f91f448f4a8aaa6162263f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.dev.mjs git --help",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3c58c0226479b515a7df712f5a4a59a5aab946df6a74e4c8785b409eb8afdf56",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.dev.mjs git attest --validate --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:335db6144eedb854e495c9c9b854ede99ee99af73d3e976e7db640fd855f4e6f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.dev.mjs git attest --commit f90064fb7c84c1d5ab5a057fad87271780bb8f9d --task TASK-GIT-0024 --actor codex-skl-captain --lane lane-20260730224814-codex-skl-captain-c81e72761f --provenance-kind emergency --provenance-ref git:f90064fb7c84c1d5ab5a057fad87271780bb8f9d --provenance-digest sha256:70461e32a7dfbbf839bea5fa7cc8f8f87d0369b437b6f1952d74f50c527cc5c7 --reason \" dry-run fixture for public forward attestation surface\\",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1b88df7728aef074435f035a750c6221fdd5cdcde010be2830d1a26556ef449d",
+      "stderrSha256": "sha256:6a64a5733a39f3ded25c5401fe9a81e2b8b7fdf061e973a77199f946073d1e6a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+    "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-30T23:06:33.209Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0272.*",
+      ".atm/history/task-events/ATM-GOV-0272/**",
+      ".atm/history/tasks/ATM-GOV-0272.json",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/command-specs/hook.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/command-specs/hook.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0272.json",
+  "closedAt": "2026-07-30T23:06:33.210Z",
+  "closedByActor": "codex-skl-captain",
+  "sessionId": "session-20260730224814-codex-skl-captain-ATM-GOV-0272-d2d6a7bd58",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T23-06-33-220Z-close-7a705c7960a1",
+  "taskId": "ATM-GOV-0272",
+  "action": "close",
+  "actorId": "codex-skl-captain",
+  "sessionId": "session-20260730224814-codex-skl-captain-ATM-GOV-0272-d2d6a7bd58",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0272.json",
+  "taskSha256": "sha256:ae974c554e0693418f169b692215338c01e0b7ef191dbc4f5602a561b68f67a6",
+  "createdAt": "2026-07-30T23:06:33.220Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0272 --actor codex-skl-captain --status done --from-batch-checkpoint --batch batch-3b57f658b7ca",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-3b57f658b7ca",
+    "sessionId": "session-20260730224814-codex-skl-captain-ATM-GOV-0272-d2d6a7bd58",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0272.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "node --strip-types tests/cli/historical-work-admission-attestation.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-30T23:06:33.209Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0272.*",
+        ".atm/history/task-events/ATM-GOV-0272/**",
+        ".atm/history/tasks/ATM-GOV-0272.json",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/command-specs/hook.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/core/src/broker/historical-work-admission-attestation.ts",
+        "tests/cli/historical-work-admission-attestation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/command-specs/hook.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/core/src/broker/historical-work-admission-attestation.ts",
+        "tests/cli/historical-work-admission-attestation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

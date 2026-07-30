@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0272",
   "title": "Public forward and emergency attestation authority",
-  "status": "planned",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0271"
@@ -108,7 +108,9 @@
   },
   "importedAt": "2026-07-30T03:39:15.367Z",
   "workAdmission": {
-    "recoveryMode": "auto"
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
   },
   "testContributions": [],
   "requiredTestCaseIds": [],
@@ -156,7 +158,170 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-30T03-39-15-637Z-import-92cadc7f3bec",
-  "lastTransitionAt": "2026-07-30T03:39:15.637Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-30T23-06-33-327Z-lock-cleanup-342746379c63",
+  "lastTransitionAt": "2026-07-30T23:06:33.327Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-30T22:48:14.102Z",
+  "promotedAt": "2026-07-30T22:48:14.105Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-ade93b658245",
+    "claimedAt": "2026-07-30T22:48:14.109Z",
+    "heartbeatAt": "2026-07-30T23:06:33.215Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0272.*",
+      ".atm/history/task-events/ATM-GOV-0272/**",
+      ".atm/history/tasks/ATM-GOV-0272.json",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/command-specs/hook.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260730224814-codex-skl-captain-c81e72761f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730224814-codex-skl-captain-c81e72761f\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-30T22:48:14.109Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-3cf50881233805f6",
+    "ticketDigest": "sha256:3cf50881233805f693d9ffbd7066a5af9a291451d342890ee4dd2938e32985f7",
+    "taskId": "ATM-GOV-0272",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260730224814-codex-skl-captain-c81e72761f",
+    "claimGeneration": "lease-ade93b658245",
+    "issuedAt": "2026-07-30T22:48:14.109Z",
+    "expiresAt": "2026-07-30T23:18:14.109Z",
+    "scopeDigest": "sha256:287eac961ef498e287237cf2f8488eb221be4e3a91c83adaa3f2019430ca233f",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T22:48:14.109Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0272.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0272/**",
+          ".atm/history/tasks/ATM-GOV-0272.json",
+          "packages/cli/src/commands/command-specs/git.spec.ts",
+          "packages/cli/src/commands/command-specs/hook.spec.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+          "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+          "packages/cli/src/commands/hook/pre-push.ts",
+          "packages/core/src/broker/historical-work-admission-attestation.ts",
+          "tests/cli/historical-work-admission-attestation.test.ts"
+        ],
+        "digest": "sha256:6196edf51ce4c2fff2732925286812ca44d3798012f4b2a38f911043a36de5cf"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260730224814-codex-skl-captain-ATM-GOV-0272-d2d6a7bd58",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0272",
+    "batchId": "batch-3b57f658b7ca",
+    "scopeKey": "tasks-7e9df11ec655",
+    "queueId": "queue-c1ce68d0cf7c8fac",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0272.*",
+      ".atm/history/task-events/ATM-GOV-0272/**",
+      ".atm/history/tasks/ATM-GOV-0272.json",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/command-specs/hook.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/core/src/broker/historical-work-admission-attestation.ts",
+      "tests/cli/historical-work-admission-attestation.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0272-public-forward-and-emergency-attestation-authority.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0272-public-forward-and-emergency-attestation-authority.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7414b53c275cfe50d785c06a55287a87eadb7c3ee919656fb3b70780ab6002ef",
+    "actorId": "codex-skl-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730224814-codex-skl-captain-c81e72761f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730224814-codex-skl-captain-c81e72761f\""
+    },
+    "createdAt": "2026-07-30T22:48:35.420Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-30T23:06:33.323Z",
+    "releasedBy": "codex-skl-captain"
+  },
+  "closedAt": "2026-07-30T23:06:33.215Z",
+  "closedByActor": "codex-skl-captain",
+  "closedBySessionId": "session-20260730224814-codex-skl-captain-ATM-GOV-0272-d2d6a7bd58",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0272.closure-packet.json"
 }
