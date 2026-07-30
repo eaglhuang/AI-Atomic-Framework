@@ -102,7 +102,7 @@ export function evaluateFrameworkDeliveryWindow(input: {
   const ok = input.historicalBatchCloseReady === true
     ? hasHistoricalDelivery
     : input.fromBatchCheckpoint
-      ? hasGovernedDeliveryFlag && scopedCriticalChangedFiles.length > 0
+      ? hasHistoricalDelivery || (hasGovernedDeliveryFlag && scopedCriticalChangedFiles.length > 0)
       : hasHistoricalDelivery;
   return {
     schemaId: 'atm.frameworkDeliveryWindow.v1',
@@ -113,7 +113,9 @@ export function evaluateFrameworkDeliveryWindow(input: {
       ? input.historicalBatchCloseReady === true
         ? 'historical-batch-close-ready'
         : input.fromBatchCheckpoint
-        ? 'batch-checkpoint-scoped-framework-critical-diff'
+        ? hasHistoricalDelivery
+          ? 'batch-checkpoint-historical-delivery'
+          : 'batch-checkpoint-scoped-framework-critical-diff'
         : 'historical-delivery-scoped-framework-critical-diff'
       : !hasGovernedDeliveryFlag
         ? 'not-from-batch-checkpoint'
