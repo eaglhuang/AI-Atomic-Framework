@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T22-14-39-003Z-scope-amendment-7e433807a19e",
+  "taskId": "ATM-GOV-0271",
+  "action": "scope-amendment",
+  "actorId": "codex-skl-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0271.json",
+  "taskSha256": "sha256:81dd1aea54b29820333388f15b50675738b9f069734a0e45c22c5233a7d04c9b",
+  "createdAt": "2026-07-30T22:14:39.003Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0271 --actor codex-skl-captain --add \"schemas/governance/cross-authority-closeback.schema.json,packages/cli/src/commands/taskflow/cross-authority-closeback.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

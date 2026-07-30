@@ -13,6 +13,12 @@
     "phase": {
       "enum": ["prepared", "target-committed", "planning-committed", "both-committed", "closeback-pending"]
     },
+    "recoveryDisposition": {
+      "enum": ["execute-now", "queue", "recover", "wait", "human-required"]
+    },
+    "recoveryOwner": {
+      "enum": ["target", "planning", "runner-sync", "pre-push", "evidence", "close", "human", "global"]
+    },
     "authoritySnapshot": {
       "type": "object",
       "additionalProperties": false,
@@ -27,6 +33,23 @@
         "canonicalRemote": { "type": ["string", "null"] },
         "canonicalRef": { "type": ["string", "null"] },
         "remoteReachableCommit": { "type": ["string", "null"] }
+      }
+    },
+    "recoveryLane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disposition", "owner", "command", "reason", "forbiddenActions", "emergency"],
+      "properties": {
+        "disposition": { "$ref": "#/$defs/recoveryDisposition" },
+        "owner": { "$ref": "#/$defs/recoveryOwner" },
+        "command": { "type": ["string", "null"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "forbiddenActions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "emergency": { "type": "boolean" }
       }
     },
     "sideEffect": {
@@ -91,6 +114,20 @@
         "receiptDigest": { "type": "string", "pattern": "^sha256:" }
       }
     },
+    "recoveryCycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "summary", "nextLegalRecoveryLane"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": { "enum": ["runner-sync", "pre-push", "evidence", "close"] },
+          "minItems": 1
+        },
+        "summary": { "type": "string", "minLength": 1 },
+        "nextLegalRecoveryLane": { "$ref": "#/$defs/recoveryLane" }
+      }
+    },
     "plan": {
       "type": "object",
       "additionalProperties": false,
@@ -106,7 +143,12 @@
         "steps",
         "compensations",
         "receipt",
-        "recoveryCommand"
+        "recoveryCommand",
+        "legalRecoveryLanes",
+        "nextLegalRecoveryLane",
+        "forbiddenActions",
+        "recoveryCycles",
+        "emergencyLanes"
       ],
       "properties": {
         "schemaId": { "const": "atm.crossAuthorityClosebackPlan.v1" },
@@ -119,11 +161,18 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["code", "summary", "recoveryCommand"],
+            "required": ["code", "summary", "owner", "recoveryLane", "forbiddenActions", "recoveryCommand"],
             "properties": {
               "code": { "type": "string", "minLength": 1 },
               "summary": { "type": "string", "minLength": 1 },
-              "recoveryCommand": { "type": "string", "minLength": 1 }
+              "owner": { "$ref": "#/$defs/recoveryOwner" },
+              "recoveryLane": { "$ref": "#/$defs/recoveryLane" },
+              "forbiddenActions": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 },
+                "minItems": 1
+              },
+              "recoveryCommand": { "type": "string" }
             }
           }
         },
@@ -156,7 +205,25 @@
           "items": { "type": "string" }
         },
         "receipt": { "$ref": "#/$defs/receipt" },
-        "recoveryCommand": { "type": "string", "minLength": 1 }
+        "recoveryCommand": { "type": "string", "minLength": 1 },
+        "legalRecoveryLanes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/recoveryLane" },
+          "minItems": 1
+        },
+        "nextLegalRecoveryLane": { "$ref": "#/$defs/recoveryLane" },
+        "forbiddenActions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "recoveryCycles": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/recoveryCycle" }
+        },
+        "emergencyLanes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/recoveryLane" }
+        }
       }
     }
   }

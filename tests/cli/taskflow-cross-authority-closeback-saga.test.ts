@@ -55,6 +55,9 @@ assert.deepEqual(pending.authorityCas, {
 assert(pending.steps.some((step) => step.id === 'target:commit'));
 assert(pending.steps.some((step) => step.id === 'planning:commit'));
 assert(pending.steps.every((step) => step.recoveryCommand === 'node atm.mjs taskflow diagnose --task ATM-GOV-0253 --json'));
+assert.equal(pending.nextLegalRecoveryLane.disposition, 'execute-now');
+assert.equal(pending.nextLegalRecoveryLane.owner, 'global');
+assert.equal(pending.emergencyLanes.length, 0);
 
 const completedTarget: CrossAuthorityClosebackSideEffect = {
   id: 'target-commit-1',
@@ -92,6 +95,37 @@ const remotePending = executeTaskCloseSaga(request, {
 assert.equal(remotePending.phase, 'closeback-pending');
 assert.equal(remotePending.globalCompletion, 'closeback-pending');
 assert(remotePending.blockers.some((blocker) => blocker.summary.includes('Planning authority commit is local-durable but not remote-visible')));
+assert(remotePending.blockers.every((blocker) => blocker.recoveryLane), 'every blocker must map to an explicit legal recovery lane');
+assert(remotePending.blockers.every((blocker) => blocker.forbiddenActions.length > 0), 'blockers must expose forbidden actions');
+assert.equal(remotePending.blockers[0]?.owner, 'planning');
+assert.equal(remotePending.blockers[0]?.recoveryLane.disposition, 'wait');
+assert.equal(remotePending.nextLegalRecoveryLane.disposition, 'wait');
+
+const notWriteable = executeTaskCloseSaga(request, {
+  target: { ...target, writeable: false },
+  planning
+});
+assert.equal(notWriteable.blockers[0]?.owner, 'target');
+assert.equal(notWriteable.blockers[0]?.recoveryLane.disposition, 'human-required');
+assert.equal(notWriteable.blockers[0]?.recoveryLane.command, null);
+assert.equal(notWriteable.blockers[0]?.recoveryCommand, '');
+assert(notWriteable.forbiddenActions.some((action) => action.includes('raw git')));
+
+const recoveryCycle = executeTaskCloseSaga(request, {
+  target,
+  planning,
+  recoveryObservations: [
+    { owner: 'runner-sync', blockedBy: ['pre-push'] },
+    { owner: 'pre-push', blockedBy: ['evidence'] },
+    { owner: 'evidence', blockedBy: ['close'] },
+    { owner: 'close', blockedBy: ['runner-sync'] }
+  ]
+});
+assert.equal(recoveryCycle.blockers[0]?.code, 'ATM_TASKFLOW_CLOSE_RECOVERY_CYCLE');
+assert.deepEqual(recoveryCycle.recoveryCycles[0]?.nodes, ['runner-sync', 'pre-push', 'evidence', 'close']);
+assert.equal(recoveryCycle.nextLegalRecoveryLane.owner, 'runner-sync');
+assert.equal(recoveryCycle.nextLegalRecoveryLane.disposition, 'recover');
+assert(recoveryCycle.nextLegalRecoveryLane.forbiddenActions.some((action) => action.includes('--force')));
 
 const complete = executeTaskCloseSaga(request, {
   target: { ...target, remoteReachableCommit: 'target-commit-sha' },
@@ -112,6 +146,9 @@ const schema = JSON.parse(readFileSync('schemas/governance/cross-authority-close
 const validate = ajv.compile(schema);
 assert.equal(validate(complete), true, JSON.stringify(validate.errors, null, 2));
 assert.equal(validate(complete.receipt), true, JSON.stringify(validate.errors, null, 2));
+assert.equal(validate(remotePending), true, JSON.stringify(validate.errors, null, 2));
+assert.equal(validate(notWriteable), true, JSON.stringify(validate.errors, null, 2));
+assert.equal(validate(recoveryCycle), true, JSON.stringify(validate.errors, null, 2));
 
 console.log(JSON.stringify({
   marker: '[taskflow-cross-authority-closeback-saga.test] ok',
