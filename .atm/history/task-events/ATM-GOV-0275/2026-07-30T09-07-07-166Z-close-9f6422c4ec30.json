@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T09-07-07-166Z-close-9f6422c4ec30",
+  "taskId": "ATM-GOV-0275",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260730084111-codex-captain-ATM-GOV-0275-9cc1d95e6c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0275.json",
+  "taskSha256": "sha256:6baeb8fbeca4e6be520545a64a3afc6eca3294d705b0abfcb1942faf62440fb1",
+  "createdAt": "2026-07-30T09:07:07.166Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0275 --actor codex-captain --status done --historical-delivery 2ddfd007a19fc6db1bfc32406a8622974f1e03a3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260730084111-codex-captain-ATM-GOV-0275-9cc1d95e6c",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0275.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/parallel-proposal-lane-admission.test.ts",
+      "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "node --strip-types tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+      "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-30T09:07:07.153Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0275.*",
+        ".atm/history/task-events/ATM-GOV-0275/**",
+        ".atm/history/tasks/ATM-GOV-0275.json",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-governance/implementation/",
+        "packages/cli/src/commands/git-governance/work-admission-check.ts",
+        "tests/cli/pre-team-dual-captain-e2e.test.ts",
+        "tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+        "tests/core/transactional-steward-single-write.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-governance/implementation/",
+        "packages/cli/src/commands/git-governance/work-admission-check.ts",
+        "tests/cli/pre-team-dual-captain-e2e.test.ts",
+        "tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
+        "tests/core/transactional-steward-single-write.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0275",
   "title": "Preserve foreign work during dual-captain governed commit",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -152,8 +152,8 @@
     "validatorReferences": [],
     "phaseOwner": null
   },
-  "lastTransitionId": "2026-07-30T09-02-06-584Z-renew-a1825846420f",
-  "lastTransitionAt": "2026-07-30T09:02:06.584Z",
+  "lastTransitionId": "2026-07-30T09-07-07-166Z-close-9f6422c4ec30",
+  "lastTransitionAt": "2026-07-30T09:07:07.166Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-07-30T08:41:11.419Z",
@@ -162,7 +162,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-597533d90f9a",
     "claimedAt": "2026-07-30T08:41:11.426Z",
-    "heartbeatAt": "2026-07-30T09:02:05.829Z",
+    "heartbeatAt": "2026-07-30T09:07:07.163Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0275.*",
@@ -176,13 +176,14 @@
       "tests/cli/work-admission-ticket-deferred-index-parity.test.ts",
       "tests/core/transactional-steward-single-write.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260730084111-codex-captain-cafd27923d",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730084111-codex-captain-cafd27923d\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-30T08:41:11.426Z",
   "startedByActor": "codex-captain",
@@ -296,5 +297,9 @@
     },
     "createdAt": "2026-07-30T08:41:26.660Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-30T09:07:07.163Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260730084111-codex-captain-ATM-GOV-0275-9cc1d95e6c",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0275.closure-packet.json"
 }
