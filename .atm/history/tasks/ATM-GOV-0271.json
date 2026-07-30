@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0271",
+  "title": "Governance close saga legal recovery coordinator",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0270"
+  ],
+  "acceptance": [
+    "Each close blocker maps to `execute-now`, `queue`, `recover`, `wait`, or `human-required`; no naked refusal is returned for shared-write gates.",
+    "The saga detects cycles among runner-sync, pre-push, evidence, and close and emits the next legal recovery lane.",
+    "Existing taskflow close JSON exposes phase, blocker owner, recovery lane, and forbidden actions.",
+    "Emergency lanes are explicit and auditable; ordinary close does not depend on hidden commands.",
+    "No specific historical Plan3.1 task id or actor is encoded."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/broker-gate.ts",
+    "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+    "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+    "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+    "tests/cli/taskflow-cross-authority-closeback-saga.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/broker-gate.ts",
+    "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+    "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/hook/pre-push.ts",
+    "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+    "tests/cli/taskflow-cross-authority-closeback-saga.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/taskflow-close-saga-plan-parity.test.ts",
+    "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert saga planning and consumers together; blockers must remain fail-closed if no legal lane exists.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-close-saga",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.close-saga-coordinator",
+        "pattern": "Saga Coordinator",
+        "source": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "tests/cli/taskflow-close-saga-plan-parity.test.ts",
+        "tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0271-governance-close-saga-legal-recovery-coordinator.task.md",
+    "sectionTitle": "ATM-GOV-0271",
+    "headingLine": 74,
+    "hash": "e66cc785b5971ab7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0271-governance-close-saga-legal-recovery-coordinator.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:e66cc785b5971ab79615d2f7a3a27b628ca26e4237edeaf4560ac1891e1c9dda",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T03:39:08.031Z"
+    }
+  },
+  "importedAt": "2026-07-30T03:39:08.031Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.taskflow.close.saga.plan.parity.test.ts",
+      "command": "node --strip-types tests/cli/taskflow-close-saga-plan-parity.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.taskflow.cross.authority.closeback.saga.test.ts",
+      "command": "node --strip-types tests/cli/taskflow-cross-authority-closeback-saga.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "lastTransitionId": "2026-07-30T03-39-10-257Z-import-ce619385b492",
+  "lastTransitionAt": "2026-07-30T03:39:10.257Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
