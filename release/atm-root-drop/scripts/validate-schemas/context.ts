@@ -61,6 +61,8 @@ export const schemaEntries: Record<string, string> = {
   'charter-invariants': 'schemas/charter/charter-invariants.schema.json',
   'charter-bundle': 'schemas/charter/charter-bundle.schema.json',
   'integration-install-manifest': 'schemas/integrations/install-manifest.schema.json',
+  'integration-external-skill-catalog': 'schemas/integrations/external-skill-catalog.schema.json',
+  'integration-editor-global-skill-manifest': 'schemas/integrations/editor-global-skill-manifest.schema.json',
   'agent-pack-manifest': 'schemas/agent-pack/manifest.schema.json',
   'write-intent': 'schemas/governance/write-intent.schema.json',
   'patch-proposal': 'schemas/governance/patch-proposal.schema.json',

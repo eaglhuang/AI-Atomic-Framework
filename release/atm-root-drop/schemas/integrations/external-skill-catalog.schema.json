@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/integrations/external-skill-catalog.schema.json",
+  "title": "ATM External Skill Catalog v0.1",
+  "description": "Provenance-aware catalog for optional external skill overlays.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "sourceDigest", "sources", "entries", "files", "skippedInvalidSources"],
+  "properties": {
+    "schemaId": { "const": "atm.externalSkillCatalog.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": { "$ref": "#/$defs/migration" },
+    "sourceDigest": { "$ref": "#/$defs/sha256" },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    },
+    "files": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file" }
+    },
+    "skippedInvalidSources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/skip" }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "enum": ["none", "additive", "breaking"] },
+        "fromVersion": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "safePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))(?!.*:).+"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "providerId", "sourceRootRef", "sourceFormat", "priority", "provenance", "license", "sourceDigest", "skillCount", "rejectedCount"],
+      "properties": {
+        "sourceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_.-]*$" },
+        "providerId": { "type": "string", "minLength": 1 },
+        "sourceRootRef": { "type": "string", "minLength": 1 },
+        "sourceFormat": { "enum": ["codex-skill-directory", "claude-skill-directory", "markdown-skill-directory"] },
+        "priority": { "type": "integer", "minimum": 0 },
+        "provenance": { "type": "string", "minLength": 1 },
+        "license": { "type": ["string", "null"] },
+        "sourceDigest": { "$ref": "#/$defs/sha256" },
+        "skillCount": { "type": "integer", "minimum": 0 },
+        "rejectedCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "sourceId", "providerId", "provenance", "license", "sourceDigest"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "sourceId": { "type": "string", "minLength": 1 },
+        "providerId": { "type": "string", "minLength": 1 },
+        "provenance": { "type": "string", "minLength": 1 },
+        "license": { "type": ["string", "null"] },
+        "sourceDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skillId", "relativePath", "fileFormat", "sourceDigest", "managed"],
+      "properties": {
+        "skillId": { "type": "string", "minLength": 1 },
+        "relativePath": { "$ref": "#/$defs/safePath" },
+        "content": {},
+        "fileFormat": { "enum": ["skill", "agent-md", "prompt-md", "instructions-md", "toml", "yaml", "markdown"] },
+        "sourceDigest": { "$ref": "#/$defs/sha256" },
+        "managed": { "const": true }
+      }
+    },
+    "skip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "relativePath", "reason"],
+      "properties": {
+        "sourceId": { "type": "string", "minLength": 1 },
+        "relativePath": { "type": ["string", "null"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

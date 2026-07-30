@@ -53,6 +53,21 @@ The welcome command may summarize state, but the deterministic router remains `n
 
 Agent packs are host-native entry files generated from framework-neutral templates. They make ATM visible in environments with different instruction or command formats, while keeping the same command route underneath.
 
+Editor-global skill overlays are an optional layer above the repo-local
+integration pack. They may federate user-global or third-party skill sources
+into an editor-specific install plan, but they remain provenance-bound overlays:
+ATM-owned skill IDs and `atm-` namespaces are preserved, source descriptors use
+stable source references instead of machine-specific absolute paths, and the
+overlay writes a separate `atm.editorGlobalSkillManifest.v1` manifest for only
+the files it manages.
+
+Dry-run is the normal review surface for overlays. It reports added or updated
+managed projections, unsupported adapter fallbacks, invalid source directories,
+namespace collisions, stale managed files, and preserved unmanaged files before
+apply. Apply and verify are hash-bound; user-modified or unmanaged global editor
+files are preserved unless a separate governed action explicitly authorizes
+replacement or removal.
+
 Adapter-specific discovery differences are documented in:
 
 - `docs/ANTIGRAVITY_INTEGRATION.md` for Antigravity (`GEMINI.md` + `.agents/skills`)

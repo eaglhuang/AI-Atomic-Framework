@@ -85,6 +85,41 @@ export {
   digestSkillInstallationPlan
 } from './distribution/skill-distribution-manager.ts';
 
+export type {
+  ExternalSkillSourceFormat,
+  ExternalSkillProviderId,
+  FederationDecision,
+  ExternalSkillSourceInput,
+  ExternalSkillSourceDescriptor,
+  ExternalSkillCatalogEntry,
+  ExternalSkillCatalog,
+  ExternalSkillCatalogSkip,
+  ExternalSkillFederationDecision,
+  FederatedSkillCatalog
+} from './distribution/external-skill-catalog.ts';
+export {
+  loadExternalSkillCatalog,
+  federateExternalSkillCatalog
+} from './distribution/external-skill-catalog.ts';
+
+export type {
+  EditorGlobalOverlayMode,
+  EditorGlobalOverlayOperationKind,
+  EditorGlobalOverlayAdapterId,
+  EditorGlobalOverlayAdapter,
+  EditorGlobalSkillManifestFile,
+  EditorGlobalSkillManifest,
+  EditorGlobalOverlayFileOperation,
+  EditorGlobalOverlayPlan,
+  EditorGlobalOverlayApplyResult
+} from './distribution/editor-global-overlay.ts';
+export {
+  getEditorGlobalOverlayAdapter,
+  createEditorGlobalOverlayPlan,
+  applyEditorGlobalOverlayPlan,
+  formatEditorGlobalSkillManifest
+} from './distribution/editor-global-overlay.ts';
+
 export type { RenderedCharterInvariants } from './compiler/compile.ts';
 export {
   renderCharterInvariantsBlock,
