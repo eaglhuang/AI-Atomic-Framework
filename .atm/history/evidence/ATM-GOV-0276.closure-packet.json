@@ -1,0 +1,197 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0276",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2da999c3d4db14fa8204e175b18f7d0d1ce07aa9",
+  "governedTreeSha": "9d2f5cff2bc9c14b579cb88d42ba5aeaa90709ec",
+  "targetCommitDelta": {
+    "currentCommitSha": "2da999c3d4db14fa8204e175b18f7d0d1ce07aa9",
+    "parentCommitShas": [
+      "2da999c3d4db14fa8204e175b18f7d0d1ce07aa9"
+    ],
+    "governedTreeSha": "9d2f5cff2bc9c14b579cb88d42ba5aeaa90709ec",
+    "changedFiles": [
+      ".atm/history/tasks/ATM-GOV-0269.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+      "atomic_workbench/registry-catalog.md",
+      "atomic-registry.json",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts",
+      "tests/cli/tasks-reserve-planning-precheck.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/planning-source-seal.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c4f7e49e70122028950cb4a5d0c5b61ea64c58e6e9c8ca49e1517a9fb99c092",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7411aed3ff22b939d0a9f917861f803fcbeb297d5f814f6863ce78fa5c1f064e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1da99c48315ef5ea36db46effecfae9f63d0d76687f6276975346ca3a73c9de0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1824e01e202f54e9bbb499fba32aacab39500104406fbe770ce7fbc3f5ecdfb7",
+      "stderrSha256": "sha256:8ceab0be31adf2e6976494b0c1e6c2d944d2629e461e7abbdf2390c199ea68bd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/planning-source-seal.test.ts",
+    "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+    "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-30T17:45:04.080Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0276.*",
+      ".atm/history/task-events/ATM-GOV-0276/**",
+      ".atm/history/tasks/ATM-GOV-0276.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+      "atomic_workbench/registry-catalog.md",
+      "atomic-registry.json",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts",
+      "tests/cli/tasks-reserve-planning-precheck.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "atomic-registry.json",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts",
+      "tests/cli/tasks-reserve-planning-precheck.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0276.json",
+  "closedAt": "2026-07-30T17:45:04.081Z",
+  "closedByActor": "claude-006",
+  "sessionId": "session-20260730155502-claude-006-ATM-GOV-0276-6ab5b77ce3",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e5754637228fd496abcbea3a17e730cd3988e062",
+    "taskMatchedFiles": [
+      "atomic-registry.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+      "atomic_workbench/registry-catalog.md",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts",
+      "tests/cli/tasks-reserve-planning-precheck.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0276.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0276/2026-07-30T15-54-06-544Z-import-bdb593d1f584.json",
+      ".atm/history/task-events/ATM-GOV-0276/2026-07-30T15-55-02-962Z-reserve-534852346514.json",
+      ".atm/history/task-events/ATM-GOV-0276/2026-07-30T15-55-02-967Z-promote-c39bc29b32a2.json",
+      ".atm/history/task-events/ATM-GOV-0276/2026-07-30T15-55-17-588Z-claim-117c2ab7cb57.json",
+      ".atm/history/task-events/ATM-GOV-0276/2026-07-30T16-02-44-209Z-scope-amendment-2890a61b91b5.json",
+      ".atm/history/task-events/ATM-GOV-0276/2026-07-30T16-38-47-970Z-scope-amendment-c609e0cf4451.json",
+      ".atm/history/task-events/ATM-GOV-0276/2026-07-30T17-29-18-402Z-renew-43125431816b.json",
+      ".atm/history/tasks/ATM-GOV-0276.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

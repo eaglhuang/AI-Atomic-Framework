@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0276",
   "title": "Planning seal benign upgrade and task import fidelity guard",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0274",
@@ -227,8 +227,8 @@
       "impactEdges": []
     }
   ],
-  "lastTransitionId": "2026-07-30T17-29-18-402Z-renew-43125431816b",
-  "lastTransitionAt": "2026-07-30T17:29:18.402Z",
+  "lastTransitionId": "2026-07-30T17-45-04-088Z-close-102d0569e22f",
+  "lastTransitionAt": "2026-07-30T17:45:04.088Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-006",
   "reservedAt": "2026-07-30T15:55:02.962Z",
@@ -237,7 +237,7 @@
     "actorId": "claude-006",
     "leaseId": "lease-422b5d1a7531",
     "claimedAt": "2026-07-30T15:55:02.973Z",
-    "heartbeatAt": "2026-07-30T17:29:18.159Z",
+    "heartbeatAt": "2026-07-30T17:45:04.085Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0276.*",
@@ -260,13 +260,14 @@
       "tests/cli/task-import-diagnostic-contract.test.ts",
       "tests/cli/tasks-reserve-planning-precheck.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260730155503-claude-006-f6e42c70fe",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730155503-claude-006-f6e42c70fe\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-30T15:55:02.973Z",
   "startedByActor": "claude-006",
@@ -398,5 +399,9 @@
     },
     "createdAt": "2026-07-30T15:55:17.631Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-30T17:45:04.085Z",
+  "closedByActor": "claude-006",
+  "closedBySessionId": "session-20260730155502-claude-006-ATM-GOV-0276-6ab5b77ce3",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0276.closure-packet.json"
 }
