@@ -35,6 +35,11 @@ export interface IntegrationSourceFile {
   readonly content: string | Uint8Array;
   readonly fileFormat?: IntegrationFileFormat;
   readonly source?: InstallManifestFileSource;
+  readonly skillId?: string;
+  readonly sourceDigest?: Sha256Digest;
+  readonly sourceCatalogDigest?: Sha256Digest;
+  readonly installProfileId?: string;
+  readonly managed?: boolean;
 }
 
 export interface InstallManifestFile {

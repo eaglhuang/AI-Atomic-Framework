@@ -41,10 +41,49 @@ export {
   defaultSkillTemplateDirectory,
   parseSkillTemplate,
   loadSkillTemplates,
+  loadSkillTemplatesForProfile,
   loadMinimumAtmSkillTemplates,
   loadSkillCorpusSourceSnapshot,
   compileSkillCorpus
 } from './compiler/skill-templates.ts';
+
+// Distribution submodule
+
+export type {
+  SkillTier,
+  SkillInstallProfileId,
+  SkillTargetScope,
+  SkillInstallProfile
+} from './distribution/install-profile.ts';
+export {
+  defaultSkillInstallProfiles,
+  getSkillInstallProfile,
+  selectDefaultSkillInstallProfile,
+  skillBelongsToProfile
+} from './distribution/install-profile.ts';
+
+export type {
+  SkillInvocationPolicy,
+  AdapterCapabilityRequirement,
+  CanonicalSkillCatalogEntry,
+  CanonicalSkillCatalog,
+  SkillProjectionFile,
+  ProjectedSkillCatalog
+} from './distribution/skill-catalog.ts';
+export {
+  buildCanonicalSkillCatalog,
+  inferCompanionFiles
+} from './distribution/skill-catalog.ts';
+
+export type {
+  AdapterCapabilities,
+  SkillInstallationPlanInput,
+  SkillInstallationPlan
+} from './distribution/skill-distribution-manager.ts';
+export {
+  resolveSkillInstallationPlan,
+  digestSkillInstallationPlan
+} from './distribution/skill-distribution-manager.ts';
 
 export type { RenderedCharterInvariants } from './compiler/compile.ts';
 export {

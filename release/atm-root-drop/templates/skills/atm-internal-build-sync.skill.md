@@ -8,6 +8,13 @@ command: node atm.mjs internal-release sync $ARGUMENTS --json
 firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
+owner: atm-framework
+tier: entry
+installProfiles: [adopter-bootstrap, framework-full, role-oriented]
+invocationPolicy: model-or-user
+companionFiles: []
+adapterCapabilityRequirements:
+  - "*:charter-injection"
 ---
 
 # {{title}}

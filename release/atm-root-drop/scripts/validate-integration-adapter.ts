@@ -114,20 +114,12 @@ if (!process.exitCode) {
   assert(renderedCharter.fallbackReason === null, 'validator fixture repo must have readable charter invariants');
   assert(renderedCharter.text.includes('INV-ATM-001'), 'rendered charter invariants must include seeded invariant text');
 
-  const codexSkillPath = 'integrations/codex-skills/atm-governance-router/SKILL.md';
-  const codexSkillContent = readFileSync(path.join(root, codexSkillPath));
-  const codexSkillDigest = packageModule.sha256Bytes(codexSkillContent);
-  assert(codexSkillDigest === fixtureManifest.files[0].sha256, 'fixture hash must match current Codex skill file');
-  assert(codexSkillContent.byteLength === fixtureManifest.files[0].sizeBytes, 'fixture byte size must match current Codex skill file');
+  const codexReferenceFiles = packageModule.compileSkillTemplatesForAdapter('codex', undefined, { repositoryRoot: root });
+  assert(codexReferenceFiles.some((file: any) => file.relativePath === 'atm-governance-router/SKILL.md'), 'Codex reference projection must include the governance router entry');
+  assert(codexReferenceFiles.every((file: any) => file.sourceCatalogDigest?.startsWith('sha256:')), 'Codex reference projection must carry source catalog digests');
+  assert(codexReferenceFiles.every((file: any) => file.installProfileId === 'framework-full'), 'Codex reference projection must use the framework-full profile in this repository');
 
-  const codexReferenceAdapter = packageModule.createCodexSkillsAdapter([
-    {
-      relativePath: 'atm-governance-router/SKILL.md',
-      content: codexSkillContent,
-      fileFormat: 'skill',
-      source: 'template'
-    }
-  ]);
+  const codexReferenceAdapter = packageModule.createCodexSkillsAdapter(codexReferenceFiles);
   assert(codexReferenceAdapter.id === 'codex', 'Codex reference adapter id mismatch');
   assert(codexReferenceAdapter.targetDir() === 'integrations/codex-skills', 'Codex reference adapter targetDir mismatch');
 

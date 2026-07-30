@@ -6,12 +6,14 @@
  * Adapter-specific skill template compiler. Emits IntegrationSourceFile
  * objects ready for installation by the manifest/construct layer.
  */
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderCharterInvariantsBlock as renderCharterInvariantsBlockCore } from './charter-block.js';
-import { loadMinimumAtmSkillTemplates } from './skill-templates.js';
+import { loadSkillTemplatesForProfile } from './skill-templates.js';
+import { selectDefaultSkillInstallProfile } from '../distribution/install-profile.js';
 // Private constants — inline literals so compile.ts has no import from index.ts
 const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
@@ -30,17 +32,31 @@ const actorIdentityHandoffGate = [
 export function renderCharterInvariantsBlock(repositoryRoot = integrationsCoreRepoRoot) {
     return renderCharterInvariantsBlockCore(repositoryRoot);
 }
-export function compileSkillTemplatesForAdapter(adapterTarget, templates = loadMinimumAtmSkillTemplates(), options = {}) {
-    const resolvedTemplates = templates ?? loadMinimumAtmSkillTemplates();
+export function compileSkillTemplatesForAdapter(adapterTarget, templates = undefined, options = {}) {
+    const profileId = selectDefaultSkillInstallProfile({
+        repositoryRoot: options.repositoryRoot ?? integrationsCoreRepoRoot
+    });
+    const resolvedTemplates = templates ?? loadSkillTemplatesForProfile(profileId);
+    const sourceCatalogDigest = digestSkillTemplates(resolvedTemplates);
     if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
         return resolvedTemplates.flatMap((template) => [
             {
                 relativePath: `${template.frontmatter.id}/SKILL.md`,
                 content: compileSkillTemplate(template, adapterTarget, options),
                 fileFormat: 'skill',
-                source: 'template'
+                source: 'template',
+                skillId: template.frontmatter.id,
+                sourceDigest: digestSkillTemplate(template),
+                sourceCatalogDigest,
+                installProfileId: profileId,
+                managed: true
             },
-            ...loadSkillTemplateCompanionFiles(template.frontmatter.id)
+            ...loadSkillTemplateCompanionFiles(template.frontmatter.id, {
+                skillId: template.frontmatter.id,
+                sourceDigest: digestSkillTemplate(template),
+                sourceCatalogDigest,
+                installProfileId: profileId
+            })
         ]);
     }
     if (adapterTarget === 'cursor') {
@@ -49,9 +65,19 @@ export function compileSkillTemplatesForAdapter(adapterTarget, templates = loadM
                 relativePath: `${template.frontmatter.id}/SKILL.md`,
                 content: compileSkillTemplate(template, 'cursor', options),
                 fileFormat: 'markdown',
-                source: 'template'
+                source: 'template',
+                skillId: template.frontmatter.id,
+                sourceDigest: digestSkillTemplate(template),
+                sourceCatalogDigest,
+                installProfileId: profileId,
+                managed: true
             },
-            ...loadSkillTemplateCompanionFiles(template.frontmatter.id)
+            ...loadSkillTemplateCompanionFiles(template.frontmatter.id, {
+                skillId: template.frontmatter.id,
+                sourceDigest: digestSkillTemplate(template),
+                sourceCatalogDigest,
+                installProfileId: profileId
+            })
         ]);
     }
     if (adapterTarget === 'gemini') {
@@ -59,7 +85,12 @@ export function compileSkillTemplatesForAdapter(adapterTarget, templates = loadM
             relativePath: `${template.frontmatter.id}.toml`,
             content: compileSkillTemplate(template, 'gemini', options),
             fileFormat: 'toml',
-            source: 'template'
+            source: 'template',
+            skillId: template.frontmatter.id,
+            sourceDigest: digestSkillTemplate(template),
+            sourceCatalogDigest,
+            installProfileId: profileId,
+            managed: true
         }));
     }
     return resolvedTemplates.flatMap((template) => [
@@ -67,13 +98,23 @@ export function compileSkillTemplatesForAdapter(adapterTarget, templates = loadM
             relativePath: `instructions/${template.frontmatter.id}.instructions.md`,
             content: compileSkillTemplate(template, 'copilot-instructions', options),
             fileFormat: 'instructions-md',
-            source: 'template'
+            source: 'template',
+            skillId: template.frontmatter.id,
+            sourceDigest: digestSkillTemplate(template),
+            sourceCatalogDigest,
+            installProfileId: profileId,
+            managed: true
         },
         {
             relativePath: `prompts/${template.frontmatter.id}.prompt.md`,
             content: compileSkillTemplate(template, 'copilot-prompt', options),
             fileFormat: 'prompt-md',
-            source: 'template'
+            source: 'template',
+            skillId: template.frontmatter.id,
+            sourceDigest: digestSkillTemplate(template),
+            sourceCatalogDigest,
+            installProfileId: profileId,
+            managed: true
         }
     ]);
 }
@@ -164,13 +205,15 @@ function renderSkillTemplateBody(template, options = {}) {
         .replaceAll(charterInvariantsPlaceholder, charterInvariants.text)
         .trimEnd();
 }
-function loadSkillTemplateCompanionFiles(templateId) {
+function loadSkillTemplateCompanionFiles(templateId, metadata) {
     const companionRoot = path.join(integrationsCoreRepoRoot, 'templates', 'skills', `${templateId}.files`);
     return walkCompanionDirectory(companionRoot).map((filePath) => ({
         relativePath: `${templateId}/${path.relative(companionRoot, filePath).replace(/\\/g, '/')}`,
         content: readFileSync(filePath, 'utf8'),
         fileFormat: inferIntegrationFileFormat(filePath),
-        source: 'template'
+        source: 'template',
+        ...metadata,
+        managed: true
     }));
 }
 function walkCompanionDirectory(directoryPath) {
@@ -227,4 +270,14 @@ function inferIntegrationFileFormat(filePath) {
 }
 function escapeTomlBasicString(value) {
     return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+function digestSkillTemplates(templates) {
+    return `sha256:${createHash('sha256').update(JSON.stringify(templates.map((template) => ({
+        id: template.frontmatter.id,
+        sourcePath: template.sourcePath,
+        sourceDigest: digestSkillTemplate(template)
+    })))).digest('hex')}`;
+}
+function digestSkillTemplate(template) {
+    return `sha256:${createHash('sha256').update(`${template.sourcePath}\n${template.body}`).digest('hex')}`;
 }

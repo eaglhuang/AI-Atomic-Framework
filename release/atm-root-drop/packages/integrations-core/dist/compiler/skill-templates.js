@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getSkillInstallProfile, skillBelongsToProfile } from '../distribution/install-profile.js';
 // Private: repo root is 4 levels above packages/integrations-core/src/compiler/
 const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 export const defaultSkillTemplateDirectory = path.join(integrationsCoreRepoRoot, 'templates', 'skills');
@@ -61,117 +62,18 @@ export function projectSkillDefinition(template, manifest) {
         legacyReadable: true
     };
 }
-export const minimumAtmEntrySkillDefinitions = [
-    {
-        id: 'atm-next',
-        title: 'ATM Next',
-        summary: 'Recommend the next official ATM guidance action from current state.',
-        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
-    },
-    {
-        id: 'atm-task-intent-resolver',
-        title: 'ATM Task Intent Resolver',
-        summary: 'Resolve the current user prompt into an atm.taskIntent.v1 proposal before next-action routing.',
-        command: 'node atm.mjs next --intent .atm/runtime/task-intent.json --json'
-    },
-    {
-        id: 'atm-orient',
-        title: 'ATM Orient',
-        summary: 'Inspect a repository and emit a guidance orientation report.',
-        command: 'node atm.mjs orient --cwd . --json'
-    },
-    {
-        id: 'atm-governance-router',
-        title: 'ATM Governance Router',
-        summary: 'Route natural-language cleanup, refactor, migration, and candidate ranking goals through ATM before local analysis.',
-        command: 'node atm.mjs guide --goal "$ARGUMENTS" --cwd . --json'
-    },
-    {
-        id: 'atm-dispatch',
-        title: 'ATM Dispatch',
-        summary: 'ATM Captain dispatch routing for task cards, sidecars, subagents, condition review, mailbox work, and closeout coordination.',
-        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
-    },
-    {
-        id: 'atm-create',
-        title: 'ATM Create',
-        summary: 'Create and register an atom through the provisioning facade.',
-        command: 'node atm.mjs create --bucket CORE --title "$ARGUMENTS" --dry-run --json'
-    },
-    {
-        id: 'atm-lock',
-        title: 'ATM Lock',
-        summary: 'Check, acquire, or release a governed scope lock.',
-        command: 'node atm.mjs lock check --json'
-    },
-    {
-        id: 'atm-evidence',
-        title: 'ATM Evidence',
-        summary: 'Explain missing evidence or blocked guidance before proceeding.',
-        command: 'node atm.mjs explain --why blocked --json'
-    },
-    {
-        id: 'atm-error-code-resolver',
-        title: 'ATM Error Code Resolver',
-        summary: 'Resolve ATM_* error codes from CLI JSON, logs, or user reports into canonical meaning, remediation, retryability, and approval guidance.',
-        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
-    },
-    {
-        id: 'atm-plan-authoring',
-        title: 'ATM Plan Authoring',
-        summary: 'Create registered planning families, plan documents, and task cards through the tool-first plan CLI.',
-        command: 'node atm.mjs plan card create $ARGUMENTS --dry-run --json'
-    },
-    {
-        id: 'atm-upgrade-scan',
-        title: 'ATM Upgrade Scan',
-        summary: 'Scan evidence reports and draft governed upgrade proposals.',
-        command: 'node atm.mjs upgrade --scan --input "$ARGUMENTS" --json'
-    },
-    {
-        id: 'atm-handoff',
-        title: 'ATM Handoff',
-        summary: 'Write a continuation summary for governed work.',
-        command: 'node atm.mjs handoff summarize --task "$ARGUMENTS" --json'
-    },
-    {
-        id: 'mailbox-worker-execution',
-        title: 'Mailbox Worker Execution',
-        summary: 'Mailbox worker execution workflow for agents that claim dispatch cards, complete scoped work, run required checks, and report done or blocked with evidence.',
-        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
-    },
-    {
-        id: 'atm-internal-build-sync',
-        title: 'ATM Internal Build Sync',
-        summary: 'Build the ATM framework runner and sync it to explicit internal adopter repositories with skip/exclude controls.',
-        command: 'node atm.mjs internal-release sync $ARGUMENTS --json'
-    },
-    {
-        id: 'atm-framework-temp-claim',
-        title: 'ATM Framework Temp Claim',
-        summary: 'Governed, tool-first route for scoped ATM framework quickfix work — dedicated skill for framework-mode claim, runner-sync queue-head reservation, sealed runner rebuild, and release, with CLI fallback that stays copy-paste runnable.',
-        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
-    },
-    {
-        id: 'atm-atom-map-refactor',
-        title: 'ATM Atom Map Refactor',
-        summary: 'Plan ATM framework refactors by preserving atom/map semantics before splitting large governance modules.',
-        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
-    },
-    {
-        id: 'atm-memory-consolidate',
-        title: 'ATM Memory Consolidate',
-        summary: "Reflective consolidation pass over a repository's keep-memory notes — merge duplicates, retire stale entries, rebuild the summary index.",
-        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
-    }
-];
+export const minimumAtmEntrySkillDefinitions = loadSkillTemplatesForProfile('adopter-bootstrap').map((template) => ({
+    id: template.frontmatter.id,
+    title: template.frontmatter.title,
+    summary: template.frontmatter.summary,
+    command: template.frontmatter.command
+}));
 /**
  * Section marker that carries the ATM-only execution route warning into the
  * canonical entry skills. The policy itself lives in the core
  * RestrictedExecutionGateway; templates only project it, and the projection is
  * required so a compiled skill cannot silently drop the warning.
- */
-export const atmOnlyExecutionRouteSectionMarker = 'ATM-Only Execution Route';
+ */ export const atmOnlyExecutionRouteSectionMarker = 'ATM-Only Execution Route';
 export const atmOnlyExecutionRouteTemplateIds = [
     'atm-governance-router',
     'atm-dispatch',
@@ -210,16 +112,19 @@ export function loadSkillTemplates(templateDirectory = defaultSkillTemplateDirec
     });
 }
 export function loadMinimumAtmSkillTemplates(templateDirectory = defaultSkillTemplateDirectory) {
-    const templatesById = new Map(loadSkillTemplates(templateDirectory).map((template) => [template.frontmatter.id, template]));
-    const loaded = minimumAtmEntrySkillDefinitions.map((entryDefinition) => {
-        const template = templatesById.get(entryDefinition.id);
-        if (!template) {
-            throw new Error(`missing ATM skill template: ${entryDefinition.id}`);
-        }
-        return template;
-    });
+    const loaded = loadSkillTemplatesForProfile('adopter-bootstrap', templateDirectory);
     assertAtmOnlyExecutionRouteProjection(loaded);
     return loaded;
+}
+export function loadSkillTemplatesForProfile(profileId, templateDirectory = defaultSkillTemplateDirectory) {
+    const profile = getSkillInstallProfile(profileId);
+    return loadSkillTemplates(templateDirectory)
+        .filter((template) => skillBelongsToProfile({
+        skillId: template.frontmatter.id,
+        tier: template.frontmatter.tier,
+        installProfiles: template.frontmatter.installProfiles,
+        profile
+    }));
 }
 export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTemplateDirectory) {
     const templates = loadSkillTemplates(templateDirectory);
@@ -268,20 +173,48 @@ export function compileSkillCorpus(input) {
 }
 // ─── Private helpers ───────────────────────────────────────────────────────
 function parseSkillTemplateFrontmatter(frontmatterSource, sourcePath) {
-    const frontmatter = Object.fromEntries(frontmatterSource
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0)
-        .map((line) => {
+    const frontmatter = {};
+    let activeArrayKey = null;
+    for (const rawLine of frontmatterSource.split(/\r?\n/)) {
+        const line = rawLine.trim();
+        if (line.length === 0)
+            continue;
+        if (line.startsWith('- ')) {
+            if (!activeArrayKey) {
+                throw new Error(`invalid skill template frontmatter array item in ${sourcePath}: ${line}`);
+            }
+            const currentValue = frontmatter[activeArrayKey];
+            if (!Array.isArray(currentValue)) {
+                throw new Error(`invalid skill template frontmatter array target in ${sourcePath}: ${activeArrayKey}`);
+            }
+            currentValue.push(parseFrontmatterScalar(line.slice(2).trim()));
+            continue;
+        }
         const separatorIndex = line.indexOf(':');
         if (separatorIndex < 0) {
             throw new Error(`invalid skill template frontmatter line in ${sourcePath}: ${line}`);
         }
         const key = line.slice(0, separatorIndex).trim();
-        const value = parseFrontmatterScalar(line.slice(separatorIndex + 1).trim());
-        return [key, value];
-    }));
+        const rawValue = line.slice(separatorIndex + 1).trim();
+        if (rawValue.length === 0) {
+            frontmatter[key] = [];
+            activeArrayKey = key;
+            continue;
+        }
+        frontmatter[key] = parseFrontmatterValue(rawValue);
+        activeArrayKey = null;
+    }
+    frontmatter.adapterCapabilityRequirements = parseAdapterCapabilityRequirements(frontmatter.adapterCapabilityRequirements, sourcePath);
     return frontmatter;
+}
+function parseFrontmatterValue(value) {
+    if (value.startsWith('[') && value.endsWith(']')) {
+        const body = value.slice(1, -1).trim();
+        if (!body)
+            return [];
+        return body.split(',').map((entry) => String(parseFrontmatterScalar(entry.trim())));
+    }
+    return parseFrontmatterScalar(value);
 }
 function parseFrontmatterScalar(value) {
     if (value === 'true')
@@ -289,6 +222,21 @@ function parseFrontmatterScalar(value) {
     if (value === 'false')
         return false;
     return value.replace(/^['"]|['"]$/g, '');
+}
+function parseAdapterCapabilityRequirements(value, sourcePath) {
+    if (!Array.isArray(value))
+        return [];
+    return value.map((entry) => {
+        const text = String(entry);
+        const separatorIndex = text.indexOf(':');
+        if (separatorIndex < 0) {
+            throw new Error(`invalid adapter capability requirement in ${sourcePath}: ${text}`);
+        }
+        return {
+            adapterId: text.slice(0, separatorIndex).trim(),
+            requires: text.slice(separatorIndex + 1).split('+').map((item) => item.trim()).filter(Boolean)
+        };
+    });
 }
 function sha256Text(content) {
     return `sha256:${createHash('sha256').update(content).digest('hex')}`;

@@ -101,7 +101,8 @@ function installSourceFiles(input) {
         targetDir: input.targetDirectory,
         files: manifestFiles,
         metadata: {
-            sourceFileCount: input.sourceFiles.length
+            sourceFileCount: input.sourceFiles.length,
+            ...buildSkillProjectionManifestMetadata(input.sourceFiles, input.defaultFileFormat, input.targetDirectory)
         }
     });
     const manifestPath = normalizeManifestPath(input.context.manifestPath ?? '.atm/integrations/manifest.json');
@@ -131,4 +132,26 @@ function installSourceFiles(input) {
 }
 function combineManifestPath(parentPath, childPath) {
     return normalizeManifestPath(`${normalizeManifestPath(parentPath)}/${normalizeManifestPath(childPath)}`);
+}
+function buildSkillProjectionManifestMetadata(sourceFiles, defaultFileFormat, targetDirectory) {
+    const managedSkillIds = [...new Set(sourceFiles.map((file) => file.skillId).filter((value) => Boolean(value)))].sort();
+    const sourceCatalogDigests = [...new Set(sourceFiles.map((file) => file.sourceCatalogDigest).filter((value) => Boolean(value)))].sort();
+    const installProfileIds = [...new Set(sourceFiles.map((file) => file.installProfileId).filter((value) => Boolean(value)))].sort();
+    if (managedSkillIds.length === 0 && sourceCatalogDigests.length === 0 && installProfileIds.length === 0) {
+        return {};
+    }
+    return {
+        sourceCatalogDigest: sourceCatalogDigests.length === 1 ? sourceCatalogDigests[0] : null,
+        installProfileId: installProfileIds.length === 1 ? installProfileIds[0] : null,
+        managedSkillIds: managedSkillIds.join(','),
+        managedSkillCount: managedSkillIds.length,
+        adapterFormat: defaultFileFormat,
+        targetScope: inferTargetScopeFromDirectory(targetDirectory)
+    };
+}
+function inferTargetScopeFromDirectory(targetDirectory) {
+    if (targetDirectory.startsWith('integrations/') || targetDirectory.startsWith('.claude/') || targetDirectory.startsWith('.cursor/') || targetDirectory.startsWith('.github/') || targetDirectory.startsWith('.gemini/')) {
+        return 'framework';
+    }
+    return 'adopter';
 }
