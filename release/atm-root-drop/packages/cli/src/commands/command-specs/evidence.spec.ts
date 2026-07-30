@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'evidence',
-  summary: 'Run validators as governed evidence, add raw/manual evidence for close/commit/PR gates, author historical-batch envelopes that feed taskflow close, or finalize diagnostic historical-batch slices. Successful fresh evidence updates the per-task bundle manifest at .atm/history/evidence/<taskId>.bundle-manifest.json.',
+  summary: 'Run validators as governed evidence, add raw/manual evidence for close/commit/PR gates, author diagnostic-loop receipts, author historical-batch envelopes that feed taskflow close, or finalize diagnostic historical-batch slices. Successful fresh evidence updates the per-task bundle manifest at .atm/history/evidence/<taskId>.bundle-manifest.json.',
   positional: [
-    { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | historical-batch | historical-batch-finalize', required: true }
+    { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | diagnose | historical-batch | historical-batch-finalize', required: true }
   ],
   options: [
     commonCwdOption,
@@ -23,6 +23,14 @@ export default defineCommandSpec({
     { flag: '--validators', value: 'csv', summary: 'Optional validator override. Omit when the command matches a known gate or a task-card declared validator; evidence run will auto-link it.' },
     { flag: '--command', value: 'text', summary: 'Command to run/capture. With evidence add this is raw metadata and also requires exit code plus sha256 outputs.' },
     { flag: '--command-runs', value: 'json-file', summary: 'Raw evidence add only: append commandRuns from a JSON array or {commandRuns:[]} cache file.' },
+    { flag: '--symptom', value: 'text', summary: 'Diagnostic-loop only: exact observed symptom that the reproducer must trigger.' },
+    { flag: '--reproducer-command', value: 'text', summary: 'Diagnostic-loop only: command that reproduces the declared symptom.' },
+    { flag: '--symptom-observed', summary: 'Diagnostic-loop only: assert the reproducer observed the declared symptom.' },
+    { flag: '--reproduction-rate', value: '0..1', summary: 'Diagnostic-loop only: observed reproduction rate for the minimized fixture.' },
+    { flag: '--minimized-fixture', value: 'path-or-id', summary: 'Diagnostic-loop only: minimized fixture path or stable fixture id.' },
+    { flag: '--hypothesis', value: 'id|summary|prediction|command|matched', summary: 'Diagnostic-loop only: repeatable falsifiable hypothesis and one-variable experiment result.' },
+    { flag: '--winning-hypothesis', value: 'id', summary: 'Diagnostic-loop only: hypothesis id whose experiment matched.' },
+    { flag: '--regression-case-id', value: 'id', summary: 'Diagnostic-loop only: regression test case id added or selected for the repair.' },
     { flag: '--exit-code', value: 'number', summary: 'Raw evidence add only: exit code paired with --command evidence.' },
     { flag: '--stdout-sha256', value: 'sha256', summary: 'Raw evidence add only: stdout digest paired with --command evidence.' },
     { flag: '--stderr-sha256', value: 'sha256', summary: 'Raw evidence add only: stderr digest paired with --command evidence.' },
@@ -57,6 +65,7 @@ export default defineCommandSpec({
     'node atm.mjs evidence verify --task ATM-GOV-0104 --gate close --json',
     'node atm.mjs evidence validators --list --task ATM-GOV-0104 --json',
     'node atm.mjs evidence missing --task ATM-GOV-0104 --actor Augment --json',
+    'node atm.mjs evidence diagnose --task ATM-GOV-0104 --actor codex-main --symptom "claim writes reserve before seal check" --reproducer-command "node atm.mjs next --claim ..." --symptom-observed --reproduction-rate 1 --minimized-fixture tests/fixtures/claim-seal --candidate-digest sha256:1111111111111111111111111111111111111111111111111111111111111111 --environment-digest sha256:2222222222222222222222222222222222222222222222222222222222222222 --hypothesis "h1|seal runs too late|ledger mutates before seal failure|node --strip-types tests/cli/claim-atomicity.test.ts|matched" --winning-hypothesis h1 --regression-case-id test_claim_atomicity --green-command "node --strip-types tests/cli/claim-atomicity.test.ts" --green-exit-code 0 --green-stdout-sha256 sha256:3333333333333333333333333333333333333333333333333333333333333333 --green-stderr-sha256 sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --write --json',
     'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validator-command "npm run validate:cli" --dry-run --json',
     'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validators typecheck --validator-command "npm run typecheck" --write --json',
     'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123 --actor codex-main --validator-command "npm test" --allow-unmatched --approved-by captain --approval-reason "diagnostic backfill" --write --json',

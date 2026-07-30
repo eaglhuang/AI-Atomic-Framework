@@ -5,6 +5,7 @@ import { run as runEvidenceVerify } from './evidence/verbs/verify.js';
 import { run as runEvidenceDiff } from './evidence/verbs/diff.js';
 import { run as runEvidenceValidators } from './evidence/verbs/validators.js';
 import { run as runEvidenceMissing } from './evidence/verbs/missing.js';
+import { run as runEvidenceDiagnose } from './evidence/verbs/diagnose.js';
 import { run as runGitHeadEvidenceBackfill } from './evidence/verbs/git-head-backfill.js';
 import { runEvidenceHistoricalBatch } from './evidence/historical-batch.js';
 import { runEvidenceHistoricalBatchFinalize } from './evidence/historical-batch-finalize.js';
@@ -25,9 +26,11 @@ export async function runEvidence(argv) {
         return runEvidenceValidators(argv.slice(1));
     if (action === 'missing')
         return runEvidenceMissing(argv.slice(1));
+    if (action === 'diagnose')
+        return runEvidenceDiagnose(argv.slice(1));
     if (action === 'historical-batch')
         return runEvidenceHistoricalBatch(argv.slice(1));
     if (action === 'historical-batch-finalize')
         return runEvidenceHistoricalBatchFinalize(argv.slice(1));
-    throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, run, git-head-backfill, verify, diff, validators, missing, historical-batch, historical-batch-finalize', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, run, git-head-backfill, verify, diff, validators, missing, diagnose, historical-batch, historical-batch-finalize', { exitCode: 2 });
 }
