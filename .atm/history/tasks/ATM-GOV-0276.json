@@ -1,0 +1,402 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0276",
+  "title": "Planning seal benign upgrade and task import fidelity guard",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0274",
+    "ATM-GOV-0275"
+  ],
+  "acceptance": [
+    "A task imported from an untracked planning card can later be claimed after the same card is committed, when `contentDigest` is unchanged and the only identity delta is `planningCommitSha: null -> <sha>`.",
+    "The benign seal upgrade is recorded as explicit evidence/result metadata; it must not require `amendment_epoch` and must not be reported as `governed-amendment`.",
+    "`tasks import --dry-run` and `tasks import --write` preserve `causalGraph` from frontmatter, including `softRelations`, `changedPublicSeams`, `causalImpactEdges`, `parallelFrontierInputs`, `validatorReferences`, and `phaseOwner`.",
+    "`tasks import --dry-run` and `tasks import --write` also preserve Plan 4.0 exam-contract fields when present, including `testContributions`, `requiredTestCaseIds`, `advisoryTestCaseIds`, `phaseTestCaseIds`, and future exam-authority metadata. Dropping these fields while preserving only `validatorReferences` is a fidelity failure.",
+    "If an unsupported machine-readable frontmatter field would be dropped by import, the command fails closed with a diagnostic instead of silently writing a reduced ledger record.",
+    "A failed claim source-seal check leaves no reserve/promote/owner mutation in `.atm/history/tasks/<task>.json` and creates no lifecycle event files; or, if lifecycle writes are unavoidable, rollback evidence restores the pre-claim ledger state.",
+    "Regression coverage reproduces the ATM-GOV-0269 failure shape without hard-coding ATM-GOV-0269, the 3KLife local path, or the observed commit SHA.",
+    "`node --strip-types tests/cli/planning-source-seal.test.ts` passes.",
+    "`node --strip-types tests/cli/task-import-diagnostic-contract.test.ts` passes.",
+    "`node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts` passes.",
+    "`npm run typecheck` passes."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/import-task.ts",
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+    "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+    "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+    "tests/cli/planning-source-seal.test.ts",
+    "tests/cli/task-import-diagnostic-contract.test.ts",
+    "tests/cli/tasks-reserve-planning-precheck.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/import-task.ts",
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/tasks/task-card-writer.ts",
+    "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+    "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+    "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+    "tests/cli/planning-source-seal.test.ts",
+    "tests/cli/task-import-diagnostic-contract.test.ts",
+    "tests/cli/tasks-reserve-planning-precheck.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/planning-source-seal.test.ts",
+    "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+    "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "mailboxAssignee": "Claude-005",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.work-coordination-authority",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.planning-source-seal-policy",
+        "pattern": "Policy Object / Result Contract",
+        "source": "packages/cli/src/commands/tasks/import-task.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.task-frontmatter-fidelity",
+        "pattern": "Parser Facade / Fidelity Contract",
+        "source": "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.claim-lifecycle-preflight-transaction",
+        "pattern": "Transaction Coordinator",
+        "source": "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/import-task.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/task-card-writer.ts",
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+        "tests/cli/planning-source-seal.test.ts",
+        "tests/cli/task-import-diagnostic-contract.test.ts",
+        "tests/cli/tasks-reserve-planning-precheck.test.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0276-planning-seal-benign-upgrade-and-task-import-fidelity-guard.task.md",
+    "sectionTitle": "ATM-GOV-0276",
+    "headingLine": 109,
+    "hash": "24a938bc2c6c748f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0276-planning-seal-benign-upgrade-and-task-import-fidelity-guard.task.md",
+      "planningCommitSha": "17dd69b18d3a76392855a42207df4da1f5ce6333",
+      "contentDigest": "sha256:24a938bc2c6c748f7dd2674493eca9299f3f0e30680a0e531d4b91a55ac47350",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-30T15:54:06.403Z"
+    }
+  },
+  "importedAt": "2026-07-30T15:54:06.403Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0274",
+      "ATM-GOV-0275"
+    ],
+    "startConditions": [
+      "ATM-GOV-0269 claim is blocked by ATM_PLANNING_SOURCE_IDENTITY_DRIFT after the external planning card changed from untracked to committed while contentDigest stayed identical.",
+      "ATM-GOV-0269 has failed-claim reserve/promote residue and must not be used for live dual-captain overlap testing until this card lands."
+    ],
+    "softRelations": [
+      "ATM-GOV-0269",
+      "ATM-BUG-2026-07-30-275",
+      "ATM-BUG-2026-07-30-276"
+    ],
+    "changedPublicSeams": [
+      "atm.planningSourceSeal.v1",
+      "atm.tasksImportFrontmatterContract.v1",
+      "atm.claimLifecyclePreflightTransaction.v1"
+    ],
+    "causalImpactEdges": [
+      "packages/cli/src/commands/tasks/import-task.ts -> tests/cli/planning-source-seal.test.ts: planningCommitSha null to committed sha with identical contentDigest must be a benign seal upgrade, not source drift.",
+      "packages/cli/src/commands/tasks/task-import-validators.ts -> tests/cli/task-import-diagnostic-contract.test.ts: machine-readable task frontmatter such as causalGraph and test-id/exam-authority fields must round-trip or fail closed instead of silently dropping fields.",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts -> tests/cli/tasks-reserve-planning-precheck.test.ts: claim seal validation must occur before reserve/promote/owner ledger mutation or be transactionally rolled back on failure."
+    ],
+    "parallelFrontierInputs": [
+      "Claude report for ATM-GOV-0269 claim failure on 2026-07-30T10:18:39Z.",
+      "Deep-module readiness fingerprint deep-module-review:9433b14b."
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/planning-source-seal.test.ts",
+      "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+      "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "Claude-005"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.planning.source.seal.test.ts",
+      "command": "node --strip-types tests/cli/planning-source-seal.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.task.import.diagnostic.contract.test.ts",
+      "command": "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.tasks.reserve.planning.precheck.test.ts",
+      "command": "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "lastTransitionId": "2026-07-30T17-29-18-402Z-renew-43125431816b",
+  "lastTransitionAt": "2026-07-30T17:29:18.402Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-006",
+  "reservedAt": "2026-07-30T15:55:02.962Z",
+  "promotedAt": "2026-07-30T15:55:02.967Z",
+  "claim": {
+    "actorId": "claude-006",
+    "leaseId": "lease-422b5d1a7531",
+    "claimedAt": "2026-07-30T15:55:02.973Z",
+    "heartbeatAt": "2026-07-30T17:29:18.159Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0276.*",
+      ".atm/history/task-events/ATM-GOV-0276/**",
+      ".atm/history/tasks/ATM-GOV-0276.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+      "atomic_workbench/registry-catalog.md",
+      "atomic-registry.json",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts",
+      "tests/cli/tasks-reserve-planning-precheck.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260730155503-claude-006-f6e42c70fe",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730155503-claude-006-f6e42c70fe\""
+    }
+  },
+  "startedAt": "2026-07-30T15:55:02.973Z",
+  "startedByActor": "claude-006",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-014bf33b78cf7883",
+    "ticketDigest": "sha256:014bf33b78cf7883ebd94cc3a4768a9dd6616dda35ee9338f050165fe67980f8",
+    "taskId": "ATM-GOV-0276",
+    "origin": "claim",
+    "actorId": "claude-006",
+    "laneSessionId": "lane-20260730155503-claude-006-f6e42c70fe",
+    "claimGeneration": "lease-422b5d1a7531",
+    "issuedAt": "2026-07-30T17:29:18.159Z",
+    "expiresAt": "2026-07-30T17:59:18.159Z",
+    "scopeDigest": "sha256:036f35c6200f98610be1c6b00bf19da44431bc747f97be698a7881192174d1c4",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T17:29:18.159Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0276.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0276/**",
+          ".atm/history/tasks/ATM-GOV-0276.json",
+          "atomic-registry.json",
+          "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+          "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+          "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+          "atomic_workbench/registry-catalog.md",
+          "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+          "packages/cli/src/commands/tasks/claim-preparation.ts",
+          "packages/cli/src/commands/tasks/import-orchestrator.ts",
+          "packages/cli/src/commands/tasks/import-task.ts",
+          "packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
+          "packages/cli/src/commands/tasks/task-card-writer.ts",
+          "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+          "packages/cli/src/commands/tasks/task-import-validators.ts",
+          "tests/cli/planning-source-seal.test.ts",
+          "tests/cli/task-import-diagnostic-contract.test.ts",
+          "tests/cli/tasks-reserve-planning-precheck.test.ts"
+        ],
+        "digest": "sha256:e0d634884f6a9584dec74d0d81e759f1e7acf46e67485098aab75e2a1e288312"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260730155502-claude-006-ATM-GOV-0276-6ab5b77ce3",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0276",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0276.*",
+      ".atm/history/task-events/ATM-GOV-0276/**",
+      ".atm/history/tasks/ATM-GOV-0276.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+      "atomic_workbench/registry-catalog.md",
+      "atomic-registry.json",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/planning-source-seal.test.ts",
+      "tests/cli/task-import-diagnostic-contract.test.ts",
+      "tests/cli/tasks-reserve-planning-precheck.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0276-planning-seal-benign-upgrade-and-task-import-fidelity-guard.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0276-planning-seal-benign-upgrade-and-task-import-fidelity-guard.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4436f61522976ff216e6005f558d6b177f815f44a0aa892c0219d311ae242948",
+    "actorId": "claude-006",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730155503-claude-006-f6e42c70fe",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730155503-claude-006-f6e42c70fe\""
+    },
+    "createdAt": "2026-07-30T15:55:17.631Z",
+    "status": "active"
+  }
+}

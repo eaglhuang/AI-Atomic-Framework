@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0276",
+  "updatedAt": "2026-07-30T17:19:52.286Z",
+  "updatedBy": "claude-006",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/planning-source-seal.test.ts",
+    "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+    "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/planning-source-seal.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c4f7e49e70122028950cb4a5d0c5b61ea64c58e6e9c8ca49e1517a9fb99c092",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/planning-source-seal.test.ts"
+      ],
+      "generatedAt": "2026-07-30T17:14:18.585Z",
+      "startedAt": "2026-07-30T17:14:08.772Z",
+      "finishedAt": "2026-07-30T17:14:18.585Z",
+      "durationMs": 9813,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce26069afa2e6d5be4277848b53b817a1ce2f9fe",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7411aed3ff22b939d0a9f917861f803fcbeb297d5f814f6863ce78fa5c1f064e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/task-import-diagnostic-contract.test.ts"
+      ],
+      "generatedAt": "2026-07-30T17:14:45.348Z",
+      "startedAt": "2026-07-30T17:14:23.028Z",
+      "finishedAt": "2026-07-30T17:14:45.348Z",
+      "durationMs": 22320,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce26069afa2e6d5be4277848b53b817a1ce2f9fe",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1da99c48315ef5ea36db46effecfae9f63d0d76687f6276975346ca3a73c9de0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts"
+      ],
+      "generatedAt": "2026-07-30T17:14:54.895Z",
+      "startedAt": "2026-07-30T17:14:51.756Z",
+      "finishedAt": "2026-07-30T17:14:54.895Z",
+      "durationMs": 3139,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce26069afa2e6d5be4277848b53b817a1ce2f9fe",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-30T17:16:10.674Z",
+      "startedAt": "2026-07-30T17:15:58.465Z",
+      "finishedAt": "2026-07-30T17:16:10.674Z",
+      "durationMs": 12209,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce26069afa2e6d5be4277848b53b817a1ce2f9fe",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1824e01e202f54e9bbb499fba32aacab39500104406fbe770ce7fbc3f5ecdfb7",
+      "stderrSha256": "sha256:8ceab0be31adf2e6976494b0c1e6c2d944d2629e461e7abbdf2390c199ea68bd",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-30T17:17:23.084Z",
+      "startedAt": "2026-07-30T17:16:18.715Z",
+      "finishedAt": "2026-07-30T17:17:23.084Z",
+      "durationMs": 64369,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce26069afa2e6d5be4277848b53b817a1ce2f9fe",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-30T17:19:52.285Z",
+      "startedAt": "2026-07-30T17:17:33.542Z",
+      "finishedAt": "2026-07-30T17:19:52.285Z",
+      "durationMs": 138743,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce26069afa2e6d5be4277848b53b817a1ce2f9fe",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

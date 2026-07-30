@@ -17,6 +17,7 @@ import {
   validateDeliverablesList
 } from './task-import-validators.ts';
 import { buildContractImportRecoveryManifest, type ContractImportRecoveryManifest } from './contract-import-recovery.ts';
+import { buildTaskFrontmatterFidelityDiagnostics } from './task-frontmatter-fidelity.ts';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.ts';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.ts';
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
@@ -256,6 +257,20 @@ export async function runTasksImport(argv: string[]) {
           ...causalValidation.diagnostics
         ]
       }))
+    };
+    // ATM-GOV-0276: a card's machine-readable declarations must round-trip into
+    // the record both surfaces share, or import fails closed here — before the
+    // dry-run manifest is reported and before any ledger file is written.
+    const fidelity = buildTaskFrontmatterFidelityDiagnostics({
+      frontmatter: causalFrontmatter,
+      record: parsed.tasks[0] as unknown as Record<string, unknown>,
+      planText,
+      workItemId: task.workItemId
+    });
+    parsed.diagnostics.push(...fidelity.diagnostics);
+    parsed = {
+      ...parsed,
+      tasks: parsed.tasks.map((entry) => ({ ...entry, frontmatterFidelity: fidelity.report }))
     };
   }
 

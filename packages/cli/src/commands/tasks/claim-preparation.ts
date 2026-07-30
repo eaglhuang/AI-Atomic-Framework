@@ -5,6 +5,7 @@ import { toStoredPlanningPath } from '../planning-repo-root.ts';
 import { evaluateTaskPromotionAdmission } from './lifecycle-state.ts';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.ts';
 import { taskPathFor } from './task-file-io-helpers.ts';
+import { assertPlanningSourceSealValid, type PlanningSourceSealValidation } from './import-task.ts';
 import type { TaskImportRecord } from './result-contracts.ts';
 
 function normalizeTaskStatus(value: unknown): string {
@@ -23,6 +24,11 @@ export interface TaskClaimPreparationResult {
   readonly originalStatus: string;
   readonly finalStatus: string;
   readonly steps: readonly TaskClaimPreparationStep[];
+  /**
+   * Seal check that gated this preparation. Carried into claim evidence so a
+   * benign seal upgrade is auditable rather than invisible.
+   */
+  readonly planningSourceSealValidation: PlanningSourceSealValidation;
 }
 
 export interface ClaimPreparationDependencies {
@@ -59,6 +65,15 @@ export function prepareTaskForClaim(input: {
   }
 
   const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+  // ATM-GOV-0276: planning-source identity is validated before the first ledger
+  // mutation. Reserve and promote both rewrite status/owner and append lifecycle
+  // events, so validating later would leave a half-prepared task behind whenever
+  // the seal check fails.
+  const planningSourceSealValidation = assertPlanningSourceSealValid({
+    cwd: input.cwd,
+    taskDocument,
+    surface: 'claim'
+  });
   const currentStatus = normalizeTaskStatus(taskDocument.status);
   const claimRecord = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
     ? taskDocument.claim as Record<string, unknown>
@@ -142,7 +157,8 @@ export function prepareTaskForClaim(input: {
     taskId: input.taskId,
     originalStatus,
     finalStatus: normalizeTaskStatus(taskDocument.status),
-    steps
+    steps,
+    planningSourceSealValidation
   };
 }
 

@@ -5,6 +5,13 @@ import path from 'node:path';
 import { CliError } from '../shared.ts';
 import { resolvePlanAbsoluteFromStored, toStoredPlanningPath } from '../planning-repo-root.ts';
 import { extractFrontMatter } from './task-import-validators.ts';
+import {
+  classifyPlanningSourceSeal,
+  type PlanningSourceDriftKind,
+  type PlanningSourceSealStatus
+} from './planning-source-seal-policy.ts';
+
+export type { PlanningSourceDriftKind, PlanningSourceSealStatus } from './planning-source-seal-policy.ts';
 
 export interface PlanningSourceSeal {
   readonly schemaId: 'atm.planningSourceSeal.v1';
@@ -19,8 +26,14 @@ export interface PlanningSourceSeal {
 
 export interface PlanningSourceSealValidation {
   readonly ok: boolean;
-  readonly status: 'match' | 'governed-amendment' | 'drift';
+  readonly status: PlanningSourceSealStatus;
   readonly driftKinds: readonly PlanningSourceDriftKind[];
+  /**
+   * Observed identity deltas that were reclassified as a benign storage-identity
+   * upgrade (see `planning-source-seal-policy.ts`). Empty unless
+   * `status === 'benign-seal-upgrade'`.
+   */
+  readonly benignUpgradeKinds: readonly PlanningSourceDriftKind[];
   readonly sealed: PlanningSourceSeal | null;
   readonly current: PlanningSourceSeal | null;
   readonly diagnostics: {
@@ -28,8 +41,6 @@ export interface PlanningSourceSealValidation {
     readonly messages: readonly string[];
   };
 }
-
-export type PlanningSourceDriftKind = 'path' | 'commit' | 'content' | 'repo-identity' | 'amendment-epoch';
 
 function sha256(text: string): string {
   return `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;
@@ -134,6 +145,7 @@ export function validatePlanningSourceSeal(input: {
       ok: true,
       status: 'match',
       driftKinds: [],
+      benignUpgradeKinds: [],
       sealed: null,
       current: null,
       diagnostics: {
@@ -152,6 +164,7 @@ export function validatePlanningSourceSeal(input: {
       ok: false,
       status: 'drift',
       driftKinds: ['path'],
+      benignUpgradeKinds: [],
       sealed,
       current: null,
       diagnostics: {
@@ -165,35 +178,15 @@ export function validatePlanningSourceSeal(input: {
     planAbsolute,
     sealedAt: sealed.sealedAt
   });
-  const driftKinds: PlanningSourceDriftKind[] = [];
-  if (current.taskCardPath !== sealed.taskCardPath || sourcePlanPath !== sealed.taskCardPath) driftKinds.push('path');
-  if (current.repoIdentity !== sealed.repoIdentity) driftKinds.push('repo-identity');
-  if (current.planningCommitSha !== sealed.planningCommitSha) driftKinds.push('commit');
-  if (current.contentDigest !== sealed.contentDigest) driftKinds.push('content');
-  if (current.amendmentEpoch !== sealed.amendmentEpoch) driftKinds.push('amendment-epoch');
-
-  const governedAmendment = driftKinds.every((kind) => kind === 'commit' || kind === 'content' || kind === 'amendment-epoch')
-    && current.amendmentEpoch > sealed.amendmentEpoch;
-  const ok = driftKinds.length === 0 || governedAmendment;
-  const status: PlanningSourceSealValidation['status'] = driftKinds.length === 0
-    ? 'match'
-    : governedAmendment
-      ? 'governed-amendment'
-      : 'drift';
+  const classification = classifyPlanningSourceSeal({ sealed, current, sourcePlanPath });
   return {
-    ok,
-    status,
-    driftKinds,
+    ok: classification.ok,
+    status: classification.status,
+    driftKinds: classification.driftKinds,
+    benignUpgradeKinds: classification.benignUpgradeKinds,
     sealed,
     current,
-    diagnostics: {
-      codes: driftKinds.length === 0
-        ? ['ATM_PLANNING_SOURCE_SEAL_MATCH']
-        : driftKinds.map((kind) => `ATM_PLANNING_SOURCE_DRIFT_${kind.toUpperCase().replace(/-/g, '_')}`),
-      messages: driftKinds.length === 0
-        ? ['Planning-source seal matches the current external task card.']
-        : [`Planning-source seal ${status}: ${driftKinds.join(', ')}.`]
-    }
+    diagnostics: classification.diagnostics
   };
 }
 
