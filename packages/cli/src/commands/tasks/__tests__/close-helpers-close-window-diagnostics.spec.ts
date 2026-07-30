@@ -38,6 +38,22 @@ const okResult = evaluateFrameworkDeliveryWindow({
 assert(okResult.ok === true, 'historical delivery -> ok');
 assert(okResult.schemaId === 'atm.frameworkDeliveryWindow.v1', 'schema id present');
 
+// batch checkpoint may close a retroactive framework task from an already-landed
+// historical delivery commit; it must not require the same critical diff to be
+// dirty again in the current worktree.
+const batchHistoricalResult = evaluateFrameworkDeliveryWindow({
+  cwd: tmp,
+  taskId: 'TASK-RFT-0013',
+  actorId: 'test-actor',
+  batchId: 'batch-test',
+  fromBatchCheckpoint: true,
+  taskDeclaredFiles: ['packages/cli/src/commands/tasks.ts'],
+  criticalChangedFiles: [],
+  historicalDeliveryRefs: ['deadbeef']
+});
+assert(batchHistoricalResult.ok === true, 'batch checkpoint historical delivery -> ok without active diff');
+assert(batchHistoricalResult.reason === 'batch-checkpoint-historical-delivery', 'batch historical reason is explicit');
+
 // failure branch — no governed delivery flag -> ok=false.
 const notOk = evaluateFrameworkDeliveryWindow({
   cwd: tmp,
@@ -77,4 +93,4 @@ try {
   assert((err as CliError).code === 'ATM_TASK_CLOSE_HISTORICAL_BATCH_NOT_FOUND', 'code matches');
 }
 
-console.log('[close-helpers-close-window-diagnostics.spec] ok (6 branches)');
+console.log('[close-helpers-close-window-diagnostics.spec] ok (7 branches)');
