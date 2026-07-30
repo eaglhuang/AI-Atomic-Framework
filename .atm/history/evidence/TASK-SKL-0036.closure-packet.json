@@ -16,15 +16,16 @@
     ]
   },
   "targetCommit": "c5be7b9bcfedf44541ee1911c11605e0bd50b3fd",
-  "governedTreeSha": "ca93b1d5f41e1a8002297eeb3c864b83eca4189e",
+  "governedTreeSha": "3fa08c04f0c792510c299512eee260c08f0f3b62",
   "targetCommitDelta": {
-    "currentCommitSha": "c5be7b9bcfedf44541ee1911c11605e0bd50b3fd",
+    "currentCommitSha": "aec29641f47f9d35b1d10875bd3e89a52809980e",
     "parentCommitShas": [
       "c5be7b9bcfedf44541ee1911c11605e0bd50b3fd"
     ],
-    "governedTreeSha": "ca93b1d5f41e1a8002297eeb3c864b83eca4189e",
+    "governedTreeSha": "3fa08c04f0c792510c299512eee260c08f0f3b62",
     "changedFiles": [
       ".atm/history/evidence/TASK-SKL-0036.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0036.closure-packet.json",
       ".atm/history/evidence/TASK-SKL-0036.json",
       ".atm/history/evidence/TASK-SKL-0036.runner-sync-receipt.json",
       ".atm/history/task-events/TASK-SKL-0036/2026-07-30T16-00-20-580Z-import-3507f8cbe7df.json",
@@ -33,9 +34,9 @@
       ".atm/history/task-events/TASK-SKL-0036/2026-07-30T19-49-39-713Z-claim-a46a52cea857.json",
       ".atm/history/task-events/TASK-SKL-0036/2026-07-30T19-56-32-410Z-scope-amendment-3f21639ecc22.json",
       ".atm/history/task-events/TASK-SKL-0036/2026-07-30T19-59-43-579Z-renew-12107a54dbf3.json",
-      ".atm/history/tasks/ATM-GOV-0269.json",
+      ".atm/history/task-events/TASK-SKL-0036/2026-07-30T20-12-21-626Z-close-02a8161c9e87.json",
+      ".atm/history/task-events/TASK-SKL-0036/2026-07-30T20-12-21-760Z-lock-cleanup-c89ae4140e2c.json",
       ".atm/history/tasks/TASK-SKL-0036.json",
-      "artifacts/generated/skill-corpus-audit.json",
       "packages/core/src/skills/incident-learning-candidate.ts",
       "packages/core/src/skills/index.ts",
       "release/atm-onefile/release-manifest.json",
@@ -166,5 +167,13 @@
   "sessionId": "session-20260730194919-codex-skl-captain-TASK-SKL-0036-1c964c644b",
   "attestation": null,
   "historicalDeliveryProvenance": null,
-  "teamSummary": null
+  "teamSummary": null,
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-07-30T20:49:09.530Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "aec29641f47f9d35b1d10875bd3e89a52809980e",
+    "repairedTargetCommitSha": "c5be7b9bcfedf44541ee1911c11605e0bd50b3fd",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
+  }
 }
