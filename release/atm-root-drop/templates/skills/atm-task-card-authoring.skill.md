@@ -207,6 +207,8 @@ tddMode: required
 tddNotApplicableReason: null
 # mechanical/docs exemptions must be reviewed; they never inflate TDD success rate
 tddExemptions: []
+methodProfiles:
+  - expand-contract
 evidence:
   required: command-backed
 rollback:
@@ -250,6 +252,11 @@ errorCodes:
   artifact tasks. `.atm/history/**` is ledger state, not the deliverable.
 - Include validators before the task is imported. If no validator exists yet,
   the task must say which validator must be created.
+- When the card uses a recurring engineering method, declare the relevant
+  `methodProfiles` id from `scripts/engineering-change-method-profiles.json`.
+  Use the profile for trigger evidence, required observations, counterexamples,
+  completion evidence, and rollback proof instead of restating a separate local
+  checklist.
 - Prefer the causal validator contract fields over command-only lists:
   - `testContributions` for shared/local case registration during the feature card;
   - `requiredTestCaseIds` for task-close obligations;

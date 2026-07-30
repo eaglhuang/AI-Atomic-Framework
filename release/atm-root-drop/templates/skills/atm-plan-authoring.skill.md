@@ -31,6 +31,13 @@ default. Cards use `causalGraph` for typed dependencies, start conditions, soft
 relations, public seams, impact edges, frontier inputs, validators, and phase
 ownership.
 
+When a plan includes broad contract migration, TDD oracle design, review-smell
+triage, merge-conflict repair, or deep-module refactoring, identify the matching
+engineering change method profile from
+`scripts/engineering-change-method-profiles.json`. The plan should name the
+profile id and the evidence it expects; it should not duplicate the profile's
+full rule set into prose.
+
 First command:
 
 ```bash

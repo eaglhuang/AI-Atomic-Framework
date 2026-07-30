@@ -145,8 +145,8 @@
   ],
   "phaseTestCaseIds": [],
   "advisoryTestCaseIds": [],
-  "lastTransitionId": "2026-07-30T19-06-56-723Z-scope-amendment-c8f00231ab3a",
-  "lastTransitionAt": "2026-07-30T19:06:56.723Z",
+  "lastTransitionId": "2026-07-30T19-16-45-898Z-renew-53c5f78cca82",
+  "lastTransitionAt": "2026-07-30T19:16:45.898Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-skl-captain",
   "reservedAt": "2026-07-30T18:58:03.493Z",
@@ -155,7 +155,7 @@
     "actorId": "codex-skl-captain",
     "leaseId": "lease-3448dc8ba3e9",
     "claimedAt": "2026-07-30T18:58:03.503Z",
-    "heartbeatAt": "2026-07-30T18:58:03.503Z",
+    "heartbeatAt": "2026-07-30T19:16:45.742Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-SKL-0034.*",
@@ -174,7 +174,6 @@
       "tests/cli/engineering-change-method-profiles.test.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260730185803-codex-skl-captain-cec9b4d6a0",
       "status": "active",
@@ -187,20 +186,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c28f69d8347d0790",
-    "ticketDigest": "sha256:c28f69d8347d07905f51b2351900591202a1ac53766e6be45998eb02ab571d4a",
+    "ticketId": "wat-6d1540d4d7ba6c3a",
+    "ticketDigest": "sha256:6d1540d4d7ba6c3a37c121c86580a6a7777f995b5693e41c6ecd8059cc8a2e8c",
     "taskId": "TASK-SKL-0034",
     "origin": "claim",
     "actorId": "codex-skl-captain",
     "laneSessionId": "lane-20260730185803-codex-skl-captain-cec9b4d6a0",
     "claimGeneration": "lease-3448dc8ba3e9",
-    "issuedAt": "2026-07-30T18:58:03.503Z",
-    "expiresAt": "2026-07-30T19:28:03.503Z",
-    "scopeDigest": "sha256:f29db79d1e1283d3857f191a537b5b6c322c0bec985c9924ec388caa305bbdfd",
+    "issuedAt": "2026-07-30T19:16:45.742Z",
+    "expiresAt": "2026-07-30T19:46:45.742Z",
+    "scopeDigest": "sha256:fc2724ad70f39188ec20c20675de2d74db32888c919ad9303b0d4be8d43a85e9",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-30T18:58:03.503Z"
+      "selectedAt": "2026-07-30T19:16:45.742Z"
     },
     "grants": [
       {
@@ -214,6 +213,7 @@
           "packages/core/src/skills/index.ts",
           "schemas/skills/engineering-change-method-profile.schema.json",
           "scripts/engineering-change-method-profiles.json",
+          "scripts/validate-schemas/context.ts",
           "templates/skills/atm-deep-module-refactor.skill.md",
           "templates/skills/atm-evidence.skill.md",
           "templates/skills/atm-plan-authoring.skill.md",
@@ -221,7 +221,7 @@
           "tests/catalog/groups/test_group_engineering_method_profiles.shard.json",
           "tests/cli/engineering-change-method-profiles.test.ts"
         ],
-        "digest": "sha256:622f83e0e41f581d4867fa33f72a82f103d8d984a57374a20e953fbe31fa6d9e"
+        "digest": "sha256:1311d734f62c5ba65b08d2aaacd905be5bfba72462c730b813094139573f8068"
       },
       {
         "kind": "lifecycle-operation",
@@ -243,11 +243,11 @@
     "deferredForeignResidue": [
       {
         "path": "artifacts/generated/skill-corpus-audit.json",
-        "observedDigest": "sha256:703c25db88a14df3cdee690de78fb5b579bba82daf90937bfd19f6a1e805d4e8",
+        "observedDigest": "sha256:18bac014d8c6540f21e92123a4a48d60a586d3878d1f6b3e3b4786cd34dba9d8",
         "producerTaskId": "TASK-SKL-0028",
         "artifactSchemaId": "atm.skillCorpusAudit.v1",
         "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
-        "sourceDigest": "sha256:49a4377b6baf707f21946b7d31aa8e5a5e727dda00b52d982a3bb89f718c8c80"
+        "sourceDigest": "sha256:9718a90eb70c235fa286c52c48999a8af01d80f9ad0071279cde6aba7c41e329"
       }
     ],
     "recovery": {
