@@ -6,6 +6,7 @@
  * Adapter-specific skill template compiler. Emits IntegrationSourceFile
  * objects ready for installation by the manifest/construct layer.
  */
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
@@ -18,9 +19,10 @@ import {
   type AtmSkillTemplate,
   type CompileSkillTemplateOptions,
   type SkillTemplateAdapterTarget,
-  loadMinimumAtmSkillTemplates
+  loadSkillTemplatesForProfile
 } from './skill-templates.ts';
 import type { IntegrationSourceFile } from '../manifest/types.ts';
+import { selectDefaultSkillInstallProfile } from '../distribution/install-profile.ts';
 
 export type { RenderedCharterInvariants };
 
@@ -46,19 +48,33 @@ export function renderCharterInvariantsBlock(repositoryRoot = integrationsCoreRe
 
 export function compileSkillTemplatesForAdapter(
   adapterTarget: SkillTemplateAdapterTarget,
-  templates: readonly AtmSkillTemplate[] | undefined = loadMinimumAtmSkillTemplates(),
+  templates: readonly AtmSkillTemplate[] | undefined = undefined,
   options: CompileSkillTemplateOptions = {}
 ): readonly IntegrationSourceFile[] {
-  const resolvedTemplates = templates ?? loadMinimumAtmSkillTemplates();
+  const profileId = selectDefaultSkillInstallProfile({
+    repositoryRoot: options.repositoryRoot ?? integrationsCoreRepoRoot
+  });
+  const resolvedTemplates = templates ?? loadSkillTemplatesForProfile(profileId);
+  const sourceCatalogDigest = digestSkillTemplates(resolvedTemplates);
   if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
     return resolvedTemplates.flatMap((template) => [
       {
         relativePath: `${template.frontmatter.id}/SKILL.md`,
         content: compileSkillTemplate(template, adapterTarget, options),
         fileFormat: 'skill',
-        source: 'template'
+        source: 'template',
+        skillId: template.frontmatter.id,
+        sourceDigest: digestSkillTemplate(template),
+        sourceCatalogDigest,
+        installProfileId: profileId,
+        managed: true
       },
-      ...loadSkillTemplateCompanionFiles(template.frontmatter.id)
+      ...loadSkillTemplateCompanionFiles(template.frontmatter.id, {
+        skillId: template.frontmatter.id,
+        sourceDigest: digestSkillTemplate(template),
+        sourceCatalogDigest,
+        installProfileId: profileId
+      })
     ]);
   }
   if (adapterTarget === 'cursor') {
@@ -67,9 +83,19 @@ export function compileSkillTemplatesForAdapter(
         relativePath: `${template.frontmatter.id}/SKILL.md`,
         content: compileSkillTemplate(template, 'cursor', options),
         fileFormat: 'markdown',
-        source: 'template'
+        source: 'template',
+        skillId: template.frontmatter.id,
+        sourceDigest: digestSkillTemplate(template),
+        sourceCatalogDigest,
+        installProfileId: profileId,
+        managed: true
       },
-      ...loadSkillTemplateCompanionFiles(template.frontmatter.id)
+      ...loadSkillTemplateCompanionFiles(template.frontmatter.id, {
+        skillId: template.frontmatter.id,
+        sourceDigest: digestSkillTemplate(template),
+        sourceCatalogDigest,
+        installProfileId: profileId
+      })
     ]);
   }
   if (adapterTarget === 'gemini') {
@@ -77,7 +103,12 @@ export function compileSkillTemplatesForAdapter(
       relativePath: `${template.frontmatter.id}.toml`,
       content: compileSkillTemplate(template, 'gemini', options),
       fileFormat: 'toml',
-      source: 'template'
+      source: 'template',
+      skillId: template.frontmatter.id,
+      sourceDigest: digestSkillTemplate(template),
+      sourceCatalogDigest,
+      installProfileId: profileId,
+      managed: true
     }));
   }
   return resolvedTemplates.flatMap((template) => [
@@ -85,13 +116,23 @@ export function compileSkillTemplatesForAdapter(
       relativePath: `instructions/${template.frontmatter.id}.instructions.md`,
       content: compileSkillTemplate(template, 'copilot-instructions', options),
       fileFormat: 'instructions-md' as const,
-      source: 'template' as const
+      source: 'template' as const,
+      skillId: template.frontmatter.id,
+      sourceDigest: digestSkillTemplate(template),
+      sourceCatalogDigest,
+      installProfileId: profileId,
+      managed: true
     },
     {
       relativePath: `prompts/${template.frontmatter.id}.prompt.md`,
       content: compileSkillTemplate(template, 'copilot-prompt', options),
       fileFormat: 'prompt-md' as const,
-      source: 'template' as const
+      source: 'template' as const,
+      skillId: template.frontmatter.id,
+      sourceDigest: digestSkillTemplate(template),
+      sourceCatalogDigest,
+      installProfileId: profileId,
+      managed: true
     }
   ]);
 }
@@ -190,13 +231,23 @@ function renderSkillTemplateBody(template: AtmSkillTemplate, options: CompileSki
     .trimEnd();
 }
 
-function loadSkillTemplateCompanionFiles(templateId: string): readonly IntegrationSourceFile[] {
+function loadSkillTemplateCompanionFiles(
+  templateId: string,
+  metadata: {
+    readonly skillId: string;
+    readonly sourceDigest: `sha256:${string}`;
+    readonly sourceCatalogDigest: `sha256:${string}`;
+    readonly installProfileId: string;
+  }
+): readonly IntegrationSourceFile[] {
   const companionRoot = path.join(integrationsCoreRepoRoot, 'templates', 'skills', `${templateId}.files`);
   return walkCompanionDirectory(companionRoot).map((filePath) => ({
     relativePath: `${templateId}/${path.relative(companionRoot, filePath).replace(/\\/g, '/')}`,
     content: readFileSync(filePath, 'utf8'),
     fileFormat: inferIntegrationFileFormat(filePath),
-    source: 'template' as const
+    source: 'template' as const,
+    ...metadata,
+    managed: true
   }));
 }
 
@@ -253,4 +304,16 @@ function inferIntegrationFileFormat(filePath: string): IntegrationSourceFile['fi
 
 function escapeTomlBasicString(value: string) {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function digestSkillTemplates(templates: readonly AtmSkillTemplate[]): `sha256:${string}` {
+  return `sha256:${createHash('sha256').update(JSON.stringify(templates.map((template) => ({
+    id: template.frontmatter.id,
+    sourcePath: template.sourcePath,
+    sourceDigest: digestSkillTemplate(template)
+  })))).digest('hex')}`;
+}
+
+function digestSkillTemplate(template: AtmSkillTemplate): `sha256:${string}` {
+  return `sha256:${createHash('sha256').update(`${template.sourcePath}\n${template.body}`).digest('hex')}`;
 }

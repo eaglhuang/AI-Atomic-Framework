@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T16-38-20-540Z-scope-amendment-1ca569074852",
+  "taskId": "TASK-SKL-0031",
+  "action": "scope-amendment",
+  "actorId": "codex-skl-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0031.json",
+  "taskSha256": "sha256:c9326045cdb455fc2868fe93c523ece2f7cc92dc15a3756080b722f569b46ce6",
+  "createdAt": "2026-07-30T16:38:20.540Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0031 --actor codex-skl-captain --add scripts/validate-integration-adapter.ts --reason \"Include the integration adapter validator that enforces TASK-SKL-0031 profile and projection metadata acceptance.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Include the integration adapter validator that enforces TASK-SKL-0031 profile and projection metadata acceptance."
+  }
+}

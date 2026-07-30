@@ -1,0 +1,382 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0031",
+  "title": "Data-driven skill tiers and full-corpus integration profiles",
+  "status": "running",
+  "milestone": "ATM-SKL-VG-R0.9",
+  "dependencies": [
+    "TASK-SKL-0029"
+  ],
+  "acceptance": [
+    "A sealed `atm.deepModuleReviewReport.v1` passes for `atm-skill-distribution-manager`, records at least two concrete editor adapters, and preserves fingerprint, rollback, and causal validators.",
+    "Every `templates/skills/*.skill.md`, including specialist and emergency skills, validates against `skill.schema.json`; malformed legacy frontmatter cannot enter the source catalog.",
+    "Canonical frontmatter declares ownership, tier, install profiles, invocation policy, companion files, and adapter capability requirements.",
+    "The legacy `minimumAtmEntrySkillDefinitions` metadata duplication is removed; no adapter owns a second title, summary, command, or membership registry for the same templates.",
+    "Data-driven profiles cover adopter bootstrap, full ATM framework, role-oriented, and emergency-explicit installation. Framework repositories select full ATM; adopter default behavior remains bootstrap-compatible.",
+    "Claude Code, Codex, Copilot, Cursor, Gemini, and Antigravity project the same ATM skill IDs, source digest, capabilities, and governance semantics. Adapter-specific bytes may differ and unsupported capabilities fail closed with structured degradation diagnostics.",
+    "The public interface `resolveSkillInstallationPlan({ sourceCatalog, installProfile, adapterCapabilities, targetScope, existingManifest })` returns additions, updates, preserved user files, stale managed projections, collisions, and degradation findings before any write occurs.",
+    "Install manifests record source-catalog digest, profile ID, managed skill IDs, adapter format, and target scope. Verify detects missing canonical projections and extra stale managed projections, not only hash mismatches.",
+    "Reconciliation never deletes modified or unmanaged user files implicitly; stale managed removal is explicit, hash-guarded, and visible in dry-run.",
+    "Full-corpus installs render charter placeholders and never leave raw template placeholders in the installed artifacts.",
+    "Focused tests prove complete schema coverage, profile parity, companion preservation, collision handling, stale projection detection, rollback, and the previously omitted specialist skills as ordinary data-driven cases.",
+    "No direct edits or ad hoc copies under an installed editor skill root are used as the delivery mechanism."
+  ],
+  "deliverables": [
+    "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+    "packages/integrations-core/src/distribution/skill-catalog.ts",
+    "packages/integrations-core/src/distribution/install-profile.ts",
+    "templates/skills/skill.schema.json",
+    "schemas/integrations/install-manifest.schema.json",
+    "scripts/validate-skill-templates.ts",
+    "artifacts/generated/skill-corpus-audit.json",
+    "tests/cli/skill-distribution-manager.test.ts",
+    "tests/cli/integration-profile-parity.test.ts",
+    "tests/cli/integration-reconciliation.test.ts"
+  ],
+  "scopePaths": [
+    "templates/skills/skill.schema.json",
+    "templates/skills/*.skill.md",
+    "templates/skills/*.files/**",
+    "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+    "packages/integrations-core/src/distribution/skill-catalog.ts",
+    "packages/integrations-core/src/distribution/install-profile.ts",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "packages/integrations-core/src/compiler/compile.ts",
+    "packages/integrations-core/src/manifest/types.ts",
+    "packages/integrations-core/src/manifest/construct.ts",
+    "packages/integrations-core/src/verify/types.ts",
+    "packages/integrations-core/src/verify/verify-installed.ts",
+    "packages/integrations-core/src/index.ts",
+    "packages/integration-claude-code/src/index.ts",
+    "packages/integration-codex/src/index.ts",
+    "packages/integration-copilot/src/index.ts",
+    "packages/integration-cursor/src/index.ts",
+    "packages/integration-gemini/src/index.ts",
+    "packages/cli/src/commands/integration/**",
+    "schemas/integrations/install-manifest.schema.json",
+    "scripts/audit-skill-corpus.ts",
+    "scripts/validate-skill-templates.ts",
+    "artifacts/generated/skill-corpus-audit.json",
+    "tests/catalog/groups/test_group_skill_integration_profiles.shard.json",
+    "tests/cli/skill-distribution-manager.test.ts",
+    "tests/cli/integration-profile-parity.test.ts",
+    "tests/cli/integration-reconciliation.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/skill-distribution-manager.test.ts",
+    "node --strip-types tests/cli/integration-profile-parity.test.ts",
+    "node --strip-types tests/cli/integration-reconciliation.test.ts",
+    "npm run validate:skill-templates",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "User-global or third-party skill source federation, which belongs to TASK-SKL-0032.",
+    "Direct edits or ad hoc copies under installed editor skill roots."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "sealed-deep-module-review-and-command-backed-profile-reconciliation",
+  "rollbackStrategy": "revert-commit-and-retain-the-existing-minimum-entry-default",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.integration-skill-compiler",
+    "atomCid": null,
+    "mapUpdates": [
+      "artifacts/generated/skill-corpus-audit.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.skill-distribution-manager",
+        "pattern": "Deep Module",
+        "source": "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0031-data-driven-skill-tiers-and-full-corpus-integration-profiles.task.md",
+    "sectionTitle": "TASK-SKL-0031",
+    "headingLine": 106,
+    "hash": "e2b9459253f6d18a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0031-data-driven-skill-tiers-and-full-corpus-integration-profiles.task.md",
+      "planningCommitSha": "949f05d94d869d02bb744fb02f892d7c0b3ddaec",
+      "contentDigest": "sha256:e2b9459253f6d18aa774d3f71a4e70450a6e2b2a6dcda437375a58c0fd6edab5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-30T15:59:39.249Z"
+    }
+  },
+  "importedAt": "2026-07-30T15:59:39.249Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-SKL-0029"
+    ],
+    "startConditions": [
+      "TASK-SKL-0029 is done and its generated integration surfaces are current."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "ATM integration install profile selection",
+      "ATM skill-template tier metadata",
+      "ATM integration manifest reconciliation"
+    ],
+    "causalImpactEdges": [
+      "canonical skill catalog -> install profile -> adapter projection",
+      "adapter projection plus existing manifest -> reconciliation plan",
+      "reconciliation plan -> complete editor corpus with stale projection control"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "node --strip-types tests/cli/skill-distribution-manager.test.ts",
+      "node --strip-types tests/cli/integration-profile-parity.test.ts",
+      "node --strip-types tests/cli/integration-reconciliation.test.ts"
+    ],
+    "phaseOwner": "atm-integrations"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [
+    "test_task_skl_0031_distribution_manager_7d3f0f24",
+    "test_task_skl_0031_profile_parity_8a6c93d1",
+    "test_task_skl_0031_reconciliation_522feaa8"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "lastTransitionId": "2026-07-30T16-39-27-793Z-renew-551bf95c7fd4",
+  "lastTransitionAt": "2026-07-30T16:39:27.793Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-30T16:01:55.383Z",
+  "promotedAt": "2026-07-30T16:01:55.387Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-d0eb90f4be47",
+    "claimedAt": "2026-07-30T16:01:55.394Z",
+    "heartbeatAt": "2026-07-30T16:39:27.133Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0031.*",
+      ".atm/history/task-events/TASK-SKL-0031/**",
+      ".atm/history/tasks/TASK-SKL-0031.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/src/commands/integration/**",
+      "packages/integration-claude-code/src/index.ts",
+      "packages/integration-codex/src/index.ts",
+      "packages/integration-copilot/src/index.ts",
+      "packages/integration-cursor/src/index.ts",
+      "packages/integration-gemini/src/index.ts",
+      "packages/integrations-core/src/compiler/compile.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "packages/integrations-core/src/distribution/install-profile.ts",
+      "packages/integrations-core/src/distribution/skill-catalog.ts",
+      "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+      "packages/integrations-core/src/index.ts",
+      "packages/integrations-core/src/manifest/construct.ts",
+      "packages/integrations-core/src/manifest/types.ts",
+      "packages/integrations-core/src/verify/types.ts",
+      "packages/integrations-core/src/verify/verify-installed.ts",
+      "schemas/integrations/install-manifest.schema.json",
+      "scripts/audit-skill-corpus.ts",
+      "scripts/validate-integration-adapter.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/*.files/**",
+      "templates/skills/*.skill.md",
+      "templates/skills/skill.schema.json",
+      "tests/catalog/groups/test_group_skill_integration_profiles.shard.json",
+      "tests/cli/integration-profile-parity.test.ts",
+      "tests/cli/integration-reconciliation.test.ts",
+      "tests/cli/skill-distribution-manager.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260730160155-codex-skl-captain-324af23500",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730160155-codex-skl-captain-324af23500\""
+    }
+  },
+  "startedAt": "2026-07-30T16:01:55.394Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-e711166ae5bbc4a0",
+    "ticketDigest": "sha256:e711166ae5bbc4a07a13b750d5f64dcf93a2d5b5e433b9c15ade65e49a2a78ab",
+    "taskId": "TASK-SKL-0031",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260730160155-codex-skl-captain-324af23500",
+    "claimGeneration": "lease-d0eb90f4be47",
+    "issuedAt": "2026-07-30T16:39:27.133Z",
+    "expiresAt": "2026-07-30T17:09:27.133Z",
+    "scopeDigest": "sha256:1ebc89afaa915df7f94c00bef449ec0485d74b6f5f4a4df2150a23b2353a5b04",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-30T16:39:27.133Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0031.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-SKL-0031/**",
+          ".atm/history/tasks/TASK-SKL-0031.json",
+          "artifacts/generated/skill-corpus-audit.json",
+          "packages/cli/src/commands/integration/**",
+          "packages/integration-claude-code/src/index.ts",
+          "packages/integration-codex/src/index.ts",
+          "packages/integration-copilot/src/index.ts",
+          "packages/integration-cursor/src/index.ts",
+          "packages/integration-gemini/src/index.ts",
+          "packages/integrations-core/src/compiler/compile.ts",
+          "packages/integrations-core/src/compiler/skill-templates.ts",
+          "packages/integrations-core/src/distribution/install-profile.ts",
+          "packages/integrations-core/src/distribution/skill-catalog.ts",
+          "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+          "packages/integrations-core/src/index.ts",
+          "packages/integrations-core/src/manifest/construct.ts",
+          "packages/integrations-core/src/manifest/types.ts",
+          "packages/integrations-core/src/verify/types.ts",
+          "packages/integrations-core/src/verify/verify-installed.ts",
+          "schemas/integrations/install-manifest.schema.json",
+          "scripts/audit-skill-corpus.ts",
+          "scripts/validate-integration-adapter.ts",
+          "scripts/validate-skill-templates.ts",
+          "templates/skills/*.files/**",
+          "templates/skills/*.skill.md",
+          "templates/skills/skill.schema.json",
+          "tests/catalog/groups/test_group_skill_integration_profiles.shard.json",
+          "tests/cli/integration-profile-parity.test.ts",
+          "tests/cli/integration-reconciliation.test.ts",
+          "tests/cli/skill-distribution-manager.test.ts"
+        ],
+        "digest": "sha256:79bf3c19056acd5b4b84c4efbbc83fd377ba81c191bd9ef60152a011e59f8fc3"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:594ab52e34ad9f2ec69ea8ef200fa8c81ca64e61f00690da98a0a74ced051c52",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:1a05520299b26b548311adec526268101fc6bf01fabd24e15d3f95c69d631578"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260730160155-codex-skl-captain-TASK-SKL-0031-a0dbb1f32b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0031",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0031.*",
+      ".atm/history/task-events/TASK-SKL-0031/**",
+      ".atm/history/tasks/TASK-SKL-0031.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/src/commands/integration/**",
+      "packages/integration-claude-code/src/index.ts",
+      "packages/integration-codex/src/index.ts",
+      "packages/integration-copilot/src/index.ts",
+      "packages/integration-cursor/src/index.ts",
+      "packages/integration-gemini/src/index.ts",
+      "packages/integrations-core/src/compiler/compile.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "packages/integrations-core/src/distribution/install-profile.ts",
+      "packages/integrations-core/src/distribution/skill-catalog.ts",
+      "packages/integrations-core/src/distribution/skill-distribution-manager.ts",
+      "packages/integrations-core/src/index.ts",
+      "packages/integrations-core/src/manifest/construct.ts",
+      "packages/integrations-core/src/manifest/types.ts",
+      "packages/integrations-core/src/verify/types.ts",
+      "packages/integrations-core/src/verify/verify-installed.ts",
+      "schemas/integrations/install-manifest.schema.json",
+      "scripts/audit-skill-corpus.ts",
+      "scripts/validate-integration-adapter.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/*.files/**",
+      "templates/skills/*.skill.md",
+      "templates/skills/skill.schema.json",
+      "tests/catalog/groups/test_group_skill_integration_profiles.shard.json",
+      "tests/cli/integration-profile-parity.test.ts",
+      "tests/cli/integration-reconciliation.test.ts",
+      "tests/cli/skill-distribution-manager.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0031-data-driven-skill-tiers-and-full-corpus-integration-profiles.task.md",
+      "C:/Users/User/AI-Atomic-Framework/artifacts/generated/skill-corpus-audit.json"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0031-data-driven-skill-tiers-and-full-corpus-integration-profiles.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "0221f66931804f2fa0e997dc9c7b18ecd17061cb4a180122640ef73dad580942",
+    "actorId": "codex-skl-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260730160155-codex-skl-captain-324af23500",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730160155-codex-skl-captain-324af23500\""
+    },
+    "createdAt": "2026-07-30T16:02:17.318Z",
+    "status": "active"
+  }
+}

@@ -8,6 +8,13 @@ command: node atm.mjs next --prompt "$ARGUMENTS" --json
 firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
+owner: atm-framework
+tier: emergency
+installProfiles: [framework-full, emergency-explicit]
+invocationPolicy: emergency-only
+companionFiles: []
+adapterCapabilityRequirements:
+  - "*:charter-injection"
 ---
 
 # {{title}}

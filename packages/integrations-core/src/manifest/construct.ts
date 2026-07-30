@@ -141,7 +141,8 @@ function installSourceFiles(input: {
     targetDir: input.targetDirectory,
     files: manifestFiles,
     metadata: {
-      sourceFileCount: input.sourceFiles.length
+      sourceFileCount: input.sourceFiles.length,
+      ...buildSkillProjectionManifestMetadata(input.sourceFiles, input.defaultFileFormat, input.targetDirectory)
     }
   });
   const manifestPath = normalizeManifestPath(input.context.manifestPath ?? '.atm/integrations/manifest.json');
@@ -174,4 +175,32 @@ function installSourceFiles(input: {
 
 function combineManifestPath(parentPath: string, childPath: string): string {
   return normalizeManifestPath(`${normalizeManifestPath(parentPath)}/${normalizeManifestPath(childPath)}`);
+}
+
+function buildSkillProjectionManifestMetadata(
+  sourceFiles: readonly IntegrationSourceFile[],
+  defaultFileFormat: IntegrationFileFormat,
+  targetDirectory: string
+): Readonly<Record<string, string | number | boolean | null>> {
+  const managedSkillIds = [...new Set(sourceFiles.map((file) => file.skillId).filter((value): value is string => Boolean(value)))].sort();
+  const sourceCatalogDigests = [...new Set(sourceFiles.map((file) => file.sourceCatalogDigest).filter((value): value is `sha256:${string}` => Boolean(value)))].sort();
+  const installProfileIds = [...new Set(sourceFiles.map((file) => file.installProfileId).filter((value): value is string => Boolean(value)))].sort();
+  if (managedSkillIds.length === 0 && sourceCatalogDigests.length === 0 && installProfileIds.length === 0) {
+    return {};
+  }
+  return {
+    sourceCatalogDigest: sourceCatalogDigests.length === 1 ? sourceCatalogDigests[0] : null,
+    installProfileId: installProfileIds.length === 1 ? installProfileIds[0] : null,
+    managedSkillIds: managedSkillIds.join(','),
+    managedSkillCount: managedSkillIds.length,
+    adapterFormat: defaultFileFormat,
+    targetScope: inferTargetScopeFromDirectory(targetDirectory)
+  };
+}
+
+function inferTargetScopeFromDirectory(targetDirectory: string): string {
+  if (targetDirectory.startsWith('integrations/') || targetDirectory.startsWith('.claude/') || targetDirectory.startsWith('.cursor/') || targetDirectory.startsWith('.github/') || targetDirectory.startsWith('.gemini/')) {
+    return 'framework';
+  }
+  return 'adopter';
 }

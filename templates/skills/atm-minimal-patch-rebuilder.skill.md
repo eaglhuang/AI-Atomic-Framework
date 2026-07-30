@@ -1,6 +1,20 @@
 ---
-name: atm-minimal-patch-rebuilder
-description: Rebuild a minimal semantic patch from a formatter-contaminated or bulk-rewritten ATM file after line-budget commit failures such as ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED. Use when a governed commit fails because one file has thousands of formatting-only changed lines, when an agent needs to preserve intended hunks while discarding noisy rewrites, or when reconstructing a small patch from HEAD/current diffs before retrying ATM commit.
+schemaId: atm.skillTemplate
+specVersion: 0.1.0
+id: atm-minimal-patch-rebuilder
+title: ATM Minimal Patch Rebuilder
+summary: Rebuild a minimal semantic patch from formatter-contaminated or bulk-rewritten ATM files after line-budget commit failures.
+command: node atm.mjs next --prompt "$ARGUMENTS" --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
+charter-invariants-injected: true
+handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
+owner: atm-framework
+tier: specialist
+installProfiles: [framework-full, role-oriented]
+invocationPolicy: explicit-user
+companionFiles: []
+adapterCapabilityRequirements:
+  - "*:charter-injection"
 ---
 
 # ATM Minimal Patch Rebuilder

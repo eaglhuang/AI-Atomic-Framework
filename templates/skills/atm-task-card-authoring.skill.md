@@ -8,6 +8,13 @@ command: node atm.mjs tasks import --from "$ARGUMENTS" --dry-run --json
 firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
+owner: atm-framework
+tier: specialist
+installProfiles: [framework-full, role-oriented]
+invocationPolicy: model-or-user
+companionFiles: []
+adapterCapabilityRequirements:
+  - "*:charter-injection"
 ---
 
 # {{title}}

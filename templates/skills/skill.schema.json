@@ -13,7 +13,13 @@
     "command",
     "firstCommand",
     "charter-invariants-injected",
-    "handoffs"
+    "handoffs",
+    "owner",
+    "tier",
+    "installProfiles",
+    "invocationPolicy",
+    "companionFiles",
+    "adapterCapabilityRequirements"
   ],
   "properties": {
     "schemaId": { "const": "atm.skillTemplate" },
@@ -31,6 +37,38 @@
     },
     "charter-invariants-injected": { "const": true },
     "handoffs": { "type": "string", "pattern": "^node atm\\.mjs " },
+    "owner": { "type": "string", "minLength": 1 },
+    "tier": { "enum": ["entry", "specialist", "emergency"] },
+    "installProfiles": {
+      "type": "array",
+      "items": { "enum": ["adopter-bootstrap", "framework-full", "role-oriented", "emergency-explicit"] },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "invocationPolicy": { "enum": ["model-or-user", "explicit-user", "router-only", "emergency-only"] },
+    "companionFiles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "adapterCapabilityRequirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["adapterId", "requires"],
+        "properties": {
+          "adapterId": { "type": "string", "minLength": 1 },
+          "requires": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      },
+      "uniqueItems": true
+    },
     "skillDefinition": {
       "$ref": "#/$defs/skillDefinitionVNext"
     }
