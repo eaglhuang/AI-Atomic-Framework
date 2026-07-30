@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-SKL-0033",
   "title": "Diagnostic feedback loop provider and causal repair receipt",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-SKL-VG-R1.1",
   "dependencies": [
     "TASK-SKL-0031"
@@ -132,8 +132,8 @@
   ],
   "phaseTestCaseIds": [],
   "advisoryTestCaseIds": [],
-  "lastTransitionId": "2026-07-30T18-36-16-091Z-scope-amendment-0bfdb280342c",
-  "lastTransitionAt": "2026-07-30T18:36:16.091Z",
+  "lastTransitionId": "2026-07-30T18-57-08-045Z-close-1bdc6a3854bf",
+  "lastTransitionAt": "2026-07-30T18:57:08.045Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-skl-captain",
   "reservedAt": "2026-07-30T18:25:24.759Z",
@@ -142,7 +142,7 @@
     "actorId": "codex-skl-captain",
     "leaseId": "lease-40f8c4a1d1ee",
     "claimedAt": "2026-07-30T18:25:24.768Z",
-    "heartbeatAt": "2026-07-30T18:25:24.768Z",
+    "heartbeatAt": "2026-07-30T18:57:08.042Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-SKL-0033.*",
@@ -162,34 +162,34 @@
       "tests/cli/diagnostic-feedback-loop.test.ts",
       "tests/core/causal-repair-receipt.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260730182524-codex-skl-captain-8ee37008fd",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260730182524-codex-skl-captain-8ee37008fd\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-30T18:25:24.768Z",
   "startedByActor": "codex-skl-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-71506f9404458a9a",
-    "ticketDigest": "sha256:71506f9404458a9a2a02f6b635c7056f1bd3ab0fd89524271439a990e266768b",
+    "ticketId": "wat-97b3b7a9c847b302",
+    "ticketDigest": "sha256:97b3b7a9c847b302cdf45c22fcd8f9dc6269611afe786a8cf8fc3ab4d36f8282",
     "taskId": "TASK-SKL-0033",
     "origin": "claim",
     "actorId": "codex-skl-captain",
     "laneSessionId": "lane-20260730182524-codex-skl-captain-8ee37008fd",
     "claimGeneration": "lease-40f8c4a1d1ee",
-    "issuedAt": "2026-07-30T18:25:24.768Z",
-    "expiresAt": "2026-07-30T18:55:24.768Z",
-    "scopeDigest": "sha256:7984d2f316427510b274e6afffca86074398837223d1de25bb2b707a545b6ceb",
+    "issuedAt": "2026-07-30T18:46:56.062Z",
+    "expiresAt": "2026-07-30T19:16:56.062Z",
+    "scopeDigest": "sha256:a735375d43f788a1fe02c31024c10ce33e659c3f3568057f6a496712d493b058",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-30T18:25:24.768Z"
+      "selectedAt": "2026-07-30T18:46:56.062Z"
     },
     "grants": [
       {
@@ -199,18 +199,21 @@
           ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-SKL-0033/**",
           ".atm/history/tasks/TASK-SKL-0033.json",
+          "packages/cli/src/commands/command-specs/evidence.spec.ts",
+          "packages/cli/src/commands/evidence.ts",
           "packages/cli/src/commands/evidence/implementation.ts",
           "packages/cli/src/commands/evidence/verbs/diagnose.ts",
           "packages/core/src/evidence/diagnostic-loop.ts",
           "packages/core/src/evidence/index.ts",
           "schemas/evidence/diagnostic-loop-receipt.schema.json",
+          "scripts/validate-schemas/context.ts",
           "templates/skills/atm-diagnostic-loop.files/**",
           "templates/skills/atm-diagnostic-loop.skill.md",
           "tests/catalog/groups/test_group_diagnostic_loop.shard.json",
           "tests/cli/diagnostic-feedback-loop.test.ts",
           "tests/core/causal-repair-receipt.test.ts"
         ],
-        "digest": "sha256:8eab70fb5b1f863807549bf411105f184cae5e0a160abc4807693126a3d7353a"
+        "digest": "sha256:a2bc4dded182c346f441d7e5a7268a731d42fcf5fe631341355262ba5e942157"
       },
       {
         "kind": "lifecycle-operation",
@@ -229,7 +232,16 @@
         "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
       }
     ],
-    "deferredForeignResidue": [],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:703c25db88a14df3cdee690de78fb5b579bba82daf90937bfd19f6a1e805d4e8",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:49a4377b6baf707f21946b7d31aa8e5a5e727dda00b52d982a3bb89f718c8c80"
+      }
+    ],
     "recovery": {
       "requestedMode": "auto",
       "resolvedMode": "enabled",
@@ -293,5 +305,9 @@
     },
     "createdAt": "2026-07-30T18:25:55.540Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-30T18:57:08.042Z",
+  "closedByActor": "codex-skl-captain",
+  "closedBySessionId": "session-20260730182524-codex-skl-captain-TASK-SKL-0033-afa048f5a4",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0033.closure-packet.json"
 }

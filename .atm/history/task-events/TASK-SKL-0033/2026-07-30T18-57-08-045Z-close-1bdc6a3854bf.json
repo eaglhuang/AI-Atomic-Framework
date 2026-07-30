@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-30T18-57-08-045Z-close-1bdc6a3854bf",
+  "taskId": "TASK-SKL-0033",
+  "action": "close",
+  "actorId": "codex-skl-captain",
+  "sessionId": "session-20260730182524-codex-skl-captain-TASK-SKL-0033-afa048f5a4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0033.json",
+  "taskSha256": "sha256:a24670cb567c3d6c4831f3b516e4558a5ba625ae66732c979acd27a293d4f40d",
+  "createdAt": "2026-07-30T18:57:08.045Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0033 --actor codex-skl-captain --status done --historical-delivery 42bb218b6a8d7b68bb1c74bedf33cdda40793ba4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260730182524-codex-skl-captain-TASK-SKL-0033-afa048f5a4",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0033.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/diagnostic-feedback-loop.test.ts",
+      "node --strip-types tests/core/causal-repair-receipt.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-30T18:57:08.035Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0033.*",
+        ".atm/history/task-events/TASK-SKL-0033/**",
+        ".atm/history/tasks/TASK-SKL-0033.json",
+        "packages/cli/src/commands/command-specs/evidence.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/evidence/implementation.ts",
+        "packages/cli/src/commands/evidence/verbs/diagnose.ts",
+        "packages/core/src/evidence/diagnostic-loop.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/diagnostic-loop-receipt.schema.json",
+        "scripts/validate-schemas/context.ts",
+        "templates/skills/atm-diagnostic-loop.files/**",
+        "templates/skills/atm-diagnostic-loop.skill.md",
+        "tests/catalog/groups/test_group_diagnostic_loop.shard.json",
+        "tests/cli/diagnostic-feedback-loop.test.ts",
+        "tests/core/causal-repair-receipt.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/evidence.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/evidence/implementation.ts",
+        "packages/cli/src/commands/evidence/verbs/diagnose.ts",
+        "packages/core/src/evidence/diagnostic-loop.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/diagnostic-loop-receipt.schema.json",
+        "scripts/validate-schemas/context.ts",
+        "templates/skills/atm-diagnostic-loop.files/**",
+        "tests/catalog/groups/test_group_diagnostic_loop.shard.json",
+        "tests/cli/diagnostic-feedback-loop.test.ts",
+        "tests/core/causal-repair-receipt.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
