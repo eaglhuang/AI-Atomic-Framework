@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0284",
   "title": "QualityGauntlet facade and ClosureAssuranceMachine reducer events",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-GOV-PLAN4-R1",
   "dependencies": [
     "ATM-GOV-0280",
@@ -217,8 +217,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-31T10-50-58-746Z-renew-5a834675ef4f",
-  "lastTransitionAt": "2026-07-31T10:50:58.746Z",
+  "lastTransitionId": "2026-07-31T10-57-26-345Z-close-383d6477d37f",
+  "lastTransitionAt": "2026-07-31T10:57:26.345Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-006",
   "reservedAt": "2026-07-31T10:19:14.484Z",
@@ -227,7 +227,7 @@
     "actorId": "claude-006",
     "leaseId": "lease-4e0e6c90a53d",
     "claimedAt": "2026-07-31T10:19:14.494Z",
-    "heartbeatAt": "2026-07-31T10:50:57.781Z",
+    "heartbeatAt": "2026-07-31T10:57:26.342Z",
     "ttlSeconds": 7200,
     "files": [
       ".atm/history/evidence/ATM-GOV-0284.*",
@@ -251,13 +251,14 @@
       "tests/cli/plan4-closure-assurance-machine.test.ts",
       "tests/cli/plan4-quality-gauntlet.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260731101914-claude-006-71866a5568",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731101914-claude-006-71866a5568\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-31T10:19:14.494Z",
   "startedByActor": "claude-006",
@@ -400,5 +401,9 @@
     },
     "createdAt": "2026-07-31T10:19:51.106Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-31T10:57:26.342Z",
+  "closedByActor": "claude-006",
+  "closedBySessionId": "session-20260731101914-claude-006-ATM-GOV-0284-4ccedab3cc",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0284.closure-packet.json"
 }

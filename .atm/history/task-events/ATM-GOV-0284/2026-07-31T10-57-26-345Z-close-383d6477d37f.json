@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-31T10-57-26-345Z-close-383d6477d37f",
+  "taskId": "ATM-GOV-0284",
+  "action": "close",
+  "actorId": "claude-006",
+  "sessionId": "session-20260731101914-claude-006-ATM-GOV-0284-4ccedab3cc",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0284.json",
+  "taskSha256": "sha256:cf844165cd020b1f726b710e1470b4cd290ed95a1ff1789112f5e5f52b505f4a",
+  "createdAt": "2026-07-31T10:57:26.345Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0284 --actor claude-006 --status done --historical-delivery b54f7723b369427635a47eaf834ef0056404af77",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260731101914-claude-006-ATM-GOV-0284-4ccedab3cc",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0284.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-closure-assurance-machine.test.ts",
+      "node --strip-types tests/cli/plan4-quality-gauntlet.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-31T10:57:26.333Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0284.*",
+        ".atm/history/evidence/git-head.jsonl",
+        ".atm/history/task-events/ATM-GOV-0284/**",
+        ".atm/history/tasks/ATM-GOV-0284.json",
+        "packages/cli/dist/index.d.ts",
+        "packages/core/src/evidence/closure-assurance-machine.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/quality-gauntlet.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+        "release/atm-root-drop/packages/cli/dist/index.d.ts",
+        "release/atm-root-drop/packages/core/dist/evidence/index.js",
+        "release/atm-root-drop/packages/core/dist/index.d.ts",
+        "release/atm-root-drop/packages/core/src/evidence/index.ts",
+        "release/atm-root-drop/release-manifest.json",
+        "schemas/evidence/quality-gauntlet.schema.json",
+        "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+        "tests/cli/plan4-closure-assurance-machine.test.ts",
+        "tests/cli/plan4-quality-gauntlet.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/index.d.ts",
+        "packages/core/src/evidence/closure-assurance-machine.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/quality-gauntlet.ts",
+        "schemas/evidence/quality-gauntlet.schema.json",
+        "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+        "tests/cli/plan4-closure-assurance-machine.test.ts",
+        "tests/cli/plan4-quality-gauntlet.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
