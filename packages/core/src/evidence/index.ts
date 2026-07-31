@@ -3,6 +3,7 @@ export * from './coverage-semantics.ts';
 export * from './diff-evidence.ts';
 export * from './diagnostic-loop.ts';
 export * from './git-boundary-evidence.ts';
+export * from './obligation-inventory.ts';
 export * from './realness.ts';
 export * from './tdd-cycle.ts';
 export * from './validation-receipt.ts';
