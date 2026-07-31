@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-31T12-56-20-594Z-scope-amendment-390f942e3ed7",
+  "taskId": "ATM-GOV-0285",
+  "action": "scope-amendment",
+  "actorId": "claude-006",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0285.json",
+  "taskSha256": "sha256:2a15c0c9cf2ecbf60d1c6f00432eac6928e3dcb8d7d030fc85b25c0b5cec04dc",
+  "createdAt": "2026-07-31T12:56:20.594Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0285 --actor claude-006 --add \"release/atm-onefile/atm.mjs,release/atm-onefile/release-manifest.json,release/atm-root-drop/packages/core/dist/evidence/index.js,release/atm-root-drop/packages/core/src/evidence/index.ts,release/atm-root-drop/release-manifest.json,.atm/history/evidence/git-head.jsonl\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

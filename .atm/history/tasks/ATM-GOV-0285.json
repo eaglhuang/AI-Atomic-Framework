@@ -214,8 +214,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-31T12-29-22-436Z-claim-0967bbae42ea",
-  "lastTransitionAt": "2026-07-31T12:29:22.436Z",
+  "lastTransitionId": "2026-07-31T12-56-24-215Z-renew-3ea548a6747d",
+  "lastTransitionAt": "2026-07-31T12:56:24.215Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-006",
   "reservedAt": "2026-07-31T12:28:55.322Z",
@@ -224,14 +224,22 @@
     "actorId": "claude-006",
     "leaseId": "lease-75bd333db7f7",
     "claimedAt": "2026-07-31T12:28:55.331Z",
-    "heartbeatAt": "2026-07-31T12:28:55.331Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-07-31T12:56:23.009Z",
+    "ttlSeconds": 7200,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0285.*",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0285/**",
       ".atm/history/tasks/ATM-GOV-0285.json",
       "packages/cli/src/commands/test-catalog.ts",
       "packages/core/src/evidence/index.ts",
       "packages/core/src/evidence/test-case-catalog.ts",
       "packages/core/src/evidence/validator-catalog-selection.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
       "scripts/lib/test-catalog.ts",
       "scripts/test-catalog.config.json",
       "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
@@ -239,7 +247,6 @@
       "tests/cli/plan4-validator-catalog-selection.test.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260731122855-claude-006-79867d22e6",
       "status": "active",
@@ -252,20 +259,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-b37d14a016c261a7",
-    "ticketDigest": "sha256:b37d14a016c261a72e51c0481176af1bee5424f85af9802d604afbcfde045024",
+    "ticketId": "wat-cf5a4e33c2259487",
+    "ticketDigest": "sha256:cf5a4e33c2259487b26dd03a4171da438abfc095bdee7a23da936ec3a499dffe",
     "taskId": "ATM-GOV-0285",
     "origin": "claim",
     "actorId": "claude-006",
     "laneSessionId": "lane-20260731122855-claude-006-79867d22e6",
     "claimGeneration": "lease-75bd333db7f7",
-    "issuedAt": "2026-07-31T12:28:55.331Z",
-    "expiresAt": "2026-07-31T12:58:55.331Z",
-    "scopeDigest": "sha256:99892d6effabd0ab6364536dcc575f463a486e1201cf9c417d56203c0a4b2783",
+    "issuedAt": "2026-07-31T12:56:23.009Z",
+    "expiresAt": "2026-07-31T14:56:23.009Z",
+    "scopeDigest": "sha256:027a01cbe225e89c8171df2b125cffaaea47ae4d5f30c79342a8feb1e05cdd91",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-31T12:28:55.331Z"
+      "selectedAt": "2026-07-31T12:56:23.009Z"
     },
     "grants": [
       {
@@ -279,13 +286,18 @@
           "packages/core/src/evidence/index.ts",
           "packages/core/src/evidence/test-case-catalog.ts",
           "packages/core/src/evidence/validator-catalog-selection.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop/packages/core/dist/evidence/index.js",
+          "release/atm-root-drop/packages/core/src/evidence/index.ts",
+          "release/atm-root-drop/release-manifest.json",
           "scripts/lib/test-catalog.ts",
           "scripts/test-catalog.config.json",
           "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
           "tests/cli/plan4-resumable-probe-scheduler.test.ts",
           "tests/cli/plan4-validator-catalog-selection.test.ts"
         ],
-        "digest": "sha256:27aba95735697ce0811277dfd62954560f67fcac3de10505ae4e6714265e7f6a"
+        "digest": "sha256:ab1e317cf280971f579113612757dc0f1059705129aa307dfba167e7e8d4b84b"
       },
       {
         "kind": "lifecycle-operation",
@@ -335,36 +347,49 @@
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0285",
     "batchId": null,
-    "scopeKey": "tasks-4bfb3e3b3e75",
-    "queueId": "queue-ef06bc9c44045d20",
-    "queueIndex": 3,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0285.*",
+      ".atm/history/evidence/git-head.jsonl",
       ".atm/history/task-events/ATM-GOV-0285/**",
       ".atm/history/tasks/ATM-GOV-0285.json",
       "packages/cli/src/commands/test-catalog.ts",
       "packages/core/src/evidence/index.ts",
       "packages/core/src/evidence/test-case-catalog.ts",
       "packages/core/src/evidence/validator-catalog-selection.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
       "scripts/lib/test-catalog.ts",
       "scripts/test-catalog.config.json",
       "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
       "tests/cli/plan4-resumable-probe-scheduler.test.ts",
       "tests/cli/plan4-validator-catalog-selection.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0285-validator-catalog-selection-bridge-and-resumable-probe-scheduler.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0285-validator-catalog-selection-bridge-and-resumable-probe-scheduler.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "06dff7f820f4db045eefd30604af5c797e52eccbfc527d41cdd8eb610fc56e25",
     "actorId": "claude-006",
-    "sessionId": "session-20260731122855-claude-006-ATM-GOV-0285-2a3d27634a",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260731122855-claude-006-79867d22e6",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731122855-claude-006-79867d22e6\""
     },
-    "createdAt": "2026-07-31T12:29:22.434Z",
+    "createdAt": "2026-07-31T12:29:22.483Z",
     "status": "active"
   }
 }

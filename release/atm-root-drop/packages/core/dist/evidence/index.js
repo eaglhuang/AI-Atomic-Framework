@@ -10,4 +10,5 @@ export * from './quality-gauntlet.js';
 export * from './realness.js';
 export * from './tdd-cycle.js';
 export * from './validation-receipt.js';
+export * from './validator-catalog-selection.js';
 export * from './validator-lifecycle.js';
