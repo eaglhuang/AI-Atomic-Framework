@@ -426,6 +426,58 @@
       "attestedBy": "codex-skl-captain",
       "attestedAt": "2026-07-30T23:27:28.555Z",
       "digest": "sha256:eba062167fec856f4d9ee055833186f89cdbe8e5ead0fb892846654282fb47e7"
+    },
+    {
+      "schemaId": "atm.historicalWorkAdmissionAttestation.v1",
+      "commitSha": "2ea5206739c732e83fc8f155e3232fe257006165",
+      "parentCommitSha": "32bd4d6c108598434d55ca60e3a7e00cbc42056f",
+      "treeSha": "6f860e67b28518e44b4db0317e7eecb3fa833199",
+      "provenance": {
+        "kind": "emergency",
+        "digest": "sha256:9b1795e1b02a89888dac8655ea0ef7093688886ba70edb8ff6d98b8f659d489d",
+        "ref": ".atm/history/evidence/git-head.jsonl"
+      },
+      "reason": "Emergency quickfix for ATM-GOV-0273 batch historical checkpoint closeback adapter.",
+      "evidenceRefs": [
+        ".atm/history/evidence/git-head.jsonl"
+      ],
+      "emergencyClass": "protected-push-recovery",
+      "scope": [
+        "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts"
+      ],
+      "taskId": "TASK-GIT-0024",
+      "laneSessionId": "lane-20260730230647-codex-skl-captain-4be61fffae",
+      "attestedBy": "codex-skl-captain",
+      "attestedAt": "2026-07-31T00:00:18.119Z",
+      "digest": "sha256:537217d2ab2c10e2ae01da99afa94ab8912a9d486ff55a66382a1f741fc5a353"
+    },
+    {
+      "schemaId": "atm.historicalWorkAdmissionAttestation.v1",
+      "commitSha": "15b3df705ee948306791c9323d563d825bc3390c",
+      "parentCommitSha": "2ea5206739c732e83fc8f155e3232fe257006165",
+      "treeSha": "3e5806a36cfd0f064fae8f97ca74bfd3e97e51c9",
+      "provenance": {
+        "kind": "emergency",
+        "digest": "sha256:9b1795e1b02a89888dac8655ea0ef7093688886ba70edb8ff6d98b8f659d489d",
+        "ref": ".atm/history/evidence/git-head.jsonl"
+      },
+      "reason": "Emergency runner publication for ATM-GOV-0273 batch historical checkpoint closeback adapter.",
+      "evidenceRefs": [
+        ".atm/history/evidence/git-head.jsonl"
+      ],
+      "emergencyClass": "runner-sync-publication",
+      "scope": [
+        "packages/cli/dist/commands/tasks/close-helpers/close-window-diagnostics.js",
+        "packages/cli/dist/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.js",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop"
+      ],
+      "taskId": "TASK-GIT-0024",
+      "laneSessionId": "lane-20260730230647-codex-skl-captain-4be61fffae",
+      "attestedBy": "codex-skl-captain",
+      "attestedAt": "2026-07-31T00:00:24.755Z",
+      "digest": "sha256:5aebbed4d581c1f0052edbc62073aa682b6caca9a050b86492474374a4bcebe2"
     }
   ]
 }

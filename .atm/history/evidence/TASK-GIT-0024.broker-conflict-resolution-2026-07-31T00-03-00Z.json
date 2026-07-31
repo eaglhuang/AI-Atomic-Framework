@@ -1,0 +1,32 @@
+{
+  "schemaId": "atm.brokerConflictResolution.v1",
+  "recordedAt": "2026-07-31T00:03:00.000Z",
+  "actorId": "codex-skl-captain",
+  "conflictTaskId": "TASK-GIT-0024",
+  "reason": "Commit append-only historical work-admission forward attestations needed before protected push of emergency ATM-GOV-0273 framework quickfix commits.",
+  "conflictFiles": [
+    ".atm/history/evidence/TASK-GIT-0024.broker-conflict-resolution-2026-07-31T00-03-00Z.json",
+    ".atm/history/evidence/TASK-GIT-0024.historical-work-admission-attestations.json"
+  ],
+  "decisionClass": "human-signoff-required",
+  "decisionReason": "TASK-GIT-0024 is terminal and released, but the append-only attestation ledger is the required evidence surface for protected push recovery.",
+  "violationStatus": "resolution-issued",
+  "resolutionClass": "append-only-attestation-ledger-update",
+  "resolutionOrder": [
+    "Validate the historical attestation ledger after appending the two records.",
+    "Stage only the TASK-GIT-0024 attestation ledger and this conflict-resolution artifact.",
+    "Use a one-time backend.gitHookBypass lease plus a one-time backend.brokerConflictOverride lease.",
+    "Retry protected push so commit-range guard can verify the new attestations."
+  ],
+  "validatorPlan": [
+    "node atm.mjs git attest --validate --json",
+    "node atm.mjs git push --actor codex-skl-captain --branch main --remote origin --dry-run --json"
+  ],
+  "indexConstraint": {
+    "allowedStagedFiles": [
+      ".atm/history/evidence/TASK-GIT-0024.historical-work-admission-attestations.json",
+      ".atm/history/evidence/TASK-GIT-0024.broker-conflict-resolution-2026-07-31T00-03-00Z.json"
+    ],
+    "foreignWorkHandling": "No source, release, task ledger, or unrelated WIP files may be staged for this override commit."
+  }
+}
