@@ -34,6 +34,13 @@ export interface SharedDeliveryCommitInput {
   readonly stagedFiles: readonly string[];
   readonly fileSlices?: Readonly<Record<string, readonly string[]>>;
   readonly commitSha?: string | null;
+  /**
+   * Paths actually recorded by the commit, read back from the committed tree.
+   * TASK-GIT-0029: the payload assertion is only evidence if it compares the
+   * expected slices against what landed; deriving both sides from the same
+   * expected slices proves nothing.
+   */
+  readonly committedFiles?: readonly string[] | null;
   readonly temporaryIndexPath?: string | null;
   readonly provenance?: SharedDeliveryProvenanceInput | null;
   /** VCS-neutral commit candidate this delivery persists (ATM-GOV-0261). */
@@ -60,9 +67,13 @@ export interface SharedWriteReceipt {
   /** VCS-neutral commit candidate id this receipt persists, when linked. */
   readonly commitCandidateId: string | null;
   readonly payloadAssertion: {
-    readonly status: 'pending' | 'passed';
+    readonly status: 'pending' | 'passed' | 'failed';
     readonly expectedFileCount: number;
     readonly committedFileCount: number | null;
+    /** Paths in the committed tree that no admitted slice declared. */
+    readonly unexpectedFiles: readonly string[];
+    /** Admitted paths the committed tree does not contain. */
+    readonly missingFiles: readonly string[];
   };
   readonly telemetry: SharedDeliveryTreatmentTelemetry;
   readonly createdAt: string;
@@ -103,6 +114,34 @@ function digestJson(value: unknown): string {
 function ticketsForDecision(document: WaveBrokerSchedulerDocument, decision: WaveBrokerBatchDecision): readonly WaveBrokerTicket[] {
   const ids = new Set(decision.ticketIds);
   return document.tickets.filter((ticket) => ids.has(ticket.ticketId));
+}
+
+/**
+ * The assertion passes only when the committed tree was read back and matches
+ * the expected slices exactly. Without an observed tree the status stays
+ * `pending`: a commit sha alone is not proof of what it contains.
+ */
+function buildPayloadAssertion(input: {
+  readonly commitSha: string | null;
+  readonly expectedFiles: readonly string[];
+  readonly committedFiles: readonly string[] | null;
+}) {
+  const expectedFileCount = input.expectedFiles.length;
+  if (!input.commitSha || input.committedFiles === null) {
+    return { status: 'pending' as const, expectedFileCount, committedFileCount: null, unexpectedFiles: [], missingFiles: [] };
+  }
+  const committed = uniqueSorted(input.committedFiles);
+  const expected = new Set(input.expectedFiles);
+  const unexpectedFiles = committed.filter((file) => !expected.has(file));
+  const committedSet = new Set(committed);
+  const missingFiles = input.expectedFiles.filter((file) => !committedSet.has(file));
+  return {
+    status: unexpectedFiles.length === 0 && missingFiles.length === 0 ? 'passed' as const : 'failed' as const,
+    expectedFileCount,
+    committedFileCount: committed.length,
+    unexpectedFiles,
+    missingFiles
+  };
 }
 
 export function planSharedDeliveryCommit(input: SharedDeliveryCommitInput): SharedDeliveryCommitPlan {
@@ -201,11 +240,11 @@ export function planSharedDeliveryCommit(input: SharedDeliveryCommitInput): Shar
     executorActor: input.actorId,
     temporaryIndexIsolated: true,
     commitCandidateId: input.commitCandidateId ?? null,
-    payloadAssertion: {
-      status: input.commitSha ? 'passed' as const : 'pending' as const,
-      expectedFileCount: uniqueSorted(Object.values(normalizedSlices).flat()).length,
-      committedFileCount: input.commitSha ? uniqueSorted(Object.values(normalizedSlices).flat()).length : null
-    },
+    payloadAssertion: buildPayloadAssertion({
+      commitSha: input.commitSha ?? null,
+      expectedFiles: uniqueSorted(Object.values(normalizedSlices).flat()),
+      committedFiles: input.committedFiles ?? null
+    }),
     telemetry: {
       schemaId: 'atm.sharedDeliveryTreatmentTelemetry.v1' as const,
       specVersion: '0.1.0' as const,

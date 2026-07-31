@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.governanceIncidentFixture.v1",
+  "specVersion": "0.1.0",
+  "semanticFamily": "shared-index-commit-attribution",
+  "title": "Governed commit absorbs content it did not admit",
+  "faultFingerprint": {
+    "violatedInvariant": "commit-content-attribution-boundary",
+    "surface": "governed-commit",
+    "preconditions": [
+      "two writers share one canonical worktree and one index",
+      "writer-a resolves and admits a bundle of paths",
+      "writer-b mutates the index or the worktree before writer-a's commit executes"
+    ],
+    "observation": "the resulting commit tree is not equal to the bundle writer-a admitted",
+    "writeOutcome": "ref advanced with unadmitted content"
+  },
+  "variants": [
+    {
+      "variantId": "unexpected-path",
+      "summary": "A path no admitted slice declared appears in the candidate tree.",
+      "expectedInvariant": "candidate tree equals sealed bundle",
+      "expectedOutcome": "fail-closed before any ref update",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
+    },
+    {
+      "variantId": "same-path-blob-substitution",
+      "summary": "An admitted path keeps its name but its content is replaced between admission and assembly.",
+      "expectedInvariant": "committed blob equals the sealed blob",
+      "expectedOutcome": "the sealed content is committed; the substitution never lands",
+      "expectedCode": null
+    },
+    {
+      "variantId": "empty-bundle-live-index-fallback",
+      "summary": "No task-scoped bundle resolves and the executor would commit whatever the shared index holds.",
+      "expectedInvariant": "no governed commit without a sealed bundle",
+      "expectedOutcome": "fail-closed",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_EMPTY_BUNDLE"
+    },
+    {
+      "variantId": "apply-before-admission",
+      "summary": "A shared-delivery plan is rejected after the commit object was written and the ref advanced.",
+      "expectedInvariant": "a rejected plan leaves HEAD unchanged",
+      "expectedOutcome": "no commit object is published and HEAD is byte-identical",
+      "expectedCode": null
+    },
+    {
+      "variantId": "head-moved-after-admission",
+      "summary": "Another lane advances HEAD between admission and ref update.",
+      "expectedInvariant": "ref update is compare-and-swap, never a force",
+      "expectedOutcome": "the other lane's commit survives and the delivery requeues",
+      "expectedCode": "ATM_BROKER_BATCH_COMMIT_HEAD_MOVED"
+    }
+  ],
+  "redGreenRunner": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+  "notes": "Writer identities, paths and timestamps in this fixture are synthetic. The family reproduces from the shape of the interleaving, not from any recorded task, actor or date."
+}

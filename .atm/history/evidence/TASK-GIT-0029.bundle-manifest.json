@@ -1,0 +1,111 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-GIT-0029",
+  "updatedAt": "2026-07-31T03:57:38.638Z",
+  "updatedBy": "claude-006",
+  "freshValidationPasses": [
+    "new focused broker admission-order tests created by this task",
+    "new focused commit attribution tests created by this task",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e17d8661df79407d04fb0c646616445ca5b7469cc4339ad551f0b18c9a60a088",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-31T03:48:58.786Z",
+      "startedAt": "2026-07-31T03:48:34.094Z",
+      "finishedAt": "2026-07-31T03:48:58.786Z",
+      "durationMs": 24692,
+      "runnerKind": "dev-source",
+      "sourceCommit": "74872fe04f47bf2d04f8d7cb5b48c2b3da3fc730",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "generatedAt": "2026-07-31T03:51:48.190Z",
+      "startedAt": "2026-07-31T03:49:41.873Z",
+      "finishedAt": "2026-07-31T03:51:48.190Z",
+      "durationMs": 126317,
+      "runnerKind": "dev-source",
+      "sourceCommit": "74872fe04f47bf2d04f8d7cb5b48c2b3da3fc730",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-31T03:52:49.313Z",
+      "startedAt": "2026-07-31T03:52:35.989Z",
+      "finishedAt": "2026-07-31T03:52:49.313Z",
+      "durationMs": 13324,
+      "runnerKind": "dev-source",
+      "sourceCommit": "74872fe04f47bf2d04f8d7cb5b48c2b3da3fc730",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5dea15373c4b32687da433ec208e38eeb330698f9e952f668bdeb7eae280c3e9",
+      "stderrSha256": "sha256:915d7761745bc73c51059914a6b57c0122f5000417c7f01a8671674a976ac7b4",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-31T03:53:53.604Z",
+      "startedAt": "2026-07-31T03:52:53.136Z",
+      "finishedAt": "2026-07-31T03:53:53.604Z",
+      "durationMs": 60468,
+      "runnerKind": "dev-source",
+      "sourceCommit": "74872fe04f47bf2d04f8d7cb5b48c2b3da3fc730",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e17d8661df79407d04fb0c646616445ca5b7469cc4339ad551f0b18c9a60a088",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "new focused commit attribution tests created by this task"
+      ],
+      "generatedAt": "2026-07-31T03:57:19.467Z",
+      "startedAt": "2026-07-31T03:57:10.462Z",
+      "finishedAt": "2026-07-31T03:57:19.467Z",
+      "durationMs": 9005,
+      "runnerKind": "dev-source",
+      "sourceCommit": "74872fe04f47bf2d04f8d7cb5b48c2b3da3fc730",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e17d8661df79407d04fb0c646616445ca5b7469cc4339ad551f0b18c9a60a088",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "new focused broker admission-order tests created by this task"
+      ],
+      "generatedAt": "2026-07-31T03:57:38.636Z",
+      "startedAt": "2026-07-31T03:57:26.211Z",
+      "finishedAt": "2026-07-31T03:57:38.636Z",
+      "durationMs": 12425,
+      "runnerKind": "dev-source",
+      "sourceCommit": "74872fe04f47bf2d04f8d7cb5b48c2b3da3fc730",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

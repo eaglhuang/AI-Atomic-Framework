@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0029",
+  "title": "Seal governed commit attribution transaction",
+  "status": "running",
+  "milestone": "G17",
+  "dependencies": [
+    "TASK-GIT-0028"
+  ],
+  "acceptance": [
+    "Repro/evidence confirms or falsifies both suspected gaps: broker apply before admission, and same-path staged blob replacement between admission and temp-index assembly.",
+    "A successful governed commit proves `actual tree diff == sealed bundle` at path, mode, blob/content digest, and provenance granularity.",
+    "Rejected admission, unexpected path, missing path, and same-path different-blob cases fail before HEAD moves.",
+    "Receipts report actual committed tree counts and bundle-vs-tree proof, not expected slice counts only.",
+    "Generic incident fixtures exist under `governance-incidents/shared-index-commit-attribution/`.",
+    "Focused tests, typecheck, and CLI validation pass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/**",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "packages/core/src/**",
+    "schemas/evidence/**",
+    "tests/cli/**",
+    "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+    "tests/catalog/groups/**"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/**",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "packages/core/src/**",
+    "schemas/evidence/**",
+    "tests/cli/**",
+    "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+    "tests/catalog/groups/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "new focused commit attribution tests created by this task",
+    "new focused broker admission-order tests created by this task",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-boundary-admission",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "pattern": "Transaction Ordering Policy",
+        "source": "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "pattern": "Sealed Bundle / Result Contract",
+        "source": "packages/cli/src/commands/git-governance/**",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0029-seal-governed-commit-attribution-transaction.task.md",
+    "sectionTitle": "TASK-GIT-0029",
+    "headingLine": 50,
+    "hash": "e3ba92d93ed6d998",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0029-seal-governed-commit-attribution-transaction.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:e3ba92d93ed6d998d6c0df9f70e8ec23d6bb8606714054d3e791affd199bb036",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T03:05:36.549Z"
+    }
+  },
+  "importedAt": "2026-07-31T03:05:36.549Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.git.commit.task.scoped.staging.test.ts",
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_new.focused.commit.attribution.tests.created.by.this.task",
+      "command": "new focused commit attribution tests created by this task",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_new.focused.broker.admission.order.tests.created.by.this.task",
+      "command": "new focused broker admission-order tests created by this task",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-31T04-07-39-162Z-scope-amendment-3998697827d4",
+  "lastTransitionAt": "2026-07-31T04:07:39.162Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-006",
+  "reservedAt": "2026-07-31T03:12:42.315Z",
+  "promotedAt": "2026-07-31T03:12:42.321Z",
+  "claim": {
+    "actorId": "claude-006",
+    "leaseId": "lease-cb36ff3e5dc0",
+    "claimedAt": "2026-07-31T03:12:42.327Z",
+    "heartbeatAt": "2026-07-31T04:03:08.767Z",
+    "ttlSeconds": 7200,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0029.*",
+      ".atm/history/task-events/TASK-GIT-0029/**",
+      ".atm/history/tasks/TASK-GIT-0029.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/core/src/**",
+      "schemas/evidence/**",
+      "tests/catalog/groups/**",
+      "tests/cli/**",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260731031243-claude-006-80fecd7dd7",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731031243-claude-006-80fecd7dd7\""
+    }
+  },
+  "startedAt": "2026-07-31T03:12:42.327Z",
+  "startedByActor": "claude-006",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-26c4977b8a91681f",
+    "ticketDigest": "sha256:26c4977b8a91681f0a2e819a67c2d259cd1090aea7efafc4f27ea2add6b86544",
+    "taskId": "TASK-GIT-0029",
+    "origin": "claim",
+    "actorId": "claude-006",
+    "laneSessionId": "lane-20260731031243-claude-006-80fecd7dd7",
+    "claimGeneration": "lease-cb36ff3e5dc0",
+    "issuedAt": "2026-07-31T04:03:08.767Z",
+    "expiresAt": "2026-07-31T06:03:08.767Z",
+    "scopeDigest": "sha256:274d5107d748739ccffe0dbcea3c82520fd0b391afcb5a4ea4fa495f7ddcaafe",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-31T04:03:08.767Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0029.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-GIT-0029/**",
+          ".atm/history/tasks/TASK-GIT-0029.json",
+          "packages/cli/src/commands/broker/batch-execute-actions.ts",
+          "packages/cli/src/commands/git-governance/**",
+          "packages/core/src/**",
+          "schemas/evidence/**",
+          "tests/catalog/groups/**",
+          "tests/cli/**",
+          "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+        ],
+        "digest": "sha256:12af8bf0585a3fbe8b9f2db05cdcd3adb2aaf626de33e03dcac49e8145479fa4"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260731031242-claude-006-TASK-GIT-0029-0bd521eaa4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0029",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0029.*",
+      ".atm/history/task-events/TASK-GIT-0029/**",
+      ".atm/history/tasks/TASK-GIT-0029.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/git-governance/**",
+      "packages/core/src/**",
+      "schemas/evidence/**",
+      "tests/catalog/groups/**",
+      "tests/cli/**",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0029-seal-governed-commit-attribution-transaction.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/git-boundary-admission/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0029-seal-governed-commit-attribution-transaction.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4e004fc4223c522f4fece4ca7349655eaecbdce72ffdaea4c69cb40046b0f11a",
+    "actorId": "claude-006",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260731031243-claude-006-80fecd7dd7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731031243-claude-006-80fecd7dd7\""
+    },
+    "createdAt": "2026-07-31T03:12:48.159Z",
+    "status": "active"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_commit_attribution",
+  "theme": "Sealed commit attribution transaction",
+  "resourceKey": "sealed-commit-attribution",
+  "maintainers": ["atm-core"],
+  "supportedSeams": ["commit-bundle-to-candidate-tree", "broker-admission-to-ref-update"],
+  "dependencyEdges": ["commit-attribution-boundary"],
+  "cases": [
+    {
+      "caseId": "test_task_git_commit_sealed_content_attribution",
+      "semanticKey": "sealed_content_attribution",
+      "responsibility": "task-required",
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "coversAcceptance": ["acceptance-1", "acceptance-2", "acceptance-3"],
+      "coversImpactEdges": ["commit-attribution-boundary"]
+    },
+    {
+      "caseId": "test_broker_apply_admission_before_ref_update",
+      "semanticKey": "admission_before_ref_update",
+      "responsibility": "task-required",
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "coversAcceptance": ["acceptance-4", "acceptance-5"],
+      "coversImpactEdges": ["broker-admission-to-ref-update"]
+    }
+  ],
+  "aliases": [],
+  "lineage": [],
+  "costBudgetMs": 30000,
+  "timeoutMs": 60000,
+  "quarantine": false,
+  "checkpointPolicy": "task-required"
+}
