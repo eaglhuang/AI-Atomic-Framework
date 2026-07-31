@@ -1,0 +1,167 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0306",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a9680a39ca9f85e10a6d5f1a0837aa93b4123d81",
+  "governedTreeSha": "452c76ce87f56f8a4c6228c8e3284fcd5a18eac6",
+  "targetCommitDelta": {
+    "currentCommitSha": "a9680a39ca9f85e10a6d5f1a0837aa93b4123d81",
+    "parentCommitShas": [
+      "a9680a39ca9f85e10a6d5f1a0837aa93b4123d81"
+    ],
+    "governedTreeSha": "452c76ce87f56f8a4c6228c8e3284fcd5a18eac6",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/tasks/ATM-GOV-0293.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/mutation-lineage.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/mutation-lineage.schema.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-mutation-adapter.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:27d699708894ba97111735bb2e11026d474422e09a770bd3e5aaacc3450bf969",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a8437d8fc7d30bd144f057a8ccf7fa6a17bf8e290702f24f1a16b18fa432764e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2361a3aef252bb84aac2257e8c3326dc8a5e04443b92929b440afc1f4214b65b",
+      "stderrSha256": "sha256:d300ba1bd665f9fb7339c74982edd43672a53e879c76ed8e04a10971f1976783",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-mutation-adapter.test.ts",
+    "node --strip-types tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-31T13:50:25.593Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0306.*",
+      ".atm/history/evidence/ATM-GOV-0306.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0306/**",
+      ".atm/history/tasks/ATM-GOV-0306.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/mutation-lineage.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/mutation-lineage.schema.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/mutation-lineage.ts",
+      "schemas/evidence/mutation-lineage.schema.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0306.json",
+  "closedAt": "2026-07-31T13:50:25.593Z",
+  "closedByActor": "cursor-0306",
+  "sessionId": "session-20260731131010-cursor-0306-ATM-GOV-0306-bcb806e82b",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "b31579017dac0efa66985d0ed5425434c3aa69a6",
+    "taskMatchedFiles": [
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/mutation-lineage.ts",
+      "schemas/evidence/mutation-lineage.schema.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0306.json",
+      ".atm/history/task-events/ATM-GOV-0306/2026-07-31T12-53-31-958Z-import-581097192551.json",
+      ".atm/history/task-events/ATM-GOV-0306/2026-07-31T13-10-10-870Z-reserve-93e07c8f0382.json",
+      ".atm/history/task-events/ATM-GOV-0306/2026-07-31T13-10-10-876Z-promote-b52561d47164.json",
+      ".atm/history/task-events/ATM-GOV-0306/2026-07-31T13-10-43-159Z-claim-b358ea7f76e3.json",
+      ".atm/history/tasks/ATM-GOV-0306.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0306",
   "title": "Mutation adapter, lineage, and equivalence governance",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-GOV-PLAN4-R1",
   "dependencies": [
     "ATM-GOV-0285"
@@ -210,8 +210,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-31T13-45-38-603Z-renew-68024e16bc7a",
-  "lastTransitionAt": "2026-07-31T13:45:38.603Z",
+  "lastTransitionId": "2026-07-31T13-50-25-610Z-close-152c25cea8ad",
+  "lastTransitionAt": "2026-07-31T13:50:25.610Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-0306",
   "reservedAt": "2026-07-31T13:10:10.870Z",
@@ -220,7 +220,7 @@
     "actorId": "cursor-0306",
     "leaseId": "lease-122ef28e98fa",
     "claimedAt": "2026-07-31T13:10:10.880Z",
-    "heartbeatAt": "2026-07-31T13:45:37.445Z",
+    "heartbeatAt": "2026-07-31T13:50:25.605Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0306.*",
@@ -239,13 +239,14 @@
       "tests/cli/plan4-mutation-adapter.test.ts",
       "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260731131011-cursor-0306-58cdb40495",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731131011-cursor-0306-58cdb40495\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-31T13:10:10.880Z",
   "startedByActor": "cursor-0306",
@@ -379,5 +380,9 @@
     },
     "createdAt": "2026-07-31T13:10:43.205Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-31T13:50:25.605Z",
+  "closedByActor": "cursor-0306",
+  "closedBySessionId": "session-20260731131010-cursor-0306-ATM-GOV-0306-bcb806e82b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0306.closure-packet.json"
 }
