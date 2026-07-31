@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -7,8 +6,13 @@ import { buildTaskScopedClaimCommand } from './task-scoped-claim-command.ts';
 import { buildTeamKnowledgeSummary } from '../team-knowledge.ts';
 import { classifyTaskDelivery } from '../task-intent.ts';
 import { inspectBatchRunConsistency, readActiveBatchRun } from '../work-channels.ts';
-import { normalizeTaskRouteStatus } from './intent-normalizers.ts';
-import { isClosedTaskStatus } from './route-predicates.ts';
+import { findActiveTaskQueue } from '../task-direction.ts';
+import { normalizeTaskRouteStatus, type TaskIntent } from './intent-normalizers.ts';
+import { isClosedTaskStatus, type ImportedTaskQueue } from './route-predicates.ts';
+import type { NextActionLike } from './next-action-assembly.ts';
+import type { NextDecisionTrailEntry } from './match-and-sort.ts';
+import type { inspectIntegrationBootstrap } from '../integration.ts';
+import type { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import { quoteCliValue, toTaskCandidateView } from './view-projections.ts';
 import { makeResult, message } from '../shared.ts';
 import {
@@ -204,7 +208,7 @@ export function buildPromptScopedNextResult(input: {
       actor: input.actor,
       taskIntent: input.taskIntent,
       importedTaskQueue: input.importedTaskQueue,
-      selectedTasks,
+      selectedTasks: [...selectedTasks],
       queueHeadTask,
       integrationBootstrap: input.integrationBootstrap,
       runtimeAdapterReadiness: input.runtimeAdapterReadiness
