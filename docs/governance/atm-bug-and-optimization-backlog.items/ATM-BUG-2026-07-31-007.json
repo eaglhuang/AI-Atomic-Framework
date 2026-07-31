@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-007",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Git governance / record-commit",
+  "finding": "`node atm.mjs git record-commit --dry-run` can accept pure task-import ledger records, but the actual governed record commit path can still be blocked by the pre-commit hook as `ATM_CROSS_TASK_MUTATION_BLOCKED`, making the dry-run/write contract unreliable for import metadata recovery.",
+  "expectedBehavior": "The record-commit dry-run and write paths must share the same hook-level admission decision. If pure import records are allowed, the real commit must pass; if they are not allowed, dry-run must fail with the same actionable diagnostic before staging or operator time is spent.",
+  "evidenceOrRepro": "While importing Plan 4.0 prerequisite cards ATM-GOV-0277, ATM-GOV-0279, ATM-GOV-0280, and ATM-GOV-0284, `tasks import --write` succeeded and `git record-commit --dry-run` accepted the corresponding `.atm/history/tasks/<id>.json` / `.atm/history/task-events/<id>/...import...json` records. The actual commit was blocked as `ATM_CROSS_TASK_MUTATION_BLOCKED`; splitting per task still failed. Emergency lease `EMG-GLOBAL-b34184071e` and four path-bounded native record commits (`335a9467e`, `a796011bd`, `82b483331`, `460a504ec`) were required to preserve the import records.",
+  "followUp": "Add a record-commit parity test that stages exactly one imported task record plus its import event, runs dry-run and write through the same protected-state classifier, and verifies no cross-task mutation false positive occurs for pure import records."
+}
