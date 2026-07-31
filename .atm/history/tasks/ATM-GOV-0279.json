@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0279",
+  "title": "Obligation inventory schema and inventory drift detector",
+  "status": "planned",
+  "milestone": "ATM-GOV-PLAN4-R1",
+  "dependencies": [
+    "ATM-GOV-0277"
+  ],
+  "acceptance": [
+    "ACC-1: A public obligation inventory schema represents obligation id, semantic family, owning seam, source refs, validator refs, and lifecycle status.",
+    "ACC-2: Canonical inventory digest is deterministic under entry reordering.",
+    "ACC-3: Drift detector reports added, removed, changed, and stale-observed obligations.",
+    "ACC-4: Drift evidence can mark a prior certificate stale without mutating that certificate.",
+    "ACC-5: The test catalog group includes the required test case id and maps it to this card."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/obligation-inventory.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/obligation-inventory.schema.json",
+    "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+    "tests/cli/plan4-obligation-inventory.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/obligation-inventory.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/obligation-inventory.schema.json",
+    "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+    "tests/cli/plan4-obligation-inventory.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-obligation-inventory.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-obligation-inventory-receipts",
+  "rollbackStrategy": "revert-commit-and-disable-plan4-obligation-inventory",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.obligation-inventory",
+        "pattern": "Schema / Drift Detector",
+        "source": "packages/core/src/evidence/obligation-inventory.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/obligation-inventory.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/obligation-inventory.schema.json",
+        "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+        "tests/cli/plan4-obligation-inventory.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0279-obligation-inventory-schema-and-inventory-drift-detector.task.md",
+    "sectionTitle": "ATM-GOV-0279",
+    "headingLine": 83,
+    "hash": "4ba9852be7d3c374",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0279-obligation-inventory-schema-and-inventory-drift-detector.task.md",
+      "planningCommitSha": "5207ea9fff741f7b0b3dd6d1b27cf926798e83ee",
+      "contentDigest": "sha256:4ba9852be7d3c374f513010c211f11d715a0121c2c62535e1c09d51a9671022e",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-31T00:20:16.334Z"
+    }
+  },
+  "importedAt": "2026-07-31T00:20:16.334Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0277"
+    ],
+    "startConditions": [
+      "ATM-GOV-0277 is done and provides model-relative vocabulary for coverage obligations and certificates."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "packages/core/src/evidence/coverage-semantics.ts"
+    ],
+    "changedPublicSeams": [
+      "atm.obligationInventory.v1",
+      "atm.inventoryDriftDetector.v1"
+    ],
+    "causalImpactEdges": [
+      "source seams and validators -> obligation inventory entries",
+      "obligation inventory digest -> inventory drift detector",
+      "inventory drift detector -> coverage certificate freshness"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-obligation-inventory.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "plan4-foundation"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0279_obligation_inventory_drift_detector_5c7f6251",
+      "targetGroupId": "test_group_plan4_obligation_inventory",
+      "semanticKey": "plan4_obligation_inventory_drift_detector",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "source seams and validators -> obligation inventory entries",
+        "obligation inventory digest -> inventory drift detector",
+        "inventory drift detector -> coverage certificate freshness"
+      ],
+      "expectedRedPredicate": "A changed obligation universe can reuse an old certificate without producing inventory drift evidence.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-obligation-inventory",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0279_obligation_inventory_drift_detector_5c7f6251"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-31T00-20-16-471Z-import-d12cf2f1e0b5",
+  "lastTransitionAt": "2026-07-31T00:20:16.471Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
