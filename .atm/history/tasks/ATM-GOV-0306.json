@@ -1,0 +1,356 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0306",
+  "title": "Mutation adapter, lineage, and equivalence governance",
+  "status": "running",
+  "milestone": "ATM-GOV-PLAN4-R1",
+  "dependencies": [
+    "ATM-GOV-0285"
+  ],
+  "acceptance": [
+    "ACC-1: a pinned deterministic mutation adapter (StrykerJS or an in-process fixture adapter) executes only inside an ATM-GOV-0285-selected probe window.",
+    "ACC-2: every observation writes a replayable lineage record with mutant id, killed/survived outcome, lower/upper score bounds, and seed/digest identity.",
+    "ACC-3: equivalence governance classifies survivors as equivalent or non-equivalent; raw tool pass never directly authorizes close.",
+    "ACC-4: unsupported or inconclusive adapter results fail closed and must not return pass.",
+    "ACC-5: lineage outputs are consumable by ATM-GOV-0293 as survivor/equivalence evidence that may strengthen or weaken confidence, but must not be the sole matching authority.",
+    "ACC-6: focused tests cover killed, survived, equivalent, unsupported, and replay-from-digest paths."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/mutation-lineage.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/mutation-lineage.schema.json",
+    "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+    "tests/cli/plan4-mutation-adapter.test.ts",
+    "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/mutation-lineage.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/mutation-lineage.schema.json",
+    "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+    "tests/cli/plan4-mutation-adapter.test.ts",
+    "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-mutation-adapter.test.ts",
+    "node --strip-types tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-mutation-lineage-and-equivalence-gate",
+  "rollbackStrategy": "revert-commit-and-disable-plan4-mutation-lineage-adapter",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.mutation-lineage-policy",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/mutation-lineage.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/mutation-lineage.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/mutation-lineage.schema.json",
+        "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+        "tests/cli/plan4-mutation-adapter.test.ts",
+        "tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0306-mutation-adapter-lineage-and-equivalence-governance.task.md",
+    "sectionTitle": "ATM-GOV-0306",
+    "headingLine": 111,
+    "hash": "f1f8ee7def09d541",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0306-mutation-adapter-lineage-and-equivalence-governance.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f1f8ee7def09d541922505fe562b4e05c6bc16b5a17d37d97ca857d4636c1389",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-31T12:53:31.680Z"
+    }
+  },
+  "importedAt": "2026-07-31T12:53:31.680Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0285"
+    ],
+    "startConditions": [
+      "ATM-GOV-0285 is done and exposes validator/test-catalog selection and resumable probe scheduling."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "ATM-GOV-0293 fault fingerprint and semantic family matching policy"
+    ],
+    "changedPublicSeams": [
+      "atm.mutationAdapter.v1",
+      "atm.mutationLineage.v1",
+      "atm.mutationEquivalenceGovernance.v1"
+    ],
+    "causalImpactEdges": [
+      "selected probe schedule -> mutation adapter execution window",
+      "mutant observation -> replayable lineage record",
+      "killed/survived outcome -> lower/upper score bounds",
+      "survivor classification -> equivalent vs non-equivalent evidence for family matching",
+      "unsupported/inconclusive adapter result -> fail-closed gate"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0285 selector and resumable probe schedule contracts",
+      "Plan 4.0 StrykerJS / in-process mutation adapter architecture"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-mutation-adapter.test.ts",
+      "node --strip-types tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "plan4-mutation-lineage"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0306_replayable_mutation_lineage_7c2e91a4",
+      "targetGroupId": "test_group_plan4_mutation_lineage",
+      "semanticKey": "plan4_replayable_mutation_lineage",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "selected probe schedule -> mutation adapter execution window",
+        "mutant observation -> replayable lineage record",
+        "killed/survived outcome -> lower/upper score bounds"
+      ],
+      "expectedRedPredicate": "Mutation observations omit mutant id, seed/digest, or lower/upper bounds, or are not replayable.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-mutation-lineage",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_atm_gov_0306_equivalence_and_fail_closed_adapter_9b18d0e3",
+      "targetGroupId": "test_group_plan4_mutation_lineage",
+      "semanticKey": "plan4_mutation_equivalence_fail_closed",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "survivor classification -> equivalent vs non-equivalent evidence for family matching",
+        "unsupported/inconclusive adapter result -> fail-closed gate"
+      ],
+      "expectedRedPredicate": "Equivalent survivors are treated as non-equivalent, unsupported adapters return pass, or lineage becomes the sole close authority for ATM-GOV-0293.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-mutation-equivalence",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0306_replayable_mutation_lineage_7c2e91a4",
+    "test_atm_gov_0306_equivalence_and_fail_closed_adapter_9b18d0e3"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-31T13-10-43-159Z-claim-b358ea7f76e3",
+  "lastTransitionAt": "2026-07-31T13:10:43.159Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-0306",
+  "reservedAt": "2026-07-31T13:10:10.870Z",
+  "promotedAt": "2026-07-31T13:10:10.876Z",
+  "claim": {
+    "actorId": "cursor-0306",
+    "leaseId": "lease-122ef28e98fa",
+    "claimedAt": "2026-07-31T13:10:10.880Z",
+    "heartbeatAt": "2026-07-31T13:10:10.880Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0306.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/mutation-lineage.ts",
+      "schemas/evidence/mutation-lineage.schema.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260731131011-cursor-0306-58cdb40495",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731131011-cursor-0306-58cdb40495\""
+    }
+  },
+  "startedAt": "2026-07-31T13:10:10.880Z",
+  "startedByActor": "cursor-0306",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d087840d36e492f0",
+    "ticketDigest": "sha256:d087840d36e492f014bda6b82f9f122150b6ab218492997762941984141685df",
+    "taskId": "ATM-GOV-0306",
+    "origin": "claim",
+    "actorId": "cursor-0306",
+    "laneSessionId": "lane-20260731131011-cursor-0306-58cdb40495",
+    "claimGeneration": "lease-122ef28e98fa",
+    "issuedAt": "2026-07-31T13:10:10.880Z",
+    "expiresAt": "2026-07-31T13:40:10.880Z",
+    "scopeDigest": "sha256:cfb9a6a7c42660d3f6ed9e31b20a6d55d27ba5edd46a7332dbab358669889560",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-31T13:10:10.880Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0306.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0306/**",
+          ".atm/history/tasks/ATM-GOV-0306.json",
+          "packages/core/src/evidence/index.ts",
+          "packages/core/src/evidence/mutation-lineage.ts",
+          "schemas/evidence/mutation-lineage.schema.json",
+          "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+          "tests/cli/plan4-mutation-adapter.test.ts",
+          "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+        ],
+        "digest": "sha256:347841d52051b5253ba07c8664012933d155fb53644c505650a5f58766080af1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260731131010-cursor-0306-ATM-GOV-0306-bcb806e82b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0306",
+    "batchId": null,
+    "scopeKey": "tasks-4bfb3e3b3e75",
+    "queueId": "queue-ef06bc9c44045d20",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0306.*",
+      ".atm/history/task-events/ATM-GOV-0306/**",
+      ".atm/history/tasks/ATM-GOV-0306.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/mutation-lineage.ts",
+      "schemas/evidence/mutation-lineage.schema.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b12e017f0aa5903f85c6707378478327a6ec4341216b9a9ccdceaffd9f900cc9",
+    "actorId": "cursor-0306",
+    "sessionId": "session-20260731131010-cursor-0306-ATM-GOV-0306-bcb806e82b",
+    "laneSession": {
+      "laneSessionId": "lane-20260731131011-cursor-0306-58cdb40495",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731131011-cursor-0306-58cdb40495\""
+    },
+    "createdAt": "2026-07-31T13:10:43.157Z",
+    "status": "active"
+  }
+}

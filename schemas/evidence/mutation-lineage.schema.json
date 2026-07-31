@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.dev/schemas/evidence/mutation-lineage.schema.json",
+  "title": "ATM Mutation Lineage Report",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "adapterSchemaId",
+    "equivalenceSchemaId",
+    "taskId",
+    "selectionDigest",
+    "adapterId",
+    "adapterPin",
+    "ok",
+    "verdict",
+    "closeAuthorization",
+    "failClosed",
+    "records",
+    "bounds",
+    "lineageDigest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.mutationLineage.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "adapterSchemaId": { "const": "atm.mutationAdapter.v1" },
+    "equivalenceSchemaId": { "const": "atm.mutationEquivalenceGovernance.v1" },
+    "taskId": { "type": "string", "minLength": 1 },
+    "selectionDigest": { "type": "string" },
+    "adapterId": { "type": "string", "minLength": 1 },
+    "adapterPin": { "type": "string", "minLength": 1 },
+    "ok": { "type": "boolean" },
+    "verdict": { "enum": ["evidence-ready", "fail-closed"] },
+    "closeAuthorization": { "const": "denied" },
+    "failClosed": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["code", "summary", "repairHint"],
+          "properties": {
+            "code": {
+              "enum": [
+                "ATM_MUTATION_ADAPTER_UNSUPPORTED",
+                "ATM_MUTATION_ADAPTER_INCONCLUSIVE",
+                "ATM_MUTATION_PROBE_WINDOW_VIOLATION",
+                "ATM_MUTATION_LINEAGE_REPLAY_MISMATCH"
+              ]
+            },
+            "summary": { "type": "string", "minLength": 1 },
+            "repairHint": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/lineageRecord" }
+    },
+    "bounds": { "$ref": "#/$defs/bounds" },
+    "lineageDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "lineageRecord": {
+      "type": "object",
+      "required": [
+        "mutantId",
+        "probeId",
+        "outcome",
+        "equivalence",
+        "lowerBound",
+        "upperBound",
+        "seed",
+        "digest"
+      ],
+      "properties": {
+        "mutantId": { "type": "string", "minLength": 1 },
+        "probeId": { "type": "string", "minLength": 1 },
+        "outcome": { "enum": ["killed", "survived"] },
+        "equivalence": {
+          "enum": ["equivalent", "non-equivalent", "not-applicable"]
+        },
+        "lowerBound": { "type": "number", "minimum": 0, "maximum": 1 },
+        "upperBound": { "type": "number", "minimum": 0, "maximum": 1 },
+        "seed": { "type": "string", "minLength": 1 },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "bounds": {
+      "type": "object",
+      "required": [
+        "killed",
+        "survived",
+        "equivalent",
+        "nonEquivalent",
+        "total",
+        "lowerBound",
+        "upperBound"
+      ],
+      "properties": {
+        "killed": { "type": "integer", "minimum": 0 },
+        "survived": { "type": "integer", "minimum": 0 },
+        "equivalent": { "type": "integer", "minimum": 0 },
+        "nonEquivalent": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 },
+        "lowerBound": { "type": "number", "minimum": 0, "maximum": 1 },
+        "upperBound": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}
