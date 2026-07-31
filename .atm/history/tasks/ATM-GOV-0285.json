@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0285",
   "title": "Validator catalog selection bridge and resumable probe scheduler",
-  "status": "planned",
+  "status": "running",
   "milestone": "ATM-GOV-PLAN4-R1",
   "dependencies": [
     "ATM-GOV-0284",
@@ -107,7 +107,9 @@
   },
   "importedAt": "2026-07-30T21:15:05.671Z",
   "workAdmission": {
-    "recoveryMode": "auto"
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -212,7 +214,157 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-30T21-15-05-802Z-import-0bf652887027",
-  "lastTransitionAt": "2026-07-30T21:15:05.802Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-31T12-29-22-436Z-claim-0967bbae42ea",
+  "lastTransitionAt": "2026-07-31T12:29:22.436Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-006",
+  "reservedAt": "2026-07-31T12:28:55.322Z",
+  "promotedAt": "2026-07-31T12:28:55.326Z",
+  "claim": {
+    "actorId": "claude-006",
+    "leaseId": "lease-75bd333db7f7",
+    "claimedAt": "2026-07-31T12:28:55.331Z",
+    "heartbeatAt": "2026-07-31T12:28:55.331Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0285.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "packages/core/src/evidence/validator-catalog-selection.ts",
+      "scripts/lib/test-catalog.ts",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260731122855-claude-006-79867d22e6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731122855-claude-006-79867d22e6\""
+    }
+  },
+  "startedAt": "2026-07-31T12:28:55.331Z",
+  "startedByActor": "claude-006",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-b37d14a016c261a7",
+    "ticketDigest": "sha256:b37d14a016c261a72e51c0481176af1bee5424f85af9802d604afbcfde045024",
+    "taskId": "ATM-GOV-0285",
+    "origin": "claim",
+    "actorId": "claude-006",
+    "laneSessionId": "lane-20260731122855-claude-006-79867d22e6",
+    "claimGeneration": "lease-75bd333db7f7",
+    "issuedAt": "2026-07-31T12:28:55.331Z",
+    "expiresAt": "2026-07-31T12:58:55.331Z",
+    "scopeDigest": "sha256:99892d6effabd0ab6364536dcc575f463a486e1201cf9c417d56203c0a4b2783",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-31T12:28:55.331Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0285.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0285/**",
+          ".atm/history/tasks/ATM-GOV-0285.json",
+          "packages/cli/src/commands/test-catalog.ts",
+          "packages/core/src/evidence/index.ts",
+          "packages/core/src/evidence/test-case-catalog.ts",
+          "packages/core/src/evidence/validator-catalog-selection.ts",
+          "scripts/lib/test-catalog.ts",
+          "scripts/test-catalog.config.json",
+          "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+          "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+          "tests/cli/plan4-validator-catalog-selection.test.ts"
+        ],
+        "digest": "sha256:27aba95735697ce0811277dfd62954560f67fcac3de10505ae4e6714265e7f6a"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260731122855-claude-006-ATM-GOV-0285-2a3d27634a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0285",
+    "batchId": null,
+    "scopeKey": "tasks-4bfb3e3b3e75",
+    "queueId": "queue-ef06bc9c44045d20",
+    "queueIndex": 3,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0285.*",
+      ".atm/history/task-events/ATM-GOV-0285/**",
+      ".atm/history/tasks/ATM-GOV-0285.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "packages/core/src/evidence/validator-catalog-selection.ts",
+      "scripts/lib/test-catalog.ts",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "06dff7f820f4db045eefd30604af5c797e52eccbfc527d41cdd8eb610fc56e25",
+    "actorId": "claude-006",
+    "sessionId": "session-20260731122855-claude-006-ATM-GOV-0285-2a3d27634a",
+    "laneSession": {
+      "laneSessionId": "lane-20260731122855-claude-006-79867d22e6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731122855-claude-006-79867d22e6\""
+    },
+    "createdAt": "2026-07-31T12:29:22.434Z",
+    "status": "active"
+  }
 }
