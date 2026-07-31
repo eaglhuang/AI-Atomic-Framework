@@ -3,6 +3,7 @@ import { buildTaskScopedClaimCommand } from './task-scoped-claim-command.js';
 import { buildTeamKnowledgeSummary } from '../team-knowledge.js';
 import { classifyTaskDelivery } from '../task-intent.js';
 import { inspectBatchRunConsistency, readActiveBatchRun } from '../work-channels.js';
+import { findActiveTaskQueue } from '../task-direction.js';
 import { normalizeTaskRouteStatus } from './intent-normalizers.js';
 import { isClosedTaskStatus } from './route-predicates.js';
 import { quoteCliValue, toTaskCandidateView } from './view-projections.js';
@@ -150,7 +151,7 @@ export function buildPromptScopedNextResult(input) {
             actor: input.actor,
             taskIntent: input.taskIntent,
             importedTaskQueue: input.importedTaskQueue,
-            selectedTasks,
+            selectedTasks: [...selectedTasks],
             queueHeadTask,
             integrationBootstrap: input.integrationBootstrap,
             runtimeAdapterReadiness: input.runtimeAdapterReadiness
