@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0284",
+  "title": "QualityGauntlet facade and ClosureAssuranceMachine reducer events",
+  "status": "planned",
+  "milestone": "ATM-GOV-PLAN4-R1",
+  "dependencies": [
+    "ATM-GOV-0280",
+    "ATM-GOV-0269"
+  ],
+  "acceptance": [
+    "ACC-1: `QualityGauntlet` exposes `advance`, `inspect`, and `replay` as the only public caller interface for start/resume quality assurance.",
+    "ACC-2: `ClosureAssuranceMachine` is a deterministic reducer/event stream; replaying recorded events reconstructs the same public view.",
+    "ACC-3: transitions can represent running, stopped-proven, stopped-sufficient, blocked-counterexample, and indeterminate states without throwing away partial progress.",
+    "ACC-4: events expose stable public fields that `ATM-GOV-0285` can use for validator catalog selection without reading private state.",
+    "ACC-5: tests prove idempotency, replay, terminal verdict mapping, and invalid transition diagnostics."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/quality-gauntlet.ts",
+    "packages/core/src/evidence/closure-assurance-machine.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/quality-gauntlet.schema.json",
+    "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+    "tests/cli/plan4-quality-gauntlet.test.ts",
+    "tests/cli/plan4-closure-assurance-machine.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/quality-gauntlet.ts",
+    "packages/core/src/evidence/closure-assurance-machine.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/quality-gauntlet.schema.json",
+    "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+    "tests/cli/plan4-quality-gauntlet.test.ts",
+    "tests/cli/plan4-closure-assurance-machine.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-quality-gauntlet.test.ts",
+    "node --strip-types tests/cli/plan4-closure-assurance-machine.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-quality-gauntlet-and-reducer-receipts",
+  "rollbackStrategy": "revert-commit-and-disable-plan4-quality-gauntlet-adapter",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.quality-gauntlet",
+        "pattern": "Facade",
+        "source": "packages/core/src/evidence/quality-gauntlet.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.closure-assurance-machine",
+        "pattern": "Reducer",
+        "source": "packages/core/src/evidence/closure-assurance-machine.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/quality-gauntlet.ts",
+        "packages/core/src/evidence/closure-assurance-machine.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/quality-gauntlet.schema.json",
+        "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+        "tests/cli/plan4-quality-gauntlet.test.ts",
+        "tests/cli/plan4-closure-assurance-machine.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0284-quality-gauntlet-facade-and-closure-assurance-machine-reducer-events.task.md",
+    "sectionTitle": "ATM-GOV-0284",
+    "headingLine": 117,
+    "hash": "64685c2578d59edb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0284-quality-gauntlet-facade-and-closure-assurance-machine-reducer-events.task.md",
+      "planningCommitSha": "18377241ca392bea800511c141d963e62ecbb266",
+      "contentDigest": "sha256:64685c2578d59edb52a77aced4d41fcccb7c05f0b9e1708707b34f59bc7a0508",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-31T00:15:00.120Z"
+    }
+  },
+  "importedAt": "2026-07-31T00:15:00.120Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0280",
+      "ATM-GOV-0269"
+    ],
+    "startConditions": [
+      "ATM-GOV-0280 is done and exposes a coverage universe / obligation model contract.",
+      "ATM-GOV-0269 is done and validation-plan observability is stable enough to provide progress evidence."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "packages/core/src/evidence/validation-contract.ts",
+      "packages/core/src/evidence/validation-receipt.ts",
+      "packages/core/src/evidence/test-case-catalog.ts"
+    ],
+    "changedPublicSeams": [
+      "atm.qualityGauntlet.v1",
+      "atm.closureAssuranceMachine.v1",
+      "atm.qualityGauntletEvent.v1"
+    ],
+    "causalImpactEdges": [
+      "close/check-in/phase/release checkpoint -> QualityGauntlet request",
+      "coverage obligations and validation plan progress -> ClosureAssuranceMachine state transition",
+      "assurance reducer event stream -> validator catalog selection inputs",
+      "terminal assurance verdict -> evidence and closeback eligibility"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-quality-gauntlet.test.ts",
+      "node --strip-types tests/cli/plan4-closure-assurance-machine.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "plan4-quality-gauntlet"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0284_quality_gauntlet_facade_contract_2ef36d44",
+      "targetGroupId": "test_group_plan4_quality_gauntlet",
+      "semanticKey": "plan4_quality_gauntlet_facade_contract",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "close/check-in/phase/release checkpoint -> QualityGauntlet request",
+        "terminal assurance verdict -> evidence and closeback eligibility"
+      ],
+      "expectedRedPredicate": "Callers must not need ClosureAssuranceMachine private state to advance, inspect, or replay a quality run.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-quality-gauntlet",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_atm_gov_0284_closure_assurance_reducer_events_91afdb50",
+      "targetGroupId": "test_group_plan4_quality_gauntlet",
+      "semanticKey": "plan4_closure_assurance_reducer_events",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "coverage obligations and validation plan progress -> ClosureAssuranceMachine state transition",
+        "assurance reducer event stream -> validator catalog selection inputs"
+      ],
+      "expectedRedPredicate": "Replaying the same event stream must produce a different view, duplicate events, or hide incomplete/blocked assurance state.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-closure-assurance-machine",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0284_quality_gauntlet_facade_contract_2ef36d44",
+    "test_atm_gov_0284_closure_assurance_reducer_events_91afdb50"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-31T00-15-00-260Z-import-8ada0437dca3",
+  "lastTransitionAt": "2026-07-31T00:15:00.260Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
