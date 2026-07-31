@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0277",
+  "updatedAt": "2026-07-31T00:29:01.061Z",
+  "updatedBy": "codex-skl-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/plan4-coverage-semantics.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-coverage-semantics.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0d5c01bb36a37fb6b2b0b3f1128a51d09bfa9a4ddcc50f6d96d7b00da8d7322d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan4-coverage-semantics.test.ts"
+      ],
+      "generatedAt": "2026-07-31T00:28:37.779Z",
+      "startedAt": "2026-07-31T00:28:37.098Z",
+      "finishedAt": "2026-07-31T00:28:37.779Z",
+      "durationMs": 681,
+      "runnerKind": "dev-source",
+      "sourceCommit": "460a504ec2012e6e37827c3847fa9c8814e73547",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-31T00:29:01.060Z",
+      "startedAt": "2026-07-31T00:28:47.488Z",
+      "finishedAt": "2026-07-31T00:29:01.060Z",
+      "durationMs": 13572,
+      "runnerKind": "dev-source",
+      "sourceCommit": "460a504ec2012e6e37827c3847fa9c8814e73547",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

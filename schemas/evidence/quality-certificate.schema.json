@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/evidence/quality-certificate.schema.json",
+  "title": "ATM Quality Certificate",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "modelRelative",
+    "certificateId",
+    "issuedAt",
+    "model",
+    "claimKind",
+    "coverageRatio",
+    "obligationSummary"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.qualityCertificate.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "modelRelative": { "const": true },
+    "certificateId": { "type": "string", "minLength": 1 },
+    "issuedAt": { "type": "string", "minLength": 1 },
+    "model": {
+      "type": "object",
+      "required": ["modelId"],
+      "properties": {
+        "modelId": { "type": "string", "minLength": 1 },
+        "version": { "type": ["string", "null"] },
+        "digest": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "claimKind": {
+      "enum": [
+        "finite-model-proven",
+        "sufficient-under-assumptions",
+        "blocked-counterexample",
+        "indeterminate",
+        "unsupported",
+        "stale"
+      ]
+    },
+    "coverageRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "statement"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "statement": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "exclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "reason"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "obligationSummary": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["status", "count"],
+        "properties": {
+          "status": {
+            "enum": [
+              "proven",
+              "sufficient-under-assumptions",
+              "blocked",
+              "unknown",
+              "unsupported",
+              "stale",
+              "excluded"
+            ]
+          },
+          "count": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}
