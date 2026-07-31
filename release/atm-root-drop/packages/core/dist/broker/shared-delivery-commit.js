@@ -10,6 +10,29 @@ function ticketsForDecision(document, decision) {
     const ids = new Set(decision.ticketIds);
     return document.tickets.filter((ticket) => ids.has(ticket.ticketId));
 }
+/**
+ * The assertion passes only when the committed tree was read back and matches
+ * the expected slices exactly. Without an observed tree the status stays
+ * `pending`: a commit sha alone is not proof of what it contains.
+ */
+function buildPayloadAssertion(input) {
+    const expectedFileCount = input.expectedFiles.length;
+    if (!input.commitSha || input.committedFiles === null) {
+        return { status: 'pending', expectedFileCount, committedFileCount: null, unexpectedFiles: [], missingFiles: [] };
+    }
+    const committed = uniqueSorted(input.committedFiles);
+    const expected = new Set(input.expectedFiles);
+    const unexpectedFiles = committed.filter((file) => !expected.has(file));
+    const committedSet = new Set(committed);
+    const missingFiles = input.expectedFiles.filter((file) => !committedSet.has(file));
+    return {
+        status: unexpectedFiles.length === 0 && missingFiles.length === 0 ? 'passed' : 'failed',
+        expectedFileCount,
+        committedFileCount: committed.length,
+        unexpectedFiles,
+        missingFiles
+    };
+}
 export function planSharedDeliveryCommit(input) {
     const blockers = [];
     const decision = input.decision;
@@ -118,11 +141,11 @@ export function planSharedDeliveryCommit(input) {
         executorActor: input.actorId,
         temporaryIndexIsolated: true,
         commitCandidateId: input.commitCandidateId ?? null,
-        payloadAssertion: {
-            status: input.commitSha ? 'passed' : 'pending',
-            expectedFileCount: uniqueSorted(Object.values(normalizedSlices).flat()).length,
-            committedFileCount: input.commitSha ? uniqueSorted(Object.values(normalizedSlices).flat()).length : null
-        },
+        payloadAssertion: buildPayloadAssertion({
+            commitSha: input.commitSha ?? null,
+            expectedFiles: uniqueSorted(Object.values(normalizedSlices).flat()),
+            committedFiles: input.committedFiles ?? null
+        }),
         telemetry: {
             schemaId: 'atm.sharedDeliveryTreatmentTelemetry.v1',
             specVersion: '0.1.0',

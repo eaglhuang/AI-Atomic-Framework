@@ -19,6 +19,8 @@ import {
 
 import { readResolutionAuthorizedForeignTaskIds } from "../../broker-conflict-resolution.ts";
 
+import { sealCommitBundleFromLiveIndex } from "./sealed-commit-attribution.ts";
+
 import {
   ATM_INDEX_FOREIGN_ACTIVE_STAGED,
   authorizeGitIndexOverrideLease,
@@ -364,6 +366,15 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     schemaId: "atm.taskScopedCommitBundle.v1",
     taskId: input.taskId,
     ok: blockedCode === null,
+    // TASK-GIT-0029: seal the admitted content here, where ownership was just
+    // inspected. The commit executor assembles from this seal, so a concurrent
+    // writer replacing content behind an admitted path afterwards cannot ride
+    // along under an already-approved path.
+    sealedBundle: sealCommitBundleFromLiveIndex({
+      cwd: input.cwd,
+      paths: commitFilesWithGovernanceEvidence,
+      provenance: "task-scope",
+    }),
     apply: input.apply,
     stagingStrategy: input.autoStage
       ? "explicit-pathspec-git-add"

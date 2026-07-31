@@ -137,12 +137,13 @@ export function executeGitCommit(options, context) {
                 copyableCommitCommand: rawCopyableCommitCommand,
                 liveIndexResidueRollback: [],
             });
-            const commitScopedBundle = () => {
-                if (scopedCommitFiles.length > 0) {
-                    return withTaskScopedCommitIndex(options.cwd, scopedCommitFiles, actorId, (scopedEnv) => runCommit({ ...commitEnv, ...scopedEnv }));
-                }
-                return runCommit(commitEnv);
-            };
+            // TASK-GIT-0029: every governed commit goes through a sealed candidate
+            // index. When no task-scoped bundle resolves, the pre-staged live index
+            // is sealed explicitly instead of being committed implicitly, so the
+            // attribution assertion still runs and an empty index fails closed.
+            const commitScopedBundle = () => withTaskScopedCommitIndex(options.cwd, scopedCommitFiles.length > 0 ? scopedCommitFiles : stagedCommitSurface, actorId, (scopedEnv) => runCommit({ ...commitEnv, ...scopedEnv }), scopedCommitFiles.length > 0
+                ? (taskScopedBundleReport?.sealedBundle ?? null)
+                : null);
             const indexLeaseAuthorization = taskScopedBundleReport?.indexLeaseAuthorization;
             if (indexLeaseAuthorization?.ok) {
                 executeTaskScopedCommitTransaction({

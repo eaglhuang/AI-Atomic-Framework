@@ -1,7 +1,6 @@
 import { createSanitizedGitEnv, resolveGitExecutable, runGitCommand, runGitCommandWithEnv, } from './git-process-port.js';
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, } from "node:fs";
-import os from "node:os";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync, } from "node:fs";
 import path from "node:path";
 import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows, } from "../../framework-development.js";
 import { extractGovernanceTaskIdFromPath, isProtectedStagedGovernanceOwnershipPath, normalizeRelativePath, pathMatchesTaskScope, uniqueSorted, } from "../commit-scope-policy.js";
@@ -11,6 +10,7 @@ import { quoteCliValue, } from "../../shared.js";
 import { ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit } from './git-head-evidence-transaction.js';
 import { parseTaskClaim, readTaskDocument } from './identity-check-command.js';
 import { isIgnorableCommitStagingSideEffect, isTaskOwnedProtectedOverrideAuditPath } from './task-scope-staging.js';
+import { runWithSealedTaskScopedCommitIndex } from './sealed-commit-attribution.js';
 export function inspectCloseCommitWindowStagedArtifacts(cwd, taskId) {
     const stagedFiles = readStagedFiles(cwd);
     if (stagedFiles.length === 0) {
@@ -351,60 +351,30 @@ export function recordGitIndexRestoreFailure(cwd, input) {
     }, null, 2)}\n`, "utf8");
     return relativePath;
 }
-export function withTaskScopedCommitIndex(cwd, files, actorId, run) {
+/**
+ * TASK-GIT-0029: the candidate index is assembled from a sealed bundle and
+ * asserted against it before `run` may create a commit. An empty bundle is no
+ * longer a licence to commit the live shared index — `sealAndRunTaskScopedCommit`
+ * fails closed instead, and callers that legitimately have nothing task-scoped
+ * to seal must resolve their own bundle explicitly.
+ */
+export function withTaskScopedCommitIndex(cwd, files, actorId, run, sealedBundle = null) {
     const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
-    if (normalizedFiles.length === 0) {
-        return run({ ...process.env });
-    }
-    const tempDir = mkdtempSync(path.join(os.tmpdir(), "atm-task-commit-index-"));
-    const tempIndexFile = path.join(tempDir, "index");
-    const env = { ...process.env, GIT_INDEX_FILE: tempIndexFile };
-    try {
-        runGitCommandWithEnv(cwd, ["read-tree", "HEAD"], env, [
-            "ignore",
-            "pipe",
-            "pipe",
-        ]);
-        stageTaskScopedBundleFilesFromLiveIndex(cwd, normalizedFiles, env);
-        if (actorId) {
-            ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, normalizedFiles, env);
-        }
-        return run(env);
-    }
-    finally {
-        rmSync(tempDir, { recursive: true, force: true });
-    }
-}
-export function stageTaskScopedBundleFilesFromLiveIndex(cwd, files, env) {
-    const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
-    if (normalizedFiles.length === 0)
-        return;
-    runGitCommandWithEnv(cwd, [
-        "rm",
-        "--cached",
-        "--quiet",
-        "--ignore-unmatch",
-        "--force",
-        "--",
-        ...normalizedFiles,
-    ], env, ["ignore", "pipe", "pipe"]);
-    const liveEntries = runGitCommand(cwd, [
-        "ls-files",
-        "-s",
-        "--",
-        ...normalizedFiles,
-    ])
-        .split(/\r?\n/)
-        .map((line) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
-        .filter((match) => match !== null);
-    for (const [, mode, objectId, filePath] of liveEntries) {
-        runGitCommandWithEnv(cwd, [
-            "update-index",
-            "--add",
-            "--cacheinfo",
-            `${mode},${objectId},${filePath}`,
-        ], env, ["ignore", "pipe", "pipe"]);
-    }
+    return runWithSealedTaskScopedCommitIndex({
+        cwd,
+        paths: normalizedFiles,
+        provenance: "task-scope",
+        actorId: actorId ?? null,
+        surface: "git commit --task-scoped",
+        sealedBundle,
+        stageGovernanceEvidence: (env) => {
+            if (!actorId)
+                return [];
+            const staged = ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, normalizedFiles, env);
+            return staged?.evidencePath ? [staged.evidencePath] : [];
+        },
+        run,
+    }).result;
 }
 export function stageTaskScopedBundleFiles(cwd, files, env) {
     const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));

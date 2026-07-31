@@ -6,11 +6,10 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { CliError, makeResult, message } from '../shared.js';
 import { planWaveBrokerBatch } from '../../../../core/dist/broker/wave-broker-scheduler.js';
-import { planSharedDeliveryCommit } from '../../../../core/dist/broker/shared-delivery-commit.js';
+import { runSharedDeliveryCommitTransaction } from './shared-delivery-commit-transaction.js';
 import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID } from '../../../../core/dist/broker/shared-write-provenance-policy.js';
 import { planSharedDeliverySaga } from '../../../../core/dist/broker/shared-delivery-saga.js';
 import { planWaveGeneratedWrite } from '../../../../core/dist/broker/wave-generated-executor.js';
-import { assertRecordCommitPayloadPresent } from '../git-governance/record-commit-payload-assertion.js';
 import { ATM_ONLY_EXECUTION_ROUTE_NOTICE, evaluateRestrictedExecution } from '../../../../core/dist/team-agents/restricted-execution-gateway.js';
 function readJson(pathName) {
     if (!existsSync(pathName)) {
@@ -85,84 +84,9 @@ function currentHead(cwd) {
     }
     return result.stdout.trim();
 }
-function runGit(cwd, args, env = {}) {
-    const result = spawnSync('git', args, {
-        cwd,
-        encoding: 'utf8',
-        env: { ...process.env, ...env },
-        stdio: ['ignore', 'pipe', 'pipe']
-    });
-    if (result.status !== 0) {
-        throw new CliError('ATM_BROKER_BATCH_COMMIT_BLOCKED', `git ${args.join(' ')} failed while executing shared delivery commit.`, {
-            exitCode: 1,
-            details: { args, stdout: result.stdout, stderr: result.stderr }
-        });
-    }
-    return result.stdout.trim();
-}
-function runGitWithPathspecStdin(cwd, args, files, env = {}) {
-    const pathspec = uniqueSorted(files).join('\0') + '\0';
-    const result = spawnSync('git', [...args, '--pathspec-from-file=-', '--pathspec-file-nul'], {
-        cwd,
-        input: pathspec,
-        encoding: 'utf8',
-        env: { ...process.env, ...env },
-        stdio: ['pipe', 'pipe', 'pipe']
-    });
-    if (result.status !== 0) {
-        throw new CliError('ATM_BROKER_BATCH_COMMIT_BLOCKED', `git ${args.join(' ')} failed while executing shared delivery commit.`, {
-            exitCode: 1,
-            details: { args, stdout: result.stdout, stderr: result.stderr }
-        });
-    }
-    return result.stdout.trim();
-}
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/').replace(/^\.\//, '').trim()).filter(Boolean))]
         .sort((left, right) => left.localeCompare(right));
-}
-function executeTemporaryIndexCommit(input) {
-    const files = uniqueSorted(input.files);
-    if (files.length === 0) {
-        throw new CliError('ATM_BROKER_BATCH_COMMIT_BLOCKED', 'Shared delivery commit apply requires at least one payload file.', {
-            exitCode: 1,
-            details: { taskIds: input.taskIds }
-        });
-    }
-    const env = { GIT_INDEX_FILE: input.temporaryIndexPath };
-    runGit(input.cwd, ['read-tree', input.expectedHeadSha], env);
-    runGitWithPathspecStdin(input.cwd, ['add', '-A', '-f'], files, env);
-    const treeSha = runGit(input.cwd, ['write-tree'], env);
-    const headTreeSha = runGit(input.cwd, ['rev-parse', `${input.expectedHeadSha}^{tree}`]);
-    if (treeSha === headTreeSha) {
-        throw new CliError('ATM_BROKER_BATCH_COMMIT_BLOCKED', 'Shared delivery commit payload produced no tree changes.', {
-            exitCode: 1,
-            details: { taskIds: input.taskIds, files }
-        });
-    }
-    const commitSha = runGit(input.cwd, [
-        'commit-tree',
-        treeSha,
-        '-p',
-        input.expectedHeadSha,
-        '-m',
-        `shared-delivery: commit ${input.taskIds.join(', ')}`
-    ], {
-        ...env,
-        GIT_AUTHOR_NAME: input.actorId,
-        GIT_AUTHOR_EMAIL: `${input.actorId}@atm.local`,
-        GIT_COMMITTER_NAME: input.actorId,
-        GIT_COMMITTER_EMAIL: `${input.actorId}@atm.local`
-    });
-    runGit(input.cwd, ['update-ref', 'HEAD', commitSha, input.expectedHeadSha]);
-    return {
-        commitSha,
-        payloadAssertion: assertRecordCommitPayloadPresent({
-            cwd: input.cwd,
-            commitSha,
-            expectedStagedFiles: files
-        })
-    };
 }
 function parseFileSlices(entries, fallbackTasks, fallbackFiles) {
     const slices = {};
@@ -492,22 +416,11 @@ export function handleBrokerBatchExecute(options, context) {
     const taskIds = scheduler.tickets
         .filter((ticket) => decision.ticketIds.includes(ticket.ticketId))
         .map((ticket) => ticket.taskId);
-    const tempIndexDir = mkdtempSync(path.join(tmpdir(), 'atm-shared-delivery-index-'));
-    const temporaryIndexPath = path.join(tempIndexDir, 'index');
+    const temporaryIndexPath = path.join(mkdtempSync(path.join(tmpdir(), 'atm-shared-delivery-index-')), 'index');
     const stagedFiles = options.scopeFiles.length > 0 ? options.scopeFiles : [];
     const fileSlices = parseFileSlices(options.fileSlices, taskIds, stagedFiles);
     const payloadFiles = uniqueSorted(Object.values(fileSlices).flat());
     const expectedHead = options.expectedHeadSha ?? options.currentHeadSha ?? currentHead(options.cwd);
-    const applied = options.apply
-        ? executeTemporaryIndexCommit({
-            cwd: options.cwd,
-            actorId: options.actorId,
-            taskIds,
-            expectedHeadSha: expectedHead,
-            temporaryIndexPath,
-            files: payloadFiles
-        })
-        : null;
     // Adapter boundary: gather local shared-write evidence only. The admission
     // rules are the same ones the pre-commit / git commit route runs.
     // Only explicitly declared per-task slices carry ownership evidence; a
@@ -516,24 +429,35 @@ export function handleBrokerBatchExecute(options, context) {
         cwd: options.cwd,
         fileSlices: options.fileSlices.length > 0 ? fileSlices : {},
         sealedBaseSha: options.sealedSourceSha,
-        headSha: applied?.commitSha ?? options.currentHeadSha ?? currentHead(options.cwd)
+        headSha: expectedHead
     });
-    const plan = planSharedDeliveryCommit({
-        provenance,
-        decision,
-        scheduler,
+    // TASK-GIT-0029: admission runs against the pre-apply HEAD, so a blocked plan
+    // returns before any commit object or ref update exists.
+    const transaction = runSharedDeliveryCommitTransaction({
+        cwd: options.cwd,
+        apply: options.apply,
         actorId: options.actorId,
-        manifestDigest: options.manifestDigest,
-        sealedBaseSha: options.sealedSourceSha,
-        currentHeadSha: applied?.commitSha ?? options.currentHeadSha ?? currentHead(options.cwd),
-        expectedHeadSha: applied ? null : options.expectedHeadSha,
-        claimedTaskIds: options.claimedTasks.length > 0 ? options.claimedTasks : taskIds,
-        validatorTaskIds: options.validatorTasks,
-        stagedFiles,
-        fileSlices,
-        commitSha: applied?.commitSha ?? null,
-        temporaryIndexPath
+        taskIds,
+        expectedHeadSha: expectedHead,
+        payloadFiles,
+        planInput: {
+            provenance,
+            decision,
+            scheduler,
+            actorId: options.actorId,
+            manifestDigest: options.manifestDigest,
+            sealedBaseSha: options.sealedSourceSha,
+            currentHeadSha: options.currentHeadSha ?? expectedHead,
+            expectedHeadSha: options.expectedHeadSha,
+            claimedTaskIds: options.claimedTasks.length > 0 ? options.claimedTasks : taskIds,
+            validatorTaskIds: options.validatorTasks,
+            stagedFiles,
+            fileSlices,
+            temporaryIndexPath
+        }
     });
+    const applied = transaction.applied;
+    const plan = transaction.plan;
     const saga = planSharedDeliverySaga({
         decision,
         scheduler,
@@ -566,9 +490,18 @@ export function handleBrokerBatchExecute(options, context) {
             saga,
             receiptPath,
             temporaryIndexPath,
-            payloadAssertion: applied?.payloadAssertion ?? null
+            payloadAssertion: applied?.payloadAssertion ?? null,
+            admissionOrder: {
+                schemaId: 'atm.sharedDeliveryAdmissionOrder.v1',
+                admittedBeforeRefUpdate: transaction.admissionPlan.ok,
+                headMoved: transaction.headMoved,
+                expectedHeadSha: expectedHead,
+                actualHeadSha: applied?.commitSha ?? expectedHead
+            },
+            commitAttributionProof: applied?.attributionProof ?? null,
+            committedFiles: applied?.committedFiles ?? null
         }
     });
-    rmSync(tempIndexDir, { recursive: true, force: true });
+    rmSync(path.dirname(temporaryIndexPath), { recursive: true, force: true });
     return result;
 }
