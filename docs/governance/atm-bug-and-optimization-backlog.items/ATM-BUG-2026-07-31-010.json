@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-010",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Has task card",
+  "area": "Git governance / sealed commit bundle deletion attribution",
+  "finding": "TASK-GIT-0029 sealed commit attribution protects add/modify content, but staged deletions are not represented in the sealed bundle because `ls-files -s` has no entry for a staged deletion. An in-scope deleted file can therefore survive in the committed tree instead of being delivered as an intentional deletion.",
+  "expectedBehavior": "Sealed commit bundles must represent deletion as an explicit tombstone and compare the committed tree against that tombstone. Commit assembly must remove tombstoned paths from the candidate index without re-adding worktree content, and any missing, extra, or wrong-blob result must fail closed before ref mutation.",
+  "evidenceOrRepro": "Claude-006 closeout report for TASK-GIT-0029: delete `src/gone.txt` and modify `src/stay.txt` through sealed commit; the resulting HEAD keeps `gone.txt`. Captain verification also observed staged deletions for `release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.d.ts` and `release/atm-root-drop/packages/core/dist/skills/index.d.ts` after TASK-GIT-0029 close.",
+  "followUp": "TASK-GIT-0030 Represent deletions in sealed commit bundles. Do not emergency-reopen TASK-GIT-0029 unless owner separately authorizes anomaly repair; keep normal delivery on queue/wait/CAS and no override lease."
+}

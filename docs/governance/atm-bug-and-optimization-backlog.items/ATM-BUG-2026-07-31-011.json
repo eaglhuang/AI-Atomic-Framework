@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-011",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Taskflow close / deferred governance state",
+  "finding": "When taskflow close uses `--defer-foreign-state`, derived evidence indexes such as `TASK-*.bundle-manifest.json` can be snapshotted into the close bundle at an older HEAD version and then reapplied to the worktree at a newer derived version. The task closes successfully, but the derived manifest remains dirty afterward and blocks push-readiness.",
+  "expectedBehavior": "Taskflow close should either include the latest derived evidence manifest in the close bundle, regenerate it deterministically after close, or classify it as safe derived residue with an explicit recovery instruction. A successful close should not leave an in-scope derived evidence file dirty with no ATM-authorized cleanup route.",
+  "evidenceOrRepro": "TASK-GIT-0031 closeout on 2026-07-31 used `--defer-foreign-state` because of foreign staged git-head state. `validate:git-head-evidence` updated `.atm/history/evidence/TASK-GIT-0031.json` and derived `.atm/history/evidence/TASK-GIT-0031.bundle-manifest.json`; the close commit sealed the older manifest while reapplying the newer derived manifest after close. ATM residue/finalize diagnostics reported no actionable residue, leaving `.atm/history/evidence/TASK-GIT-0031.bundle-manifest.json` as a push blocker until the captain explicitly authorized restoring that exact derived file.",
+  "followUp": "Open a GIT/taskflow follow-up to fix defer-foreign-state close ordering or derived-manifest recovery semantics. Acceptance should prove close with deferred governance state does not leave dirty derived evidence manifests, or emits an explicit safe cleanup/rebuild route."
+}

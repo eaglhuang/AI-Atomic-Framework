@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-009",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Git governance / commit attribution",
+  "finding": "Governed commit admission is path-scoped but not yet proven content-attributed across every success path. Broker apply code also needs proof that shared-delivery admission happens before commit-tree/update-ref effects. A same-path staged blob swap or late admission rejection could produce a successful commit whose actual tree does not match the admitted bundle.",
+  "expectedBehavior": "Every governed commit must seal path, mode, blob/content digest, and provenance before any ref mutation; temporary-index assembly must consume that sealed bundle; rejected admission must leave HEAD unchanged; receipts must be derived from the actual committed tree. Multiple captains may prepare sealed bundles in parallel, but the branch ref update must be broker-managed through queue/wait or CAS retry. Override leases are exceptional repair authority, not the normal answer to daily multi-captain commits.",
+  "evidenceOrRepro": "Captain source review on 2026-07-31 found current atm git commit already uses task-scoped temporary index execution from TASK-GIT-0028, so the older no-isolation claim is stale. Remaining evidence-backed concern is success-path content attribution and broker apply/admission ordering around packages/cli/src/commands/git-governance/** and packages/cli/src/commands/broker/batch-execute-actions.ts.",
+  "followUp": "Implement TASK-GIT-0029 Seal governed commit attribution transaction and map its generic fixture family to Plan 4.0 commit content attribution boundary coverage. Acceptance should prove wait/queue/CAS retry safety and keep override lease out of the normal multi-captain commit path."
+}
