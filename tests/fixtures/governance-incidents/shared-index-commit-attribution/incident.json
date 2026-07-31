@@ -44,6 +44,27 @@
       "expectedCode": null
     },
     {
+      "variantId": "staged-deletion-dropped-from-seal",
+      "summary": "A staged deletion has no index entry, so a seal built only from present content omits it and the file survives the commit.",
+      "expectedInvariant": "deletion is sealed as an explicit tombstone and the committed tree omits the path",
+      "expectedOutcome": "the deletion and any accompanying modification both land",
+      "expectedCode": null
+    },
+    {
+      "variantId": "tombstone-not-honoured",
+      "summary": "A tombstoned path is still present in the candidate tree.",
+      "expectedInvariant": "a tombstone requires absence from the committed tree",
+      "expectedOutcome": "fail-closed before any ref update",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
+    },
+    {
+      "variantId": "out-of-scope-deletion",
+      "summary": "A deletion outside the admitted scope is staged alongside an admitted one.",
+      "expectedInvariant": "unadmitted removals are excluded, never absorbed",
+      "expectedOutcome": "excluded from the candidate; forcing it in fails closed",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
+    },
+    {
       "variantId": "head-moved-after-admission",
       "summary": "Another lane advances HEAD between admission and ref update.",
       "expectedInvariant": "ref update is compare-and-swap, never a force",

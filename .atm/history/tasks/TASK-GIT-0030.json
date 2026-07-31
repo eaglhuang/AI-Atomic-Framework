@@ -1,0 +1,336 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0030",
+  "title": "Represent deletions in sealed commit bundles",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-GIT-0029"
+  ],
+  "acceptance": [
+    "Sealed bundle entries can represent deletions as explicit tombstones, not as absent entries.",
+    "Commit assembly removes tombstoned paths from the candidate index and never re-adds them from the live worktree.",
+    "Bundle-vs-tree comparison treats deletion as required committed tree state and fails closed on missing, extra, or same-path wrong-blob findings.",
+    "Regression test proves an in-scope deletion plus an in-scope modification commits both effects.",
+    "Regression test proves an out-of-scope deletion is rejected or excluded fail-closed and cannot be silently absorbed.",
+    "Existing sealed add/modify/CAS/admission-before-ref-update coverage remains green.",
+    "Frozen runner/release mirrors are synced after the source fix; current staged root-drop `.d.ts` deletions are either correctly delivered by this task or explicitly justified as no-op cleanup evidence.",
+    "No override lease, raw git commit, branch, rebase, or push is used unless the owner gives a separate emergency instruction."
+  ],
+  "deliverables": [
+    "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+  ],
+  "scopePaths": [
+    "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+    "tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+    "tests/catalog/groups/**",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop/**"
+  ],
+  "validators": [
+    "npm run test:cli -- --run tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "npm run test:cli -- --run tests/cli/git-commit-task-scoped-staging.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:module-boundaries"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": "- This is a follow-up card, not a reopen of TASK-GIT-0029. The prior task is already closed in the target ledger.\n- Current evidence: Claude-006 reported minimal repro `delete src/gone.txt + modify src/stay.txt`; observed canonical index also has staged deletions under `release/atm-root-drop/packages/core/dist/skills/*.d.ts`.\n- Keep the rule generic. Do not special-case TASK-GIT-0029, actor names, local dates, or release paths in production control flow.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-07-31T05:13:55.225Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"git-boundary-admission/tasks/TASK-GIT-0030-represent-deletions-in-sealed-commit-bundles.task.md\",\"contentDigest\":\"sha256:38e1c1d5003a4260013ebba58c47c06b1e0498b4a770218218d90de2602a833c\"} -->",
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0030-represent-deletions-in-sealed-commit-bundles.task.md",
+    "sectionTitle": "TASK-GIT-0030",
+    "headingLine": 41,
+    "hash": "5bb123b3446ada6c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0030-represent-deletions-in-sealed-commit-bundles.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:5bb123b3446ada6c4b1862abd76f3443ebf446f7ea2a8d3f76cf156b9e4b08d0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T05:14:59.904Z"
+    }
+  },
+  "importedAt": "2026-07-31T05:14:59.904Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.test.cli.run.tests.cli.commit.attribution.sealed.transaction.test.ts",
+      "command": "npm run test:cli -- --run tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.test.cli.run.tests.cli.git.commit.task.scoped.staging.test.ts",
+      "command": "npm run test:cli -- --run tests/cli/git-commit-task-scoped-staging.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.module.boundaries",
+      "command": "npm run validate:module-boundaries",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-31T05-50-39-637Z-renew-fd7419e68511",
+  "lastTransitionAt": "2026-07-31T05:50:39.637Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-006",
+  "reservedAt": "2026-07-31T05:31:35.595Z",
+  "promotedAt": "2026-07-31T05:31:35.599Z",
+  "claim": {
+    "actorId": "claude-006",
+    "leaseId": "lease-e4918a186ac8",
+    "claimedAt": "2026-07-31T05:31:35.603Z",
+    "heartbeatAt": "2026-07-31T05:50:39.202Z",
+    "ttlSeconds": 7200,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0030.*",
+      ".atm/history/task-events/TASK-GIT-0030/**",
+      ".atm/history/tasks/TASK-GIT-0030.json",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+      "release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.d.ts",
+      "release/atm-root-drop/packages/core/dist/skills/index.d.ts",
+      "tests/catalog/groups/**",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260731053135-claude-006-29df6db271",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731053135-claude-006-29df6db271\""
+    }
+  },
+  "startedAt": "2026-07-31T05:31:35.603Z",
+  "startedByActor": "claude-006",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-4adacf5c05077c6b",
+    "ticketDigest": "sha256:4adacf5c05077c6bcb15de79927ade8787d980007d33602a8e3fa4e95eb35e76",
+    "taskId": "TASK-GIT-0030",
+    "origin": "claim",
+    "actorId": "claude-006",
+    "laneSessionId": "lane-20260731053135-claude-006-29df6db271",
+    "claimGeneration": "lease-e4918a186ac8",
+    "issuedAt": "2026-07-31T05:50:39.202Z",
+    "expiresAt": "2026-07-31T07:50:39.202Z",
+    "scopeDigest": "sha256:99d830fcaa9a3da71893384b1efd9eb9641b16b1ac4f46f21a9260815fed3f74",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-31T05:50:39.202Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0030.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-GIT-0030/**",
+          ".atm/history/tasks/TASK-GIT-0030.json",
+          "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+          "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+          "release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.d.ts",
+          "release/atm-root-drop/packages/core/dist/skills/index.d.ts",
+          "tests/catalog/groups/**",
+          "tests/cli/commit-attribution-sealed-transaction.test.ts",
+          "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+        ],
+        "digest": "sha256:f56dbe68a2ff4cc3524ba5a215732606b5665aef86508026701f7fa4bdefea70"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260731053135-claude-006-TASK-GIT-0030-4792366d0f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0030",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0030.*",
+      ".atm/history/task-events/TASK-GIT-0030/**",
+      ".atm/history/tasks/TASK-GIT-0030.json",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+      "release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.d.ts",
+      "release/atm-root-drop/packages/core/dist/skills/index.d.ts",
+      "tests/catalog/groups/**",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0030-represent-deletions-in-sealed-commit-bundles.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/git-boundary-admission/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0030-represent-deletions-in-sealed-commit-bundles.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "514e33056b3daacba576cf6cbc19adbf13dd2aa018852cc97b0d1b8bcfe69eed",
+    "actorId": "claude-006",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260731053135-claude-006-29df6db271",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731053135-claude-006-29df6db271\""
+    },
+    "createdAt": "2026-07-31T05:31:46.015Z",
+    "status": "active"
+  }
+}

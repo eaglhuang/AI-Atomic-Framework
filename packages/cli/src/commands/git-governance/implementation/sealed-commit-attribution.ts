@@ -19,6 +19,7 @@ import {
   ATM_COMMIT_ATTRIBUTION_MISMATCH,
   assertSealedBundleNotEmpty,
   compareCommitTreeToSealedBundle,
+  isTombstone,
   sealCommitBundle,
   type CommitAttributionProof,
   type CommitTreeEntry,
@@ -54,6 +55,7 @@ export function sealCommitBundleFromLiveIndex(input: {
   readonly paths: readonly string[];
   readonly provenance: SealedCommitEntryProvenance;
   readonly baseTreeSha?: string | null;
+  readonly baseRef?: string | null;
 }): SealedCommitBundle {
   const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
   if (paths.length === 0) {
@@ -67,10 +69,44 @@ export function sealCommitBundleFromLiveIndex(input: {
       path: normalizePath(match[3]),
       mode: match[1],
       blobId: match[2],
-      provenance: input.provenance
+      provenance: input.provenance,
+      disposition: 'present'
     });
   }
+  // TASK-GIT-0030: a staged deletion has no index entry, so the loop above
+  // cannot see it. Sealing only what `ls-files` returns silently drops the
+  // removal from the candidate tree and the file survives the commit. Deletions
+  // are therefore sealed explicitly as tombstones.
+  for (const entry of readStagedDeletionEntries({ cwd: input.cwd, paths, baseRef: input.baseRef ?? 'HEAD' })) {
+    entries.push({ ...entry, provenance: input.provenance });
+  }
   return sealCommitBundle({ entries, baseTreeSha: input.baseTreeSha ?? null });
+}
+
+/**
+ * Paths the index removes relative to the base tree, sealed with their
+ * pre-image mode so the tombstone still carries identity.
+ */
+function readStagedDeletionEntries(input: {
+  readonly cwd: string;
+  readonly paths: readonly string[];
+  readonly baseRef: string;
+}): readonly SealedCommitBundleEntry[] {
+  const entries: SealedCommitBundleEntry[] = [];
+  for (const line of splitLines(
+    runGitCommand(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths])
+  )) {
+    const match = line.match(RAW_DIFF_PATTERN);
+    if (!match) continue;
+    entries.push({
+      path: normalizePath(match[6]),
+      mode: match[1],
+      blobId: '',
+      provenance: 'task-scope',
+      disposition: 'deleted'
+    });
+  }
+  return entries;
 }
 
 /** Merge overlay entries (governance evidence) onto an already sealed bundle. */
@@ -99,13 +135,18 @@ export function assembleSealedCommitIndex(input: {
   runGitCommandWithEnv(input.cwd, ['read-tree', input.baseRef ?? 'HEAD'], input.env, [...QUIET_STDIO]);
   const paths = input.bundle.entries.map((entry) => entry.path);
   if (paths.length === 0) return;
+  // Every sealed path is first removed from the candidate index. Tombstoned
+  // paths stop here: they are never re-added, and because the content is taken
+  // from the seal rather than the worktree, a file that still exists on disk
+  // cannot resurrect itself into the commit.
   runGitCommandWithEnv(
     input.cwd,
     ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', ...paths],
     input.env,
     [...QUIET_STDIO]
   );
-  for (const entry of input.bundle.entries) {
+  const presentEntries = input.bundle.entries.filter((entry) => !isTombstone(entry));
+  for (const entry of presentEntries) {
     runGitCommandWithEnv(
       input.cwd,
       ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`],
@@ -119,9 +160,10 @@ export function assembleSealedCommitIndex(input: {
   // substitution this seal exists to prevent. Marking the sealed entries
   // assume-unchanged tells the refresh to trust the index. The bit only ever
   // exists in the throwaway candidate index, never in the live one.
+  if (presentEntries.length === 0) return;
   runGitCommandWithEnv(
     input.cwd,
-    ['update-index', '--assume-unchanged', '--', ...paths],
+    ['update-index', '--assume-unchanged', '--', ...presentEntries.map((entry) => entry.path)],
     input.env,
     [...QUIET_STDIO]
   );
@@ -139,7 +181,8 @@ function parseRawDiffEntries(output: string): readonly CommitTreeEntry[] {
     entries.push({
       path: normalizePath(filePath),
       mode: deleted ? sourceMode : targetMode,
-      blobId: deleted ? '' : targetBlob
+      blobId: deleted ? '' : targetBlob,
+      disposition: deleted ? 'deleted' : 'present'
     });
   }
   return entries;
@@ -169,7 +212,7 @@ export function readCandidateTreeEntries(input: {
     )) {
       const match = line.match(LS_FILES_STAGE_PATTERN);
       if (!match) continue;
-      entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2] });
+      entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2], disposition: 'present' });
     }
   }
   const diffEntries = parseRawDiffEntries(

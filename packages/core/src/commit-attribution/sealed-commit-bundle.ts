@@ -32,14 +32,27 @@ export type SealedCommitEntryProvenance =
   | 'shared-delivery-slice'
   | 'pre-staged-index';
 
+/**
+ * `present` seals content that must exist in the committed tree. `deleted` is
+ * a tombstone: the path must be absent from the committed tree.
+ *
+ * Tombstones exist because absence cannot be sealed by omission. A staged
+ * deletion has no index entry, so a bundle that only records what `ls-files`
+ * returns has no way to distinguish "this path must go" from "this path is not
+ * mine" — and the removal is silently dropped from the candidate tree.
+ */
+export type SealedCommitEntryDisposition = 'present' | 'deleted';
+
 export interface SealedCommitBundleEntry {
   /** Repository-relative, forward-slash normalized. */
   readonly path: string;
-  /** Git file mode as recorded by the index, for example `100644`. */
+  /** Git file mode. For a tombstone this is the pre-image mode from the base tree. */
   readonly mode: string;
-  /** Content identity: a blob object id, or any digest the adapter seals. */
+  /** Content identity: a blob object id, or any digest the adapter seals. Empty for a tombstone. */
   readonly blobId: string;
   readonly provenance: SealedCommitEntryProvenance;
+  /** Defaults to `present` so existing callers keep their meaning. */
+  readonly disposition?: SealedCommitEntryDisposition;
 }
 
 export interface SealedCommitBundle {
@@ -55,7 +68,9 @@ export type CommitAttributionFindingKind =
   | 'missing-path'
   | 'unexpected-path'
   | 'mode-mismatch'
-  | 'content-mismatch';
+  | 'content-mismatch'
+  /** A tombstoned path is still present in the candidate tree. */
+  | 'undeleted-path';
 
 export interface CommitAttributionFinding {
   readonly kind: CommitAttributionFindingKind;
@@ -82,6 +97,21 @@ export interface CommitTreeEntry {
   readonly path: string;
   readonly mode: string;
   readonly blobId: string;
+  /**
+   * `deleted` when the observed tree removes the path. Adapters that only
+   * report present entries may omit this.
+   */
+  readonly disposition?: SealedCommitEntryDisposition;
+}
+
+function dispositionOf(entry: { readonly disposition?: SealedCommitEntryDisposition; readonly blobId?: string }): SealedCommitEntryDisposition {
+  if (entry.disposition) return entry.disposition;
+  // An empty blob id can only mean "no post-image content".
+  return entry.blobId ? 'present' : 'deleted';
+}
+
+export function isTombstone(entry: SealedCommitBundleEntry): boolean {
+  return dispositionOf(entry) === 'deleted';
 }
 
 function normalizePath(value: string): string {
@@ -140,12 +170,30 @@ export function compareCommitTreeToSealedBundle(input: {
   let matched = 0;
   for (const [path, sealedEntry] of sealedByPath) {
     const actualEntry = actualByPath.get(path);
-    if (!actualEntry) {
+    if (isTombstone(sealedEntry)) {
+      // A tombstone is satisfied either by an observed deletion or by the path
+      // simply not being in the observed tree — both mean the commit does not
+      // carry that content. Anything with post-image content is a failure.
+      if (!actualEntry || dispositionOf(actualEntry) === 'deleted') {
+        matched += 1;
+        continue;
+      }
+      findings.push({
+        kind: 'undeleted-path',
+        path,
+        sealedMode: sealedEntry.mode,
+        actualMode: actualEntry.mode,
+        sealedBlobId: null,
+        actualBlobId: actualEntry.blobId
+      });
+      continue;
+    }
+    if (!actualEntry || dispositionOf(actualEntry) === 'deleted') {
       findings.push({
         kind: 'missing-path',
         path,
         sealedMode: sealedEntry.mode,
-        actualMode: null,
+        actualMode: actualEntry?.mode ?? null,
         sealedBlobId: sealedEntry.blobId,
         actualBlobId: null
       });

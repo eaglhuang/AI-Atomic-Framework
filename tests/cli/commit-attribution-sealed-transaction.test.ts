@@ -22,6 +22,7 @@ import {
   ATM_COMMIT_ATTRIBUTION_MISMATCH,
   assertSealedBundleNotEmpty,
   compareCommitTreeToSealedBundle,
+  isTombstone,
   sealCommitBundle
 } from '../../packages/core/src/commit-attribution/sealed-commit-bundle.ts';
 import {
@@ -247,6 +248,130 @@ expectThrows(() => assertSealedBundleNotEmpty(sealCommitBundle({ entries: [] }))
   });
   assert.equal(proof.ok, true, 'an unchanged sealed path must not be reported missing');
   assert.equal(proof.matchedEntryCount, 2);
+}
+
+// --- TASK-GIT-0030: deletions are sealed as tombstones -------------------
+
+{
+  // In-scope deletion plus in-scope modification must both land. Before
+  // tombstones existed, the deletion had no index entry to seal and the file
+  // silently survived the commit.
+  const root = createRepository();
+  const removed = 'src/gone.txt';
+  const modified = 'src/stay.txt';
+  write(root, removed, 'gone\n');
+  write(root, modified, 'stay\n');
+  git(root, ['add', '--', removed, modified]);
+  git(root, ['commit', '--quiet', '-m', 'seed']);
+
+  git(root, ['rm', '--quiet', '--', removed]);
+  write(root, modified, 'stay v2\n');
+  git(root, ['add', '--', modified]);
+
+  const bundle = sealCommitBundleFromLiveIndex({ cwd: root, paths: [removed, modified], provenance: 'task-scope' });
+  const tombstones = bundle.entries.filter(isTombstone);
+  assert.deepEqual(tombstones.map((entry) => entry.path), [removed], 'the deletion must be sealed as a tombstone');
+  assert.equal(tombstones[0].blobId, '', 'a tombstone carries no post-image content');
+  assert.ok(tombstones[0].mode.length > 0, 'a tombstone keeps its pre-image mode');
+
+  runWithSealedTaskScopedCommitIndex({
+    cwd: root,
+    paths: [removed, modified],
+    provenance: 'task-scope',
+    surface: 'test',
+    sealedBundle: bundle,
+    run: (env) => execFileSync('git', ['commit', '--quiet', '-m', 'delete and modify'], {
+      cwd: root,
+      env: { ...env, GIT_AUTHOR_NAME: 'fixture-writer', GIT_AUTHOR_EMAIL: 'fixture-writer@example.com' },
+      stdio: ['ignore', 'pipe', 'pipe']
+    })
+  });
+
+  const tree = git(root, ['ls-tree', '-r', '--name-only', 'HEAD']).split(/\r?\n/);
+  assert.ok(!tree.includes(removed), 'the deleted path must be absent from the committed tree');
+  assert.ok(tree.includes(modified), 'the modified path must remain');
+  assert.equal(git(root, ['show', `HEAD:${modified}`]).trim(), 'stay v2', 'the modification must land');
+  const committed = readCommittedTreeEntries(root, head(root));
+  assert.deepEqual(
+    committed.map((entry) => `${entry.disposition}:${entry.path}`).sort(),
+    [`deleted:${removed}`, `present:${modified}`].sort()
+  );
+}
+
+{
+  // A tombstone that the candidate tree does not honour is a hard failure, and
+  // an out-of-scope deletion is never absorbed: it is simply not sealed, so it
+  // cannot reach the commit, and forcing it into the candidate fails closed.
+  const root = createRepository();
+  const owned = 'src/owned.txt';
+  const foreign = 'src/foreign.txt';
+  write(root, owned, 'owned\n');
+  write(root, foreign, 'foreign\n');
+  git(root, ['add', '--', owned, foreign]);
+  git(root, ['commit', '--quiet', '-m', 'seed']);
+
+  git(root, ['rm', '--quiet', '--', owned, foreign]);
+
+  // Only the owned path is admitted, so only it is sealed.
+  const bundle = sealCommitBundleFromLiveIndex({ cwd: root, paths: [owned], provenance: 'task-scope' });
+  assert.deepEqual(bundle.entries.map((entry) => entry.path), [owned]);
+
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-tombstone-'));
+  roots.push(tempDir);
+  const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
+  assembleSealedCommitIndex({ cwd: root, bundle, env });
+  const sealedPaths = bundle.entries.map((entry) => entry.path);
+  assert.equal(
+    assertCommitAttribution({
+      sealed: bundle,
+      actual: readCandidateTreeEntries({ cwd: root, env, sealedPaths }),
+      surface: 'test'
+    }).ok,
+    true,
+    'the out-of-scope deletion must be excluded, not absorbed'
+  );
+
+  // Force the out-of-scope removal into the candidate; it must fail closed.
+  execFileSync('git', ['rm', '--cached', '--quiet', '--force', '--', foreign], {
+    cwd: root,
+    env,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  const beforeHead = head(root);
+  const error = expectThrows(
+    () => assertCommitAttribution({
+      sealed: bundle,
+      actual: readCandidateTreeEntries({ cwd: root, env, sealedPaths }),
+      surface: 'test'
+    }),
+    ATM_COMMIT_ATTRIBUTION_MISMATCH
+  );
+  assert.equal(head(root), beforeHead, 'the rejection must not move HEAD');
+  const findings = (error.details?.findings ?? []) as { kind: string; path: string }[];
+  assert.deepEqual(findings.map((finding) => `${finding.kind}:${finding.path}`), [`unexpected-path:${foreign}`]);
+}
+
+{
+  // A tombstone whose path is still present in the candidate tree fails closed
+  // rather than shipping a commit that quietly keeps the file.
+  const sealedWithTombstone = sealCommitBundle({
+    entries: [{ path: 'src/gone.txt', mode: '100644', blobId: '', provenance: 'task-scope', disposition: 'deleted' }]
+  });
+  const proof = compareCommitTreeToSealedBundle({
+    sealed: sealedWithTombstone,
+    actual: [{ path: 'src/gone.txt', mode: '100644', blobId: 'abc', disposition: 'present' }]
+  });
+  assert.equal(proof.ok, false);
+  assert.deepEqual(proof.findings.map((finding) => finding.kind), ['undeleted-path']);
+
+  // And an honoured tombstone matches whether the adapter reports the deletion
+  // explicitly or simply omits the path.
+  for (const actual of [
+    [{ path: 'src/gone.txt', mode: '100644', blobId: '', disposition: 'deleted' as const }],
+    [] as const
+  ]) {
+    assert.equal(compareCommitTreeToSealedBundle({ sealed: sealedWithTombstone, actual }).ok, true);
+  }
 }
 
 // --- adapter: an empty bundle no longer commits the live index ------------
