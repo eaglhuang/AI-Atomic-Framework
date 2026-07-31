@@ -3,6 +3,7 @@ export * from './coverage-semantics.js';
 export * from './diff-evidence.js';
 export * from './diagnostic-loop.js';
 export * from './git-boundary-evidence.js';
+export * from './obligation-inventory.js';
 export * from './realness.js';
 export * from './tdd-cycle.js';
 export * from './validation-receipt.js';
