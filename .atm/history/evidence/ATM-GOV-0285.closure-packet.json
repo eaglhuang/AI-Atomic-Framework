@@ -1,0 +1,169 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0285",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c00b9875aed0507856e91b3b8924f20bf638c648",
+  "governedTreeSha": "348c276c738ccfa350728194d3c8095e53bc31ca",
+  "targetCommitDelta": {
+    "currentCommitSha": "c00b9875aed0507856e91b3b8924f20bf638c648",
+    "parentCommitShas": [
+      "c00b9875aed0507856e91b3b8924f20bf638c648"
+    ],
+    "governedTreeSha": "348c276c738ccfa350728194d3c8095e53bc31ca",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/tasks/ATM-GOV-0293.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/validator-catalog-selection.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-validator-catalog-selection.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c6fb5bf8601df93c1de1214063e6c86ceb186dc33f17e8395e324b88ca344e1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-resumable-probe-scheduler.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d0a1ad7928959bcf1587c3c95a14e4875f552a621567f059d781fe838f47a4a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5dea15373c4b32687da433ec208e38eeb330698f9e952f668bdeb7eae280c3e9",
+      "stderrSha256": "sha256:d3c6b3e1878cf444ef1924cbd0dccddd337b7e6005d3049228e6c991215df03e",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-resumable-probe-scheduler.test.ts",
+    "node --strip-types tests/cli/plan4-validator-catalog-selection.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-31T13:00:30.699Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0285.*",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0285/**",
+      ".atm/history/tasks/ATM-GOV-0285.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "packages/core/src/evidence/validator-catalog-selection.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/lib/test-catalog.ts",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "packages/core/src/evidence/validator-catalog-selection.ts",
+      "scripts/lib/test-catalog.ts",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0285.json",
+  "closedAt": "2026-07-31T13:00:30.700Z",
+  "closedByActor": "claude-006",
+  "sessionId": "session-20260731122855-claude-006-ATM-GOV-0285-2a3d27634a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c00b9875aed0507856e91b3b8924f20bf638c648",
+    "taskMatchedFiles": [],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0285/2026-07-31T12-56-20-594Z-scope-amendment-390f942e3ed7.json",
+      ".atm/history/task-events/ATM-GOV-0285/2026-07-31T12-56-24-215Z-renew-3ea548a6747d.json",
+      ".atm/history/tasks/ATM-GOV-0285.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

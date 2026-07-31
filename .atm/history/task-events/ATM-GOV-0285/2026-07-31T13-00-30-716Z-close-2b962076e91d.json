@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-31T13-00-30-716Z-close-2b962076e91d",
+  "taskId": "ATM-GOV-0285",
+  "action": "close",
+  "actorId": "claude-006",
+  "sessionId": "session-20260731122855-claude-006-ATM-GOV-0285-2a3d27634a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0285.json",
+  "taskSha256": "sha256:5011b8c591f75681df95aee60b284618d31a3a5d13907134fde2550b5aecdc3c",
+  "createdAt": "2026-07-31T13:00:30.716Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0285 --actor claude-006 --status done --historical-delivery c00b9875aed0507856e91b3b8924f20bf638c648",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260731122855-claude-006-ATM-GOV-0285-2a3d27634a",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0285.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-resumable-probe-scheduler.test.ts",
+      "node --strip-types tests/cli/plan4-validator-catalog-selection.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-31T13:00:30.699Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0285.*",
+        ".atm/history/evidence/git-head.jsonl",
+        ".atm/history/task-events/ATM-GOV-0285/**",
+        ".atm/history/tasks/ATM-GOV-0285.json",
+        "packages/cli/src/commands/test-catalog.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/test-case-catalog.ts",
+        "packages/core/src/evidence/validator-catalog-selection.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/packages/core/dist/evidence/index.js",
+        "release/atm-root-drop/packages/core/src/evidence/index.ts",
+        "release/atm-root-drop/release-manifest.json",
+        "scripts/lib/test-catalog.ts",
+        "scripts/test-catalog.config.json",
+        "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+        "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+        "tests/cli/plan4-validator-catalog-selection.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/test-catalog.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/test-case-catalog.ts",
+        "packages/core/src/evidence/validator-catalog-selection.ts",
+        "scripts/lib/test-catalog.ts",
+        "scripts/test-catalog.config.json",
+        "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+        "tests/cli/plan4-resumable-probe-scheduler.test.ts",
+        "tests/cli/plan4-validator-catalog-selection.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0285",
   "title": "Validator catalog selection bridge and resumable probe scheduler",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-GOV-PLAN4-R1",
   "dependencies": [
     "ATM-GOV-0284",
@@ -214,8 +214,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-31T12-56-24-215Z-renew-3ea548a6747d",
-  "lastTransitionAt": "2026-07-31T12:56:24.215Z",
+  "lastTransitionId": "2026-07-31T13-00-30-716Z-close-2b962076e91d",
+  "lastTransitionAt": "2026-07-31T13:00:30.716Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-006",
   "reservedAt": "2026-07-31T12:28:55.322Z",
@@ -224,7 +224,7 @@
     "actorId": "claude-006",
     "leaseId": "lease-75bd333db7f7",
     "claimedAt": "2026-07-31T12:28:55.331Z",
-    "heartbeatAt": "2026-07-31T12:56:23.009Z",
+    "heartbeatAt": "2026-07-31T13:00:30.712Z",
     "ttlSeconds": 7200,
     "files": [
       ".atm/history/evidence/ATM-GOV-0285.*",
@@ -246,13 +246,14 @@
       "tests/cli/plan4-resumable-probe-scheduler.test.ts",
       "tests/cli/plan4-validator-catalog-selection.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260731122855-claude-006-79867d22e6",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731122855-claude-006-79867d22e6\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-31T12:28:55.331Z",
   "startedByActor": "claude-006",
@@ -391,5 +392,9 @@
     },
     "createdAt": "2026-07-31T12:29:22.483Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-31T13:00:30.712Z",
+  "closedByActor": "claude-006",
+  "closedBySessionId": "session-20260731122855-claude-006-ATM-GOV-0285-2a3d27634a",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0285.closure-packet.json"
 }
