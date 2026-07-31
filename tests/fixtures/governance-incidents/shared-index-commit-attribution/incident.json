@@ -65,6 +65,27 @@
       "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
     },
     {
+      "variantId": "concurrent-sealed-preparation",
+      "summary": "Two writers seal their own slices from the one shared index at overlapping times.",
+      "expectedInvariant": "a prepared seal is stable while the other writer stages",
+      "expectedOutcome": "both seals carry only their own paths and each candidate tree proves independently",
+      "expectedCode": null
+    },
+    {
+      "variantId": "unsealed-live-index-fallback",
+      "summary": "A governed commit reaches candidate assembly with no admitted bundle and no named seal route.",
+      "expectedInvariant": "sealing the live shared index is a named decision, never a default",
+      "expectedOutcome": "fail-closed before a candidate index exists",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE"
+    },
+    {
+      "variantId": "provenance-relabel",
+      "summary": "An overlay re-declares an admitted path with identical content under a different provenance.",
+      "expectedInvariant": "supersession is allowed only for paths the transaction declares it staged",
+      "expectedOutcome": "fail-closed before any ref update, with the conflict named",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
+    },
+    {
       "variantId": "head-moved-after-admission",
       "summary": "Another lane advances HEAD between admission and ref update.",
       "expectedInvariant": "ref update is compare-and-swap, never a force",
@@ -73,5 +94,6 @@
     }
   ],
   "redGreenRunner": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+  "additionalRunners": ["node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts"],
   "notes": "Writer identities, paths and timestamps in this fixture are synthetic. The family reproduces from the shape of the interleaving, not from any recorded task, actor or date."
 }

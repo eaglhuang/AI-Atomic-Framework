@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-31T07-58-29-837Z-scope-amendment-ac9c6a18b03c",
+  "taskId": "TASK-GIT-0031",
+  "action": "scope-amendment",
+  "actorId": "claude-006",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0031.json",
+  "taskSha256": "sha256:b6ceefe531d9ec120a23c2b7ee981bc37914b08d00cd87a2893ff9097e6c9cde",
+  "createdAt": "2026-07-31T07:58:29.837Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0031 --actor claude-006 --add \"packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts,tests/cli/commit-attribution-concurrency-gates.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

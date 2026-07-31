@@ -19,6 +19,7 @@
 
 export const ATM_COMMIT_ATTRIBUTION_MISMATCH = 'ATM_COMMIT_ATTRIBUTION_MISMATCH' as const;
 export const ATM_COMMIT_ATTRIBUTION_EMPTY_BUNDLE = 'ATM_COMMIT_ATTRIBUTION_EMPTY_BUNDLE' as const;
+export const ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE = 'ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE' as const;
 
 /**
  * Why an entry is allowed in the bundle. Provenance is sealed alongside the
@@ -70,7 +71,15 @@ export type CommitAttributionFindingKind =
   | 'mode-mismatch'
   | 'content-mismatch'
   /** A tombstoned path is still present in the candidate tree. */
-  | 'undeleted-path';
+  | 'undeleted-path'
+  /**
+   * One path is claimed by two different provenances inside a single seal.
+   * Content equality is not enough here: an overlay that re-declares an
+   * admitted task-scope path as governance evidence relabels who is
+   * accountable for it, and a later reader can no longer tell the admitted
+   * change apart from what ATM staged on the actor's behalf.
+   */
+  | 'provenance-mismatch';
 
 export interface CommitAttributionFinding {
   readonly kind: CommitAttributionFindingKind;
@@ -79,6 +88,9 @@ export interface CommitAttributionFinding {
   readonly actualMode: string | null;
   readonly sealedBlobId: string | null;
   readonly actualBlobId: string | null;
+  /** Only carried by `provenance-mismatch`, where the conflict is the label. */
+  readonly sealedProvenance?: SealedCommitEntryProvenance | null;
+  readonly conflictingProvenance?: SealedCommitEntryProvenance | null;
 }
 
 export interface CommitAttributionProof {
@@ -146,6 +158,43 @@ export function sealCommitBundle(input: {
     baseTreeSha: input.baseTreeSha ?? null,
     entries: [...byPath.values()].sort((left, right) => left.path.localeCompare(right.path))
   };
+}
+
+/**
+ * Duplicate declarations of one path that disagree about provenance.
+ *
+ * `sealCommitBundle` resolves duplicates by last-declaration-wins so an overlay
+ * can supersede an earlier entry, which is safe only while both declarations
+ * agree about who admitted the path. When they do not, the surviving entry
+ * silently carries the wrong accountability, so the seal has to be refused
+ * before it is ever compared against a tree.
+ */
+export function findSealedBundleProvenanceConflicts(
+  entries: readonly SealedCommitBundleEntry[]
+): readonly CommitAttributionFinding[] {
+  const declared = new Map<string, SealedCommitBundleEntry>();
+  const findings: CommitAttributionFinding[] = [];
+  for (const entry of entries) {
+    const path = normalizePath(entry.path);
+    if (!path) continue;
+    const first = declared.get(path);
+    if (!first) {
+      declared.set(path, entry);
+      continue;
+    }
+    if (first.provenance === entry.provenance) continue;
+    findings.push({
+      kind: 'provenance-mismatch',
+      path,
+      sealedMode: first.mode,
+      actualMode: entry.mode,
+      sealedBlobId: first.blobId,
+      actualBlobId: entry.blobId,
+      sealedProvenance: first.provenance,
+      conflictingProvenance: entry.provenance
+    });
+  }
+  return findings.sort((left, right) => left.path.localeCompare(right.path));
 }
 
 /**

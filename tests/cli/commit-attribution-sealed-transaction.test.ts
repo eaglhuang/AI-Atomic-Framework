@@ -167,7 +167,7 @@ expectThrows(() => assertSealedBundleNotEmpty(sealCommitBundle({ entries: [] }))
     paths: [admitted],
     provenance: 'task-scope',
     surface: 'test',
-    sealedBundle: bundle,
+    sealSource: { kind: 'sealed-bundle', bundle },
     run: (env) => execFileSync('git', ['commit', '--quiet', '-m', 'sealed commit'], {
       cwd: root,
       env: { ...env, GIT_AUTHOR_NAME: 'fixture-writer', GIT_AUTHOR_EMAIL: 'fixture-writer@example.com' },
@@ -279,7 +279,7 @@ expectThrows(() => assertSealedBundleNotEmpty(sealCommitBundle({ entries: [] }))
     paths: [removed, modified],
     provenance: 'task-scope',
     surface: 'test',
-    sealedBundle: bundle,
+    sealSource: { kind: 'sealed-bundle', bundle },
     run: (env) => execFileSync('git', ['commit', '--quiet', '-m', 'delete and modify'], {
       cwd: root,
       env: { ...env, GIT_AUTHOR_NAME: 'fixture-writer', GIT_AUTHOR_EMAIL: 'fixture-writer@example.com' },
@@ -387,6 +387,7 @@ expectThrows(() => assertSealedBundleNotEmpty(sealCommitBundle({ entries: [] }))
       paths: [],
       provenance: 'task-scope',
       surface: 'test',
+      sealSource: { kind: 'live-index-diagnostic', reason: 'empty-bundle probe' },
       run: () => {
         throw new Error('run must never be reached for an empty bundle');
       }

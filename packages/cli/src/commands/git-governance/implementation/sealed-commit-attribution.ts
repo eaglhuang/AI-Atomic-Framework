@@ -17,8 +17,10 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   ATM_COMMIT_ATTRIBUTION_MISMATCH,
+  ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE,
   assertSealedBundleNotEmpty,
   compareCommitTreeToSealedBundle,
+  findSealedBundleProvenanceConflicts,
   isTombstone,
   sealCommitBundle,
   type CommitAttributionProof,
@@ -109,11 +111,41 @@ function readStagedDeletionEntries(input: {
   return entries;
 }
 
-/** Merge overlay entries (governance evidence) onto an already sealed bundle. */
+/**
+ * Merge overlay entries (governance evidence) onto an already sealed bundle.
+ *
+ * Composition is where accountability can be quietly rewritten: the overlay
+ * wins on duplicate paths, so an entry that re-declares an admitted path under
+ * a different provenance would leave the seal describing the right content and
+ * the wrong author. Supersession is therefore allowed only for the paths the
+ * caller declares it staged in this transaction; every other cross-provenance
+ * re-declaration is a named finding and fails closed.
+ */
 export function mergeSealedCommitBundles(
   base: SealedCommitBundle,
-  overlay: SealedCommitBundle
+  overlay: SealedCommitBundle,
+  options?: { readonly supersedingPaths?: readonly string[]; readonly surface?: string }
 ): SealedCommitBundle {
+  const superseding = new Set((options?.supersedingPaths ?? []).map(normalizePath).filter(Boolean));
+  const conflicts = findSealedBundleProvenanceConflicts([...base.entries, ...overlay.entries])
+    .filter((finding) => !superseding.has(finding.path));
+  if (conflicts.length > 0) {
+    throw new CliError(
+      ATM_COMMIT_ATTRIBUTION_MISMATCH,
+      `Sealed commit bundle declares conflicting provenance for ${conflicts.map((finding) => finding.path).join(', ')}.`,
+      {
+        exitCode: 1,
+        details: {
+          surface: options?.surface ?? 'seal-composition',
+          findings: conflicts,
+          safeNextActions: [
+            're-resolve-the-commit-bundle-and-retry',
+            'declare-the-superseding-paths-explicitly'
+          ]
+        }
+      }
+    );
+  }
   return sealCommitBundle({
     entries: [...base.entries, ...overlay.entries],
     baseTreeSha: base.baseTreeSha ?? overlay.baseTreeSha ?? null,
@@ -277,6 +309,44 @@ export interface SealedCommitIndexOutcome<T> {
   readonly result: T;
   readonly bundle: SealedCommitBundle;
   readonly proof: CommitAttributionProof;
+  /** Which named route produced the seal this transaction was proved against. */
+  readonly sealSource: SealedCommitSealSource['kind'];
+  /** Non-null only on the diagnostic route, and carried into the receipt. */
+  readonly liveIndexSealDiagnostic: { readonly reason: string } | null;
+}
+
+/**
+ * Where the seal came from. There is deliberately no "unset" case: sealing the
+ * live index is a decision, not a default. A governed commit passes the bundle
+ * it admitted; the diagnostic route exists for probes and tests that have no
+ * prior admission, and it has to say why in a string that reaches the outcome.
+ */
+export type SealedCommitSealSource =
+  | { readonly kind: 'sealed-bundle'; readonly bundle: SealedCommitBundle }
+  | { readonly kind: 'live-index-diagnostic'; readonly reason: string };
+
+/**
+ * Resolve the seal a governed commit will be proved against.
+ *
+ * Both governed branches seal explicitly: a resolved task-scope bundle is
+ * reused as admitted, and a commit that has only a pre-staged index seals that
+ * index here, under its own provenance, rather than letting the transaction
+ * discover an unsealed state later and improvise.
+ */
+export function resolveGovernedCommitSeal(input: {
+  readonly cwd: string;
+  readonly admittedBundle?: SealedCommitBundle | null;
+  readonly paths: readonly string[];
+  readonly provenance: SealedCommitEntryProvenance;
+}): SealedCommitSealSource {
+  return {
+    kind: 'sealed-bundle',
+    bundle: input.admittedBundle ?? sealCommitBundleFromLiveIndex({
+      cwd: input.cwd,
+      paths: input.paths,
+      provenance: input.provenance
+    })
+  };
 }
 
 /**
@@ -298,19 +368,23 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
   readonly surface: string;
   readonly stageGovernanceEvidence?: (env: NodeJS.ProcessEnv) => readonly string[];
   /**
-   * Bundle sealed earlier in the transaction. Callers that resolved and
-   * admitted their bundle before reaching the commit step must pass it, so the
-   * content admitted is the content committed even if the live index changed
-   * in between. Omitting it seals at this point instead.
+   * Where the seal comes from. Governed callers resolve and admit their bundle
+   * before reaching the commit step and pass it here, so the content admitted
+   * is the content committed even if the live index changed in between. There
+   * is no implicit fallback: a caller with no bundle has to ask for the named
+   * diagnostic route and say why.
    */
-  readonly sealedBundle?: SealedCommitBundle | null;
+  readonly sealSource: SealedCommitSealSource;
   readonly run: (env: NodeJS.ProcessEnv) => T;
 }): SealedCommitIndexOutcome<T> {
-  const sealed = input.sealedBundle ?? sealCommitBundleFromLiveIndex({
-    cwd: input.cwd,
-    paths: input.paths,
-    provenance: input.provenance
-  });
+  const sealSource = assertNamedSealSource(input.sealSource, input.surface);
+  const sealed = sealSource.kind === 'sealed-bundle'
+    ? sealSource.bundle
+    : sealCommitBundleFromLiveIndex({
+      cwd: input.cwd,
+      paths: input.paths,
+      provenance: input.provenance
+    });
   assertSealedBundleNotEmpty(sealed);
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-commit-index-'));
   const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
@@ -320,7 +394,8 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
     const bundle = evidencePaths.length > 0
       ? mergeSealedCommitBundles(
         sealed,
-        sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: evidencePaths })
+        sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: evidencePaths }),
+        { supersedingPaths: evidencePaths, surface: input.surface }
       )
       : sealed;
     const proof = assertCommitAttribution({
@@ -330,10 +405,42 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
       actorId: input.actorId,
       taskId: input.taskId
     });
-    return { result: input.run(env), bundle, proof };
+    return {
+      result: input.run(env),
+      bundle,
+      proof,
+      sealSource: sealSource.kind,
+      liveIndexSealDiagnostic: sealSource.kind === 'live-index-diagnostic' ? { reason: sealSource.reason } : null
+    };
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }
+}
+
+/**
+ * Reject an unnamed seal before a temporary index is even created. A caller
+ * that reaches assembly without a bundle and without asking for the diagnostic
+ * route would otherwise commit whatever the shared index holds.
+ */
+function assertNamedSealSource(source: SealedCommitSealSource | null | undefined, surface: string): SealedCommitSealSource {
+  if (source?.kind === 'sealed-bundle' || (source?.kind === 'live-index-diagnostic' && source.reason.trim())) {
+    return source;
+  }
+  throw new CliError(
+    ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE,
+    'A governed commit requires an admitted sealed bundle; sealing the live shared index is only available as a named diagnostic route with a reason.',
+    {
+      exitCode: 1,
+      details: {
+        surface,
+        sealSourceKind: source?.kind ?? null,
+        safeNextActions: [
+          'resolve-and-admit-the-commit-bundle-before-committing',
+          'pass-a-live-index-diagnostic-reason-for-non-governed-probes'
+        ]
+      }
+    }
+  );
 }
 
 /** Seal specific paths from an already-assembled candidate index. */

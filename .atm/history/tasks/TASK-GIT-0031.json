@@ -1,0 +1,334 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0031",
+  "title": "Cover sealed commit concurrency and override-free attribution gates",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-GIT-0029",
+    "TASK-GIT-0030"
+  ],
+  "acceptance": [
+    "Two independent sealed bundles can be prepared from separate logical lanes without reading each other's live-index changes; only final ref update serializes through broker/CAS.",
+    "HEAD moved between prepare and apply returns broker queue/wait/CAS retry guidance; no governed commit success path may update HEAD through a non-broker finalization route.",
+    "Tests fail if a successful governed commit uses, requests, or records override lease authority.",
+    "Provenance mismatch for same path/mode/blob has a named finding kind and fails closed before ref mutation.",
+    "`runWithSealedTaskScopedCommitIndex` has no unsafe live-index fallback on governed commit paths; any remaining fallback is limited to a named diagnostic/test-only route with evidence.",
+    "Incident fixture/catalog coverage names the generic family, not a task id, actor, commit SHA, or date in production control flow.",
+    "TASK-GIT-0030 deletion tombstone tests remain green if 0030 has already landed."
+  ],
+  "deliverables": [
+    "tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+    "tests/catalog/groups/**",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "packages/cli/src/commands/git-governance/lease-command.ts",
+    "packages/core/src/commit-attribution/sealed-commit-bundle.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+    "packages/cli/src/commands/broker/wave-broker-scheduler.ts",
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+    "packages/cli/src/commands/git-governance/lease-command.ts",
+    "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+    "tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+    "tests/catalog/groups/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:module-boundaries"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": "- Source review input: Cursor reported 1 partial, 2 partial, 3 missing, 4 mostly pass for the original concurrency model acceptance, then identified missing scope around batch execute, lease command, wave broker scheduler, validator spelling, and provenance-mismatch finding kind.\n- This card is coverage/policy hardening. Do not claim or implement it while TASK-GIT-0030 is still running; it may start only after TASK-GIT-0030 is done/released or Captain explicitly authorizes a read-only design pass.\n- Suggested order after TASK-GIT-0030 lands: disable governed live-index fallback; add provenance mismatch finding; add dual sealed prepare test; prove HEAD moved uses broker queue/wait/CAS only; prove success path zero override lease; preserve deletion tombstone regression.\n- No raw git, branch, rebase, push, or override lease unless separately authorized by owner.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-07-31T05:25:25.974Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"git-boundary-admission/tasks/TASK-GIT-0031-cover-sealed-commit-concurrency-and-override-free-attribution-gates.task.md\",\"contentDigest\":\"sha256:5b064237ab109e6ef3efdcf344a12e41b8406b4a22eb6d80969819af217a8e93\"} -->",
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0031-cover-sealed-commit-concurrency-and-override-free-attribution-gates.task.md",
+    "sectionTitle": "TASK-GIT-0031",
+    "headingLine": 44,
+    "hash": "e221cf3fd9d4aa53",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "git-boundary-admission/tasks/TASK-GIT-0031-cover-sealed-commit-concurrency-and-override-free-attribution-gates.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:e221cf3fd9d4aa531a3dea240974e7a69ec5d6e7762908edc722d2ffc26e1c59",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T05:48:52.344Z"
+    }
+  },
+  "importedAt": "2026-07-31T05:48:52.344Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.commit.attribution.sealed.transaction.test.ts",
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.module.boundaries",
+      "command": "npm run validate:module-boundaries",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-31T08-12-57-150Z-renew-414cfef31c44",
+  "lastTransitionAt": "2026-07-31T08:12:57.150Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-006",
+  "reservedAt": "2026-07-31T07:47:04.777Z",
+  "promotedAt": "2026-07-31T07:47:04.780Z",
+  "claim": {
+    "actorId": "claude-006",
+    "leaseId": "lease-36785ed0438f",
+    "claimedAt": "2026-07-31T07:47:04.783Z",
+    "heartbeatAt": "2026-07-31T08:12:56.735Z",
+    "ttlSeconds": 7200,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0031.*",
+      ".atm/history/task-events/TASK-GIT-0031/**",
+      ".atm/history/tasks/TASK-GIT-0031.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/broker/wave-broker-scheduler.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "packages/cli/src/commands/git-governance/lease-command.ts",
+      "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+      "tests/catalog/groups/**",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260731074704-claude-006-f6d08b1ecf",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731074704-claude-006-f6d08b1ecf\""
+    }
+  },
+  "startedAt": "2026-07-31T07:47:04.783Z",
+  "startedByActor": "claude-006",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-4e64c60edb70a51c",
+    "ticketDigest": "sha256:4e64c60edb70a51ca1c2b0b04d570b4427fce0e07a2ee4ccfb68b18ddf0442fd",
+    "taskId": "TASK-GIT-0031",
+    "origin": "claim",
+    "actorId": "claude-006",
+    "laneSessionId": "lane-20260731074704-claude-006-f6d08b1ecf",
+    "claimGeneration": "lease-36785ed0438f",
+    "issuedAt": "2026-07-31T08:12:56.735Z",
+    "expiresAt": "2026-07-31T10:12:56.735Z",
+    "scopeDigest": "sha256:8ccfb55595525f5b32cc088adfd9df5289c1dfc5bbc71443b0cd90111f9968fd",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-31T08:12:56.735Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0031.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-GIT-0031/**",
+          ".atm/history/tasks/TASK-GIT-0031.json",
+          "packages/cli/src/commands/broker/batch-execute-actions.ts",
+          "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+          "packages/cli/src/commands/broker/wave-broker-scheduler.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+          "packages/cli/src/commands/git-governance/lease-command.ts",
+          "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+          "tests/catalog/groups/**",
+          "tests/cli/commit-attribution-concurrency-gates.test.ts",
+          "tests/cli/commit-attribution-sealed-transaction.test.ts",
+          "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+        ],
+        "digest": "sha256:7ae42d54e20f9c85a51bc34521379daaca2a158832407f0a90c37442724cef29"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260731074704-claude-006-TASK-GIT-0031-963a8dd3de",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0031",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0031.*",
+      ".atm/history/task-events/TASK-GIT-0031/**",
+      ".atm/history/tasks/TASK-GIT-0031.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/broker/wave-broker-scheduler.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "packages/cli/src/commands/git-governance/lease-command.ts",
+      "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+      "tests/catalog/groups/**",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0031-cover-sealed-commit-concurrency-and-override-free-attribution-gates.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/git-boundary-admission/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/",
+      "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0031-cover-sealed-commit-concurrency-and-override-free-attribution-gates.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7f4ed00040e6e74aa82adb025cd79c5bdf5596fad90c4dc50a83d4130ee8ce42",
+    "actorId": "claude-006",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260731074704-claude-006-f6d08b1ecf",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731074704-claude-006-f6d08b1ecf\""
+    },
+    "createdAt": "2026-07-31T07:47:08.017Z",
+    "status": "active"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-GIT-0031",
+  "updatedAt": "2026-07-31T08:10:50.684Z",
+  "updatedBy": "claude-006",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:module-boundaries"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e17d8661df79407d04fb0c646616445ca5b7469cc4339ad551f0b18c9a60a088",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts"
+      ],
+      "generatedAt": "2026-07-31T08:08:30.345Z",
+      "startedAt": "2026-07-31T08:08:19.910Z",
+      "finishedAt": "2026-07-31T08:08:30.345Z",
+      "durationMs": 10435,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e5814dcc20a76051c6478a7a55ec41b29cf239dc",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9bcf873178438da1f43e200896c7cb3744713b6c669fa1837925fdd8664efcd5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-31T08:08:46.381Z",
+      "startedAt": "2026-07-31T08:08:36.066Z",
+      "finishedAt": "2026-07-31T08:08:46.381Z",
+      "durationMs": 10315,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e5814dcc20a76051c6478a7a55ec41b29cf239dc",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-31T08:09:34.553Z",
+      "startedAt": "2026-07-31T08:09:25.382Z",
+      "finishedAt": "2026-07-31T08:09:34.553Z",
+      "durationMs": 9171,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e5814dcc20a76051c6478a7a55ec41b29cf239dc",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:module-boundaries",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8004b24e7d203bfcaf40da1009975373ba146967019f8107d9548ad1ecb6bacc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:module-boundaries"
+      ],
+      "generatedAt": "2026-07-31T08:09:41.607Z",
+      "startedAt": "2026-07-31T08:09:38.779Z",
+      "finishedAt": "2026-07-31T08:09:41.607Z",
+      "durationMs": 2828,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e5814dcc20a76051c6478a7a55ec41b29cf239dc",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:abc610ab51427dcf9a573e902722fc392ae358610bc2bab84818c37cccce91cf",
+      "stderrSha256": "sha256:ec45a1a036798bced147a6db6f8cc290520cb2119880f837048403b2146bdabd",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-31T08:10:50.683Z",
+      "startedAt": "2026-07-31T08:09:47.582Z",
+      "finishedAt": "2026-07-31T08:10:50.683Z",
+      "durationMs": 63101,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e5814dcc20a76051c6478a7a55ec41b29cf239dc",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
