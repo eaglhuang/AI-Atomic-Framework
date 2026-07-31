@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-31T04-53-25-688Z-close-3d1637c563a9",
+  "taskId": "TASK-GIT-0029",
+  "action": "close",
+  "actorId": "claude-006",
+  "sessionId": "session-20260731031242-claude-006-TASK-GIT-0029-0bd521eaa4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0029.json",
+  "taskSha256": "sha256:6cea389200fbd18246060e76187b450ef68c308d0569db84b2027b8cae1676e3",
+  "createdAt": "2026-07-31T04:53:25.688Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0029 --actor claude-006 --status done --historical-delivery 4bfd6c2970b78957d962928b35b7c3ef0e753b2d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260731031242-claude-006-TASK-GIT-0029-0bd521eaa4",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0029.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "new focused broker admission-order tests created by this task",
+      "new focused commit attribution tests created by this task",
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-31T04:53:25.673Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0029.*",
+        ".atm/history/task-events/TASK-GIT-0029/**",
+        ".atm/history/tasks/TASK-GIT-0029.json",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/core/src/**",
+        "schemas/evidence/**",
+        "tests/catalog/groups/**",
+        "tests/cli/**",
+        "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/core/src/**",
+        "schemas/evidence/**",
+        "tests/catalog/groups/**",
+        "tests/cli/**",
+        "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
