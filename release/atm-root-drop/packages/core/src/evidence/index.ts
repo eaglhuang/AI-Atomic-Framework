@@ -5,6 +5,7 @@ export * from './coverage-universe-compiler.ts';
 export * from './diff-evidence.ts';
 export * from './diagnostic-loop.ts';
 export * from './git-boundary-evidence.ts';
+export * from './mutation-lineage.ts';
 export * from './obligation-inventory.ts';
 export * from './quality-gauntlet.ts';
 export * from './realness.ts';

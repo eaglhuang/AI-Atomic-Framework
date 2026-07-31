@@ -5,6 +5,7 @@ export * from './coverage-universe-compiler.js';
 export * from './diff-evidence.js';
 export * from './diagnostic-loop.js';
 export * from './git-boundary-evidence.js';
+export * from './mutation-lineage.js';
 export * from './obligation-inventory.js';
 export * from './quality-gauntlet.js';
 export * from './realness.js';

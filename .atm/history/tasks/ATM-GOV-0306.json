@@ -104,7 +104,7 @@
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -210,8 +210,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-31T13-10-43-159Z-claim-b358ea7f76e3",
-  "lastTransitionAt": "2026-07-31T13:10:43.159Z",
+  "lastTransitionId": "2026-07-31T13-45-38-603Z-renew-68024e16bc7a",
+  "lastTransitionAt": "2026-07-31T13:45:38.603Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-0306",
   "reservedAt": "2026-07-31T13:10:10.870Z",
@@ -220,22 +220,29 @@
     "actorId": "cursor-0306",
     "leaseId": "lease-122ef28e98fa",
     "claimedAt": "2026-07-31T13:10:10.880Z",
-    "heartbeatAt": "2026-07-31T13:10:10.880Z",
+    "heartbeatAt": "2026-07-31T13:45:37.445Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0306.*",
+      ".atm/history/evidence/ATM-GOV-0306.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0306/**",
       ".atm/history/tasks/ATM-GOV-0306.json",
       "packages/core/src/evidence/index.ts",
       "packages/core/src/evidence/mutation-lineage.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
       "schemas/evidence/mutation-lineage.schema.json",
       "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
       "tests/cli/plan4-mutation-adapter.test.ts",
       "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260731131011-cursor-0306-58cdb40495",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731131011-cursor-0306-58cdb40495\""
     }
@@ -245,37 +252,43 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d087840d36e492f0",
-    "ticketDigest": "sha256:d087840d36e492f014bda6b82f9f122150b6ab218492997762941984141685df",
+    "ticketId": "wat-4ce34d0ac060cfae",
+    "ticketDigest": "sha256:4ce34d0ac060cfaecf8bc735759280038c4998fa9a164586df83b2b36301c41d",
     "taskId": "ATM-GOV-0306",
     "origin": "claim",
     "actorId": "cursor-0306",
     "laneSessionId": "lane-20260731131011-cursor-0306-58cdb40495",
     "claimGeneration": "lease-122ef28e98fa",
-    "issuedAt": "2026-07-31T13:10:10.880Z",
-    "expiresAt": "2026-07-31T13:40:10.880Z",
-    "scopeDigest": "sha256:cfb9a6a7c42660d3f6ed9e31b20a6d55d27ba5edd46a7332dbab358669889560",
+    "issuedAt": "2026-07-31T13:45:37.445Z",
+    "expiresAt": "2026-07-31T14:15:37.445Z",
+    "scopeDigest": "sha256:77635650196bf6478e026bd5b80d660549dc6b686f3a5304d3790c67cd8dd22d",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-31T13:10:10.880Z"
+      "selectedAt": "2026-07-31T13:45:37.445Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0306.*",
+          ".atm/history/evidence/ATM-GOV-0306.runner-sync-receipt.json",
           ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0306/**",
           ".atm/history/tasks/ATM-GOV-0306.json",
           "packages/core/src/evidence/index.ts",
           "packages/core/src/evidence/mutation-lineage.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop/packages/core/dist/evidence/index.js",
+          "release/atm-root-drop/packages/core/src/evidence/index.ts",
+          "release/atm-root-drop/release-manifest.json",
           "schemas/evidence/mutation-lineage.schema.json",
           "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
           "tests/cli/plan4-mutation-adapter.test.ts",
           "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
         ],
-        "digest": "sha256:347841d52051b5253ba07c8664012933d155fb53644c505650a5f58766080af1"
+        "digest": "sha256:d5f53ce28b662d7f5c8f3be7dd0a4df3a52f18753bc88903111e1ad549f16e77"
       },
       {
         "kind": "lifecycle-operation",
@@ -308,6 +321,7 @@
       "requestedMode": "auto",
       "resolvedMode": "enabled",
       "reasons": [
+        "complex-task",
         "shared-surface"
       ],
       "maxSavePoints": 2,
@@ -315,7 +329,7 @@
       "repositoryByteBudget": 268435456,
       "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   },
   "startedBySessionId": "session-20260731131010-cursor-0306-ATM-GOV-0306-bcb806e82b",
@@ -324,33 +338,46 @@
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0306",
     "batchId": null,
-    "scopeKey": "tasks-4bfb3e3b3e75",
-    "queueId": "queue-ef06bc9c44045d20",
+    "scopeKey": null,
+    "queueId": null,
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0306.*",
+      ".atm/history/evidence/ATM-GOV-0306.runner-sync-receipt.json",
       ".atm/history/task-events/ATM-GOV-0306/**",
       ".atm/history/tasks/ATM-GOV-0306.json",
       "packages/core/src/evidence/index.ts",
       "packages/core/src/evidence/mutation-lineage.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
       "schemas/evidence/mutation-lineage.schema.json",
       "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
       "tests/cli/plan4-mutation-adapter.test.ts",
       "tests/cli/plan4-mutation-lineage-equivalence.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0306-mutation-adapter-lineage-and-equivalence-governance.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0306-mutation-adapter-lineage-and-equivalence-governance.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "b12e017f0aa5903f85c6707378478327a6ec4341216b9a9ccdceaffd9f900cc9",
     "actorId": "cursor-0306",
-    "sessionId": "session-20260731131010-cursor-0306-ATM-GOV-0306-bcb806e82b",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260731131011-cursor-0306-58cdb40495",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731131011-cursor-0306-58cdb40495\""
     },
-    "createdAt": "2026-07-31T13:10:43.157Z",
+    "createdAt": "2026-07-31T13:10:43.205Z",
     "status": "active"
   }
 }
