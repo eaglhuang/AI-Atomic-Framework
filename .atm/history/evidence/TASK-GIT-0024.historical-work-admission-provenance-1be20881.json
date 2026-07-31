@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.historicalWorkAdmissionProvenance.v1",
+  "commitSha": "1be20881d306c970e83021fbc4bd738045f53554",
+  "parentCommitSha": "be2cd8a920d5e02f5672ac9efb0887090d5c63f3",
+  "treeSha": "c3bb13027e956f97cd3e011141bd99ceee77f76a",
+  "taskId": "TASK-GIT-0029",
+  "subject": "build(release): publish TASK-GIT-0029 sealed commit attribution runner",
+  "actorId": "claude-006",
+  "laneSessionId": "lane-20260731031243-claude-006-80fecd7dd7",
+  "attestedBy": "codex-skl-captain",
+  "createdAt": "2026-07-31T10:04:30.000Z",
+  "reason": "Forward attestation provenance for a historical TASK-GIT-0029 runner publication commit that predates protected pre-push work-admission trailer enforcement. The commit is an immutable ancestor of HEAD and is covered without rewriting history so the governed TASK-GIT-0029/TASK-GIT-0030/TASK-GIT-0031 delivery chain can be pushed.",
+  "evidenceRefs": [
+    ".atm/history/evidence/TASK-GIT-0029.runner-sync-receipt.json",
+    ".atm/history/evidence/TASK-GIT-0029.closure-packet.json",
+    ".atm/history/evidence/TASK-GIT-0029.seal-and-commit.json"
+  ],
+  "scope": [
+    ".atm/history/evidence/git-head.jsonl",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**"
+  ],
+  "classification": "historical-runner-publication-without-work-admission-trailer",
+  "noHistoryRewrite": true
+}

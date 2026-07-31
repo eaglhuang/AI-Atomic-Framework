@@ -478,6 +478,35 @@
       "attestedBy": "codex-skl-captain",
       "attestedAt": "2026-07-31T00:00:24.755Z",
       "digest": "sha256:5aebbed4d581c1f0052edbc62073aa682b6caca9a050b86492474374a4bcebe2"
+    },
+    {
+      "schemaId": "atm.historicalWorkAdmissionAttestation.v1",
+      "commitSha": "1be20881d306c970e83021fbc4bd738045f53554",
+      "parentCommitSha": "be2cd8a920d5e02f5672ac9efb0887090d5c63f3",
+      "treeSha": "c3bb13027e956f97cd3e011141bd99ceee77f76a",
+      "provenance": {
+        "kind": "emergency",
+        "digest": "sha256:6c033ea1760f2996908ce0b2c75f9e4e5547e2e0b95b2d0f892c6b59f95bc583",
+        "ref": ".atm/history/evidence/TASK-GIT-0024.historical-work-admission-provenance-1be20881.json"
+      },
+      "reason": "Forward-attest historical TASK-GIT-0029 runner publication commit that predates protected pre-push work-admission trailer enforcement; immutable provenance binds commit 1be20881d to TASK-GIT-0029 receipt and closeout evidence.",
+      "evidenceRefs": [
+        ".atm/history/evidence/TASK-GIT-0029.runner-sync-receipt.json",
+        ".atm/history/evidence/TASK-GIT-0029.closure-packet.json",
+        ".atm/history/evidence/TASK-GIT-0029.seal-and-commit.json"
+      ],
+      "emergencyClass": "historical-runner-publication-attestation",
+      "scope": [
+        ".atm/history/evidence/git-head.jsonl",
+        "packages/cli/dist/**",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**"
+      ],
+      "taskId": "TASK-GIT-0024",
+      "laneSessionId": "lane-20260731031243-claude-006-80fecd7dd7",
+      "attestedBy": "codex-skl-captain",
+      "attestedAt": "2026-07-31T10:05:03.662Z",
+      "digest": "sha256:46a5884dc412d4d39aa52a69ac764e1eeb53c682b0da76e3f9ad63d2b48418b5"
     }
   ]
 }
