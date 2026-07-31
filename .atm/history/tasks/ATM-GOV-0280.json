@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0280",
   "title": "CoverageUniverseCompiler interface reachability and canonical obligation IDs",
-  "status": "planned",
+  "status": "running",
   "milestone": "ATM-GOV-PLAN4-R1",
   "dependencies": [
     "ATM-GOV-0279"
@@ -96,7 +96,9 @@
   },
   "importedAt": "2026-07-31T00:20:31.186Z",
   "workAdmission": {
-    "recoveryMode": "auto"
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -195,7 +197,144 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-31T00-20-31-384Z-import-1ccfa4014292",
-  "lastTransitionAt": "2026-07-31T00:20:31.384Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-31T01-20-32-585Z-claim-144ff4980d61",
+  "lastTransitionAt": "2026-07-31T01:20:32.585Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-skl-captain",
+  "reservedAt": "2026-07-31T01:20:14.816Z",
+  "promotedAt": "2026-07-31T01:20:14.819Z",
+  "claim": {
+    "actorId": "codex-skl-captain",
+    "leaseId": "lease-54601df210de",
+    "claimedAt": "2026-07-31T01:20:14.822Z",
+    "heartbeatAt": "2026-07-31T01:20:14.822Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0280.json",
+      "packages/core/src/evidence/coverage-universe-compiler.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/coverage-universe.schema.json",
+      "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+      "tests/cli/plan4-coverage-universe-compiler.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260731012014-codex-skl-captain-45a9082b05",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731012014-codex-skl-captain-45a9082b05\""
+    }
+  },
+  "startedAt": "2026-07-31T01:20:14.822Z",
+  "startedByActor": "codex-skl-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-bce1cd1280ccc1da",
+    "ticketDigest": "sha256:bce1cd1280ccc1dac023a77598435a0ecb7a79ec64d210453aa91648a2b0f2a9",
+    "taskId": "ATM-GOV-0280",
+    "origin": "claim",
+    "actorId": "codex-skl-captain",
+    "laneSessionId": "lane-20260731012014-codex-skl-captain-45a9082b05",
+    "claimGeneration": "lease-54601df210de",
+    "issuedAt": "2026-07-31T01:20:14.822Z",
+    "expiresAt": "2026-07-31T01:50:14.822Z",
+    "scopeDigest": "sha256:e9ce1f7c121dc13810c1dad537fab208a0a1b6fd1ed10698e5d7c8269227dafc",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-07-31T01:20:14.822Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0280.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0280/**",
+          ".atm/history/tasks/ATM-GOV-0280.json",
+          "packages/core/src/evidence/coverage-universe-compiler.ts",
+          "packages/core/src/evidence/index.ts",
+          "schemas/evidence/coverage-universe.schema.json",
+          "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+          "tests/cli/plan4-coverage-universe-compiler.test.ts"
+        ],
+        "digest": "sha256:ab2d11b0bb6f16957e33a89890860539a58a298aa7dede694e8477266cdf318b"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260731012014-codex-skl-captain-ATM-GOV-0280-9ed89e6dad",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0280",
+    "batchId": null,
+    "scopeKey": "tasks-4bfb3e3b3e75",
+    "queueId": "queue-ef06bc9c44045d20",
+    "queueIndex": 1,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0280.*",
+      ".atm/history/task-events/ATM-GOV-0280/**",
+      ".atm/history/tasks/ATM-GOV-0280.json",
+      "packages/core/src/evidence/coverage-universe-compiler.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/coverage-universe.schema.json",
+      "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+      "tests/cli/plan4-coverage-universe-compiler.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d24a135173dfeef55c1d86379105b2d5cec7e1a9f107e1ab8644bc9d6ad5c4db",
+    "actorId": "codex-skl-captain",
+    "sessionId": "session-20260731012014-codex-skl-captain-ATM-GOV-0280-9ed89e6dad",
+    "laneSession": {
+      "laneSessionId": "lane-20260731012014-codex-skl-captain-45a9082b05",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731012014-codex-skl-captain-45a9082b05\""
+    },
+    "createdAt": "2026-07-31T01:20:32.584Z",
+    "status": "active"
+  }
 }
