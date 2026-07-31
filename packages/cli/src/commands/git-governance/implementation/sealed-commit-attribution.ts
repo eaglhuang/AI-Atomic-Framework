@@ -145,17 +145,43 @@ function parseRawDiffEntries(output: string): readonly CommitTreeEntry[] {
   return entries;
 }
 
-/** Post-image entries of the candidate index relative to its base tree. */
+/**
+ * What the candidate index will actually commit, expressed so it can be
+ * compared to a seal.
+ *
+ * Two sources are needed. A sealed path whose content already matches the base
+ * tree produces no diff entry at all, so the index itself is the authority for
+ * sealed paths. Anything that appears in the diff without being sealed is an
+ * intruder, and only the diff can reveal it — the index is full of base-tree
+ * entries that are not part of this commit.
+ */
 export function readCandidateTreeEntries(input: {
   readonly cwd: string;
   readonly env: NodeJS.ProcessEnv;
   readonly baseRef?: string;
+  readonly sealedPaths?: readonly string[];
 }): readonly CommitTreeEntry[] {
-  return parseRawDiffEntries(
+  const sealedPaths = [...new Set((input.sealedPaths ?? []).map(normalizePath).filter(Boolean))].sort();
+  const entries = new Map<string, CommitTreeEntry>();
+  if (sealedPaths.length > 0) {
+    for (const line of splitLines(
+      runGitCommandWithEnv(input.cwd, ['ls-files', '-s', '--', ...sealedPaths], input.env, [...QUIET_STDIO])
+    )) {
+      const match = line.match(LS_FILES_STAGE_PATTERN);
+      if (!match) continue;
+      entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2] });
+    }
+  }
+  const diffEntries = parseRawDiffEntries(
     runGitCommandWithEnv(input.cwd, ['diff-index', '--cached', '--raw', '-M', input.baseRef ?? 'HEAD'], input.env, [
       ...QUIET_STDIO
     ])
   );
+  for (const entry of diffEntries) {
+    if (entries.has(entry.path)) continue;
+    entries.set(entry.path, entry);
+  }
+  return [...entries.values()].sort((left, right) => left.path.localeCompare(right.path));
 }
 
 /** Post-image entries actually recorded by a commit that already exists. */
@@ -256,7 +282,7 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
       : sealed;
     const proof = assertCommitAttribution({
       sealed: bundle,
-      actual: readCandidateTreeEntries({ cwd: input.cwd, env }),
+      actual: readCandidateTreeEntries({ cwd: input.cwd, env, sealedPaths: bundle.entries.map((entry) => entry.path) }),
       surface: input.surface,
       actorId: input.actorId,
       taskId: input.taskId

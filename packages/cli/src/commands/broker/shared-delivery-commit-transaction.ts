@@ -92,7 +92,7 @@ export function applySealedSharedDeliveryCommit(input: {
     assembleSealedCommitIndex({ cwd: input.cwd, bundle, env, baseRef: input.expectedHeadSha });
     const attributionProof = assertCommitAttribution({
       sealed: bundle,
-      actual: readCandidateTreeEntries({ cwd: input.cwd, env, baseRef: input.expectedHeadSha }),
+      actual: readCandidateTreeEntries({ cwd: input.cwd, env, baseRef: input.expectedHeadSha, sealedPaths: bundle.entries.map((entry) => entry.path) }),
       surface: 'broker batch execute --surface commit --apply',
       actorId: input.actorId
     });

@@ -220,6 +220,35 @@ expectThrows(() => assertSealedBundleNotEmpty(sealCommitBundle({ entries: [] }))
   assert.deepEqual(findings.map((finding) => `${finding.kind}:${finding.path}`), [`unexpected-path:${foreign}`]);
 }
 
+// --- adapter: a sealed path already equal to the base tree still matches --
+
+{
+  // A bundle legitimately contains paths whose staged content equals HEAD —
+  // governance evidence that ATM re-emits identically, for example. Those
+  // produce no diff entry, so comparing the seal against the diff alone would
+  // report them as missing and block a correct commit.
+  const root = createRepository();
+  const unchanged = 'baseline.txt';
+  const changed = 'src/changed.txt';
+  write(root, changed, 'changed\n');
+  git(root, ['add', '--', changed, unchanged]);
+
+  const bundle = sealCommitBundleFromLiveIndex({ cwd: root, paths: [unchanged, changed], provenance: 'task-scope' });
+  assert.deepEqual(bundle.entries.map((entry) => entry.path).sort(), [changed, unchanged].sort());
+
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-unchanged-'));
+  roots.push(tempDir);
+  const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
+  assembleSealedCommitIndex({ cwd: root, bundle, env });
+  const proof = assertCommitAttribution({
+    sealed: bundle,
+    actual: readCandidateTreeEntries({ cwd: root, env, sealedPaths: bundle.entries.map((entry) => entry.path) }),
+    surface: 'test'
+  });
+  assert.equal(proof.ok, true, 'an unchanged sealed path must not be reported missing');
+  assert.equal(proof.matchedEntryCount, 2);
+}
+
 // --- adapter: an empty bundle no longer commits the live index ------------
 
 {
