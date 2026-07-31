@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0279",
-  "updatedAt": "2026-07-31T01:05:51.910Z",
+  "updatedAt": "2026-07-31T01:07:08.839Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -381,6 +381,109 @@
               "startedAt": "2026-07-31T01:02:59.000Z",
               "finishedAt": "2026-07-31T01:05:51.909Z",
               "durationMs": 172909,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:8e0311e48f5c6ebcfa6891c74d88ae05935a656f9fc8425b67c949ee8768c2fd",
+              "outputDigest": "sha256:be4bf9fa561d02eaa8ea014e9c342775cea0dc27cddc293655c129794de2a829",
+              "cache": {
+                "key": "sha256:e8449e10d6e223c8847b3652a0242c8cf1d01b624e3290c503e9cc5f7dd610c2",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:git-head-evidence",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:git-head-evidence"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "25ae688905819ed3cb252002703d42ca4232ffb9",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e6cd4c4477525972ccf8d317fe5e3c880a5f904d32660b95a1734a535a299044",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-skl-captain",
+      "sessionId": "session-20260731005339-codex-skl-captain-ATM-GOV-0279-5b72c31826",
+      "createdAt": "2026-07-31T01:07:08.839Z",
+      "details": {
+        "actorId": "codex-skl-captain",
+        "sessionId": "session-20260731005339-codex-skl-captain-ATM-GOV-0279-5b72c31826",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.evidence-validation",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-07-31T01:04:20.659Z",
+            "finishedAt": "2026-07-31T01:07:08.838Z",
+            "durationMs": 168179,
+            "cached": false,
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "25ae688905819ed3cb252002703d42ca4232ffb9",
+            "cacheKey": "sha256:e8449e10d6e223c8847b3652a0242c8cf1d01b624e3290c503e9cc5f7dd610c2",
+            "generatedAt": "2026-07-31T01:07:08.838Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:e8449e10d6e223c8847b3652a0242c8cf1d01b624e3290c503e9cc5f7dd610c2",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-07-31T01:07:08.838Z",
+              "observedAt": "2026-07-31T01:07:08.838Z",
+              "startedAt": "2026-07-31T01:04:20.659Z",
+              "finishedAt": "2026-07-31T01:07:08.838Z",
+              "durationMs": 168179,
               "laneSessionId": null,
               "taskId": null,
               "batchId": null,

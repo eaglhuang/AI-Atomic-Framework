@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0279",
   "title": "Obligation inventory schema and inventory drift detector",
-  "status": "running",
+  "status": "done",
   "milestone": "ATM-GOV-PLAN4-R1",
   "dependencies": [
     "ATM-GOV-0277"
@@ -176,8 +176,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-31T00-53-58-627Z-claim-789133b1c9d1",
-  "lastTransitionAt": "2026-07-31T00:53:58.627Z",
+  "lastTransitionId": "2026-07-31T01-14-10-693Z-close-7a894ee742f6",
+  "lastTransitionAt": "2026-07-31T01:14:10.693Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-skl-captain",
   "reservedAt": "2026-07-31T00:53:39.952Z",
@@ -186,7 +186,7 @@
     "actorId": "codex-skl-captain",
     "leaseId": "lease-673678ddbd43",
     "claimedAt": "2026-07-31T00:53:39.959Z",
-    "heartbeatAt": "2026-07-31T00:53:39.959Z",
+    "heartbeatAt": "2026-07-31T01:14:10.690Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0279.json",
@@ -196,14 +196,14 @@
       "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
       "tests/cli/plan4-obligation-inventory.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260731005340-codex-skl-captain-ec53c7f260",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731005340-codex-skl-captain-ec53c7f260\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-31T00:53:39.959Z",
   "startedByActor": "codex-skl-captain",
@@ -315,5 +315,9 @@
     },
     "createdAt": "2026-07-31T00:53:58.626Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-31T01:14:10.690Z",
+  "closedByActor": "codex-skl-captain",
+  "closedBySessionId": "session-20260731005339-codex-skl-captain-ATM-GOV-0279-5b72c31826",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0279.closure-packet.json"
 }

@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0279",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9e603ea3f9868d89a96bf0c74b2bf472a03d3f5d",
+  "governedTreeSha": "3fb83678897b761a1fcad6e09b3b817e38e6290f",
+  "targetCommitDelta": {
+    "currentCommitSha": "9e603ea3f9868d89a96bf0c74b2bf472a03d3f5d",
+    "parentCommitShas": [
+      "9e603ea3f9868d89a96bf0c74b2bf472a03d3f5d"
+    ],
+    "governedTreeSha": "3fb83678897b761a1fcad6e09b3b817e38e6290f",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0279.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0279.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/obligation-inventory.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/obligation-inventory.schema.json",
+      "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+      "tests/cli/plan4-obligation-inventory.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-obligation-inventory.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:23c7d2741e726d88d366e42539a667a671bb5d56054c2edb9c4f8a295709a9ff",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d176cc2147236b0b0ee83e67097bf8c76ecaee4f6f2dbb5cf64f78c3607f1add",
+      "stderrSha256": "sha256:de5cb416ec1eefe41e825d8cc474335c37fd49531fe9f6b17eef51e1f12a0f5e",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-obligation-inventory.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-31T01:14:10.684Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0279.*",
+      ".atm/history/task-events/ATM-GOV-0279/**",
+      ".atm/history/tasks/ATM-GOV-0279.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/obligation-inventory.ts",
+      "schemas/evidence/obligation-inventory.schema.json",
+      "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+      "tests/cli/plan4-obligation-inventory.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/obligation-inventory.ts",
+      "schemas/evidence/obligation-inventory.schema.json",
+      "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+      "tests/cli/plan4-obligation-inventory.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0279.json",
+  "closedAt": "2026-07-31T01:14:10.684Z",
+  "closedByActor": "codex-skl-captain",
+  "sessionId": "session-20260731005339-codex-skl-captain-ATM-GOV-0279-5b72c31826",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9e603ea3f9868d89a96bf0c74b2bf472a03d3f5d",
+    "taskMatchedFiles": [
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/obligation-inventory.ts",
+      "schemas/evidence/obligation-inventory.schema.json",
+      "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+      "tests/cli/plan4-obligation-inventory.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0279.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0279/2026-07-31T00-53-39-952Z-reserve-59ee6b1b1a13.json",
+      ".atm/history/task-events/ATM-GOV-0279/2026-07-31T00-53-39-955Z-promote-b5c4b3965651.json",
+      ".atm/history/task-events/ATM-GOV-0279/2026-07-31T00-53-58-627Z-claim-789133b1c9d1.json",
+      ".atm/history/tasks/ATM-GOV-0279.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
