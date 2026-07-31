@@ -10,6 +10,7 @@ import { inspectTouchedPhysicalLineBudget, } from "../commit-scope-policy.js";
 import { CliError, makeResult, message, quoteCliValue, } from "../../shared.js";
 import { withBranchCommitQueueLock } from './branch-commit-window.js';
 import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, readStagedFiles, recordGitIndexRestoreFailure, rollbackNewlyStagedLiveIndexResidue, withTaskScopedCommitIndex } from './git-index-transaction.js';
+import { resolveGovernedCommitSeal } from './sealed-commit-attribution.js';
 import { isHeadRaceCommitFailure, readHeadCommitSha } from './push-command.js';
 export function assertGovernedCommitPhysicalLineBudget(cwd, files, actorId, taskId) {
     const report = inspectTouchedPhysicalLineBudget(cwd, files, {
@@ -137,13 +138,19 @@ export function executeGitCommit(options, context) {
                 copyableCommitCommand: rawCopyableCommitCommand,
                 liveIndexResidueRollback: [],
             });
-            // TASK-GIT-0029: every governed commit goes through a sealed candidate
-            // index. When no task-scoped bundle resolves, the pre-staged live index
-            // is sealed explicitly instead of being committed implicitly, so the
-            // attribution assertion still runs and an empty index fails closed.
-            const commitScopedBundle = () => withTaskScopedCommitIndex(options.cwd, scopedCommitFiles.length > 0 ? scopedCommitFiles : stagedCommitSurface, actorId, (scopedEnv) => runCommit({ ...commitEnv, ...scopedEnv }), scopedCommitFiles.length > 0
-                ? (taskScopedBundleReport?.sealedBundle ?? null)
-                : null);
+            // Every governed commit goes through a sealed candidate index, and both
+            // branches seal explicitly: the admitted task-scope bundle is reused as
+            // resolved, and a commit that only has a pre-staged index seals that
+            // index under its own provenance. Neither branch reaches assembly
+            // without a named seal, so there is no live-index fallback left.
+            const commitScopedBundle = () => withTaskScopedCommitIndex(options.cwd, scopedCommitFiles.length > 0 ? scopedCommitFiles : stagedCommitSurface, actorId, (scopedEnv) => runCommit({ ...commitEnv, ...scopedEnv }), resolveGovernedCommitSeal({
+                cwd: options.cwd,
+                admittedBundle: scopedCommitFiles.length > 0
+                    ? (taskScopedBundleReport?.sealedBundle ?? null)
+                    : null,
+                paths: stagedCommitSurface,
+                provenance: "pre-staged-index",
+            }));
             const indexLeaseAuthorization = taskScopedBundleReport?.indexLeaseAuthorization;
             if (indexLeaseAuthorization?.ok) {
                 executeTaskScopedCommitTransaction({

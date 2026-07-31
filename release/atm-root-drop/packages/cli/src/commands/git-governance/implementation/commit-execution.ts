@@ -51,6 +51,7 @@ import {
 } from "../../shared.ts";
 import { withBranchCommitQueueLock } from './branch-commit-window.ts';
 import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles, recordGitIndexRestoreFailure, rollbackNewlyStagedLiveIndexResidue, withTaskScopedCommitIndex } from './git-index-transaction.ts';
+import { resolveGovernedCommitSeal } from './sealed-commit-attribution.ts';
 import { isHeadRaceCommitFailure, readHeadBranchRef, readHeadCommitSha } from './push-command.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
@@ -210,19 +211,26 @@ try {
           copyableCommitCommand: rawCopyableCommitCommand,
           liveIndexResidueRollback: [],
         });
-        // TASK-GIT-0029: every governed commit goes through a sealed candidate
-        // index. When no task-scoped bundle resolves, the pre-staged live index
-        // is sealed explicitly instead of being committed implicitly, so the
-        // attribution assertion still runs and an empty index fails closed.
+        // Every governed commit goes through a sealed candidate index, and both
+        // branches seal explicitly: the admitted task-scope bundle is reused as
+        // resolved, and a commit that only has a pre-staged index seals that
+        // index under its own provenance. Neither branch reaches assembly
+        // without a named seal, so there is no live-index fallback left.
         const commitScopedBundle = () =>
           withTaskScopedCommitIndex(
             options.cwd,
             scopedCommitFiles.length > 0 ? scopedCommitFiles : stagedCommitSurface,
             actorId,
             (scopedEnv: LegacyValue) => runCommit({ ...commitEnv, ...scopedEnv }),
-            scopedCommitFiles.length > 0
-              ? (taskScopedBundleReport?.sealedBundle ?? null)
-              : null,
+            resolveGovernedCommitSeal({
+              cwd: options.cwd,
+              admittedBundle:
+                scopedCommitFiles.length > 0
+                  ? (taskScopedBundleReport?.sealedBundle ?? null)
+                  : null,
+              paths: stagedCommitSurface,
+              provenance: "pre-staged-index",
+            }),
           );
         const indexLeaseAuthorization = taskScopedBundleReport?.indexLeaseAuthorization;
         if (indexLeaseAuthorization?.ok) {

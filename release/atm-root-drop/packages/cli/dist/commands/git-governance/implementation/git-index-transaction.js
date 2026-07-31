@@ -352,13 +352,12 @@ export function recordGitIndexRestoreFailure(cwd, input) {
     return relativePath;
 }
 /**
- * TASK-GIT-0029: the candidate index is assembled from a sealed bundle and
- * asserted against it before `run` may create a commit. An empty bundle is no
- * longer a licence to commit the live shared index — `sealAndRunTaskScopedCommit`
- * fails closed instead, and callers that legitimately have nothing task-scoped
- * to seal must resolve their own bundle explicitly.
+ * The candidate index is assembled from a sealed bundle and asserted against it
+ * before `run` may create a commit. An empty bundle is not a licence to commit
+ * the live shared index, and neither is an absent one: the caller passes the
+ * seal source it decided on, and an unnamed source fails closed.
  */
-export function withTaskScopedCommitIndex(cwd, files, actorId, run, sealedBundle = null) {
+export function withTaskScopedCommitIndex(cwd, files, actorId, run, sealSource) {
     const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
     return runWithSealedTaskScopedCommitIndex({
         cwd,
@@ -366,7 +365,7 @@ export function withTaskScopedCommitIndex(cwd, files, actorId, run, sealedBundle
         provenance: "task-scope",
         actorId: actorId ?? null,
         surface: "git commit --task-scoped",
-        sealedBundle,
+        sealSource,
         stageGovernanceEvidence: (env) => {
             if (!actorId)
                 return [];
