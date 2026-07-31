@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0277",
+  "title": "Model-relative coverage semantics and quality certificate vocabulary",
+  "status": "planned",
+  "milestone": "ATM-GOV-PLAN4-R1",
+  "dependencies": [
+    "ATM-GOV-0276"
+  ],
+  "acceptance": [
+    "ACC-1: A public `coverage-semantics` module defines model-relative coverage states, quality verdicts, assumptions, exclusions, and certificate vocabulary.",
+    "ACC-2: Certificate helpers reject or diagnose absolute/unqualified 100% claims.",
+    "ACC-3: The vocabulary can represent proven, sufficient-under-assumptions, blocked, indeterminate, unsupported, and stale evidence without losing partial progress.",
+    "ACC-4: The JSON schema validates the same public shape used by tests and downstream modules.",
+    "ACC-5: The test catalog group includes the required test case id and maps it to this card."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/coverage-semantics.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/quality-certificate.schema.json",
+    "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+    "tests/cli/plan4-coverage-semantics.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/coverage-semantics.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/quality-certificate.schema.json",
+    "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+    "tests/cli/plan4-coverage-semantics.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-coverage-semantics.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-model-relative-certificate-receipts",
+  "rollbackStrategy": "revert-commit-and-disable-plan4-certificate-vocabulary",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.coverage-semantics",
+        "pattern": "Value Object / Vocabulary Module",
+        "source": "packages/core/src/evidence/coverage-semantics.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/coverage-semantics.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/quality-certificate.schema.json",
+        "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+        "tests/cli/plan4-coverage-semantics.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0277-model-relative-coverage-semantics-and-quality-certificate-vocabulary.task.md",
+    "sectionTitle": "ATM-GOV-0277",
+    "headingLine": 84,
+    "hash": "87053b329cc7534b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0277-model-relative-coverage-semantics-and-quality-certificate-vocabulary.task.md",
+      "planningCommitSha": "5207ea9fff741f7b0b3dd6d1b27cf926798e83ee",
+      "contentDigest": "sha256:87053b329cc7534b391e0be22781e88174d577735ea3a5408fb78b9c96290396",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-31T00:20:07.671Z"
+    }
+  },
+  "importedAt": "2026-07-31T00:20:07.671Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0276"
+    ],
+    "startConditions": [
+      "ATM-GOV-0276 is done so task import fidelity, planning seal upgrades, and claim atomicity are trustworthy enough for Plan 4.0 task cards."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "packages/core/src/evidence/validation-contract.ts",
+      "packages/core/src/evidence/validation-receipt.ts"
+    ],
+    "changedPublicSeams": [
+      "atm.coverageSemantics.v1",
+      "atm.qualityCertificateVocabulary.v1"
+    ],
+    "causalImpactEdges": [
+      "Plan 4.0 coverage claims -> model-relative assumptions and vocabulary",
+      "validation receipts -> quality certificate terminology",
+      "closure evidence -> explicit proven/sufficient/unknown distinction"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-coverage-semantics.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "plan4-foundation"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0277_model_relative_certificate_vocabulary_0d0fd68c",
+      "targetGroupId": "test_group_plan4_coverage_semantics",
+      "semanticKey": "plan4_model_relative_certificate_vocabulary",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "Plan 4.0 coverage claims -> model-relative assumptions and vocabulary",
+        "validation receipts -> quality certificate terminology",
+        "closure evidence -> explicit proven/sufficient/unknown distinction"
+      ],
+      "expectedRedPredicate": "A closure certificate can claim absolute 100% coverage without naming the model, assumptions, and unknown/gap status.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-coverage-semantics",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0277_model_relative_certificate_vocabulary_0d0fd68c"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-31T00-20-07-808Z-import-6aa25aaa31d6",
+  "lastTransitionAt": "2026-07-31T00:20:07.808Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
