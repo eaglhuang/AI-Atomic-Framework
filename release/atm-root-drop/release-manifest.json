@@ -2550,6 +2550,7 @@
     "release/atm-root-drop/packages/core/dist/broker/__tests__/agr-layer2.test.js",
     "release/atm-root-drop/packages/core/dist/broker/__tests__/atm-core-scope.test.js",
     "release/atm-root-drop/packages/core/dist/broker/__tests__/atom-map-adapter.test.js",
+    "release/atm-root-drop/packages/core/dist/broker/__tests__/batch-planner.test.d.ts",
     "release/atm-root-drop/packages/core/dist/broker/__tests__/batch-planner.test.js",
     "release/atm-root-drop/packages/core/dist/broker/__tests__/candidate-bridge.test.js",
     "release/atm-root-drop/packages/core/dist/broker/__tests__/compose.test.js",
@@ -2695,6 +2696,7 @@
     "release/atm-root-drop/packages/core/dist/broker/write-scope-policy.js",
     "release/atm-root-drop/packages/core/dist/broker/write-ticket.js",
     "release/atm-root-drop/packages/core/dist/cache/guide-cache.js",
+    "release/atm-root-drop/packages/core/dist/commit-attribution/sealed-commit-bundle.d.ts",
     "release/atm-root-drop/packages/core/dist/commit-attribution/sealed-commit-bundle.js",
     "release/atm-root-drop/packages/core/dist/commit-candidate/commit-candidate-store.js",
     "release/atm-root-drop/packages/core/dist/commit-candidate/commit-candidate.js",
@@ -2852,9 +2854,7 @@
     "release/atm-root-drop/packages/core/dist/schemas/parallel-replay-scenario.js",
     "release/atm-root-drop/packages/core/dist/scope/linked-surface/index.js",
     "release/atm-root-drop/packages/core/dist/skills/engineering-change-method.js",
-    "release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.d.ts",
     "release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.js",
-    "release/atm-root-drop/packages/core/dist/skills/index.d.ts",
     "release/atm-root-drop/packages/core/dist/skills/index.js",
     "release/atm-root-drop/packages/core/dist/source-inventory/source-inventory.js",
     "release/atm-root-drop/packages/core/dist/spec/parse-spec.js",
@@ -4920,9 +4920,9 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 207,
-    "unchanged": 4676,
-    "removed": 2
+    "copied": 197,
+    "unchanged": 4688,
+    "removed": 0
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -6184,7 +6184,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:3d70d6842d3a9a50bf60fa735fd567678b282ceccf8a54de9dc38a1d5e1b3504"
+    "digest": "sha256:118383343d301f62dfb0faa24b9a5bf04b0a65835a6f269aec85b931f04c737b"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -8708,6 +8708,7 @@
       "release/atm-root-drop/packages/core/dist/broker/__tests__/agr-layer2.test.js",
       "release/atm-root-drop/packages/core/dist/broker/__tests__/atm-core-scope.test.js",
       "release/atm-root-drop/packages/core/dist/broker/__tests__/atom-map-adapter.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/batch-planner.test.d.ts",
       "release/atm-root-drop/packages/core/dist/broker/__tests__/batch-planner.test.js",
       "release/atm-root-drop/packages/core/dist/broker/__tests__/candidate-bridge.test.js",
       "release/atm-root-drop/packages/core/dist/broker/__tests__/compose.test.js",
@@ -8853,6 +8854,7 @@
       "release/atm-root-drop/packages/core/dist/broker/write-scope-policy.js",
       "release/atm-root-drop/packages/core/dist/broker/write-ticket.js",
       "release/atm-root-drop/packages/core/dist/cache/guide-cache.js",
+      "release/atm-root-drop/packages/core/dist/commit-attribution/sealed-commit-bundle.d.ts",
       "release/atm-root-drop/packages/core/dist/commit-attribution/sealed-commit-bundle.js",
       "release/atm-root-drop/packages/core/dist/commit-candidate/commit-candidate-store.js",
       "release/atm-root-drop/packages/core/dist/commit-candidate/commit-candidate.js",
@@ -9010,9 +9012,7 @@
       "release/atm-root-drop/packages/core/dist/schemas/parallel-replay-scenario.js",
       "release/atm-root-drop/packages/core/dist/scope/linked-surface/index.js",
       "release/atm-root-drop/packages/core/dist/skills/engineering-change-method.js",
-      "release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.d.ts",
       "release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.js",
-      "release/atm-root-drop/packages/core/dist/skills/index.d.ts",
       "release/atm-root-drop/packages/core/dist/skills/index.js",
       "release/atm-root-drop/packages/core/dist/source-inventory/source-inventory.js",
       "release/atm-root-drop/packages/core/dist/spec/parse-spec.js",
@@ -11081,34 +11081,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:3f58b2e547114248aa583f478295a881168b67aed9485c81e6b7032d892ccaf5",
-  "sealedSourceCommit": "4bfd6c2970b78957d962928b35b7c3ef0e753b2d",
+  "buildInputsTreeHash": "sha256:0e25c3618e851a4b2db1f491272c8c1aca5a8cbf3131932a40efb6dfb6a2c38a",
+  "sealedSourceCommit": "9c066ef9d1fc1caecaf12706d0087faa6f60c945",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:ad7e80254b0d48e005af506ab682da86e16e6942bdc30994ae744553c03cb179",
-  "tsBuildCacheDigest": "sha256:0a028129bec20ea51215279617f6f9aeab7252994a31d5a2be4b4eaeffe8b27a",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:b348aebdf0f4e4714969f083e7de253f66760f6abd25dab6cd29aa42077bb4d6",
+  "tsBuildCacheDigest": "sha256:46e693d247012abbe7838e168e4029b813b074d778bbda9f58646a5de44526d0",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 17330,
-    "totalElapsedMs": 51728,
-    "dominanceRatio": 0.335,
-    "phaseMedianMs": 2107,
-    "phaseP95Ms": 17330,
+    "dominantPhaseMs": 16656,
+    "totalElapsedMs": 52664,
+    "dominanceRatio": 0.3163,
+    "phaseMedianMs": 1852,
+    "phaseP95Ms": 16656,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 43,
-    "skipDecision": 38,
-    "worktreeSetup": 17330,
-    "typescriptBuild": 11996,
-    "rootDropReleaseAssembly": 9692,
-    "onefileReleaseAssembly": 2107,
-    "artifactSync": 8768,
+    "inputHashCalculation": 51,
+    "skipDecision": 50,
+    "worktreeSetup": 16656,
+    "typescriptBuild": 13768,
+    "rootDropReleaseAssembly": 9093,
+    "onefileReleaseAssembly": 1852,
+    "artifactSync": 7558,
     "cleanup": 0,
-    "totalElapsed": 51728
+    "totalElapsed": 52664
   }
 }
