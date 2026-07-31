@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-31T06-39-47-917Z-close-d1c96073268f",
+  "taskId": "TASK-GIT-0030",
+  "action": "close",
+  "actorId": "claude-006",
+  "sessionId": "session-20260731053135-claude-006-TASK-GIT-0030-4792366d0f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0030.json",
+  "taskSha256": "sha256:8f5305d1ba1a027f2a04cad0085c717c5c7f244c11c362e2c7b92cf05ebdc615",
+  "createdAt": "2026-07-31T06:39:47.917Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0030 --actor claude-006 --status done --historical-delivery e7ff78e7fbffb6993d24ecf1102a97d8a11c5e2d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260731053135-claude-006-TASK-GIT-0030-4792366d0f",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0030.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "test:cli -- --run tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "test:cli -- --run tests/cli/git-commit-task-scoped-staging.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:module-boundaries"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-31T06:39:47.901Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0030.*",
+        ".atm/history/task-events/TASK-GIT-0030/**",
+        ".atm/history/tasks/TASK-GIT-0030.json",
+        "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+        "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop/**",
+        "release/atm-root-drop/packages/core/dist/skills/incident-learning-candidate.d.ts",
+        "release/atm-root-drop/packages/core/dist/skills/index.d.ts",
+        "tests/catalog/groups/**",
+        "tests/cli/commit-attribution-sealed-transaction.test.ts",
+        "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+        "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+        "tests/catalog/groups/**",
+        "tests/cli/commit-attribution-sealed-transaction.test.ts",
+        "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
