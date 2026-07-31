@@ -1,0 +1,207 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0031",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a80e646b7ba1ce3b4cfa8b3be00a491aee5abac3",
+  "governedTreeSha": "2d46293a63f5d9ce4655abd231cbce93dc706030",
+  "targetCommitDelta": {
+    "currentCommitSha": "a80e646b7ba1ce3b4cfa8b3be00a491aee5abac3",
+    "parentCommitShas": [
+      "a80e646b7ba1ce3b4cfa8b3be00a491aee5abac3"
+    ],
+    "governedTreeSha": "2d46293a63f5d9ce4655abd231cbce93dc706030",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/evidence/TASK-GIT-0031.json",
+      ".atm/history/task-events/TASK-GIT-0031/2026-07-31T08-34-32-225Z-scope-amendment-0f3a6e40adef.json",
+      ".atm/history/task-events/TASK-GIT-0031/2026-07-31T08-34-35-664Z-renew-d884f20d4483.json",
+      ".atm/history/tasks/TASK-GIT-0031.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+      "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/catalog/groups/test_group_commit_attribution.shard.json",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/incident.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e17d8661df79407d04fb0c646616445ca5b7469cc4339ad551f0b18c9a60a088",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9bcf873178438da1f43e200896c7cb3744713b6c669fa1837925fdd8664efcd5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:module-boundaries",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8004b24e7d203bfcaf40da1009975373ba146967019f8107d9548ad1ecb6bacc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:abc610ab51427dcf9a573e902722fc392ae358610bc2bab84818c37cccce91cf",
+      "stderrSha256": "sha256:ec45a1a036798bced147a6db6f8cc290520cb2119880f837048403b2146bdabd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:module-boundaries"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-31T08:40:53.034Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/evidence/TASK-GIT-0031.*",
+      ".atm/history/task-events/TASK-GIT-0031/**",
+      ".atm/history/tasks/TASK-GIT-0031.json",
+      "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+      "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/broker/wave-broker-scheduler.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "packages/cli/src/commands/git-governance/lease-command.ts",
+      "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/catalog/groups/**",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+      "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/broker/wave-broker-scheduler.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "packages/cli/src/commands/git-governance/lease-command.ts",
+      "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+      "tests/catalog/groups/**",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-GIT-0031.json",
+  "closedAt": "2026-07-31T08:40:53.035Z",
+  "closedByActor": "claude-006",
+  "sessionId": "session-20260731074704-claude-006-TASK-GIT-0031-963a8dd3de",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a80e646b7ba1ce3b4cfa8b3be00a491aee5abac3",
+    "taskMatchedFiles": [
+      "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+      "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-GIT-0031/2026-07-31T08-25-18-603Z-scope-amendment-7ae887be3672.json",
+      ".atm/history/task-events/TASK-GIT-0031/2026-07-31T08-26-16-793Z-renew-f90e0401d9f8.json",
+      ".atm/history/tasks/TASK-GIT-0031.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

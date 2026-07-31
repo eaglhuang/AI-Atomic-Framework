@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0031",
   "title": "Cover sealed commit concurrency and override-free attribution gates",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-GIT-0029",
@@ -158,8 +158,8 @@
     "checkedFields": [],
     "findings": []
   },
-  "lastTransitionId": "2026-07-31T08-26-16-793Z-renew-f90e0401d9f8",
-  "lastTransitionAt": "2026-07-31T08:26:16.793Z",
+  "lastTransitionId": "2026-07-31T08-40-53-057Z-close-9919eb6ca314",
+  "lastTransitionAt": "2026-07-31T08:40:53.057Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-006",
   "reservedAt": "2026-07-31T07:47:04.777Z",
@@ -168,9 +168,10 @@
     "actorId": "claude-006",
     "leaseId": "lease-36785ed0438f",
     "claimedAt": "2026-07-31T07:47:04.783Z",
-    "heartbeatAt": "2026-07-31T08:26:16.109Z",
+    "heartbeatAt": "2026-07-31T08:40:53.052Z",
     "ttlSeconds": 7200,
     "files": [
+      ".atm/history/evidence/git-head.jsonl",
       ".atm/history/evidence/TASK-GIT-0031.*",
       ".atm/history/task-events/TASK-GIT-0031/**",
       ".atm/history/tasks/TASK-GIT-0031.json",
@@ -197,33 +198,34 @@
       "tests/cli/commit-attribution-sealed-transaction.test.ts",
       "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260731074704-claude-006-f6d08b1ecf",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260731074704-claude-006-f6d08b1ecf\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-07-31T07:47:04.783Z",
   "startedByActor": "claude-006",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-668e01d0ae3b2111",
-    "ticketDigest": "sha256:668e01d0ae3b21115a03fa036858ca0775aefa6cf29e2f0bb7abdd29f4eca676",
+    "ticketId": "wat-34f5ff6e20b9e4dd",
+    "ticketDigest": "sha256:34f5ff6e20b9e4ddf3b2d8a1644f10acc0cae2463ba57c06b253e60c83940986",
     "taskId": "TASK-GIT-0031",
     "origin": "claim",
     "actorId": "claude-006",
     "laneSessionId": "lane-20260731074704-claude-006-f6d08b1ecf",
     "claimGeneration": "lease-36785ed0438f",
-    "issuedAt": "2026-07-31T08:26:16.109Z",
-    "expiresAt": "2026-07-31T10:26:16.109Z",
+    "issuedAt": "2026-07-31T08:34:35.090Z",
+    "expiresAt": "2026-07-31T10:34:35.090Z",
     "scopeDigest": "sha256:d861fc88e989dcf69d415cbd0b568f2ab86fde01c071da565e040e2b36d07b46",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-31T08:26:16.109Z"
+      "selectedAt": "2026-07-31T08:34:35.090Z"
     },
     "grants": [
       {
@@ -310,6 +312,7 @@
     "queueId": null,
     "queueIndex": null,
     "allowedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
       ".atm/history/evidence/TASK-GIT-0031.*",
       ".atm/history/task-events/TASK-GIT-0031/**",
       ".atm/history/tasks/TASK-GIT-0031.json",
@@ -357,5 +360,9 @@
     },
     "createdAt": "2026-07-31T07:47:08.017Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-31T08:40:53.052Z",
+  "closedByActor": "claude-006",
+  "closedBySessionId": "session-20260731074704-claude-006-TASK-GIT-0031-963a8dd3de",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0031.closure-packet.json"
 }

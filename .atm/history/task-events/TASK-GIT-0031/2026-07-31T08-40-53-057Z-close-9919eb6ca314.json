@@ -1,0 +1,92 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-31T08-40-53-057Z-close-9919eb6ca314",
+  "taskId": "TASK-GIT-0031",
+  "action": "close",
+  "actorId": "claude-006",
+  "sessionId": "session-20260731074704-claude-006-TASK-GIT-0031-963a8dd3de",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0031.json",
+  "taskSha256": "sha256:be3fb0e049b58d9292f900594327d7310baa44f85cbbdb67867067e6c64eab31",
+  "createdAt": "2026-07-31T08:40:53.057Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0031 --actor claude-006 --status done --historical-delivery a80e646b7ba1ce3b4cfa8b3be00a491aee5abac3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260731074704-claude-006-TASK-GIT-0031-963a8dd3de",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0031.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:module-boundaries"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-31T08:40:53.034Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/git-head.jsonl",
+        ".atm/history/evidence/TASK-GIT-0031.*",
+        ".atm/history/task-events/TASK-GIT-0031/**",
+        ".atm/history/tasks/TASK-GIT-0031.json",
+        "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+        "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+        "packages/cli/src/commands/broker/wave-broker-scheduler.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+        "packages/cli/src/commands/git-governance/lease-command.ts",
+        "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+        "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+        "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "release/atm-root-drop/release-manifest.json",
+        "tests/catalog/groups/**",
+        "tests/cli/commit-attribution-concurrency-gates.test.ts",
+        "tests/cli/commit-attribution-sealed-transaction.test.ts",
+        "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+        "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+        "packages/cli/src/commands/broker/wave-broker-scheduler.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+        "packages/cli/src/commands/git-governance/lease-command.ts",
+        "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+        "tests/catalog/groups/**",
+        "tests/cli/commit-attribution-concurrency-gates.test.ts",
+        "tests/cli/commit-attribution-sealed-transaction.test.ts",
+        "tests/fixtures/governance-incidents/shared-index-commit-attribution/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
