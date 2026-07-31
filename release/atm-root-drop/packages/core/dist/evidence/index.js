@@ -1,5 +1,6 @@
 export * from './acceptance-predicate.js';
 export * from './coverage-semantics.js';
+export * from './coverage-universe-compiler.js';
 export * from './diff-evidence.js';
 export * from './diagnostic-loop.js';
 export * from './git-boundary-evidence.js';
