@@ -5037,8 +5037,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 323,
-    "unchanged": 4679,
+    "copied": 314,
+    "unchanged": 4688,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -11321,34 +11321,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:4018d134d0eef87a430ec488a378702f0b57409af4a8f1aeb226116ca503a444",
-  "sealedSourceCommit": "db40f85ac3484da5380637875d6e0f8258a6e0a7",
+  "buildInputsTreeHash": "sha256:86c29499c23c9db0bbb72430b247a3263ede3ee84218bc4b2e57174a77b77a26",
+  "sealedSourceCommit": "ef974940f3410c4531c08362f4ed1adf76e37d1f",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:29b585fef5633a939f273224e3bb0d1cc28bd1d1b1dbf1d715b05da1e15220cb",
-  "tsBuildCacheDigest": "sha256:0c9fb562c66eb58e2c846d85b58f5200422e716d79e0ce816460a858e4fa3732",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:6e8b56d4baf0453e0431c7db31c098b4584bf8a52de4be60ca7bdd04fedebfad",
+  "tsBuildCacheDigest": "sha256:4e330c3e0b83e159a218b4091bcaaa2612f0beb5810329a1d287a5461e90981e",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "typescriptBuild",
-    "dominantPhaseMs": 22637,
-    "totalElapsedMs": 58781,
-    "dominanceRatio": 0.3851,
-    "phaseMedianMs": 1755,
-    "phaseP95Ms": 22637,
+    "dominantPhase": "rootDropReleaseAssembly",
+    "dominantPhaseMs": 20115,
+    "totalElapsedMs": 52454,
+    "dominanceRatio": 0.3835,
+    "phaseMedianMs": 1391,
+    "phaseP95Ms": 20115,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 254,
-    "skipDecision": 54,
-    "worktreeSetup": 8957,
-    "typescriptBuild": 22637,
-    "rootDropReleaseAssembly": 17579,
-    "onefileReleaseAssembly": 1755,
-    "artifactSync": 5507,
+    "inputHashCalculation": 41,
+    "skipDecision": 40,
+    "worktreeSetup": 8670,
+    "typescriptBuild": 14623,
+    "rootDropReleaseAssembly": 20115,
+    "onefileReleaseAssembly": 1391,
+    "artifactSync": 5866,
     "cleanup": 0,
-    "totalElapsed": 58781
+    "totalElapsed": 52454
   }
 }
