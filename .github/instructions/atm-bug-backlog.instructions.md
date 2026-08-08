@@ -1,10 +1,9 @@
 ---
-mode: agent
-description: Explain missing evidence or blocked guidance before proceeding.
+applyTo: "**"
 ---
 
 
-# ATM Evidence
+# ATM Bug Backlog
 
 First command:
 
@@ -12,82 +11,61 @@ First command:
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-## Route Command
+Use this skill when the user asks to record an ATM bug, dogfood failure,
+workflow friction, optimization backlog item, or when a governed ATM run exposes
+a repeatable defect.
 
-Use this ATM command only after the first command confirms it is the current governed route:
+## Backlog Authority
+
+Choose the owning backlog before writing anything:
+
+- ATM product, framework, CLI, governance lifecycle, Team Agents, integration
+  packs, release runner, or ATM docs: write one
+  `atm.governanceBacklogItem.v1` item shard under the ATM backlog item
+  directory, then regenerate the Markdown projection.
+- Current adopter or app behavior: write only that repository's project backlog.
+- Cross-repo unclear: record the adopter symptom first; add an ATM item only
+  when evidence points to ATM itself.
+
+The item shard is the record authority. The Markdown backlog is a generated
+projection for humans. Do not directly author new ATM rows in the projection.
+
+## Incident Learning Intake
+
+When the bug report has enough signal to learn from, produce or request an
+`atm.incidentLearningCandidate.v1` candidate alongside the backlog item. This is
+the "leak expands nearby pressure tests" loop:
+
+- Preserve the symptom and the public seam where it appeared.
+- Preserve invariant refs, acceptance refs, reproduction refs, receipt refs, and
+  source availability.
+- Keep missing or conflicting information as `unknown` or `unavailable`.
+- Suggest breadth hypotheses:
+  upstream/downstream paths, same-policy callers, sibling adapters, adjacent transitions, and shared invariants.
+- Suggest depth hypotheses:
+  boundary, negative, rollback, retry, concurrency, mutation, property/metamorphic, and independent-oracle gaps.
+- Tie proposed tests to the incident's semantic family so future runs can select
+  the relevant family instead of running every possible test.
+
+The candidate is evidence-bounded. It may recommend a task card, test ids, or
+more evidence, but it cannot authorize merge, cannot declare fix success, cannot exclude
+tests, cannot close a task, or create a second backlog.
+
+## Unknown-Safe Rule
+
+Do not guess root cause or family membership. If evidence is missing, say
+`unavailable`; if evidence conflicts, say `conflicting`. Root-cause and family
+hints stay candidate-only until a task card, validator, or review receipt proves
+them.
+
+## Projection Commands
+
+For ATM-owned backlog item shards, rebuild and validate the generated projection:
 
 ```bash
-node atm.mjs explain --why blocked --json
+node --strip-types scripts/validate-governance-projections.ts --write
+node --strip-types scripts/validate-governance-projections.ts
 ```
-
-If blocked guidance includes an `ATM_*` code, use `atm-error-code-resolver`
-for the meaning, retryability, approval requirement, and next safe action. Do
-not turn source-index context into a private remediation table here.
-
-## Governance Evidence Checklist
-
-When explaining readiness or missing evidence for a governed task, check for:
-
-- consumed sealed summaries;
-- missing data and assumption changes;
-- a stop rule;
-- touched shared-write gates and the `INV-ATM-008` outcome;
-- telemetry window, watermark, counters, duration/timing, source availability,
-  compact digest, and explicit unavailable receipts;
-- frozen-entry smoke evidence when runner, release, broker shared-write
-  behavior, first-layer entry behavior, skill template projection, or generated
-  integration output changed.
-
-If a required signal is unavailable, say `unavailable` with the receipt or
-reason. Do not treat missing telemetry as zero latency, zero failures, or
-success.
-
-## Validation Contract Lifecycle
-
-Evidence run, auto-evidence, pre-close, write-readiness, and the advisory review
-all consume the one `evaluateValidationContract` selector. Never derive a local
-required set or recompute freshness in an adapter.
-
-When a task card declares engineering change method profile ids, carry those
-profile ids into evidence review and verify their completion evidence through
-the shared profile evaluator. Evidence may report a missing or stale method
-profile receipt, but it must not create a parallel checklist that disagrees with
-the profile source.
-
-- **Selected-case execution.** Run only the contract-selected case ids and
-  preserve each case's structured output. A shell command that exits zero
-  without executing its declared assertions is a zero-test result and fails the
-  execution contract — it is not a pass.
-- **One contract digest.** Evidence, pre-close, close packet, and pre-push must
-  thread the same validation-contract digest. A changed required set, freshness,
-  or phase owner between stages is a defect, not a refresh.
-- **Candidate freshness.** A candidate source change invalidates every TDD,
-  review, and required-case receipt whose recorded candidate digest no longer
-  matches; stale green receipts do not survive a change under them.
-- **Fail closed.** Pre-close rejects unresolved required cases, zero-test
-  results, and stale phase ownership; advisory checks stay non-blocking. A
-  missing required contract fails closed with one executable recovery manifest —
-  never a full-repository run.
-
-## Team Agents Evidence Surface
-
-When evidence or blocked guidance involves Team Agents, recognize these as
-first-class proof surfaces:
-
-- `atm.teamProviderRunArtifact.v1` proves a governed provider role run.
-- `atm.reviewAgentSignature.v1` proves formal or advisory Review Agent output.
-- `atm.teamAgentObservabilityEvent.v1` proves runtime events such as
-  `artifact.output`, `session.failure`, and `broker.conflict.blocked`.
-- `knowledge.query` is shareable advisory read access; `knowledge.index.write`
-  is coordinator-only generated cache writing.
-- `review.signature.write` is formal Review Agent authority and requires the
-  independence/quorum checks named by the task.
-
-If `decisionClass`, `decisionReason`, `requiresHumanSignoff`, `requiresAdr`,
-`violationStatus`, or `escalationTarget` appears in plan/status/start output,
-carry those fields into the evidence explanation. If `violationStatus` is
-`broker-conflict-blocked`, explain the required Broker resolution path instead
-of treating it as a warning.
 
 ## Handoff
 
@@ -121,9 +99,10 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ## Guardrails
 
 - Stay inside ATM CLI routing and evidence contracts.
-- Do not create a parallel task model, registry, or approval flow.
-- Treat any planning hint as CLI output, not as template authority.
+- Do not create a parallel backlog, task lifecycle, evidence authority, or test
+  catalog.
+- Do not use an incident-learning candidate as proof that a fix is complete.
+- Do not widen into full-repository testing when the incident family selects a
+  narrower relevant test set.
 
-Plan 4 evidence projections must preserve the sealed test-case selection, independent-oracle role separation, and explicit omitted-case reasons across every adapter; unknown mappings fail closed with an executable repair route.
-
-Do not introduce a second registry, task state, or approval path.
+Keep this flow inside ATM CLI routing. Preserve host edits and rely on install manifest hashes for uninstall safety.

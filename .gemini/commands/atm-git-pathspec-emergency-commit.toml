@@ -1,14 +1,14 @@
-name = "atm-evidence"
-description = "Explain missing evidence or blocked guidance before proceeding."
+name = "atm-git-pathspec-emergency-commit"
+description = "Emergency-only runbook for a one-time path-bounded native Git commit when ATM governed commit, WIP park, or commit-candidate lanes are blocked and the owner explicitly authorizes anomaly recovery. Not a Plan 3.1 autonomous success path."
 first_command = "node atm.mjs next --prompt \"$ARGUMENTS\" --json"
-command = "node atm.mjs explain --why blocked --json"
+command = "node atm.mjs next --prompt \"$ARGUMENTS\" --json"
 handoff = "node atm.mjs handoff summarize --task \"$ARGUMENTS\" --json"
 charter_invariants_injected = true
 
 [atm]
-entry_id = "atm-evidence"
+entry_id = "atm-git-pathspec-emergency-commit"
 first_command = "node atm.mjs next --prompt \"$ARGUMENTS\" --json"
-route_command = "node atm.mjs explain --why blocked --json"
+route_command = "node atm.mjs next --prompt \"$ARGUMENTS\" --json"
 handoff_command = "node atm.mjs handoff summarize --task \"$ARGUMENTS\" --json"
 
 [atm.guardrails]
@@ -18,96 +18,155 @@ hash_guarded_uninstall = true
 
 instructions = """
 
-# ATM Evidence
+# Git Pathspec Emergency Commit Repair
 
-First command:
+Use this skill only as an **emergency/anomaly repair runbook**. Direct Git
+pathspec or native commit is **emergency-only** and is **excluded from
+autonomous Plan 3.1 success metrics**. Prefer ATM governed
+`task` / `claim` / `broker` / `git commit` / `taskflow close` whenever those
+lanes can complete. Do **not** treat Git pathspec as ATM core concurrency.
+
+## Authority preconditions
+
+Enter this skill only when **all** of the following hold:
+
+1. The project owner or captain explicitly grants emergency authority for a
+   path-bounded commit, **or** ATM returned a hard blocker with **no**
+   executable `recoveryCommand`.
+2. Normal ATM recovery was attempted or ruled out: governed `node atm.mjs git
+   commit`, WIP park, commit-candidate / broker ticket, and claim re-attach
+   when applicable.
+3. The keep-list of paths is provided by the captain/task card. Never infer the
+   keep-list from every dirty file in the worktree.
+4. You will record or reference a backlog/follow-up item explaining why ATM
+   lacked a normal recovery route (for example same-task unowned WIP with no
+   reclaim command).
+
+If any precondition is missing, stop and ask for authority. Using this skill
+for ordinary delivery is a Plan 3.1 **failure signal**, not a success pattern.
+
+## Compact emergency checklist
+
+### 1. Capture baseline (read-only)
+
+```bash
+git status --short
+git diff --cached --name-only
+node atm.mjs broker status --json
+```
+
+Confirm broker is understood and unrelated residue is not silently consumed.
+
+### 2. Exact keep-list staging
+
+- Build an explicit keep-list from the captain/task card.
+- Stage **only** keep-list paths with path-bounded `git add -- <paths>`.
+- **Exact staged-set verification**: `git diff --cached --name-only` must
+  exactly equal the keep-list (same paths, no extras, no missing entries).
+- If the staged set differs, stop. Do not commit.
+
+Forbidden without a **separate** human destructive/recovery approval:
+
+- `git restore` (working tree or destructive restore)
+- `git stash`
+- `git clean`
+- `git reset`
+- `git checkout`
+- broad `git add -A` / `git add .`
+
+Index-only unstage of non-keep-list paths may be used only when the captain
+explicitly authorizes index adjustment and working-tree content must remain
+unchanged.
+
+### 3. Focused validators
+
+Run focused validators for the keep-list when available. If validators fail
+because the WIP is incomplete, you may still create a **non-delivery WIP**
+commit, but the report must say validators are not all passing and
+`ATM-Delivery: false`.
+
+### 4. Author / committer continuity
+
+Set Git identity from the explicit actor identity before commit:
+
+```bash
+# Values come from the actor identity for this emergency (not ambient editor).
+export GIT_AUTHOR_NAME="<actor-git-name>"
+export GIT_AUTHOR_EMAIL="<actor-git-email>"
+export GIT_COMMITTER_NAME="<actor-git-name>"
+export GIT_COMMITTER_EMAIL="<actor-git-email>"
+```
+
+Author continuity requires `GIT_AUTHOR_*` and `GIT_COMMITTER_*` to match the
+authorized actor for this emergency lane.
+
+### 5. Native commit command shape (emergency only)
+
+Use `--no-verify` **only** when the owner/captain explicitly authorized hook
+bypass for this emergency. Include required trailers:
+
+- `ATM-Actor: <actor-id>`
+- `ATM-Task: <task-id>`
+- `ATM-WIP: true|false`
+- `ATM-Delivery: false` for emergency park / non-delivery WIP
+- `ATM-Emergency-Reason: <short reason, include ATM_* code when present>`
+
+Example shape (paths already staged and verified):
+
+```bash
+git commit --no-verify \
+  -m "wip(<task-id>): preserve emergency keep-list work" \
+  -m "Emergency non-delivery pathspec commit. Not governed ATM delivery." \
+  -m "ATM-Actor: <actor-id>" \
+  -m "ATM-Task: <task-id>" \
+  -m "ATM-WIP: true" \
+  -m "ATM-Delivery: false" \
+  -m "ATM-Emergency-Reason: <reason>"
+```
+
+### 6. Post-commit verification
+
+After commit:
+
+1. Confirm HEAD advanced.
+2. Confirm `git diff --cached --name-only` is empty for this keep-list.
+3. Re-check `node atm.mjs broker status --json`.
+4. Report remaining dirty files (must not silently absorb unrelated residue).
+
+### 7. Push boundary
+
+Push only when the owner/captain requested push and pre-push passes. Do not
+treat a successful emergency push as task close or Plan 3.1 delivery success.
+
+## Closeout and backlog rules
+
+- Using this skill **must** create or reference a backlog/follow-up item when
+  the emergency was required because ATM lacked a normal recovery route.
+- Do **not** close the underlying task as normal delivery solely because this
+  emergency commit landed. Close only after subsequent governed claim,
+  validators, evidence, and `taskflow close` prove delivery.
+- ATM-GOV-0261 (when present) owns the durable VCS-neutral commit-candidate
+  product route. This skill remains temporary anomaly evidence until that
+  product lane exists.
+
+## Stop conditions
+
+Stop immediately when:
+
+- staged set is not an exact keep-list match;
+- authority or `--no-verify` was not granted;
+- recovery would require forbidden `restore` / `stash` / `clean` / `reset` /
+  `checkout` / `git add -A` without separate approval;
+- broker-conflict-blocked appears and no ticket path is provided;
+- the request is ordinary delivery disguised as emergency.
+
+## First command
 
 ```bash
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-## Route Command
-
-Use this ATM command only after the first command confirms it is the current governed route:
-
-```bash
-node atm.mjs explain --why blocked --json
-```
-
-If blocked guidance includes an `ATM_*` code, use `atm-error-code-resolver`
-for the meaning, retryability, approval requirement, and next safe action. Do
-not turn source-index context into a private remediation table here.
-
-## Governance Evidence Checklist
-
-When explaining readiness or missing evidence for a governed task, check for:
-
-- consumed sealed summaries;
-- missing data and assumption changes;
-- a stop rule;
-- touched shared-write gates and the `INV-ATM-008` outcome;
-- telemetry window, watermark, counters, duration/timing, source availability,
-  compact digest, and explicit unavailable receipts;
-- frozen-entry smoke evidence when runner, release, broker shared-write
-  behavior, first-layer entry behavior, skill template projection, or generated
-  integration output changed.
-
-If a required signal is unavailable, say `unavailable` with the receipt or
-reason. Do not treat missing telemetry as zero latency, zero failures, or
-success.
-
-## Validation Contract Lifecycle
-
-Evidence run, auto-evidence, pre-close, write-readiness, and the advisory review
-all consume the one `evaluateValidationContract` selector. Never derive a local
-required set or recompute freshness in an adapter.
-
-When a task card declares engineering change method profile ids, carry those
-profile ids into evidence review and verify their completion evidence through
-the shared profile evaluator. Evidence may report a missing or stale method
-profile receipt, but it must not create a parallel checklist that disagrees with
-the profile source.
-
-- **Selected-case execution.** Run only the contract-selected case ids and
-  preserve each case's structured output. A shell command that exits zero
-  without executing its declared assertions is a zero-test result and fails the
-  execution contract — it is not a pass.
-- **One contract digest.** Evidence, pre-close, close packet, and pre-push must
-  thread the same validation-contract digest. A changed required set, freshness,
-  or phase owner between stages is a defect, not a refresh.
-- **Candidate freshness.** A candidate source change invalidates every TDD,
-  review, and required-case receipt whose recorded candidate digest no longer
-  matches; stale green receipts do not survive a change under them.
-- **Fail closed.** Pre-close rejects unresolved required cases, zero-test
-  results, and stale phase ownership; advisory checks stay non-blocking. A
-  missing required contract fails closed with one executable recovery manifest —
-  never a full-repository run.
-
-## Team Agents Evidence Surface
-
-When evidence or blocked guidance involves Team Agents, recognize these as
-first-class proof surfaces:
-
-- `atm.teamProviderRunArtifact.v1` proves a governed provider role run.
-- `atm.reviewAgentSignature.v1` proves formal or advisory Review Agent output.
-- `atm.teamAgentObservabilityEvent.v1` proves runtime events such as
-  `artifact.output`, `session.failure`, and `broker.conflict.blocked`.
-- `knowledge.query` is shareable advisory read access; `knowledge.index.write`
-  is coordinator-only generated cache writing.
-- `review.signature.write` is formal Review Agent authority and requires the
-  independence/quorum checks named by the task.
-
-If `decisionClass`, `decisionReason`, `requiresHumanSignoff`, `requiresAdr`,
-`violationStatus`, or `escalationTarget` appears in plan/status/start output,
-carry those fields into the evidence explanation. If `violationStatus` is
-`broker-conflict-blocked`, explain the required Broker resolution path instead
-of treating it as a warning.
-
-## Handoff
-
-```bash
-node atm.mjs handoff summarize --task "$ARGUMENTS" --json
-```
+Read playbook and blockers before choosing emergency pathspec commit.
 
 ## Charter Invariants
 
@@ -131,14 +190,6 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
   Rule: Any code logic change, bug fix, or governance rule change must first be designed as the most general rule that correctly explains the observed failure class. Hard-coded special cases are allowed only with recorded evidence that the general rule is not currently safe, feasible, or economical, and that the exception is bounded and reversible. Data-shaped behavior, including thresholds, mappings, allowlists, routing choices, telemetry classifications, prompts, message text, fixtures, and domain content, must first be modeled outside control flow through schemas, registries, configuration, observed counters, or compact digest evidence instead of embedded changeable numbers or strings. The generalized solution must remain observable, testable, and no broader than the evidence supports.
 - `INV-ATM-010` ??**Single canonical worktree and compose-first shared writes** (enforcement: `doctor`, breaking change: no)
   Rule: Normal governed parallel development uses one canonical worktree, base, and HEAD. A shared physical file is compose-eligible rather than a file lock: workers declare bounded atom/CID/content-anchor/source-range intents and submit proposals, while the broker, format adapter, and transactional composer decide compose, revalidation, escalation, or queue. A neutral steward is the only shared-file writer and shared delivery records member attribution. Queueing or revalidation is a fallback for a true logical conflict, stale base/CAS failure, unsupported adapter, or fairness bound. AI workers must not use Git branches, detached worktrees, alternate indexes, merges, or rebases as normal concurrency/isolation mechanisms. The closed exceptions are emergency/anomaly recovery, historical read-only discrimination, and non-development sealed packaging; each requires a named receipt and cannot perform normal governed contribution writes.
-
-## Guardrails
-
-- Stay inside ATM CLI routing and evidence contracts.
-- Do not create a parallel task model, registry, or approval flow.
-- Treat any planning hint as CLI output, not as template authority.
-
-Plan 4 evidence projections must preserve the sealed test-case selection, independent-oracle role separation, and explicit omitted-case reasons across every adapter; unknown mappings fail closed with an executable repair route.
 """
 
 charter_invariants = """

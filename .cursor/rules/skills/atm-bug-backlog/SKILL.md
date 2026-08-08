@@ -1,24 +1,5 @@
 
-# ATM Plan Authoring
-
-Use this skill when creating or auditing ATM planning families, plan documents,
-or task cards under an external planning repository such as
-`docs/ai_atomic_framework`.
-
-## First-principles intake contract
-
-Resolve identity, authority, outcome, scope, and existing evidence before asking
-the human a question. Ask only currently unblocked decisions and show the
-default. Cards use `causalGraph` for typed dependencies, start conditions, soft
-relations, public seams, impact edges, frontier inputs, validators, and phase
-ownership.
-
-When a plan includes broad contract migration, TDD oracle design, review-smell
-triage, merge-conflict repair, or deep-module refactoring, identify the matching
-engineering change method profile from
-`scripts/engineering-change-method-profiles.json`. The plan should name the
-profile id and the evidence it expects; it should not duplicate the profile's
-full rule set into prose.
+# ATM Bug Backlog
 
 First command:
 
@@ -26,94 +7,67 @@ First command:
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-## Tool-First Rule
+Use this skill when the user asks to record an ATM bug, dogfood failure,
+workflow friction, optimization backlog item, or when a governed ATM run exposes
+a repeatable defect.
 
-Planning artifacts must be created through the plan CLI:
+## Backlog Authority
 
-```bash
-node atm.mjs plan doc create --planning-root <planning-root> --family-dir <family-dir> --title "<title>" --doc-name <file.md> --dry-run --json
-node atm.mjs plan series register --planning-root <planning-root> --series <key> --prefix <TASK-PREFIX> --family-dir <family-dir> --plan <family-dir>/<file.md> --owner-approved --dry-run --json
-node atm.mjs plan card create --planning-root <planning-root> --series <key> --title "<title>" --dry-run --json
-```
+Choose the owning backlog before writing anything:
 
-After the dry-run is correct, repeat the same command with `--write`.
+- ATM product, framework, CLI, governance lifecycle, Team Agents, integration
+  packs, release runner, or ATM docs: write one
+  `atm.governanceBacklogItem.v1` item shard under the ATM backlog item
+  directory, then regenerate the Markdown projection.
+- Current adopter or app behavior: write only that repository's project backlog.
+- Cross-repo unclear: record the adopter symptom first; add an ATM item only
+  when evidence points to ATM itself.
 
-Do not hand-write a new `docs/ai_atomic_framework/<family>/tasks/*.task.md`
-file or a new family directory as a substitute for these commands. If the CLI
-returns `ATM_PLAN_SERIES_NOT_REGISTERED`,
-`ATM_PLAN_SERIES_OWNER_APPROVAL_REQUIRED`, or another structured error, report
-that result and the suggested command instead of bypassing the tool.
+The item shard is the record authority. The Markdown backlog is a generated
+projection for humans. Do not directly author new ATM rows in the projection.
 
-## Registered Series Model
+## Incident Learning Intake
 
-The registry file is:
+When the bug report has enough signal to learn from, produce or request an
+`atm.incidentLearningCandidate.v1` candidate alongside the backlog item. This is
+the "leak expands nearby pressure tests" loop:
 
-```text
-<planning-root>/series-registry.json
-```
+- Preserve the symptom and the public seam where it appeared.
+- Preserve invariant refs, acceptance refs, reproduction refs, receipt refs, and
+  source availability.
+- Keep missing or conflicting information as `unknown` or `unavailable`.
+- Suggest breadth hypotheses:
+  upstream/downstream paths, same-policy callers, sibling adapters, adjacent transitions, and shared invariants.
+- Suggest depth hypotheses:
+  boundary, negative, rollback, retry, concurrency, mutation, property/metamorphic, and independent-oracle gaps.
+- Tie proposed tests to the incident's semantic family so future runs can select
+  the relevant family instead of running every possible test.
 
-It is the machine-readable source for mapping a task prefix to its family
-directory and approved plan documents. Task ids are assigned from the planning
-family's `tasks/` directory, not from the target repository's `.atm/history`
-ledger.
+The candidate is evidence-bounded. It may recommend a task card, test ids, or
+more evidence, but it cannot authorize merge, cannot declare fix success, cannot exclude
+tests, cannot close a task, or create a second backlog.
 
-Use `--series ERR --prefix TASK-ERR` for the error governance family and
-`--series TMP --prefix TASK-TMP` for temporary cleanup or quarantine work that
-has explicit owner approval. TMP is not a junk drawer; every TMP card must say
-why it is temporary and how it will be removed, migrated, or abandoned.
+## Unknown-Safe Rule
 
-This ERR/TMP routing is mandatory. Do not spend GOV numbers on ErrorCode,
-error-governance, temporary cleanup, quarantine, or one-off residue-disposition
-work. If such work was already drafted under GOV, stop and reclassify it
-through the registered planning family before implementation continues.
+Do not guess root cause or family membership. If evidence is missing, say
+`unavailable`; if evidence conflicts, say `conflicting`. Root-cause and family
+hints stay candidate-only until a task card, validator, or review receipt proves
+them.
 
-## Cohesion-First Split Rule
+## Projection Commands
 
-TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
-canary set: plan follow-up cards by cohesive ownership before ticket count. A
-plan should split around one behavior, interface, evidence contract, or rollback
-boundary per card. If a split would scatter one behavior across several cards,
-keep the plan section whole or require a provider-neutral review receipt before
-the split is accepted.
-
-For skill-template or integration projection plans, source templates are the
-authority. Installed copies and adapter projections must come from a sealed
-corpus source snapshot and must report source digest, compiler version,
-degradation diagnostics, and manifest digest.
-
-## Error Governance Boundary
-
-The canonical ErrorCode registry currently remains:
-
-```text
-docs/governance/error-code-registry.json
-```
-
-Future ERR-family work may migrate error governance docs or add a wrapper plan,
-but moving the registry itself requires a governed migration that updates
-registry readers, `npm run generate:error-codes`, generated `docs/ERROR_CODES.md`,
-tests, and every emitter/import path together.
-
-When a plan or task introduces, renames, retires, or explains an `ATM_*` code,
-route the code contract through `atm-error-code-resolver`; this skill only owns
-planning-family and artifact creation.
-
-## Windows Text IO
-
-On Windows, read, write, and compare Markdown, JSON, and text planning files
-with Node.js UTF-8 helpers or the ATM CLI. Do not use PowerShell content
-commands for document authoring or content comparison.
-
-## Import Check
-
-After creating a card, verify import routing before implementation:
+For ATM-owned backlog item shards, rebuild and validate the generated projection:
 
 ```bash
-node atm.mjs tasks import --from <generated-card.task.md> --dry-run --json
+node --strip-types scripts/validate-governance-projections.ts --write
+node --strip-types scripts/validate-governance-projections.ts
 ```
 
-The dry-run must discover the intended task id and must not fall back to an
-unrelated task.
+## Handoff
+
+```bash
+node atm.mjs handoff summarize --task "$ARGUMENTS" --json
+```
 
 ## Charter Invariants
 
@@ -140,12 +94,12 @@ unrelated task.
 
 ## Guardrails
 
-- Do not create a second task lifecycle or task store.
-- Do not register a new series without an approved plan document.
-- Do not use an unregistered prefix just because it appears in target ledger
-  history.
-- Do not move `docs/governance/error-code-registry.json` as part of routine
-  family setup.
+- Stay inside ATM CLI routing and evidence contracts.
+- Do not create a parallel backlog, task lifecycle, evidence authority, or test
+  catalog.
+- Do not use an incident-learning candidate as proof that a fix is complete.
+- Do not widen into full-repository testing when the incident family selects a
+  narrower relevant test set.
 
 ## Rules
 

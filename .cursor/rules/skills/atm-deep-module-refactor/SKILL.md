@@ -1,121 +1,106 @@
 
-# ATM Plan Authoring
+# ATM Deep Module Refactor
 
-Use this skill when creating or auditing ATM planning families, plan documents,
-or task cards under an external planning repository such as
-`docs/ai_atomic_framework`.
+Use this skill when a task asks whether a scattered policy cluster should
+become a deeper ATM module or provider-neutral refactor card. The provider is a
+replaceable reference input. Matt Pocock's skills are cited for vocabulary and
+review heuristics, but ATM runtime authority stays in the sealed review receipt
+and task card contracts.
 
-## First-principles intake contract
-
-Resolve identity, authority, outcome, scope, and existing evidence before asking
-the human a question. Ask only currently unblocked decisions and show the
-default. Cards use `causalGraph` for typed dependencies, start conditions, soft
-relations, public seams, impact edges, frontier inputs, validators, and phase
-ownership.
-
-When a plan includes broad contract migration, TDD oracle design, review-smell
-triage, merge-conflict repair, or deep-module refactoring, identify the matching
-engineering change method profile from
-`scripts/engineering-change-method-profiles.json`. The plan should name the
-profile id and the evidence it expects; it should not duplicate the profile's
-full rule set into prose.
-
-First command:
+## First Command
 
 ```bash
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-## Tool-First Rule
+## Provider Contract
 
-Planning artifacts must be created through the plan CLI:
+Callers submit one bounded refactor candidate plus observed friction. The
+provider returns one `atm.deepModuleReviewReport.v1` receipt. Callers do not
+copy deep-module rules into production logic.
 
-```bash
-node atm.mjs plan doc create --planning-root <planning-root> --family-dir <family-dir> --title "<title>" --doc-name <file.md> --dry-run --json
-node atm.mjs plan series register --planning-root <planning-root> --series <key> --prefix <TASK-PREFIX> --family-dir <family-dir> --plan <family-dir>/<file.md> --owner-approved --dry-run --json
-node atm.mjs plan card create --planning-root <planning-root> --series <key> --title "<title>" --dry-run --json
+Before turning the review into implementation instructions, select the
+`deep-module-refactor` engineering change method profile from
+`scripts/engineering-change-method-profiles.json` and preserve the selected
+trigger evidence, required observations, counterexamples, completion evidence,
+and rollback expectation in the review receipt. If the profile cannot be loaded,
+degrade with evidence instead of embedding a private copy of the rules here.
+
+The review uses the vocabulary `module`, `interface`, `seam`, `adapter`,
+`depth`, `leverage`, and `locality`.
+
+Actionable triggers:
+
+- repeated bugs
+- shotgun changes
+- duplicated policy
+- caller complexity
+- private-internal tests
+- missing test seams
+
+File length is advisory only. It cannot by itself require refactoring. Urgent
+fixes default to the smallest generalized repair; broader deepening becomes a
+governed follow-up unless a test seam is required for the fix.
+
+## Review Rules
+
+1. Preserve the public interface, owner atom or map, rollback path, and causal
+   validators.
+2. Apply the deletion test: if deleting the module removes little complexity,
+   the module is too shallow.
+3. Treat the interface as the test surface.
+4. Require two concrete adapters before introducing a replaceable seam.
+5. Classify dependencies as in-process, local-substitutable, remote-owned, or
+   true-external.
+6. Use replace-don't-layer tests through the proposed interface.
+
+## Progressive Disclosure
+
+Read `references/deepening.md` only when dependency classification or
+replace-don't-layer testing is the decision point.
+
+When a repository declares a module boundary policy and a supported source
+discovery adapter is available, run the module-boundary topology validator before
+promoting a deep-module refactor. If the language is unsupported, report the
+unsupported-language advisory explicitly and keep the refactor recommendation
+manual-review until an adapter exists.
+
+Read `references/design-it-twice.md` only when the user asks for alternative
+interfaces or the first proposed interface is too shallow. Do not load report
+scaffolding or broad codebase history by default.
+
+## Skill Definition
+
+```json
+{
+  "schemaId": "atm.skillDefinition.vNext",
+  "specVersion": "0.1.0",
+  "provider": {
+    "providerId": "matt-pocock-deep-module-reference",
+    "version": "2026-07-24.ed37663",
+    "provenance": {
+      "upstreamUrl": "https://github.com/mattpocock/skills",
+      "upstreamCommit": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
+      "sourceDigest": "sha256:c46b49303a81c7fc8934d0f4fbc44382cdecb73942d85d8d7db3523407fff8fa"
+    },
+    "license": "MIT"
+  },
+  "capabilities": ["deep-module-review", "refactor-provider"],
+  "compatibility": {
+    "atmContractVersions": ["atm.deepModuleRefactorProvider.v1", "atm.deepModuleReviewReport.v1"]
+  },
+  "fallbackPolicy": "degrade-with-evidence",
+  "rollbackPolicy": "provider-only",
+  "shadowRun": true,
+  "promotion": "manual-review"
+}
 ```
 
-After the dry-run is correct, repeat the same command with `--write`.
+Pinned secondary reference digest:
+`improve-codebase-architecture sha256:d3682058df92c259b47c36503baa02345d5811758621b5dc03081d5ba0f7b69b`.
 
-Do not hand-write a new `docs/ai_atomic_framework/<family>/tasks/*.task.md`
-file or a new family directory as a substitute for these commands. If the CLI
-returns `ATM_PLAN_SERIES_NOT_REGISTERED`,
-`ATM_PLAN_SERIES_OWNER_APPROVAL_REQUIRED`, or another structured error, report
-that result and the suggested command instead of bypassing the tool.
-
-## Registered Series Model
-
-The registry file is:
-
-```text
-<planning-root>/series-registry.json
-```
-
-It is the machine-readable source for mapping a task prefix to its family
-directory and approved plan documents. Task ids are assigned from the planning
-family's `tasks/` directory, not from the target repository's `.atm/history`
-ledger.
-
-Use `--series ERR --prefix TASK-ERR` for the error governance family and
-`--series TMP --prefix TASK-TMP` for temporary cleanup or quarantine work that
-has explicit owner approval. TMP is not a junk drawer; every TMP card must say
-why it is temporary and how it will be removed, migrated, or abandoned.
-
-This ERR/TMP routing is mandatory. Do not spend GOV numbers on ErrorCode,
-error-governance, temporary cleanup, quarantine, or one-off residue-disposition
-work. If such work was already drafted under GOV, stop and reclassify it
-through the registered planning family before implementation continues.
-
-## Cohesion-First Split Rule
-
-TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
-canary set: plan follow-up cards by cohesive ownership before ticket count. A
-plan should split around one behavior, interface, evidence contract, or rollback
-boundary per card. If a split would scatter one behavior across several cards,
-keep the plan section whole or require a provider-neutral review receipt before
-the split is accepted.
-
-For skill-template or integration projection plans, source templates are the
-authority. Installed copies and adapter projections must come from a sealed
-corpus source snapshot and must report source digest, compiler version,
-degradation diagnostics, and manifest digest.
-
-## Error Governance Boundary
-
-The canonical ErrorCode registry currently remains:
-
-```text
-docs/governance/error-code-registry.json
-```
-
-Future ERR-family work may migrate error governance docs or add a wrapper plan,
-but moving the registry itself requires a governed migration that updates
-registry readers, `npm run generate:error-codes`, generated `docs/ERROR_CODES.md`,
-tests, and every emitter/import path together.
-
-When a plan or task introduces, renames, retires, or explains an `ATM_*` code,
-route the code contract through `atm-error-code-resolver`; this skill only owns
-planning-family and artifact creation.
-
-## Windows Text IO
-
-On Windows, read, write, and compare Markdown, JSON, and text planning files
-with Node.js UTF-8 helpers or the ATM CLI. Do not use PowerShell content
-commands for document authoring or content comparison.
-
-## Import Check
-
-After creating a card, verify import routing before implementation:
-
-```bash
-node atm.mjs tasks import --from <generated-card.task.md> --dry-run --json
-```
-
-The dry-run must discover the intended task id and must not fall back to an
-unrelated task.
-
-## Charter Invariants
+Replacing this provider must not change ATM review receipt, task-card,
+test-case, claim, or close contracts.
 
 - `INV-ATM-001` ??**No second registry** (enforcement: `gate`, breaking change: yes)
   Rule: A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.
@@ -137,15 +122,6 @@ unrelated task.
   Rule: Any code logic change, bug fix, or governance rule change must first be designed as the most general rule that correctly explains the observed failure class. Hard-coded special cases are allowed only with recorded evidence that the general rule is not currently safe, feasible, or economical, and that the exception is bounded and reversible. Data-shaped behavior, including thresholds, mappings, allowlists, routing choices, telemetry classifications, prompts, message text, fixtures, and domain content, must first be modeled outside control flow through schemas, registries, configuration, observed counters, or compact digest evidence instead of embedded changeable numbers or strings. The generalized solution must remain observable, testable, and no broader than the evidence supports.
 - `INV-ATM-010` ??**Single canonical worktree and compose-first shared writes** (enforcement: `doctor`, breaking change: no)
   Rule: Normal governed parallel development uses one canonical worktree, base, and HEAD. A shared physical file is compose-eligible rather than a file lock: workers declare bounded atom/CID/content-anchor/source-range intents and submit proposals, while the broker, format adapter, and transactional composer decide compose, revalidation, escalation, or queue. A neutral steward is the only shared-file writer and shared delivery records member attribution. Queueing or revalidation is a fallback for a true logical conflict, stale base/CAS failure, unsupported adapter, or fairness bound. AI workers must not use Git branches, detached worktrees, alternate indexes, merges, or rebases as normal concurrency/isolation mechanisms. The closed exceptions are emergency/anomaly recovery, historical read-only discrimination, and non-development sealed packaging; each requires a named receipt and cannot perform normal governed contribution writes.
-
-## Guardrails
-
-- Do not create a second task lifecycle or task store.
-- Do not register a new series without an approved plan document.
-- Do not use an unregistered prefix just because it appears in target ledger
-  history.
-- Do not move `docs/governance/error-code-registry.json` as part of routine
-  family setup.
 
 ## Rules
 

@@ -1,8 +1,6 @@
 ---
-name: atm-minimal-patch-rebuilder
+mode: agent
 description: Rebuild a minimal semantic patch from formatter-contaminated or bulk-rewritten ATM files after line-budget commit failures.
-argument-hint: "<ATM context>"
-charter-invariants-injected: true
 ---
 
 
@@ -90,3 +88,5 @@ temporary-index staging is only the local Git adapter's final write operation.
   ordinary Plan 3.1 autonomous-parallel success; record it in the backlog and
   keep it replayable as a counterexample until the candidate lane handles it
   without emergency authority.
+
+Do not introduce a second registry, task state, or approval path.

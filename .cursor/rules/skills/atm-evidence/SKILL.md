@@ -43,6 +43,12 @@ Evidence run, auto-evidence, pre-close, write-readiness, and the advisory review
 all consume the one `evaluateValidationContract` selector. Never derive a local
 required set or recompute freshness in an adapter.
 
+When a task card declares engineering change method profile ids, carry those
+profile ids into evidence review and verify their completion evidence through
+the shared profile evaluator. Evidence may report a missing or stale method
+profile receipt, but it must not create a parallel checklist that disagrees with
+the profile source.
+
 - **Selected-case execution.** Run only the contract-selected case ids and
   preserve each case's structured output. A shell command that exits zero
   without executing its declared assertions is a zero-test result and fails the
@@ -112,6 +118,8 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - Stay inside ATM CLI routing and evidence contracts.
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
+
+Plan 4 evidence projections must preserve the sealed test-case selection, independent-oracle role separation, and explicit omitted-case reasons across every adapter; unknown mappings fail closed with an executable repair route.
 
 ## Rules
 
