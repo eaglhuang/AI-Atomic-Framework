@@ -1,0 +1,325 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0289",
+  "title": "changed/impacted/repository coverage ratchet and baseline migration",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0288"
+  ],
+  "acceptance": [
+    "ACC-1: the module emits a schema-valid, deterministic result with canonical identity and provenance.",
+    "ACC-2: all downstream projections derive from one sealed authority; no silent omission or expansion is allowed.",
+    "ACC-3: unsupported, stale, contradictory, or incomplete inputs fail closed with a repair command.",
+    "ACC-4: focused tests cover success, replay, negative controls, and evidence invalidation.",
+    "ACC-5: deep-module review records cohesion, narrow API, and no duplicate authority."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/coverage-ratchet-baseline.schema.json",
+    "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
+    "tests/cli/plan4-coverage-ratchet-baseline.test.ts",
+    "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/coverage-ratchet-baseline.schema.json",
+    "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
+    "tests/cli/plan4-coverage-ratchet-baseline.test.ts",
+    "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-coverage-ratchet-baseline.test.ts",
+    "node --strip-types tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-remove-generated-receipts",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-evidence",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.coverage-ratchet-baseline",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/coverage-ratchet-baseline.schema.json",
+        "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
+        "tests/cli/plan4-coverage-ratchet-baseline.test.ts",
+        "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0289-changed-impacted-repository-coverage-ratchet-and-baseline-migration.task.md",
+    "sectionTitle": "ATM-GOV-0289",
+    "headingLine": 85,
+    "hash": "c83e1fe67fd0547e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0289-changed-impacted-repository-coverage-ratchet-and-baseline-migration.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:c83e1fe67fd0547ec9f55189f11cab410b29b7872d690bc68d85fefc31f0b3f2",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T16:05:54.311Z"
+    }
+  },
+  "importedAt": "2026-07-31T16:05:54.311Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0289_core_6e4b2a91",
+      "targetGroupId": "test_group_plan4_coverage-ratchet-baseline",
+      "semanticKey": "plan4_coverage-ratchet-baseline",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0289; relation=coverage-ratchet; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0289_negative_3c7f8d20",
+      "targetGroupId": "test_group_plan4_coverage-ratchet-baseline",
+      "semanticKey": "plan4_coverage-ratchet-baseline_negative",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0289; relation=coverage-ratchet; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0289_core_6e4b2a91",
+    "test_task_atm_gov_0289_negative_3c7f8d20"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T19-32-55-127Z-lock-cleanup-7b8993b975f7",
+  "lastTransitionAt": "2026-08-08T19:32:55.127Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T19:25:07.329Z",
+  "promotedAt": "2026-08-08T19:25:07.332Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-b6a082ca4883",
+    "claimedAt": "2026-08-08T19:25:07.335Z",
+    "heartbeatAt": "2026-08-08T19:32:54.580Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0289.json",
+      "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/coverage-ratchet-baseline.schema.json",
+      "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
+      "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
+      "tests/cli/plan4-coverage-ratchet-baseline.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808192507-codex-captain-2026-08-09-83bbedc009",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808192507-codex-captain-2026-08-09-83bbedc009\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T19:25:07.335Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6445922b728aa01b",
+    "ticketDigest": "sha256:6445922b728aa01b4de7dfe6e7a37aa86e9244d8aaa2269a4547a67d79382799",
+    "taskId": "ATM-GOV-0289",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808192507-codex-captain-2026-08-09-83bbedc009",
+    "claimGeneration": "lease-b6a082ca4883",
+    "issuedAt": "2026-08-08T19:25:07.335Z",
+    "expiresAt": "2026-08-08T19:55:07.335Z",
+    "scopeDigest": "sha256:661b6484ac552df36882efb021f71419950318f93367e6a114f618a332fd7afc",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T19:25:07.335Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0289.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0289/**",
+          ".atm/history/tasks/ATM-GOV-0289.json",
+          "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+          "packages/core/src/evidence/index.ts",
+          "schemas/evidence/coverage-ratchet-baseline.schema.json",
+          "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
+          "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
+          "tests/cli/plan4-coverage-ratchet-baseline.test.ts"
+        ],
+        "digest": "sha256:87c06083be0ccf8845eeb35bd5c1ab6dcf35a4ba4390d574eab78f6008ba2dd1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808192507-codex-captain-2026-08-09-ATM-GOV-0289-c28feff3c7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0289",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-bcc00487708fe2b0",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0289.*",
+      ".atm/history/task-events/ATM-GOV-0289/**",
+      ".atm/history/tasks/ATM-GOV-0289.json",
+      "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/coverage-ratchet-baseline.schema.json",
+      "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
+      "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
+      "tests/cli/plan4-coverage-ratchet-baseline.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0502b8fd196404da4ce749cbf78655192370ba31abc903fd81bc0272e6602741",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808192507-codex-captain-2026-08-09-ATM-GOV-0289-c28feff3c7",
+    "laneSession": {
+      "laneSessionId": "lane-20260808192507-codex-captain-2026-08-09-83bbedc009",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808192507-codex-captain-2026-08-09-83bbedc009\""
+    },
+    "createdAt": "2026-08-08T19:25:16.813Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T19:32:55.124Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T19:32:54.580Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808192507-codex-captain-2026-08-09-ATM-GOV-0289-c28feff3c7",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0289.closure-packet.json"
+}

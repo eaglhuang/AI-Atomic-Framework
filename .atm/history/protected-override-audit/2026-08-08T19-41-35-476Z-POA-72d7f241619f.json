@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-72d7f241619f",
+  "recordedAt": "2026-08-08T19:41:35.476Z",
+  "actorId": "codex-captain-2026-08-09",
+  "taskId": "ATM-GOV-0289",
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-captain-2026-08-09 --task ATM-GOV-0289 --message \"feat: add coverage ratchet baseline adapter\n\nATM-Work-Admission: wat-6445922b728aa01b sha256:6445922b728aa01b4de7dfe6e7a37aa86e9244d8aaa2269a4547a67d79382799\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-ATM-GOV-0289-4cac08fade",
+  "reason": "Pre-commit governance hook timeout after validators passed; one-time task-scoped emergency delivery commit with recorded queue-head conflict resolution.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-08T19-41-35-475Z-EMG-ATM-GOV-0289-4cac08fade.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

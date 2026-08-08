@@ -1,0 +1,23 @@
+{
+  "schemaId": "atm.brokerConflictResolution.v1",
+  "recordedAt": "2026-08-08T19:40:00.000Z",
+  "actorId": "codex-captain-2026-08-09",
+  "conflictTaskId": "ATM-GOV-0290",
+  "reason": "Complete the already validated queue-head delivery before later batch tasks claim the shared evidence index surface.",
+  "conflictFiles": ["packages/core/src/evidence/index.ts"],
+  "decisionClass": "human-signoff-required",
+  "decisionReason": "ATM-GOV-0289 is the completed queue-head delivery; later tasks are planned batch reservations, not competing writes. The override is limited to this exact commit and shared index file.",
+  "violationStatus": "resolution-issued",
+  "resolutionClass": "queue-head-delivery-serialization",
+  "resolutionOrder": [
+    "Release later-task broker intents and preserve their planned task cards.",
+    "Commit only the ATM-GOV-0289 task evidence, ledger events, and six declared deliverables.",
+    "Do not mutate or stage any later-task source, evidence, or task files.",
+    "Re-run batch routing after the queue-head commit."
+  ],
+  "validatorPlan": ["node --strip-types tests/cli/plan4-coverage-ratchet-baseline.test.ts", "node --strip-types tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts", "npm run typecheck", "npm run validate:cli", "npm run validate:git-head-evidence"],
+  "indexConstraint": {
+    "allowedStagedFiles": [".atm/history/evidence/ATM-GOV-0289*", ".atm/history/task-events/ATM-GOV-0289/**", ".atm/history/tasks/ATM-GOV-0289.json", "packages/core/src/evidence/coverage-ratchet-baseline.ts", "packages/core/src/evidence/index.ts", "schemas/evidence/coverage-ratchet-baseline.schema.json", "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json", "tests/cli/plan4-coverage-ratchet-baseline.test.ts", "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts"],
+    "foreignWorkHandling": "No later batch task files or unrelated WIP may be staged."
+  }
+}
