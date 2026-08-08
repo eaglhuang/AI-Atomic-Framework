@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T20-55-50-930Z-close-73e59a9f9739",
+  "taskId": "ATM-GOV-0302",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808204804-codex-captain-2026-08-09-ATM-GOV-0302-1c6da641da",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0302.json",
+  "taskSha256": "sha256:f5e53786466219be7e69c23149aef9cd59f15c967646f187b7f88f52cdff4b2c",
+  "createdAt": "2026-08-08T20:55:50.930Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0302 --actor codex-captain-2026-08-09 --status done --from-batch-checkpoint --batch batch-e641205eb5c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e641205eb5c4",
+    "sessionId": "session-20260808204804-codex-captain-2026-08-09-ATM-GOV-0302-1c6da641da",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0302.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-security-quality-receipts-negative.test.ts",
+      "node --strip-types tests/cli/plan4-security-quality-receipts.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T20:55:50.920Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0302.*",
+        ".atm/history/task-events/ATM-GOV-0302/**",
+        ".atm/history/tasks/ATM-GOV-0302.json",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/security-quality-receipts.ts",
+        "schemas/evidence/security-quality-receipts.schema.json",
+        "tests/catalog/groups/test_group_plan4_security-quality-receipts.shard.json",
+        "tests/cli/plan4-security-quality-receipts-negative.test.ts",
+        "tests/cli/plan4-security-quality-receipts.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/security-quality-receipts.ts",
+        "schemas/evidence/security-quality-receipts.schema.json",
+        "tests/catalog/groups/test_group_plan4_security-quality-receipts.shard.json",
+        "tests/cli/plan4-security-quality-receipts-negative.test.ts",
+        "tests/cli/plan4-security-quality-receipts.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

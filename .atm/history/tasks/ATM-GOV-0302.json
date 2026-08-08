@@ -1,0 +1,326 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0302",
+  "title": "security quality dimension and risk acceptance receipts",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0321",
+    "ATM-GOV-0285"
+  ],
+  "acceptance": [
+    "ACC-1: the module emits a schema-valid, deterministic result with canonical identity and provenance.",
+    "ACC-2: all downstream projections derive from one sealed authority; no silent omission or expansion is allowed.",
+    "ACC-3: unsupported, stale, contradictory, or incomplete inputs fail closed with a repair command.",
+    "ACC-4: focused tests cover success, replay, negative controls, and evidence invalidation.",
+    "ACC-5: deep-module review records cohesion, narrow API, and no duplicate authority."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/security-quality-receipts.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/security-quality-receipts.schema.json",
+    "tests/catalog/groups/test_group_plan4_security-quality-receipts.shard.json",
+    "tests/cli/plan4-security-quality-receipts.test.ts",
+    "tests/cli/plan4-security-quality-receipts-negative.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/security-quality-receipts.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/security-quality-receipts.schema.json",
+    "tests/catalog/groups/test_group_plan4_security-quality-receipts.shard.json",
+    "tests/cli/plan4-security-quality-receipts.test.ts",
+    "tests/cli/plan4-security-quality-receipts-negative.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-security-quality-receipts.test.ts",
+    "node --strip-types tests/cli/plan4-security-quality-receipts-negative.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-remove-generated-receipts",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-evidence",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.security-quality-receipts",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/security-quality-receipts.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/security-quality-receipts.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/security-quality-receipts.schema.json",
+        "tests/catalog/groups/test_group_plan4_security-quality-receipts.shard.json",
+        "tests/cli/plan4-security-quality-receipts.test.ts",
+        "tests/cli/plan4-security-quality-receipts-negative.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0302-security-quality-dimension-and-risk-acceptance-receipts.task.md",
+    "sectionTitle": "ATM-GOV-0302",
+    "headingLine": 87,
+    "hash": "808161fc8343337b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0302-security-quality-dimension-and-risk-acceptance-receipts.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:808161fc8343337bfbf7af3c6bf855ff152fb9b350812d833b5edf89298051a9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T16:07:27.765Z"
+    }
+  },
+  "importedAt": "2026-07-31T16:07:27.765Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0302_core_6e4b2a91",
+      "targetGroupId": "test_group_plan4_security-quality-receipts",
+      "semanticKey": "plan4_security-quality-receipts",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0302; relation=security-quality; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0302_negative_3c7f8d20",
+      "targetGroupId": "test_group_plan4_security-quality-receipts",
+      "semanticKey": "plan4_security-quality-receipts_negative",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0302; relation=security-quality; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0302_core_6e4b2a91",
+    "test_task_atm_gov_0302_negative_3c7f8d20"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T20-55-51-054Z-lock-cleanup-4299aeb8832d",
+  "lastTransitionAt": "2026-08-08T20:55:51.054Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T20:48:04.636Z",
+  "promotedAt": "2026-08-08T20:48:04.639Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-9ebb652c00c8",
+    "claimedAt": "2026-08-08T20:48:04.643Z",
+    "heartbeatAt": "2026-08-08T20:55:50.928Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0302.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/security-quality-receipts.ts",
+      "schemas/evidence/security-quality-receipts.schema.json",
+      "tests/catalog/groups/test_group_plan4_security-quality-receipts.shard.json",
+      "tests/cli/plan4-security-quality-receipts-negative.test.ts",
+      "tests/cli/plan4-security-quality-receipts.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808204805-codex-captain-2026-08-09-94f73b1805",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808204805-codex-captain-2026-08-09-94f73b1805\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T20:48:04.643Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-570c7cf63c79b2eb",
+    "ticketDigest": "sha256:570c7cf63c79b2ebc7ee0fa15027e2aab0af5270388d9d751042ced2baceecf3",
+    "taskId": "ATM-GOV-0302",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808204805-codex-captain-2026-08-09-94f73b1805",
+    "claimGeneration": "lease-9ebb652c00c8",
+    "issuedAt": "2026-08-08T20:48:04.643Z",
+    "expiresAt": "2026-08-08T21:18:04.643Z",
+    "scopeDigest": "sha256:88a1ef2e793ea680d58a4c5aeea6699d51114369089e62898b611f406289dce4",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T20:48:04.643Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0302.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0302/**",
+          ".atm/history/tasks/ATM-GOV-0302.json",
+          "packages/core/src/evidence/index.ts",
+          "packages/core/src/evidence/security-quality-receipts.ts",
+          "schemas/evidence/security-quality-receipts.schema.json",
+          "tests/catalog/groups/test_group_plan4_security-quality-receipts.shard.json",
+          "tests/cli/plan4-security-quality-receipts-negative.test.ts",
+          "tests/cli/plan4-security-quality-receipts.test.ts"
+        ],
+        "digest": "sha256:be69e4f61a2f78600e05c44c69952c364c77ac8685c70042b0f491b88194042e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808204804-codex-captain-2026-08-09-ATM-GOV-0302-1c6da641da",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0302",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-46c4e5b460cd9174",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0302.*",
+      ".atm/history/task-events/ATM-GOV-0302/**",
+      ".atm/history/tasks/ATM-GOV-0302.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/security-quality-receipts.ts",
+      "schemas/evidence/security-quality-receipts.schema.json",
+      "tests/catalog/groups/test_group_plan4_security-quality-receipts.shard.json",
+      "tests/cli/plan4-security-quality-receipts-negative.test.ts",
+      "tests/cli/plan4-security-quality-receipts.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "54e39bc06b69ed4ab48ae5eed63430822a08c82e6e3daada52ab509bfa57b32f",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808204804-codex-captain-2026-08-09-ATM-GOV-0302-1c6da641da",
+    "laneSession": {
+      "laneSessionId": "lane-20260808204805-codex-captain-2026-08-09-94f73b1805",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808204805-codex-captain-2026-08-09-94f73b1805\""
+    },
+    "createdAt": "2026-08-08T20:48:20.068Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T20:55:51.052Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T20:55:50.928Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808204804-codex-captain-2026-08-09-ATM-GOV-0302-1c6da641da",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0302.closure-packet.json"
+}
