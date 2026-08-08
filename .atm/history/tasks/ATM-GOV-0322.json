@@ -1,0 +1,347 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0322",
+  "title": "Gap normalization, lexicographic planning and deterministic proposal ordering",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0318",
+    "ATM-GOV-0288",
+    "ATM-GOV-0306"
+  ],
+  "acceptance": [
+    "Equivalent gaps normalize to one stable identity and ambiguous gaps fail closed.",
+    "Proposal order is deterministic across replay and independent of actor/date/path.",
+    "Accepted proposals monotonically reduce the sealed gap frontier.",
+    "Evidence includes rollback, provenance, and deep-module review."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence",
+    "schemas/evidence",
+    "tests/cli/plan4-gap-normalization.test.ts",
+    "tests/cli/plan4-proposal-ordering.test.ts",
+    "tests/catalog/groups/test_group_plan4_gap_planning.shard.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence",
+    "schemas/evidence",
+    "tests/cli/plan4-gap-normalization.test.ts",
+    "tests/cli/plan4-proposal-ordering.test.ts",
+    "tests/catalog/groups/test_group_plan4_gap_planning.shard.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-gap-normalization.test.ts",
+    "node --strip-types tests/cli/plan4-proposal-ordering.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "disable-proposal-planner-and-preserve-existing-frontier",
+  "rollbackNotes": "Retain normalized gap observations while reverting planner publication.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence",
+        "schemas/evidence",
+        "tests/cli/plan4-gap-normalization.test.ts",
+        "tests/cli/plan4-proposal-ordering.test.ts",
+        "tests/catalog/groups/test_group_plan4_gap_planning.shard.json",
+        "gap normalization adapter",
+        "lexicographic proposal planner",
+        "deterministic ordering receipt",
+        "focused tests",
+        "catalog shard",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0322-gap-normalization-lexicographic-planning-and-deterministic-proposal-ordering.task.md",
+    "sectionTitle": "ATM-GOV-0322",
+    "headingLine": 52,
+    "hash": "4d842ddaa288e4e7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0322-gap-normalization-lexicographic-planning-and-deterministic-proposal-ordering.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4d842ddaa288e4e74add57423ea57d2189be26d43a647595efc93b8f5bb21ad1",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T15:50:12.960Z"
+    }
+  },
+  "importedAt": "2026-07-31T15:50:12.960Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0318",
+      "ATM-GOV-0288",
+      "ATM-GOV-0306"
+    ],
+    "startConditions": [
+      "0318 freshness",
+      "0288 denominator",
+      "and 0306 mutation lineage are fresh and sealed"
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md"
+    ],
+    "changedPublicSeams": [
+      "atm.gapNormalization.v1",
+      "atm.lexicographicProposalPlan.v1"
+    ],
+    "causalImpactEdges": [
+      "duplicate/ambiguous gaps -> deterministic normalization",
+      "proposal ordering -> monotonic frontier reduction"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0318 freshness",
+      "ATM-GOV-0288 coverage ratchet",
+      "ATM-GOV-0306 mutation lineage"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-gap-normalization.test.ts",
+      "node --strip-types tests/cli/plan4-proposal-ordering.test.ts"
+    ],
+    "phaseOwner": "Plan4-generation-loop"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0322_gap_normalization_4b9e2c71",
+      "targetGroupId": "test_group_plan4_gap_planning",
+      "semanticKey": "plan4_gap_normalization",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "duplicate/ambiguous gaps -> deterministic normalization"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0322_proposal_order_7d1f5a83",
+      "targetGroupId": "test_group_plan4_gap_planning",
+      "semanticKey": "plan4_lexicographic_proposal_ordering",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "proposal ordering -> monotonic frontier reduction"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0322_gap_normalization_4b9e2c71",
+    "test_task_atm_gov_0322_proposal_order_7d1f5a83"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T21-06-41-895Z-lock-cleanup-5b63cc5491b5",
+  "lastTransitionAt": "2026-08-08T21:06:41.895Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T20:59:48.181Z",
+  "promotedAt": "2026-08-08T20:59:48.184Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-a7627a8d4792",
+    "claimedAt": "2026-08-08T20:59:48.188Z",
+    "heartbeatAt": "2026-08-08T21:06:41.696Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0322.json",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_gap_planning.shard.json",
+      "tests/cli/plan4-gap-normalization.test.ts",
+      "tests/cli/plan4-proposal-ordering.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808205948-codex-captain-2026-08-09-eea17d161b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808205948-codex-captain-2026-08-09-eea17d161b\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T20:59:48.188Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-e594048714155c83",
+    "ticketDigest": "sha256:e594048714155c831596c19c0fdcc33569c1ad91009d6c6761e9d6f0a27d4d72",
+    "taskId": "ATM-GOV-0322",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808205948-codex-captain-2026-08-09-eea17d161b",
+    "claimGeneration": "lease-a7627a8d4792",
+    "issuedAt": "2026-08-08T20:59:48.188Z",
+    "expiresAt": "2026-08-08T21:29:48.188Z",
+    "scopeDigest": "sha256:22b1a58fb5e54a1d5cf2e10da3d29185ed4f6a02c08a44d959e054e022c58d82",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T20:59:48.188Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0322.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0322/**",
+          ".atm/history/tasks/ATM-GOV-0322.json",
+          "packages/core/src/evidence",
+          "schemas/evidence",
+          "tests/catalog/groups/test_group_plan4_gap_planning.shard.json",
+          "tests/cli/plan4-gap-normalization.test.ts",
+          "tests/cli/plan4-proposal-ordering.test.ts"
+        ],
+        "digest": "sha256:a8756f4e9c117e3db9759d0449129aeff04e9d5bdc29a272a6e4a8bbfa16bf68"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808205948-codex-captain-2026-08-09-ATM-GOV-0322-7bf4f28eec",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0322",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-5a87924cdc261f9b",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0322.*",
+      ".atm/history/task-events/ATM-GOV-0322/**",
+      ".atm/history/tasks/ATM-GOV-0322.json",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_gap_planning.shard.json",
+      "tests/cli/plan4-gap-normalization.test.ts",
+      "tests/cli/plan4-proposal-ordering.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5964cbf4b928b12a57914768e0a27684bf0be69b0cbf61ef39ed861989298890",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808205948-codex-captain-2026-08-09-ATM-GOV-0322-7bf4f28eec",
+    "laneSession": {
+      "laneSessionId": "lane-20260808205948-codex-captain-2026-08-09-eea17d161b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808205948-codex-captain-2026-08-09-eea17d161b\""
+    },
+    "createdAt": "2026-08-08T21:00:00.941Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T21:06:41.893Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T21:06:41.696Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808205948-codex-captain-2026-08-09-ATM-GOV-0322-7bf4f28eec",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0322.closure-packet.json"
+}
