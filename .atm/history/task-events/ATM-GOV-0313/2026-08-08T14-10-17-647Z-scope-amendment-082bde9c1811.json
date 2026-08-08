@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T14-10-17-647Z-scope-amendment-082bde9c1811",
+  "taskId": "ATM-GOV-0313",
+  "action": "scope-amendment",
+  "actorId": "claude-007",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0313.json",
+  "taskSha256": "sha256:6b3d3ddb9d8b0429d0d861f98d3f078099b1fceb68cc689d6cd8b45493f01875",
+  "createdAt": "2026-08-08T14:10:17.647Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0313 --actor claude-007 --add packages/core/src/evidence/test-case-catalog.ts --class linked-surface --phase during-implementation --reason \"ACC-3 requires the full-catalog scan to fail when a shard is omitted; the omission occurs in the core loader normalizeGroupShard, and the CLI-side workaround introduced duplicate shard-reading logic that must be consolidated into the single core reader.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ACC-3 requires the full-catalog scan to fail when a shard is omitted; the omission occurs in the core loader normalizeGroupShard, and the CLI-side workaround introduced duplicate shard-reading logic that must be consolidated into the single core reader."
+  }
+}

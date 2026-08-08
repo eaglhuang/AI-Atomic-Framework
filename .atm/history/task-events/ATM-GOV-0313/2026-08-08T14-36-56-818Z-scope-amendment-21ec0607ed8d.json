@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T14-36-56-818Z-scope-amendment-21ec0607ed8d",
+  "taskId": "ATM-GOV-0313",
+  "action": "scope-amendment",
+  "actorId": "claude-007",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0313.json",
+  "taskSha256": "sha256:88ff84038cefd567fc2e292740068c41c7467c84f35cfa36b7eb12d0248aae64",
+  "createdAt": "2026-08-08T14:36:56.818Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0313 --actor claude-007 --add \"docs/governance/atm-bug-and-optimization-backlog.md,docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-012.json,docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json,packages/core/src/evidence/test-case-catalog.ts,packages/cli/src/commands/test-catalog.ts,schemas/validators/test-case-group.schema.json,tests/cli/commit-attribution-sealed-transaction.test.ts\" --class linked-surface --phase closeout --reason \"Re-applying the scope amendments that were rolled back when repair-claim released the expired lease; these are the same paths previously admitted for ATM-GOV-0313 and all are delivered work of this card.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "closeout",
+    "amendmentMode": "normal",
+    "reason": "Re-applying the scope amendments that were rolled back when repair-claim released the expired lease; these are the same paths previously admitted for ATM-GOV-0313 and all are delivered work of this card."
+  }
+}

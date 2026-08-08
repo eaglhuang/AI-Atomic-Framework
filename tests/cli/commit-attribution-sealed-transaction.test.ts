@@ -3,7 +3,7 @@
  *
  * Case ids:
  *   test_task_git_commit_sealed_content_attribution
- *   test_broker_apply_admission_before_ref_update
+ *   test_task_git_commit_attribution_admission_before_ref_update_2fc52f16
  *
  * The incident this suite encodes is generic: two writers share one worktree
  * and one index. Nothing here depends on which tasks, actors or dates were

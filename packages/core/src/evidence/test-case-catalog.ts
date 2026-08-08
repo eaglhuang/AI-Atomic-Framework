@@ -120,18 +120,150 @@ export function resolveCaseGroupShardsRoot(repositoryRoot: string): string {
   return path.join(repositoryRoot, configured || 'tests/catalog/groups');
 }
 
-export function loadTestCaseGroupShards(repositoryRoot: string, groupsRoot?: string): TestCaseGroupShard[] {
+// atm.shard-file-reader — the single place in the codebase that enumerates and
+// reads `tests/catalog/groups/*.shard.json`. Every other surface (group loader,
+// legacy-alias table, reachability report, CLI re-exports) builds on this so the
+// shard inventory can never diverge between readers.
+export interface RawTestCaseShardFile {
+  readonly raw: Record<string, unknown>;
+  readonly sourcePath: string;
+}
+
+export function readRawShardFiles(repositoryRoot: string, groupsRoot?: string): RawTestCaseShardFile[] {
   const root = groupsRoot ? path.resolve(groupsRoot) : resolveCaseGroupShardsRoot(repositoryRoot);
   if (!existsSync(root)) return [];
   return readdirSync(root, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith('.shard.json'))
     .map((entry) => {
-      const sourcePath = path.join(root, entry.name);
-      const raw = JSON.parse(readFileSync(sourcePath, 'utf8')) as Record<string, unknown>;
-      return normalizeGroupShard(raw, toPortablePath(sourcePath));
+      const sourcePath = toPortablePath(path.join(root, entry.name));
+      return {
+        raw: JSON.parse(readFileSync(sourcePath, 'utf8')) as Record<string, unknown>,
+        sourcePath
+      };
     })
+    .sort((left, right) => left.sourcePath.localeCompare(right.sourcePath));
+}
+
+export function loadTestCaseGroupShards(repositoryRoot: string, groupsRoot?: string): TestCaseGroupShard[] {
+  return readRawShardFiles(repositoryRoot, groupsRoot)
+    .map(({ raw, sourcePath }) => normalizeGroupShard(raw, sourcePath))
     .filter((shard): shard is TestCaseGroupShard => Boolean(shard))
     .sort((left, right) => left.groupId.localeCompare(right.groupId));
+}
+
+// atm.legacy-case-alias — closed task cards keep referencing pre-migration case
+// ids in requiredTestCaseIds. Those cards are immutable, so the shards carry a
+// `legacyAliases` lineage table and this surface resolves the old id to its
+// canonical case. It reads the raw shard files (not loadTestCaseGroupShards)
+// because historical catalog shards that are not group-shaped are dropped by the
+// group normalizer yet still own migrated cases.
+export interface LegacyCaseAlias {
+  readonly legacyCaseId: string;
+  readonly canonicalCaseId: string;
+  readonly groupId: string;
+  readonly sourcePath: string;
+}
+
+export function loadLegacyCaseAliases(repositoryRoot: string, groupsRoot?: string): LegacyCaseAlias[] {
+  return readRawShardFiles(repositoryRoot, groupsRoot).flatMap(({ raw, sourcePath }) => {
+    const groupId = String(raw.groupId ?? '').trim();
+    const entries = Array.isArray(raw.legacyAliases) ? raw.legacyAliases : [];
+    return entries.flatMap((entry) => {
+      if (!isRecord(entry)) return [];
+      const legacyCaseId = String(entry.legacyCaseId ?? '').trim();
+      const canonicalCaseId = String(entry.canonicalCaseId ?? '').trim();
+      if (!legacyCaseId || !canonicalCaseId) return [];
+      return [{ legacyCaseId, canonicalCaseId, groupId, sourcePath }];
+    });
+  });
+}
+
+export function loadAllShardCaseIds(repositoryRoot: string, groupsRoot?: string): string[] {
+  return readRawShardFiles(repositoryRoot, groupsRoot)
+    .flatMap(({ raw }) => declaredCaseIds(raw).fromCases);
+}
+
+export function resolveLegacyCaseId(legacyCaseId: string, aliases: readonly LegacyCaseAlias[]): string | null {
+  const needle = String(legacyCaseId ?? '').trim();
+  if (!needle) return null;
+  return aliases.find((alias) => alias.legacyCaseId === needle)?.canonicalCaseId ?? null;
+}
+
+export function validateLegacyCaseAliases(
+  aliases: readonly LegacyCaseAlias[],
+  knownCaseIds: readonly string[]
+): TestCaseShardDiagnostic[] {
+  const known = new Set(knownCaseIds);
+  return aliases
+    .filter((alias) => !known.has(alias.canonicalCaseId))
+    .map((alias) => ({
+      code: 'ATM_TEST_CASE_UNRESOLVED_LEGACY_ALIAS',
+      severity: 'error' as const,
+      groupId: alias.groupId,
+      caseId: alias.legacyCaseId,
+      message: `Legacy alias ${alias.legacyCaseId} points to unresolved canonical case ${alias.canonicalCaseId}.`
+    }));
+}
+
+// atm.shard-reachability — `normalizeGroupShard` accepts exactly one schemaId and
+// drops everything else, silently. That silence is the defect: shards whose
+// schemaId is not accepted never reach validation, so their case ids look
+// validated when they are not. This report never throws on an unknown shape; it
+// enumerates every shard file and states plainly whether the group loader can see
+// it and which case ids it declares (both the `cases[].caseId` and the legacy
+// `caseIds: string[]` shapes).
+export interface ShardReachabilityEntry {
+  readonly sourcePath: string;
+  readonly fileName: string;
+  readonly groupId: string;
+  readonly schemaId: string;
+  readonly reachable: boolean;
+  readonly caseIds: readonly string[];
+  readonly caseIdShape: 'cases' | 'caseIds' | 'mixed' | 'none';
+}
+
+export function reportShardReachability(repositoryRoot: string, groupsRoot?: string): ShardReachabilityEntry[] {
+  return readRawShardFiles(repositoryRoot, groupsRoot)
+    .map(({ raw, sourcePath }) => {
+      const declared = declaredCaseIds(raw);
+      const caseIds = [...new Set([...declared.fromCases, ...declared.fromCaseIds])].sort();
+      const fileName = sourcePath.slice(sourcePath.lastIndexOf('/') + 1);
+      let reachable = false;
+      try {
+        reachable = normalizeGroupShard(raw, sourcePath) !== null;
+      } catch {
+        reachable = false;
+      }
+      return {
+        sourcePath,
+        fileName,
+        groupId: String(raw.groupId ?? '').trim() || fileName.replace(/\.shard\.json$/, ''),
+        schemaId: String(raw.schemaId ?? '').trim(),
+        reachable,
+        caseIds,
+        caseIdShape: declared.fromCases.length && declared.fromCaseIds.length
+          ? 'mixed'
+          : declared.fromCases.length
+            ? 'cases'
+            : declared.fromCaseIds.length
+              ? 'caseIds'
+              : 'none'
+      } satisfies ShardReachabilityEntry;
+    })
+    .sort((left, right) => left.groupId.localeCompare(right.groupId));
+}
+
+function declaredCaseIds(raw: Record<string, unknown>): { fromCases: string[]; fromCaseIds: string[] } {
+  const fromCases = (Array.isArray(raw.cases) ? raw.cases : []).flatMap((entry) => {
+    if (!isRecord(entry)) return [];
+    const caseId = String(entry.caseId ?? '').trim();
+    return caseId ? [caseId] : [];
+  });
+  const fromCaseIds = (Array.isArray(raw.caseIds) ? raw.caseIds : []).flatMap((entry) => {
+    const caseId = typeof entry === 'string' || typeof entry === 'number' ? String(entry).trim() : '';
+    return caseId ? [caseId] : [];
+  });
+  return { fromCases, fromCaseIds };
 }
 
 export function validateTestCaseGroupShards(shards: readonly TestCaseGroupShard[]): TestCaseShardDiagnostic[] {

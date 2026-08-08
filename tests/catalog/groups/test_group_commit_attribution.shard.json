@@ -4,46 +4,74 @@
   "groupId": "test_group_commit_attribution",
   "theme": "Sealed commit attribution transaction",
   "resourceKey": "sealed-commit-attribution",
-  "maintainers": ["atm-core"],
+  "maintainers": [
+    "atm-core"
+  ],
   "supportedSeams": [
     "commit-bundle-to-candidate-tree",
     "broker-admission-to-ref-update",
     "concurrent-seal-preparation",
     "override-free-attribution"
   ],
-  "dependencyEdges": ["commit-attribution-boundary"],
+  "dependencyEdges": [
+    "commit-attribution-boundary"
+  ],
   "cases": [
     {
       "caseId": "test_task_git_commit_sealed_content_attribution",
       "semanticKey": "sealed_content_attribution",
       "responsibility": "task-required",
       "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
-      "coversAcceptance": ["acceptance-1", "acceptance-2", "acceptance-3"],
-      "coversImpactEdges": ["commit-attribution-boundary"]
+      "coversAcceptance": [
+        "acceptance-1",
+        "acceptance-2",
+        "acceptance-3"
+      ],
+      "coversImpactEdges": [
+        "commit-attribution-boundary"
+      ]
     },
     {
-      "caseId": "test_broker_apply_admission_before_ref_update",
+      "caseId": "test_task_git_commit_attribution_admission_before_ref_update_2fc52f16",
       "semanticKey": "admission_before_ref_update",
       "responsibility": "task-required",
       "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
-      "coversAcceptance": ["acceptance-4", "acceptance-5"],
-      "coversImpactEdges": ["broker-admission-to-ref-update"]
+      "coversAcceptance": [
+        "acceptance-4",
+        "acceptance-5"
+      ],
+      "coversImpactEdges": [
+        "broker-admission-to-ref-update"
+      ]
     },
     {
-      "caseId": "test_sealed_commit_dual_lane_prepare_and_broker_finalization",
+      "caseId": "test_task_git_commit_attribution_dual_lane_prepare_and_broker_finalization_351966f5",
       "semanticKey": "dual_lane_prepare_and_broker_finalization",
       "responsibility": "task-required",
       "command": "node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts",
-      "coversAcceptance": ["acceptance-1", "acceptance-2"],
-      "coversImpactEdges": ["broker-admission-to-ref-update", "concurrent-seal-preparation"]
+      "coversAcceptance": [
+        "acceptance-1",
+        "acceptance-2"
+      ],
+      "coversImpactEdges": [
+        "broker-admission-to-ref-update",
+        "concurrent-seal-preparation"
+      ]
     },
     {
-      "caseId": "test_governed_commit_seal_source_and_provenance_gates",
+      "caseId": "test_task_git_commit_attribution_seal_source_and_provenance_gates_abb1c2ba",
       "semanticKey": "seal_source_and_provenance_gates",
       "responsibility": "task-required",
       "command": "node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts",
-      "coversAcceptance": ["acceptance-3", "acceptance-4", "acceptance-5"],
-      "coversImpactEdges": ["commit-attribution-boundary", "override-free-attribution"]
+      "coversAcceptance": [
+        "acceptance-3",
+        "acceptance-4",
+        "acceptance-5"
+      ],
+      "coversImpactEdges": [
+        "commit-attribution-boundary",
+        "override-free-attribution"
+      ]
     }
   ],
   "aliases": [],
@@ -51,5 +79,19 @@
   "costBudgetMs": 30000,
   "timeoutMs": 60000,
   "quarantine": false,
-  "checkpointPolicy": "task-required"
+  "checkpointPolicy": "task-required",
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_broker_apply_admission_before_ref_update",
+      "canonicalCaseId": "test_task_git_commit_attribution_admission_before_ref_update_2fc52f16"
+    },
+    {
+      "legacyCaseId": "test_sealed_commit_dual_lane_prepare_and_broker_finalization",
+      "canonicalCaseId": "test_task_git_commit_attribution_dual_lane_prepare_and_broker_finalization_351966f5"
+    },
+    {
+      "legacyCaseId": "test_governed_commit_seal_source_and_provenance_gates",
+      "canonicalCaseId": "test_task_git_commit_attribution_seal_source_and_provenance_gates_abb1c2ba"
+    }
+  ]
 }

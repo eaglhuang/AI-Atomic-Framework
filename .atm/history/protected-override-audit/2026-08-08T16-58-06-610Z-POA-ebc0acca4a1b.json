@@ -1,0 +1,23 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-ebc0acca4a1b",
+  "recordedAt": "2026-08-08T16:58:06.610Z",
+  "actorId": "codex-captain-2026-08-09",
+  "taskId": "ATM-GOV-0313",
+  "surface": "tasks reset",
+  "command": "node atm.mjs tasks reset --task ATM-GOV-0313 --actor codex-captain-2026-08-09 --to open --json",
+  "flags": [],
+  "permission": "backend.tasks.reset",
+  "leaseId": "EMG-ATM-GOV-0313-a6f4a62fa8",
+  "reason": "Recover orphaned claim state before authorized captain takeover",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.reset"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-08T16-58-06-606Z-EMG-ATM-GOV-0313-a6f4a62fa8.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

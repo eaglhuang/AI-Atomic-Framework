@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T14-34-39-664Z-repair-claim-4afecf52d34a",
+  "taskId": "ATM-GOV-0313",
+  "action": "repair-claim",
+  "actorId": "claude-007",
+  "sessionId": "session-20260731145402-claude-007-ATM-GOV-0313-5f852c2cdd",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0313.json",
+  "taskSha256": "sha256:e77f4025e8e120addee65ec5a574cb4dd7a79b18e44888eb2e349c535d93d6fb",
+  "createdAt": "2026-08-08T14:34:39.664Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0313 --actor claude-007 --write --reason \"Lease lease-096024c1da8e expired (claimedAt 2026-07-31T14:54Z, ttl 1800s) and cannot be renewed: ownershipMode is lane-id and every CLI process mints a fresh lane session, so the holding lane lane-20260731145403 can never be matched again across a process boundary. lane adopt succeeds but does not persist. Same actor claude-007, no competing claim, work is complete and validated.\" --json"
+}

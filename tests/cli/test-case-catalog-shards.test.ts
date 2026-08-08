@@ -40,10 +40,23 @@ assert.equal(normalizeSemanticKey('Actor Continuity!!'), 'actor_continuity');
 
 const shards = loadTestCaseGroupShards(root);
 assert.ok(shards.length >= 2, 'expected fixture shards under tests/catalog/groups');
+// Validate every shard before asserting: a per-iteration assert aborts on the
+// first offender and hides the remaining broken shards.
+const schemaFailures: string[] = [];
 for (const shard of shards) {
   const { sourcePath: _sourcePath, ...schemaBody } = shard;
-  assert.equal(validateSchema(schemaBody), true, `shard ${shard.groupId} must validate`);
+  if (validateSchema(schemaBody)) continue;
+  for (const error of validateSchema.errors ?? []) {
+    const caseIndex = /^\/cases\/(\d+)/.exec(String(error.instancePath))?.[1];
+    const caseId = caseIndex === undefined ? '<shard>' : shard.cases[Number(caseIndex)]?.caseId ?? '<unknown>';
+    schemaFailures.push(`${shard.groupId}::${caseId} ${error.instancePath} ${error.message}`);
+  }
 }
+assert.equal(
+  schemaFailures.length,
+  0,
+  `every shard must validate; offenders:\n${schemaFailures.join('\n')}`
+);
 
 const okCatalog = generateReadOnlyTestCaseCatalog(shards, { generatedAt: '2026-07-25T00:00:00.000Z' });
 assert.equal(okCatalog.schemaId, 'atm.generatedTestCaseCatalog.v1');

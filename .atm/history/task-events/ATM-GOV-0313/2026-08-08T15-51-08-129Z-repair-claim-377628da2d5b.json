@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T15-51-08-129Z-repair-claim-377628da2d5b",
+  "taskId": "ATM-GOV-0313",
+  "action": "repair-claim",
+  "actorId": "claude-007",
+  "sessionId": "session-20260808143650-claude-007-ATM-GOV-0313-fbf2a1eda0",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0313.json",
+  "taskSha256": "sha256:52fdb376a241b92b01b91cfd33343df4fa5c5e497305eb23b7567daa5ff54e2b",
+  "createdAt": "2026-08-08T15:51:08.129Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0313 --actor claude-007 --write --reason \"Captain handback to Codex. Lease lease-9f3b38bf2b90 expired at 2026-08-08T15:06:50Z. Releasing so the incoming captain can re-import the amended planning card and claim cleanly. Implementation is complete and verified in the worktree; only the governed commit remains blocked by the write-ticket reseal defect.\" --json"
+}

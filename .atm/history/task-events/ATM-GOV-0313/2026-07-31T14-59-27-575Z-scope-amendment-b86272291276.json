@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-31T14-59-27-575Z-scope-amendment-b86272291276",
+  "taskId": "ATM-GOV-0313",
+  "action": "scope-amendment",
+  "actorId": "claude-007",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0313.json",
+  "taskSha256": "sha256:ea80a3c4a7559359445ea935d81f4641feca7be5114fd5331f709905c1a3a7ad",
+  "createdAt": "2026-07-31T14:59:27.575Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0313 --actor claude-007 --add \"schemas/validators/test-case-group.schema.json,packages/cli/src/commands/test-catalog.ts,tests/cli/commit-attribution-sealed-transaction.test.ts\" --class linked-surface --phase during-implementation --reason \"ACC-2 alias lineage is unsatisfiable under the current schema because aliasId carries the same canonical pattern as caseId; a narrow legacyAliases seam must be added to the schema and honored by the catalog loader/resolver, and the commit-attribution test references two of the five migrated ids.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ACC-2 alias lineage is unsatisfiable under the current schema because aliasId carries the same canonical pattern as caseId; a narrow legacyAliases seam must be added to the schema and honored by the catalog loader/resolver, and the commit-attribution test references two of the five migrated ids."
+  }
+}

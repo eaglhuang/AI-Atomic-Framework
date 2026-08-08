@@ -11,15 +11,24 @@ import { normalizeValidatorResponsibility } from '../../../core/src/evidence/tes
 export {
   buildTestCaseId,
   generateReadOnlyTestCaseCatalog,
+  loadAllShardCaseIds,
+  loadLegacyCaseAliases,
   loadTestCaseGroupShards,
   normalizeSemanticKey,
   normalizeValidatorResponsibility,
+  readRawShardFiles,
+  reportShardReachability,
   resolveCaseGroupShardsRoot,
+  resolveLegacyCaseId,
+  validateLegacyCaseAliases,
   validateTestCaseGroupShards,
   VALIDATOR_RESPONSIBILITIES
 } from '../../../core/src/evidence/test-case-catalog.ts';
 export type {
   GeneratedTestCaseCatalog,
+  LegacyCaseAlias,
+  RawTestCaseShardFile,
+  ShardReachabilityEntry,
   TestCaseGroupCase,
   TestCaseGroupShard,
   TestCaseIdKind,

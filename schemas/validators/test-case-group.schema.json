@@ -104,6 +104,24 @@
         }
       }
     },
+    "legacyAliases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["legacyCaseId", "canonicalCaseId"],
+        "properties": {
+          "legacyCaseId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "canonicalCaseId": {
+            "type": "string",
+            "pattern": "^(test_int_|test_task_)[A-Za-z0-9_.:-]+$"
+          }
+        }
+      }
+    },
     "lineage": {
       "type": "array",
       "items": {

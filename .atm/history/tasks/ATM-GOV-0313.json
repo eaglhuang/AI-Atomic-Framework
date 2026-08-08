@@ -1,0 +1,442 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0313",
+  "title": "Canonical test-catalog namespace repair and historical shard migration",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0306"
+  ],
+  "acceptance": [
+    "ACC-1: Every catalog shard validates against the canonical schema and no catalog entry uses a caseId outside the `test_int_` / `test_task_` namespaces. Exactly the five identifiers listed under \"Corrected defect scope\" are migrated; the six valid `test_task_atm_gov_*` identifiers are left byte-identical, and the regression asserts they were not renamed.",
+    "ACC-2: Each migrated identifier is deterministic, collision-free, and retains an explicit alias/lineage record for historical references.",
+    "ACC-3: Full-catalog validation passes, not merely the two new 0307/0312 shards; the regression fails if any shard is omitted from the scan.",
+    "ACC-4: Every still-planned card that consumes a migrated case id is updated by dry-run then governed import, with frontmatter fidelity proof.",
+    "ACC-5: Focused regression covers legacy-id rejection, canonical-id generation, alias resolution, and a negative control for silent omission.",
+    "ACC-6: Rollback preserves historical sealed evidence and leaves the catalog in an explicit reconcile-required state rather than false green."
+  ],
+  "deliverables": [
+    "tests/catalog/groups/test_group_commit_attribution.shard.json",
+    "tests/catalog/groups/test_group_plan4_catalog_contract.shard.json",
+    "tests/cli/test-case-catalog-shards.test.ts",
+    "tests/cli/plan4-catalog-contract.test.ts"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-012.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json",
+    "packages/cli/src/commands/test-catalog.ts",
+    "packages/core/src/evidence/test-case-catalog.ts",
+    "schemas/validators/test-case-group.schema.json",
+    "tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "tests/catalog/groups/test_group_commit_attribution.shard.json",
+    "tests/catalog/groups/test_group_plan4_catalog_contract.shard.json",
+    "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+    "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+    "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+    "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+    "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+    "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+    "tests/cli/test-case-catalog-shards.test.ts",
+    "tests/cli/plan4-catalog-contract.test.ts",
+    "tests/cli/plan4-quality-gauntlet.test.ts",
+    "tests/cli/plan4-validator-catalog-selection.test.ts",
+    "tests/cli/plan4-mutation-adapter.test.ts",
+    "tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+    "tests/cli/plan4-obligation-inventory.test.ts",
+    "tests/cli/plan4-coverage-universe-compiler.test.ts",
+    "tests/cli/plan4-coverage-semantics.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+    "node --strip-types tests/cli/plan4-catalog-contract.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-preserve-alias-lineage",
+  "rollbackNotes": "Revert the migration while retaining an explicit alias map and the pre-migration sealed catalog receipt; do not rewrite historical evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-test-catalog",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.test-case-catalog-contract",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/test-catalog.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-012.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json",
+        "packages/cli/src/commands/test-catalog.ts",
+        "packages/core/src/evidence/test-case-catalog.ts",
+        "schemas/validators/test-case-group.schema.json",
+        "tests/cli/commit-attribution-sealed-transaction.test.ts",
+        "tests/catalog/groups/test_group_commit_attribution.shard.json",
+        "tests/catalog/groups/test_group_plan4_catalog_contract.shard.json",
+        "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+        "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+        "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+        "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+        "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+        "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+        "tests/cli/test-case-catalog-shards.test.ts",
+        "tests/cli/plan4-catalog-contract.test.ts",
+        "tests/cli/plan4-quality-gauntlet.test.ts",
+        "tests/cli/plan4-validator-catalog-selection.test.ts",
+        "tests/cli/plan4-mutation-adapter.test.ts",
+        "tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+        "tests/cli/plan4-obligation-inventory.test.ts",
+        "tests/cli/plan4-coverage-universe-compiler.test.ts",
+        "tests/cli/plan4-coverage-semantics.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0313-canonical-test-catalog-namespace-repair-and-historical-shard-migration.task.md",
+    "sectionTitle": "ATM-GOV-0313",
+    "headingLine": 120,
+    "hash": "09240d8f299e0c16",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0313-canonical-test-catalog-namespace-repair-and-historical-shard-migration.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:09240d8f299e0c1616efaea686acf7d51ef46f8c17bf393f603aea57cb63f590",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-08T17:00:48.828Z"
+    }
+  },
+  "importedAt": "2026-08-08T17:00:48.828Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0306"
+    ],
+    "startConditions": [
+      "ATM-BUG-2026-07-31-012 is recorded as open with a reproducible full-catalog validator failure.",
+      "The canonical test-case schema and deterministic ID builder remain the authority."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md"
+    ],
+    "changedPublicSeams": [
+      "atm.testCaseGroup.v1",
+      "atm.generatedTestCaseCatalog.v1",
+      "atm.testCaseId.v1"
+    ],
+    "causalImpactEdges": [
+      "legacy case id -> canonical schema-valid id with alias lineage",
+      "full catalog scan -> zero schema diagnostics",
+      "linked planned task -> governed re-import fidelity",
+      "migration rollback -> historical evidence preserved and reconcile-required"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0307/0312 valid catalog contract scaffolds",
+      "ATM-BUG-2026-07-31-012 failing full-catalog receipt"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+      "node --strip-types tests/cli/plan4-catalog-contract.test.ts"
+    ],
+    "phaseOwner": "plan4-catalog-contract"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0313_historical_shard_namespace_migration_8a48480f",
+      "targetGroupId": "test_group_plan4_catalog_contract",
+      "semanticKey": "historical_shard_namespace_migration",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "legacy case id -> canonical schema-valid id with alias lineage",
+        "linked task requiredTestCaseId -> governed re-import fidelity",
+        "linked planned task -> governed re-import fidelity"
+      ],
+      "expectedRedPredicate": "Any catalog shard or planned task card still depends on a caseId outside the test_int_/test_task_ namespaces, or a valid test_task_atm_gov_ identifier was renamed by the migration.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "catalog-namespace-migration",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0313_complete_catalog_schema_contract_7d958211",
+      "targetGroupId": "test_group_plan4_catalog_contract",
+      "semanticKey": "complete_catalog_schema_contract",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "full catalog scan -> zero schema diagnostics",
+        "canonical id builder -> deterministic no-collision namespace",
+        "migration rollback -> historical evidence preserved and reconcile-required"
+      ],
+      "expectedRedPredicate": "The full catalog validator can fail while focused new shards appear green, or canonical IDs are non-deterministic.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "catalog-validator-completeness",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0313_historical_shard_namespace_migration_8a48480f",
+    "test_task_atm_gov_0313_complete_catalog_schema_contract_7d958211"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T17-01-20-743Z-claim-32e955e5e75f",
+  "lastTransitionAt": "2026-08-08T17:01:20.743Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-a7ef24b3c0b8",
+    "claimedAt": "2026-08-08T17:01:03.776Z",
+    "heartbeatAt": "2026-08-08T17:01:03.776Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-012.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/catalog/groups/test_group_commit_attribution.shard.json",
+      "tests/catalog/groups/test_group_plan4_catalog_contract.shard.json",
+      "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+      "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+      "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+      "tests/cli/test-case-catalog-shards.test.ts",
+      "tests/cli/plan4-catalog-contract.test.ts",
+      "tests/cli/plan4-quality-gauntlet.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+      "tests/cli/plan4-obligation-inventory.test.ts",
+      "tests/cli/plan4-coverage-universe-compiler.test.ts",
+      "tests/cli/plan4-coverage-semantics.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260808170104-codex-captain-2026-08-09-01917189c4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808170104-codex-captain-2026-08-09-01917189c4\""
+    }
+  },
+  "owner": "codex-captain-2026-08-09",
+  "startedAt": "2026-08-08T17:01:03.776Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-7a2b9041114e237c",
+    "ticketDigest": "sha256:7a2b9041114e237c9b1c19d09ba95b839bd8a02e35eac2ab3be8d33aba0fe2a7",
+    "taskId": "ATM-GOV-0313",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808170104-codex-captain-2026-08-09-01917189c4",
+    "claimGeneration": "lease-a7ef24b3c0b8",
+    "issuedAt": "2026-08-08T17:01:03.776Z",
+    "expiresAt": "2026-08-08T17:31:03.776Z",
+    "scopeDigest": "sha256:a4b54e9af5d0a9d879980b127bc34abe4f59da684f823bc3250741680ec7d7a3",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T17:01:03.776Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0313.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0313/**",
+          ".atm/history/tasks/ATM-GOV-0313.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-012.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json",
+          "docs/governance/atm-bug-and-optimization-backlog.md",
+          "packages/cli/src/commands/test-catalog.ts",
+          "packages/core/src/evidence/test-case-catalog.ts",
+          "schemas/validators/test-case-group.schema.json",
+          "tests/catalog/groups/test_group_commit_attribution.shard.json",
+          "tests/catalog/groups/test_group_plan4_catalog_contract.shard.json",
+          "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+          "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+          "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+          "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+          "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+          "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+          "tests/cli/commit-attribution-sealed-transaction.test.ts",
+          "tests/cli/plan4-catalog-contract.test.ts",
+          "tests/cli/plan4-coverage-semantics.test.ts",
+          "tests/cli/plan4-coverage-universe-compiler.test.ts",
+          "tests/cli/plan4-mutation-adapter.test.ts",
+          "tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+          "tests/cli/plan4-obligation-inventory.test.ts",
+          "tests/cli/plan4-quality-gauntlet.test.ts",
+          "tests/cli/plan4-validator-catalog-selection.test.ts",
+          "tests/cli/test-case-catalog-shards.test.ts"
+        ],
+        "digest": "sha256:7fe02ccfba15d0df5f925f9ba097b528e7a9daef9374f106e0a3aba17ff1a220"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260808170103-codex-captain-2026-08-09-ATM-GOV-0313-65f3c0df47",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0313",
+    "batchId": null,
+    "scopeKey": "tasks-4bfb3e3b3e75",
+    "queueId": "queue-ef06bc9c44045d20",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0313.*",
+      ".atm/history/task-events/ATM-GOV-0313/**",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-012.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "tests/catalog/groups/test_group_commit_attribution.shard.json",
+      "tests/catalog/groups/test_group_plan4_catalog_contract.shard.json",
+      "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+      "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+      "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/cli/plan4-catalog-contract.test.ts",
+      "tests/cli/plan4-coverage-semantics.test.ts",
+      "tests/cli/plan4-coverage-universe-compiler.test.ts",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+      "tests/cli/plan4-obligation-inventory.test.ts",
+      "tests/cli/plan4-quality-gauntlet.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts",
+      "tests/cli/test-case-catalog-shards.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "dc43be41c6d93338f6c3188d343049311fd9fbd2f483aaaec4eb7fe9fe5fa7a9",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808170103-codex-captain-2026-08-09-ATM-GOV-0313-65f3c0df47",
+    "laneSession": {
+      "laneSessionId": "lane-20260808170104-codex-captain-2026-08-09-01917189c4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808170104-codex-captain-2026-08-09-01917189c4\""
+    },
+    "createdAt": "2026-08-08T17:01:20.742Z",
+    "status": "active"
+  }
+}

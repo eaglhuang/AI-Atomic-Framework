@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T14-24-02-587Z-scope-amendment-19fc043d71fd",
+  "taskId": "ATM-GOV-0313",
+  "action": "scope-amendment",
+  "actorId": "claude-007",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0313.json",
+  "taskSha256": "sha256:0e6394236c75e5509b6169666f806882e92efe65ac0f0e23fca074bb56ffd9cb",
+  "createdAt": "2026-08-08T14:24:02.587Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0313 --actor claude-007 --add docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json --class doc-sync --phase closeout --reason \"ATM-GOV-0313 discovered a distinct catalog reachability blind spot while repairing 012; it must be registered as its own backlog item so a green full-catalog validator is not mistaken for catalog completeness.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "doc-sync",
+    "amendmentPhase": "closeout",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0313 discovered a distinct catalog reachability blind spot while repairing 012; it must be registered as its own backlog item so a green full-catalog validator is not mistaken for catalog completeness."
+  }
+}
