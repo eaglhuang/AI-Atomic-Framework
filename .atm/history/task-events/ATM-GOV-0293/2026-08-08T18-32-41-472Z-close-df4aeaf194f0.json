@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T18-32-41-472Z-close-df4aeaf194f0",
+  "taskId": "ATM-GOV-0293",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808181935-codex-captain-2026-08-09-ATM-GOV-0293-f63ab9e1e7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0293.json",
+  "taskSha256": "sha256:684006b2f0610bbd2fe0898579890774a8fbe4034951fa71da1806e965506aba",
+  "createdAt": "2026-08-08T18:32:41.472Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0293 --actor codex-captain-2026-08-09 --status done --historical-delivery 2cbee21acbbd940616a6ca0bafc4700b3bd1a87e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260808181935-codex-captain-2026-08-09-ATM-GOV-0293-f63ab9e1e7",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0293.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-fault-fingerprint.test.ts",
+      "node --strip-types tests/cli/plan4-semantic-family-match.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T18:32:41.459Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0293.*",
+        ".atm/history/evidence/ATM-GOV-0293.runner-sync-receipt.json",
+        ".atm/history/task-events/ATM-GOV-0293/**",
+        ".atm/history/tasks/ATM-GOV-0293.json",
+        "packages/cli/dist",
+        "packages/core/src/evidence/fault-fingerprint.ts",
+        "packages/core/src/evidence/index.ts",
+        "release/atm-onefile",
+        "release/atm-root-drop",
+        "schemas/evidence/fault-fingerprint.schema.json",
+        "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+        "tests/cli/plan4-fault-fingerprint.test.ts",
+        "tests/cli/plan4-semantic-family-match.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/core/src/evidence/fault-fingerprint.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/fault-fingerprint.schema.json",
+        "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+        "tests/cli/plan4-fault-fingerprint.test.ts",
+        "tests/cli/plan4-semantic-family-match.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

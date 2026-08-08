@@ -1,0 +1,167 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0293",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b188c9b4b93caac9bf313f0803d5c54435d28f27",
+  "governedTreeSha": "de1073702645ab3ab7622464133ec7602a8f3614",
+  "targetCommitDelta": {
+    "currentCommitSha": "b188c9b4b93caac9bf313f0803d5c54435d28f27",
+    "parentCommitShas": [
+      "b188c9b4b93caac9bf313f0803d5c54435d28f27"
+    ],
+    "governedTreeSha": "de1073702645ab3ab7622464133ec7602a8f3614",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/core/src/evidence/fault-fingerprint.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/fault-fingerprint.schema.json",
+      "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+      "tests/cli/plan4-fault-fingerprint.test.ts",
+      "tests/cli/plan4-semantic-family-match.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-fault-fingerprint.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6c72ed10460c4936cf375f63004a5fd348e398c78d5e677414d61fb1749e4836",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-semantic-family-match.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8c0f30b330e2bf5dac840d8357ae3b8b65d2b9848ea7eaa19ec8a80541ccebf5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:91913562f389e3161fef714453a8aff87a24a33c4ecd3424c7ae2e876e1abe24",
+      "stderrSha256": "sha256:4288e648d77f9038030a6c26785f4d260a1b1c7bb31cd50623c8a00b6125342b",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-fault-fingerprint.test.ts",
+    "node --strip-types tests/cli/plan4-semantic-family-match.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T18:32:41.459Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0293.*",
+      ".atm/history/evidence/ATM-GOV-0293.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0293/**",
+      ".atm/history/tasks/ATM-GOV-0293.json",
+      "packages/cli/dist",
+      "packages/core/src/evidence/fault-fingerprint.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile",
+      "release/atm-root-drop",
+      "schemas/evidence/fault-fingerprint.schema.json",
+      "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+      "tests/cli/plan4-fault-fingerprint.test.ts",
+      "tests/cli/plan4-semantic-family-match.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/core/src/evidence/fault-fingerprint.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/fault-fingerprint.schema.json",
+      "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+      "tests/cli/plan4-fault-fingerprint.test.ts",
+      "tests/cli/plan4-semantic-family-match.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0293.json",
+  "closedAt": "2026-08-08T18:32:41.460Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808181935-codex-captain-2026-08-09-ATM-GOV-0293-f63ab9e1e7",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "2cbee21acbbd940616a6ca0bafc4700b3bd1a87e",
+    "taskMatchedFiles": [
+      "packages/core/src/evidence/fault-fingerprint.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/fault-fingerprint.schema.json",
+      "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+      "tests/cli/plan4-fault-fingerprint.test.ts",
+      "tests/cli/plan4-semantic-family-match.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0293.json",
+      ".atm/history/task-events/ATM-GOV-0293/2026-07-31T12-34-31-485Z-import-2106f96f5d9f.json",
+      ".atm/history/task-events/ATM-GOV-0293/2026-07-31T12-57-02-604Z-import-e2db89a00dab.json",
+      ".atm/history/task-events/ATM-GOV-0293/2026-08-08T18-19-35-991Z-reserve-bd3a47ff05e6.json",
+      ".atm/history/task-events/ATM-GOV-0293/2026-08-08T18-19-35-994Z-promote-02f82740f439.json",
+      ".atm/history/task-events/ATM-GOV-0293/2026-08-08T18-19-45-841Z-claim-1f18d2d7c1fb.json",
+      ".atm/history/tasks/ATM-GOV-0293.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
