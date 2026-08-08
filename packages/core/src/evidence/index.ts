@@ -18,3 +18,4 @@ export * from './concurrency-schedule-obligations.ts';
 export * from './governance-model-adapters.ts';
 export * from './fault-fingerprint.ts';
 export * from './causal-neighborhood.ts';
+export * from './legal-recovery-checkpoints.ts';

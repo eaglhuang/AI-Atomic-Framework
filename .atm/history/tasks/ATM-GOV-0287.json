@@ -1,0 +1,326 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0287",
+  "title": "legal recovery and checkpoint projection for check-in/close/phase/release",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0284",
+    "ATM-GOV-0271"
+  ],
+  "acceptance": [
+    "ACC-1: the module emits a schema-valid, deterministic result with canonical identity and provenance.",
+    "ACC-2: all downstream projections derive from one sealed authority; no silent omission or expansion is allowed.",
+    "ACC-3: unsupported, stale, contradictory, or incomplete inputs fail closed with a repair command.",
+    "ACC-4: focused tests cover success, replay, negative controls, and evidence invalidation.",
+    "ACC-5: deep-module review records cohesion, narrow API, and no duplicate authority."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/legal-recovery-checkpoints.schema.json",
+    "tests/catalog/groups/test_group_plan4_legal-recovery-checkpoints.shard.json",
+    "tests/cli/plan4-legal-recovery-checkpoints.test.ts",
+    "tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/legal-recovery-checkpoints.schema.json",
+    "tests/catalog/groups/test_group_plan4_legal-recovery-checkpoints.shard.json",
+    "tests/cli/plan4-legal-recovery-checkpoints.test.ts",
+    "tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-legal-recovery-checkpoints.test.ts",
+    "node --strip-types tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-remove-generated-receipts",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-evidence",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.legal-recovery-checkpoints",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/legal-recovery-checkpoints.schema.json",
+        "tests/catalog/groups/test_group_plan4_legal-recovery-checkpoints.shard.json",
+        "tests/cli/plan4-legal-recovery-checkpoints.test.ts",
+        "tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0287-legal-recovery-and-checkpoint-projection-for-check-in-close-phase-release.task.md",
+    "sectionTitle": "ATM-GOV-0287",
+    "headingLine": 87,
+    "hash": "bae4ad5794201105",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0287-legal-recovery-and-checkpoint-projection-for-check-in-close-phase-release.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:bae4ad5794201105c9a1c49d9d3e74f5524ff9311a38672c98201de036915b83",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T16:05:41.948Z"
+    }
+  },
+  "importedAt": "2026-07-31T16:05:41.948Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0287_core_6e4b2a91",
+      "targetGroupId": "test_group_plan4_legal-recovery-checkpoints",
+      "semanticKey": "plan4_legal-recovery-checkpoints",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0287; relation=recovery-projection; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0287_negative_3c7f8d20",
+      "targetGroupId": "test_group_plan4_legal-recovery-checkpoints",
+      "semanticKey": "plan4_legal-recovery-checkpoints_negative",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0287; relation=recovery-projection; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0287_core_6e4b2a91",
+    "test_task_atm_gov_0287_negative_3c7f8d20"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T18-57-30-633Z-lock-cleanup-93478f45bb54",
+  "lastTransitionAt": "2026-08-08T18:57:30.633Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T18:44:49.446Z",
+  "promotedAt": "2026-08-08T18:44:49.454Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-8896427bc13a",
+    "claimedAt": "2026-08-08T18:44:49.457Z",
+    "heartbeatAt": "2026-08-08T18:57:30.449Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0287.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+      "schemas/evidence/legal-recovery-checkpoints.schema.json",
+      "tests/catalog/groups/test_group_plan4_legal-recovery-checkpoints.shard.json",
+      "tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts",
+      "tests/cli/plan4-legal-recovery-checkpoints.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808184449-codex-captain-2026-08-09-b4f6d16506",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808184449-codex-captain-2026-08-09-b4f6d16506\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T18:44:49.457Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-82e48ba7deeadc7f",
+    "ticketDigest": "sha256:82e48ba7deeadc7f340012344dbea95cd57992cecce2e75dfb6f5907889639c8",
+    "taskId": "ATM-GOV-0287",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808184449-codex-captain-2026-08-09-b4f6d16506",
+    "claimGeneration": "lease-8896427bc13a",
+    "issuedAt": "2026-08-08T18:44:49.457Z",
+    "expiresAt": "2026-08-08T19:14:49.457Z",
+    "scopeDigest": "sha256:1cf22e3d2871e646ed1a03fdd8bf36b96beef16700e808b3b1d5d6932f166337",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T18:44:49.457Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0287.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0287/**",
+          ".atm/history/tasks/ATM-GOV-0287.json",
+          "packages/core/src/evidence/index.ts",
+          "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+          "schemas/evidence/legal-recovery-checkpoints.schema.json",
+          "tests/catalog/groups/test_group_plan4_legal-recovery-checkpoints.shard.json",
+          "tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts",
+          "tests/cli/plan4-legal-recovery-checkpoints.test.ts"
+        ],
+        "digest": "sha256:0800356d5caa5aebc911bcb88aaf403b5f35cb7330976e40a88b52c1e9f40edd"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808184449-codex-captain-2026-08-09-ATM-GOV-0287-58fbdcc86b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0287",
+    "batchId": null,
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-521c3d0257a5fa6c",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0287.*",
+      ".atm/history/task-events/ATM-GOV-0287/**",
+      ".atm/history/tasks/ATM-GOV-0287.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+      "schemas/evidence/legal-recovery-checkpoints.schema.json",
+      "tests/catalog/groups/test_group_plan4_legal-recovery-checkpoints.shard.json",
+      "tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts",
+      "tests/cli/plan4-legal-recovery-checkpoints.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e571d73ac46992032657cefc90220b379da29c3d0d68d718ff906850c471947c",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808184449-codex-captain-2026-08-09-ATM-GOV-0287-58fbdcc86b",
+    "laneSession": {
+      "laneSessionId": "lane-20260808184449-codex-captain-2026-08-09-b4f6d16506",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808184449-codex-captain-2026-08-09-b4f6d16506\""
+    },
+    "createdAt": "2026-08-08T18:45:01.405Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T18:57:30.630Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T18:57:30.449Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808184449-codex-captain-2026-08-09-ATM-GOV-0287-58fbdcc86b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0287.closure-packet.json"
+}

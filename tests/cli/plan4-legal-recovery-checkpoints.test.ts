@@ -1,0 +1,4 @@
+import assert from 'node:assert/strict';
+import { projectLegalRecoveryCheckpoints, replayLegalRecoveryCheckpoints, validateLegalRecoveryCheckpoints } from '../../packages/core/src/evidence/legal-recovery-checkpoints.ts';
+const input = { runId: 'fixture', authority: { authorityId: 'sealed-v1', sealed: true, digest: 'sha256:fixture' }, checkpoints: [{ checkpointId: 'check-in-1', phase: 'check-in', state: 'ready' }, { checkpointId: 'close-1', phase: 'close', state: 'committed', predecessorIds: ['check-in-1'] }, { checkpointId: 'release-1', phase: 'release', state: 'published', predecessorIds: ['close-1'] }] };
+const result = projectLegalRecoveryCheckpoints(input); assert.equal(result.status, 'projected'); assert.equal(result.projections.length, 3); assert.equal(validateLegalRecoveryCheckpoints(result).ok, true); assert.equal(replayLegalRecoveryCheckpoints(input, result).deterministic, true); console.log('plan4 legal recovery checkpoints: PASS');

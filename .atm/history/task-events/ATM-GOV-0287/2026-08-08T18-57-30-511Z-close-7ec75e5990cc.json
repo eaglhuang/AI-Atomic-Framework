@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T18-57-30-511Z-close-7ec75e5990cc",
+  "taskId": "ATM-GOV-0287",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808184449-codex-captain-2026-08-09-ATM-GOV-0287-58fbdcc86b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0287.json",
+  "taskSha256": "sha256:0a7c78ba6a50fbec75b1fb4d4a0c9e38a94c39bae8b291f7e93ebdf526f2a9e5",
+  "createdAt": "2026-08-08T18:57:30.511Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0287 --actor codex-captain-2026-08-09 --status done --from-batch-checkpoint --batch batch-e641205eb5c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e641205eb5c4",
+    "sessionId": "session-20260808184449-codex-captain-2026-08-09-ATM-GOV-0287-58fbdcc86b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0287.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts",
+      "node --strip-types tests/cli/plan4-legal-recovery-checkpoints.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T18:57:30.436Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0287.*",
+        ".atm/history/task-events/ATM-GOV-0287/**",
+        ".atm/history/tasks/ATM-GOV-0287.json",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+        "schemas/evidence/legal-recovery-checkpoints.schema.json",
+        "tests/catalog/groups/test_group_plan4_legal-recovery-checkpoints.shard.json",
+        "tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts",
+        "tests/cli/plan4-legal-recovery-checkpoints.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/legal-recovery-checkpoints.ts",
+        "schemas/evidence/legal-recovery-checkpoints.schema.json",
+        "tests/catalog/groups/test_group_plan4_legal-recovery-checkpoints.shard.json",
+        "tests/cli/plan4-legal-recovery-checkpoints-negative.test.ts",
+        "tests/cli/plan4-legal-recovery-checkpoints.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
