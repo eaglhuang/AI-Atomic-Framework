@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T19-12-22-328Z-close-c47244738017",
+  "taskId": "ATM-GOV-0288",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808190507-codex-captain-2026-08-09-ATM-GOV-0288-8f9474e363",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0288.json",
+  "taskSha256": "sha256:f96ed47634ad111fd9f767989c51e9f8ff75f7183b5ca4a061ae436f178093d7",
+  "createdAt": "2026-08-08T19:12:22.328Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0288 --actor codex-captain-2026-08-09 --status done --from-batch-checkpoint --batch batch-e641205eb5c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e641205eb5c4",
+    "sessionId": "session-20260808190507-codex-captain-2026-08-09-ATM-GOV-0288-8f9474e363",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0288.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-denominator-reconciliation.test.ts",
+      "node --strip-types tests/cli/plan4-structural-coverage.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T19:12:22.316Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0288.*",
+        ".atm/history/task-events/ATM-GOV-0288/**",
+        ".atm/history/tasks/ATM-GOV-0288.json",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/structural-coverage.ts",
+        "schemas/evidence/structural-coverage.schema.json",
+        "tests/catalog/groups/test_group_plan4_structural_coverage.shard.json",
+        "tests/cli/plan4-denominator-reconciliation.test.ts",
+        "tests/cli/plan4-structural-coverage.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/structural-coverage.ts",
+        "schemas/evidence/structural-coverage.schema.json",
+        "tests/catalog/groups/test_group_plan4_structural_coverage.shard.json",
+        "tests/cli/plan4-denominator-reconciliation.test.ts",
+        "tests/cli/plan4-structural-coverage.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

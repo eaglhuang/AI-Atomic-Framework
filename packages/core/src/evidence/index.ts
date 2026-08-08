@@ -2,6 +2,7 @@ export * from './acceptance-predicate.ts';
 export * from './closure-assurance-machine.ts';
 export * from './coverage-semantics.ts';
 export * from './coverage-universe-compiler.ts';
+export * from './structural-coverage.ts';
 export * from './diff-evidence.ts';
 export * from './diagnostic-loop.ts';
 export * from './git-boundary-evidence.ts';

@@ -1,0 +1,347 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0288",
+  "title": "JS/TS structural coverage adapter and authoritative denominator reconciliation",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0279",
+    "ATM-GOV-0285"
+  ],
+  "acceptance": [
+    "ACC-1: adapter emits canonical obligation IDs, denominator digest, source inventory digest, and explicit reachable/unreachable exclusions.",
+    "ACC-2: changed/impacted/repository views are projections of one authority; no view may silently add or drop obligations.",
+    "ACC-3: denominator drift, duplicate IDs, unsupported syntax, and missing inventory inputs fail closed with repair commands.",
+    "ACC-4: replaying the same sealed inventory is byte-stable and its proof can be consumed by ATM-GOV-0289 and ATM-GOV-0316.",
+    "ACC-5: focused tests cover baseline reconciliation, drift, exclusions, deterministic replay, and schema-invalid output."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/structural-coverage.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/structural-coverage.schema.json",
+    "tests/catalog/groups/test_group_plan4_structural_coverage.shard.json",
+    "tests/cli/plan4-structural-coverage.test.ts",
+    "tests/cli/plan4-denominator-reconciliation.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/structural-coverage.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/structural-coverage.schema.json",
+    "tests/catalog/groups/test_group_plan4_structural_coverage.shard.json",
+    "tests/cli/plan4-structural-coverage.test.ts",
+    "tests/cli/plan4-denominator-reconciliation.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-structural-coverage.test.ts",
+    "node --strip-types tests/cli/plan4-denominator-reconciliation.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed adapter output, schema validation, and bundle-vs-tree proof",
+  "rollbackStrategy": "revert-commit-and-remove-generated-receipts",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-evidence",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.structural-coverage-adapter",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/structural-coverage.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/structural-coverage.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/structural-coverage.schema.json",
+        "tests/catalog/groups/test_group_plan4_structural_coverage.shard.json",
+        "tests/cli/plan4-structural-coverage.test.ts",
+        "tests/cli/plan4-denominator-reconciliation.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0288-js-ts-structural-coverage-adapter-and-authoritative-denominator-reconciliation.task.md",
+    "sectionTitle": "ATM-GOV-0288",
+    "headingLine": 92,
+    "hash": "ff7b459c562b9e37",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0288-js-ts-structural-coverage-adapter-and-authoritative-denominator-reconciliation.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ff7b459c562b9e37d9b53c9b8f0037be5258721a7d14a5dd53e2724be2ac869a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T15:56:47.493Z"
+    }
+  },
+  "importedAt": "2026-07-31T15:56:47.493Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0279",
+      "ATM-GOV-0285"
+    ],
+    "startConditions": [
+      "ATM-GOV-0279 and ATM-GOV-0285 are done/released.",
+      "The adapter has a pinned source inventory and deterministic fixture baseline."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md"
+    ],
+    "changedPublicSeams": [
+      "packages/core/src/evidence/structural-coverage.ts",
+      "packages/core/src/evidence/index.ts"
+    ],
+    "causalImpactEdges": [
+      "from=ATM-GOV-0288; relation=authoritative-denominator; to=ATM-GOV-0289",
+      "from=ATM-GOV-0288; relation=structural-quality-proof; to=ATM-GOV-0316"
+    ],
+    "parallelFrontierInputs": [
+      "packages/core/src/evidence/index.ts"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-structural-coverage.test.ts",
+      "node --strip-types tests/cli/plan4-denominator-reconciliation.test.ts"
+    ],
+    "phaseOwner": "plan4-structural-quality"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0288_structural_coverage_6e4b2a91",
+      "targetGroupId": "test_group_plan4_structural_coverage",
+      "semanticKey": "plan4_structural_coverage",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0288; relation=authoritative-denominator; to=ATM-GOV-0289"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0288_denominator_reconciliation_3c7f8d20",
+      "targetGroupId": "test_group_plan4_structural_coverage",
+      "semanticKey": "plan4_denominator_reconciliation",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0288; relation=structural-quality-proof; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0288_structural_coverage_6e4b2a91",
+    "test_task_atm_gov_0288_denominator_reconciliation_3c7f8d20"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T19-05-15-690Z-claim-cda36542851d",
+  "lastTransitionAt": "2026-08-08T19:05:15.690Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T19:05:07.538Z",
+  "promotedAt": "2026-08-08T19:05:07.586Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-27f3af2bcf11",
+    "claimedAt": "2026-08-08T19:05:07.590Z",
+    "heartbeatAt": "2026-08-08T19:05:07.590Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/structural-coverage.ts",
+      "schemas/evidence/structural-coverage.schema.json",
+      "tests/catalog/groups/test_group_plan4_structural_coverage.shard.json",
+      "tests/cli/plan4-denominator-reconciliation.test.ts",
+      "tests/cli/plan4-structural-coverage.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260808190508-codex-captain-2026-08-09-44466d055b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808190508-codex-captain-2026-08-09-44466d055b\""
+    }
+  },
+  "startedAt": "2026-08-08T19:05:07.590Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-9dc155a729f053dc",
+    "ticketDigest": "sha256:9dc155a729f053dcc42e064e37fc355dec6ed7a952814656ed9cd3e380ddcc91",
+    "taskId": "ATM-GOV-0288",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808190508-codex-captain-2026-08-09-44466d055b",
+    "claimGeneration": "lease-27f3af2bcf11",
+    "issuedAt": "2026-08-08T19:05:07.590Z",
+    "expiresAt": "2026-08-08T19:35:07.590Z",
+    "scopeDigest": "sha256:d7525c67f4680100c20c7ef1ddde38350802880dc2e6c306b7b25b16cae265ec",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T19:05:07.590Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0288.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0288/**",
+          ".atm/history/tasks/ATM-GOV-0288.json",
+          "packages/core/src/evidence/index.ts",
+          "packages/core/src/evidence/structural-coverage.ts",
+          "schemas/evidence/structural-coverage.schema.json",
+          "tests/catalog/groups/test_group_plan4_structural_coverage.shard.json",
+          "tests/cli/plan4-denominator-reconciliation.test.ts",
+          "tests/cli/plan4-structural-coverage.test.ts"
+        ],
+        "digest": "sha256:ee33cf5c5ed62c23d95cc345e9fc2fe598467b1fb220cf72b6783ca3410b1cd8"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808190507-codex-captain-2026-08-09-ATM-GOV-0288-8f9474e363",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0288",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-7a1c114328aa4a06",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0288.*",
+      ".atm/history/task-events/ATM-GOV-0288/**",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/structural-coverage.ts",
+      "schemas/evidence/structural-coverage.schema.json",
+      "tests/catalog/groups/test_group_plan4_structural_coverage.shard.json",
+      "tests/cli/plan4-denominator-reconciliation.test.ts",
+      "tests/cli/plan4-structural-coverage.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3fadb32e72b914f35748493efb870ac974dba598862cc2293b182efbcad6b5d4",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808190507-codex-captain-2026-08-09-ATM-GOV-0288-8f9474e363",
+    "laneSession": {
+      "laneSessionId": "lane-20260808190508-codex-captain-2026-08-09-44466d055b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808190508-codex-captain-2026-08-09-44466d055b\""
+    },
+    "createdAt": "2026-08-08T19:05:15.688Z",
+    "status": "active"
+  }
+}

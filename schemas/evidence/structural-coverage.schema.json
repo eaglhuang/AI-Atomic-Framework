@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-atomic-framework.dev/schemas/evidence/structural-coverage.schema.json",
+  "title": "ATM Structural Coverage Result",
+  "type": "object",
+  "required": ["schemaId", "specVersion", "compilerId", "coverageId", "generatedAt", "model", "authority", "denominator", "projection", "entries", "status", "diagnostics", "resultDigest"],
+  "properties": {
+    "schemaId": { "const": "atm.structuralCoverage.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "compilerId": { "const": "atm.structuralCoverageAdapter.v1" },
+    "coverageId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "model": { "type": "object", "required": ["modelId", "modelDigest"], "properties": { "modelId": { "type": "string", "minLength": 1 }, "modelDigest": { "type": "string", "minLength": 1 } }, "additionalProperties": false },
+    "authority": { "type": "object", "required": ["sealed", "digest"], "properties": { "sealed": { "const": true }, "digest": { "type": "string", "minLength": 1 } }, "additionalProperties": false },
+    "denominator": { "type": "object", "required": ["sourceId", "total", "digest"], "properties": { "sourceId": { "type": "string", "minLength": 1 }, "total": { "type": "integer", "minimum": 0 }, "digest": { "type": "string", "minLength": 1 } }, "additionalProperties": false },
+    "projection": { "type": "object", "required": ["total", "covered", "uncovered", "unsupported", "excluded", "ratio"], "properties": { "total": { "type": "integer", "minimum": 0 }, "covered": { "type": "integer", "minimum": 0 }, "uncovered": { "type": "integer", "minimum": 0 }, "unsupported": { "type": "integer", "minimum": 0 }, "excluded": { "type": "integer", "minimum": 0 }, "ratio": { "type": "number", "minimum": 0, "maximum": 1 } }, "additionalProperties": false },
+    "entries": { "type": "array", "items": { "type": "object", "required": ["obligationId", "semanticFamily", "sourceRef", "coverage", "observedDigest", "entryDigest"], "properties": { "obligationId": { "type": "string", "minLength": 1 }, "semanticFamily": { "type": "string", "minLength": 1 }, "sourceRef": { "type": "string", "minLength": 1 }, "coverage": { "enum": ["covered", "uncovered", "unsupported", "excluded"] }, "observedDigest": { "type": "string", "minLength": 1 }, "entryDigest": { "type": "string", "minLength": 1 } }, "additionalProperties": false } },
+    "status": { "enum": ["proven", "blocked", "stale", "contradictory"] },
+    "diagnostics": { "type": "array", "items": { "type": "string" } },
+    "resultDigest": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}
