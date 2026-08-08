@@ -15,3 +15,4 @@ export * from './validator-catalog-selection.js';
 export * from './validator-lifecycle.js';
 export * from './constraint-solver.js';
 export * from './concurrency-schedule-obligations.js';
+export * from './governance-model-adapters.js';

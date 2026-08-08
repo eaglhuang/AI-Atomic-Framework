@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T18-15-36-554Z-scope-amendment-783824018e49",
+  "taskId": "ATM-GOV-0283",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0283.json",
+  "taskSha256": "sha256:a1e5d8d9f9ccfc3226c2073f3368665613b798e32ac4711256f11a3056e02c2b",
+  "createdAt": "2026-08-08T18:15:36.554Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0283 --actor codex-captain-2026-08-09 --add \"packages/cli/dist,release/atm-onefile,release/atm-root-drop,.atm/history/evidence/ATM-GOV-0283.runner-sync-receipt.json\" --reason \"Runner-sync publication is a required close gate for the frozen runner.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Runner-sync publication is a required close gate for the frozen runner."
+  }
+}
