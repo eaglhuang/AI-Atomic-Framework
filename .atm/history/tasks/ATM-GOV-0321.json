@@ -1,0 +1,340 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0321",
+  "title": "Sealed quality authority, policy epoch, protected exam surfaces and role capabilities",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0277"
+  ],
+  "acceptance": [
+    "Writer cannot alter policy, oracle, denominator, or verdict authority.",
+    "Epoch drift invalidates certificates and preserves prior authority.",
+    "Capability overlap and missing protected surfaces fail closed.",
+    "Evidence includes rollback, provenance, and deep-module review."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence",
+    "schemas/evidence",
+    "tests/cli/plan4-quality-authority.test.ts",
+    "tests/cli/plan4-role-capabilities.test.ts",
+    "tests/catalog/groups/test_group_plan4_authority_foundation.shard.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence",
+    "schemas/evidence",
+    "tests/cli/plan4-quality-authority.test.ts",
+    "tests/cli/plan4-role-capabilities.test.ts",
+    "tests/catalog/groups/test_group_plan4_authority_foundation.shard.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-quality-authority.test.ts",
+    "node --strip-types tests/cli/plan4-role-capabilities.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "preserve-prior-authority-and-disable-new-policy-epoch",
+  "rollbackNotes": "Reopen legacy authority if capability or epoch evidence is incomplete.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence",
+        "schemas/evidence",
+        "tests/cli/plan4-quality-authority.test.ts",
+        "tests/cli/plan4-role-capabilities.test.ts",
+        "tests/catalog/groups/test_group_plan4_authority_foundation.shard.json",
+        "sealed quality authority adapter",
+        "policy epoch receipt",
+        "protected exam-surface capability matrix",
+        "focused tests",
+        "catalog shard",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0321-sealed-quality-authority-policy-epoch-protected-exam-surfaces-and-role-capabilities.task.md",
+    "sectionTitle": "ATM-GOV-0321",
+    "headingLine": 52,
+    "hash": "fd238cfeb3d04201",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0321-sealed-quality-authority-policy-epoch-protected-exam-surfaces-and-role-capabilities.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:fd238cfeb3d04201f6d80fc1456b147eaacb5cd0c6c8c21271788388f7ec1963",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T15:50:06.581Z"
+    }
+  },
+  "importedAt": "2026-07-31T15:50:06.581Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0277"
+    ],
+    "startConditions": [
+      "0277 quality semantics and certificate vocabulary are done with fresh evidence"
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md"
+    ],
+    "changedPublicSeams": [
+      "atm.qualityAuthority.v1",
+      "atm.policyEpoch.v1",
+      "atm.examSurfaceCapability.v1"
+    ],
+    "causalImpactEdges": [
+      "writer capability overlap -> authority violation",
+      "policy epoch drift -> certificate invalidation"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0277 quality semantics"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-quality-authority.test.ts",
+      "node --strip-types tests/cli/plan4-role-capabilities.test.ts"
+    ],
+    "phaseOwner": "Plan4-authority-foundation"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0321_authority_5c8e1d42",
+      "targetGroupId": "test_group_plan4_authority_foundation",
+      "semanticKey": "plan4_sealed_quality_authority",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "writer capability overlap -> authority violation"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0321_epoch_capability_8a3f6b19",
+      "targetGroupId": "test_group_plan4_authority_foundation",
+      "semanticKey": "plan4_policy_epoch_and_role_capabilities",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "policy epoch drift -> certificate invalidation"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0321_authority_5c8e1d42",
+    "test_task_atm_gov_0321_epoch_capability_8a3f6b19"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T20-45-42-519Z-lock-cleanup-278e1d380631",
+  "lastTransitionAt": "2026-08-08T20:45:42.519Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T20:38:23.783Z",
+  "promotedAt": "2026-08-08T20:38:23.786Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-e365fab46e74",
+    "claimedAt": "2026-08-08T20:38:23.789Z",
+    "heartbeatAt": "2026-08-08T20:45:42.321Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0321.json",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_authority_foundation.shard.json",
+      "tests/cli/plan4-quality-authority.test.ts",
+      "tests/cli/plan4-role-capabilities.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808203824-codex-captain-2026-08-09-1e9cc6de48",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808203824-codex-captain-2026-08-09-1e9cc6de48\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T20:38:23.789Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-42d0a78e632e7b04",
+    "ticketDigest": "sha256:42d0a78e632e7b04f510194ffa52da08c615a8e63d1b0ce1d687c02eb7a8d609",
+    "taskId": "ATM-GOV-0321",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808203824-codex-captain-2026-08-09-1e9cc6de48",
+    "claimGeneration": "lease-e365fab46e74",
+    "issuedAt": "2026-08-08T20:38:23.789Z",
+    "expiresAt": "2026-08-08T21:08:23.789Z",
+    "scopeDigest": "sha256:6eac6ed346cb654f0c125e00679e66d25d3d6f0cbbf623812a8864f70c386725",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T20:38:23.789Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0321.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0321/**",
+          ".atm/history/tasks/ATM-GOV-0321.json",
+          "packages/core/src/evidence",
+          "schemas/evidence",
+          "tests/catalog/groups/test_group_plan4_authority_foundation.shard.json",
+          "tests/cli/plan4-quality-authority.test.ts",
+          "tests/cli/plan4-role-capabilities.test.ts"
+        ],
+        "digest": "sha256:f961efbf45297dfa4baa2f3a81ce35aa76a322ff0d15af15ce7aa37663079d02"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808203823-codex-captain-2026-08-09-ATM-GOV-0321-4bacf27170",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0321",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-7e9157f2fa0b81ee",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0321.*",
+      ".atm/history/task-events/ATM-GOV-0321/**",
+      ".atm/history/tasks/ATM-GOV-0321.json",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_authority_foundation.shard.json",
+      "tests/cli/plan4-quality-authority.test.ts",
+      "tests/cli/plan4-role-capabilities.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "fa1770bc453158118a6d08e9e8af8b887fc2f47adf999f9b54e964edd8ea8578",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808203823-codex-captain-2026-08-09-ATM-GOV-0321-4bacf27170",
+    "laneSession": {
+      "laneSessionId": "lane-20260808203824-codex-captain-2026-08-09-1e9cc6de48",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808203824-codex-captain-2026-08-09-1e9cc6de48\""
+    },
+    "createdAt": "2026-08-08T20:38:46.690Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T20:45:42.516Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T20:45:42.321Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808203823-codex-captain-2026-08-09-ATM-GOV-0321-4bacf27170",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0321.closure-packet.json"
+}

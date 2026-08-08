@@ -24,5 +24,6 @@ export * from './coverage-ratchet-baseline.ts';
 export * from './performance-resilience-ratchet.ts';
 export * from './regression-family.ts';
 export * from './evidence-freshness-certificate.ts';
+export * from './quality-authority.ts';
 export * from './complexity-interface-size.ts';
 export * from './dependency-graph-bypass-gate.ts';
