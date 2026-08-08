@@ -14,3 +14,4 @@ export * from './validation-receipt.js';
 export * from './validator-catalog-selection.js';
 export * from './validator-lifecycle.js';
 export * from './constraint-solver.js';
+export * from './concurrency-schedule-obligations.js';
