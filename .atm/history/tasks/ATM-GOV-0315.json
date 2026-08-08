@@ -1,0 +1,328 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0315",
+  "title": "Plan 4.0 six-editor runtime adapter parity canary",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0314"
+  ],
+  "acceptance": [
+    "Six adapters have matching source/compiler/manifest evidence.",
+    "Reinstall and frozen-runner smoke pass for each adapter.",
+    "Unsupported/degraded behavior is explicit and fail-closed.",
+    "Fresh sealed evidence includes rollback and deep-module review."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands",
+    "packages/core/src",
+    "tests/cli/plan4-adapter-parity.test.ts",
+    "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json"
+  ],
+  "scopePaths": [
+    "integrations",
+    "packages/cli/src/commands",
+    "packages/core/src",
+    "tests/cli/plan4-adapter-parity.test.ts",
+    "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-adapter-parity.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "restore-last-known-good-adapter-corpus",
+  "rollbackNotes": "Retain source evidence but disable any adapter projection whose compiler or manifest digest diverges.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "integrations",
+        "packages/cli/src/commands",
+        "packages/core/src",
+        "tests/cli/plan4-adapter-parity.test.ts",
+        "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+        "six-editor/provider adapter parity receipt with source/compiler/manifest digests",
+        "reinstall and frozen-runner smoke evidence for each adapter",
+        "degradation diagnostics and rollback/recovery proof"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0315-plan-4-0-six-editor-runtime-adapter-parity-canary.task.md",
+    "sectionTitle": "ATM-GOV-0315",
+    "headingLine": 69,
+    "hash": "3edd4034e93dc583",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0315-plan-4-0-six-editor-runtime-adapter-parity-canary.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:3edd4034e93dc5839fdf532e7352e31bc28cc4321dab66d1e7896ed460d7a896",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T15:19:28.697Z"
+    }
+  },
+  "importedAt": "2026-07-31T15:19:28.697Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0314"
+    ],
+    "startConditions": [
+      "0314 shadow adjudication is done with no unresolved escaped defect"
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md"
+    ],
+    "changedPublicSeams": [
+      "atm.adapterParityReceipt.v1"
+    ],
+    "causalImpactEdges": [
+      "source/compiler/manifest digest mismatch -> adapter parity block"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0314 shadow adjudication"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-adapter-parity.test.ts"
+    ],
+    "phaseOwner": "Plan4-adapter-parity"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0315_adapter_parity_4d8a1c73",
+      "targetGroupId": "test_group_plan4_adapter_parity",
+      "semanticKey": "plan4_six_editor_adapter_parity",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "source/compiler/manifest digest mismatch -> adapter parity block"
+      ],
+      "expectedRedPredicate": "any adapter drifts without a parity block",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0315_adapter_reinstall_smoke_9e2b6f14",
+      "targetGroupId": "test_group_plan4_adapter_parity",
+      "semanticKey": "plan4_adapter_reinstall_frozen_smoke",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "source/compiler/manifest digest mismatch -> adapter parity block"
+      ],
+      "expectedRedPredicate": "reinstall or frozen smoke hides degradation",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0315_adapter_parity_4d8a1c73",
+    "test_task_atm_gov_0315_adapter_reinstall_smoke_9e2b6f14"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T22-54-46-443Z-lock-cleanup-ba7df6a583c3",
+  "lastTransitionAt": "2026-08-08T22:54:46.443Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T22:50:40.939Z",
+  "promotedAt": "2026-08-08T22:50:40.941Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-290a407ec5f3",
+    "claimedAt": "2026-08-08T22:50:40.944Z",
+    "heartbeatAt": "2026-08-08T22:54:46.262Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0315.json",
+      "integrations",
+      "packages/cli/src/commands",
+      "packages/core/src",
+      "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+      "tests/cli/plan4-adapter-parity.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808225041-codex-captain-2026-08-09-6803b28ef2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808225041-codex-captain-2026-08-09-6803b28ef2\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T22:50:40.944Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-045fcc65fbdeb61a",
+    "ticketDigest": "sha256:045fcc65fbdeb61a630dfc52883ea18bc3102e37650aad94d5f203bddf520624",
+    "taskId": "ATM-GOV-0315",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808225041-codex-captain-2026-08-09-6803b28ef2",
+    "claimGeneration": "lease-290a407ec5f3",
+    "issuedAt": "2026-08-08T22:50:40.944Z",
+    "expiresAt": "2026-08-08T23:20:40.944Z",
+    "scopeDigest": "sha256:37c4e14a8e81a0ea40cecf9454eab7830e661aac3bfe6dd5c3d39d0514f97e74",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T22:50:40.944Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0315.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0315/**",
+          ".atm/history/tasks/ATM-GOV-0315.json",
+          "integrations",
+          "packages/cli/src/commands",
+          "packages/core/src",
+          "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+          "tests/cli/plan4-adapter-parity.test.ts"
+        ],
+        "digest": "sha256:39c4e130addba1b9cad6cbe0f07d90d6077b7bc112bdf4581a655bebdaca4edf"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:0d5ed1bc03405a6875f8a6a9695c02ed6a43f7c6224758da6074392dd538e08b",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:0ffedd9d1b17c336126113c0470433dfd3f5f6bfa74dfccff7f447b593ea5f2c"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808225040-codex-captain-2026-08-09-ATM-GOV-0315-9f260f9fae",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0315",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-70336525262a831f",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0315.*",
+      ".atm/history/task-events/ATM-GOV-0315/**",
+      ".atm/history/tasks/ATM-GOV-0315.json",
+      "integrations",
+      "packages/cli/src/commands",
+      "packages/core/src",
+      "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+      "tests/cli/plan4-adapter-parity.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7f4b529e95c6638494fb1fc672f8fbc15510955dc9c38564982f78a6a8858061",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808225040-codex-captain-2026-08-09-ATM-GOV-0315-9f260f9fae",
+    "laneSession": {
+      "laneSessionId": "lane-20260808225041-codex-captain-2026-08-09-6803b28ef2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808225041-codex-captain-2026-08-09-6803b28ef2\""
+    },
+    "createdAt": "2026-08-08T22:50:43.916Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T22:54:46.441Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T22:54:46.262Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808225040-codex-captain-2026-08-09-ATM-GOV-0315-9f260f9fae",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0315.closure-packet.json"
+}

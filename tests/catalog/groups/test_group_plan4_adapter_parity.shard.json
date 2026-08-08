@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_adapter_parity",
+  "theme": "Plan 4.0 six-editor runtime adapter parity",
+  "resourceKey": "plan4.adapter-parity",
+  "maintainers": ["atm-core"],
+  "cases": [
+    {"caseId":"test_task_atm_gov_0315_adapter_parity_4d8a1c73","semanticKey":"plan4_six_editor_adapter_parity","command":"node --strip-types tests/cli/plan4-adapter-parity.test.ts"},
+    {"caseId":"test_task_atm_gov_0315_adapter_reinstall_smoke_9e2b6f14","semanticKey":"plan4_adapter_reinstall_frozen_smoke","command":"node --strip-types tests/cli/plan4-adapter-parity.test.ts"}
+  ],
+  "taskIds": ["ATM-GOV-0315"]
+}
