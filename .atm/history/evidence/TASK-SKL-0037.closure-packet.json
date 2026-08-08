@@ -1,0 +1,174 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0037",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "929deaafe13f4e5a103845407cff9887f7f3e5fc",
+  "governedTreeSha": "5e30a8938fe87b7f646b0758f67a3d0b34e8997a",
+  "targetCommitDelta": {
+    "currentCommitSha": "929deaafe13f4e5a103845407cff9887f7f3e5fc",
+    "parentCommitShas": [
+      "929deaafe13f4e5a103845407cff9887f7f3e5fc"
+    ],
+    "governedTreeSha": "5e30a8938fe87b7f646b0758f67a3d0b34e8997a",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/evidence/TASK-SKL-0037.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0037.json",
+      ".atm/history/task-events/TASK-SKL-0037/2026-07-30T16-00-31-880Z-import-5ba2e645a583.json",
+      ".atm/history/task-events/TASK-SKL-0037/2026-08-08T22-13-42-940Z-reserve-38ba419ac103.json",
+      ".atm/history/task-events/TASK-SKL-0037/2026-08-08T22-13-42-943Z-promote-002c3544a173.json",
+      ".atm/history/task-events/TASK-SKL-0037/2026-08-08T22-13-54-266Z-claim-92bcaf0d9407.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      ".atm/history/tasks/TASK-SKL-0037.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "templates/skills/atm-evidence.skill.md",
+      "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+      "tests/cli/plan4-skill-adapter-parity.test.ts",
+      "tests/cli/plan4-skill-learning-lineage.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-skill-learning-lineage.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:68f6fdcb3e8e3e9086ae1130b1d9022da69712497b78d340a61c0384b03651b3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-skill-adapter-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0797c210ff6cf301d6bfac065c7934c522c0958e0a7500ecb342e0d581005adf",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ee77af378f2b32a65c3d5d8b08a509ab3a1abb51227cca6ab339e7423da72c23",
+      "stderrSha256": "sha256:ecbf6b4777072ee9d6edc21117b83c2caffa340505d3218a70c4884096a60d19",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:integration-adapter",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19063ae4e9017f3439a6036376ae04f39f88e27233b4bfbda0a594b4f7348d3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1ad3962e05a1cbf3df00da39cb065926c70ed6ff343565ad77347ab06a29c7db",
+      "stderrSha256": "sha256:1a68a8ed1042d47606e43ffbfb9041e147c0b0d29e440406b2a07c5a81f609bd",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-skill-adapter-parity.test.ts",
+    "node --strip-types tests/cli/plan4-skill-learning-lineage.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:integration-adapter",
+    "validate:skill-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T22:21:37.825Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0037.*",
+      ".atm/history/task-events/TASK-SKL-0037/**",
+      ".atm/history/tasks/TASK-SKL-0037.json",
+      "packages/integrations-core/src/compiler/**",
+      "scripts/validate-integration-adapter.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-handoff.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "templates/skills/atm-upgrade-scan.skill.md",
+      "templates/skills/mailbox-worker-execution.skill.md",
+      "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+      "tests/cli/plan4-skill-adapter-parity.test.ts",
+      "tests/cli/plan4-skill-learning-lineage.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/integrations-core/src/compiler/**",
+      "scripts/validate-integration-adapter.ts",
+      "scripts/validate-skill-templates.ts",
+      "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+      "tests/cli/plan4-skill-adapter-parity.test.ts",
+      "tests/cli/plan4-skill-learning-lineage.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0037.json",
+  "closedAt": "2026-08-08T22:21:37.826Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808221342-codex-captain-2026-08-09-TASK-SKL-0037-03bf46a980",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

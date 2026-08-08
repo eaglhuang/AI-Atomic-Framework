@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T22-21-37-835Z-close-2ef3ab0cb0e6",
+  "taskId": "TASK-SKL-0037",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808221342-codex-captain-2026-08-09-TASK-SKL-0037-03bf46a980",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0037.json",
+  "taskSha256": "sha256:ff58858b8e7319e135d6c8a9fedd072f97a1615ab321854c239d287f6678ba70",
+  "createdAt": "2026-08-08T22:21:37.835Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0037 --actor codex-captain-2026-08-09 --status done --from-batch-checkpoint --batch batch-e641205eb5c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e641205eb5c4",
+    "sessionId": "session-20260808221342-codex-captain-2026-08-09-TASK-SKL-0037-03bf46a980",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0037.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-skill-adapter-parity.test.ts",
+      "node --strip-types tests/cli/plan4-skill-learning-lineage.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T22:21:37.825Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0037.*",
+        ".atm/history/task-events/TASK-SKL-0037/**",
+        ".atm/history/tasks/TASK-SKL-0037.json",
+        "packages/integrations-core/src/compiler/**",
+        "scripts/validate-integration-adapter.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-deep-module-refactor.skill.md",
+        "templates/skills/atm-dispatch.skill.md",
+        "templates/skills/atm-evidence.skill.md",
+        "templates/skills/atm-governance-router.skill.md",
+        "templates/skills/atm-handoff.skill.md",
+        "templates/skills/atm-next.skill.md",
+        "templates/skills/atm-task-card-authoring.skill.md",
+        "templates/skills/atm-upgrade-scan.skill.md",
+        "templates/skills/mailbox-worker-execution.skill.md",
+        "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+        "tests/cli/plan4-skill-adapter-parity.test.ts",
+        "tests/cli/plan4-skill-learning-lineage.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/integrations-core/src/compiler/**",
+        "scripts/validate-integration-adapter.ts",
+        "scripts/validate-skill-templates.ts",
+        "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+        "tests/cli/plan4-skill-adapter-parity.test.ts",
+        "tests/cli/plan4-skill-learning-lineage.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

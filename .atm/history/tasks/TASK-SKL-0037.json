@@ -1,0 +1,391 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0037",
+  "title": "Plan 4.0 lifecycle skill projections and adapter parity",
+  "status": "done",
+  "milestone": "ATM-SKL-PLAN4-R1",
+  "dependencies": [
+    "TASK-SKL-0036",
+    "ATM-GOV-0305"
+  ],
+  "acceptance": [
+    "ACC-1: router/next distinguish record-only, reproduce, confirmed incident, recurrence and audit routes while consuming typed family selection rather than guessing it.",
+    "ACC-2: task-card, dispatch and evidence skills preserve acceptance IDs, public seams, protected exam surfaces, same-case red/green, independent oracle, selected/omitted reasons and zero-test failure.",
+    "ACC-3: handoff, upgrade scan, deep-module review and mailbox execution carry family revision, selection digest, new factors, unavailable data and replay refs without recomputing authority.",
+    "ACC-4: Codex, Claude Code, Cursor, Copilot, Gemini and Antigravity preserve required machine fields, source digest, compiler version, degradation diagnostics and manifest digest after reinstall.",
+    "ACC-5: Unknown mapping blocks closure with an executable mapping-repair route; it does not trigger run-all and cannot produce run-none-and-pass.",
+    "ACC-6: Source templates remain authoritative and installed-copy-only edits fail review.",
+    "ACC-7: task-card, dispatch, evidence, handoff and mailbox skills preserve Plan 4.0 exam-authority mode. No-Team mode requires card-author-as-Test- Generator, sealed required/advisory/phase test case ids, and a Writer actor different from the card author. Team Agents mode requires a pre-implementation Test Generator review/amendment receipt, with Test Generator and Writer as different actors and different provider/model families by default."
+  ],
+  "deliverables": [
+    "templates/skills/atm-governance-router.skill.md",
+    "templates/skills/atm-next.skill.md",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "templates/skills/atm-dispatch.skill.md",
+    "templates/skills/atm-evidence.skill.md",
+    "templates/skills/atm-handoff.skill.md",
+    "templates/skills/atm-upgrade-scan.skill.md",
+    "templates/skills/atm-deep-module-refactor.skill.md",
+    "templates/skills/mailbox-worker-execution.skill.md",
+    "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+    "tests/cli/plan4-skill-learning-lineage.test.ts",
+    "tests/cli/plan4-skill-adapter-parity.test.ts"
+  ],
+  "scopePaths": [
+    "templates/skills/atm-governance-router.skill.md",
+    "templates/skills/atm-next.skill.md",
+    "templates/skills/atm-task-card-authoring.skill.md",
+    "templates/skills/atm-dispatch.skill.md",
+    "templates/skills/atm-evidence.skill.md",
+    "templates/skills/atm-handoff.skill.md",
+    "templates/skills/atm-upgrade-scan.skill.md",
+    "templates/skills/atm-deep-module-refactor.skill.md",
+    "templates/skills/mailbox-worker-execution.skill.md",
+    "packages/integrations-core/src/compiler/**",
+    "scripts/validate-skill-templates.ts",
+    "scripts/validate-integration-adapter.ts",
+    "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+    "tests/cli/plan4-skill-learning-lineage.test.ts",
+    "tests/cli/plan4-skill-adapter-parity.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-skill-learning-lineage.test.ts",
+    "node --strip-types tests/cli/plan4-skill-adapter-parity.test.ts",
+    "npm run validate:skill-templates",
+    "npm run validate:integration-adapter",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-typed-lineage-and-six-adapter-parity",
+  "rollbackStrategy": "revert-commit-and-retain-task-local-plan4-advisory-output",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.skill-distribution",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.plan4-skill-learning-projection",
+        "pattern": "Adapter",
+        "source": "packages/integrations-core/src/compiler",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0037-plan-4-lifecycle-skill-projections-and-adapter-parity.task.md",
+    "sectionTitle": "TASK-SKL-0037",
+    "headingLine": 144,
+    "hash": "0a8e43cc864b064c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0037-plan-4-lifecycle-skill-projections-and-adapter-parity.task.md",
+      "planningCommitSha": "17dd69b18d3a76392855a42207df4da1f5ce6333",
+      "contentDigest": "sha256:0a8e43cc864b064c4374113362140899508d9296790c5ee69572969ff04c4e36",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-07-30T16:00:31.134Z"
+    }
+  },
+  "importedAt": "2026-07-30T16:00:31.134Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-SKL-0036",
+      "ATM-GOV-0305"
+    ],
+    "startConditions": [
+      "TASK-SKL-0036 is done and incident candidates have a canonical template and schema.",
+      "ATM-GOV-0305 is done and typed family revision and selection outputs are sealed."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "TASK-SKL-0034 engineering change method profiles",
+      "TASK-SKL-0035 deep-module boundary topology validator"
+    ],
+    "changedPublicSeams": [
+      "ATM incident-learning skill lineage",
+      "Skill-to-CausalRegressionFamily typed projection",
+      "Six editor/provider skill adapter parity"
+    ],
+    "causalImpactEdges": [
+      "typed incident candidate -> task/evidence contract",
+      "confirmed observation -> family observe route",
+      "family selection -> focused worker execution and handoff",
+      "recurrent family trend -> upgrade and deep-module review"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-SKL-0036 candidate schema and template",
+      "ATM-GOV-0305 family revision and selection contracts"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-skill-learning-lineage.test.ts",
+      "node --strip-types tests/cli/plan4-skill-adapter-parity.test.ts",
+      "npm run validate:skill-templates",
+      "npm run validate:integration-adapter"
+    ],
+    "phaseOwner": "atm-captain-skill-lane"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_skl_0037_learning_lineage_8c542ad1",
+      "targetGroupId": "test_group_plan4_skill_learning",
+      "semanticKey": "plan4_skill_learning_lineage",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "typed incident candidate -> task/evidence contract",
+        "confirmed observation -> family observe route",
+        "family selection -> focused worker execution and handoff"
+      ],
+      "expectedRedPredicate": "Entry skills drop or independently reinterpret typed incident-learning fields.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-skill-learning-lineage",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_skl_0037_six_adapter_parity_3d79f2b6",
+      "targetGroupId": "test_group_plan4_skill_learning",
+      "semanticKey": "plan4_skill_six_adapter_parity",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "recurrent family trend -> upgrade and deep-module review"
+      ],
+      "expectedRedPredicate": "An editor projection loses required fields, provenance, or fail-closed behavior.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-skill-adapter-parity",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_skl_0037_exam_authority_modes_91b0a64e",
+      "targetGroupId": "test_group_plan4_skill_learning",
+      "semanticKey": "plan4_skill_exam_authority_modes",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-7"
+      ],
+      "coversImpactEdges": [
+        "typed incident candidate -> task/evidence contract",
+        "family selection -> focused worker execution and handoff"
+      ],
+      "expectedRedPredicate": "Skill projection omits No-Team card-author/Test-Generator separation or Team Agents Test Generator versus Writer actor/provider separation.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-exam-authority-separation",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_skl_0037_learning_lineage_8c542ad1",
+    "test_task_skl_0037_six_adapter_parity_3d79f2b6",
+    "test_task_skl_0037_exam_authority_modes_91b0a64e"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "lastTransitionId": "2026-08-08T22-21-37-975Z-lock-cleanup-af6085ecb0b3",
+  "lastTransitionAt": "2026-08-08T22:21:37.975Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T22:13:42.940Z",
+  "promotedAt": "2026-08-08T22:13:42.943Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-73d47b542e2f",
+    "claimedAt": "2026-08-08T22:13:42.948Z",
+    "heartbeatAt": "2026-08-08T22:21:37.833Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0037.json",
+      "packages/integrations-core/src/compiler/**",
+      "scripts/validate-integration-adapter.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-handoff.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "templates/skills/atm-upgrade-scan.skill.md",
+      "templates/skills/mailbox-worker-execution.skill.md",
+      "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+      "tests/cli/plan4-skill-adapter-parity.test.ts",
+      "tests/cli/plan4-skill-learning-lineage.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808221343-codex-captain-2026-08-09-b22e7b2af6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808221343-codex-captain-2026-08-09-b22e7b2af6\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T22:13:42.948Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-8c3671d5915d0247",
+    "ticketDigest": "sha256:8c3671d5915d02474a4541162ea806c1e0cc35dc798004340bc7b12beb1fa136",
+    "taskId": "TASK-SKL-0037",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808221343-codex-captain-2026-08-09-b22e7b2af6",
+    "claimGeneration": "lease-73d47b542e2f",
+    "issuedAt": "2026-08-08T22:13:42.948Z",
+    "expiresAt": "2026-08-08T22:43:42.948Z",
+    "scopeDigest": "sha256:814813d2d4b8eac050aa33e29f0c4e8545b21b39172166a75a248dfa072c6992",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T22:13:42.948Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0037.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/TASK-SKL-0037/**",
+          ".atm/history/tasks/TASK-SKL-0037.json",
+          "packages/integrations-core/src/compiler/**",
+          "scripts/validate-integration-adapter.ts",
+          "scripts/validate-skill-templates.ts",
+          "templates/skills/atm-deep-module-refactor.skill.md",
+          "templates/skills/atm-dispatch.skill.md",
+          "templates/skills/atm-evidence.skill.md",
+          "templates/skills/atm-governance-router.skill.md",
+          "templates/skills/atm-handoff.skill.md",
+          "templates/skills/atm-next.skill.md",
+          "templates/skills/atm-task-card-authoring.skill.md",
+          "templates/skills/atm-upgrade-scan.skill.md",
+          "templates/skills/mailbox-worker-execution.skill.md",
+          "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+          "tests/cli/plan4-skill-adapter-parity.test.ts",
+          "tests/cli/plan4-skill-learning-lineage.test.ts"
+        ],
+        "digest": "sha256:5d65939cf75be401769002c1584dbb015362d5f887c9939793b6bb5c42764450"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260808221342-codex-captain-2026-08-09-TASK-SKL-0037-03bf46a980",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0037",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-b9ec48f1af6e86ab",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0037.*",
+      ".atm/history/task-events/TASK-SKL-0037/**",
+      ".atm/history/tasks/TASK-SKL-0037.json",
+      "packages/integrations-core/src/compiler/**",
+      "scripts/validate-integration-adapter.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-handoff.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "templates/skills/atm-upgrade-scan.skill.md",
+      "templates/skills/mailbox-worker-execution.skill.md",
+      "tests/catalog/groups/test_group_plan4_skill_learning.shard.json",
+      "tests/cli/plan4-skill-adapter-parity.test.ts",
+      "tests/cli/plan4-skill-learning-lineage.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "71044a73fe39ac05ce319f21dda7b370bb50dc10f10d16170ab792c52bb335bb",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808221342-codex-captain-2026-08-09-TASK-SKL-0037-03bf46a980",
+    "laneSession": {
+      "laneSessionId": "lane-20260808221343-codex-captain-2026-08-09-b22e7b2af6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808221343-codex-captain-2026-08-09-b22e7b2af6\""
+    },
+    "createdAt": "2026-08-08T22:13:54.266Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T22:21:37.973Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T22:21:37.833Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808221342-codex-captain-2026-08-09-TASK-SKL-0037-03bf46a980",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0037.closure-packet.json"
+}
