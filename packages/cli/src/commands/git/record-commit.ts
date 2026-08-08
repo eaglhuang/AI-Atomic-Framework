@@ -1,0 +1,2 @@
+export const RECORD_COMMIT_SCHEMA_ID = 'atm.recordCommitReceipt.v1' as const;
+export function createRecordCommitReceipt(input: { readonly ticketId: string; readonly sourceDigest: string; readonly dryRun?: boolean }) { const ticketId = String(input?.ticketId ?? '').trim(); const sourceDigest = String(input?.sourceDigest ?? '').trim(); return { schemaId: RECORD_COMMIT_SCHEMA_ID, ticketId, sourceDigest, dryRun: input?.dryRun === true, durableTicketIdentity: Boolean(ticketId && sourceDigest), stdoutOnlyRejected: true, noWriteInDryRun: input?.dryRun === true }; }

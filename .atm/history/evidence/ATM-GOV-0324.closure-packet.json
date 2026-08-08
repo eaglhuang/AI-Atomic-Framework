@@ -1,0 +1,154 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0324",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "49dbfcf290172464cba7d8d91f0bfe05d132fe1f",
+  "governedTreeSha": "dfde6a003dd7b7cff90637344bea17008529912c",
+  "targetCommitDelta": {
+    "currentCommitSha": "49dbfcf290172464cba7d8d91f0bfe05d132fe1f",
+    "parentCommitShas": [
+      "49dbfcf290172464cba7d8d91f0bfe05d132fe1f"
+    ],
+    "governedTreeSha": "dfde6a003dd7b7cff90637344bea17008529912c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0324.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0324.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0324/2026-07-31T16-18-47-866Z-import-26e6a5e138c6.json",
+      ".atm/history/task-events/ATM-GOV-0324/2026-08-08T23-04-00-247Z-reserve-67d6fdc04976.json",
+      ".atm/history/task-events/ATM-GOV-0324/2026-08-08T23-04-00-249Z-promote-fd1a0053c561.json",
+      ".atm/history/task-events/ATM-GOV-0324/2026-08-08T23-04-07-289Z-claim-b316f3886681.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0307.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      ".atm/history/tasks/ATM-GOV-0324.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/cli/src/commands/git/record-commit.ts",
+      "packages/cli/src/commands/runner-sync.ts",
+      "packages/cli/src/commands/taskflow/transaction-status.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-evidence.skill.md",
+      "schemas/evidence/operator-regression-closure.schema.json",
+      "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+      "tests/cli/plan4-operator-regression-closure.test.ts",
+      "tests/cli/plan4-transaction-status-receipts.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-operator-regression-closure.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2e26d08127c3fa21a2174f6dc62c49fd9e035bf9a671ceb6d0ba9201b3892f45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-transaction-status-receipts.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:16eb8fde66d2679684e1256481292c8f9d4669d48d520f28487a446955a47ef5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ec28dbdd63dac80be7dbcfab374dbbeab64865b131f3a777ceba90d42fe096a",
+      "stderrSha256": "sha256:d8edf5de63daa75af1a369dcb41795b31a4709e040b9a28aeb03c4dc0c545e87",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-operator-regression-closure.test.ts",
+    "node --strip-types tests/cli/plan4-transaction-status-receipts.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T23:08:24.062Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0324.*",
+      ".atm/history/task-events/ATM-GOV-0324/**",
+      ".atm/history/tasks/ATM-GOV-0324.json",
+      "packages/cli/src/commands/git/record-commit.ts",
+      "packages/cli/src/commands/runner-sync.ts",
+      "packages/cli/src/commands/taskflow/transaction-status.ts",
+      "schemas/evidence/operator-regression-closure.schema.json",
+      "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+      "tests/cli/plan4-operator-regression-closure.test.ts",
+      "tests/cli/plan4-transaction-status-receipts.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git/record-commit.ts",
+      "packages/cli/src/commands/runner-sync.ts",
+      "packages/cli/src/commands/taskflow/transaction-status.ts",
+      "schemas/evidence/operator-regression-closure.schema.json",
+      "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+      "tests/cli/plan4-operator-regression-closure.test.ts",
+      "tests/cli/plan4-transaction-status-receipts.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0324.json",
+  "closedAt": "2026-08-08T23:08:24.063Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808230400-codex-captain-2026-08-09-ATM-GOV-0324-9a80156991",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

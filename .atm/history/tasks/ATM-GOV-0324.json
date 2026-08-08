@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0324",
+  "title": "recent governance operator regression closure and transaction-status receipts",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0307",
+    "ATM-GOV-0287"
+  ],
+  "acceptance": [
+    "ACC-1: bugs 002–008 each have a red reproduction, explicit owner mapping, repair result, and generic fixture/incident-family link.",
+    "ACC-2: repair-closure, write-ticket, record-commit, and runner-sync publication share durable ticket identity; stdout-only handoff is rejected.",
+    "ACC-3: dry-run proves HEAD/index/worktree no-write invariants and import records cannot trigger cross-task attribution false positives.",
+    "ACC-4: timeout/close status receipts expose phase markers and a safe read-only recovery command; retries are idempotent.",
+    "ACC-5: all seven bug rows have fresh sealed evidence, rollback proof, and no emergency/override lease in the success path."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/transaction-status.ts",
+    "packages/cli/src/commands/git/record-commit.ts",
+    "packages/cli/src/commands/runner-sync.ts",
+    "schemas/evidence/operator-regression-closure.schema.json",
+    "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+    "tests/cli/plan4-operator-regression-closure.test.ts",
+    "tests/cli/plan4-transaction-status-receipts.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/transaction-status.ts",
+    "packages/cli/src/commands/git/record-commit.ts",
+    "packages/cli/src/commands/runner-sync.ts",
+    "schemas/evidence/operator-regression-closure.schema.json",
+    "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+    "tests/cli/plan4-operator-regression-closure.test.ts",
+    "tests/cli/plan4-transaction-status-receipts.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-operator-regression-closure.test.ts",
+    "node --strip-types tests/cli/plan4-transaction-status-receipts.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-remove-generated-receipts",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-governance-routing",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.operator-regression-closure",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/taskflow/transaction-status.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/transaction-status.ts",
+        "packages/cli/src/commands/git/record-commit.ts",
+        "packages/cli/src/commands/runner-sync.ts",
+        "schemas/evidence/operator-regression-closure.schema.json",
+        "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+        "tests/cli/plan4-operator-regression-closure.test.ts",
+        "tests/cli/plan4-transaction-status-receipts.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0324-recent-governance-operator-regression-closure-and-transaction-status-receipts.task.md",
+    "sectionTitle": "ATM-GOV-0324",
+    "headingLine": 93,
+    "hash": "2d182a513a1ab973",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0324-recent-governance-operator-regression-closure-and-transaction-status-receipts.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:2d182a513a1ab9733a73eb77967f6d7616befbf65538348169f0f956dab57fc6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T16:18:47.611Z"
+    }
+  },
+  "importedAt": "2026-07-31T16:18:47.611Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0307",
+      "ATM-GOV-0287"
+    ],
+    "startConditions": [
+      "Incident replay contract and legal recovery projections are sealed.",
+      "Each 002–008 regression has a reproducible command-backed observation."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md"
+    ],
+    "changedPublicSeams": [
+      "packages/cli/src/commands/taskflow/transaction-status.ts",
+      "packages/cli/src/commands/git/record-commit.ts",
+      "packages/cli/src/commands/runner-sync.ts"
+    ],
+    "causalImpactEdges": [
+      "from=ATM-GOV-0324; relation=operator-regression-closure; to=ATM-GOV-0317",
+      "from=ATM-GOV-0324; relation=transaction-status-receipt; to=ATM-GOV-0316"
+    ],
+    "parallelFrontierInputs": [
+      "packages/cli/src/commands/taskflow/transaction-status.ts",
+      "packages/cli/src/commands/git/record-commit.ts"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-operator-regression-closure.test.ts",
+      "node --strip-types tests/cli/plan4-transaction-status-receipts.test.ts"
+    ],
+    "phaseOwner": "plan4-final-verdict-blockers"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0324_operator_regression_4e8c2a71",
+      "targetGroupId": "test_group_plan4_operator_regression_closure",
+      "semanticKey": "plan4_operator_regression_closure",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0324; relation=operator-regression-closure; to=ATM-GOV-0317"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0324_transaction_status_7d1f5b03",
+      "targetGroupId": "test_group_plan4_operator_regression_closure",
+      "semanticKey": "plan4_transaction_status_receipts",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0324; relation=transaction-status-receipt; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0324_operator_regression_4e8c2a71",
+    "test_task_atm_gov_0324_transaction_status_7d1f5b03"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T23-08-24-268Z-lock-cleanup-668cca5be95b",
+  "lastTransitionAt": "2026-08-08T23:08:24.268Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T23:04:00.247Z",
+  "promotedAt": "2026-08-08T23:04:00.249Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-d2de39727cf2",
+    "claimedAt": "2026-08-08T23:04:00.252Z",
+    "heartbeatAt": "2026-08-08T23:08:24.071Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0324.json",
+      "packages/cli/src/commands/git/record-commit.ts",
+      "packages/cli/src/commands/runner-sync.ts",
+      "packages/cli/src/commands/taskflow/transaction-status.ts",
+      "schemas/evidence/operator-regression-closure.schema.json",
+      "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+      "tests/cli/plan4-operator-regression-closure.test.ts",
+      "tests/cli/plan4-transaction-status-receipts.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808230400-codex-captain-2026-08-09-2628c779f9",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808230400-codex-captain-2026-08-09-2628c779f9\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T23:04:00.252Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d7c6fe4f2a5c29a3",
+    "ticketDigest": "sha256:d7c6fe4f2a5c29a38c4061b65120f2b9afdbec0c884e605335fecfad1b93326c",
+    "taskId": "ATM-GOV-0324",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808230400-codex-captain-2026-08-09-2628c779f9",
+    "claimGeneration": "lease-d2de39727cf2",
+    "issuedAt": "2026-08-08T23:04:00.252Z",
+    "expiresAt": "2026-08-08T23:34:00.252Z",
+    "scopeDigest": "sha256:9de90ece7850b5f47bfcb0831f15768040825fabc5d364e1c60320be07058239",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T23:04:00.252Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0324.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0324/**",
+          ".atm/history/tasks/ATM-GOV-0324.json",
+          "packages/cli/src/commands/git/record-commit.ts",
+          "packages/cli/src/commands/runner-sync.ts",
+          "packages/cli/src/commands/taskflow/transaction-status.ts",
+          "schemas/evidence/operator-regression-closure.schema.json",
+          "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+          "tests/cli/plan4-operator-regression-closure.test.ts",
+          "tests/cli/plan4-transaction-status-receipts.test.ts"
+        ],
+        "digest": "sha256:77e8a6d4b4e050d73d61d781f3f3b0b2162ea0126c4b22f29a681945bfbce5fb"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:0d5ed1bc03405a6875f8a6a9695c02ed6a43f7c6224758da6074392dd538e08b",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:0ffedd9d1b17c336126113c0470433dfd3f5f6bfa74dfccff7f447b593ea5f2c"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808230400-codex-captain-2026-08-09-ATM-GOV-0324-9a80156991",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0324",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-ae12e771258969d0",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0324.*",
+      ".atm/history/task-events/ATM-GOV-0324/**",
+      ".atm/history/tasks/ATM-GOV-0324.json",
+      "packages/cli/src/commands/git/record-commit.ts",
+      "packages/cli/src/commands/runner-sync.ts",
+      "packages/cli/src/commands/taskflow/transaction-status.ts",
+      "schemas/evidence/operator-regression-closure.schema.json",
+      "tests/catalog/groups/test_group_plan4_operator_regression_closure.shard.json",
+      "tests/cli/plan4-operator-regression-closure.test.ts",
+      "tests/cli/plan4-transaction-status-receipts.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "74df1c3030db33ec692c145e2771ea2c9a0690dc36bfc0de1639c54df9020a3e",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808230400-codex-captain-2026-08-09-ATM-GOV-0324-9a80156991",
+    "laneSession": {
+      "laneSessionId": "lane-20260808230400-codex-captain-2026-08-09-2628c779f9",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808230400-codex-captain-2026-08-09-2628c779f9\""
+    },
+    "createdAt": "2026-08-08T23:04:07.289Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T23:08:24.266Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T23:08:24.071Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808230400-codex-captain-2026-08-09-ATM-GOV-0324-9a80156991",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0324.closure-packet.json"
+}
