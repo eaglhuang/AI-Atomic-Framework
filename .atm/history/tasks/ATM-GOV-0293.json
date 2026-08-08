@@ -2,14 +2,16 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0293",
   "title": "Fault fingerprint and semantic family matching policy",
-  "status": "planned",
+  "status": "running",
   "milestone": "ATM-GOV-PLAN4-R1",
   "dependencies": [
     "ATM-GOV-0279",
-    "ATM-GOV-0292"
+    "ATM-GOV-0306"
   ],
   "acceptance": [
     "ACC-1: equivalent incidents normalize to stable fingerprints.",
+    "ACC-6: fingerprints preserve the incident family for shared-index attribution, sealed-commit fallback, CAS/queue, foreign-dirty, stale-batch, and close-deferral failures; an unknown family is fail-closed.",
+    "ACC-7: focused tests replay at least one Plan 3.2 dual-captain fixture and prove family routing is derived from sealed observations, not task id, actor, date, or hard-coded incident text.",
     "ACC-2: family matching uses public seam, error/recovery class, causal impact, and mutation lineage; it does not rely on task id or actor.",
     "ACC-3: low-confidence or conflicting matches fail closed with mapping review, not silent merge.",
     "ACC-4: mutation survivor/equivalence evidence can strengthen or weaken confidence without becoming the sole authority.",
@@ -87,31 +89,33 @@
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0293-fault-fingerprint-and-semantic-family-matching-policy.task.md",
     "sectionTitle": "ATM-GOV-0293",
-    "headingLine": 110,
-    "hash": "dadda013877866c5",
+    "headingLine": 115,
+    "hash": "fc48c8ab03ceaece",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0293-fault-fingerprint-and-semantic-family-matching-policy.task.md",
       "planningCommitSha": "e05645d4417eb2b6314a7e9726570215fac5a278",
-      "contentDigest": "sha256:dadda013877866c59013b741f822d9cc16acf9a629d1bc3d4757ca3f55c36198",
-      "amendmentEpoch": 1,
-      "sealedAt": "2026-07-30T21:15:09.951Z"
+      "contentDigest": "sha256:fc48c8ab03ceaece55d8266073ec5e0ab6887e3314d55b72b97f6534e57c51e8",
+      "amendmentEpoch": 3,
+      "sealedAt": "2026-07-31T12:57:01.933Z"
     }
   },
-  "importedAt": "2026-07-30T21:15:09.951Z",
+  "importedAt": "2026-07-31T12:57:01.933Z",
   "workAdmission": {
-    "recoveryMode": "auto"
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
   },
   "causalGraph": {
     "causalDependencies": [
       "ATM-GOV-0279",
-      "ATM-GOV-0292"
+      "ATM-GOV-0306"
     ],
     "startConditions": [
       "ATM-GOV-0279 is done and exposes confirmed incident observation inputs.",
-      "ATM-GOV-0292 is done and exposes mutation lineage and equivalence governance."
+      "ATM-GOV-0306 is done and exposes mutation lineage and equivalence governance."
     ],
     "softRelations": [
       "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
@@ -126,11 +130,13 @@
       "incident symptoms -> normalized fault fingerprint",
       "public seam and error class -> semantic family candidate",
       "confidence threshold -> exact match, new family proposal, or human mapping review",
-      "mutation lineage -> survivor/equivalence matching evidence"
+      "mutation lineage -> survivor/equivalence matching evidence",
+      "parallel-governance incident family -> recurrence classification and gate selection"
     ],
     "parallelFrontierInputs": [
       "TASK-SKL-0036 incidentLearningCandidate schema",
-      "ATM-GOV-0292 mutation lineage outputs"
+      "ATM-GOV-0306 mutation lineage outputs",
+      "Plan 3.2 dual-captain incident fixtures and broker receipts"
     ],
     "validatorReferences": [
       "node --strip-types tests/cli/plan4-fault-fingerprint.test.ts",
@@ -166,11 +172,14 @@
       "coversAcceptance": [
         "ACC-2",
         "ACC-3",
-        "ACC-5"
+        "ACC-5",
+        "ACC-6",
+        "ACC-7"
       ],
       "coversImpactEdges": [
         "public seam and error class -> semantic family candidate",
-        "confidence threshold -> exact match, new family proposal, or human mapping review"
+        "confidence threshold -> exact match, new family proposal, or human mapping review",
+        "parallel-governance incident family -> recurrence classification and gate selection"
       ],
       "expectedRedPredicate": "Low-confidence or conflicting family match is accepted as exact.",
       "contributionResourceKey": null,
@@ -206,7 +215,147 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-07-30T21-15-10-585Z-import-8dd4e7c1194c",
-  "lastTransitionAt": "2026-07-30T21:15:10.585Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-08-08T18-19-45-841Z-claim-1f18d2d7c1fb",
+  "lastTransitionAt": "2026-08-08T18:19:45.841Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T18:19:35.991Z",
+  "promotedAt": "2026-08-08T18:19:35.994Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-cb800a834ca8",
+    "claimedAt": "2026-08-08T18:19:35.997Z",
+    "heartbeatAt": "2026-08-08T18:19:35.997Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0293.json",
+      "packages/core/src/evidence/fault-fingerprint.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/fault-fingerprint.schema.json",
+      "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+      "tests/cli/plan4-fault-fingerprint.test.ts",
+      "tests/cli/plan4-semantic-family-match.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260808181936-codex-captain-2026-08-09-b40cd0589a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808181936-codex-captain-2026-08-09-b40cd0589a\""
+    }
+  },
+  "startedAt": "2026-08-08T18:19:35.997Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-ab4d3e62de08d470",
+    "ticketDigest": "sha256:ab4d3e62de08d4705ec573d0fc6f2be4dd942415f392085a71bc0349679f559f",
+    "taskId": "ATM-GOV-0293",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808181936-codex-captain-2026-08-09-b40cd0589a",
+    "claimGeneration": "lease-cb800a834ca8",
+    "issuedAt": "2026-08-08T18:19:35.997Z",
+    "expiresAt": "2026-08-08T18:49:35.997Z",
+    "scopeDigest": "sha256:15b6e74037176349e568741086cc5645266636da1d807d6c04c831400e19bea0",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T18:19:35.997Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0293.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0293/**",
+          ".atm/history/tasks/ATM-GOV-0293.json",
+          "packages/core/src/evidence/fault-fingerprint.ts",
+          "packages/core/src/evidence/index.ts",
+          "schemas/evidence/fault-fingerprint.schema.json",
+          "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+          "tests/cli/plan4-fault-fingerprint.test.ts",
+          "tests/cli/plan4-semantic-family-match.test.ts"
+        ],
+        "digest": "sha256:366d98f901d0dbeec603a921e35403215293d746ee6a03fc20881b55f1ab4739"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808181935-codex-captain-2026-08-09-ATM-GOV-0293-f63ab9e1e7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0293",
+    "batchId": null,
+    "scopeKey": "tasks-4bfb3e3b3e75",
+    "queueId": "queue-ef06bc9c44045d20",
+    "queueIndex": 4,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0293.*",
+      ".atm/history/task-events/ATM-GOV-0293/**",
+      ".atm/history/tasks/ATM-GOV-0293.json",
+      "packages/core/src/evidence/fault-fingerprint.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/fault-fingerprint.schema.json",
+      "tests/catalog/groups/test_group_plan4_fault_fingerprint.shard.json",
+      "tests/cli/plan4-fault-fingerprint.test.ts",
+      "tests/cli/plan4-semantic-family-match.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1f725a297481db848395130c6b51a904fd8c66ac1869f920ae96c1756cce6b82",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808181935-codex-captain-2026-08-09-ATM-GOV-0293-f63ab9e1e7",
+    "laneSession": {
+      "laneSessionId": "lane-20260808181936-codex-captain-2026-08-09-b40cd0589a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808181936-codex-captain-2026-08-09-b40cd0589a\""
+    },
+    "createdAt": "2026-08-08T18:19:45.840Z",
+    "status": "active"
+  }
 }

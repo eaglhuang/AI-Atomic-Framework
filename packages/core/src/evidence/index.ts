@@ -16,3 +16,4 @@ export * from './validator-lifecycle.ts';
 export * from './constraint-solver.ts';
 export * from './concurrency-schedule-obligations.ts';
 export * from './governance-model-adapters.ts';
+export * from './fault-fingerprint.ts';

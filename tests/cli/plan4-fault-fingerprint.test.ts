@@ -1,0 +1,4 @@
+import assert from 'node:assert/strict';
+import { createFaultFingerprint, replayFaultFingerprint, validateFaultFingerprint } from '../../packages/core/src/evidence/fault-fingerprint.ts';
+const input = { runId: 'fixture', authority: { authorityId: 'sealed-v1', sealed: true, digest: 'sha256:fixture' }, knownFamilies: ['shared-index', 'cas-queue'] as const, observations: [{ observationId: 'incident-1', publicSeam: 'shared index stage', errorClass: 'shared staging failure', causalImpact: 'shared queue contention', mutationLineage: 'commit delivery', mutationEvidence: ['survivor-equivalent'] }] };
+const result = createFaultFingerprint(input); assert.equal(result.status, 'matched'); assert.equal(result.fingerprints[0].familyMatch.decision, 'exact-match'); assert.equal(validateFaultFingerprint(result).ok, true); assert.equal(replayFaultFingerprint(input, result).deterministic, true); console.log('plan4 fault fingerprint: PASS');
