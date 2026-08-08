@@ -1,0 +1,167 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0282",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d700efb880c29e7c936202018999832bd3739bee",
+  "governedTreeSha": "b76eef7ace2550f2f33bd92743108d03a70ec732",
+  "targetCommitDelta": {
+    "currentCommitSha": "d700efb880c29e7c936202018999832bd3739bee",
+    "parentCommitShas": [
+      "d700efb880c29e7c936202018999832bd3739bee"
+    ],
+    "governedTreeSha": "b76eef7ace2550f2f33bd92743108d03a70ec732",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/tasks/ATM-GOV-0293.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/core/src/evidence/concurrency-schedule-obligations.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/concurrency-schedule-obligations.schema.json",
+      "tests/catalog/groups/test_group_plan4_concurrency-schedule-obligations.shard.json",
+      "tests/cli/plan4-concurrency-schedule-obligations-negative.test.ts",
+      "tests/cli/plan4-concurrency-schedule-obligations.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-concurrency-schedule-obligations-negative.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0f43dadb3e73baf4af40010d3e3ea4c7880d6d1ef23bf2aeb85b6bde3540d7f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-concurrency-schedule-obligations.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:62606a825f0e10bcc2d34d09906314bbd1221e49927609580171626ef9ae39f8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a2e31458d17df80919780f26beb752f8e398d27b11023c6de7c9b7ea4129b074",
+      "stderrSha256": "sha256:27d5581f9c87cbc26d56f4af5c7517d2f14f8ae1d8a3c595184cc1403f1d2519",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-concurrency-schedule-obligations-negative.test.ts",
+    "node --strip-types tests/cli/plan4-concurrency-schedule-obligations.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T18:04:57.399Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0282.*",
+      ".atm/history/evidence/ATM-GOV-0282.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0282/**",
+      ".atm/history/tasks/ATM-GOV-0282.json",
+      "packages/cli/dist",
+      "packages/core/src/evidence/concurrency-schedule-obligations.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile",
+      "release/atm-root-drop",
+      "schemas/evidence/concurrency-schedule-obligations.schema.json",
+      "tests/catalog/groups/test_group_plan4_concurrency-schedule-obligations.shard.json",
+      "tests/cli/plan4-concurrency-schedule-obligations-negative.test.ts",
+      "tests/cli/plan4-concurrency-schedule-obligations.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/core/src/evidence/concurrency-schedule-obligations.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/concurrency-schedule-obligations.schema.json",
+      "tests/catalog/groups/test_group_plan4_concurrency-schedule-obligations.shard.json",
+      "tests/cli/plan4-concurrency-schedule-obligations-negative.test.ts",
+      "tests/cli/plan4-concurrency-schedule-obligations.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0282.json",
+  "closedAt": "2026-08-08T18:04:57.399Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808175420-codex-captain-2026-08-09-ATM-GOV-0282-13e07fba0a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "200ead3624190f6b80d67fdfae17f3c373427029",
+    "taskMatchedFiles": [
+      "packages/core/src/evidence/concurrency-schedule-obligations.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/concurrency-schedule-obligations.schema.json",
+      "tests/catalog/groups/test_group_plan4_concurrency-schedule-obligations.shard.json",
+      "tests/cli/plan4-concurrency-schedule-obligations-negative.test.ts",
+      "tests/cli/plan4-concurrency-schedule-obligations.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0282.json",
+      ".atm/history/task-events/ATM-GOV-0282/2026-07-31T16-05-23-707Z-import-a8bf5085adc8.json",
+      ".atm/history/task-events/ATM-GOV-0282/2026-08-08T17-54-20-234Z-reserve-ba6578d32968.json",
+      ".atm/history/task-events/ATM-GOV-0282/2026-08-08T17-54-20-238Z-promote-6d06bf325994.json",
+      ".atm/history/task-events/ATM-GOV-0282/2026-08-08T17-54-31-985Z-claim-b05b467b56cc.json",
+      ".atm/history/tasks/ATM-GOV-0282.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
