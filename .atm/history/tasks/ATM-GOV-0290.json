@@ -1,0 +1,325 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0290",
+  "title": "cyclomatic complexity, CRAP, module/interface size adapter",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0285"
+  ],
+  "acceptance": [
+    "ACC-1: the module emits a schema-valid, deterministic result with canonical identity and provenance.",
+    "ACC-2: all downstream projections derive from one sealed authority; no silent omission or expansion is allowed.",
+    "ACC-3: unsupported, stale, contradictory, or incomplete inputs fail closed with a repair command.",
+    "ACC-4: focused tests cover success, replay, negative controls, and evidence invalidation.",
+    "ACC-5: deep-module review records cohesion, narrow API, and no duplicate authority."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/complexity-interface-size.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/complexity-interface-size.schema.json",
+    "tests/catalog/groups/test_group_plan4_complexity-interface-size.shard.json",
+    "tests/cli/plan4-complexity-interface-size.test.ts",
+    "tests/cli/plan4-complexity-interface-size-negative.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/complexity-interface-size.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/complexity-interface-size.schema.json",
+    "tests/catalog/groups/test_group_plan4_complexity-interface-size.shard.json",
+    "tests/cli/plan4-complexity-interface-size.test.ts",
+    "tests/cli/plan4-complexity-interface-size-negative.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-complexity-interface-size.test.ts",
+    "node --strip-types tests/cli/plan4-complexity-interface-size-negative.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-remove-generated-receipts",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-evidence",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.complexity-interface-size",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/complexity-interface-size.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/complexity-interface-size.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/complexity-interface-size.schema.json",
+        "tests/catalog/groups/test_group_plan4_complexity-interface-size.shard.json",
+        "tests/cli/plan4-complexity-interface-size.test.ts",
+        "tests/cli/plan4-complexity-interface-size-negative.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0290-cyclomatic-complexity-crap-module-interface-size-adapter.task.md",
+    "sectionTitle": "ATM-GOV-0290",
+    "headingLine": 85,
+    "hash": "ef881bb01db712ec",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0290-cyclomatic-complexity-crap-module-interface-size-adapter.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ef881bb01db712ecf82ea4b155e79314587261ce72764d792472e9a5265aa616",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T16:06:06.948Z"
+    }
+  },
+  "importedAt": "2026-07-31T16:06:06.948Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0290_core_6e4b2a91",
+      "targetGroupId": "test_group_plan4_complexity-interface-size",
+      "semanticKey": "plan4_complexity-interface-size",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0290; relation=complexity-ratchet; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0290_negative_3c7f8d20",
+      "targetGroupId": "test_group_plan4_complexity-interface-size",
+      "semanticKey": "plan4_complexity-interface-size_negative",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0290; relation=complexity-ratchet; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0290_core_6e4b2a91",
+    "test_task_atm_gov_0290_negative_3c7f8d20"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T19-49-25-433Z-lock-cleanup-938f93b8af0c",
+  "lastTransitionAt": "2026-08-08T19:49:25.433Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T19:43:11.304Z",
+  "promotedAt": "2026-08-08T19:43:11.307Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-d3858ecc822f",
+    "claimedAt": "2026-08-08T19:43:11.310Z",
+    "heartbeatAt": "2026-08-08T19:49:25.232Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0290.json",
+      "packages/core/src/evidence/complexity-interface-size.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/complexity-interface-size.schema.json",
+      "tests/catalog/groups/test_group_plan4_complexity-interface-size.shard.json",
+      "tests/cli/plan4-complexity-interface-size-negative.test.ts",
+      "tests/cli/plan4-complexity-interface-size.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808194311-codex-captain-2026-08-09-7e782d241c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808194311-codex-captain-2026-08-09-7e782d241c\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T19:43:11.310Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-9bf1640f25f3de1b",
+    "ticketDigest": "sha256:9bf1640f25f3de1b992fd7275c24cedaffac3062dafed0ee380f4df29570e763",
+    "taskId": "ATM-GOV-0290",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808194311-codex-captain-2026-08-09-7e782d241c",
+    "claimGeneration": "lease-d3858ecc822f",
+    "issuedAt": "2026-08-08T19:43:11.310Z",
+    "expiresAt": "2026-08-08T20:13:11.310Z",
+    "scopeDigest": "sha256:d3325f64b10861e1e085eac5692a502dbf92790eb7c929eba20fb74d210715c7",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T19:43:11.310Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0290.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0290/**",
+          ".atm/history/tasks/ATM-GOV-0290.json",
+          "packages/core/src/evidence/complexity-interface-size.ts",
+          "packages/core/src/evidence/index.ts",
+          "schemas/evidence/complexity-interface-size.schema.json",
+          "tests/catalog/groups/test_group_plan4_complexity-interface-size.shard.json",
+          "tests/cli/plan4-complexity-interface-size-negative.test.ts",
+          "tests/cli/plan4-complexity-interface-size.test.ts"
+        ],
+        "digest": "sha256:c1a81cac83bfa2dc9629680faa9e60cceb9a33ab7f9440c41bf29d44f6be0124"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808194311-codex-captain-2026-08-09-ATM-GOV-0290-058dedb38e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0290",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-ca55d679f80b4854",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0290.*",
+      ".atm/history/task-events/ATM-GOV-0290/**",
+      ".atm/history/tasks/ATM-GOV-0290.json",
+      "packages/core/src/evidence/complexity-interface-size.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/complexity-interface-size.schema.json",
+      "tests/catalog/groups/test_group_plan4_complexity-interface-size.shard.json",
+      "tests/cli/plan4-complexity-interface-size-negative.test.ts",
+      "tests/cli/plan4-complexity-interface-size.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7945934e1a982b1ceaa44a35776252bfe43a33a0ce0399fef7bf965362238582",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808194311-codex-captain-2026-08-09-ATM-GOV-0290-058dedb38e",
+    "laneSession": {
+      "laneSessionId": "lane-20260808194311-codex-captain-2026-08-09-7e782d241c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808194311-codex-captain-2026-08-09-7e782d241c\""
+    },
+    "createdAt": "2026-08-08T19:43:18.783Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T19:49:25.431Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T19:49:25.232Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808194311-codex-captain-2026-08-09-ATM-GOV-0290-058dedb38e",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0290.closure-packet.json"
+}

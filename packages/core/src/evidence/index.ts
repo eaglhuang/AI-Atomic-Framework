@@ -21,3 +21,4 @@ export * from './fault-fingerprint.ts';
 export * from './causal-neighborhood.ts';
 export * from './legal-recovery-checkpoints.ts';
 export * from './coverage-ratchet-baseline.ts';
+export * from './complexity-interface-size.ts';
