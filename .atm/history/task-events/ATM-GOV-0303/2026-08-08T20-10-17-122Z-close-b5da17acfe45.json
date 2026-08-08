@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T20-10-17-122Z-close-b5da17acfe45",
+  "taskId": "ATM-GOV-0303",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808200233-codex-captain-2026-08-09-ATM-GOV-0303-a85f4c6222",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0303.json",
+  "taskSha256": "sha256:f80c7b3ac417d02a03fbd3e037f35fc9e9cfc9bac049a50380b7e99b3ee1f6d3",
+  "createdAt": "2026-08-08T20:10:17.122Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0303 --actor codex-captain-2026-08-09 --status done --from-batch-checkpoint --batch batch-e641205eb5c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e641205eb5c4",
+    "sessionId": "session-20260808200233-codex-captain-2026-08-09-ATM-GOV-0303-a85f4c6222",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0303.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-performance-resilience-ratchet-negative.test.ts",
+      "node --strip-types tests/cli/plan4-performance-resilience-ratchet.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T20:10:17.110Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0303.*",
+        ".atm/history/task-events/ATM-GOV-0303/**",
+        ".atm/history/tasks/ATM-GOV-0303.json",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/performance-resilience-ratchet.ts",
+        "schemas/evidence/performance-resilience-ratchet.schema.json",
+        "tests/catalog/groups/test_group_plan4_performance-resilience-ratchet.shard.json",
+        "tests/cli/plan4-performance-resilience-ratchet-negative.test.ts",
+        "tests/cli/plan4-performance-resilience-ratchet.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/performance-resilience-ratchet.ts",
+        "schemas/evidence/performance-resilience-ratchet.schema.json",
+        "tests/catalog/groups/test_group_plan4_performance-resilience-ratchet.shard.json",
+        "tests/cli/plan4-performance-resilience-ratchet-negative.test.ts",
+        "tests/cli/plan4-performance-resilience-ratchet.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
