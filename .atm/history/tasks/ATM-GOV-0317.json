@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0317",
+  "title": "Plan 4.0 final four-plan objective certification and legacy-authority retirement",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0316",
+    "ATM-GOV-0324"
+  ],
+  "acceptance": [
+    "Every matrix row has a complete evidence tuple or explicit non-claim.",
+    "Backlog census has no unresolved open-like item or unauthorized exception.",
+    "Fresh sealed dogfood and release/push provenance are present.",
+    "Legacy authority retirement is reversible and independently reviewed."
+  ],
+  "deliverables": [
+    "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+    "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+    "tests/cli/plan4-final-certification.test.ts",
+    "tests/catalog/groups/test_group_plan4_final_certification.shard.json"
+  ],
+  "scopePaths": [
+    "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+    "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+    "tests/cli/plan4-final-certification.test.ts",
+    "tests/catalog/groups/test_group_plan4_final_certification.shard.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-final-certification.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "retain-legacy-authority-and-reopen-failed-objective-rows",
+  "rollbackNotes": "Retirement is reversible; any unresolved row, bug, unknown, or stale mirror keeps legacy authority active.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0317-plan-4-0-final-four-plan-objective-certification-and-legacy-authority-retirement.task.md",
+    "sectionTitle": "ATM-GOV-0317",
+    "headingLine": 68,
+    "hash": "ed939cf63ce45c09",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0317-plan-4-0-final-four-plan-objective-certification-and-legacy-authority-retirement.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ed939cf63ce45c09fd6ff4ae71f1d175b1a97f501c5837be82e8b51c98a1a395",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T16:19:40.177Z"
+    }
+  },
+  "importedAt": "2026-07-31T16:19:40.177Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0316",
+      "ATM-GOV-0324"
+    ],
+    "startConditions": [
+      "0316 phase-exit evidence is sealed and 0324 closes the recent operator-regression cluster"
+    ],
+    "softRelations": [
+      "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md"
+    ],
+    "changedPublicSeams": [
+      "atm.fourPlanCertificate.v1"
+    ],
+    "causalImpactEdges": [
+      "unresolved matrix row -> final verdict blocked"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0316 hostile dogfood phase exit"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-final-certification.test.ts"
+    ],
+    "phaseOwner": "Plan4-final-certification"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0317_four_plan_certificate_5b9d2e71",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "plan4_four_plan_objective_certificate",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "unresolved matrix row -> final verdict blocked"
+      ],
+      "expectedRedPredicate": "an incomplete row is silently certified",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0317_legacy_retirement_gate_8a4f1c36",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "plan4_legacy_authority_retirement_gate",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "unresolved matrix row -> final verdict blocked"
+      ],
+      "expectedRedPredicate": "legacy retirement proceeds with an open bug, unknown, or missing rollback",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0317_four_plan_certificate_5b9d2e71",
+    "test_task_atm_gov_0317_legacy_retirement_gate_8a4f1c36"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T23-13-08-307Z-lock-cleanup-64dc60be346a",
+  "lastTransitionAt": "2026-08-08T23:13:08.307Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T23:10:17.840Z",
+  "promotedAt": "2026-08-08T23:10:17.842Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-542046062a7a",
+    "claimedAt": "2026-08-08T23:10:17.845Z",
+    "heartbeatAt": "2026-08-08T23:13:08.173Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0317.json",
+      "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+      "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+      "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+      "tests/cli/plan4-final-certification.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808231018-codex-captain-2026-08-09-333939cb0b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808231018-codex-captain-2026-08-09-333939cb0b\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T23:10:17.845Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-1f9a6eb5023baf91",
+    "ticketDigest": "sha256:1f9a6eb5023baf91200b458c09a4b3f9cf1c203f23faea191ff66356286a1472",
+    "taskId": "ATM-GOV-0317",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808231018-codex-captain-2026-08-09-333939cb0b",
+    "claimGeneration": "lease-542046062a7a",
+    "issuedAt": "2026-08-08T23:10:17.845Z",
+    "expiresAt": "2026-08-08T23:40:17.845Z",
+    "scopeDigest": "sha256:d157acbc70ff7294e6ca6e76ed32857c9ae0de677ca5bc127cdbf67e20f15380",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T23:10:17.845Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0317.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0317/**",
+          ".atm/history/tasks/ATM-GOV-0317.json",
+          "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+          "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+          "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+          "tests/cli/plan4-final-certification.test.ts"
+        ],
+        "digest": "sha256:2a64802b90d2bc2ef54ae1fcc5e55bfdf3831abd165529492864935c857d7458"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:0d5ed1bc03405a6875f8a6a9695c02ed6a43f7c6224758da6074392dd538e08b",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:0ffedd9d1b17c336126113c0470433dfd3f5f6bfa74dfccff7f447b593ea5f2c"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260808231017-codex-captain-2026-08-09-ATM-GOV-0317-e82513a235",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0317",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-ee81b9a4704f5e4b",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0317.*",
+      ".atm/history/task-events/ATM-GOV-0317/**",
+      ".atm/history/tasks/ATM-GOV-0317.json",
+      "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+      "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+      "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+      "tests/cli/plan4-final-certification.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "19f507d8c796a0dec4ac81b8f7a9e935b86963749eea826009ee7db9f11c549c",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808231017-codex-captain-2026-08-09-ATM-GOV-0317-e82513a235",
+    "laneSession": {
+      "laneSessionId": "lane-20260808231018-codex-captain-2026-08-09-333939cb0b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808231018-codex-captain-2026-08-09-333939cb0b\""
+    },
+    "createdAt": "2026-08-08T23:10:24.925Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T23:13:08.305Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T23:13:08.173Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808231017-codex-captain-2026-08-09-ATM-GOV-0317-e82513a235",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0317.closure-packet.json"
+}

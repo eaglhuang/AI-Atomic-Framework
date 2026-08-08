@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T23-13-08-174Z-close-93674a026e8f",
+  "taskId": "ATM-GOV-0317",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808231017-codex-captain-2026-08-09-ATM-GOV-0317-e82513a235",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0317.json",
+  "taskSha256": "sha256:9fd8acbb95af02bfaf3940df96c4a39cc874a6c7a4533c877c9676849f0b1434",
+  "createdAt": "2026-08-08T23:13:08.174Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0317 --actor codex-captain-2026-08-09 --status done --from-batch-checkpoint --batch batch-e641205eb5c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e641205eb5c4",
+    "sessionId": "session-20260808231017-codex-captain-2026-08-09-ATM-GOV-0317-e82513a235",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0317.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-final-certification.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T23:13:08.164Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0317.*",
+        ".atm/history/task-events/ATM-GOV-0317/**",
+        ".atm/history/tasks/ATM-GOV-0317.json",
+        "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+        "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+        "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+        "tests/cli/plan4-final-certification.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+        "tests/cli/plan4-final-certification.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

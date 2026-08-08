@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_final_certification",
+  "theme": "Plan 4.0 four-plan certification and legacy retirement",
+  "resourceKey": "plan4.final-certification",
+  "maintainers": ["atm-core"],
+  "cases": [
+    {"caseId":"test_task_atm_gov_0317_four_plan_certificate_5b9d2e71","semanticKey":"plan4_four_plan_objective_certificate","command":"node --strip-types tests/cli/plan4-final-certification.test.ts"},
+    {"caseId":"test_task_atm_gov_0317_legacy_retirement_gate_8a4f1c36","semanticKey":"plan4_legacy_authority_retirement_gate","command":"node --strip-types tests/cli/plan4-final-certification.test.ts"}
+  ],
+  "taskIds": ["ATM-GOV-0317"]
+}
