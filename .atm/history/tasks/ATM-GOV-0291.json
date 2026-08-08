@@ -1,0 +1,325 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0291",
+  "title": "dependency graph, forbidden edge, cycle and public-interface bypass gate",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0285"
+  ],
+  "acceptance": [
+    "ACC-1: the module emits a schema-valid, deterministic result with canonical identity and provenance.",
+    "ACC-2: all downstream projections derive from one sealed authority; no silent omission or expansion is allowed.",
+    "ACC-3: unsupported, stale, contradictory, or incomplete inputs fail closed with a repair command.",
+    "ACC-4: focused tests cover success, replay, negative controls, and evidence invalidation.",
+    "ACC-5: deep-module review records cohesion, narrow API, and no duplicate authority."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+    "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+    "tests/cli/plan4-dependency-graph-bypass-gate.test.ts",
+    "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+    "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+    "tests/cli/plan4-dependency-graph-bypass-gate.test.ts",
+    "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-dependency-graph-bypass-gate.test.ts",
+    "node --strip-types tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-remove-generated-receipts",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-evidence",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.dependency-graph-bypass-gate",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+        "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+        "tests/cli/plan4-dependency-graph-bypass-gate.test.ts",
+        "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0291-dependency-graph-forbidden-edge-cycle-and-public-interface-bypass-gate.task.md",
+    "sectionTitle": "ATM-GOV-0291",
+    "headingLine": 85,
+    "hash": "8a05cc74b5390f18",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0291-dependency-graph-forbidden-edge-cycle-and-public-interface-bypass-gate.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:8a05cc74b5390f18dfe65751fb09eba3c3982c29da6de546798d0e475b344229",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T16:06:14.720Z"
+    }
+  },
+  "importedAt": "2026-07-31T16:06:14.720Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0291_core_6e4b2a91",
+      "targetGroupId": "test_group_plan4_dependency-graph-bypass-gate",
+      "semanticKey": "plan4_dependency-graph-bypass-gate",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0291; relation=dependency-gate; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0291_negative_3c7f8d20",
+      "targetGroupId": "test_group_plan4_dependency-graph-bypass-gate",
+      "semanticKey": "plan4_dependency-graph-bypass-gate_negative",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0291; relation=dependency-gate; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0291_core_6e4b2a91",
+    "test_task_atm_gov_0291_negative_3c7f8d20"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T19-59-58-598Z-lock-cleanup-3efe7534fb2d",
+  "lastTransitionAt": "2026-08-08T19:59:58.598Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T19:51:57.866Z",
+  "promotedAt": "2026-08-08T19:51:57.869Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-e82b7210dd19",
+    "claimedAt": "2026-08-08T19:51:57.873Z",
+    "heartbeatAt": "2026-08-08T19:59:58.413Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0291.json",
+      "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+      "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+      "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+      "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808195158-codex-captain-2026-08-09-4542cf3844",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808195158-codex-captain-2026-08-09-4542cf3844\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T19:51:57.873Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-e95fe6af642ea540",
+    "ticketDigest": "sha256:e95fe6af642ea54074367236adf03de2c067021ee0a76582aff8daa198ce5a4f",
+    "taskId": "ATM-GOV-0291",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808195158-codex-captain-2026-08-09-4542cf3844",
+    "claimGeneration": "lease-e82b7210dd19",
+    "issuedAt": "2026-08-08T19:51:57.873Z",
+    "expiresAt": "2026-08-08T20:21:57.873Z",
+    "scopeDigest": "sha256:331641e5b211f2355df1a786e4635cb62bf30e49e9d8e8b64f151cd0f59eba00",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T19:51:57.873Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0291.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0291/**",
+          ".atm/history/tasks/ATM-GOV-0291.json",
+          "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+          "packages/core/src/evidence/index.ts",
+          "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+          "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+          "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+          "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
+        ],
+        "digest": "sha256:d99dac3067de697d4054664e52fd3d4953a15446a10585fee38d6f6be9a0560d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808195157-codex-captain-2026-08-09-ATM-GOV-0291-f421e778b4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0291",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-387a1368095b37c3",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0291.*",
+      ".atm/history/task-events/ATM-GOV-0291/**",
+      ".atm/history/tasks/ATM-GOV-0291.json",
+      "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+      "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+      "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+      "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "268e380d028dd9fbb3d06ae81ba011fa72ebdd484be3b909ea0d93871e4d0489",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808195157-codex-captain-2026-08-09-ATM-GOV-0291-f421e778b4",
+    "laneSession": {
+      "laneSessionId": "lane-20260808195158-codex-captain-2026-08-09-4542cf3844",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808195158-codex-captain-2026-08-09-4542cf3844\""
+    },
+    "createdAt": "2026-08-08T19:52:14.488Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T19:59:58.596Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T19:59:58.413Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808195157-codex-captain-2026-08-09-ATM-GOV-0291-f421e778b4",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0291.closure-packet.json"
+}

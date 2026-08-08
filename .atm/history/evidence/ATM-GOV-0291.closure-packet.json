@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0291",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "79a03601305ee68e7bfae87052148882dee413d2",
+  "governedTreeSha": "9872bbc59efb3837807fd91321491e6fd1210e17",
+  "targetCommitDelta": {
+    "currentCommitSha": "79a03601305ee68e7bfae87052148882dee413d2",
+    "parentCommitShas": [
+      "79a03601305ee68e7bfae87052148882dee413d2"
+    ],
+    "governedTreeSha": "9872bbc59efb3837807fd91321491e6fd1210e17",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0291.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0291.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0291/2026-07-31T16-06-18-010Z-import-7a7ffc016046.json",
+      ".atm/history/task-events/ATM-GOV-0291/2026-08-08T19-51-57-866Z-reserve-2d103c85a601.json",
+      ".atm/history/task-events/ATM-GOV-0291/2026-08-08T19-51-57-869Z-promote-079dbb2c7e16.json",
+      ".atm/history/task-events/ATM-GOV-0291/2026-08-08T19-52-14-489Z-claim-9b40bcb7192f.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0291.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+      "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+      "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+      "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-dependency-graph-bypass-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e31c59805853407a5d81704ba694f26455708cd5b769dd46444e461581f9752",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da6fcb077d934234c23c296b7d88ce1f110481dd030ae3c4fa06817d0ccf5694",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1b88e05bef873a45ff86b57e7dcf284c038671543c2dae7058db2fd29156d01d",
+      "stderrSha256": "sha256:ab31bfe7f38616973db63f80d44e5226db6e59ce5a540fbe12225e8c45dc1a21",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+    "node --strip-types tests/cli/plan4-dependency-graph-bypass-gate.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T19:59:58.403Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0291.*",
+      ".atm/history/task-events/ATM-GOV-0291/**",
+      ".atm/history/tasks/ATM-GOV-0291.json",
+      "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+      "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+      "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+      "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+      "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+      "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+      "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0291.json",
+  "closedAt": "2026-08-08T19:59:58.403Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808195157-codex-captain-2026-08-09-ATM-GOV-0291-f421e778b4",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
