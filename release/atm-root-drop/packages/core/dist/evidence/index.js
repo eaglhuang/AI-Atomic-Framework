@@ -16,3 +16,4 @@ export * from './validator-lifecycle.js';
 export * from './constraint-solver.js';
 export * from './concurrency-schedule-obligations.js';
 export * from './governance-model-adapters.js';
+export * from './fault-fingerprint.js';
