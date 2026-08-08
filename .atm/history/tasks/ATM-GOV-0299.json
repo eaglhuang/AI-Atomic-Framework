@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0299",
+  "title": "concurrency/fuzz/torture/fault generator pack",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0282",
+    "ATM-GOV-0294",
+    "ATM-GOV-0296"
+  ],
+  "acceptance": [
+    "ACC-1: the module emits a schema-valid, deterministic result with canonical identity and provenance.",
+    "ACC-2: all downstream projections derive from one sealed authority; no silent omission or expansion is allowed.",
+    "ACC-3: unsupported, stale, contradictory, or incomplete inputs fail closed with a repair command.",
+    "ACC-4: focused tests cover success, replay, negative controls, and evidence invalidation.",
+    "ACC-5: deep-module review records cohesion, narrow API, and no duplicate authority."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/concurrency-fuzz-generators.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/concurrency-fuzz-generators.schema.json",
+    "tests/catalog/groups/test_group_plan4_concurrency-fuzz-generators.shard.json",
+    "tests/cli/plan4-concurrency-fuzz-generators.test.ts",
+    "tests/cli/plan4-concurrency-fuzz-generators-negative.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/concurrency-fuzz-generators.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/concurrency-fuzz-generators.schema.json",
+    "tests/catalog/groups/test_group_plan4_concurrency-fuzz-generators.shard.json",
+    "tests/cli/plan4-concurrency-fuzz-generators.test.ts",
+    "tests/cli/plan4-concurrency-fuzz-generators-negative.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-concurrency-fuzz-generators.test.ts",
+    "node --strip-types tests/cli/plan4-concurrency-fuzz-generators-negative.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-remove-generated-receipts",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-evidence",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.concurrency-fuzz-generators",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/concurrency-fuzz-generators.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/concurrency-fuzz-generators.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/concurrency-fuzz-generators.schema.json",
+        "tests/catalog/groups/test_group_plan4_concurrency-fuzz-generators.shard.json",
+        "tests/cli/plan4-concurrency-fuzz-generators.test.ts",
+        "tests/cli/plan4-concurrency-fuzz-generators-negative.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0299-concurrency-fuzz-torture-fault-generator-pack.task.md",
+    "sectionTitle": "ATM-GOV-0299",
+    "headingLine": 89,
+    "hash": "72da8f192f8b2a5d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0299-concurrency-fuzz-torture-fault-generator-pack.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:72da8f192f8b2a5d29ca2acf3cfd9404002ccc2e9639ee114b26a593d6a41953",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T16:07:01.751Z"
+    }
+  },
+  "importedAt": "2026-07-31T16:07:01.751Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0299_core_6e4b2a91",
+      "targetGroupId": "test_group_plan4_concurrency-fuzz-generators",
+      "semanticKey": "plan4_concurrency-fuzz-generators",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0299; relation=generator-family; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0299_negative_3c7f8d20",
+      "targetGroupId": "test_group_plan4_concurrency-fuzz-generators",
+      "semanticKey": "plan4_concurrency-fuzz-generators_negative",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "from=ATM-GOV-0299; relation=generator-family; to=ATM-GOV-0316"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0299_core_6e4b2a91",
+    "test_task_atm_gov_0299_negative_3c7f8d20"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-07-31T16-07-02-425Z-import-90d08ea55dc3",
+  "lastTransitionAt": "2026-07-31T16:07:02.425Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
