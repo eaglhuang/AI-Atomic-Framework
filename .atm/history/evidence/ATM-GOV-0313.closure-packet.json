@@ -1,0 +1,225 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0313",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "1810e91ace110ccfb73cb0943fff3f7e842e1333",
+  "governedTreeSha": "aa7ff13b742c6e1ec39ee14e74b61cbd49aaa7ed",
+  "targetCommitDelta": {
+    "currentCommitSha": "1810e91ace110ccfb73cb0943fff3f7e842e1333",
+    "parentCommitShas": [
+      "1810e91ace110ccfb73cb0943fff3f7e842e1333"
+    ],
+    "governedTreeSha": "aa7ff13b742c6e1ec39ee14e74b61cbd49aaa7ed",
+    "changedFiles": [
+      ".atm/history/tasks/ATM-GOV-0293.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/commands/test-catalog.js",
+      "packages/cli/dist/index.d.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/test-catalog.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/test-catalog.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/test-case-catalog.js",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/src/evidence/test-case-catalog.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/schemas/validators/test-case-group.schema.json",
+      "release/atm-root-drop/tests/cli/test-case-catalog-shards.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-catalog-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e4fc574d82dfca2452b63f9d676f256aff1af8d9e649ad2ea51f6743668a4511",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:64bd8dcf5dab4ddbbeee5912eec62d9731f31992a1b02d395366b4fa7191ea8e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e17d8661df79407d04fb0c646616445ca5b7469cc4339ad551f0b18c9a60a088",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d0e13b0568e9ae9db6e9273b2d910ee8362832ae877d79f2538bc404858f3a3a",
+      "stderrSha256": "sha256:150be9f9a4e53a1342edaeae65e0a212bc2161e8cb8cd993aec969e5a20a7a2b",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "node --strip-types tests/cli/plan4-catalog-contract.test.ts",
+    "node --strip-types tests/cli/test-case-catalog-shards.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T17:32:21.610Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0313.*",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0313/**",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-012.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "release/atm-onefile",
+      "release/atm-root-drop",
+      "schemas/validators/test-case-group.schema.json",
+      "tests/catalog/groups/test_group_commit_attribution.shard.json",
+      "tests/catalog/groups/test_group_plan4_catalog_contract.shard.json",
+      "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+      "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+      "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/cli/plan4-catalog-contract.test.ts",
+      "tests/cli/plan4-coverage-semantics.test.ts",
+      "tests/cli/plan4-coverage-universe-compiler.test.ts",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+      "tests/cli/plan4-obligation-inventory.test.ts",
+      "tests/cli/plan4-quality-gauntlet.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts",
+      "tests/cli/test-case-catalog-shards.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/test-case-catalog.ts",
+      "schemas/validators/test-case-group.schema.json",
+      "tests/catalog/groups/test_group_commit_attribution.shard.json",
+      "tests/catalog/groups/test_group_plan4_catalog_contract.shard.json",
+      "tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json",
+      "tests/catalog/groups/test_group_plan4_coverage_universe.shard.json",
+      "tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json",
+      "tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json",
+      "tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json",
+      "tests/catalog/groups/test_group_plan4_validator_selection.shard.json",
+      "tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "tests/cli/plan4-catalog-contract.test.ts",
+      "tests/cli/plan4-coverage-semantics.test.ts",
+      "tests/cli/plan4-coverage-universe-compiler.test.ts",
+      "tests/cli/plan4-mutation-adapter.test.ts",
+      "tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+      "tests/cli/plan4-obligation-inventory.test.ts",
+      "tests/cli/plan4-quality-gauntlet.test.ts",
+      "tests/cli/plan4-validator-catalog-selection.test.ts",
+      "tests/cli/test-case-catalog-shards.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0313.json",
+  "closedAt": "2026-08-08T17:32:21.611Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808172942-codex-captain-2026-08-09-ATM-GOV-0313-0e34192de8",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "4e4f7ff1b58ddc4b1a71d0de97814ceccba2b98f",
+    "taskMatchedFiles": [
+      "packages/cli/dist/commands/test-catalog.js",
+      "packages/cli/dist/index.d.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0313/2026-08-08T17-20-47-273Z-scope-amendment-161289514294.json",
+      ".atm/history/task-events/ATM-GOV-0313/2026-08-08T17-21-12-071Z-claim-f196e4a94fe5.json",
+      ".atm/history/tasks/ATM-GOV-0313.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/test-catalog.js",
+      "release/atm-root-drop/packages/cli/dist/index.d.ts",
+      "release/atm-root-drop/packages/cli/src/commands/test-catalog.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/test-case-catalog.js",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/src/evidence/test-case-catalog.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/schemas/validators/test-case-group.schema.json",
+      "release/atm-root-drop/tests/cli/test-case-catalog-shards.test.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
