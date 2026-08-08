@@ -36,3 +36,5 @@ export * from './concurrency-fuzz-generators.ts';
 export * from './acceptance-spec-mutation.ts';
 export * from './anti-gaming-control.ts';
 export * from './oracle-adjudication.ts';
+export * from './coverage-certificate.ts';
+export * from './quality-vector.ts';

@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T22-28-39-695Z-close-bb49c8874afe",
+  "taskId": "ATM-GOV-0312",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808222350-codex-captain-2026-08-09-ATM-GOV-0312-3ba3ae2c2a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0312.json",
+  "taskSha256": "sha256:8e562d4e10239cd0bb179fa0587ca337763050953953da450572486705414f0a",
+  "createdAt": "2026-08-08T22:28:39.695Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0312 --actor codex-captain-2026-08-09 --status done --from-batch-checkpoint --batch batch-e641205eb5c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e641205eb5c4",
+    "sessionId": "session-20260808222350-codex-captain-2026-08-09-ATM-GOV-0312-3ba3ae2c2a",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0312.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-coverage-certificate.test.ts",
+      "node --strip-types tests/cli/plan4-quality-vector.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T22:28:39.685Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0312.*",
+        ".atm/history/task-events/ATM-GOV-0312/**",
+        ".atm/history/tasks/ATM-GOV-0312.json",
+        "packages/core/src/evidence/coverage-certificate.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/quality-vector.ts",
+        "schemas/evidence/quality-certificate.schema.json",
+        "tests/catalog/groups/test_group_plan4_quality_certificate.shard.json",
+        "tests/cli/plan4-coverage-certificate.test.ts",
+        "tests/cli/plan4-quality-vector.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/coverage-certificate.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/quality-vector.ts",
+        "schemas/evidence/quality-certificate.schema.json",
+        "tests/catalog/groups/test_group_plan4_quality_certificate.shard.json",
+        "tests/cli/plan4-coverage-certificate.test.ts",
+        "tests/cli/plan4-quality-vector.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
