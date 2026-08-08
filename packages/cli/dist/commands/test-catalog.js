@@ -7,7 +7,7 @@ import { normalizeValidatorResponsibility } from '../../../core/dist/evidence/te
 // packages/core/src/evidence/test-case-catalog.ts. This module keeps the
 // catalog-reading and profile/tier selection surface and re-exports the
 // extracted contract types and helpers for backward compatibility.
-export { buildTestCaseId, generateReadOnlyTestCaseCatalog, loadTestCaseGroupShards, normalizeSemanticKey, normalizeValidatorResponsibility, resolveCaseGroupShardsRoot, validateTestCaseGroupShards, VALIDATOR_RESPONSIBILITIES } from '../../../core/dist/evidence/test-case-catalog.js';
+export { buildTestCaseId, generateReadOnlyTestCaseCatalog, loadAllShardCaseIds, loadLegacyCaseAliases, loadTestCaseGroupShards, normalizeSemanticKey, normalizeValidatorResponsibility, readRawShardFiles, reportShardReachability, resolveCaseGroupShardsRoot, resolveLegacyCaseId, validateLegacyCaseAliases, validateTestCaseGroupShards, VALIDATOR_RESPONSIBILITIES } from '../../../core/dist/evidence/test-case-catalog.js';
 const tierRank = {
     quick: 1,
     standard: 2,

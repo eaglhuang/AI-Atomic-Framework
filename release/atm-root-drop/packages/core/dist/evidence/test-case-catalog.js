@@ -40,19 +40,107 @@ export function resolveCaseGroupShardsRoot(repositoryRoot) {
         : null;
     return path.join(repositoryRoot, configured || 'tests/catalog/groups');
 }
-export function loadTestCaseGroupShards(repositoryRoot, groupsRoot) {
+export function readRawShardFiles(repositoryRoot, groupsRoot) {
     const root = groupsRoot ? path.resolve(groupsRoot) : resolveCaseGroupShardsRoot(repositoryRoot);
     if (!existsSync(root))
         return [];
     return readdirSync(root, { withFileTypes: true })
         .filter((entry) => entry.isFile() && entry.name.endsWith('.shard.json'))
         .map((entry) => {
-        const sourcePath = path.join(root, entry.name);
-        const raw = JSON.parse(readFileSync(sourcePath, 'utf8'));
-        return normalizeGroupShard(raw, toPortablePath(sourcePath));
+        const sourcePath = toPortablePath(path.join(root, entry.name));
+        return {
+            raw: JSON.parse(readFileSync(sourcePath, 'utf8')),
+            sourcePath
+        };
     })
+        .sort((left, right) => left.sourcePath.localeCompare(right.sourcePath));
+}
+export function loadTestCaseGroupShards(repositoryRoot, groupsRoot) {
+    return readRawShardFiles(repositoryRoot, groupsRoot)
+        .map(({ raw, sourcePath }) => normalizeGroupShard(raw, sourcePath))
         .filter((shard) => Boolean(shard))
         .sort((left, right) => left.groupId.localeCompare(right.groupId));
+}
+export function loadLegacyCaseAliases(repositoryRoot, groupsRoot) {
+    return readRawShardFiles(repositoryRoot, groupsRoot).flatMap(({ raw, sourcePath }) => {
+        const groupId = String(raw.groupId ?? '').trim();
+        const entries = Array.isArray(raw.legacyAliases) ? raw.legacyAliases : [];
+        return entries.flatMap((entry) => {
+            if (!isRecord(entry))
+                return [];
+            const legacyCaseId = String(entry.legacyCaseId ?? '').trim();
+            const canonicalCaseId = String(entry.canonicalCaseId ?? '').trim();
+            if (!legacyCaseId || !canonicalCaseId)
+                return [];
+            return [{ legacyCaseId, canonicalCaseId, groupId, sourcePath }];
+        });
+    });
+}
+export function loadAllShardCaseIds(repositoryRoot, groupsRoot) {
+    return readRawShardFiles(repositoryRoot, groupsRoot)
+        .flatMap(({ raw }) => declaredCaseIds(raw).fromCases);
+}
+export function resolveLegacyCaseId(legacyCaseId, aliases) {
+    const needle = String(legacyCaseId ?? '').trim();
+    if (!needle)
+        return null;
+    return aliases.find((alias) => alias.legacyCaseId === needle)?.canonicalCaseId ?? null;
+}
+export function validateLegacyCaseAliases(aliases, knownCaseIds) {
+    const known = new Set(knownCaseIds);
+    return aliases
+        .filter((alias) => !known.has(alias.canonicalCaseId))
+        .map((alias) => ({
+        code: 'ATM_TEST_CASE_UNRESOLVED_LEGACY_ALIAS',
+        severity: 'error',
+        groupId: alias.groupId,
+        caseId: alias.legacyCaseId,
+        message: `Legacy alias ${alias.legacyCaseId} points to unresolved canonical case ${alias.canonicalCaseId}.`
+    }));
+}
+export function reportShardReachability(repositoryRoot, groupsRoot) {
+    return readRawShardFiles(repositoryRoot, groupsRoot)
+        .map(({ raw, sourcePath }) => {
+        const declared = declaredCaseIds(raw);
+        const caseIds = [...new Set([...declared.fromCases, ...declared.fromCaseIds])].sort();
+        const fileName = sourcePath.slice(sourcePath.lastIndexOf('/') + 1);
+        let reachable = false;
+        try {
+            reachable = normalizeGroupShard(raw, sourcePath) !== null;
+        }
+        catch {
+            reachable = false;
+        }
+        return {
+            sourcePath,
+            fileName,
+            groupId: String(raw.groupId ?? '').trim() || fileName.replace(/\.shard\.json$/, ''),
+            schemaId: String(raw.schemaId ?? '').trim(),
+            reachable,
+            caseIds,
+            caseIdShape: declared.fromCases.length && declared.fromCaseIds.length
+                ? 'mixed'
+                : declared.fromCases.length
+                    ? 'cases'
+                    : declared.fromCaseIds.length
+                        ? 'caseIds'
+                        : 'none'
+        };
+    })
+        .sort((left, right) => left.groupId.localeCompare(right.groupId));
+}
+function declaredCaseIds(raw) {
+    const fromCases = (Array.isArray(raw.cases) ? raw.cases : []).flatMap((entry) => {
+        if (!isRecord(entry))
+            return [];
+        const caseId = String(entry.caseId ?? '').trim();
+        return caseId ? [caseId] : [];
+    });
+    const fromCaseIds = (Array.isArray(raw.caseIds) ? raw.caseIds : []).flatMap((entry) => {
+        const caseId = typeof entry === 'string' || typeof entry === 'number' ? String(entry).trim() : '';
+        return caseId ? [caseId] : [];
+    });
+    return { fromCases, fromCaseIds };
 }
 export function validateTestCaseGroupShards(shards) {
     const diagnostics = [];
