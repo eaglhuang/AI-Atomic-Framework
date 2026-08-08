@@ -1,0 +1,157 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0297",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "bdc02704ad20b4f92746fff06a80a10a392a18d6",
+  "governedTreeSha": "d19954c8de6f04009987d17b30441996d1ffad84",
+  "targetCommitDelta": {
+    "currentCommitSha": "bdc02704ad20b4f92746fff06a80a10a392a18d6",
+    "parentCommitShas": [
+      "bdc02704ad20b4f92746fff06a80a10a392a18d6"
+    ],
+    "governedTreeSha": "d19954c8de6f04009987d17b30441996d1ffad84",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0297.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0297.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0297/2026-07-31T16-06-42-385Z-import-8f0164e96d41.json",
+      ".atm/history/task-events/ATM-GOV-0297/2026-08-08T21-18-23-662Z-reserve-b11ea2193a62.json",
+      ".atm/history/task-events/ATM-GOV-0297/2026-08-08T21-18-23-665Z-promote-bf4a24aeb575.json",
+      ".atm/history/task-events/ATM-GOV-0297/2026-08-08T21-18-40-438Z-claim-8e7ca19ed16d.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0297.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/core/src/evidence/example-branch-generators.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/example-branch-generators.schema.json",
+      "tests/catalog/groups/test_group_plan4_example-branch-generators.shard.json",
+      "tests/cli/plan4-example-branch-generators-negative.test.ts",
+      "tests/cli/plan4-example-branch-generators.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-example-branch-generators.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:431515a5b805fff98b0fc8f92ac356a9e8901c94b018162058de1c4c29d71b57",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-example-branch-generators-negative.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4821000e1005e760d2bbc6572fd7539b322a3b6cde4130bf2b0b694112d35c4c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2d15575060301cff8bea5103ec143d38400c3edc9a7d83b9cbcc1f019c448070",
+      "stderrSha256": "sha256:653209bf1ee9edc1d5858e89a3158d2ff34ac404e47e437b3d8f10c51b352c8a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/deep-module-refactor-provider.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:d9e60ff17ccae605406cfea1068dd7a17694a6944871d369c7e21238a2dd4059",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-example-branch-generators-negative.test.ts",
+    "node --strip-types tests/cli/plan4-example-branch-generators.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T21:25:18.757Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0297.*",
+      ".atm/history/task-events/ATM-GOV-0297/**",
+      ".atm/history/tasks/ATM-GOV-0297.json",
+      "packages/core/src/evidence/example-branch-generators.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/example-branch-generators.schema.json",
+      "tests/catalog/groups/test_group_plan4_example-branch-generators.shard.json",
+      "tests/cli/plan4-example-branch-generators-negative.test.ts",
+      "tests/cli/plan4-example-branch-generators.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/evidence/example-branch-generators.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/example-branch-generators.schema.json",
+      "tests/catalog/groups/test_group_plan4_example-branch-generators.shard.json",
+      "tests/cli/plan4-example-branch-generators-negative.test.ts",
+      "tests/cli/plan4-example-branch-generators.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0297.json",
+  "closedAt": "2026-08-08T21:25:18.757Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808211823-codex-captain-2026-08-09-ATM-GOV-0297-dedd942da9",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
