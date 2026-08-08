@@ -13,3 +13,4 @@ export * from './tdd-cycle.js';
 export * from './validation-receipt.js';
 export * from './validator-catalog-selection.js';
 export * from './validator-lifecycle.js';
+export * from './constraint-solver.js';

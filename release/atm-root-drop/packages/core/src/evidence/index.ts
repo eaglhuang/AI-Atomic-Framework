@@ -13,3 +13,4 @@ export * from './tdd-cycle.ts';
 export * from './validation-receipt.ts';
 export * from './validator-catalog-selection.ts';
 export * from './validator-lifecycle.ts';
+export * from './constraint-solver.ts';
