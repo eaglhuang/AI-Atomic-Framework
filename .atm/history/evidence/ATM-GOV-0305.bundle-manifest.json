@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0305",
+  "updatedAt": "2026-08-08T20:25:49.704Z",
+  "updatedBy": "codex-captain-2026-08-09",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/plan4-regression-family-recurrence.test.ts",
+    "node --strip-types tests/cli/plan4-regression-family-selector.test.ts",
+    "node --strip-types tests/cli/plan4-regression-family-store.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-regression-family-store.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:76aabd07a86db71a76a5786c882957cb314af5a16f1cf2830f0b53bf6f1cc8c9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan4-regression-family-store.test.ts"
+      ],
+      "generatedAt": "2026-08-08T20:20:49.436Z",
+      "startedAt": "2026-08-08T20:20:48.785Z",
+      "finishedAt": "2026-08-08T20:20:49.436Z",
+      "durationMs": 651,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-regression-family-selector.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5c8794ed793801fc0549d6d177560a490cae6c7ac22e0a65d583ee886cd1714d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan4-regression-family-selector.test.ts"
+      ],
+      "generatedAt": "2026-08-08T20:20:54.651Z",
+      "startedAt": "2026-08-08T20:20:53.977Z",
+      "finishedAt": "2026-08-08T20:20:54.651Z",
+      "durationMs": 674,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-regression-family-recurrence.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2d8d9dd4ccbbb3f5440a37996096e4a71da0c4dcbc3baba2d7cb2be199b507e2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan4-regression-family-recurrence.test.ts"
+      ],
+      "generatedAt": "2026-08-08T20:21:00.019Z",
+      "startedAt": "2026-08-08T20:20:58.957Z",
+      "finishedAt": "2026-08-08T20:21:00.019Z",
+      "durationMs": 1062,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-08T20:21:15.058Z",
+      "startedAt": "2026-08-08T20:21:04.259Z",
+      "finishedAt": "2026-08-08T20:21:15.058Z",
+      "durationMs": 10799,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e7a59d78b6f4896dd376890f34d9eb5e0084742e780f1a40e09496e8f3c53a04",
+      "stderrSha256": "sha256:a364403cbf3b37b066b7158b5cb0079cd7f6e21503210a2e7971b842c6b00b53",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-08T20:22:01.813Z",
+      "startedAt": "2026-08-08T20:21:19.277Z",
+      "finishedAt": "2026-08-08T20:22:01.813Z",
+      "durationMs": 42536,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-08T20:25:49.703Z",
+      "startedAt": "2026-08-08T20:24:02.463Z",
+      "finishedAt": "2026-08-08T20:25:49.703Z",
+      "durationMs": 107240,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

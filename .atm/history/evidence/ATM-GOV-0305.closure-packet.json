@@ -1,0 +1,166 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0305",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f",
+  "governedTreeSha": "4fd57f193679cb98a5f8ffb6286a4b6de1614be4",
+  "targetCommitDelta": {
+    "currentCommitSha": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f",
+    "parentCommitShas": [
+      "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f"
+    ],
+    "governedTreeSha": "4fd57f193679cb98a5f8ffb6286a4b6de1614be4",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0305.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0305.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0305/2026-08-08T20-16-50-622Z-reserve-9756e895aaa2.json",
+      ".atm/history/task-events/ATM-GOV-0305/2026-08-08T20-16-50-626Z-promote-b6af18c76fe1.json",
+      ".atm/history/task-events/ATM-GOV-0305/2026-08-08T20-17-04-839Z-claim-90ba915c8a19.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0305.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/regression-family.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/causal-regression-family.schema.json",
+      "tests/catalog/groups/test_group_plan4_regression_family.shard.json",
+      "tests/cli/plan4-regression-family-recurrence.test.ts",
+      "tests/cli/plan4-regression-family-selector.test.ts",
+      "tests/cli/plan4-regression-family-store.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-regression-family-store.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:76aabd07a86db71a76a5786c882957cb314af5a16f1cf2830f0b53bf6f1cc8c9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-regression-family-selector.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5c8794ed793801fc0549d6d177560a490cae6c7ac22e0a65d583ee886cd1714d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-regression-family-recurrence.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2d8d9dd4ccbbb3f5440a37996096e4a71da0c4dcbc3baba2d7cb2be199b507e2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e7a59d78b6f4896dd376890f34d9eb5e0084742e780f1a40e09496e8f3c53a04",
+      "stderrSha256": "sha256:a364403cbf3b37b066b7158b5cb0079cd7f6e21503210a2e7971b842c6b00b53",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-regression-family-recurrence.test.ts",
+    "node --strip-types tests/cli/plan4-regression-family-selector.test.ts",
+    "node --strip-types tests/cli/plan4-regression-family-store.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T20:26:02.640Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0305.*",
+      ".atm/history/task-events/ATM-GOV-0305/**",
+      ".atm/history/tasks/ATM-GOV-0305.json",
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/regression-family.ts",
+      "schemas/evidence/causal-regression-family.schema.json",
+      "scripts/lib/test-catalog.ts",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/test_group_plan4_regression_family.shard.json",
+      "tests/cli/plan4-regression-family-recurrence.test.ts",
+      "tests/cli/plan4-regression-family-selector.test.ts",
+      "tests/cli/plan4-regression-family-store.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/test-catalog.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/regression-family.ts",
+      "schemas/evidence/causal-regression-family.schema.json",
+      "scripts/lib/test-catalog.ts",
+      "scripts/test-catalog.config.json",
+      "tests/catalog/groups/test_group_plan4_regression_family.shard.json",
+      "tests/cli/plan4-regression-family-recurrence.test.ts",
+      "tests/cli/plan4-regression-family-selector.test.ts",
+      "tests/cli/plan4-regression-family-store.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0305.json",
+  "closedAt": "2026-08-08T20:26:02.641Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808201650-codex-captain-2026-08-09-ATM-GOV-0305-cb6d91d0ce",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
