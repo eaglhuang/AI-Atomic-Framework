@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0298",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8426c033ec4d13e340568da5d0d6eab5f010cb6d",
+  "governedTreeSha": "2cb50959e302e0ea8172e30de67599e99be285d2",
+  "targetCommitDelta": {
+    "currentCommitSha": "8426c033ec4d13e340568da5d0d6eab5f010cb6d",
+    "parentCommitShas": [
+      "8426c033ec4d13e340568da5d0d6eab5f010cb6d"
+    ],
+    "governedTreeSha": "2cb50959e302e0ea8172e30de67599e99be285d2",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0298.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0298.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0298/2026-07-31T16-06-52-511Z-import-dc135c1d4d55.json",
+      ".atm/history/task-events/ATM-GOV-0298/2026-08-08T21-27-51-486Z-reserve-2751aa694f06.json",
+      ".atm/history/task-events/ATM-GOV-0298/2026-08-08T21-27-51-489Z-promote-7d138fc383ac.json",
+      ".atm/history/task-events/ATM-GOV-0298/2026-08-08T21-28-05-233Z-claim-7e918e9a2be4.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0298.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/property-metamorphic-generators.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/property-metamorphic-generators.schema.json",
+      "tests/catalog/groups/test_group_plan4_property-metamorphic-generators.shard.json",
+      "tests/cli/plan4-property-metamorphic-generators-negative.test.ts",
+      "tests/cli/plan4-property-metamorphic-generators.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-property-metamorphic-generators.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:21bf6409fb4b30fc91a79d673ff93167253cf10ff98e98250f8866491266afad",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-property-metamorphic-generators-negative.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0a0e84190403a7483823f1fd652e929e39ce27aa584eb121f1b2d5560198bc4c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:139557ec24c24c19030794134ad913ada3a500b23d7cb3ab0ffe832bae6f3285",
+      "stderrSha256": "sha256:43dcff1333a866cada2a9ba17091b8caf73009710c76f69578288f21ee8920b0",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-property-metamorphic-generators-negative.test.ts",
+    "node --strip-types tests/cli/plan4-property-metamorphic-generators.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T21:33:23.199Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0298.*",
+      ".atm/history/task-events/ATM-GOV-0298/**",
+      ".atm/history/tasks/ATM-GOV-0298.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/property-metamorphic-generators.ts",
+      "schemas/evidence/property-metamorphic-generators.schema.json",
+      "tests/catalog/groups/test_group_plan4_property-metamorphic-generators.shard.json",
+      "tests/cli/plan4-property-metamorphic-generators-negative.test.ts",
+      "tests/cli/plan4-property-metamorphic-generators.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/property-metamorphic-generators.ts",
+      "schemas/evidence/property-metamorphic-generators.schema.json",
+      "tests/catalog/groups/test_group_plan4_property-metamorphic-generators.shard.json",
+      "tests/cli/plan4-property-metamorphic-generators-negative.test.ts",
+      "tests/cli/plan4-property-metamorphic-generators.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0298.json",
+  "closedAt": "2026-08-08T21:33:23.199Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808212751-codex-captain-2026-08-09-ATM-GOV-0298-6b44e98ae7",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

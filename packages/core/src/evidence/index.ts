@@ -31,3 +31,4 @@ export * from './dependency-graph-bypass-gate.ts';
 export * from './gap-planning.ts';
 export * from './sandboxed-test-patch.ts';
 export * from './example-branch-generators.ts';
+export * from './property-metamorphic-generators.ts';
