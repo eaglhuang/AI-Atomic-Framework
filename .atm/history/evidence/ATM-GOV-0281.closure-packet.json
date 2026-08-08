@@ -1,0 +1,171 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0281",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e83ff30df6fa81c12ce35f8dc8ea9c6bdbb2e5b8",
+  "governedTreeSha": "1c9cc73013391e6d35ff2279430bbd9e381e6f81",
+  "targetCommitDelta": {
+    "currentCommitSha": "e83ff30df6fa81c12ce35f8dc8ea9c6bdbb2e5b8",
+    "parentCommitShas": [
+      "e83ff30df6fa81c12ce35f8dc8ea9c6bdbb2e5b8"
+    ],
+    "governedTreeSha": "1c9cc73013391e6d35ff2279430bbd9e381e6f81",
+    "changedFiles": [
+      ".atm/history/tasks/ATM-GOV-0293.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/core/src/evidence/constraint-solver.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/dist/index.d.ts",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/constraint-solver.schema.json",
+      "tests/catalog/groups/test_group_plan4_constraint-solver.shard.json",
+      "tests/cli/plan4-constraint-solver-negative.test.ts",
+      "tests/cli/plan4-constraint-solver.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-constraint-solver-negative.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:696c2edc6f16149ee7d6b6275ef29b79e538dd8358e9ef355256f61b56586f2a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-constraint-solver.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8590d382f848b996ea6cd62af3eb99b9d73688232aa368f527b3b068318bde8d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a2e31458d17df80919780f26beb752f8e398d27b11023c6de7c9b7ea4129b074",
+      "stderrSha256": "sha256:c16f6bc971d2146831dbca809a540233d1dc4e0c1e5f6e1e729059d247e7a179",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-constraint-solver-negative.test.ts",
+    "node --strip-types tests/cli/plan4-constraint-solver.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T17:53:39.229Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0281.*",
+      ".atm/history/evidence/ATM-GOV-0281.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0281/**",
+      ".atm/history/tasks/ATM-GOV-0281.json",
+      "packages/cli/dist",
+      "packages/core/src/evidence/constraint-solver.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile",
+      "release/atm-root-drop",
+      "schemas/evidence/constraint-solver.schema.json",
+      "tests/catalog/groups/test_group_plan4_constraint-solver.shard.json",
+      "tests/cli/plan4-constraint-solver-negative.test.ts",
+      "tests/cli/plan4-constraint-solver.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/core/src/evidence/constraint-solver.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/constraint-solver.schema.json",
+      "tests/catalog/groups/test_group_plan4_constraint-solver.shard.json",
+      "tests/cli/plan4-constraint-solver-negative.test.ts",
+      "tests/cli/plan4-constraint-solver.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0281.json",
+  "closedAt": "2026-08-08T17:53:39.230Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808173829-codex-captain-2026-08-09-ATM-GOV-0281-13e65007b9",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "34aa7ffbace8917e61d0fa986f0e4863fe5b17ec",
+    "taskMatchedFiles": [
+      "packages/core/src/evidence/constraint-solver.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/constraint-solver.schema.json",
+      "tests/catalog/groups/test_group_plan4_constraint-solver.shard.json",
+      "tests/cli/plan4-constraint-solver-negative.test.ts",
+      "tests/cli/plan4-constraint-solver.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0281.json",
+      ".atm/history/task-events/ATM-GOV-0281/2026-07-31T16-05-16-363Z-import-808141e82729.json",
+      ".atm/history/task-events/ATM-GOV-0281/2026-08-08T17-38-29-749Z-reserve-f3d3af75cd44.json",
+      ".atm/history/task-events/ATM-GOV-0281/2026-08-08T17-38-29-751Z-promote-127c3ae157bd.json",
+      ".atm/history/task-events/ATM-GOV-0281/2026-08-08T17-38-37-486Z-claim-19758cbf8446.json",
+      ".atm/history/task-events/ATM-GOV-0281/2026-08-08T17-47-32-746Z-scope-amendment-5f63e4979fc3.json",
+      ".atm/history/tasks/ATM-GOV-0281.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
