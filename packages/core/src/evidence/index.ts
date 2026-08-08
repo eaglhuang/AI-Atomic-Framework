@@ -35,3 +35,4 @@ export * from './property-metamorphic-generators.ts';
 export * from './concurrency-fuzz-generators.ts';
 export * from './acceptance-spec-mutation.ts';
 export * from './anti-gaming-control.ts';
+export * from './oracle-adjudication.ts';
