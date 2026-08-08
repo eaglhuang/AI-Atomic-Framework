@@ -117,3 +117,5 @@ of treating it as a warning.
 - Stay inside ATM CLI routing and evidence contracts.
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
+
+Plan 4 evidence projections must preserve the sealed test-case selection, independent-oracle role separation, and explicit omitted-case reasons across every adapter; unknown mappings fail closed with an executable repair route.
