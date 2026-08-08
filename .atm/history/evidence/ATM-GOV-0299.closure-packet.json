@@ -1,0 +1,140 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0299",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a915a840389e12ca931e00b9218356e1c9112a1b",
+  "governedTreeSha": "e43d9662086950b57fee6a7e28946ce3a78fc1e4",
+  "targetCommitDelta": {
+    "currentCommitSha": "a915a840389e12ca931e00b9218356e1c9112a1b",
+    "parentCommitShas": [
+      "a915a840389e12ca931e00b9218356e1c9112a1b"
+    ],
+    "governedTreeSha": "e43d9662086950b57fee6a7e28946ce3a78fc1e4",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0299/2026-08-08T21-44-27-629Z-reserve-01fc6804ec77.json",
+      ".atm/history/task-events/ATM-GOV-0299/2026-08-08T21-44-27-632Z-promote-8fdcb08dfcd2.json",
+      ".atm/history/task-events/ATM-GOV-0299/2026-08-08T21-44-35-633Z-claim-594d7cc28d5c.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0299.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/core/src/evidence/concurrency-fuzz-generators.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-concurrency-fuzz-generators.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fa7b51507fb92a66d561b1f15e0e3f5639a521184d4ab0704d63e30678c2653c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-concurrency-fuzz-generators-negative.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccae87bc7394556e45c852317da5171ba33c168dd48444723ed38335195cfcf0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:139557ec24c24c19030794134ad913ada3a500b23d7cb3ab0ffe832bae6f3285",
+      "stderrSha256": "sha256:161000c27076384d109f094a194a10ca3553fa6d677d72dd49e7f909747e1c46",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-concurrency-fuzz-generators-negative.test.ts",
+    "node --strip-types tests/cli/plan4-concurrency-fuzz-generators.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T21:48:06.071Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0299.*",
+      ".atm/history/task-events/ATM-GOV-0299/**",
+      ".atm/history/tasks/ATM-GOV-0299.json",
+      "packages/core/src/evidence/concurrency-fuzz-generators.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/concurrency-fuzz-generators.schema.json",
+      "tests/catalog/groups/test_group_plan4_concurrency-fuzz-generators.shard.json",
+      "tests/cli/plan4-concurrency-fuzz-generators-negative.test.ts",
+      "tests/cli/plan4-concurrency-fuzz-generators.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/evidence/concurrency-fuzz-generators.ts",
+      "packages/core/src/evidence/index.ts",
+      "schemas/evidence/concurrency-fuzz-generators.schema.json",
+      "tests/catalog/groups/test_group_plan4_concurrency-fuzz-generators.shard.json",
+      "tests/cli/plan4-concurrency-fuzz-generators-negative.test.ts",
+      "tests/cli/plan4-concurrency-fuzz-generators.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0299.json",
+  "closedAt": "2026-08-08T21:48:06.071Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808214427-codex-captain-2026-08-09-ATM-GOV-0299-f27a64c2f8",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
