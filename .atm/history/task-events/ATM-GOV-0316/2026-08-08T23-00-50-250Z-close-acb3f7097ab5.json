@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-08T23-00-50-250Z-close-acb3f7097ab5",
+  "taskId": "ATM-GOV-0316",
+  "action": "close",
+  "actorId": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0316.json",
+  "taskSha256": "sha256:5a86753211ed24796f34260dfeb7e5e8a1bd47c370d3cf20c46148ef30bd3082",
+  "createdAt": "2026-08-08T23:00:50.250Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0316 --actor codex-captain-2026-08-09 --status done --from-batch-checkpoint --batch batch-e641205eb5c4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e641205eb5c4",
+    "sessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0316.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-08T23:00:50.237Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0316.*",
+        ".atm/history/task-events/ATM-GOV-0316/**",
+        ".atm/history/tasks/ATM-GOV-0316.json",
+        "packages/cli/src",
+        "packages/core/src",
+        "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+        "tests/cli/plan4-hostile-dual-captain.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src",
+        "packages/core/src",
+        "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+        "tests/cli/plan4-hostile-dual-captain.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

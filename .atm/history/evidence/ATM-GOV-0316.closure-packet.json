@@ -1,0 +1,140 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0316",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8e37076d2b0e185422e26399615243b55fdb57ff",
+  "governedTreeSha": "33aff9b4eafa984aef91db7e20925217ec936fe0",
+  "targetCommitDelta": {
+    "currentCommitSha": "8e37076d2b0e185422e26399615243b55fdb57ff",
+    "parentCommitShas": [
+      "8e37076d2b0e185422e26399615243b55fdb57ff"
+    ],
+    "governedTreeSha": "33aff9b4eafa984aef91db7e20925217ec936fe0",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0316.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0316.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0316/2026-07-31T15-06-19-245Z-import-1fc7210b425c.json",
+      ".atm/history/task-events/ATM-GOV-0316/2026-07-31T15-10-42-878Z-import-d713f4af6fdf.json",
+      ".atm/history/task-events/ATM-GOV-0316/2026-07-31T15-19-46-943Z-import-b32f815196dd.json",
+      ".atm/history/task-events/ATM-GOV-0316/2026-08-08T22-56-47-220Z-reserve-94e211e91456.json",
+      ".atm/history/task-events/ATM-GOV-0316/2026-08-08T22-56-47-223Z-promote-1bb398d5a270.json",
+      ".atm/history/task-events/ATM-GOV-0316/2026-08-08T22-56-50-316Z-claim-630766722cd7.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0307.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      ".atm/history/tasks/ATM-GOV-0316.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/core/src/evidence/hostile-dogfood.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-evidence.skill.md",
+      "schemas/evidence/adapter-parity.schema.json",
+      "schemas/evidence/hostile-dogfood.schema.json",
+      "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+      "tests/cli/plan4-hostile-dual-captain.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ad7e41f462b5f3ea3e491a8c2b918a1a598f335880b51be5608dc29f5eea3325",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ec28dbdd63dac80be7dbcfab374dbbeab64865b131f3a777ceba90d42fe096a",
+      "stderrSha256": "sha256:395fbc51969403fa9410731739d83a954ed6d4f25980cd103d471c35e15d8ef2",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T23:00:50.237Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0316.*",
+      ".atm/history/task-events/ATM-GOV-0316/**",
+      ".atm/history/tasks/ATM-GOV-0316.json",
+      "packages/cli/src",
+      "packages/core/src",
+      "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+      "tests/cli/plan4-hostile-dual-captain.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src",
+      "packages/core/src",
+      "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+      "tests/cli/plan4-hostile-dual-captain.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0316.json",
+  "closedAt": "2026-08-08T23:00:50.237Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

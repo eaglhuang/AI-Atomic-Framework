@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_hostile_dogfood",
+  "theme": "Plan 4.0 hostile dual-captain dogfood and phase exit",
+  "resourceKey": "plan4.hostile-dogfood",
+  "maintainers": ["atm-core"],
+  "cases": [
+    {"caseId":"test_task_atm_gov_0316_hostile_parallel_6f3a8b20","semanticKey":"plan4_hostile_dual_captain_parallel","command":"node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts"},
+    {"caseId":"test_task_atm_gov_0316_phase_exit_saturation_1c7e5a94","semanticKey":"plan4_recurrence_saturation_phase_exit","command":"node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts"}
+  ],
+  "taskIds": ["ATM-GOV-0316"]
+}

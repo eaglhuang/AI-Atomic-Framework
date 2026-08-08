@@ -1,0 +1,308 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0316",
+  "title": "Plan 4.0 hostile dual-captain dogfood and phase-exit saturation",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0315"
+  ],
+  "acceptance": [
+    "Real two-lane dogfood covers every listed hostile condition.",
+    "Each known incident family has recurrence, saturation, and rollback evidence.",
+    "No success path uses override lease or hides unknown outcomes.",
+    "Fresh sealed phase-exit receipt proves canonical worktree integrity."
+  ],
+  "deliverables": [
+    "packages/core/src",
+    "packages/cli/src",
+    "tests/cli/plan4-hostile-dual-captain.test.ts",
+    "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json"
+  ],
+  "scopePaths": [
+    "packages/core/src",
+    "packages/cli/src",
+    "tests/cli/plan4-hostile-dual-captain.test.ts",
+    "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "halt-phase-exit-and-requeue-unpublished-lane",
+  "rollbackNotes": "Preserve both lane receipts; do not use override lease or force ref update to recover a failed race.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0316-plan-4-0-hostile-dual-captain-dogfood-and-phase-exit-saturation.task.md",
+    "sectionTitle": "ATM-GOV-0316",
+    "headingLine": 68,
+    "hash": "7389862e05cd20ff",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0316-plan-4-0-hostile-dual-captain-dogfood-and-phase-exit-saturation.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:7389862e05cd20ff4d9e06fe88f761ae35e1393b01e950e3ed60c8b4c6a275c5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T15:19:45.315Z"
+    }
+  },
+  "importedAt": "2026-07-31T15:19:45.315Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0315"
+    ],
+    "startConditions": [
+      "0315 adapter parity and frozen smoke are fresh and green"
+    ],
+    "softRelations": [
+      "governance-optimization/parallel-governance-charter.md"
+    ],
+    "changedPublicSeams": [
+      "atm.hostileDogfoodReceipt.v1"
+    ],
+    "causalImpactEdges": [
+      "shared-index/CAS/queue race -> fail-closed recovery evidence"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0315 adapter parity"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts"
+    ],
+    "phaseOwner": "Plan4-hostile-dogfood"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0316_hostile_parallel_6f3a8b20",
+      "targetGroupId": "test_group_plan4_hostile_dogfood",
+      "semanticKey": "plan4_hostile_dual_captain_parallel",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "shared-index/CAS/queue race -> fail-closed recovery evidence"
+      ],
+      "expectedRedPredicate": "parallel race absorbs foreign content or loses a lane's commit",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0316_phase_exit_saturation_1c7e5a94",
+      "targetGroupId": "test_group_plan4_hostile_dogfood",
+      "semanticKey": "plan4_recurrence_saturation_phase_exit",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "shared-index/CAS/queue race -> fail-closed recovery evidence"
+      ],
+      "expectedRedPredicate": "unknown or override-based success is accepted at phase exit",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0316_hostile_parallel_6f3a8b20",
+    "test_task_atm_gov_0316_phase_exit_saturation_1c7e5a94"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T23-00-50-444Z-lock-cleanup-7266006a0f2e",
+  "lastTransitionAt": "2026-08-08T23:00:50.444Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T22:56:47.220Z",
+  "promotedAt": "2026-08-08T22:56:47.223Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-d6db0d7739d8",
+    "claimedAt": "2026-08-08T22:56:47.226Z",
+    "heartbeatAt": "2026-08-08T23:00:50.247Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0316.json",
+      "packages/cli/src",
+      "packages/core/src",
+      "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+      "tests/cli/plan4-hostile-dual-captain.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T22:56:47.226Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-25c662371b5299bf",
+    "ticketDigest": "sha256:25c662371b5299bf32c084df04108710e3d725df4296c71a788d8ae384cc8aee",
+    "taskId": "ATM-GOV-0316",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf",
+    "claimGeneration": "lease-d6db0d7739d8",
+    "issuedAt": "2026-08-08T22:56:47.226Z",
+    "expiresAt": "2026-08-08T23:26:47.226Z",
+    "scopeDigest": "sha256:4c457166e33deb7cfc273d97e219c41f03f15b1e330dff363842cc033627543a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T22:56:47.226Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0316.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0316/**",
+          ".atm/history/tasks/ATM-GOV-0316.json",
+          "packages/cli/src",
+          "packages/core/src",
+          "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+          "tests/cli/plan4-hostile-dual-captain.test.ts"
+        ],
+        "digest": "sha256:b85c1bc35fa5f0818b95ba38d100c51ded1872d80ea0484e337131118b0885c5"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:0d5ed1bc03405a6875f8a6a9695c02ed6a43f7c6224758da6074392dd538e08b",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:0ffedd9d1b17c336126113c0470433dfd3f5f6bfa74dfccff7f447b593ea5f2c"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0316",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-529cb54757e2c5bc",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0316.*",
+      ".atm/history/task-events/ATM-GOV-0316/**",
+      ".atm/history/tasks/ATM-GOV-0316.json",
+      "packages/cli/src",
+      "packages/core/src",
+      "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+      "tests/cli/plan4-hostile-dual-captain.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "689ca4ec93877f9aec68e85fcb93732ff4cc15914fd8899de80558e0683eddaa",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
+    "laneSession": {
+      "laneSessionId": "lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf\""
+    },
+    "createdAt": "2026-08-08T22:56:50.315Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T23:00:50.442Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T23:00:50.248Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0316.closure-packet.json"
+}
