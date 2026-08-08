@@ -17,3 +17,4 @@ export * from './constraint-solver.ts';
 export * from './concurrency-schedule-obligations.ts';
 export * from './governance-model-adapters.ts';
 export * from './fault-fingerprint.ts';
+export * from './causal-neighborhood.ts';
