@@ -1,0 +1,384 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0307",
+  "title": "State replay and known incident corpus closure",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0306",
+    "ATM-GOV-0293",
+    "ATM-GOV-0312"
+  ],
+  "acceptance": [
+    "ACC-1: Each known incident family is represented: shared-index attribution/TOCTOU (009), sealed deletion/tombstone (010), close deferral manifest (011), active-batch router crash (270), import-frontmatter fidelity (0276), runner-sync protected-state, and stale/mixed batch ownership.",
+    "ACC-2: Replay consumes a sealed observation and deterministically classifies repaired, regressed, stale, forged, missing, or unsupported evidence; unknown is fail-closed.",
+    "ACC-3: Every fixture has a focused red-before/green-after regression case and a catalog shard entry with stable case ids.",
+    "ACC-4: Proof invalidation rejects evidence whose source commit, runner digest, bundle/tree attribution, provenance, or fixture family digest does not match.",
+    "ACC-5: Real dogfood replay proves at least one cross-lane shared-index commit, one close-deferral path, and one active-batch routing path; fixture-only replay cannot satisfy the row.",
+    "ACC-6: Replay output is consumable by ATM-GOV-0312/0308/0310 and cannot authorize Plan 4.0 close by itself.",
+    "ACC-7: Rollback drill reverts the replay adapter and leaves historical incident evidence intact."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/state-replay.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/state-replay.schema.json",
+    "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+    "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+    "tests/fixtures/governance-incidents/active-batch-router/**",
+    "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+    "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+    "tests/fixtures/governance-incidents/stale-mixed-batch/**",
+    "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+    "tests/cli/plan4-state-replay.test.ts",
+    "tests/cli/plan4-incident-corpus.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/state-replay.ts",
+    "packages/core/src/evidence/index.ts",
+    "schemas/evidence/state-replay.schema.json",
+    "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+    "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+    "tests/fixtures/governance-incidents/active-batch-router/**",
+    "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+    "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+    "tests/fixtures/governance-incidents/stale-mixed-batch/**",
+    "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+    "tests/cli/plan4-state-replay.test.ts",
+    "tests/cli/plan4-incident-corpus.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-state-replay.test.ts",
+    "node --strip-types tests/cli/plan4-incident-corpus.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-disable-plan4-incident-replay",
+  "rollbackNotes": "Revert the delivery and release commits; retain sealed incident observations as historical references.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.state-replay-policy",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/evidence/state-replay.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0307-state-replay-and-known-incident-corpus-closure.task.md",
+    "sectionTitle": "ATM-GOV-0307",
+    "headingLine": 132,
+    "hash": "c1d3f7b37d2d270c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0307-state-replay-and-known-incident-corpus-closure.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:c1d3f7b37d2d270cdae56c158a64646e63b96fbbfea9614cb29212fce9c689c9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T14:24:10.157Z"
+    }
+  },
+  "importedAt": "2026-07-31T14:24:10.157Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0306",
+      "ATM-GOV-0293",
+      "ATM-GOV-0312"
+    ],
+    "startConditions": [
+      "ATM-GOV-0306 is done/released and its lineage/equivalence evidence is consumable.",
+      "ATM-GOV-0293 has produced the stable fingerprint/family contract consumed by replay.",
+      "ATM-GOV-0312 has sealed the objective-level certificate contract consumed by phase exit."
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md",
+      "git-boundary-admission/git-boundary-admission-plan.md"
+    ],
+    "changedPublicSeams": [
+      "atm.stateReplay.v1",
+      "atm.incidentRegressionFamily.v1",
+      "atm.proofInvalidation.v1"
+    ],
+    "causalImpactEdges": [
+      "known incident observation -> generic semantic family fixture",
+      "repair commit -> red/green replay and proof invalidation",
+      "stale/forged/missing receipt -> fail-closed replay verdict",
+      "replay verdict -> Plan 4.0 phase-exit incident closure"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0306 mutation lineage/equivalence contract",
+      "ATM-GOV-0293 fingerprint/family matching contract",
+      "TASK-GIT-0029 through TASK-GIT-0031 delivery evidence"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-state-replay.test.ts",
+      "node --strip-types tests/cli/plan4-incident-corpus.test.ts",
+      "npm run typecheck",
+      "npm run validate:cli"
+    ],
+    "phaseOwner": "plan4-incident-replay"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0307_state_replay_4f2d8c71",
+      "targetGroupId": "test_group_plan4_incident_replay",
+      "semanticKey": "plan4_state_replay_proof_invalidation",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-4",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "stale/forged/missing receipt -> fail-closed replay verdict",
+        "repair commit -> red/green replay and proof invalidation"
+      ],
+      "expectedRedPredicate": "Replay accepts stale, forged, missing, or unsupported evidence as a passing result.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-state-replay",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0307_incident_corpus_9a1e6b34",
+      "targetGroupId": "test_group_plan4_incident_replay",
+      "semanticKey": "plan4_known_incident_corpus",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-3",
+        "ACC-5",
+        "ACC-7"
+      ],
+      "coversImpactEdges": [
+        "known incident observation -> generic semantic family fixture",
+        "replay verdict -> Plan 4.0 phase-exit incident closure",
+        "repair commit -> red/green replay and proof invalidation"
+      ],
+      "expectedRedPredicate": "A required family is missing, fixture-only replay is treated as real dogfood, or rollback destroys historical evidence.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "plan4-incident-corpus",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0307_state_replay_4f2d8c71",
+    "test_task_atm_gov_0307_incident_corpus_9a1e6b34"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T22-39-06-748Z-close-e1a570f63add",
+  "lastTransitionAt": "2026-08-08T22:39:06.748Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T22:30:45.788Z",
+  "promotedAt": "2026-08-08T22:30:45.790Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-dc527c9470c3",
+    "claimedAt": "2026-08-08T22:30:45.793Z",
+    "heartbeatAt": "2026-08-08T22:39:06.746Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0307.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "schemas/evidence/state-replay.schema.json",
+      "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+      "tests/cli/plan4-incident-corpus.test.ts",
+      "tests/cli/plan4-state-replay.test.ts",
+      "tests/fixtures/governance-incidents/active-batch-router/**",
+      "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+      "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+      "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+      "tests/fixtures/governance-incidents/stale-mixed-batch/**"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808223045-codex-captain-2026-08-09-46fab3e0d9",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808223045-codex-captain-2026-08-09-46fab3e0d9\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T22:30:45.793Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-b724f0802ae5c2d0",
+    "ticketDigest": "sha256:b724f0802ae5c2d07d2285c217cd2ee4d1d28d7cbef43d90e85669f06d7de7e6",
+    "taskId": "ATM-GOV-0307",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808223045-codex-captain-2026-08-09-46fab3e0d9",
+    "claimGeneration": "lease-dc527c9470c3",
+    "issuedAt": "2026-08-08T22:30:45.793Z",
+    "expiresAt": "2026-08-08T23:00:45.793Z",
+    "scopeDigest": "sha256:14f6c10a5a8d152452d16d64704b2a8ac3f57342b7370aa7773036435ff4551e",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T22:30:45.793Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0307.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0307/**",
+          ".atm/history/tasks/ATM-GOV-0307.json",
+          "packages/core/src/evidence/index.ts",
+          "packages/core/src/evidence/state-replay.ts",
+          "schemas/evidence/state-replay.schema.json",
+          "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+          "tests/cli/plan4-incident-corpus.test.ts",
+          "tests/cli/plan4-state-replay.test.ts",
+          "tests/fixtures/governance-incidents/active-batch-router/**",
+          "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+          "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+          "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+          "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+          "tests/fixtures/governance-incidents/stale-mixed-batch/**"
+        ],
+        "digest": "sha256:7723026ee9a22ee61b2fe4a29837cf5ad0846b516cce6a4658a1e36f58025415"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:0d5ed1bc03405a6875f8a6a9695c02ed6a43f7c6224758da6074392dd538e08b",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:0ffedd9d1b17c336126113c0470433dfd3f5f6bfa74dfccff7f447b593ea5f2c"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260808223045-codex-captain-2026-08-09-ATM-GOV-0307-cb98c614b7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0307",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-461051327b0a3964",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0307.*",
+      ".atm/history/task-events/ATM-GOV-0307/**",
+      ".atm/history/tasks/ATM-GOV-0307.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "schemas/evidence/state-replay.schema.json",
+      "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+      "tests/cli/plan4-incident-corpus.test.ts",
+      "tests/cli/plan4-state-replay.test.ts",
+      "tests/fixtures/governance-incidents/active-batch-router/**",
+      "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+      "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+      "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+      "tests/fixtures/governance-incidents/stale-mixed-batch/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0f72340f32eee3828a95af61f397b4943dbb639e04a87bcd0e04ca4258caff9b",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808223045-codex-captain-2026-08-09-ATM-GOV-0307-cb98c614b7",
+    "laneSession": {
+      "laneSessionId": "lane-20260808223045-codex-captain-2026-08-09-46fab3e0d9",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808223045-codex-captain-2026-08-09-46fab3e0d9\""
+    },
+    "createdAt": "2026-08-08T22:30:55.087Z",
+    "status": "active"
+  },
+  "closedAt": "2026-08-08T22:39:06.746Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808223045-codex-captain-2026-08-09-ATM-GOV-0307-cb98c614b7",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json"
+}

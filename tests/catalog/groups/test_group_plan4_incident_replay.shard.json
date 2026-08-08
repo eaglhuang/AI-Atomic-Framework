@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_incident_replay",
+  "theme": "Plan 4.0 state replay and known incident corpus closure",
+  "resourceKey": "plan4.incident-replay",
+  "maintainers": [
+    "atm-core"
+  ],
+  "cases": [
+    {
+      "caseId": "test_task_atm_gov_0307_state_replay_4f2d8c71",
+      "semanticKey": "plan4_state_replay_proof_invalidation",
+      "command": "node --strip-types tests/cli/plan4-state-replay.test.ts"
+    },
+    {
+      "caseId": "test_task_atm_gov_0307_incident_corpus_9a1e6b34",
+      "semanticKey": "plan4_known_incident_corpus",
+      "command": "node --strip-types tests/cli/plan4-incident-corpus.test.ts"
+    }
+  ],
+  "taskIds": [
+    "ATM-GOV-0307"
+  ]
+}

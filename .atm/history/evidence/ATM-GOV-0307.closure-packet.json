@@ -1,0 +1,170 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0307",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d03c81433aaec4fe1803eb8e276a35ce6185ada4",
+  "governedTreeSha": "43d3cc6844258bf69dca89f006487f8a4c13103c",
+  "targetCommitDelta": {
+    "currentCommitSha": "d03c81433aaec4fe1803eb8e276a35ce6185ada4",
+    "parentCommitShas": [
+      "d03c81433aaec4fe1803eb8e276a35ce6185ada4"
+    ],
+    "governedTreeSha": "43d3cc6844258bf69dca89f006487f8a4c13103c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0307.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0307.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0307/2026-07-31T14-03-03-075Z-import-b7c3cf7c88fb.json",
+      ".atm/history/task-events/ATM-GOV-0307/2026-07-31T14-05-49-147Z-import-2e3f63e06915.json",
+      ".atm/history/task-events/ATM-GOV-0307/2026-07-31T14-21-59-754Z-import-352d6cea8550.json",
+      ".atm/history/task-events/ATM-GOV-0307/2026-07-31T14-24-10-822Z-import-0fb4290f0064.json",
+      ".atm/history/task-events/ATM-GOV-0307/2026-08-08T22-30-45-788Z-reserve-80e1439ad93e.json",
+      ".atm/history/task-events/ATM-GOV-0307/2026-08-08T22-30-45-790Z-promote-de4484827ba7.json",
+      ".atm/history/task-events/ATM-GOV-0307/2026-08-08T22-30-55-089Z-claim-7c9ef737d0e6.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0307.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-evidence.skill.md",
+      "schemas/evidence/state-replay.schema.json",
+      "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+      "tests/cli/plan4-incident-corpus.test.ts",
+      "tests/cli/plan4-state-replay.test.ts",
+      "tests/fixtures/governance-incidents/active-batch-router/incident.json",
+      "tests/fixtures/governance-incidents/close-deferral-derived-manifest/incident.json",
+      "tests/fixtures/governance-incidents/import-frontmatter-fidelity/incident.json",
+      "tests/fixtures/governance-incidents/runner-sync-protected-state/incident.json",
+      "tests/fixtures/governance-incidents/stale-mixed-batch/incident.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-state-replay.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9a33b4e29f8356f8c5751a5f90e4d1552e7bde613b5305186d4aab44cd8ae169",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-incident-corpus.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b448bbea11e1afb365ea4aeecef442a320da7bc1547afe08f1927b93fbe1b0ec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ba7195e6e9574bc6b3cab85a28dc05da13d86522e0077a77c3823abbcf1663cd",
+      "stderrSha256": "sha256:f4d0e494ba997477247765519bd6760112fd3ddb1066576a8c293ca536a94a9d",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-incident-corpus.test.ts",
+    "node --strip-types tests/cli/plan4-state-replay.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T22:39:06.738Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0307.*",
+      ".atm/history/task-events/ATM-GOV-0307/**",
+      ".atm/history/tasks/ATM-GOV-0307.json",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "schemas/evidence/state-replay.schema.json",
+      "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+      "tests/cli/plan4-incident-corpus.test.ts",
+      "tests/cli/plan4-state-replay.test.ts",
+      "tests/fixtures/governance-incidents/active-batch-router/**",
+      "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+      "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+      "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+      "tests/fixtures/governance-incidents/stale-mixed-batch/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "schemas/evidence/state-replay.schema.json",
+      "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+      "tests/cli/plan4-incident-corpus.test.ts",
+      "tests/cli/plan4-state-replay.test.ts",
+      "tests/fixtures/governance-incidents/active-batch-router/**",
+      "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+      "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+      "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+      "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+      "tests/fixtures/governance-incidents/stale-mixed-batch/**"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0307.json",
+  "closedAt": "2026-08-08T22:39:06.738Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808223045-codex-captain-2026-08-09-ATM-GOV-0307-cb98c614b7",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

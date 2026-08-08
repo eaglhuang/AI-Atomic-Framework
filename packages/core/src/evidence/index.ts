@@ -38,3 +38,4 @@ export * from './anti-gaming-control.ts';
 export * from './oracle-adjudication.ts';
 export * from './coverage-certificate.ts';
 export * from './quality-vector.ts';
+export * from './state-replay.ts';
