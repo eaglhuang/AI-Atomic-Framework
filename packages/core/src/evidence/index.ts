@@ -29,3 +29,4 @@ export * from './security-quality-receipts.ts';
 export * from './complexity-interface-size.ts';
 export * from './dependency-graph-bypass-gate.ts';
 export * from './gap-planning.ts';
+export * from './sandboxed-test-patch.ts';
