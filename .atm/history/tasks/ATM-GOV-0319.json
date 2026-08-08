@@ -1,0 +1,342 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0319",
+  "title": "Seed commitment, hidden negative controls and anti-gaming checks",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0321",
+    "ATM-GOV-0322"
+  ],
+  "acceptance": [
+    "Seed commitments are replayable and independent from task/actor/date identity.",
+    "Hidden negative controls are not writable by the implementation lane and must be red when active.",
+    "Missing, unsupported, or inconclusive controls fail closed.",
+    "Evidence includes rollback, provenance, and deep-module review receipt."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence",
+    "schemas/evidence",
+    "tests/cli/plan4-anti-gaming.test.ts",
+    "tests/cli/plan4-hidden-negative-controls.test.ts",
+    "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence",
+    "schemas/evidence",
+    "tests/cli/plan4-anti-gaming.test.ts",
+    "tests/cli/plan4-hidden-negative-controls.test.ts",
+    "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-anti-gaming.test.ts",
+    "node --strip-types tests/cli/plan4-hidden-negative-controls.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "disable-anti-gaming-publication-and-preserve-negative-controls",
+  "rollbackNotes": "Keep hidden controls sealed and revert only the policy publication.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-validation",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence",
+        "schemas/evidence",
+        "tests/cli/plan4-anti-gaming.test.ts",
+        "tests/cli/plan4-hidden-negative-controls.test.ts",
+        "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json",
+        "seed commitment and replay receipt",
+        "hidden negative-control registry",
+        "anti-gaming verdict adapter",
+        "focused tests",
+        "catalog shard",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0319-seed-commitment-hidden-negative-controls-and-anti-gaming-checks.task.md",
+    "sectionTitle": "ATM-GOV-0319",
+    "headingLine": 52,
+    "hash": "54d6094caab2b5ec",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0319-seed-commitment-hidden-negative-controls-and-anti-gaming-checks.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:54d6094caab2b5ec5432406b937b0191a3782d5554c76f165772c3392ff931fb",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T15:52:42.373Z"
+    }
+  },
+  "importedAt": "2026-07-31T15:52:42.373Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0321",
+      "ATM-GOV-0322"
+    ],
+    "startConditions": [
+      "0321 authority and 0322 planning contracts are done with fresh evidence"
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md"
+    ],
+    "changedPublicSeams": [
+      "atm.antiGamingControl.v1",
+      "atm.hiddenNegativeControl.v1"
+    ],
+    "causalImpactEdges": [
+      "seed commitment -> replayable adversarial cases",
+      "hidden negative control -> fail-closed anti-gaming verdict"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0321 authority contract",
+      "ATM-GOV-0322 planning contract"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-anti-gaming.test.ts",
+      "node --strip-types tests/cli/plan4-hidden-negative-controls.test.ts"
+    ],
+    "phaseOwner": "Plan4-anti-gaming"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0319_seed_commitment_0a7e4c92",
+      "targetGroupId": "test_group_plan4_anti_gaming",
+      "semanticKey": "plan4_seed_commitment_replay",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "seed commitment -> replayable adversarial cases"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0319_hidden_negative_control_6d2f1b84",
+      "targetGroupId": "test_group_plan4_anti_gaming",
+      "semanticKey": "plan4_hidden_negative_control_fail_closed",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "hidden negative control -> fail-closed anti-gaming verdict"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0319_seed_commitment_0a7e4c92",
+    "test_task_atm_gov_0319_hidden_negative_control_6d2f1b84"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T22-04-19-323Z-lock-cleanup-c5fb28cba018",
+  "lastTransitionAt": "2026-08-08T22:04:19.323Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T21:59:41.153Z",
+  "promotedAt": "2026-08-08T21:59:41.156Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-5a7438dd728d",
+    "claimedAt": "2026-08-08T21:59:41.160Z",
+    "heartbeatAt": "2026-08-08T22:04:19.103Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0319.json",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json",
+      "tests/cli/plan4-anti-gaming.test.ts",
+      "tests/cli/plan4-hidden-negative-controls.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808215941-codex-captain-2026-08-09-6cc9c18e7c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808215941-codex-captain-2026-08-09-6cc9c18e7c\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T21:59:41.160Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-769957a7e2dc541f",
+    "ticketDigest": "sha256:769957a7e2dc541fad5cd584dd203de44b14c761400f463d71e7f327e68f2b0e",
+    "taskId": "ATM-GOV-0319",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808215941-codex-captain-2026-08-09-6cc9c18e7c",
+    "claimGeneration": "lease-5a7438dd728d",
+    "issuedAt": "2026-08-08T21:59:41.160Z",
+    "expiresAt": "2026-08-08T22:29:41.160Z",
+    "scopeDigest": "sha256:7ad343c44a0164af748ad8ff4fd3c920fffe2b3db2d6ecf23d45d13552570715",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T21:59:41.160Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0319.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0319/**",
+          ".atm/history/tasks/ATM-GOV-0319.json",
+          "packages/core/src/evidence",
+          "schemas/evidence",
+          "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json",
+          "tests/cli/plan4-anti-gaming.test.ts",
+          "tests/cli/plan4-hidden-negative-controls.test.ts"
+        ],
+        "digest": "sha256:90a3373e9998116266e50f03a219316694ae14033bca3ce61a88047cf2c5d556"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808215941-codex-captain-2026-08-09-ATM-GOV-0319-5fd23aa879",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0319",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-253457a8a2be8e06",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0319.*",
+      ".atm/history/task-events/ATM-GOV-0319/**",
+      ".atm/history/tasks/ATM-GOV-0319.json",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json",
+      "tests/cli/plan4-anti-gaming.test.ts",
+      "tests/cli/plan4-hidden-negative-controls.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f473d6dc9bbb3c9c82e77d2d4366f21072f7a983b642fa6f74f269e088222630",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808215941-codex-captain-2026-08-09-ATM-GOV-0319-5fd23aa879",
+    "laneSession": {
+      "laneSessionId": "lane-20260808215941-codex-captain-2026-08-09-6cc9c18e7c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808215941-codex-captain-2026-08-09-6cc9c18e7c\""
+    },
+    "createdAt": "2026-08-08T21:59:43.455Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T22:04:19.321Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T22:04:19.103Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808215941-codex-captain-2026-08-09-ATM-GOV-0319-5fd23aa879",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0319.closure-packet.json"
+}

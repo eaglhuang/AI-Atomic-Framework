@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0319",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "41f39b17a4355d420bd78b4f4c0f8ef147273ae6",
+  "governedTreeSha": "2d8b27b7766e0e5aaef13c3b30e48ded29ce48cb",
+  "targetCommitDelta": {
+    "currentCommitSha": "41f39b17a4355d420bd78b4f4c0f8ef147273ae6",
+    "parentCommitShas": [
+      "41f39b17a4355d420bd78b4f4c0f8ef147273ae6"
+    ],
+    "governedTreeSha": "2d8b27b7766e0e5aaef13c3b30e48ded29ce48cb",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0319.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0319.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0319/2026-07-31T15-42-07-329Z-import-b9df549dea3b.json",
+      ".atm/history/task-events/ATM-GOV-0319/2026-07-31T15-46-57-513Z-import-782dbc032aae.json",
+      ".atm/history/task-events/ATM-GOV-0319/2026-07-31T15-52-43-202Z-import-eda6f2b2ee5b.json",
+      ".atm/history/task-events/ATM-GOV-0319/2026-08-08T21-59-41-153Z-reserve-58eca3bbba95.json",
+      ".atm/history/task-events/ATM-GOV-0319/2026-08-08T21-59-41-156Z-promote-52bbdcc47fb7.json",
+      ".atm/history/task-events/ATM-GOV-0319/2026-08-08T21-59-43-456Z-claim-c8cacc829703.json",
+      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/tasks/ATM-GOV-0313.json",
+      ".atm/history/tasks/ATM-GOV-0319.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/core/src/evidence/anti-gaming-control.ts",
+      "packages/core/src/evidence/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+      "release/atm-root-drop/packages/core/dist/evidence/index.js",
+      "release/atm-root-drop/packages/core/src/evidence/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/evidence/anti-gaming-control.schema.json",
+      "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json",
+      "tests/cli/plan4-anti-gaming.test.ts",
+      "tests/cli/plan4-hidden-negative-controls.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-anti-gaming.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5abd7eb78b21c7cf247b4a994f85070aa2c302fefe76ce2c5abfa7602c9c1dc3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-hidden-negative-controls.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:de6440b8f0f4fd8b81276393f73049f199005b747dcea580bbfe885e4415eb7d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:139557ec24c24c19030794134ad913ada3a500b23d7cb3ab0ffe832bae6f3285",
+      "stderrSha256": "sha256:16068b234ac2b8912b89b1a64e1b6174ede7bbf2af60f26fc9a949f272b0e48b",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/plan4-anti-gaming.test.ts",
+    "node --strip-types tests/cli/plan4-hidden-negative-controls.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-08T22:04:19.093Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0319.*",
+      ".atm/history/task-events/ATM-GOV-0319/**",
+      ".atm/history/tasks/ATM-GOV-0319.json",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json",
+      "tests/cli/plan4-anti-gaming.test.ts",
+      "tests/cli/plan4-hidden-negative-controls.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_anti_gaming.shard.json",
+      "tests/cli/plan4-anti-gaming.test.ts",
+      "tests/cli/plan4-hidden-negative-controls.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0319.json",
+  "closedAt": "2026-08-08T22:04:19.093Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "sessionId": "session-20260808215941-codex-captain-2026-08-09-ATM-GOV-0319-5fd23aa879",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
