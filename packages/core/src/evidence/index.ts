@@ -39,3 +39,4 @@ export * from './oracle-adjudication.ts';
 export * from './coverage-certificate.ts';
 export * from './quality-vector.ts';
 export * from './state-replay.ts';
+export * from './shadow-comparison.ts';

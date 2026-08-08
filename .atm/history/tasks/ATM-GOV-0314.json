@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0314",
+  "title": "Plan 4.0 selected-versus-full shadow comparison and escaped-defect adjudication",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0294",
+    "ATM-GOV-0305",
+    "ATM-GOV-0312",
+    "TASK-SKL-0037"
+  ],
+  "acceptance": [
+    "Shadow receipt records selected/skipped/false-block/escaped/latency/cache/unknown dimensions.",
+    "Legacy authority remains independently executable and its result is preserved.",
+    "Any escaped related defect invalidates the selector policy epoch and fails closed.",
+    "Focused test covers clean parity, false block, escaped defect, cache invalidation, and unknown data.",
+    "Fresh sealed evidence includes delivery, runner provenance, rollback, and deep-module review."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence",
+    "packages/cli/src/commands",
+    "schemas/evidence",
+    "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+    "tests/cli/plan4-shadow-comparison.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence",
+    "packages/cli/src/commands",
+    "schemas/evidence",
+    "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+    "tests/cli/plan4-shadow-comparison.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-shadow-comparison.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "disable-selector-epoch-and-revert-shadow-policy",
+  "rollbackNotes": "Preserve the legacy authority and sealed observations while reverting the selected-policy publication.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence",
+        "packages/cli/src/commands",
+        "schemas/evidence",
+        "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+        "tests/cli/plan4-shadow-comparison.test.ts",
+        "selected-versus-full shadow receipt with selected/skipped/false-block/escaped/latency/cache/unknown dimensions",
+        "selector policy-epoch invalidation and legacy-authority comparison evidence",
+        "adversarial escaped-defect fixture and fail-closed adjudication"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0314-plan-4-0-selected-versus-full-shadow-comparison-and-escaped-defect-adjudication.task.md",
+    "sectionTitle": "ATM-GOV-0314",
+    "headingLine": 69,
+    "hash": "94eb83bc415fe2bf",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0314-plan-4-0-selected-versus-full-shadow-comparison-and-escaped-defect-adjudication.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:94eb83bc415fe2bfe9eaf006a0ee2f506ec19a59cc65048066623384698997e5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-31T15:22:25.637Z"
+    }
+  },
+  "importedAt": "2026-07-31T15:22:25.637Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0294",
+      "ATM-GOV-0305",
+      "ATM-GOV-0312",
+      "TASK-SKL-0037"
+    ],
+    "startConditions": [
+      "0294/0305/0312/TASK-SKL-0037 are done with fresh evidence"
+    ],
+    "softRelations": [
+      "governance-optimization/end-to-end-auto-batch-performance-plan-v4.md"
+    ],
+    "changedPublicSeams": [
+      "atm.shadowComparison.v1"
+    ],
+    "causalImpactEdges": [
+      "selected-versus-full divergence -> selector policy epoch invalidation"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0312 objective certificate"
+    ],
+    "validatorReferences": [
+      "node --strip-types tests/cli/plan4-shadow-comparison.test.ts"
+    ],
+    "phaseOwner": "Plan4-shadow-adjudication"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_atm_gov_0314_shadow_comparison_2a6f9d41",
+      "targetGroupId": "test_group_plan4_shadow_comparison",
+      "semanticKey": "plan4_selected_full_shadow_comparison",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "selected-versus-full divergence -> selector policy epoch invalidation"
+      ],
+      "expectedRedPredicate": "selected/full divergence is hidden or escaped defects are treated as pass",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_task_atm_gov_0314_shadow_adjudication_7c1b4e92",
+      "targetGroupId": "test_group_plan4_shadow_comparison",
+      "semanticKey": "plan4_escaped_defect_adjudication",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "selected-versus-full divergence -> selector policy epoch invalidation"
+      ],
+      "expectedRedPredicate": "escaped related defect does not invalidate policy epoch",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_atm_gov_0314_shadow_comparison_2a6f9d41",
+    "test_task_atm_gov_0314_shadow_adjudication_7c1b4e92"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-08T22-46-05-219Z-lock-cleanup-fd4324fac168",
+  "lastTransitionAt": "2026-08-08T22:46:05.219Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-2026-08-09",
+  "reservedAt": "2026-08-08T22:41:48.175Z",
+  "promotedAt": "2026-08-08T22:41:48.178Z",
+  "claim": {
+    "actorId": "codex-captain-2026-08-09",
+    "leaseId": "lease-0caa9edad466",
+    "claimedAt": "2026-08-08T22:41:48.182Z",
+    "heartbeatAt": "2026-08-08T22:46:05.021Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0314.json",
+      "packages/cli/src/commands",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+      "tests/cli/plan4-shadow-comparison.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260808224148-codex-captain-2026-08-09-f850b67a88",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808224148-codex-captain-2026-08-09-f850b67a88\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-08T22:41:48.182Z",
+  "startedByActor": "codex-captain-2026-08-09",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-4b7eda29346727a0",
+    "ticketDigest": "sha256:4b7eda29346727a0c604998752d3a2837d7fd3a52bec70c95323ce6657ad34f6",
+    "taskId": "ATM-GOV-0314",
+    "origin": "claim",
+    "actorId": "codex-captain-2026-08-09",
+    "laneSessionId": "lane-20260808224148-codex-captain-2026-08-09-f850b67a88",
+    "claimGeneration": "lease-0caa9edad466",
+    "issuedAt": "2026-08-08T22:41:48.182Z",
+    "expiresAt": "2026-08-08T23:11:48.182Z",
+    "scopeDigest": "sha256:cedf16c4ac303fe7d206abd8a2ee6518e099b920f400d1c180a4a60e9e1c71a2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-08T22:41:48.182Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0314.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0314/**",
+          ".atm/history/tasks/ATM-GOV-0314.json",
+          "packages/cli/src/commands",
+          "packages/core/src/evidence",
+          "schemas/evidence",
+          "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+          "tests/cli/plan4-shadow-comparison.test.ts"
+        ],
+        "digest": "sha256:89fee50d123e93134241f76c69c97cf44c76231ddf47468b657e7a2144071b2c"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [
+      {
+        "path": "artifacts/generated/skill-corpus-audit.json",
+        "observedDigest": "sha256:0d5ed1bc03405a6875f8a6a9695c02ed6a43f7c6224758da6074392dd538e08b",
+        "producerTaskId": "TASK-SKL-0028",
+        "artifactSchemaId": "atm.skillCorpusAudit.v1",
+        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
+        "sourceDigest": "sha256:0ffedd9d1b17c336126113c0470433dfd3f5f6bfa74dfccff7f447b593ea5f2c"
+      }
+    ],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260808224148-codex-captain-2026-08-09-ATM-GOV-0314-5ad0bc4ec6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0314",
+    "batchId": "batch-e641205eb5c4",
+    "scopeKey": "tasks-0670222abab7",
+    "queueId": "queue-43579b3b3bd9750f",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0314.*",
+      ".atm/history/task-events/ATM-GOV-0314/**",
+      ".atm/history/tasks/ATM-GOV-0314.json",
+      "packages/cli/src/commands",
+      "packages/core/src/evidence",
+      "schemas/evidence",
+      "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+      "tests/cli/plan4-shadow-comparison.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f24b7b92a35febb8af8dcdfc531002a6d9ecb3cf0db27baa58c3587cffec21ad",
+    "actorId": "codex-captain-2026-08-09",
+    "sessionId": "session-20260808224148-codex-captain-2026-08-09-ATM-GOV-0314-5ad0bc4ec6",
+    "laneSession": {
+      "laneSessionId": "lane-20260808224148-codex-captain-2026-08-09-f850b67a88",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808224148-codex-captain-2026-08-09-f850b67a88\""
+    },
+    "createdAt": "2026-08-08T22:41:51.031Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-08T22:46:05.216Z",
+    "releasedBy": "codex-captain-2026-08-09"
+  },
+  "closedAt": "2026-08-08T22:46:05.021Z",
+  "closedByActor": "codex-captain-2026-08-09",
+  "closedBySessionId": "session-20260808224148-codex-captain-2026-08-09-ATM-GOV-0314-5ad0bc4ec6",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0314.closure-packet.json"
+}

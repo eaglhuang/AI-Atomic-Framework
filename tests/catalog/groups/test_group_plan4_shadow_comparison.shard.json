@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_shadow_comparison",
+  "theme": "Plan 4.0 selected-versus-full shadow comparison",
+  "resourceKey": "plan4.shadow-comparison",
+  "maintainers": ["atm-core"],
+  "cases": [
+    {"caseId":"test_task_atm_gov_0314_shadow_comparison_2a6f9d41","semanticKey":"plan4_selected_full_shadow_comparison","command":"node --strip-types tests/cli/plan4-shadow-comparison.test.ts"},
+    {"caseId":"test_task_atm_gov_0314_shadow_adjudication_7c1b4e92","semanticKey":"plan4_escaped_defect_adjudication","command":"node --strip-types tests/cli/plan4-shadow-comparison.test.ts"}
+  ],
+  "taskIds": ["ATM-GOV-0314"]
+}
