@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0012",
   "title": "Reconcile released residue transaction with commit readiness",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-ERR-0010",
@@ -326,7 +326,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-90979fed9752",
     "claimedAt": "2026-08-09T17:20:05.008Z",
-    "heartbeatAt": "2026-08-09T18:12:39.308Z",
+    "heartbeatAt": "2026-08-09T18:16:18.217Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-ERR-0012.*",
@@ -380,13 +380,14 @@
       "tests/cli/released-residue-transaction.test.ts",
       "tests/cli/released-wip-reclaim-transaction.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260809172005-codex-gpt-5.4-mini-9daaf416bd",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809172005-codex-gpt-5.4-mini-9daaf416bd\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-gpt-5.4-mini",
   "startedAt": "2026-08-09T17:20:05.008Z",
@@ -473,8 +474,8 @@
     "createdAt": "2026-08-09T17:20:15.239Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-09T18-12-40-032Z-renew-bcc8a989454e",
-  "lastTransitionAt": "2026-08-09T18:12:40.032Z",
+  "lastTransitionId": "2026-08-09T18-16-18-219Z-close-73cae15c8230",
+  "lastTransitionAt": "2026-08-09T18:16:18.219Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -583,5 +584,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
-  }
+  },
+  "closedAt": "2026-08-09T18:16:18.217Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809172005-codex-gpt-5.4-mini-TASK-ERR-0012-c01b5e7c91",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0012.closure-packet.json"
 }
