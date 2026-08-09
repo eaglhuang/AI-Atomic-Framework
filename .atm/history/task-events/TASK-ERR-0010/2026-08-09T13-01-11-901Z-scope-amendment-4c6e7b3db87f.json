@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T13-01-11-901Z-scope-amendment-4c6e7b3db87f",
+  "taskId": "TASK-ERR-0010",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0010.json",
+  "taskSha256": "sha256:4ccac39cff63c62d34c9c231a918cf32f4a19038dec22ed41773a2db678a38ff",
+  "createdAt": "2026-08-09T13:01:11.901Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0010 --actor codex-gpt-5.4-mini --add \"packages/cli/dist,release/atm-onefile/atm.mjs,release/atm-root-drop\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

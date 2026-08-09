@@ -93,16 +93,75 @@ function readCloseWindowStagedIndexLock(cwd) {
         return null;
     }
 }
+function readStagedIndexEntries(cwd, files) {
+    const requested = uniqueSorted(files);
+    if (requested.length === 0)
+        return [];
+    const output = execFileSync(resolveGitExecutable(), ['ls-files', '-s', '--', ...requested], {
+        cwd,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+    return output.split(/\r?\n/).flatMap((line) => {
+        const match = /^(\d+)\s+([0-9a-f]{40,})\s+\d+\t(.+)$/.exec(line.trim());
+        return match ? [{ mode: match[1], blobId: match[2], path: normalizeRelativePath(match[3]) }] : [];
+    }).filter((entry) => entry.path);
+}
 function writeForeignStagedSnapshot(cwd, taskId, files) {
+    const entries = readStagedIndexEntries(cwd, files);
+    if (entries.length !== uniqueSorted(files).length) {
+        throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Close window could not record every foreign staged index entry before deferral.', {
+            exitCode: 1,
+            details: {
+                recoveryState: 'snapshot-incomplete',
+                files: uniqueSorted(files),
+                entries,
+                remediation: 'Do not proceed with the close. Keep the foreign staged entries intact and retry only after the index can be read completely.'
+            }
+        });
+    }
     const snapshotPath = `.atm/runtime/snapshots/close-window-foreign-staged-${taskId}-${Date.now()}.json`;
     mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
     writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({
         schemaId: 'atm.closeWindowForeignStagedSnapshot.v1',
         taskId,
         createdAt: new Date().toISOString(),
-        files: uniqueSorted(files)
+        files: uniqueSorted(files),
+        entries
     }, null, 2)}\n`, 'utf8');
     return snapshotPath;
+}
+function restoreForeignStagedSnapshot(cwd, snapshotPath) {
+    const parsed = JSON.parse(readFileSync(path.join(cwd, snapshotPath), 'utf8'));
+    const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+    if (entries.length === 0) {
+        throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Close window cannot restore a legacy or incomplete foreign staged snapshot.', {
+            exitCode: 1,
+            details: {
+                recoveryState: 'restore-snapshot-incomplete',
+                snapshotPath,
+                remediation: 'The close-window lock and recovery snapshot were retained. Repair the durable snapshot before retrying release; do not delete the snapshot or claim success.'
+            }
+        });
+    }
+    for (const entry of entries) {
+        execFileSync(resolveGitExecutable(), ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    }
+    const restored = readStagedIndexEntries(cwd, entries.map((entry) => entry.path));
+    const expected = entries.map((entry) => `${entry.mode}:${entry.blobId}:${entry.path}`).sort();
+    const actual = restored.map((entry) => `${entry.mode}:${entry.blobId}:${entry.path}`).sort();
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Close window restored foreign staged entries but byte-identity verification failed.', {
+            exitCode: 1,
+            details: {
+                recoveryState: 'restore-verification-failed',
+                snapshotPath,
+                expected,
+                actual,
+                remediation: 'The close-window lock and recovery snapshot were retained. Do not finalize the close until the foreign index entries match the durable snapshot byte-for-byte.'
+            }
+        });
+    }
 }
 function deferForeignStagedFiles(cwd, unexpectedStagedTasks) {
     if (unexpectedStagedTasks.length === 0)
@@ -213,7 +272,10 @@ export function releaseCloseWindowStagedIndexLock(input) {
         return null;
     if (existing.taskId !== normalizeTaskId(input.taskId))
         return existing;
-    cleanupForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
+    if (existing.foreignStagedSnapshotPath) {
+        restoreForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
+        cleanupForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
+    }
     const released = {
         ...existing,
         status: 'released',

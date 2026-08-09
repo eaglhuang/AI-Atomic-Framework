@@ -43,6 +43,18 @@ try {
     const foreignTaskId = 'TASK-FOREIGN-0002';
     const expectedStageFile = stageGovernanceFile(repoRoot, taskId);
     const foreignStageFile = stageGovernanceFile(repoRoot, foreignTaskId);
+    writeJson(path.join(repoRoot, '.atm/runtime/locks', `${foreignTaskId}.lock.json`), {
+        schemaId: 'atm.governanceScopeLock',
+        workItemId: foreignTaskId,
+        lockedBy: 'foreign-agent',
+        taskDirectionLock: {
+            schemaId: 'atm.taskDirectionLock.v1',
+            taskId: foreignTaskId,
+            actorId: 'foreign-agent',
+            status: 'active',
+            allowedFiles: [foreignStageFile]
+        }
+    });
     const foreignOnly = inspectForeignStagedTasksForCloseWindow({
         cwd: repoRoot,
         taskId,
@@ -50,7 +62,7 @@ try {
     });
     assert.equal(foreignOnly.length, 1);
     assert.equal(foreignOnly[0]?.taskId, foreignTaskId);
-    assert.match(foreignOnly[0]?.restoreChoice ?? '', /--defer-foreign-staged/);
+    assert.match(foreignOnly[0]?.deferCommand ?? '', /git lease stage-override/);
     const blocked = acquireCloseWindowStagedIndexLock({
         cwd: repoRoot,
         taskId,
@@ -112,7 +124,43 @@ try {
         actorId: 'fixture-agent',
         outcome: 'aborted'
     });
+    const stagedAfterRelease = execFileSync('git', ['diff', '--cached', '--name-only'], {
+        cwd: repoRoot,
+        encoding: 'utf8'
+    }).trim().split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(stagedAfterRelease, [expectedStageFile, foreignStageFile].sort(), 'releasing a deferred close window must restore the foreign staged entry');
     assert.equal(existsSync(path.join(repoRoot, deferred.foreignStagedSnapshotPath)), false, 'close-window deferred snapshot must be auto-cleaned when the lock releases');
+    execFileSync('git', ['restore', '--staged', '--', foreignStageFile], { cwd: repoRoot, stdio: 'ignore' });
+    execFileSync('git', ['add', foreignStageFile], { cwd: repoRoot, stdio: 'ignore' });
+    const recoveryDeferred = acquireCloseWindowStagedIndexLock({
+        cwd: repoRoot,
+        taskId,
+        actorId: 'fixture-agent',
+        expectedStageFiles: [expectedStageFile],
+        deferForeignStaged: true
+    });
+    assert.equal(recoveryDeferred.ok, true);
+    const recoverySnapshotPath = path.join(repoRoot, recoveryDeferred.foreignStagedSnapshotPath);
+    const durableSnapshot = readFileSync(recoverySnapshotPath, 'utf8');
+    writeJson(recoverySnapshotPath, { schemaId: 'atm.closeWindowForeignStagedSnapshot.v1', entries: [] });
+    assert.throws(() => releaseCloseWindowStagedIndexLock({
+        cwd: repoRoot,
+        taskId,
+        actorId: 'fixture-agent',
+        outcome: 'aborted'
+    }), (error) => error instanceof CliError
+        && error.code === 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS'
+        && error.details?.recoveryState === 'restore-snapshot-incomplete');
+    assert.ok(existsSync(recoverySnapshotPath), 'failed restoration must retain the durable recovery snapshot');
+    assert.ok(readCloseWindowStagedIndexLockReport(repoRoot), 'failed restoration must retain the active close-window lock');
+    writeFileSync(recoverySnapshotPath, durableSnapshot, 'utf8');
+    releaseCloseWindowStagedIndexLock({
+        cwd: repoRoot,
+        taskId,
+        actorId: 'fixture-agent',
+        outcome: 'aborted'
+    });
+    execFileSync('git', ['restore', '--staged', '--', foreignStageFile], { cwd: repoRoot, stdio: 'ignore' });
     const previousTaskContent = readFileSync(path.join(repoRoot, `.atm/history/tasks/${taskId}.json`), 'utf8');
     writeJson(path.join(repoRoot, `.atm/history/tasks/${taskId}.json`), {
         schemaVersion: 'atm.workItem.v0.2',
