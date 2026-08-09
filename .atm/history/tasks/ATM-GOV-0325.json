@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0325",
+  "title": "Freeze false-green evidence and establish reproducible baseline",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: 所有 census 都具時間窗、分母、來源、digest 與 unavailable 欄位，可由相同輸入 byte-stable 重建。",
+    "ACC-2: 23/23 rescue entries 皆在 manifest，且檔案明示 evidence hold。",
+    "ACC-3: 三點 commit lineage 與 façade timing observations 分開記錄，`a548eb381` 被認列為真修復但整體仍 NOT COMPLETE。",
+    "ACC-4: 沒有未經授權的產品／證據資料 mutation、cleanup、reset、rebase、merge 或 completion promotion；ATM 所需的 identity、claim、import、evidence 與受治理 commit control-plane 寫入必須最小化、可稽核且在報告中逐一列出。"
+  ],
+  "deliverables": [
+    "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+    "docs/reports/plan-3x-4x-false-green-evidence-freeze.md"
+  ],
+  "scopePaths": [
+    "scripts/diagnose-plan3-evidence-closure.ts",
+    "scripts/analyze-captain-parallel-ledger.ts",
+    "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+    "docs/reports/plan-3x-4x-false-green-evidence-freeze.md"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+    "node --strip-types scripts/validate-charter.ts --mode validate"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "discard-incomplete-snapshot-and-rerun",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-integrity",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0325-freeze-false-green-evidence-and-establish-reproducible-baseline.task.md",
+    "sectionTitle": "ATM-GOV-0325",
+    "headingLine": 61,
+    "hash": "1b61feadc406e06b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0325-freeze-false-green-evidence-and-establish-reproducible-baseline.task.md",
+      "planningCommitSha": "0fc0217677df0942961b88392f94912821660488",
+      "contentDigest": "sha256:1b61feadc406e06bc78c6d6340d803bacd144b4f3d871e6efe2d8b3cdf3440c4",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:25:07.612Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:25:07.612Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The planning runbook verdict remains NOT COMPLETE.",
+      "No rescue worktree, audit shard, historical receipt, or shadow certificate has been deleted."
+    ],
+    "softRelations": [
+      "TASK-ERR-0007"
+    ],
+    "changedPublicSeams": [
+      "atm.falseGreenEvidenceFreeze.v1"
+    ],
+    "causalImpactEdges": [
+      "authority-baseline",
+      "validator-baseline",
+      "rescue-evidence-hold"
+    ],
+    "parallelFrontierInputs": [
+      "planning-head",
+      "target-head",
+      "origin-head",
+      "worktree-registry",
+      "backlog-shards",
+      "audit-shards"
+    ],
+    "validatorReferences": [
+      "validate-git-head-evidence",
+      "validate-charter",
+      "validate-test-facade",
+      "validate-module-boundaries"
+    ],
+    "phaseOwner": "correction-wave-0"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_false_green_freeze_manifest_complete_0325",
+      "targetGroupId": null,
+      "semanticKey": "false_green_freeze_manifest",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "authority-baseline",
+        "validator-baseline",
+        "rescue-evidence-hold"
+      ],
+      "expectedRedPredicate": "missing source, digest, window, watermark, unavailable receipt, or rescue HEAD fails the manifest",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.falseGreenEvidenceFreeze.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_false_green_freeze_manifest_complete_0325"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-captain-20260809",
+    "leaseId": "lease-9a14f4829db0",
+    "claimedAt": "2026-08-09T07:53:15.280Z",
+    "heartbeatAt": "2026-08-09T08:33:46.173Z",
+    "ttlSeconds": 3600,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0325.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260809075315-codex-captain-20260809-f79f20ce8d",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809075315-codex-captain-20260809-f79f20ce8d\""
+    }
+  },
+  "owner": "codex-captain-20260809",
+  "startedAt": "2026-08-09T07:53:15.280Z",
+  "startedBySessionId": "session-20260809075315-codex-captain-20260809-ATM-GOV-0325-6d21ea31ab",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0325",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0325.*",
+      ".atm/history/task-events/ATM-GOV-0325/**",
+      ".atm/history/tasks/ATM-GOV-0325.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a62d5f2a907bae43f11ee40731a5d231a33c425c5172d176e70d2dc2ec44fb90",
+    "actorId": "codex-captain-20260809",
+    "sessionId": "session-20260809075315-codex-captain-20260809-ATM-GOV-0325-6d21ea31ab",
+    "laneSession": {
+      "laneSessionId": "lane-20260809075315-codex-captain-20260809-f79f20ce8d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809075315-codex-captain-20260809-f79f20ce8d\""
+    },
+    "createdAt": "2026-08-09T07:53:34.770Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-09T08-33-46-762Z-renew-18a102e9b4d2",
+  "lastTransitionAt": "2026-08-09T08:33:46.762Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-97985f37db6e0365",
+    "ticketDigest": "sha256:97985f37db6e0365d93defcc50ea156ccb3963662b3946ac76c13fa1d2cac223",
+    "taskId": "ATM-GOV-0325",
+    "origin": "claim",
+    "actorId": "codex-captain-20260809",
+    "laneSessionId": "lane-20260809075315-codex-captain-20260809-f79f20ce8d",
+    "claimGeneration": "lease-9a14f4829db0",
+    "issuedAt": "2026-08-09T08:33:46.173Z",
+    "expiresAt": "2026-08-09T09:33:46.173Z",
+    "scopeDigest": "sha256:a93798ea024ac7cca590fee43458fb6708ff1e54c41facc8e3d0ace333e58b24",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-09T08:33:46.173Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0325.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0325/**",
+          ".atm/history/tasks/ATM-GOV-0325.json",
+          "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+          "docs/reports/plan-3x-4x-false-green-evidence-freeze.md",
+          "scripts/analyze-captain-parallel-ledger.ts",
+          "scripts/diagnose-plan3-evidence-closure.ts"
+        ],
+        "digest": "sha256:401dbe26e6b392885fb0faa0ea590457e6308bc6d1cd0f46b6afc9a1991bc4aa"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

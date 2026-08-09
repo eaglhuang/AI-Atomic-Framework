@@ -1,0 +1,89 @@
+{
+  "schemaId": "atm.falseGreenEvidenceFreeze.v1",
+  "generatedAt": "2026-08-09T08:00:00.000Z",
+  "verdict": "remain-open",
+  "scope": {
+    "targetHead": "0d50ba508a866d92fc4e26501a060ac539024140",
+    "originMainHead": "0d50ba508a866d92fc4e26501a060ac539024140",
+    "planningHead": "4b32b63056fe5b15612e5d10b9bb644e788ac8bb",
+    "planningDirtyPathCount": 60,
+    "targetDirtyPathCount": 113,
+    "sourceDigestStatus": "unavailable",
+    "sourceDigestReason": "The raw command transcripts are intentionally not copied into this report; every census item carries its source command and observation time."
+  },
+  "lineage": [
+    { "commit": "51ab0b3feb3f7661983cf426f9fa5d9c849007ed", "role": "pre-burst baseline", "observation": "Previously failed skew smoke through hash-placeholders." },
+    { "commit": "a548eb381436c741272cf751fd0f234331a16ab3", "role": "real repair", "observation": "Removed registry hash placeholder; this repair is credited, but it does not certify the four plans." },
+    { "commit": "0d50ba508a866d92fc4e26501a060ac539024140", "role": "observed target and origin HEAD", "observation": "Current baseline remains not complete." }
+  ],
+  "skewMatrixObservations": [
+    {
+      "phase": "cold",
+      "command": "node --strip-types scripts/validate-skew-matrix.ts --mode validate",
+      "startedAt": "2026-08-09T07:54:00.000Z",
+      "elapsedMs": 176353,
+      "exitCode": 1,
+      "timedOut": false,
+      "stdoutDigest": "unavailable",
+      "stderrDigest": "unavailable",
+      "failureCode": "SKEW_SMOKE_FAILED",
+      "failureSummary": "Six current CLI × Plugin SDK smoke cases failed governance-entry-readiness, not hash-placeholders or the former 120000 ms façade timeout."
+    },
+    {
+      "phase": "warm",
+      "status": "not-run",
+      "reason": "Cold run established a deterministic governance-entry-readiness failure. Repeating warm or loaded runs would not distinguish timeout behaviour until that blocker is removed."
+    },
+    {
+      "phase": "loaded",
+      "status": "not-run",
+      "reason": "Cold run established a deterministic governance-entry-readiness failure. Repeating warm or loaded runs would not distinguish timeout behaviour until that blocker is removed."
+    }
+  ],
+  "governanceReadiness": {
+    "status": "blocked",
+    "code": "ATM_DOCTOR_FAILED",
+    "directCause": ".atm/catalog/registry/actors.json is a tracked, unstaged governance surface after the required actor identity setup.",
+    "firstPrinciplesFinding": "A worker must establish an actor identity before claim, but the resulting governance change prevents the smoke validator from running. Identity setup therefore changes the measurement under test and must be isolated or admitted before baseline measurement."
+  },
+  "controlPlaneWrites": [
+    { "at": "2026-08-09T07:52:46.318Z", "kind": "task-import", "scope": "ATM-GOV-0325", "effect": "Initial import created a record with planningCommitSha null; later repaired." },
+    { "at": "2026-08-09T07:53:10.509Z", "kind": "actor-identity", "scope": "codex-captain-20260809", "effect": "Required actor identity registration; it exposed the governance-entry-readiness interaction." },
+    { "at": "2026-08-09T07:53:34.771Z", "kind": "task-claim", "scope": "ATM-GOV-0325", "effect": "Active scoped claim for the freeze deliverables." },
+    { "at": "2026-08-09T08:15:50.083Z", "kind": "planning-identity", "scope": "C:/Users/User/3KLife", "effect": "Actor profile required for governed planning-source sealing." },
+    { "commit": "261d893658808b02643768c240a72617b3aee9fb", "kind": "planning-source-seal", "scope": "19 task sources and runbook", "effect": "Initial path-bounded non-delivery source seal." },
+    { "at": "2026-08-09T08:21:20.880Z", "kind": "emergency-force-import", "scope": "ATM-GOV-0325", "lease": "EMG-GLOBAL-9f00109962", "effect": "Repaired unreadable/null-seal ledger record while preserving active claim." },
+    { "commit": "0fc0217677df0942961b88392f94912821660488", "kind": "planning-source-amendment", "scope": "ATM-GOV-0325 and runbook", "effect": "Clarified the control-plane boundary in ACC-4." },
+    { "at": "2026-08-09T08:25:07.733Z", "kind": "emergency-force-import", "scope": "ATM-GOV-0325", "lease": "EMG-GLOBAL-6594580912", "effect": "Bound the active ledger record to the amended sealed source while preserving claim." }
+  ],
+  "rescueWorktrees": [
+    { "id": "0287", "path": "C:/Users/User/ATM-rescue-0287", "head": "3f401cc3d5ab49b02f49516e262994f0c0f4df97", "evidenceHold": true },
+    { "id": "0288", "path": "C:/Users/User/ATM-rescue-0288", "head": "6ec21a548b721cade920ecc22b35e6101c1c8f03", "evidenceHold": true },
+    { "id": "0289", "path": "C:/Users/User/ATM-rescue-0289", "head": "4fa69c38c0e8153daac735432b95b464d9d394ea", "evidenceHold": true },
+    { "id": "0290", "path": "C:/Users/User/ATM-rescue-0290", "head": "79a03601305ee68e7bfae87052148882dee413d2", "evidenceHold": true },
+    { "id": "0291", "path": "C:/Users/User/ATM-rescue-0291", "head": "5fa2682d863ba33140e3f117c2e0939c7ced5399", "evidenceHold": true },
+    { "id": "0296", "path": "C:/Users/User/ATM-rescue-0296", "head": "bdc02704ad20b4f92746fff06a80a10a392a18d6", "evidenceHold": true },
+    { "id": "0297", "path": "C:/Users/User/ATM-rescue-0297", "head": "8426c033ec4d13e340568da5d0d6eab5f010cb6d", "evidenceHold": true },
+    { "id": "0298", "path": "C:/Users/User/ATM-rescue-0298", "head": "92de98db24d9ba1f11db35fa0d166f03c5bbdcd0", "evidenceHold": true },
+    { "id": "0299", "path": "C:/Users/User/ATM-rescue-0299", "head": "708f8ee5fc05042dde875a10624633295ebd9a60", "evidenceHold": true },
+    { "id": "0300", "path": "C:/Users/User/ATM-rescue-0300", "head": "41f39b17a4355d420bd78b4f4c0f8ef147273ae6", "evidenceHold": true },
+    { "id": "0302", "path": "C:/Users/User/ATM-rescue-0302", "head": "7478e81a9929a3b273ef45a585bcf26ae427d143", "evidenceHold": true },
+    { "id": "0303", "path": "C:/Users/User/ATM-rescue-0303", "head": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f", "evidenceHold": true },
+    { "id": "0305", "path": "C:/Users/User/ATM-rescue-0305", "head": "78ce6f90979ada1a05538e28e47a57b678ab5448", "evidenceHold": true },
+    { "id": "0307", "path": "C:/Users/User/ATM-rescue-0307", "head": "10abe4204a7030ac138b17ec61da55826990610d", "evidenceHold": true },
+    { "id": "0312", "path": "C:/Users/User/ATM-rescue-0312", "head": "d03c81433aaec4fe1803eb8e276a35ce6185ada4", "evidenceHold": true },
+    { "id": "0313", "path": "C:/Users/User/ATM-rescue-0313", "head": "6b47e4bc55f1effee7add88c253fe16888bc46c7", "evidenceHold": true },
+    { "id": "0314", "path": "C:/Users/User/ATM-rescue-0314", "head": "b18c7ff6a441d7c8a0f5fd1e82a632ec69467d77", "evidenceHold": true },
+    { "id": "0318", "path": "C:/Users/User/ATM-rescue-0318", "head": "ab501515ccd896a174790bf7a748a71234a7c5b4", "evidenceHold": true },
+    { "id": "0319", "path": "C:/Users/User/ATM-rescue-0319", "head": "f4e48b4d051bd772f7617e58cff0f6a003b631e4", "evidenceHold": true },
+    { "id": "0320", "path": "C:/Users/User/ATM-rescue-0320", "head": "929deaafe13f4e5a103845407cff9887f7f3e5fc", "evidenceHold": true },
+    { "id": "0321", "path": "C:/Users/User/ATM-rescue-0321", "head": "8795447d50567fe9fad868606a47f4819a2b5549", "evidenceHold": true },
+    { "id": "0322", "path": "C:/Users/User/ATM-rescue-0322", "head": "2fb48a300c729926c624535f9a03321e2b8e7597", "evidenceHold": true },
+    { "id": "SKL0037", "path": "C:/Users/User/ATM-rescue-SKL0037", "head": "e903e83bd3cf92086bc0beeaf1e30d5ee8cbca97", "evidenceHold": true }
+  ],
+  "nonClaims": [
+    "This report does not certify Plan 3.0, 3.1, 3.2, or 4.0.",
+    "No rescue worktree was pruned, removed, reset, rebased, merged, or otherwise cleaned.",
+    "Initial null planningCommitSha import was repaired under audited emergency leases; the active record is now sealed to 0fc0217677df0942961b88392f94912821660488."
+  ]
+}
