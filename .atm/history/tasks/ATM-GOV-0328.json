@@ -66,14 +66,14 @@
       "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
       "contentDigest": "sha256:bc565fba9e09956d22da9ddf08f9a4292a43c568805cce8d6ba47554689d914d",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-09T08:22:04.702Z"
+      "sealedAt": "2026-08-09T14:46:21.434Z"
     }
   },
-  "importedAt": "2026-08-09T08:22:04.702Z",
+  "importedAt": "2026-08-09T14:46:21.434Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -178,28 +178,33 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T10-13-06-127Z-renew-0afcbcdec7c1",
-  "lastTransitionAt": "2026-08-09T10:13:06.127Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-08-09T09:34:44.036Z",
-  "promotedAt": "2026-08-09T09:34:44.043Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-7531b2046991",
     "claimedAt": "2026-08-09T09:34:44.054Z",
-    "heartbeatAt": "2026-08-09T10:13:05.452Z",
+    "heartbeatAt": "2026-08-09T15:33:04.689Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
       ".atm/history/evidence/ATM-GOV-0328.*",
       ".atm/history/task-events/ATM-GOV-0328/**",
       ".atm/history/tasks/ATM-GOV-0328.json",
       "docs/governance/atm-bug-and-optimization-backlog.items/",
       "docs/reports/test-facade-performance-margin.json",
+      "packages/cli/dist",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+      "packages/core/src/lane/wip-ownership-transition.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop",
       "scripts/run-validators/implementation.ts",
       "scripts/validate-skew-matrix.ts",
       "scripts/validate-test-facade.ts",
       "scripts/validators.config.json",
+      "tests/cli/runner-publication-reconciliation.test.ts",
       "tests/cli/test-facade-timeout-policy.test.ts",
       "tests/skew/skew-matrix.test.ts"
     ],
@@ -211,77 +216,8 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809093444-codex-gpt-5.4-mini-cba0ba2542\""
     }
   },
+  "owner": "codex-gpt-5.4-mini",
   "startedAt": "2026-08-09T09:34:44.054Z",
-  "startedByActor": "codex-gpt-5.4-mini",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-6486a0ec709e9155",
-    "ticketDigest": "sha256:6486a0ec709e9155f04d2135885f3fc34e4e7ad77750de6700fdc765a5ab467a",
-    "taskId": "ATM-GOV-0328",
-    "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260809093444-codex-gpt-5.4-mini-cba0ba2542",
-    "claimGeneration": "lease-7531b2046991",
-    "issuedAt": "2026-08-09T10:13:05.452Z",
-    "expiresAt": "2026-08-09T10:43:05.452Z",
-    "scopeDigest": "sha256:9cbdefd34a692b78a7a25d575ddf4034f2abe29781904e2f444b5a7326867244",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-09T10:13:05.452Z"
-    },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/ATM-GOV-0328.*",
-          ".atm/history/evidence/git-head.jsonl",
-          ".atm/history/task-events/ATM-GOV-0328/**",
-          ".atm/history/tasks/ATM-GOV-0328.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/",
-          "docs/reports/test-facade-performance-margin.json",
-          "scripts/run-validators/implementation.ts",
-          "scripts/validate-skew-matrix.ts",
-          "scripts/validate-test-facade.ts",
-          "scripts/validators.config.json",
-          "tests/cli/test-facade-timeout-policy.test.ts",
-          "tests/skew/skew-matrix.test.ts"
-        ],
-        "digest": "sha256:0b5602281b11fa1874ea1a056f9e6204c9bcd7f5a6b8ea9aa823032c4a04f83e"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "enabled",
-      "reasons": [
-        "shared-surface"
-      ],
-      "maxSavePoints": 2,
-      "perTaskByteBudget": 16777216,
-      "repositoryByteBudget": 268435456,
-      "handoffTtlSeconds": 604800,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
-    }
-  },
   "startedBySessionId": "session-20260809093444-codex-gpt-5.4-mini-ATM-GOV-0328-4f33bb07ba",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
@@ -292,15 +228,26 @@
     "queueId": null,
     "queueIndex": null,
     "allowedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
       ".atm/history/evidence/ATM-GOV-0328.*",
       ".atm/history/task-events/ATM-GOV-0328/**",
       ".atm/history/tasks/ATM-GOV-0328.json",
       "docs/governance/atm-bug-and-optimization-backlog.items/",
       "docs/reports/test-facade-performance-margin.json",
+      "packages/cli/dist",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+      "packages/core/src/lane/wip-ownership-transition.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop",
       "scripts/run-validators/implementation.ts",
       "scripts/validate-skew-matrix.ts",
       "scripts/validate-test-facade.ts",
       "scripts/validators.config.json",
+      "tests/cli/runner-publication-reconciliation.test.ts",
       "tests/cli/test-facade-timeout-policy.test.ts",
       "tests/skew/skew-matrix.test.ts"
     ],
@@ -325,5 +272,88 @@
     },
     "createdAt": "2026-08-09T09:35:17.064Z",
     "status": "active"
+  },
+  "lastTransitionId": "2026-08-09T15-33-04-934Z-renew-00be2140e1bb",
+  "lastTransitionAt": "2026-08-09T15:33:04.934Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-49577a3fb7fad8c5",
+    "ticketDigest": "sha256:49577a3fb7fad8c57b3adb2107c4d6a137670ace2e8243cc5e01f93e1527bf5d",
+    "taskId": "ATM-GOV-0328",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809093444-codex-gpt-5.4-mini-cba0ba2542",
+    "claimGeneration": "lease-7531b2046991",
+    "issuedAt": "2026-08-09T15:33:04.689Z",
+    "expiresAt": "2026-08-09T16:03:04.689Z",
+    "scopeDigest": "sha256:0077ef82cc6b03cc97f54df85e53c3fd9ecafe9ac0db0339f9bd1f9a513b8afa",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-09T15:33:04.689Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+          ".atm/history/evidence/ATM-GOV-0328.*",
+          ".atm/history/task-events/ATM-GOV-0328/**",
+          ".atm/history/tasks/ATM-GOV-0328.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/",
+          "docs/reports/test-facade-performance-margin.json",
+          "packages/cli/dist",
+          "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+          "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+          "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+          "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+          "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+          "packages/core/src/lane/wip-ownership-transition.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop",
+          "scripts/run-validators/implementation.ts",
+          "scripts/validate-skew-matrix.ts",
+          "scripts/validate-test-facade.ts",
+          "scripts/validators.config.json",
+          "tests/cli/runner-publication-reconciliation.test.ts",
+          "tests/cli/test-facade-timeout-policy.test.ts",
+          "tests/skew/skew-matrix.test.ts"
+        ],
+        "digest": "sha256:9aabcf0999427f9b6d6df89343ff09991d6b9a71ee122bd5b75aaf51621580b5"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
   }
 }

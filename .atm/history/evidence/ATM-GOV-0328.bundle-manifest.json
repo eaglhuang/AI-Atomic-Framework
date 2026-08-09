@@ -1,11 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0328",
-  "updatedAt": "2026-08-09T10:24:14.389Z",
+  "updatedAt": "2026-08-09T10:32:30.173Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types scripts/run-validators.ts standard --filter validate-skew-matrix --json",
     "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:test-facade"
   ],
   "staleValidationPasses": [],
@@ -70,6 +73,54 @@
       "durationMs": 197358,
       "runnerKind": "dev-source",
       "sourceCommit": "148ea422056b40cdac94f4029ae50ca2d2491582",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-09T10:28:16.241Z",
+      "startedAt": "2026-08-09T10:28:07.746Z",
+      "finishedAt": "2026-08-09T10:28:16.241Z",
+      "durationMs": 8495,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5776fe294b6d48dc40cbcc6545902a7b6a6993e80130ae5b1b8c5b622885f5fb",
+      "stderrSha256": "sha256:1b2cc5a004f659ff3fe77aca7620a5956009b891b4af3cac0ed9279805ce7d8a",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-09T10:29:31.040Z",
+      "startedAt": "2026-08-09T10:28:27.928Z",
+      "finishedAt": "2026-08-09T10:29:31.040Z",
+      "durationMs": 63112,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-09T10:32:30.172Z",
+      "startedAt": "2026-08-09T10:30:24.597Z",
+      "finishedAt": "2026-08-09T10:32:30.172Z",
+      "durationMs": 125575,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

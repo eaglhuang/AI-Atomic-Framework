@@ -442,7 +442,10 @@ function normalizeReceiptRef(value: string): string {
 }
 
 function taskIdFromRunnerReceiptPath(receiptRef: string): string | null {
-  const match = /^\.atm\/history\/evidence\/((?:TASK-[A-Z0-9-]+)|(?:ATM-FRAMEWORK-TEMP-[A-Z0-9_-]+))\.runner-sync-receipt\.json$/i.exec(receiptRef);
+  // The filename is an attribution hint only. The receipt's taskId is checked
+  // against this value before any recovery write, so accept every canonical
+  // hyphenated work-item family instead of coupling recovery to two prefixes.
+  const match = /^\.atm\/history\/evidence\/([A-Z][A-Z0-9_]*(?:-[A-Z0-9_]+)+)\.runner-sync-receipt\.json$/i.exec(receiptRef);
   return match?.[1] ?? null;
 }
 

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-09-008",
+  "date": "2026-08-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Taskflow close index-lane admission",
+  "finding": "taskflow close classifies .atm/history/evidence/git-head.jsonl as a foreign-active staged entry and mandates a stage-override lease, but the prescribed git lease stage-override command simultaneously reports foreignActiveStaged as empty and rejects the identical path with ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT.",
+  "expectedBehavior": "The close readiness gate and the stage-override issuer must share one ownership snapshot. A path required by taskflow close must either receive a lease for that exact snapshot or be reclassified before close is reported blocked; they must never prescribe an impossible recovery command.",
+  "evidenceOrRepro": "2026-08-09, ATM-GOV-0328 after governed delivery a2e441037d15abd0ab64d2812ede1752b2356273: node atm.mjs taskflow close --task ATM-GOV-0328 --actor codex-gpt-5.4-mini --historical-delivery a2e441037d15abd0ab64d2812ede1752b2356273 --dry-run --json returned ATM_INDEX_FOREIGN_ACTIVE_STAGED for .atm/history/evidence/git-head.jsonl and required git lease stage-override. Two immediate invocations of that exact lease command failed ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT with foreignActiveStaged: []. The staged line was produced by the same actor's governed commit hook at 2026-08-09T10:24:44.726Z.",
+  "followUp": "Unify the staged-index ownership resolver used by taskflow close and git lease stage-override, bind both to one index-tree digest, and add a regression covering a hook-generated git-head receipt after a task-scoped delivery commit. The regression must prove either successful exact-path lease issuance or an automatically non-blocking close classification; no manual index edit or broad staging is permitted."
+}
