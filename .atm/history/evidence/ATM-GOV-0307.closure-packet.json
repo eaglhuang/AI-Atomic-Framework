@@ -16,16 +16,16 @@
     ]
   },
   "targetCommit": "d03c81433aaec4fe1803eb8e276a35ce6185ada4",
-  "governedTreeSha": "43d3cc6844258bf69dca89f006487f8a4c13103c",
+  "governedTreeSha": "cfc17b983a1a2ec703b671332b559ce392117688",
   "targetCommitDelta": {
-    "currentCommitSha": "d03c81433aaec4fe1803eb8e276a35ce6185ada4",
+    "currentCommitSha": "10abe4204a7030ac138b17ec61da55826990610d",
     "parentCommitShas": [
       "d03c81433aaec4fe1803eb8e276a35ce6185ada4"
     ],
-    "governedTreeSha": "43d3cc6844258bf69dca89f006487f8a4c13103c",
+    "governedTreeSha": "cfc17b983a1a2ec703b671332b559ce392117688",
     "changedFiles": [
-      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
       ".atm/history/evidence/ATM-GOV-0307.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0307.closure-packet.json",
       ".atm/history/evidence/ATM-GOV-0307.json",
       ".atm/history/evidence/git-head.jsonl",
       ".atm/history/task-events/ATM-GOV-0307/2026-07-31T14-03-03-075Z-import-b7c3cf7c88fb.json",
@@ -35,20 +35,10 @@
       ".atm/history/task-events/ATM-GOV-0307/2026-08-08T22-30-45-788Z-reserve-80e1439ad93e.json",
       ".atm/history/task-events/ATM-GOV-0307/2026-08-08T22-30-45-790Z-promote-de4484827ba7.json",
       ".atm/history/task-events/ATM-GOV-0307/2026-08-08T22-30-55-089Z-claim-7c9ef737d0e6.json",
-      ".atm/history/tasks/ATM-GOV-0288.json",
+      ".atm/history/task-events/ATM-GOV-0307/2026-08-08T22-39-06-748Z-close-e1a570f63add.json",
       ".atm/history/tasks/ATM-GOV-0307.json",
-      ".atm/history/tasks/ATM-GOV-0313.json",
-      "artifacts/generated/skill-corpus-audit.json",
-      "packages/cli/dist/atm.d.ts",
       "packages/core/src/evidence/index.ts",
       "packages/core/src/evidence/state-replay.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-onefile/release-manifest.json",
-      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
-      "release/atm-root-drop/packages/core/dist/evidence/index.js",
-      "release/atm-root-drop/packages/core/src/evidence/index.ts",
-      "release/atm-root-drop/release-manifest.json",
-      "release/atm-root-drop/templates/skills/atm-evidence.skill.md",
       "schemas/evidence/state-replay.schema.json",
       "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
       "tests/cli/plan4-incident-corpus.test.ts",
@@ -166,5 +156,13 @@
   "sessionId": "session-20260808223045-codex-captain-2026-08-09-ATM-GOV-0307-cb98c614b7",
   "attestation": null,
   "historicalDeliveryProvenance": null,
-  "teamSummary": null
+  "teamSummary": null,
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-08-09T01:19:27.895Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "10abe4204a7030ac138b17ec61da55826990610d",
+    "repairedTargetCommitSha": "d03c81433aaec4fe1803eb8e276a35ce6185ada4",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
+  }
 }
