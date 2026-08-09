@@ -1,0 +1,134 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0325",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9e6f8cf41263dfe3fc289a2585ed18bb6e7f447b",
+  "governedTreeSha": "30877b26cc401efdfe250360eb3f42543ced894a",
+  "targetCommitDelta": {
+    "currentCommitSha": "9e6f8cf41263dfe3fc289a2585ed18bb6e7f447b",
+    "parentCommitShas": [
+      "9e6f8cf41263dfe3fc289a2585ed18bb6e7f447b"
+    ],
+    "governedTreeSha": "30877b26cc401efdfe250360eb3f42543ced894a",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:charter",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:35f7c060f358008b76472bbef5fc46642ef08e3f367c78ea123f918c593259f4",
+      "stderrSha256": "sha256:315f260be964d9ce6b13463662f301c3087c22c7cf5d86774ba928d5da18c005",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:309aa971da26b957f87b39449d721f629a9bcebbae53ab30a2e1e1fbd12e7362",
+      "stderrSha256": "sha256:a99e7819e1a2a3f3bdfc13d8e468b86d22e3799af270c47a4da386c5cf17702f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:charter",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-09T08:35:46.431Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0325.*",
+      ".atm/history/task-events/ATM-GOV-0325/**",
+      ".atm/history/tasks/ATM-GOV-0325.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.md",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/diagnose-plan3-evidence-closure.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0325.json",
+  "closedAt": "2026-08-09T08:35:46.432Z",
+  "closedByActor": "codex-captain-20260809",
+  "sessionId": "session-20260809075315-codex-captain-20260809-ATM-GOV-0325-6d21ea31ab",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9e6f8cf41263dfe3fc289a2585ed18bb6e7f447b",
+    "taskMatchedFiles": [
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.md"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0325.json",
+      ".atm/history/task-events/ATM-GOV-0325/2026-08-09T07-52-46-528Z-import-ffea07c11698.json",
+      ".atm/history/task-events/ATM-GOV-0325/2026-08-09T07-53-15-274Z-reserve-0da81925247e.json",
+      ".atm/history/task-events/ATM-GOV-0325/2026-08-09T07-53-15-277Z-promote-7bbe6a75c032.json",
+      ".atm/history/task-events/ATM-GOV-0325/2026-08-09T07-53-34-771Z-claim-f5b02381fcdc.json",
+      ".atm/history/task-events/ATM-GOV-0325/2026-08-09T08-21-20-891Z-import-1fdbf70bcfe6.json",
+      ".atm/history/task-events/ATM-GOV-0325/2026-08-09T08-25-07-745Z-import-ea565a7f6e4e.json",
+      ".atm/history/task-events/ATM-GOV-0325/2026-08-09T08-33-46-762Z-renew-18a102e9b4d2.json",
+      ".atm/history/tasks/ATM-GOV-0325.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

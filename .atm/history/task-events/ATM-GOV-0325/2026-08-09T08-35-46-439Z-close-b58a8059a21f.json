@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T08-35-46-439Z-close-b58a8059a21f",
+  "taskId": "ATM-GOV-0325",
+  "action": "close",
+  "actorId": "codex-captain-20260809",
+  "sessionId": "session-20260809075315-codex-captain-20260809-ATM-GOV-0325-6d21ea31ab",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0325.json",
+  "taskSha256": "sha256:7a1e2bf627d3af546c6fb3c2a5e65697bdb126bbb811e5d0320c8b6fb119ea59",
+  "createdAt": "2026-08-09T08:35:46.439Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0325 --actor codex-captain-20260809 --status done --historical-delivery 9e6f8cf41263dfe3fc289a2585ed18bb6e7f447b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260809075315-codex-captain-20260809-ATM-GOV-0325-6d21ea31ab",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0325.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:charter",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-09T08:35:46.431Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0325.*",
+        ".atm/history/task-events/ATM-GOV-0325/**",
+        ".atm/history/tasks/ATM-GOV-0325.json",
+        "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+        "docs/reports/plan-3x-4x-false-green-evidence-freeze.md",
+        "scripts/analyze-captain-parallel-ledger.ts",
+        "scripts/diagnose-plan3-evidence-closure.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/analyze-captain-parallel-ledger.ts",
+        "scripts/diagnose-plan3-evidence-closure.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
