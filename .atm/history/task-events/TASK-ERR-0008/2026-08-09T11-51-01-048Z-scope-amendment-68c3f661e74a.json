@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T11-51-01-048Z-scope-amendment-68c3f661e74a",
+  "taskId": "TASK-ERR-0008",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0008.json",
+  "taskSha256": "sha256:d7e5bb2fdb0e1e0ce638889d7b4b6a850b9f60fd024f6ded49fa22accb71893d",
+  "createdAt": "2026-08-09T11:51:01.048Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0008 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts,packages/cli/src/commands/git-governance/implementation/commit-execution.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
