@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-09-007",
+  "date": "2026-08-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Batch routing and recovery",
+  "finding": "A whole-plan next route returned a mandatory batch playbook with state repair-required and command node atm.mjs batch repair --actor <id> --json. The commanded repair then failed with ATM_BATCH_RUN_MISSING, while node atm.mjs batch status --json reported no active batch and internally consistent state.",
+  "expectedBehavior": "A returned recovery command must be executable against the state that produced it. If no active batch exists, next must either create or name a batch run before prescribing repair, or return a non-batch wait/claim route with the actual dependency blocker.",
+  "evidenceOrRepro": "2026-08-09: node atm.mjs next --prompt \"Continue all Plan 3.x/4.x task cards\" --json returned channel=batch, state=repair-required, repairCommand=node atm.mjs batch repair --actor <id> --json. Running node atm.mjs batch repair --actor codex-gpt-5.4-mini --json failed ATM_BATCH_RUN_MISSING. node atm.mjs batch status --json then reported active=false, activeBatchCount=0, consistency.ok=true.",
+  "followUp": "Add a regression that exercises the whole-plan route when the queue head is foreign-claimed and no batch run exists. Make the playbook select one reachable command, preserve the foreign-claim wait condition, and reject no-op repair advice. Keep batch repair strict once a real batch id exists."
+}
