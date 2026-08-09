@@ -65,6 +65,18 @@ const ownLockContext = buildTaskFrameworkLockContext({
     actorId: 'test-actor'
 });
 assert(ownLockContext.blockers.length === 0 && ownLockContext.staleLocks.length === 0, 'own active lock is transition context, not stale cleanup');
+const ownTemporaryLockContext = buildTaskFrameworkLockContext({
+    blockers: ['framework-stale-lock-cleanup-required'],
+    staleLocks: [{
+            kind: 'still-active',
+            lockTaskId: 'ATM-FRAMEWORK-TEMP-test-actor',
+            linkedTaskId: 'TASK-RFT-0013',
+            actorId: 'test-actor'
+        }],
+    taskId: 'ATM-FRAMEWORK-TEMP-test-actor',
+    actorId: 'test-actor'
+});
+assert(ownTemporaryLockContext.blockers.length === 0 && ownTemporaryLockContext.staleLocks.length === 0, 'own temporary framework lock is recognized by its lock work item');
 const foreignLockContext = buildTaskFrameworkLockContext({
     blockers: ['framework-stale-lock-cleanup-required'],
     staleLocks: [{ kind: 'still-active', linkedTaskId: 'TASK-OTHER-0001', actorId: 'other-actor' }],

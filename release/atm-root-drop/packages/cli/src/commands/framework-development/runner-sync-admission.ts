@@ -44,7 +44,7 @@ export type RunnerSyncAdmissionReport = {
     readonly ok: boolean;
     readonly stewardWorkId: string | null;
     readonly queuePosition: number | null;
-    readonly queueHeadHealth: 'task-active' | 'task-missing' | 'task-terminal';
+    readonly queueHeadHealth: 'task-active' | 'task-lease-expired' | 'task-missing' | 'task-terminal';
     readonly waitingTasks: readonly string[];
     readonly ownerActorIds: readonly string[];
     readonly reason: string | null;
@@ -64,7 +64,7 @@ export type RunnerSyncAdmissionBrokerTicket = {
   readonly ticketId: string;
   readonly position: number;
   readonly headOwner: string | null;
-  readonly headHealth: 'task-active' | 'task-missing' | 'task-terminal';
+  readonly headHealth: 'task-active' | 'task-lease-expired' | 'task-missing' | 'task-terminal';
   readonly batchEligible: boolean;
   readonly enqueuedAt: string;
   readonly waitedMs: number;

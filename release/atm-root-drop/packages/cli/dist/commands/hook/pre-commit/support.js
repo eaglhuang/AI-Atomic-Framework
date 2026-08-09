@@ -4,6 +4,7 @@ import path from 'node:path';
 import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows } from '../../framework-development.js';
 import { findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from '../../actor-registry.js';
 import { resolveActorWorkSession } from '../../actor-session.js';
+import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-attribution.js';
 import { CliError, quoteCliValue, relativePathFrom } from '../../shared.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.js';
 import { isPathAllowedByScope, listActiveBatchRuns } from '../../work-channels.js';
@@ -570,7 +571,8 @@ export function inspectCommitAttribution(cwd, stagedFiles) {
     const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok || pendingBatchCheckpoint.ok;
     const claimForSession = bypassesActiveSession ? null : claim;
     const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, { sessionId, actorId, taskId: effectiveTaskId, claimLeaseId: claimLeaseId ?? claimForSession?.leaseId ?? null, includeNonActive: true });
-    if (!session && !bypassesActiveSession) {
+    const frameworkTempClaimAttribution = hasLiveFrameworkTempClaimAttribution({ cwd, actorId, taskId: effectiveTaskId });
+    if (!session && !bypassesActiveSession && !frameworkTempClaimAttribution) {
         findings.push({ code: 'ATM_COMMIT_SESSION_MISSING', source: 'commit-attribution', detail: `No ATM work session matched actor ${actorId} and task ${effectiveTaskId}. Claim the task through ATM before committing.`, requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${effectiveTaskId}" --json`, classification: 'current-task' });
         return { ok: false, findings };
     }

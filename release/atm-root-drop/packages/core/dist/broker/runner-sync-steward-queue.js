@@ -381,6 +381,8 @@ function staleReleaseReasonFromHealth(health) {
         return 'orphan-task-missing';
     if (health === 'task-terminal')
         return 'orphan-task-terminal';
+    if (health === 'task-lease-expired')
+        return 'orphan-task-lease-expired';
     return null;
 }
 function buildRetryCommand(request) {

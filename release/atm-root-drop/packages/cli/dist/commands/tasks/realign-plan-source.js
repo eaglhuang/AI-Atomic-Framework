@@ -6,6 +6,7 @@ import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
 import { resolvePlanAbsoluteFromStored, toStoredPlanningPath } from '../planning-repo-root.js';
 import { buildPlanningSourceSeal } from './import-task.js';
+import { runTasksSealPlanSource } from './seal-plan-source.js';
 const PROTECTED_LIFECYCLE_FIELDS = [
     'status',
     'closedAt',
@@ -354,6 +355,8 @@ function commitWithTemporaryIndex(input) {
     }
 }
 export async function runTasksRealignPlanSource(argv) {
+    if (argv.includes('--seal-plan-source'))
+        return runTasksSealPlanSource(argv.filter((value) => value !== '--seal-plan-source'));
     const options = parseRealignPlanSourceArgv(argv);
     const mappings = parseRealignMapFile(options.mapPath);
     const proposals = buildRealignProposals({

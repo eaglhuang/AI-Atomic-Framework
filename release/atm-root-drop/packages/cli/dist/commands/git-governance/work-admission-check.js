@@ -101,11 +101,14 @@ function issueLegacyActiveTaskAdmissionTicket(input) {
  */
 export function evaluateTaskWorkAdmissionGate(input) {
     const task = readTaskAdmissionContext(input.cwd, input.taskId);
+    const frameworkTemp = task ? null : readFrameworkTempLockProjection(input.cwd).find((candidate) => candidate.workItemId === input.taskId
+        && candidate.disposition === 'foreign-live'
+        && input.files.every((file) => candidate.files.some((scope) => pathMatchesWriteScope(file, scope))));
     return evaluateWorkAdmissionGate({
         ...input,
-        actorId: task?.actorId ?? '',
-        laneSessionId: task?.laneSessionId ?? null,
-        claimGeneration: task?.claimGeneration ?? null
+        actorId: task?.actorId ?? frameworkTemp?.actorId ?? '',
+        laneSessionId: task?.laneSessionId ?? frameworkTemp?.laneSessionId ?? null,
+        claimGeneration: task?.claimGeneration ?? (frameworkTemp?.heartbeatAt ? `framework-lock:${frameworkTemp.heartbeatAt}` : null)
     });
 }
 export function readWorkAdmissionTicket(cwd, taskId) {

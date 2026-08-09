@@ -25,7 +25,12 @@ function isCurrentTaskActiveLock(
   const currentActorId = normalizeText(actorId);
   const actorMatches = currentActorId === null || lockActorId === null || lockActorId === currentActorId;
   return lock.kind === 'still-active'
-    && valuesMatch(lock.linkedTaskId ?? lock.lockTaskId, taskId)
+    // A temporary framework claim has two legitimate identifiers: the
+    // temporary work item that owns the lock and the task it is linked to.
+    // Commit admission uses the former, whereas lifecycle diagnostics often
+    // use the latter.  Both identify the same authoritative lock; preferring
+    // one with `??` made a live temporary claim unable to authorize itself.
+    && (valuesMatch(lock.lockTaskId, taskId) || valuesMatch(lock.linkedTaskId, taskId))
     && actorMatches;
 }
 

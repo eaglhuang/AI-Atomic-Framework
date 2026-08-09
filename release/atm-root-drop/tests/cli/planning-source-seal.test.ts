@@ -6,6 +6,7 @@ import path from 'node:path';
 import { runTasksImport } from '../../packages/cli/src/commands/tasks/import-orchestrator.ts';
 import { runTasksClaimLifecycle } from '../../packages/cli/src/commands/tasks/claim-orchestrator.ts';
 import { validatePlanningSourceSeal } from '../../packages/cli/src/commands/tasks/import-task.ts';
+import { runTasksSealPlanSource } from '../../packages/cli/src/commands/tasks/seal-plan-source.ts';
 import { prepareImportedTaskForClaim } from '../../packages/cli/src/commands/next/claim-helpers.ts';
 import { assertClosebackPlanningPathReady, resolveClosebackPlanningPath } from '../../packages/cli/src/commands/taskflow/close-orchestration.ts';
 import { buildDelegationContract } from '../../packages/cli/src/commands/taskflow/profile-loader.ts';
@@ -272,6 +273,21 @@ const benignClaim = await runTasksClaimLifecycle('claim', [
 assert.equal(benignClaim.ok, true);
 assert.equal(benignClaim.evidence.planningSourceSealValidation.status, 'benign-seal-upgrade');
 assert.deepEqual(benignClaim.evidence.planningSourceSealValidation.benignUpgradeKinds, ['commit']);
+const statusBeforeRepair = (JSON.parse(readFileSync(benignTaskPath, 'utf8')) as Record<string, unknown>).status;
+
+const benignRepair = await runTasksSealPlanSource([
+  '--cwd', targetRepo,
+  '--task', benignTaskId,
+  '--write',
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(benignRepair.ok, true);
+const repairedBenignTask = JSON.parse(readFileSync(benignTaskPath, 'utf8')) as Record<string, unknown>;
+assert.equal(typeof ((repairedBenignTask.source as any).planningSourceSeal as any).planningCommitSha, 'string');
+assert.equal(((repairedBenignTask.source as any).planningSourceSeal as any).planningCommitSha, execFileSync('git', ['log', '-1', '--format=%H', '--', 'docs/tasks/TASK-SEAL-0002.task.md'], { cwd: planningRepo, encoding: 'utf8' }).trim());
+assert.equal(repairedBenignTask.status, statusBeforeRepair, 'seal repair must not change lifecycle status');
+assert.equal(validatePlanningSourceSeal({ cwd: targetRepo, taskDocument: repairedBenignTask }).status, 'match');
 
 // ── Negative seal upgrade ──────────────────────────────────────────────────
 // The same `null -> sha` shape must still block when the card content moved,

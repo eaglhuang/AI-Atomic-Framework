@@ -13,6 +13,7 @@ import { buildIdentitySetRequiredCommand, parseTaskClaim, readTaskDocument, requ
 import { readHeadBranchRef, readHeadCommitSha } from './push-command.js';
 import { inspectHistoricalLedgerRestoreStagedArtifacts, inspectMirrorSyncOnlyStagedArtifacts } from './record-bundle-inspection.js';
 import { autoStageFrameworkClaimFiles, inspectFrameworkScopedUnstagedCommit, inspectTaskScopedStagedGovernanceBundle, inspectTaskScopedUnstagedCommit, isFrameworkGeneratedArtifactAllowed, isIgnorableFrameworkCommitStagingSideEffect, readActiveFrameworkClaimFiles, readReleaseGeneratedArtifactPaths } from './task-scope-staging.js';
+import { resolveFrameworkHookTaskId } from './framework-hook-identity.js';
 import { executeGitCommit } from './commit-execution.js';
 export function runGitCommit(options) {
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -320,10 +321,11 @@ export function runGitCommit(options) {
         const claimedFiles = new Set(readActiveFrameworkClaimFiles(options.cwd, actorId));
         if (claimedFiles.size > 0) {
             const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(options.cwd);
-            frameworkClaimCommitFiles = uniqueSorted(readStagedFiles(options.cwd).filter((filePath) => isIgnorableFrameworkCommitStagingSideEffect(filePath) ||
+            frameworkClaimCommitFiles = uniqueSorted(readStagedFiles(options.cwd).filter((filePath) => (!options.deferForeignStaged && isIgnorableFrameworkCommitStagingSideEffect(filePath)) ||
                 isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
         }
     }
+    const hookTaskId = resolveFrameworkHookTaskId({ taskId: options.taskId, actorId, frameworkClaimCommitFiles });
     const trailers = [
         `ATM-Actor: ${actorId}`,
         ...(options.taskId ? [`ATM-Task: ${options.taskId}`] : []),
@@ -393,5 +395,5 @@ export function runGitCommit(options) {
         copyableCommitCommand: rawCopyableCommitCommand,
         liveIndexResidueRollback: [],
     });
-    return executeGitCommit(options, { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
+    return executeGitCommit(options, { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
 }

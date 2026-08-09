@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { resolveRunnerSyncLeaseHealth } from './runner-sync-lease-health.js';
 import { sanitizeIdentityValue } from '../shared/identity-normalization.js';
 export function inspectRunnerSyncQueueHeadOwnership(input, steward) {
     if (!steward) {
@@ -170,23 +171,7 @@ function resolveQueueHeadHealth(cwd, requests) {
     const taskId = String(requests[0]?.taskId ?? '').trim();
     if (!taskId)
         return 'task-active';
-    const frameworkTempHealth = resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId);
-    if (frameworkTempHealth) {
-        return frameworkTempHealth;
-    }
-    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
-    if (!existsSync(taskPath))
-        return 'task-missing';
-    try {
-        const task = JSON.parse(readFileSync(taskPath, 'utf8'));
-        const status = typeof task.status === 'string' ? task.status.trim().toLowerCase() : '';
-        return status === 'done' || status === 'verified' || status === 'abandoned'
-            ? 'task-terminal'
-            : 'task-active';
-    }
-    catch {
-        return 'task-active';
-    }
+    return resolveRunnerSyncLeaseHealth(cwd, taskId);
 }
 function resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId) {
     const normalizedTaskId = String(taskId ?? '').trim();

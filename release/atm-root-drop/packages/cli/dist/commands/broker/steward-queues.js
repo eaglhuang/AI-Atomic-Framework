@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { CliError, makeResult, message } from '../shared.js';
 import { cleanupRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue } from '../../../../core/dist/broker/runner-sync-steward-queue.js';
+import { resolveRunnerSyncLeaseHealth } from '../framework-development/runner-sync-lease-health.js';
 import { supersedeRunnerSyncReservation } from './runner-sync-supersession.js';
 import { cleanupGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../../core/dist/broker/generated-projection-steward.js';
 import { readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward } from './persistence.js';
@@ -294,24 +295,7 @@ function resolveRunnerSyncTaskHealth(cwd, request) {
     return resolveRunnerSyncTaskIdHealth(cwd, request.taskId);
 }
 function resolveRunnerSyncTaskIdHealth(cwd, taskId) {
-    const frameworkTempHealth = resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId);
-    if (frameworkTempHealth) {
-        return frameworkTempHealth;
-    }
-    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
-    if (!existsSync(taskPath)) {
-        return 'task-missing';
-    }
-    try {
-        const task = JSON.parse(readFileSync(taskPath, 'utf8'));
-        const status = typeof task.status === 'string' ? task.status.trim().toLowerCase() : '';
-        return status === 'done' || status === 'verified' || status === 'abandoned'
-            ? 'task-terminal'
-            : 'task-active';
-    }
-    catch {
-        return 'task-active';
-    }
+    return resolveRunnerSyncLeaseHealth(cwd, taskId);
 }
 function assertRunnerSyncRecoveryAuthority(cwd, taskId, actorId) {
     const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);

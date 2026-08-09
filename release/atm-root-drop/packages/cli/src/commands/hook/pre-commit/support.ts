@@ -14,6 +14,7 @@ import path from 'node:path';
 import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows } from '../../framework-development.ts';
 import { findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from '../../actor-registry.ts';
 import { resolveActorWorkSession } from '../../actor-session.ts';
+import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-attribution.ts';
 import { CliError, quoteCliValue, relativePathFrom } from '../../shared.ts';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns } from '../../work-channels.ts';
@@ -356,7 +357,8 @@ const pendingBatchCheckpoint = inspectPendingBatchCheckpointStagedArtifacts(cwd,
 const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok || pendingBatchCheckpoint.ok;
 const claimForSession = bypassesActiveSession ? null : claim;
 const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, { sessionId, actorId, taskId: effectiveTaskId, claimLeaseId: claimLeaseId ?? claimForSession?.leaseId ?? null, includeNonActive: true });
-if (!session && !bypassesActiveSession) { findings.push({ code: 'ATM_COMMIT_SESSION_MISSING', source: 'commit-attribution', detail: `No ATM work session matched actor ${actorId} and task ${effectiveTaskId}. Claim the task through ATM before committing.`, requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${effectiveTaskId}" --json`, classification: 'current-task' });
+const frameworkTempClaimAttribution = hasLiveFrameworkTempClaimAttribution({ cwd, actorId, taskId: effectiveTaskId });
+if (!session && !bypassesActiveSession && !frameworkTempClaimAttribution) { findings.push({ code: 'ATM_COMMIT_SESSION_MISSING', source: 'commit-attribution', detail: `No ATM work session matched actor ${actorId} and task ${effectiveTaskId}. Claim the task through ATM before committing.`, requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${effectiveTaskId}" --json`, classification: 'current-task' });
 return { ok: false, findings };
 } if (session && session.actorId !== actorId) { findings.push({ code: 'ATM_COMMIT_SESSION_ACTOR_MISMATCH', source: 'commit-attribution', detail: `Session ${session.sessionId} belongs to ${session.actorId}, not ${actorId}.`, classification: 'current-task' });
 } if (session && session.taskId !== effectiveTaskId) { findings.push({ code: 'ATM_COMMIT_SESSION_TASK_MISMATCH', source: 'commit-attribution', detail: `Session ${session.sessionId} is for ${session.taskId}, not ${effectiveTaskId}.`, classification: 'current-task' });
