@@ -129,17 +129,15 @@ function writeForeignStagedSnapshot(cwd, taskId, files) {
         files: uniqueSorted(files),
         entries
     }, null, 2)}\n`, 'utf8');
-    return snapshotPath;
+    return { snapshotPath, entries };
 }
-function restoreForeignStagedSnapshot(cwd, snapshotPath) {
-    const parsed = JSON.parse(readFileSync(path.join(cwd, snapshotPath), 'utf8'));
-    const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+function restoreForeignStagedEntries(cwd, entries, recoveryReference) {
     if (entries.length === 0) {
         throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Close window cannot restore a legacy or incomplete foreign staged snapshot.', {
             exitCode: 1,
             details: {
                 recoveryState: 'restore-snapshot-incomplete',
-                snapshotPath,
+                snapshotPath: recoveryReference,
                 remediation: 'The close-window lock and recovery snapshot were retained. Repair the durable snapshot before retrying release; do not delete the snapshot or claim success.'
             }
         });
@@ -155,7 +153,7 @@ function restoreForeignStagedSnapshot(cwd, snapshotPath) {
             exitCode: 1,
             details: {
                 recoveryState: 'restore-verification-failed',
-                snapshotPath,
+                snapshotPath: recoveryReference,
                 expected,
                 actual,
                 remediation: 'The close-window lock and recovery snapshot were retained. Do not finalize the close until the foreign index entries match the durable snapshot byte-for-byte.'
@@ -163,16 +161,16 @@ function restoreForeignStagedSnapshot(cwd, snapshotPath) {
         });
     }
 }
-function deferForeignStagedFiles(cwd, unexpectedStagedTasks) {
-    if (unexpectedStagedTasks.length === 0)
+function deferForeignStagedFiles(cwd, taskId, files) {
+    const normalizedFiles = uniqueSorted(files);
+    if (normalizedFiles.length === 0)
         return null;
-    const files = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
-    const snapshotPath = writeForeignStagedSnapshot(cwd, unexpectedStagedTasks[0]?.taskId ?? 'foreign', files);
+    const snapshot = writeForeignStagedSnapshot(cwd, taskId, normalizedFiles);
     execFileSync(resolveGitExecutable(), ['restore', '--staged', '--', ...files], {
         cwd,
         stdio: ['ignore', 'pipe', 'pipe']
     });
-    return snapshotPath;
+    return snapshot;
 }
 function cleanupForeignStagedSnapshot(cwd, snapshotPath) {
     if (!snapshotPath)
@@ -207,8 +205,11 @@ export function acquireCloseWindowStagedIndexLock(input) {
         taskId: input.taskId,
         expectedStageFiles: input.expectedStageFiles
     });
+    const expectedStageFiles = new Set(uniqueSorted(input.expectedStageFiles));
+    const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expectedStageFiles.has(filePath));
     let foreignStagedSnapshotPath = null;
-    if (unexpectedStagedTasks.length > 0 && !input.deferForeignStaged) {
+    let foreignStagedEntries = [];
+    if (unexpectedStagedFiles.length > 0 && !input.deferForeignStaged) {
         return {
             schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
             ok: false,
@@ -217,11 +218,15 @@ export function acquireCloseWindowStagedIndexLock(input) {
             unexpectedStagedTasks,
             foreignStagedSnapshotPath: null,
             blockedCode: 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS',
-            blockedSummary: `Close window blocked by foreign staged tasks (${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}); defer explicitly or wait for the other agent to commit.`
+            blockedSummary: unexpectedStagedTasks.length > 0
+                ? `Close window blocked by foreign staged tasks (${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}); defer explicitly or wait for the other agent to commit.`
+                : 'Close window blocked by staged entries outside the governed bundle; defer explicitly or reconcile the index before closing.'
         };
     }
-    if (unexpectedStagedTasks.length > 0 && input.deferForeignStaged) {
-        foreignStagedSnapshotPath = deferForeignStagedFiles(input.cwd, unexpectedStagedTasks);
+    if (unexpectedStagedFiles.length > 0 && input.deferForeignStaged) {
+        const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles);
+        foreignStagedSnapshotPath = deferred?.snapshotPath ?? null;
+        foreignStagedEntries = deferred?.entries ?? [];
     }
     const record = {
         schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
@@ -232,6 +237,7 @@ export function acquireCloseWindowStagedIndexLock(input) {
         status: 'active',
         expectedStageFiles: uniqueSorted(input.expectedStageFiles),
         foreignStagedSnapshotPath,
+        foreignStagedEntries,
         unexpectedStagedTasks,
         releasedAt: null,
         releaseOutcome: null
@@ -273,7 +279,7 @@ export function releaseCloseWindowStagedIndexLock(input) {
     if (existing.taskId !== normalizeTaskId(input.taskId))
         return existing;
     if (existing.foreignStagedSnapshotPath) {
-        restoreForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
+        restoreForeignStagedEntries(input.cwd, existing.foreignStagedEntries ?? [], existing.foreignStagedSnapshotPath);
         cleanupForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
     }
     const released = {

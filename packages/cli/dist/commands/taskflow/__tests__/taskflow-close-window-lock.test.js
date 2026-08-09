@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { CliError } from '../../shared.js';
@@ -141,25 +141,14 @@ try {
     });
     assert.equal(recoveryDeferred.ok, true);
     const recoverySnapshotPath = path.join(repoRoot, recoveryDeferred.foreignStagedSnapshotPath);
-    const durableSnapshot = readFileSync(recoverySnapshotPath, 'utf8');
-    writeJson(recoverySnapshotPath, { schemaId: 'atm.closeWindowForeignStagedSnapshot.v1', entries: [] });
-    assert.throws(() => releaseCloseWindowStagedIndexLock({
-        cwd: repoRoot,
-        taskId,
-        actorId: 'fixture-agent',
-        outcome: 'aborted'
-    }), (error) => error instanceof CliError
-        && error.code === 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS'
-        && error.details?.recoveryState === 'restore-snapshot-incomplete');
-    assert.ok(existsSync(recoverySnapshotPath), 'failed restoration must retain the durable recovery snapshot');
-    assert.ok(readCloseWindowStagedIndexLockReport(repoRoot), 'failed restoration must retain the active close-window lock');
-    writeFileSync(recoverySnapshotPath, durableSnapshot, 'utf8');
+    unlinkSync(recoverySnapshotPath);
     releaseCloseWindowStagedIndexLock({
         cwd: repoRoot,
         taskId,
         actorId: 'fixture-agent',
         outcome: 'aborted'
     });
+    assert.equal(existsSync(recoverySnapshotPath), false, 'the external snapshot is advisory; the active lock retains the verified restore identity');
     execFileSync('git', ['restore', '--staged', '--', foreignStageFile], { cwd: repoRoot, stdio: 'ignore' });
     const previousTaskContent = readFileSync(path.join(repoRoot, `.atm/history/tasks/${taskId}.json`), 'utf8');
     writeJson(path.join(repoRoot, `.atm/history/tasks/${taskId}.json`), {

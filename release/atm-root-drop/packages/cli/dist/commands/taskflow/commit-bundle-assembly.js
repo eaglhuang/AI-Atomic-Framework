@@ -515,7 +515,7 @@ export async function commitTaskflowDeliveryFiles(input) {
     if (staged.status !== 'staged') {
         return null;
     }
-    const targetResult = await runAtmGit(['commit', '--cwd', repoRoot, '--actor', input.actorId, '--task', input.taskId, '--message', deliveryBundle.commitMessage,
+    const targetResult = await runAtmGit(['commit', '--cwd', repoRoot, '--actor', input.actorId, '--task', input.taskId, '--message', deliveryBundle.commitMessage, '--auto-stage',
         ...(input.deferForeignStaged ? ['--defer-foreign-staged'] : []), '--json']);
     const commitSha = String(targetResult.evidence?.commitSha ?? '') || null;
     return { repoRoot, stageFiles: staged.stageFiles, commitMessage: deliveryBundle.commitMessage, commitSha, status: 'committed' };

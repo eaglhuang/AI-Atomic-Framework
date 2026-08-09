@@ -26,6 +26,9 @@ function writeText(filePath, content) {
     mkdirSync(path.dirname(filePath), { recursive: true });
     writeFileSync(filePath, content, 'utf8');
 }
+function readIndexEntry(repoRoot, filePath) {
+    return execFileSync('git', ['ls-files', '-s', '--', filePath], { cwd: repoRoot, encoding: 'utf8' }).trim();
+}
 function initGitRepo(repoRoot) {
     mkdirSync(repoRoot, { recursive: true });
     execFileSync('git', ['init'], { cwd: repoRoot, stdio: 'ignore' });
@@ -154,6 +157,11 @@ assert.equal(successClose.evidence.closeWriteTransaction.ok, true);
 const successTaskDoc = JSON.parse(readFileSync(path.join(successFixture.targetRepo, '.atm/history/tasks', `${successFixture.taskId}.json`), 'utf8'));
 assert.equal(successTaskDoc.status, 'done');
 const rollbackFixture = await makeCloseAtomicityFixture('rollback');
+const foreignStagedPath = 'foreign/closure-receipt.json';
+writeText(path.join(rollbackFixture.targetRepo, foreignStagedPath), '{"version":"before-close"}\n');
+execFileSync('git', ['add', '--', foreignStagedPath], { cwd: rollbackFixture.targetRepo, stdio: 'ignore' });
+const foreignIndexBeforeClose = readIndexEntry(rollbackFixture.targetRepo, foreignStagedPath);
+const foreignWorktreeBeforeClose = readFileSync(path.join(rollbackFixture.targetRepo, foreignStagedPath), 'utf8');
 const hookDir = path.join(rollbackFixture.planningRepo, '.githooks');
 mkdirSync(hookDir, { recursive: true });
 const hookPath = path.join(hookDir, 'pre-commit');
@@ -166,6 +174,7 @@ const rollbackClose = await withLaneCapability(rollbackFixture.laneSessionId, ()
     '--profile', rollbackFixture.profilePath,
     '--task', rollbackFixture.taskId,
     '--actor', 'validator',
+    '--defer-foreign-state',
     '--write',
     '--json'
 ]));
@@ -175,6 +184,8 @@ assert.ok(rollbackClose.evidence.closeWriteTransaction.rolledBackArtifacts.lengt
 const rollbackTaskDoc = JSON.parse(readFileSync(path.join(rollbackFixture.targetRepo, '.atm/history/tasks', `${rollbackFixture.taskId}.json`), 'utf8'));
 assert.notEqual(rollbackTaskDoc.status, 'done', 'rolled-back close must not leave a done ledger behind');
 assert.match(readFileSync(rollbackFixture.planPath, 'utf8'), /status:\s*running/, 'planning card closeback must roll back with the transaction');
+assert.equal(readIndexEntry(rollbackFixture.targetRepo, foreignStagedPath), foreignIndexBeforeClose, 'rollback must restore every foreign staged mode/blob/path identity');
+assert.equal(readFileSync(path.join(rollbackFixture.targetRepo, foreignStagedPath), 'utf8'), foreignWorktreeBeforeClose, 'rollback must not alter foreign worktree content');
 for (const fixture of [successFixture, rollbackFixture]) {
     if (existsSync(fixture.tempRoot)) {
         rmSync(fixture.tempRoot, { recursive: true, force: true });
