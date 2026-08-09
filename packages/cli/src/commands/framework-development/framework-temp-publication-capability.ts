@@ -33,7 +33,10 @@ export function resolveFrameworkCommitAuthorityContext(input: {
   readonly actorId: string;
   readonly taskExists: boolean;
 }): FrameworkCommitAuthorityContext {
-  const capability = input.taskExists ? null : resolveFrameworkTempPublicationCapability(input);
+  const capability = input.taskExists ? null : resolveFrameworkTempPublicationCapability({
+    ...input,
+    laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null,
+  });
   return {
     usesFrameworkClaimCommit: !input.taskExists || capability !== null,
     frameworkClaimFiles: capability?.allowedFiles ?? null,
@@ -44,17 +47,25 @@ export function resolveFrameworkTempPublicationCapability(input: {
   readonly cwd: string;
   readonly taskId: string | null | undefined;
   readonly actorId?: string | null;
+  /** A no-task framework commit must bind to its current lane, never another
+   * live claim held by the same actor. */
+  readonly laneSessionId?: string | null;
   readonly now?: number;
 }): FrameworkTempPublicationCapability | null {
   const taskId = input.taskId?.trim();
   const actorId = input.actorId?.trim() ?? '';
-  if (!taskId) return null;
-  const lock = readFrameworkTempLockProjection(input.cwd, input.now).find(
+  const laneSessionId = input.laneSessionId?.trim() ?? '';
+  const candidates = readFrameworkTempLockProjection(input.cwd, input.now).filter(
     (candidate) =>
-      candidate.workItemId === taskId &&
+      (!taskId || candidate.workItemId === taskId) &&
       (!actorId || candidate.actorId === actorId) &&
+      (!laneSessionId || candidate.laneSessionId === laneSessionId) &&
       candidate.disposition === 'foreign-live',
   );
+  // A task id already provides a canonical authority key.  A taskless
+  // publication must instead be unique after lane binding; guessing among an
+  // actor's other live claims would permit receipt/lock identity drift.
+  const lock = candidates.length === 1 ? candidates[0] : null;
   return lock ? toCapability(input.cwd, lock) : null;
 }
 

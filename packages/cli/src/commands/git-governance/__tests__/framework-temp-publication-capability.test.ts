@@ -24,6 +24,15 @@ writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`),
   linkedTaskId: 'ATM-GOV-0342',
   files: ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'],
 }, null, 2)}\n`, 'utf8');
+writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', 'ATM-FRAMEWORK-TEMP-other-live-claim.lock.json'), `${JSON.stringify({
+  workItemId: 'ATM-FRAMEWORK-TEMP-other-live-claim',
+  actorId: 'publication-steward',
+  heartbeatAt: '2026-08-09T14:52:54.000Z',
+  ttlSeconds: 3600,
+  laneSessionId: 'lane-other',
+  linkedTaskId: 'ATM-GOV-elsewhere',
+  files: ['release/atm-onefile/atm.mjs'],
+}, null, 2)}\n`, 'utf8');
 writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'ATM-GOV-0344.json'), `${JSON.stringify({ status: 'done' })}\n`, 'utf8');
 writeFileSync(path.join(cwd, '.atm', 'history', 'evidence', 'ATM-GOV-0344.runner-sync-receipt.json'), `${JSON.stringify({
   schemaId: 'atm.runnerSyncReceipt.v1',
@@ -59,6 +68,24 @@ assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
 assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
   '.atm/history/evidence/ATM-GOV-0344.runner-sync-receipt.json',
 ]), true, 'queue/receipt-bound terminal continuation must be publishable without reopening its task');
+
+assert.equal(resolveFrameworkTempPublicationCapability({
+  cwd,
+  taskId: null,
+  actorId: 'publication-steward',
+  now: Date.parse(now),
+}), null, 'taskless publication must not guess between same-actor claims');
+const laneBound = resolveFrameworkTempPublicationCapability({
+  cwd,
+  taskId: null,
+  actorId: 'publication-steward',
+  laneSessionId: 'lane-publication',
+  now: Date.parse(now),
+});
+assert.equal(laneBound?.taskId, taskId, 'taskless publication must bind to the current lane claim');
+assert.equal(frameworkTempPublicationCapabilityCovers(laneBound, [
+  '.atm/history/evidence/ATM-GOV-0342.runner-sync-receipt.json',
+]), true);
 
 const admitted = evaluateTaskWorkAdmissionGate({
   cwd,
