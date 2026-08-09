@@ -221,6 +221,7 @@ try {
             options.cwd,
             scopedCommitFiles.length > 0 ? scopedCommitFiles : stagedCommitSurface,
             actorId,
+            options.taskId,
             (scopedEnv: LegacyValue) => runCommit({ ...commitEnv, ...scopedEnv }),
             resolveGovernedCommitSeal({
               cwd: options.cwd,

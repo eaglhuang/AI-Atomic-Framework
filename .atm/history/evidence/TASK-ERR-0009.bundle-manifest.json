@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-ERR-0009",
+  "updatedAt": "2026-08-09T12:04:12.471Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:632d10fae4f8fab83eaa5aa23af40cd00b976e9ce338c5df6e3eb9ed3bc49171",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts"
+      ],
+      "generatedAt": "2026-08-09T12:03:18.782Z",
+      "startedAt": "2026-08-09T12:03:17.918Z",
+      "finishedAt": "2026-08-09T12:03:18.782Z",
+      "durationMs": 864,
+      "runnerKind": "dev-source",
+      "sourceCommit": "96a8e5ef7d12f2c468d2fc87b14227b6afb94bf9",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-09T12:03:32.535Z",
+      "startedAt": "2026-08-09T12:03:21.805Z",
+      "finishedAt": "2026-08-09T12:03:32.535Z",
+      "durationMs": 10730,
+      "runnerKind": "dev-source",
+      "sourceCommit": "96a8e5ef7d12f2c468d2fc87b14227b6afb94bf9",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c920dbfa44da0987ea3f84fbbae7ad3919881a994eb0d33973f9e87ec1741e43",
+      "stderrSha256": "sha256:891b5b3963767296720c2a6567357bc52274080ea5f05b2acf613f94e524ec20",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-09T12:04:12.470Z",
+      "startedAt": "2026-08-09T12:03:35.764Z",
+      "finishedAt": "2026-08-09T12:04:12.470Z",
+      "durationMs": 36706,
+      "runnerKind": "dev-source",
+      "sourceCommit": "96a8e5ef7d12f2c468d2fc87b14227b6afb94bf9",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

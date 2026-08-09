@@ -281,7 +281,7 @@ function readSource(relative: string): string {
   // The governed wrapper is the route a real commit takes, so it has to fail
   // the same way rather than quietly sealing whatever the shared index holds.
   expectThrows(
-    () => withTaskScopedCommitIndex(root, ['stray.txt'], 'claude-006', neverRun, null),
+    () => withTaskScopedCommitIndex(root, ['stray.txt'], 'claude-006', 'TASK-TEST-0001', neverRun, null),
     ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE
   );
   expectThrows(
