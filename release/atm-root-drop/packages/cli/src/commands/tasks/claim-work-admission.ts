@@ -59,7 +59,7 @@ export async function completeTaskClaimWithWorkAdmission(input: {
       actorId: input.actorId,
       laneSessionId: input.laneSession.session.laneId,
       claimGeneration: String(claim.leaseId),
-      allowedFiles: resolveTaskWorkAdmissionFiles(input.taskDocument, input.files),
+      allowedFiles: resolveTaskWorkAdmissionFiles(input.taskDocument, input.files, input.cwd),
       requestedRecoveryMode: readRequestedRecoveryMode(input.taskDocument),
       runnerSelection: {
         runnerKind: 'frozen',
@@ -160,7 +160,7 @@ export function resealWorkAdmissionTicketForRenewal(input: {
     actorId: input.actorId,
     laneSessionId: typeof laneSessionId === 'string' ? laneSessionId : null,
     claimGeneration: String(input.claim.leaseId),
-    allowedFiles: resolveTaskWorkAdmissionFiles(input.taskDocument, []),
+    allowedFiles: resolveTaskWorkAdmissionFiles(input.taskDocument, [], input.cwd),
     requestedRecoveryMode: readRequestedRecoveryMode(input.taskDocument),
     runnerSelection: {
       runnerKind: 'frozen',
@@ -221,7 +221,7 @@ function producerDeclaresArtifactPath(cwd: string, taskId: string, artifactPath:
   } catch { return false; }
 }
 
-export function resolveTaskWorkAdmissionFiles(taskDocument: Record<string, unknown>, fallback: readonly string[]): readonly string[] {
+export function resolveTaskWorkAdmissionFiles(taskDocument: Record<string, unknown>, fallback: readonly string[], cwd?: string): readonly string[] {
   const directionLock = readRecord(taskDocument.taskDirectionLock);
   const declaredFiles = Array.isArray(directionLock?.allowedFiles)
     ? directionLock.allowedFiles.map(String)
@@ -230,17 +230,28 @@ export function resolveTaskWorkAdmissionFiles(taskDocument: Record<string, unkno
     : fallback;
   const taskId = normalizeTaskId(taskDocument.workItemId ?? taskDocument.taskId);
   return taskId
-    ? [...new Set([...declaredFiles, ...taskLifecycleArtifactPaths(taskId)])]
+    ? [...new Set([...declaredFiles, ...taskLifecycleArtifactPaths(taskId, cwd)])]
     : declaredFiles;
 }
 
-function taskLifecycleArtifactPaths(taskId: string): readonly string[] {
+function taskLifecycleArtifactPaths(taskId: string, cwd?: string): readonly string[] {
   return [
-    '.atm/history/evidence/git-head.jsonl',
+    ...(cwd && readGitHeadReceiptOwner(cwd) === taskId ? ['.atm/history/evidence/git-head.jsonl'] : []),
     `.atm/history/evidence/${taskId}.*`,
     `.atm/history/task-events/${taskId}/**`,
     `.atm/history/tasks/${taskId}.json`
   ];
+}
+
+function readGitHeadReceiptOwner(cwd: string): string | null {
+  const receipt = path.join(cwd, '.atm/history/evidence/git-head.jsonl');
+  if (!existsSync(receipt)) return null;
+  try {
+    const entries = readFileSync(receipt, 'utf8').trim().split(/\r?\n/).filter(Boolean);
+    const latest = JSON.parse(entries.at(-1) ?? '{}') as { evidence?: Array<{ details?: { taskId?: unknown } }> };
+    const taskId = latest.evidence?.[0]?.details?.taskId;
+    return typeof taskId === 'string' && taskId.trim() ? taskId.trim() : null;
+  } catch { return null; }
 }
 
 function normalizeTaskId(value: unknown): string | null {

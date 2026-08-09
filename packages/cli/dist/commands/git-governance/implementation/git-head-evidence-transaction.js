@@ -58,7 +58,7 @@ export function ensureGovernedGitHeadEvidenceStagedForCommit(cwd, actorId) {
     runGitCommand(cwd, ["add", "--", gitHeadEvidencePath], ["ignore", "pipe", "pipe"]);
     return { evidencePath: gitHeadEvidencePath, treeSha, parentCommitShas };
 }
-export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, commitFiles, env) {
+export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, taskId, commitFiles, env) {
     if (!shouldStageGovernedGitHeadEvidenceBeforeCommit(commitFiles)) {
         return null;
     }
@@ -84,6 +84,7 @@ export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, acto
                     commandRuns: [],
                     details: {
                         actorId,
+                        taskId,
                         kind: "commit",
                         freshness: "fresh",
                         git: {

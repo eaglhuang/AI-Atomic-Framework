@@ -143,7 +143,7 @@ export function executeGitCommit(options, context) {
             // resolved, and a commit that only has a pre-staged index seals that
             // index under its own provenance. Neither branch reaches assembly
             // without a named seal, so there is no live-index fallback left.
-            const commitScopedBundle = () => withTaskScopedCommitIndex(options.cwd, scopedCommitFiles.length > 0 ? scopedCommitFiles : stagedCommitSurface, actorId, (scopedEnv) => runCommit({ ...commitEnv, ...scopedEnv }), resolveGovernedCommitSeal({
+            const commitScopedBundle = () => withTaskScopedCommitIndex(options.cwd, scopedCommitFiles.length > 0 ? scopedCommitFiles : stagedCommitSurface, actorId, options.taskId, (scopedEnv) => runCommit({ ...commitEnv, ...scopedEnv }), resolveGovernedCommitSeal({
                 cwd: options.cwd,
                 admittedBundle: scopedCommitFiles.length > 0
                     ? (taskScopedBundleReport?.sealedBundle ?? null)

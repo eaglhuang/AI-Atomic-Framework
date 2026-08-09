@@ -357,7 +357,7 @@ export function recordGitIndexRestoreFailure(cwd, input) {
  * the live shared index, and neither is an absent one: the caller passes the
  * seal source it decided on, and an unnamed source fails closed.
  */
-export function withTaskScopedCommitIndex(cwd, files, actorId, run, sealSource) {
+export function withTaskScopedCommitIndex(cwd, files, actorId, taskId, run, sealSource) {
     const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
     return runWithSealedTaskScopedCommitIndex({
         cwd,
@@ -369,7 +369,7 @@ export function withTaskScopedCommitIndex(cwd, files, actorId, run, sealSource) 
         stageGovernanceEvidence: (env) => {
             if (!actorId)
                 return [];
-            const staged = ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, normalizedFiles, env);
+            const staged = ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, taskId, normalizedFiles, env);
             return staged?.evidencePath ? [staged.evidencePath] : [];
         },
         run,

@@ -112,6 +112,7 @@ export function ensureGovernedGitHeadEvidenceStagedForCommit(cwd: LegacyValue, a
 export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
   cwd: LegacyValue,
   actorId: LegacyValue,
+  taskId: LegacyValue,
   commitFiles: LegacyValue,
   env: LegacyValue,
 ) {
@@ -140,6 +141,7 @@ export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
           commandRuns: [],
           details: {
             actorId,
+            taskId,
             kind: "commit",
             freshness: "fresh",
             git: {
