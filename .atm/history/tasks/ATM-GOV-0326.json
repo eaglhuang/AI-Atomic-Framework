@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0326",
   "title": "Reconcile planning target ledger projection and closure authority",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0325"
@@ -168,7 +168,7 @@
     "actorId": "codex-captain-20260809",
     "leaseId": "lease-1d5e23ef889f",
     "claimedAt": "2026-08-09T08:37:18.641Z",
-    "heartbeatAt": "2026-08-09T09:10:58.057Z",
+    "heartbeatAt": "2026-08-09T09:22:51.465Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0326.*",
@@ -185,13 +185,14 @@
       "scripts/validate-taskflow-close-atomicity.ts",
       "tests/cli/cross-authority-closeback-authority.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260809083719-codex-captain-20260809-b10112bd4f",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809083719-codex-captain-20260809-b10112bd4f\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-captain-20260809",
   "startedAt": "2026-08-09T08:37:18.641Z",
@@ -241,8 +242,8 @@
     "createdAt": "2026-08-09T08:37:28.136Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-09T09-10-58-675Z-renew-2738254e5c05",
-  "lastTransitionAt": "2026-08-09T09:10:58.675Z",
+  "lastTransitionId": "2026-08-09T09-22-51-469Z-close-7bc722b4d5de",
+  "lastTransitionAt": "2026-08-09T09:22:51.469Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -315,5 +316,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  }
+  },
+  "closedAt": "2026-08-09T09:22:51.465Z",
+  "closedByActor": "codex-captain-20260809",
+  "closedBySessionId": "session-20260809083718-codex-captain-20260809-ATM-GOV-0326-199653ddf7",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0326.closure-packet.json"
 }
