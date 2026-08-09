@@ -41,6 +41,15 @@ writeFileSync(path.join(cwd, '.atm', 'history', 'evidence', 'ATM-GOV-0344.runner
   stewardWorkId: 'runner-sync-fixture',
   sealedSourceSha: 'a'.repeat(40),
 })}\n`, 'utf8');
+writeFileSync(path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.runner-sync-receipt.json`), `${JSON.stringify({
+  schemaId: 'atm.runnerSyncReceipt.v1',
+  taskId,
+  actorId: 'publication-steward',
+  outputInventory: { entries: [
+    { path: 'packages/cli/dist/commands/generated.js', disposition: 'owned-current' },
+    { path: 'packages/cli/dist/commands/foreign.js', disposition: 'foreign-retained' },
+  ] },
+})}\n`, 'utf8');
 writeFileSync(path.join(cwd, '.atm', 'runtime', 'runner-sync-steward-queue.json'), `${JSON.stringify({
   groups: [{
     queuePosition: 1,
@@ -68,6 +77,12 @@ assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
 assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
   `.atm/history/evidence/${taskId}.runner-sync-receipt.json`,
 ]), true, 'a temporary build receipt must always be publishable by its own lock');
+assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
+  'packages/cli/dist/commands/generated.js',
+]), true, 'the receipt-owned generated output must be publishable even when no release manifest lists it');
+assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
+  'packages/cli/dist/commands/foreign.js',
+]), false, 'a receipt must not grant publication authority over foreign inventory entries');
 assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
   '.atm/history/evidence/ATM-GOV-0344.runner-sync-receipt.json',
 ]), true, 'queue/receipt-bound terminal continuation must be publishable without reopening its task');

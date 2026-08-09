@@ -101,9 +101,38 @@ function toCapability(cwd: string, lock: FrameworkTempLockProjection): Framework
       ...(lock.linkedTaskId
         ? [`.atm/history/evidence/${lock.linkedTaskId}.runner-sync-receipt.json`]
         : []),
+      ...resolveReceiptBoundGeneratedOutputPaths(cwd, lock),
       ...resolveQueueBoundTerminalReceiptPaths(cwd, lock),
     ],
   };
+}
+
+/**
+ * A sealed runner receipt is the authority for its generated output set.  A
+ * release manifest is only a projection and can lag the actual build delta.
+ * Accept no path unless the live lock, receipt identity, and owned-current
+ * inventory entry all agree.
+ */
+function resolveReceiptBoundGeneratedOutputPaths(cwd: string, lock: FrameworkTempLockProjection): readonly string[] {
+  const receiptPath = `.atm/history/evidence/${lock.workItemId}.runner-sync-receipt.json`;
+  const absolute = path.join(cwd, receiptPath);
+  if (!existsSync(absolute)) return [];
+  try {
+    const receipt = JSON.parse(readFileSync(absolute, 'utf8')) as Record<string, unknown>;
+    if (receipt.schemaId !== 'atm.runnerSyncReceipt.v1' || receipt.taskId !== lock.workItemId || receipt.actorId !== lock.actorId) return [];
+    const inventory = receipt.outputInventory;
+    if (!inventory || typeof inventory !== 'object' || !Array.isArray((inventory as Record<string, unknown>).entries)) return [];
+    return (inventory as { entries: unknown[] }).entries.flatMap((entry): string[] => {
+      if (!entry || typeof entry !== 'object') return [];
+      const record = entry as Record<string, unknown>;
+      const outputPath = typeof record.path === 'string' ? record.path : '';
+      return record.disposition === 'owned-current' && outputPath && !path.isAbsolute(outputPath) && !outputPath.startsWith('../')
+        ? [outputPath.replace(/\\/g, '/')]
+        : [];
+    });
+  } catch {
+    return [];
+  }
 }
 
 /**
