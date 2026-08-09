@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { resolveRunnerSyncLeaseHealth } from './runner-sync-lease-health.ts';
 import { sanitizeIdentityValue } from '../shared/identity-normalization.ts';
 import type { RunnerSyncAdmissionReport, RunnerSyncAdmissionStewardRequest } from './runner-sync-admission.ts';
 
@@ -197,25 +198,11 @@ export function resolveActiveLaneSessionId(cwd: string, stewardActorId: string):
 function resolveQueueHeadHealth(
   cwd: string,
   requests: unknown
-): 'task-active' | 'task-missing' | 'task-terminal' {
+): 'task-active' | 'task-lease-expired' | 'task-missing' | 'task-terminal' {
   if (!Array.isArray(requests) || requests.length === 0) return 'task-active';
   const taskId = String((requests[0] as { taskId?: unknown })?.taskId ?? '').trim();
   if (!taskId) return 'task-active';
-  const frameworkTempHealth = resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId);
-  if (frameworkTempHealth) {
-    return frameworkTempHealth;
-  }
-  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
-  if (!existsSync(taskPath)) return 'task-missing';
-  try {
-    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
-    const status = typeof task.status === 'string' ? task.status.trim().toLowerCase() : '';
-    return status === 'done' || status === 'verified' || status === 'abandoned'
-      ? 'task-terminal'
-      : 'task-active';
-  } catch {
-    return 'task-active';
-  }
+  return resolveRunnerSyncLeaseHealth(cwd, taskId);
 }
 
 function resolveFrameworkTempRunnerSyncTaskHealth(

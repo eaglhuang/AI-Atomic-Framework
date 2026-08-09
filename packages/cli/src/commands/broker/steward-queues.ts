@@ -23,6 +23,7 @@ import { planMutationBatch } from '../../../../core/src/broker/adapters/batch-pl
 import { computeCasResult, hashContent } from '../../../../core/src/broker/adapters/cas.ts';
 import { enqueueSharedSurface, planSharedSurfaceAcquisition, removeSharedSurfaceEntry, type SharedSurfaceQueue } from '../../../../core/src/broker/shared-surface-queue.ts';
 import { cleanupRunnerSyncStewardQueue, emptyRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue, type RunnerSyncStewardQueueDocument, type RunnerSyncTaskHealth, type RunnerSyncStewardRequest } from '../../../../core/src/broker/runner-sync-steward-queue.ts';
+import { resolveRunnerSyncLeaseHealth } from '../framework-development/runner-sync-lease-health.ts';
 import { supersedeRunnerSyncReservation } from './runner-sync-supersession.ts';
 import { cleanupGeneratedProjectionSteward, emptyGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild, type GeneratedProjectionStewardDocument } from '../../../../core/src/broker/generated-projection-steward.ts';
 import { acknowledgeFreeze, createFreezeSignal, resolveFreezeDecision, type FreezeAck, type FreezeResolution, type FreezeSignal } from '../../../../core/src/broker/freeze.ts';
@@ -338,23 +339,7 @@ function resolveRunnerSyncTaskHealth(cwd: string, request: RunnerSyncStewardRequ
 }
 
 function resolveRunnerSyncTaskIdHealth(cwd: string, taskId: string): RunnerSyncTaskHealth {
-  const frameworkTempHealth = resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId);
-  if (frameworkTempHealth) {
-    return frameworkTempHealth;
-  }
-  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
-  if (!existsSync(taskPath)) {
-    return 'task-missing';
-  }
-  try {
-    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
-    const status = typeof task.status === 'string' ? task.status.trim().toLowerCase() : '';
-    return status === 'done' || status === 'verified' || status === 'abandoned'
-      ? 'task-terminal'
-      : 'task-active';
-  } catch {
-    return 'task-active';
-  }
+  return resolveRunnerSyncLeaseHealth(cwd, taskId);
 }
 
 function assertRunnerSyncRecoveryAuthority(cwd: string, taskId: string, actorId: string): void {

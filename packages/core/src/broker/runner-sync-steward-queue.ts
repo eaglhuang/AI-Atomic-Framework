@@ -45,7 +45,7 @@ export type BrokerTicketEnvelope = {
 export type RunnerSyncStewardStaleRelease = {
   readonly taskId: string; readonly actorId: string; readonly sealedSourceSha: string; readonly stewardWorkId: string;
   readonly queuePosition: number; readonly expiredAt: string;
-  readonly reason: 'ttl-expired' | 'orphan-task-missing' | 'orphan-task-terminal' | 'malformed-sealed-source' | 'superseded-task-generation';
+  readonly reason: 'ttl-expired' | 'orphan-task-lease-expired' | 'orphan-task-missing' | 'orphan-task-terminal' | 'malformed-sealed-source' | 'superseded-task-generation';
   readonly safeRetryCommand: string;
 };
 
@@ -58,7 +58,7 @@ export type RunnerSyncStewardReleaseInput = {
   readonly taskId: string; readonly stewardWorkId: string; readonly receiptRef?: string | null; readonly receiptDigest?: string | null; readonly releasedAt?: string;
 };
 
-export type RunnerSyncTaskHealth = 'task-active' | 'task-missing' | 'task-terminal';
+export type RunnerSyncTaskHealth = 'task-active' | 'task-lease-expired' | 'task-missing' | 'task-terminal';
 export type TaskHealthResolver = (request: RunnerSyncStewardRequest) => RunnerSyncTaskHealth;
 
 export type RunnerSyncStewardCleanupOptions = {
@@ -537,6 +537,7 @@ function staleReleaseReasonFromHealth(
 ): RunnerSyncStewardStaleRelease['reason'] | null {
   if (health === 'task-missing') return 'orphan-task-missing';
   if (health === 'task-terminal') return 'orphan-task-terminal';
+  if (health === 'task-lease-expired') return 'orphan-task-lease-expired';
   return null;
 }
 
