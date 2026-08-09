@@ -74,13 +74,13 @@ export function assertGovernedCommitPhysicalLineBudget(cwd: LegacyValue, files: 
 }
 
 export function executeGitCommit(options: LegacyValue, context: LegacyValue) {
-let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers } = context;
+let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers } = context;
 try {
     withBranchCommitQueueLock(
       {
         cwd: options.cwd,
         actorId,
-        taskId: options.taskId,
+        taskId: hookTaskId,
         sessionId: session?.sessionId ?? null,
         branchRef,
         branchName,
@@ -114,7 +114,7 @@ try {
           GIT_COMMITTER_NAME: gitName,
           GIT_COMMITTER_EMAIL: gitEmail,
           ATM_COMMIT_ACTOR_ID: actorId,
-          ATM_COMMIT_TASK_ID: options.taskId ?? "",
+          ATM_COMMIT_TASK_ID: hookTaskId ?? "",
           ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? "",
           ATM_COMMIT_SESSION_ID: session?.sessionId ?? "",
           ATM_COMMIT_LANE_SESSION_ID: laneSessionId ?? "",
@@ -158,7 +158,7 @@ try {
           options.cwd,
           stagedCommitSurface,
           actorId,
-          options.taskId,
+          hookTaskId,
         );
         if (
           !options.noVerify &&
