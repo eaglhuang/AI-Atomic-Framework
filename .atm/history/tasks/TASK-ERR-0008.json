@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0008",
   "title": "Unify taskflow close and stage-override index ownership snapshots",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -163,8 +163,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T12-10-35-230Z-scope-amendment-41c9ff3ba1ea",
-  "lastTransitionAt": "2026-08-09T12:10:35.230Z",
+  "lastTransitionId": "2026-08-09T12-25-04-961Z-close-5d6925a88cef",
+  "lastTransitionAt": "2026-08-09T12:25:04.961Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T11:22:29.853Z",
@@ -173,7 +173,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-b60d3c4a3ce1",
     "claimedAt": "2026-08-09T11:22:29.859Z",
-    "heartbeatAt": "2026-08-09T11:56:14.214Z",
+    "heartbeatAt": "2026-08-09T12:25:04.959Z",
     "ttlSeconds": 3600,
     "files": [
       ".atm/history/evidence/TASK-ERR-0008.*",
@@ -188,13 +188,14 @@
       "packages/cli/src/commands/tasks/close-window-lock.ts",
       "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260809112230-codex-gpt-5.4-mini-7cd280dd5e",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809112230-codex-gpt-5.4-mini-7cd280dd5e\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-09T11:22:29.859Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -309,5 +310,9 @@
     },
     "createdAt": "2026-08-09T11:22:43.150Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-09T12:25:04.959Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809112229-codex-gpt-5.4-mini-TASK-ERR-0008-c9d724a2d2",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0008.closure-packet.json"
 }

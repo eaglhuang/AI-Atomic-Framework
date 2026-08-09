@@ -1,12 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-ERR-0008",
-  "updatedAt": "2026-08-09T11:29:45.741Z",
+  "updatedAt": "2026-08-09T12:20:50.437Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
     "typecheck",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -56,6 +57,38 @@
       "durationMs": 41635,
       "runnerKind": "dev-source",
       "sourceCommit": "a2e441037d15abd0ab64d2812ede1752b2356273",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:87c69c64afb814d6ff768044cc19034220d48b75db6750755d19dcbc91116066",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+      ],
+      "generatedAt": "2026-08-09T11:55:39.261Z",
+      "startedAt": "2026-08-09T11:55:36.613Z",
+      "finishedAt": "2026-08-09T11:55:39.261Z",
+      "durationMs": 2648,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-09T12:20:50.436Z",
+      "startedAt": "2026-08-09T12:19:17.963Z",
+      "finishedAt": "2026-08-09T12:20:50.436Z",
+      "durationMs": 92473,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

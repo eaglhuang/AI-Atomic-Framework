@@ -1,0 +1,152 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ERR-0008",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "580c085d303c1b65e2427ea555c89534ab78455c",
+  "governedTreeSha": "895bcb865947549fa1039ff0059dd3e2709c24df",
+  "targetCommitDelta": {
+    "currentCommitSha": "580c085d303c1b65e2427ea555c89534ab78455c",
+    "parentCommitShas": [
+      "580c085d303c1b65e2427ea555c89534ab78455c"
+    ],
+    "governedTreeSha": "895bcb865947549fa1039ff0059dd3e2709c24df",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0328.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0328.json",
+      ".atm/history/evidence/TASK-ERR-0008.bundle-manifest.json",
+      ".atm/history/evidence/TASK-ERR-0008.json",
+      ".atm/history/tasks/ATM-GOV-0328.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:87c69c64afb814d6ff768044cc19034220d48b75db6750755d19dcbc91116066",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:91913562f389e3161fef714453a8aff87a24a33c4ecd3424c7ae2e876e1abe24",
+      "stderrSha256": "sha256:5f0b4a6c30611c824b00f5c97446f1cf1e2d7706ed2726a5c3845165bc184236",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-09T12:25:04.955Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ERR-0008.*",
+      ".atm/history/task-events/TASK-ERR-0008/**",
+      ".atm/history/tasks/TASK-ERR-0008.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/lease-command.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/lease-command.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ERR-0008.json",
+  "closedAt": "2026-08-09T12:25:04.956Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809112229-codex-gpt-5.4-mini-TASK-ERR-0008-c9d724a2d2",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f2f264e12a7a4346f4bd51d5a2fcce2da367b336",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/tasks/close-window-lock.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-ERR-0008/2026-08-09T11-56-14-906Z-renew-209c5d939948.json",
+      ".atm/history/task-events/TASK-ERR-0008/2026-08-09T12-10-35-230Z-scope-amendment-41c9ff3ba1ea.json",
+      ".atm/history/tasks/TASK-ERR-0008.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
