@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T12-10-35-230Z-scope-amendment-41c9ff3ba1ea",
+  "taskId": "TASK-ERR-0008",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0008.json",
+  "taskSha256": "sha256:d6da57ba587a4d443adca56bc6266a1271fddf1f1df0131ca2bc28e247ad94c5",
+  "createdAt": "2026-08-09T12:10:35.230Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0008 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/tasks/close-window-lock.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

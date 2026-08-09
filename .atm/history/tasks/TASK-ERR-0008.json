@@ -163,8 +163,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T11-51-01-048Z-scope-amendment-68c3f661e74a",
-  "lastTransitionAt": "2026-08-09T11:51:01.048Z",
+  "lastTransitionId": "2026-08-09T12-10-35-230Z-scope-amendment-41c9ff3ba1ea",
+  "lastTransitionAt": "2026-08-09T12:10:35.230Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T11:22:29.853Z",
@@ -173,8 +173,8 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-b60d3c4a3ce1",
     "claimedAt": "2026-08-09T11:22:29.859Z",
-    "heartbeatAt": "2026-08-09T11:22:29.859Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-08-09T11:56:14.214Z",
+    "ttlSeconds": 3600,
     "files": [
       ".atm/history/evidence/TASK-ERR-0008.*",
       ".atm/history/task-events/TASK-ERR-0008/**",
@@ -185,13 +185,13 @@
       "packages/cli/src/commands/git-index-ownership.ts",
       "packages/cli/src/commands/taskflow/close-preflight.ts",
       "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
       "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260809112230-codex-gpt-5.4-mini-7cd280dd5e",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809112230-codex-gpt-5.4-mini-7cd280dd5e\""
     }
@@ -201,20 +201,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-b9bf2d94ed4ea0e1",
-    "ticketDigest": "sha256:b9bf2d94ed4ea0e1ad536dca4c3942ac9449ba2c6fb7e33bf9d1c1b47b40cc9b",
+    "ticketId": "wat-124e915cdcc461ae",
+    "ticketDigest": "sha256:124e915cdcc461ae20d3511d7dda363f7d541b81dbb2b8e3cf976e2c7b5ec71c",
     "taskId": "TASK-ERR-0008",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260809112230-codex-gpt-5.4-mini-7cd280dd5e",
     "claimGeneration": "lease-b60d3c4a3ce1",
-    "issuedAt": "2026-08-09T11:22:29.859Z",
-    "expiresAt": "2026-08-09T11:52:29.859Z",
-    "scopeDigest": "sha256:0904169cbe85a8bb57265390544ccade70f697e0b8a9924239839eb377dd6b9b",
+    "issuedAt": "2026-08-09T11:56:14.214Z",
+    "expiresAt": "2026-08-09T12:56:14.214Z",
+    "scopeDigest": "sha256:c0bf2b31fcd2dbf09412e05eccde89799316761bc03bcc7bc5b6fdcf4bcb713e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-09T11:22:29.859Z"
+      "selectedAt": "2026-08-09T11:56:14.214Z"
     },
     "grants": [
       {
@@ -224,12 +224,15 @@
           ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-ERR-0008/**",
           ".atm/history/tasks/TASK-ERR-0008.json",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
           "packages/cli/src/commands/git-governance/implementation/lease-command.ts",
           "packages/cli/src/commands/git-index-ownership.ts",
           "packages/cli/src/commands/taskflow/close-preflight.ts",
+          "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
           "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
         ],
-        "digest": "sha256:f5adfae93d242f17bbc10f1d7f7fec37b5d35463288b3dacbae394096f3a9c4a"
+        "digest": "sha256:33dd1521d9396e748c90b922e119f518f9a824bb656489ba2b73bd50d346b49c"
       },
       {
         "kind": "lifecycle-operation",
@@ -282,6 +285,7 @@
       "packages/cli/src/commands/git-index-ownership.ts",
       "packages/cli/src/commands/taskflow/close-preflight.ts",
       "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
       "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
     ],
     "planningReadOnlyPaths": [
