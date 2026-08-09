@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0344",
   "title": "restore taskflow close failure index and worktree atomicity",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0325",
@@ -88,8 +88,8 @@
   "importedAt": "2026-08-09T22:11:09.362Z",
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -180,8 +180,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T22-31-24-080Z-scope-amendment-1d177f620416",
-  "lastTransitionAt": "2026-08-09T22:31:24.080Z",
+  "lastTransitionId": "2026-08-09T22-47-49-735Z-close-15128ba30cdd",
+  "lastTransitionAt": "2026-08-09T22:47:49.735Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T22:11:30.237Z",
@@ -190,7 +190,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-a708e7ee6e12",
     "claimedAt": "2026-08-09T22:11:30.243Z",
-    "heartbeatAt": "2026-08-09T22:18:52.498Z",
+    "heartbeatAt": "2026-08-09T22:47:49.733Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0344.*",
@@ -209,43 +209,49 @@
       "tests/cli/git-index-close-isolation.test.ts",
       "tests/cli/git-index-override-lease-consumption.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260809221130-codex-gpt-5.4-mini-e8f817cbef",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809221130-codex-gpt-5.4-mini-e8f817cbef\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-09T22:11:30.243Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-65bad88c1f40d6a2",
-    "ticketDigest": "sha256:65bad88c1f40d6a2fbe0b1deda7da465166132e82b32fccace1e6fed87ee90cb",
+    "ticketId": "wat-6b0fe06dd55fbf16",
+    "ticketDigest": "sha256:6b0fe06dd55fbf16ed30a255b7b89b70d21bee7d0642ec1707106343a7c99ffb",
     "taskId": "ATM-GOV-0344",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260809221130-codex-gpt-5.4-mini-e8f817cbef",
     "claimGeneration": "lease-a708e7ee6e12",
-    "issuedAt": "2026-08-09T22:18:52.498Z",
-    "expiresAt": "2026-08-09T22:48:52.498Z",
-    "scopeDigest": "sha256:e4c522665d60cb8dd861191c975471b88ae64a3618b663fe7f8bfaf5813f1486",
+    "issuedAt": "2026-08-09T22:41:19.033Z",
+    "expiresAt": "2026-08-09T23:11:19.033Z",
+    "scopeDigest": "sha256:0fb01387555a8863c3a781673c5a6198ec9b5af09041d3a23475aa40d11d4d1e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-09T22:18:52.498Z"
+      "selectedAt": "2026-08-09T22:41:19.033Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0344.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0344/**",
           ".atm/history/tasks/ATM-GOV-0344.json",
           "packages/cli/src/commands/git-index-ownership.ts",
+          "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
           "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+          "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
           "packages/cli/src/commands/taskflow/close-orchestration.ts",
           "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
           "packages/cli/src/commands/taskflow/implementation.ts",
@@ -253,7 +259,7 @@
           "tests/cli/git-index-close-isolation.test.ts",
           "tests/cli/git-index-override-lease-consumption.test.ts"
         ],
-        "digest": "sha256:647422e3d0f561ea4769a8b9d87177314dbe7623f6dbbd9e892c41b521f96570"
+        "digest": "sha256:6b31f8ebcc151e846445d323213aa8420c925ec27988372ec8ecfd1332e5f0f9"
       },
       {
         "kind": "lifecycle-operation",
@@ -275,16 +281,16 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "disabled",
+      "resolvedMode": "enabled",
       "reasons": [
-        "low-risk-task"
+        "complex-task"
       ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
   },
   "startedBySessionId": "session-20260809221130-codex-gpt-5.4-mini-ATM-GOV-0344-19cc9bfbaf",
@@ -334,5 +340,9 @@
     },
     "createdAt": "2026-08-09T22:11:37.519Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-09T22:47:49.733Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809221130-codex-gpt-5.4-mini-ATM-GOV-0344-19cc9bfbaf",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0344.closure-packet.json"
 }

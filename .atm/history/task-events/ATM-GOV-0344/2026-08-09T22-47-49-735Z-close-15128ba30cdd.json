@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T22-47-49-735Z-close-15128ba30cdd",
+  "taskId": "ATM-GOV-0344",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809221130-codex-gpt-5.4-mini-ATM-GOV-0344-19cc9bfbaf",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0344.json",
+  "taskSha256": "sha256:d061e1f5e8b8f7426e36b1135867f8d8ec519917e99b99a1928047bdd826dfb9",
+  "createdAt": "2026-08-09T22:47:49.735Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0344 --actor codex-gpt-5.4-mini --status done --historical-delivery c1d16162e56e4375b17413340aae14f0c811739f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260809221130-codex-gpt-5.4-mini-ATM-GOV-0344-19cc9bfbaf",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0344.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "node --strip-types tests/cli/git-index-close-isolation.test.ts",
+      "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-09T22:47:49.722Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0344.*",
+        ".atm/history/task-events/ATM-GOV-0344/**",
+        ".atm/history/tasks/ATM-GOV-0344.json",
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/close-window-lock.ts",
+        "tests/cli/git-index-close-isolation.test.ts",
+        "tests/cli/git-index-override-lease-consumption.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/close-window-lock.ts",
+        "tests/cli/git-index-close-isolation.test.ts",
+        "tests/cli/git-index-override-lease-consumption.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
