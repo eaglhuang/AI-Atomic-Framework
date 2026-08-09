@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { inspectGitIndexOwnership } from '../../packages/cli/src/commands/git-index-ownership.ts';
 import { runGitLease } from '../../packages/cli/src/commands/git-governance/implementation/lease-command.ts';
+import { buildHistoricalClosePreflight } from '../../packages/cli/src/commands/taskflow/historical-close-preflight.ts';
 
 const tempDir = path.join(os.tmpdir(), `atm-index-snapshot-${process.pid}`);
 const runGit = (args: string[]) => execFileSync('git', args, { cwd: tempDir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -67,6 +68,25 @@ try {
   });
   assert.equal(issued.ok, true, 'the issuer must consume the same ownership snapshot as the close gate');
   assert.deepEqual((issued.evidence as { lease: { paths: string[] } }).lease.paths, [stagedPath]);
+
+  const closePreflight = buildHistoricalClosePreflight({
+    cwd: tempDir,
+    taskId: 'TASK-CLOSE-0008',
+    actorId: 'fixture-agent',
+    taskDocument: { workItemId: 'TASK-CLOSE-0008', scopePaths: [], deliverables: [] },
+    previewCommitBundle: {
+      targetRepo: { repoRoot: tempDir, stageFiles: [] },
+      planningRepo: { repoRoot: null, stageFiles: [] }
+    },
+    historicalDeliveryRefs: [],
+    waiverOutOfScopeDelivery: false,
+    waiverReason: null
+  });
+  assert.deepEqual(
+    closePreflight.unexpectedStagedTasks.map((entry) => ({ taskId: entry.taskId, stagedFiles: entry.stagedFiles })),
+    [{ taskId: foreignTaskId, stagedFiles: [stagedPath] }],
+    'close preflight must consume the same active-owner snapshot as lease issuance'
+  );
   console.log(JSON.stringify({ marker: '[git-index-override-lease-snapshot-consistency] ok' }));
 } finally {
   rmSync(tempDir, { recursive: true, force: true });

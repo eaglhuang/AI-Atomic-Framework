@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { inspectGitIndexOwnership } from '../git-index-ownership.ts';
 import { computeMissingValidatorReport } from '../evidence.ts';
 import { ATM_INDEX_FOREIGN_ACTIVE_STAGED } from '../git-index-ownership.ts';
 import { readActiveTaskDirectionLocks } from '../task-direction.ts';
@@ -167,17 +168,26 @@ function buildUnexpectedStagedTasks(input: {
   planningRepoRoot: string | null;
   previewCommitBundle: PreflightCommitBundle;
 }): UnexpectedStagedTaskReport[] {
-  const expected = new Set<string>([
-    ...existingBundleFiles(input.targetRepoRoot, input.previewCommitBundle.targetRepo.stageFiles),
-    ...existingBundleFiles(input.planningRepoRoot, input.previewCommitBundle.planningRepo.stageFiles)
-  ]);
-  const stagedFiles = uniqueStrings([
-    ...readStagedFiles(input.targetRepoRoot),
-    ...(input.planningRepoRoot ? readStagedFiles(input.planningRepoRoot) : [])
-  ]);
-  const unexpected = stagedFiles.filter((file) => !expected.has(file));
+  const expectedTarget = new Set(existingBundleFiles(input.targetRepoRoot, input.previewCommitBundle.targetRepo.stageFiles));
+  const targetUnexpected = readStagedFiles(input.targetRepoRoot)
+    .filter((filePath) => !expectedTarget.has(filePath));
+  const targetOwnership = inspectGitIndexOwnership({
+    cwd: input.targetRepoRoot,
+    taskId: input.taskId,
+    stagedFiles: targetUnexpected
+  });
   const grouped = new Map<string, string[]>();
-  for (const filePath of unexpected) {
+  for (const entry of targetOwnership.foreignActiveStaged) {
+    if (!entry.ownerTaskId) continue;
+    const bucket = grouped.get(entry.ownerTaskId) ?? [];
+    bucket.push(entry.path);
+    grouped.set(entry.ownerTaskId, bucket);
+  }
+  const expectedPlanning = new Set(existingBundleFiles(input.planningRepoRoot, input.previewCommitBundle.planningRepo.stageFiles));
+  const planningUnexpected = input.planningRepoRoot && input.planningRepoRoot !== input.targetRepoRoot
+    ? readStagedFiles(input.planningRepoRoot).filter((filePath) => !expectedPlanning.has(filePath))
+    : [];
+  for (const filePath of planningUnexpected) {
     const foreignTaskId = extractGovernanceTaskId(filePath);
     if (!foreignTaskId || foreignTaskId === normalizeTaskId(input.taskId)) continue;
     const bucket = grouped.get(foreignTaskId) ?? [];

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T11-44-16-104Z-scope-amendment-83a674685a02",
+  "taskId": "TASK-ERR-0008",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0008.json",
+  "taskSha256": "sha256:f26584f3f8b2b55d170836bb97110cddbf3d9228e461fcdce5f64c5fc4857204",
+  "createdAt": "2026-08-09T11:44:16.104Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0008 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/taskflow/historical-close-preflight.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

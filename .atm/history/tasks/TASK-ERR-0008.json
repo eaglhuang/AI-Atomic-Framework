@@ -163,8 +163,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T11-22-43-135Z-claim-2860622f3814",
-  "lastTransitionAt": "2026-08-09T11:22:43.135Z",
+  "lastTransitionId": "2026-08-09T11-44-16-104Z-scope-amendment-83a674685a02",
+  "lastTransitionAt": "2026-08-09T11:44:16.104Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T11:22:29.853Z",
@@ -176,10 +176,13 @@
     "heartbeatAt": "2026-08-09T11:22:29.859Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-ERR-0008.*",
+      ".atm/history/task-events/TASK-ERR-0008/**",
       ".atm/history/tasks/TASK-ERR-0008.json",
       "packages/cli/src/commands/git-governance/implementation/lease-command.ts",
       "packages/cli/src/commands/git-index-ownership.ts",
       "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
       "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
     ],
     "state": "active",
@@ -274,21 +277,29 @@
       "packages/cli/src/commands/git-governance/implementation/lease-command.ts",
       "packages/cli/src/commands/git-index-ownership.ts",
       "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
       "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0008-unify-taskflow-close-and-stage-override-index-ownership-snapshots.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/error-governance/",
+      "docs/ai_atomic_framework/error-governance/tasks/",
+      "docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0008-unify-taskflow-close-and-stage-override-index-ownership-snapshots.task.md"
+    ],
     "allowPlanningMirror": false,
-    "promptHash": "aeca95ef23a18bee9596ab2c27b733dab2daf0493d55a05ed7aa703190dc9ef9",
+    "promptHash": "cadfdd71be8d171ebf560149dc57b991b66dc6bdc4489bb8a151e4c0db167354",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260809112229-codex-gpt-5.4-mini-TASK-ERR-0008-c9d724a2d2",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260809112230-codex-gpt-5.4-mini-7cd280dd5e",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809112230-codex-gpt-5.4-mini-7cd280dd5e\""
     },
-    "createdAt": "2026-08-09T11:22:43.134Z",
+    "createdAt": "2026-08-09T11:22:43.150Z",
     "status": "active"
   }
 }
