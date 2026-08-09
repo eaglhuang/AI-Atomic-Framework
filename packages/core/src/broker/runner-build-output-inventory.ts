@@ -27,6 +27,7 @@ export interface RunnerBuildOutputSnapshot {
   readonly schemaId: 'atm.runnerBuildOutputSnapshot.v1';
   readonly buildTarget: RunnerBuildOutputTarget;
   readonly members: Readonly<Record<string, string>>;
+  readonly preexistingDirtyPaths: readonly string[];
 }
 
 export type RunnerPublicationDisposition =
@@ -122,7 +123,8 @@ export function captureRunnerBuildOutputSnapshot(input: {
 }): RunnerBuildOutputSnapshot {
   const roots = publicationRoots(input.cwd, input.buildTarget);
   const members = Object.fromEntries(collectOutputPaths(input.cwd, roots).map((entry) => [entry, fileFingerprint(input.cwd, entry)]));
-  return { schemaId: 'atm.runnerBuildOutputSnapshot.v1', buildTarget: input.buildTarget, members };
+  const preexistingDirtyPaths = listDirtyPaths(input.cwd).filter((entry) => Object.hasOwn(members, entry));
+  return { schemaId: 'atm.runnerBuildOutputSnapshot.v1', buildTarget: input.buildTarget, members, preexistingDirtyPaths };
 }
 
 export function buildRunnerBuildOutputInventory(input: {
@@ -217,6 +219,15 @@ function fileFingerprint(cwd: string, relativePath: string): string {
   const absolute = path.join(cwd, relativePath);
   if (!existsSync(absolute)) return 'missing';
   return `sha256:${createHash('sha256').update(readFileSync(absolute)).digest('hex')}`;
+}
+
+function listDirtyPaths(cwd: string): string[] {
+  const collect = (args: readonly string[]) => {
+    const result = spawnSync('git', args as string[], { cwd, encoding: 'utf8' });
+    if ((result.status ?? 1) !== 0) return [] as string[];
+    return String(result.stdout ?? '').split(/\r?\n/).map(normalizePath).filter(Boolean);
+  };
+  return uniquePaths([...collect(['diff', '--name-only']), ...collect(['diff', '--name-only', '--cached'])]);
 }
 
 export function verifyRunnerBuildOutputParity(

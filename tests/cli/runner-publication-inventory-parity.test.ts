@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -11,6 +11,7 @@ import {
   verifyRunnerBuildOutputParity
 } from '../../packages/core/src/broker/runner-build-output-inventory.ts';
 import { buildRunnerSyncReceipt } from '../../scripts/runner-sync-incremental-build.ts';
+import { syncGeneratedArtifacts } from '../../scripts/run-sealed-runner-build.ts';
 
 const inventory = deriveRunnerBuildOutputInventory({
   sealedSourceSha: '0123456789abcdef0123456789abcdef01234567',
@@ -90,6 +91,7 @@ git('add', '.');
 git('commit', '-m', 'fixture');
 writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'release-manifest.json'), 'foreign-wip\n');
 const snapshot = captureRunnerBuildOutputSnapshot({ cwd: fixtureRoot, buildTarget: 'onefile' });
+assert.deepEqual(snapshot.preexistingDirtyPaths, ['release/atm-onefile/release-manifest.json']);
 writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'atm.mjs'), 'generated-by-build\n');
 const deltaInventory = scanSealedRunnerBuildOutputInventory({
   cwd: fixtureRoot,
@@ -102,4 +104,11 @@ assert.deepEqual(deltaInventory.entries.map((entry) => entry.path), [
   '.atm/history/evidence/TASK-ERR-0011.runner-sync-receipt.json',
   'release/atm-onefile/atm.mjs'
 ]);
+const sourceRoot = path.join(fixtureRoot, 'build-output');
+mkdirSync(path.join(sourceRoot, 'release', 'atm-onefile'), { recursive: true });
+writeFileSync(path.join(sourceRoot, 'release', 'atm-onefile', 'atm.mjs'), 'rebuilt\n');
+writeFileSync(path.join(sourceRoot, 'release', 'atm-onefile', 'release-manifest.json'), 'would-overwrite\n');
+syncGeneratedArtifacts(sourceRoot, fixtureRoot, 'onefile', snapshot.preexistingDirtyPaths);
+assert.equal(readFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'atm.mjs'), 'utf8'), 'rebuilt\n');
+assert.equal(readFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'release-manifest.json'), 'utf8'), 'foreign-wip\n');
 console.log('[runner-publication-inventory-parity.test] ok');

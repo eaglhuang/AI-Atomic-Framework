@@ -205,7 +205,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     }
     runTimedInnerBuild(worktreeRoot, buildTarget, timings, buildDecision === 'incrementalBuild' ? incrementalPlan : null);
     tsBuildCache = persistTsBuildCache({ cwd: repoRoot, worktreeRoot, summary: tsBuildCache });
-    timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget));
+    timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, beforeBuildSnapshot.preexistingDirtyPaths));
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeBuildMetadataToReleaseManifests({
       cwd: repoRoot,
@@ -216,7 +216,8 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       incrementalPlan,
       runtimeTelemetryRef: null,
       tsBuildCache,
-      timings
+      timings,
+      preservePaths: beforeBuildSnapshot.preexistingDirtyPaths
     });
     const dominantPhaseSummary = summarizeDominantPhase(timings);
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
@@ -386,8 +387,11 @@ export function writeBuildMetadataToReleaseManifests(input: {
   readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
   readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
   readonly timings: SealedBuildTimings;
+  readonly preservePaths?: readonly string[];
 }): void {
+  const preserved = new Set(input.preservePaths ?? []);
   for (const relative of releaseManifestPaths) {
+    if (preserved.has(relative.replace(/\\/g, '/'))) continue;
     const absolute = path.join(input.cwd, relative);
     if (!existsSync(absolute)) continue;
     const manifest = readJsonRecord(absolute);
@@ -496,17 +500,21 @@ function runInnerBuild(buildTarget: BuildTarget): void {
   }
 }
 
-function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget): void {
+export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget, preservePaths: readonly string[] = []): void {
+  const preservedUnder = (root: string) => preservePaths
+    .filter((entry) => entry === root || entry.startsWith(`${root}/`))
+    .map((entry) => entry.slice(root.length).replace(/^\//, ''));
   if (buildTarget === 'full' || buildTarget === 'packages') {
     for (const packageName of readDirectoryNames(path.join(sourceRoot, 'packages'))) {
-      syncDirectoryHashChanged(path.join(sourceRoot, 'packages', packageName, 'dist'), path.join(targetRoot, 'packages', packageName, 'dist'));
+      const root = `packages/${packageName}/dist`;
+      syncDirectoryHashChanged(path.join(sourceRoot, root), path.join(targetRoot, root), { preserveRelativePaths: preservedUnder(root) });
     }
   }
   if (buildTarget === 'full' || buildTarget === 'root-drop') {
-    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-root-drop'), path.join(targetRoot, 'release', 'atm-root-drop'));
+    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-root-drop'), path.join(targetRoot, 'release', 'atm-root-drop'), { preserveRelativePaths: preservedUnder('release/atm-root-drop') });
   }
   if (buildTarget === 'full' || buildTarget === 'onefile') {
-    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'));
+    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'), { preserveRelativePaths: preservedUnder('release/atm-onefile') });
   }
 }
 

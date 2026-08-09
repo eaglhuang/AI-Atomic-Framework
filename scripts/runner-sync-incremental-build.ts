@@ -498,13 +498,16 @@ export function buildRunnerSyncReleaseCommand(input: {
   return `node atm.mjs broker runner-sync release --task ${quoteCliArg(input.taskId)} --steward-work-id ${quoteCliArg(input.stewardWorkId)} --receipt-ref ${quoteCliArg(input.receiptRef)}${digest} --json`;
 }
 
-export function syncDirectoryHashChanged(source: string, target: string): void {
+export function syncDirectoryHashChanged(source: string, target: string, options?: { readonly preserveRelativePaths?: readonly string[] }): void {
   if (!existsSync(source)) return;
+  const preserved = new Set((options?.preserveRelativePaths ?? []).map((entry) => entry.replace(/\\/g, '/')));
   mkdirSync(target, { recursive: true });
   const expected = new Set<string>();
   for (const sourceFile of walkFiles(source)) {
     const relative = path.relative(source, sourceFile);
-    expected.add(relative.replace(/\\/g, '/'));
+    const normalizedRelative = relative.replace(/\\/g, '/');
+    expected.add(normalizedRelative);
+    if (preserved.has(normalizedRelative)) continue;
     const targetFile = path.join(target, relative);
     mkdirSync(path.dirname(targetFile), { recursive: true });
     if (existsSync(targetFile) && fileDigest(targetFile) === fileDigest(sourceFile)) continue;
@@ -512,7 +515,7 @@ export function syncDirectoryHashChanged(source: string, target: string): void {
   }
   for (const targetFile of walkFiles(target)) {
     const relative = path.relative(target, targetFile).replace(/\\/g, '/');
-    if (!expected.has(relative)) unlinkSync(targetFile);
+    if (!expected.has(relative) && !preserved.has(relative)) unlinkSync(targetFile);
   }
 }
 
