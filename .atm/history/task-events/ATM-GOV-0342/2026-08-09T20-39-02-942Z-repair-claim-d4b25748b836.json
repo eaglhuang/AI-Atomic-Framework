@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T20-39-02-942Z-repair-claim-d4b25748b836",
+  "taskId": "ATM-GOV-0342",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809200212-codex-gpt-5.4-mini-ATM-GOV-0342-11cf370441",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0342.json",
+  "taskSha256": "sha256:0439d120287b64ad0a1d28d84d601b453696cc87500d3d0b527b8d6074476d6e",
+  "createdAt": "2026-08-09T20:39:02.942Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0342 --actor codex-gpt-5.4-mini --write --reason \"Repair missing canonical lane authority so the existing framework publication lock can be resumed through a fresh governed claim.\" --json"
+}

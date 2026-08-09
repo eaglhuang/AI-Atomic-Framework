@@ -1,0 +1,173 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0342",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6e1d5c2abdd123de64e43f2ab0ca5ddf51c559fb",
+  "governedTreeSha": "4a2a9f469dee8a92d13cf05a3a477b1e67836f6c",
+  "targetCommitDelta": {
+    "currentCommitSha": "6e1d5c2abdd123de64e43f2ab0ca5ddf51c559fb",
+    "parentCommitShas": [
+      "6e1d5c2abdd123de64e43f2ab0ca5ddf51c559fb"
+    ],
+    "governedTreeSha": "4a2a9f469dee8a92d13cf05a3a477b1e67836f6c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0287.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0288.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0289.closure-packet.json",
+      ".atm/history/task-events/ATM-GOV-0287/2026-08-09T16-15-07-375Z-close-d1df72afacd9.json",
+      ".atm/history/task-events/ATM-GOV-0287/2026-08-09T16-15-07-463Z-lock-cleanup-84fe8bb12e34.json",
+      ".atm/history/task-events/ATM-GOV-0288/2026-08-09T16-20-32-610Z-close-28727a9ad53a.json",
+      ".atm/history/task-events/ATM-GOV-0288/2026-08-09T16-20-32-695Z-lock-cleanup-017eecb5ecfb.json",
+      ".atm/history/task-events/ATM-GOV-0289/2026-08-09T16-24-01-973Z-close-4772a7ffba58.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T20-39-02-942Z-repair-claim-d4b25748b836.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T20-39-17-952Z-claim-c7180b670dd3.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T21-11-34-394Z-repair-claim-23f36e619446.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T21-11-57-126Z-claim-6f0b670f5efb.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T21-42-24-787Z-renew-1bfa81e21f47.json",
+      ".atm/history/tasks/ATM-GOV-0287.json",
+      ".atm/history/tasks/ATM-GOV-0289.json",
+      ".atm/history/tasks/ATM-GOV-0290.json",
+      ".atm/history/tasks/ATM-GOV-0291.json",
+      ".atm/history/tasks/ATM-GOV-0296.json",
+      ".atm/history/tasks/ATM-GOV-0297.json",
+      ".atm/history/tasks/ATM-GOV-0298.json",
+      ".atm/history/tasks/ATM-GOV-0299.json",
+      ".atm/history/tasks/ATM-GOV-0300.json",
+      ".atm/history/tasks/ATM-GOV-0302.json",
+      ".atm/history/tasks/ATM-GOV-0303.json",
+      ".atm/history/tasks/ATM-GOV-0312.json",
+      ".atm/history/tasks/ATM-GOV-0314.json",
+      ".atm/history/tasks/ATM-GOV-0315.json",
+      ".atm/history/tasks/ATM-GOV-0316.json",
+      ".atm/history/tasks/ATM-GOV-0317.json",
+      ".atm/history/tasks/ATM-GOV-0342.json",
+      ".atm/history/tasks/TASK-LANE-0023.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
+      "packages/cli/src/commands/lane-session/resolve.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:23be0f69ed8f368717629a385840e062a16a57e920ca1f0f14a7545497c926b0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6b85b34caec4dd9c9141003810eba937b373d719a04e206ddb85d637b362bf3",
+      "stderrSha256": "sha256:f6bee194bf8219e3874f8891c306c7c5974bc51552922ce582d9c55ee75cbdfb",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-09T21:43:04.470Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0342.*",
+      ".atm/history/task-events/ATM-GOV-0342/**",
+      ".atm/history/tasks/ATM-GOV-0342.json",
+      "packages/cli/src/commands/lane-session/__tests__/**",
+      "packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
+      "packages/cli/src/commands/lane-session/adopt-rebind.ts",
+      "packages/cli/src/commands/lane-session/resolve.ts",
+      "packages/cli/src/commands/tasks/__tests__/**",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/lane-session/__tests__/**",
+      "packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
+      "packages/cli/src/commands/lane-session/adopt-rebind.ts",
+      "packages/cli/src/commands/lane-session/resolve.ts",
+      "packages/cli/src/commands/tasks/__tests__/**",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0342.json",
+  "closedAt": "2026-08-09T21:43:04.470Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809211154-codex-gpt-5.4-mini-ATM-GOV-0342-03f4364079",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "692ec05b1b851e5289553acdfa22a1a6295c78ec",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
+      "packages/cli/src/commands/lane-session/resolve.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0342.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T20-01-43-554Z-import-c4c53560a24c.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T20-02-12-001Z-reserve-8254ad24e850.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T20-02-12-004Z-promote-29ec7f027345.json",
+      ".atm/history/task-events/ATM-GOV-0342/2026-08-09T20-02-23-236Z-claim-e6ad17d925e9.json",
+      ".atm/history/tasks/ATM-GOV-0342.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

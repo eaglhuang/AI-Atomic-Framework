@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0342",
   "title": "Restore lane-registry claim authority continuity",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0325"
@@ -153,17 +153,16 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T20-02-23-236Z-claim-e6ad17d925e9",
-  "lastTransitionAt": "2026-08-09T20:02:23.236Z",
+  "lastTransitionId": "2026-08-09T21-43-04-476Z-close-0eeb2309415d",
+  "lastTransitionAt": "2026-08-09T21:43:04.476Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T20:02:12.001Z",
   "promotedAt": "2026-08-09T20:02:12.004Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-bc68819fb856",
-    "claimedAt": "2026-08-09T20:02:12.008Z",
-    "heartbeatAt": "2026-08-09T20:02:12.008Z",
+    "leaseId": "lease-1af4b7fa5ba9",
+    "claimedAt": "2026-08-09T21:11:54.990Z",
+    "heartbeatAt": "2026-08-09T21:43:04.474Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0342.json",
@@ -174,34 +173,34 @@
       "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
       "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260809200212-codex-gpt-5.4-mini-38283736f2",
-      "status": "active",
+      "laneSessionId": "lane-20260809211155-codex-gpt-5.4-mini-6bc6d2d537",
+      "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809200212-codex-gpt-5.4-mini-38283736f2\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809211155-codex-gpt-5.4-mini-6bc6d2d537\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-09T20:02:12.008Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-2682948d85278af1",
-    "ticketDigest": "sha256:2682948d85278af1d19bb3e5e029ce55ee84084acc9784f7c2906e512f0369c7",
+    "ticketId": "wat-d8600816b72e6091",
+    "ticketDigest": "sha256:d8600816b72e6091513b56c0aabec742e024d303b3330e5768a679f073d792e9",
     "taskId": "ATM-GOV-0342",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260809200212-codex-gpt-5.4-mini-38283736f2",
-    "claimGeneration": "lease-bc68819fb856",
-    "issuedAt": "2026-08-09T20:02:12.008Z",
-    "expiresAt": "2026-08-09T20:32:12.008Z",
+    "laneSessionId": "lane-20260809211155-codex-gpt-5.4-mini-6bc6d2d537",
+    "claimGeneration": "lease-1af4b7fa5ba9",
+    "issuedAt": "2026-08-09T21:42:24.448Z",
+    "expiresAt": "2026-08-09T22:12:24.448Z",
     "scopeDigest": "sha256:9a85422f3a2beb33169dcfecc621533c2fb1a5ade21a948a7fecfe580d897058",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-09T20:02:12.008Z"
+      "selectedAt": "2026-08-09T21:42:24.448Z"
     },
     "grants": [
       {
@@ -251,7 +250,19 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260809200212-codex-gpt-5.4-mini-ATM-GOV-0342-11cf370441",
+  "startedBySessionId": "session-20260809211154-codex-gpt-5.4-mini-ATM-GOV-0342-03f4364079",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0342",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809203916-codex-gpt-5.4-mini-880f4fa41a",
+    "dirtyPaths": [
+      ".atm/history/tasks/ATM-GOV-0342.json"
+    ],
+    "retainedAt": "2026-08-09T21:11:33.731Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-gpt-5.4-mini",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -276,14 +287,18 @@
     "allowPlanningMirror": false,
     "promptHash": "c6b3d1cdba874f2b7d86118854b2ad722908c1e170a63516816bdb5bb1c997a5",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260809200212-codex-gpt-5.4-mini-ATM-GOV-0342-11cf370441",
+    "sessionId": "session-20260809211154-codex-gpt-5.4-mini-ATM-GOV-0342-03f4364079",
     "laneSession": {
-      "laneSessionId": "lane-20260809200212-codex-gpt-5.4-mini-38283736f2",
+      "laneSessionId": "lane-20260809211155-codex-gpt-5.4-mini-6bc6d2d537",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809200212-codex-gpt-5.4-mini-38283736f2\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809211155-codex-gpt-5.4-mini-6bc6d2d537\""
     },
-    "createdAt": "2026-08-09T20:02:23.235Z",
+    "createdAt": "2026-08-09T21:11:57.125Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-09T21:43:04.474Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809211154-codex-gpt-5.4-mini-ATM-GOV-0342-03f4364079",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0342.closure-packet.json"
 }

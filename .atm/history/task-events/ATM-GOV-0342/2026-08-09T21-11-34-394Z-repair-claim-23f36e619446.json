@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T21-11-34-394Z-repair-claim-23f36e619446",
+  "taskId": "ATM-GOV-0342",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809203916-codex-gpt-5.4-mini-ATM-GOV-0342-df754cfa82",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0342.json",
+  "taskSha256": "sha256:3b5fe45f9d80ab30c3b07fb358dcbe0b34e1e65225caf5c4a1e9745dd353bb47",
+  "createdAt": "2026-08-09T21:11:34.394Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0342 --actor codex-gpt-5.4-mini --write --reason \"Repair expired lane-bound claim and lock lineage before governed historical closeout; preserve recorded delivery and runner queue evidence.\" --json"
+}
