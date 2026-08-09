@@ -1,0 +1,338 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0344",
+  "title": "restore taskflow close failure index and worktree atomicity",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0325",
+    "ATM-GOV-0326"
+  ],
+  "acceptance": [
+    "ACC-1: An injected failure before delivery commit leaves HEAD, the full index (including foreign staged entries), unrelated worktree files, and the target ledger byte-identical to the captured pre-state.",
+    "ACC-2: An injected failure after temporary foreign-index parking either restores every parked entry by exact mode/blob/path identity or emits a durable recoverable transaction record and blocks later close writes.",
+    "ACC-3: A successful close restores deferred foreign state exactly and commits only the active task's declared bundle.",
+    "ACC-4: Tests use generated fixture paths and multiple foreign entries; they contain no local paths, card IDs, or fixed entry count.",
+    "ACC-5: Pre-close and write-readiness return one executable, broker-aware recovery route when isolation cannot be established."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "tests/cli/git-index-close-isolation.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/tasks/close-window-lock.ts",
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "tests/cli/git-index-close-isolation.test.ts",
+    "tests/cli/git-index-override-lease-consumption.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "node --strip-types tests/cli/git-index-close-isolation.test.ts",
+    "node --strip-types tests/cli/git-index-override-lease-consumption.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert transaction boundary and regression tests together; no recovery path may mutate foreign staged data without a byte-identity receipt.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-close-transaction",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-evidence-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.close-transaction-rollback-boundary",
+        "pattern": "Transaction Script",
+        "source": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "disposition": "inline",
+        "inlineReason": "Existing cohesive rollback boundary; retain one public transaction seam while adding exact state snapshots."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0344-restore-taskflow-close-failure-index-and-worktree-atomicity.task.md",
+    "sectionTitle": "ATM-GOV-0344",
+    "headingLine": 70,
+    "hash": "ead0c83f98dd650c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0344-restore-taskflow-close-failure-index-and-worktree-atomicity.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ead0c83f98dd650c456de6e2e2c7af4fc6ad9a925dfaf26453f0282cda4458a2",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T22:11:09.362Z"
+    }
+  },
+  "importedAt": "2026-08-09T22:11:09.362Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0325",
+      "ATM-GOV-0326"
+    ],
+    "startConditions": [
+      "A reproducible close failure has a recorded pre-state and post-state for HEAD",
+      "index",
+      "worktree",
+      "and task ledger."
+    ],
+    "softRelations": [
+      "ATM-GOV-0327",
+      "TASK-AAO-0149",
+      "TASK-MAO-0050"
+    ],
+    "changedPublicSeams": [
+      "atm.taskflowCloseTransaction.v1",
+      "atm.gitIndexLeaseParkPlan.v1"
+    ],
+    "causalImpactEdges": [
+      "close-failure",
+      "staged-index-isolation",
+      "protected-governance-rollback",
+      "deferred-foreign-state"
+    ],
+    "parallelFrontierInputs": [
+      "canonical-worktree",
+      "broker-ticket",
+      "byte-identified-index-baseline"
+    ],
+    "validatorReferences": [
+      "validate-taskflow-close-atomicity",
+      "git-index-close-isolation",
+      "git-index-override-lease-consumption"
+    ],
+    "phaseOwner": "wave-2-lifecycle-atomicity"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_close_failure_preserves_index_and_worktree_0344",
+      "targetGroupId": null,
+      "semanticKey": "close_failure_preserves_index_and_worktree",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "close-failure",
+        "staged-index-isolation",
+        "protected-governance-rollback",
+        "deferred-foreign-state"
+      ],
+      "expectedRedPredicate": "a forced close failure changes a pre-existing staged blob, unstaged file, or protected governance artifact",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "taskflow-close-transaction",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_close_failure_preserves_index_and_worktree_0344"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-09T22-31-24-080Z-scope-amendment-1d177f620416",
+  "lastTransitionAt": "2026-08-09T22:31:24.080Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-09T22:11:30.237Z",
+  "promotedAt": "2026-08-09T22:11:30.240Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-a708e7ee6e12",
+    "claimedAt": "2026-08-09T22:11:30.243Z",
+    "heartbeatAt": "2026-08-09T22:18:52.498Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0344.*",
+      ".atm/history/task-events/ATM-GOV-0344/**",
+      ".atm/history/tasks/ATM-GOV-0344.json",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "tests/cli/git-index-close-isolation.test.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260809221130-codex-gpt-5.4-mini-e8f817cbef",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809221130-codex-gpt-5.4-mini-e8f817cbef\""
+    }
+  },
+  "startedAt": "2026-08-09T22:11:30.243Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-65bad88c1f40d6a2",
+    "ticketDigest": "sha256:65bad88c1f40d6a2fbe0b1deda7da465166132e82b32fccace1e6fed87ee90cb",
+    "taskId": "ATM-GOV-0344",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809221130-codex-gpt-5.4-mini-e8f817cbef",
+    "claimGeneration": "lease-a708e7ee6e12",
+    "issuedAt": "2026-08-09T22:18:52.498Z",
+    "expiresAt": "2026-08-09T22:48:52.498Z",
+    "scopeDigest": "sha256:e4c522665d60cb8dd861191c975471b88ae64a3618b663fe7f8bfaf5813f1486",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-09T22:18:52.498Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0344.*",
+          ".atm/history/task-events/ATM-GOV-0344/**",
+          ".atm/history/tasks/ATM-GOV-0344.json",
+          "packages/cli/src/commands/git-index-ownership.ts",
+          "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
+          "packages/cli/src/commands/tasks/close-window-lock.ts",
+          "tests/cli/git-index-close-isolation.test.ts",
+          "tests/cli/git-index-override-lease-consumption.test.ts"
+        ],
+        "digest": "sha256:647422e3d0f561ea4769a8b9d87177314dbe7623f6dbbd9e892c41b521f96570"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260809221130-codex-gpt-5.4-mini-ATM-GOV-0344-19cc9bfbaf",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0344",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0344.*",
+      ".atm/history/task-events/ATM-GOV-0344/**",
+      ".atm/history/tasks/ATM-GOV-0344.json",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "tests/cli/git-index-close-isolation.test.ts",
+      "tests/cli/git-index-override-lease-consumption.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0344-restore-taskflow-close-failure-index-and-worktree-atomicity.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0344-restore-taskflow-close-failure-index-and-worktree-atomicity.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "2199732f27eab7fa20f0a1563d4f1bed626b847d8df9afbe84e80b11c9c01101",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260809221130-codex-gpt-5.4-mini-e8f817cbef",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809221130-codex-gpt-5.4-mini-e8f817cbef\""
+    },
+    "createdAt": "2026-08-09T22:11:37.519Z",
+    "status": "active"
+  }
+}

@@ -26,6 +26,7 @@ export interface CloseWindowStagedIndexLockRecord {
   readonly status: 'active' | 'released';
   readonly expectedStageFiles: readonly string[];
   readonly foreignStagedSnapshotPath: string | null;
+  readonly foreignStagedEntries: readonly ForeignStagedIndexEntry[];
   readonly unexpectedStagedTasks: readonly CloseWindowForeignStagedTaskReport[];
   readonly releasedAt: string | null;
   readonly releaseOutcome: CloseWindowStagedIndexLockOutcome | null;
@@ -151,7 +152,7 @@ function readStagedIndexEntries(cwd: string, files: readonly string[]): ForeignS
   }).filter((entry) => entry.path);
 }
 
-function writeForeignStagedSnapshot(cwd: string, taskId: string, files: readonly string[]): string {
+function writeForeignStagedSnapshot(cwd: string, taskId: string, files: readonly string[]): { snapshotPath: string; entries: ForeignStagedIndexEntry[] } {
   const entries = readStagedIndexEntries(cwd, files);
   if (entries.length !== uniqueSorted(files).length) {
     throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Close window could not record every foreign staged index entry before deferral.', {
@@ -173,18 +174,16 @@ function writeForeignStagedSnapshot(cwd: string, taskId: string, files: readonly
     files: uniqueSorted(files),
     entries
   }, null, 2)}\n`, 'utf8');
-  return snapshotPath;
+  return { snapshotPath, entries };
 }
 
-function restoreForeignStagedSnapshot(cwd: string, snapshotPath: string): void {
-  const parsed = JSON.parse(readFileSync(path.join(cwd, snapshotPath), 'utf8')) as { entries?: ForeignStagedIndexEntry[] };
-  const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+function restoreForeignStagedEntries(cwd: string, entries: readonly ForeignStagedIndexEntry[], recoveryReference: string): void {
   if (entries.length === 0) {
     throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Close window cannot restore a legacy or incomplete foreign staged snapshot.', {
       exitCode: 1,
       details: {
         recoveryState: 'restore-snapshot-incomplete',
-        snapshotPath,
+        snapshotPath: recoveryReference,
         remediation: 'The close-window lock and recovery snapshot were retained. Repair the durable snapshot before retrying release; do not delete the snapshot or claim success.'
       }
     });
@@ -200,7 +199,7 @@ function restoreForeignStagedSnapshot(cwd: string, snapshotPath: string): void {
       exitCode: 1,
       details: {
         recoveryState: 'restore-verification-failed',
-        snapshotPath,
+        snapshotPath: recoveryReference,
         expected,
         actual,
         remediation: 'The close-window lock and recovery snapshot were retained. Do not finalize the close until the foreign index entries match the durable snapshot byte-for-byte.'
@@ -209,15 +208,15 @@ function restoreForeignStagedSnapshot(cwd: string, snapshotPath: string): void {
   }
 }
 
-function deferForeignStagedFiles(cwd: string, unexpectedStagedTasks: readonly CloseWindowForeignStagedTaskReport[]): string | null {
-  if (unexpectedStagedTasks.length === 0) return null;
-  const files = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
-  const snapshotPath = writeForeignStagedSnapshot(cwd, unexpectedStagedTasks[0]?.taskId ?? 'foreign', files);
+function deferForeignStagedFiles(cwd: string, taskId: string, files: readonly string[]): { snapshotPath: string; entries: ForeignStagedIndexEntry[] } | null {
+  const normalizedFiles = uniqueSorted(files);
+  if (normalizedFiles.length === 0) return null;
+  const snapshot = writeForeignStagedSnapshot(cwd, taskId, normalizedFiles);
   execFileSync(resolveGitExecutable(), ['restore', '--staged', '--', ...files], {
     cwd,
     stdio: ['ignore', 'pipe', 'pipe']
   });
-  return snapshotPath;
+  return snapshot;
 }
 
 function cleanupForeignStagedSnapshot(cwd: string, snapshotPath: string | null) {
@@ -258,8 +257,11 @@ export function acquireCloseWindowStagedIndexLock(input: {
     taskId: input.taskId,
     expectedStageFiles: input.expectedStageFiles
   });
+  const expectedStageFiles = new Set(uniqueSorted(input.expectedStageFiles));
+  const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expectedStageFiles.has(filePath));
   let foreignStagedSnapshotPath: string | null = null;
-  if (unexpectedStagedTasks.length > 0 && !input.deferForeignStaged) {
+  let foreignStagedEntries: readonly ForeignStagedIndexEntry[] = [];
+  if (unexpectedStagedFiles.length > 0 && !input.deferForeignStaged) {
     return {
       schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
       ok: false,
@@ -268,11 +270,15 @@ export function acquireCloseWindowStagedIndexLock(input: {
       unexpectedStagedTasks,
       foreignStagedSnapshotPath: null,
       blockedCode: 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS',
-      blockedSummary: `Close window blocked by foreign staged tasks (${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}); defer explicitly or wait for the other agent to commit.`
+      blockedSummary: unexpectedStagedTasks.length > 0
+        ? `Close window blocked by foreign staged tasks (${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}); defer explicitly or wait for the other agent to commit.`
+        : 'Close window blocked by staged entries outside the governed bundle; defer explicitly or reconcile the index before closing.'
     };
   }
-  if (unexpectedStagedTasks.length > 0 && input.deferForeignStaged) {
-    foreignStagedSnapshotPath = deferForeignStagedFiles(input.cwd, unexpectedStagedTasks);
+  if (unexpectedStagedFiles.length > 0 && input.deferForeignStaged) {
+    const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles);
+    foreignStagedSnapshotPath = deferred?.snapshotPath ?? null;
+    foreignStagedEntries = deferred?.entries ?? [];
   }
 
   const record: CloseWindowStagedIndexLockRecord = {
@@ -284,6 +290,7 @@ export function acquireCloseWindowStagedIndexLock(input: {
     status: 'active',
     expectedStageFiles: uniqueSorted(input.expectedStageFiles),
     foreignStagedSnapshotPath,
+    foreignStagedEntries,
     unexpectedStagedTasks,
     releasedAt: null,
     releaseOutcome: null
@@ -332,7 +339,7 @@ export function releaseCloseWindowStagedIndexLock(input: {
   if (!existing || existing.status !== 'active') return null;
   if (existing.taskId !== normalizeTaskId(input.taskId)) return existing;
   if (existing.foreignStagedSnapshotPath) {
-    restoreForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
+    restoreForeignStagedEntries(input.cwd, existing.foreignStagedEntries ?? [], existing.foreignStagedSnapshotPath);
     cleanupForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
   }
   const released: CloseWindowStagedIndexLockRecord = {

@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0344",
+  "updatedAt": "2026-08-09T22:20:07.986Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d95f62e0e8800cd53b0f3b2f9f6c880a24314cc33ab3c08381514b45e9d75343",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts"
+      ],
+      "generatedAt": "2026-08-09T22:19:26.147Z",
+      "startedAt": "2026-08-09T22:19:05.246Z",
+      "finishedAt": "2026-08-09T22:19:26.147Z",
+      "durationMs": 20901,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d16c35a4527a715271ba832db65409bef9a4af53",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bd2f4da12937c801247333ee02e9a7d8d37aa42a0157e3f58e55e9159c77ee5c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-09T22:19:53.534Z",
+      "startedAt": "2026-08-09T22:19:50.957Z",
+      "finishedAt": "2026-08-09T22:19:53.534Z",
+      "durationMs": 2577,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d16c35a4527a715271ba832db65409bef9a4af53",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-09T22:20:07.986Z",
+      "startedAt": "2026-08-09T22:19:56.465Z",
+      "finishedAt": "2026-08-09T22:20:07.986Z",
+      "durationMs": 11521,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d16c35a4527a715271ba832db65409bef9a4af53",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
