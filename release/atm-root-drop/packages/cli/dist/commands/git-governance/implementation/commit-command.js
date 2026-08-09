@@ -66,7 +66,7 @@ export function runGitCommit(options) {
     const taskDocument = options.taskId
         ? readTaskDocument(options.cwd, options.taskId)
         : null;
-    const { usesFrameworkClaimCommit, frameworkClaimFiles } = resolveFrameworkCommitAuthorityContext({
+    const { usesFrameworkClaimCommit, frameworkClaimFiles, frameworkClaimTaskId } = resolveFrameworkCommitAuthorityContext({
         cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
     });
     const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
@@ -321,7 +321,11 @@ export function runGitCommit(options) {
                 isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
         }
     }
-    const hookTaskId = resolveFrameworkHookTaskId({ taskId: options.taskId, actorId, frameworkClaimCommitFiles });
+    const hookTaskId = resolveFrameworkHookTaskId({
+        taskId: options.taskId,
+        frameworkClaimTaskId,
+        frameworkClaimCommitFiles,
+    });
     const trailers = [
         `ATM-Actor: ${actorId}`,
         ...(options.taskId ? [`ATM-Task: ${options.taskId}`] : []),

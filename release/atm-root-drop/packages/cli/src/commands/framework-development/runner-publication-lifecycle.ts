@@ -121,6 +121,55 @@ export interface PublicationDecision {
   readonly reason: string;
 }
 
+export interface RunnerPublicationContinuationInput {
+  readonly taskId: string;
+  readonly queueMemberTaskIds: readonly string[];
+  readonly stewardWorkId: string;
+  readonly queueHeadStewardWorkId: string;
+  readonly sealedSourceSha: string;
+  readonly receiptSealedSourceSha: string;
+  readonly receiptDigest: string;
+  readonly inventoryDigest: string;
+  readonly receiptInventoryDigest: string;
+}
+
+export interface RunnerPublicationContinuationDecision {
+  readonly schemaId: 'atm.runnerPublicationContinuationDecision.v1';
+  readonly allowed: boolean;
+  readonly code: 'ATM_RUNNER_PUBLICATION_CONTINUATION_MISMATCH' | null;
+  readonly reason: string;
+}
+
+/**
+ * Validates the durable continuation authority for publishing a receipt after
+ * its source task has closed.  The authority is the sealed queue/receipt
+ * tuple, never a reopened task, actor override, or task-id exception.
+ */
+export function evaluateRunnerPublicationContinuation(
+  input: RunnerPublicationContinuationInput,
+): RunnerPublicationContinuationDecision {
+  const mismatches = [
+    input.queueMemberTaskIds.includes(input.taskId) ? null : 'queue-member-task',
+    input.stewardWorkId === input.queueHeadStewardWorkId ? null : 'queue-head-work',
+    input.sealedSourceSha === input.receiptSealedSourceSha ? null : 'sealed-source',
+    input.inventoryDigest === input.receiptInventoryDigest ? null : 'output-inventory',
+    /^sha256:[a-f0-9]{64}$/i.test(input.receiptDigest) ? null : 'receipt-digest',
+  ].filter((entry): entry is string => entry !== null);
+  return mismatches.length === 0
+    ? {
+      schemaId: 'atm.runnerPublicationContinuationDecision.v1',
+      allowed: true,
+      code: null,
+      reason: 'Queue-head, sealed source, receipt digest, and output inventory form one durable publication continuation.',
+    }
+    : {
+      schemaId: 'atm.runnerPublicationContinuationDecision.v1',
+      allowed: false,
+      code: 'ATM_RUNNER_PUBLICATION_CONTINUATION_MISMATCH',
+      reason: `Publication continuation facts do not match: ${mismatches.join(', ')}.`,
+    };
+}
+
 export interface RunnerPublicationInspection {
   readonly schemaId: 'atm.runnerPublicationInspection.v1';
   readonly ok: boolean;

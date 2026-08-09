@@ -11,6 +11,33 @@ const PHASE_ORDER = [
     'published',
     'receipt-archived'
 ];
+/**
+ * Validates the durable continuation authority for publishing a receipt after
+ * its source task has closed.  The authority is the sealed queue/receipt
+ * tuple, never a reopened task, actor override, or task-id exception.
+ */
+export function evaluateRunnerPublicationContinuation(input) {
+    const mismatches = [
+        input.queueMemberTaskIds.includes(input.taskId) ? null : 'queue-member-task',
+        input.stewardWorkId === input.queueHeadStewardWorkId ? null : 'queue-head-work',
+        input.sealedSourceSha === input.receiptSealedSourceSha ? null : 'sealed-source',
+        input.inventoryDigest === input.receiptInventoryDigest ? null : 'output-inventory',
+        /^sha256:[a-f0-9]{64}$/i.test(input.receiptDigest) ? null : 'receipt-digest',
+    ].filter((entry) => entry !== null);
+    return mismatches.length === 0
+        ? {
+            schemaId: 'atm.runnerPublicationContinuationDecision.v1',
+            allowed: true,
+            code: null,
+            reason: 'Queue-head, sealed source, receipt digest, and output inventory form one durable publication continuation.',
+        }
+        : {
+            schemaId: 'atm.runnerPublicationContinuationDecision.v1',
+            allowed: false,
+            code: 'ATM_RUNNER_PUBLICATION_CONTINUATION_MISMATCH',
+            reason: `Publication continuation facts do not match: ${mismatches.join(', ')}.`,
+        };
+}
 function fingerprint(value, kind) {
     if (typeof value !== 'string' || value.trim().length === 0)
         return null;

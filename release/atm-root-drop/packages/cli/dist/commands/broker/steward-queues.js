@@ -10,7 +10,7 @@ import { supersedeRunnerSyncReservation } from './runner-sync-supersession.js';
 import { cleanupGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../../core/dist/broker/generated-projection-steward.js';
 import { readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward } from './persistence.js';
 import { appendLaneSessionEvent } from '../lane-session/events.js';
-import { inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.js';
+import { evaluateRunnerPublicationContinuation, inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.js';
 export function handleBrokerStewardQueues(options, context) {
     const runnerSyncQueuePath = context.runnerSyncQueuePath;
     const projectionStewardPath = context.projectionStewardPath;
@@ -406,6 +406,20 @@ export function validateRunnerSyncReleaseReceipt(input) {
     const publication = inspectRunnerPublicationDisposition(input.cwd, receiptRef);
     if (!publication.ok && publication.code) {
         throw new Error(`${publication.code}: receipt ${receiptRef} cannot release ${input.stewardWorkId} while its sealed output inventory is ${publication.report.disposition}. inventoryDigest=${publication.report.inventoryDigest}.`);
+    }
+    const continuation = evaluateRunnerPublicationContinuation({
+        taskId: input.taskId,
+        queueMemberTaskIds: group.waitingTasks,
+        stewardWorkId: input.stewardWorkId,
+        queueHeadStewardWorkId: group.queuePosition === 1 ? group.stewardWorkId : '',
+        sealedSourceSha: group.sealedSourceSha,
+        receiptSealedSourceSha: String(receipt.sealedSourceSha ?? ''),
+        receiptDigest: digest,
+        inventoryDigest: publication.report.inventoryDigest,
+        receiptInventoryDigest: String(receipt.outputInventory?.digest ?? ''),
+    });
+    if (!continuation.allowed) {
+        throw new Error(`${continuation.code}: ${continuation.reason}`);
     }
     validateRunnerSyncReleaseFinalizableReceipt({ receipt, group, stewardWorkId: input.stewardWorkId });
     return {
