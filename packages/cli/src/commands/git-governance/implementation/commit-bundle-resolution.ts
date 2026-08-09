@@ -182,7 +182,10 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     .map((filePath) => {
       const ownerTaskId = filePath.match(/^\.atm\/history\/evidence\/([^/]+)\.bundle-manifest\.json$/i)?.[1]?.toUpperCase() ?? null;
       const disposition = ownerTaskId ? readGeneratedResidueTaskDisposition(input.cwd, ownerTaskId) : null;
-      return ownerTaskId && isReleasedGeneratedBundleSafeToClean(disposition)
+      // A task-scoped commit may clean only its own disposable byproducts.
+      // Foreign released residue can still be evidence for another lifecycle
+      // and must survive both successful and failed defer transactions.
+      return ownerTaskId === input.taskId.toUpperCase() && isReleasedGeneratedBundleSafeToClean(disposition)
         ? { path: filePath, verdict: 'auto-clean-safe' as const, reason: 'Released-task bundle-manifest is disposable generated residue; lifecycle audit records remain preserved.', ownerTaskId, cleanupAction: 'remove' as const }
         : null;
     })

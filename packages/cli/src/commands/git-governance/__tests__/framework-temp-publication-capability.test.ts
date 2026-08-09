@@ -12,6 +12,8 @@ const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-framework-temp-publication-'
 const taskId = 'ATM-FRAMEWORK-TEMP-publication';
 const now = '2026-08-09T14:53:00.000Z';
 mkdirSync(path.join(cwd, '.atm', 'runtime', 'locks'), { recursive: true });
+mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
+mkdirSync(path.join(cwd, '.atm', 'history', 'evidence'), { recursive: true });
 mkdirSync(path.join(cwd, 'release', 'atm-root-drop'), { recursive: true });
 writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`), `${JSON.stringify({
   workItemId: taskId,
@@ -22,6 +24,22 @@ writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`),
   linkedTaskId: 'ATM-GOV-0342',
   files: ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'],
 }, null, 2)}\n`, 'utf8');
+writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'ATM-GOV-0344.json'), `${JSON.stringify({ status: 'done' })}\n`, 'utf8');
+writeFileSync(path.join(cwd, '.atm', 'history', 'evidence', 'ATM-GOV-0344.runner-sync-receipt.json'), `${JSON.stringify({
+  schemaId: 'atm.runnerSyncReceipt.v1',
+  taskId: 'ATM-GOV-0344',
+  actorId: 'publication-steward',
+  stewardWorkId: 'runner-sync-fixture',
+  sealedSourceSha: 'a'.repeat(40),
+})}\n`, 'utf8');
+writeFileSync(path.join(cwd, '.atm', 'runtime', 'runner-sync-steward-queue.json'), `${JSON.stringify({
+  groups: [{
+    queuePosition: 1,
+    stewardWorkId: 'runner-sync-fixture',
+    sealedSourceSha: 'a'.repeat(40),
+    requests: [{ taskId: 'ATM-GOV-0344', actorId: 'publication-steward', sealedSourceSha: 'a'.repeat(40) }],
+  }],
+})}\n`, 'utf8');
 
 const capability = resolveFrameworkTempPublicationCapability({
   cwd,
@@ -38,6 +56,9 @@ assert.equal(frameworkTempPublicationCapabilityCovers(capability, ['packages/cor
 assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
   '.atm/history/evidence/ATM-GOV-0342.runner-sync-receipt.json',
 ]), true);
+assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
+  '.atm/history/evidence/ATM-GOV-0344.runner-sync-receipt.json',
+]), true, 'queue/receipt-bound terminal continuation must be publishable without reopening its task');
 
 const admitted = evaluateTaskWorkAdmissionGate({
   cwd,

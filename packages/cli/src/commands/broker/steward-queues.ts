@@ -35,7 +35,7 @@ import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleas
 import { loadComposeProposals, relativeStorePath, resolveBrokerRunEvidenceDir, normalizeEvidencePath } from './parser.ts';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
 import { appendLaneSessionEvent } from '../lane-session/events.ts';
-import { inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.ts';
+import { evaluateRunnerPublicationContinuation, inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.ts';
 
 
 export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context: BrokerCommandContext) {
@@ -458,6 +458,20 @@ export function validateRunnerSyncReleaseReceipt(input: {
   const publication = inspectRunnerPublicationDisposition(input.cwd, receiptRef);
   if (!publication.ok && publication.code) {
     throw new Error(`${publication.code}: receipt ${receiptRef} cannot release ${input.stewardWorkId} while its sealed output inventory is ${publication.report.disposition}. inventoryDigest=${publication.report.inventoryDigest}.`);
+  }
+  const continuation = evaluateRunnerPublicationContinuation({
+    taskId: input.taskId,
+    queueMemberTaskIds: group.waitingTasks,
+    stewardWorkId: input.stewardWorkId,
+    queueHeadStewardWorkId: group.queuePosition === 1 ? group.stewardWorkId : '',
+    sealedSourceSha: group.sealedSourceSha,
+    receiptSealedSourceSha: String(receipt.sealedSourceSha ?? ''),
+    receiptDigest: digest,
+    inventoryDigest: publication.report.inventoryDigest,
+    receiptInventoryDigest: String((receipt.outputInventory as Record<string, unknown> | undefined)?.digest ?? ''),
+  });
+  if (!continuation.allowed) {
+    throw new Error(`${continuation.code}: ${continuation.reason}`);
   }
   validateRunnerSyncReleaseFinalizableReceipt({ receipt, group, stewardWorkId: input.stewardWorkId });
   return {

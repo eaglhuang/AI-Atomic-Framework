@@ -1,5 +1,5 @@
 import { pathMatchesWriteScope } from '../../../../core/src/broker/write-scope-policy.ts';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import {
   readFrameworkTempLockProjection,
@@ -86,8 +86,68 @@ function toCapability(cwd: string, lock: FrameworkTempLockProjection): Framework
       ...(lock.linkedTaskId
         ? [`.atm/history/evidence/${lock.linkedTaskId}.runner-sync-receipt.json`]
         : []),
+      ...resolveQueueBoundTerminalReceiptPaths(cwd, lock),
     ],
   };
+}
+
+/**
+ * A completed task has no live task lease.  It may nevertheless retain one
+ * narrow publication continuation when a live framework lock, queue-head and
+ * sealed receipt all agree.  This derives capability from durable facts rather
+ * than treating a terminal task as generally writable.
+ */
+function resolveQueueBoundTerminalReceiptPaths(cwd: string, lock: FrameworkTempLockProjection): readonly string[] {
+  const queuePath = path.join(cwd, '.atm', 'runtime', 'runner-sync-steward-queue.json');
+  if (!existsSync(queuePath)) return [];
+  try {
+    const queue = JSON.parse(readFileSync(queuePath, 'utf8')) as { groups?: unknown };
+    if (!Array.isArray(queue.groups)) return [];
+    return queue.groups.flatMap((group): string[] => {
+      if (!group || typeof group !== 'object') return [];
+      const candidate = group as Record<string, unknown>;
+      if (candidate.queuePosition !== 1 || typeof candidate.stewardWorkId !== 'string' || typeof candidate.sealedSourceSha !== 'string' || !Array.isArray(candidate.requests)) return [];
+      return candidate.requests.flatMap((request): string[] => {
+        if (!request || typeof request !== 'object') return [];
+        const entry = request as Record<string, unknown>;
+        const taskId = typeof entry.taskId === 'string' ? entry.taskId.trim() : '';
+        if (!taskId || entry.actorId !== lock.actorId || entry.sealedSourceSha !== candidate.sealedSourceSha || !isTerminalTask(cwd, taskId)) return [];
+        const receiptPath = `.atm/history/evidence/${taskId}.runner-sync-receipt.json`;
+        const receipt = readQueueBoundReceipt(cwd, receiptPath);
+        return receipt
+          && receipt.taskId === taskId
+          && receipt.actorId === lock.actorId
+          && receipt.stewardWorkId === candidate.stewardWorkId
+          && receipt.sealedSourceSha === candidate.sealedSourceSha
+          ? [receiptPath]
+          : [];
+      });
+    });
+  } catch {
+    return [];
+  }
+}
+
+function isTerminalTask(cwd: string, taskId: string): boolean {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return false;
+  try {
+    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as { status?: unknown };
+    return task.status === 'done' || task.status === 'review' || task.status === 'abandoned';
+  } catch {
+    return false;
+  }
+}
+
+function readQueueBoundReceipt(cwd: string, receiptPath: string): Record<string, unknown> | null {
+  const absolute = path.join(cwd, receiptPath);
+  if (!existsSync(absolute)) return null;
+  try {
+    const receipt = JSON.parse(readFileSync(absolute, 'utf8')) as Record<string, unknown>;
+    return receipt.schemaId === 'atm.runnerSyncReceipt.v1' ? receipt : null;
+  } catch {
+    return null;
+  }
 }
 
 function normalizeDirectoryScope(cwd: string, scope: string): string {
