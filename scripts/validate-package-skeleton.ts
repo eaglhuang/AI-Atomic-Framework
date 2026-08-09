@@ -145,6 +145,7 @@ for (const packageSpec of fixture.packages) {
 const workspacePackageDirs = new Set(
   readdirSync(path.join(root, 'packages'), { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
+    .filter((entry) => existsSync(path.join(root, 'packages', entry.name, 'package.json')))
     .map((entry) => `packages/${entry.name}`)
 );
 

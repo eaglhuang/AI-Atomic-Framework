@@ -1,0 +1,17 @@
+{
+  "schemaId": "atm.historicalWorkAdmissionProvenance.v1",
+  "commitSha": "7fcbf4a599b22c78d167ff7ae1eaca6c784c06e0",
+  "actorId": "codex-captain-2026-08-09",
+  "taskId": "TASK-GIT-0024",
+  "reason": "Forward attestation for the sealed runner inventory publication commit created before protected pre-push historical attestation enforcement.",
+  "validation": [
+    "node atm.mjs doctor --json",
+    "node atm.mjs integration verify codex --json",
+    "node atm.mjs integration verify claude-code --json",
+    "node atm.mjs integration verify copilot --json",
+    "node atm.mjs integration verify cursor --json",
+    "node atm.mjs integration verify gemini --json",
+    "node atm.mjs integration verify antigravity --json"
+  ],
+  "followUp": "Preserve this evidence with the historical work-admission attestation ledger before protected push."
+}
