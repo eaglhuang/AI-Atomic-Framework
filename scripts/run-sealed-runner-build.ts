@@ -29,6 +29,7 @@ import {
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
 import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 export type BuildDecision = 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
@@ -121,7 +122,16 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     sealedSourceSha
   });
   assertRunnerSyncAdmission(admission);
-  const beforeBuildSnapshot = captureRunnerBuildOutputSnapshot({ cwd: repoRoot, buildTarget });
+  const currentTaskId = admission.queueHeadOwnership.waitingTasks[0] ?? null;
+  const currentTask = currentTaskId
+    ? getActiveTasks(repoRoot).find((entry) => entry.taskId === currentTaskId.toUpperCase())
+    : null;
+  const beforeBuildSnapshot = captureRunnerBuildOutputSnapshot({
+    cwd: repoRoot,
+    buildTarget,
+    currentTaskId,
+    currentTaskAllowedFiles: currentTask?.allowedFiles
+  });
 
   const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
   const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({

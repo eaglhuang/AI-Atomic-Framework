@@ -120,10 +120,16 @@ export function scanSealedRunnerBuildOutputInventory(input: {
 export function captureRunnerBuildOutputSnapshot(input: {
   readonly cwd: string;
   readonly buildTarget: RunnerBuildOutputTarget;
+  readonly currentTaskId?: string | null;
+  readonly currentTaskAllowedFiles?: readonly string[];
 }): RunnerBuildOutputSnapshot {
   const roots = publicationRoots(input.cwd, input.buildTarget);
   const members = Object.fromEntries(collectOutputPaths(input.cwd, roots).map((entry) => [entry, fileFingerprint(input.cwd, entry)]));
-  const preexistingDirtyPaths = listDirtyPaths(input.cwd).filter((entry) => Object.hasOwn(members, entry));
+  const allowedFiles = input.currentTaskAllowedFiles ?? [];
+  const hasCanonicalScope = Boolean(input.currentTaskId?.trim()) && allowedFiles.length > 0;
+  const preexistingDirtyPaths = listDirtyPaths(input.cwd)
+    .filter((entry) => Object.hasOwn(members, entry))
+    .filter((entry) => !hasCanonicalScope || !pathMatchesScope(entry, allowedFiles));
   return { schemaId: 'atm.runnerBuildOutputSnapshot.v1', buildTarget: input.buildTarget, members, preexistingDirtyPaths };
 }
 
@@ -228,6 +234,28 @@ function listDirtyPaths(cwd: string): string[] {
     return String(result.stdout ?? '').split(/\r?\n/).map(normalizePath).filter(Boolean);
   };
   return uniquePaths([...collect(['diff', '--name-only']), ...collect(['diff', '--name-only', '--cached'])]);
+}
+
+export function pathMatchesScope(filePath: string, allowedFiles: readonly string[]): boolean {
+  const normalizedFile = normalizePath(filePath).toLowerCase();
+  return allowedFiles.some((candidate) => {
+    const normalizedCandidate = normalizePath(candidate).toLowerCase();
+    if (normalizedCandidate.endsWith('/**')) {
+      const prefix = normalizedCandidate.slice(0, -3);
+      return normalizedFile === prefix || normalizedFile.startsWith(`${prefix}/`);
+    }
+    if (normalizedCandidate.endsWith('/*')) {
+      const prefix = normalizedCandidate.slice(0, -2);
+      const remainder = normalizedFile.startsWith(`${prefix}/`) ? normalizedFile.slice(prefix.length + 1) : '';
+      return remainder.length > 0 && !remainder.includes('/');
+    }
+    if (normalizedCandidate.endsWith('.*')) {
+      const prefix = normalizedCandidate.slice(0, -2);
+      const remainder = normalizedFile.startsWith(`${prefix}.`) ? normalizedFile.slice(prefix.length + 1) : '';
+      return remainder.length > 0 && !remainder.includes('/');
+    }
+    return normalizedFile === normalizedCandidate;
+  });
 }
 
 export function verifyRunnerBuildOutputParity(

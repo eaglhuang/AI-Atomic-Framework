@@ -90,7 +90,13 @@ git('config', 'user.name', 'ATM test');
 git('add', '.');
 git('commit', '-m', 'fixture');
 writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'release-manifest.json'), 'foreign-wip\n');
-const snapshot = captureRunnerBuildOutputSnapshot({ cwd: fixtureRoot, buildTarget: 'onefile' });
+writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'atm.mjs'), 'stale-generated\n');
+const snapshot = captureRunnerBuildOutputSnapshot({
+  cwd: fixtureRoot,
+  buildTarget: 'onefile',
+  currentTaskId: 'TASK-FIXTURE-0011',
+  currentTaskAllowedFiles: ['release/atm-onefile/atm.mjs']
+});
 assert.deepEqual(snapshot.preexistingDirtyPaths, ['release/atm-onefile/release-manifest.json']);
 writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'atm.mjs'), 'generated-by-build\n');
 const deltaInventory = scanSealedRunnerBuildOutputInventory({
