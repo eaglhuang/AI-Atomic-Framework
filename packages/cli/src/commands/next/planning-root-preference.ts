@@ -3,17 +3,95 @@ import path from 'node:path';
 
 export const PLANNING_ROOT_RELATIVE_SUFFIX = path.join('docs', 'ai_atomic_framework');
 
-export interface PlanningRootWarning {
-  readonly code: 'ATM_PLANNING_ROOT_AMBIGUOUS';
+/**
+ * Canonical operator contract for planning-root ambiguity.
+ *
+ * This module is the registered `sourceOwner` for ATM_PLANNING_ROOT_AMBIGUOUS.
+ * The ambiguity decision, its operator diagnostics, and its recovery contract are
+ * defined here once so callers consume a single object instead of rescanning the
+ * filesystem or assembling their own error text. `docs/governance/error-code-registry.json`
+ * mirrors this contract and the focused test asserts the two stay aligned.
+ */
+export const PLANNING_ROOT_AMBIGUOUS_CODE = 'ATM_PLANNING_ROOT_AMBIGUOUS' as const;
+
+export const PLANNING_ROOT_AMBIGUOUS_RETRYABLE = true;
+export const PLANNING_ROOT_AMBIGUOUS_REQUIRES_HUMAN_APPROVAL = false;
+
+/**
+ * The single safe, non-destructive route out of an ambiguous planning root.
+ * Selecting a root is an operator decision; this module never makes it implicitly.
+ */
+export const PLANNING_ROOT_AMBIGUOUS_SAFE_NEXT_STEPS: readonly string[] = [
+  'Re-run the command with an explicit planning root, for example --planning-root <absolute-planning-root>.'
+];
+
+/** Read-only inspection preserves every ambiguous root until an owner approves cleanup. */
+export const PLANNING_ROOT_AMBIGUOUS_READ_ONLY_STEPS: readonly string[] = [
+  'Inspect each candidate planning root reported in candidates[] before changing anything on disk.',
+  'Run node atm.mjs doctor --json to record the ambiguous roots as governed evidence.'
+];
+
+/** Behaviours that would trade a diagnosable stop for a silent guess. */
+export const PLANNING_ROOT_AMBIGUOUS_FORBIDDEN_ACTIONS: readonly string[] = [
+  'auto-cleanup-ambiguous-planning-roots',
+  'silently-select-first-planning-root'
+];
+
+export interface PlanningRootRecoveryContract {
+  readonly code: typeof PLANNING_ROOT_AMBIGUOUS_CODE;
+  readonly retryable: boolean;
+  readonly requiresHumanApproval: boolean;
+  readonly safeNextSteps: readonly string[];
+  readonly readOnlyInspectionSteps: readonly string[];
+  readonly forbiddenActions: readonly string[];
+}
+
+export interface PlanningRootCandidate {
+  readonly repoDirName: string;
+  readonly repoDir: string;
+  readonly planningRoot: string;
+  readonly sourceAvailable: boolean;
+}
+
+export interface PlanningRootAmbiguity {
+  readonly code: typeof PLANNING_ROOT_AMBIGUOUS_CODE;
   readonly detail: string;
+  readonly prefix: string;
   readonly siblingRepoDirs: readonly string[];
+  readonly candidates: readonly PlanningRootCandidate[];
+  readonly recovery: PlanningRootRecoveryContract;
+}
+
+/** Retained name for callers that only consume the code/detail/siblingRepoDirs shape. */
+export type PlanningRootWarning = PlanningRootAmbiguity;
+
+export type PlanningRootSelectionStatus = 'explicit' | 'canonical' | 'ambiguous';
+
+export interface PlanningRootSelection {
+  readonly status: PlanningRootSelectionStatus;
+  /** True when ambiguity was detected and no root may be used without an operator decision. */
+  readonly failClosed: boolean;
+  /** Empty whenever `failClosed` is true, so a caller has nothing to guess with. */
+  readonly resolvedRoots: readonly string[];
+  readonly ambiguities: readonly PlanningRootAmbiguity[];
 }
 
 export interface PlanningRootResolution {
   readonly roots: readonly string[];
   readonly excludedDerivativeRoots: readonly string[];
   readonly ambiguousSiblingGroups: readonly (readonly string[])[];
-  readonly warnings: readonly PlanningRootWarning[];
+  readonly warnings: readonly PlanningRootAmbiguity[];
+}
+
+export function planningRootAmbiguityRecovery(): PlanningRootRecoveryContract {
+  return {
+    code: PLANNING_ROOT_AMBIGUOUS_CODE,
+    retryable: PLANNING_ROOT_AMBIGUOUS_RETRYABLE,
+    requiresHumanApproval: PLANNING_ROOT_AMBIGUOUS_REQUIRES_HUMAN_APPROVAL,
+    safeNextSteps: PLANNING_ROOT_AMBIGUOUS_SAFE_NEXT_STEPS,
+    readOnlyInspectionSteps: PLANNING_ROOT_AMBIGUOUS_READ_ONLY_STEPS,
+    forbiddenActions: PLANNING_ROOT_AMBIGUOUS_FORBIDDEN_ACTIONS
+  };
 }
 
 export function isDerivativeSiblingRepoName(canonicalName: string, candidateName: string): boolean {
@@ -36,8 +114,10 @@ export function repoDirNameFromPlanningRoot(planningRoot: string): string | null
 
 export function applyCanonicalSiblingPreference(
   planningRoots: readonly string[],
-  parentDir: string
+  parentDir: string,
+  options?: { readonly exists?: (filePath: string) => boolean }
 ): PlanningRootResolution {
+  const exists = options?.exists ?? existsSync;
   const siblingRoots = planningRoots.filter((root) => {
     const repoDir = repoDirFromPlanningRoot(root);
     return repoDir !== null && path.resolve(path.dirname(repoDir)) === path.resolve(parentDir);
@@ -67,7 +147,12 @@ export function applyCanonicalSiblingPreference(
     .filter((entry): entry is string => Boolean(entry));
 
   const ambiguousSiblingGroups: string[][] = [];
-  const warnings: PlanningRootWarning[] = [];
+  const warnings: PlanningRootAmbiguity[] = [];
+  const rootByRepoName = new Map<string, string>();
+  for (const root of filtered) {
+    const name = repoDirNameFromPlanningRoot(root);
+    if (name && !rootByRepoName.has(name)) rootByRepoName.set(name, path.resolve(root));
+  }
   const derivativeOnlyFamilies = new Map<string, string[]>();
   for (const name of remainingSiblingNames) {
     const dashIndex = name.indexOf('-');
@@ -78,11 +163,23 @@ export function applyCanonicalSiblingPreference(
   }
   for (const [base, members] of derivativeOnlyFamilies.entries()) {
     if (members.length < 2) continue;
-    ambiguousSiblingGroups.push(uniqueSorted(members));
+    const siblingRepoDirs = uniqueSorted(members);
+    ambiguousSiblingGroups.push(siblingRepoDirs);
     warnings.push({
-      code: 'ATM_PLANNING_ROOT_AMBIGUOUS',
+      code: PLANNING_ROOT_AMBIGUOUS_CODE,
       detail: `Multiple sibling planning repos share prefix "${base}" without a canonical "${base}" directory.`,
-      siblingRepoDirs: uniqueSorted(members)
+      prefix: base,
+      siblingRepoDirs,
+      candidates: siblingRepoDirs.map((repoDirName) => {
+        const planningRoot = rootByRepoName.get(repoDirName) ?? path.resolve(parentDir, repoDirName, PLANNING_ROOT_RELATIVE_SUFFIX);
+        return {
+          repoDirName,
+          repoDir: path.resolve(parentDir, repoDirName),
+          planningRoot,
+          sourceAvailable: exists(planningRoot)
+        };
+      }),
+      recovery: planningRootAmbiguityRecovery()
     });
   }
 
@@ -122,7 +219,39 @@ export function resolveCandidatePlanningRoots(
     .filter((entry) => exists(entry))
     .sort((left, right) => left.localeCompare(right));
 
-  return applyCanonicalSiblingPreference(resolved, parent);
+  return applyCanonicalSiblingPreference(resolved, parent, { exists });
+}
+
+/**
+ * Single entry point for planning-root selection.
+ *
+ * An explicit operator-supplied root always wins. Otherwise a canonical base
+ * directory resolves its derivatives. When a prefix family has no canonical base
+ * the selection fails closed: `resolvedRoots` is empty so no caller can fall back
+ * to guessing, and `ambiguities[]` carries the candidates, their source
+ * availability, and the one safe non-destructive recovery route.
+ */
+export function selectPlanningRoot(
+  cwd: string,
+  options?: {
+    readonly explicitRoot?: string;
+    readonly configuredRoots?: readonly string[];
+    readonly readDir?: (directoryPath: string) => readonly Dirent[];
+    readonly exists?: (filePath: string) => boolean;
+  }
+): PlanningRootSelection {
+  const explicitRoot = options?.explicitRoot;
+  if (explicitRoot) {
+    const resolvedExplicit = path.isAbsolute(explicitRoot) ? path.resolve(explicitRoot) : path.resolve(cwd, explicitRoot);
+    return { status: 'explicit', failClosed: false, resolvedRoots: [resolvedExplicit], ambiguities: [] };
+  }
+
+  const resolution = resolveCandidatePlanningRoots(cwd, options);
+  if (resolution.warnings.length > 0) {
+    return { status: 'ambiguous', failClosed: true, resolvedRoots: [], ambiguities: resolution.warnings };
+  }
+
+  return { status: 'canonical', failClosed: false, resolvedRoots: resolution.roots, ambiguities: [] };
 }
 
 export function listCandidatePlanningRoots(cwd: string): readonly string[] {
