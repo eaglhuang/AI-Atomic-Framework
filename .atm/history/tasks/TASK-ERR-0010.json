@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0010",
   "title": "Preserve foreign staged bytes across taskflow close",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-ERR-0008",
@@ -186,134 +186,71 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T14-05-36-005Z-scope-amendment-60e32561b10a",
-  "lastTransitionAt": "2026-08-09T14:05:36.005Z",
+  "lastTransitionId": "2026-08-09T16-04-00-293Z-close-48718de3a5f5",
+  "lastTransitionAt": "2026-08-09T16:04:00.293Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T12:27:40.308Z",
   "promotedAt": "2026-08-09T12:27:40.312Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-c8ce32850235",
-    "claimedAt": "2026-08-09T12:27:40.317Z",
-    "heartbeatAt": "2026-08-09T13:52:57.896Z",
+    "leaseId": "lease-5c814f8693c3",
+    "claimedAt": "2026-08-09T15:50:09.651Z",
+    "heartbeatAt": "2026-08-09T16:04:00.291Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/TASK-ERR-0010.*",
-      ".atm/history/task-events/TASK-ERR-0010/**",
       ".atm/history/tasks/TASK-ERR-0010.json",
-      "packages/cli/dist",
-      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
       "packages/cli/src/commands/git-index-ownership.ts",
-      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-      "packages/cli/src/commands/residue.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
       "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-      "packages/cli/src/commands/tasks/__tests__/generated-residue-policy.test.ts",
       "packages/cli/src/commands/tasks/close-window-lock.ts",
-      "packages/cli/src/commands/tasks/generated-residue-policy.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-root-drop",
       "tests/cli/git-commit-task-scoped-staging.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260809122654-codex-gpt-5.4-mini-51163d4aec",
+      "laneSessionId": "lane-20260809155009-codex-gpt-5.4-mini-db284d8035",
       "status": "adopted",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809122654-codex-gpt-5.4-mini-51163d4aec\""
-    }
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809155009-codex-gpt-5.4-mini-db284d8035\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-09T12:26:53.255Z",
   "startedByActor": "codex-gpt-5.4-mini",
-  "startedBySessionId": "session-20260809122740-codex-gpt-5.4-mini-TASK-ERR-0010-bb01cdfbab",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
-    "taskId": "TASK-ERR-0010",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/TASK-ERR-0010.*",
-      ".atm/history/task-events/TASK-ERR-0010/**",
-      ".atm/history/tasks/TASK-ERR-0010.json",
-      "packages/cli/dist",
-      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
-      "packages/cli/src/commands/git-index-ownership.ts",
-      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-      "packages/cli/src/commands/residue.ts",
-      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
-      "packages/cli/src/commands/taskflow/close-orchestration.ts",
-      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-      "packages/cli/src/commands/tasks/__tests__/generated-residue-policy.test.ts",
-      "packages/cli/src/commands/tasks/close-window-lock.ts",
-      "packages/cli/src/commands/tasks/generated-residue-policy.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-root-drop",
-      "tests/cli/git-commit-task-scoped-staging.test.ts"
-    ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0010-preserve-foreign-staged-bytes-across-taskflow-close.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/error-governance/",
-      "docs/ai_atomic_framework/error-governance/tasks/",
-      "docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0010-preserve-foreign-staged-bytes-across-taskflow-close.task.md"
-    ],
-    "allowPlanningMirror": false,
-    "promptHash": "e7e2c64a4f065981beea46bb061c1ba7732ff1b630c4deeed59132b21f9def4e",
-    "actorId": "codex-gpt-5.4-mini",
-    "sessionId": null,
-    "laneSession": {
-      "laneSessionId": "lane-20260809122654-codex-gpt-5.4-mini-51163d4aec",
-      "status": "active",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809122654-codex-gpt-5.4-mini-51163d4aec\""
-    },
-    "createdAt": "2026-08-09T12:27:46.555Z",
-    "status": "active"
-  },
+  "startedBySessionId": "session-20260809155009-codex-gpt-5.4-mini-TASK-ERR-0010-f225c2c8db",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-175b7b7ee240e50a",
-    "ticketDigest": "sha256:175b7b7ee240e50ac235b73290dea6495120055694e39f27c19b6fbac8248459",
+    "ticketId": "wat-a421a4d88f21712b",
+    "ticketDigest": "sha256:a421a4d88f21712bfccd758dee422c954d358d5f28b415d04a911046b96e910e",
     "taskId": "TASK-ERR-0010",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260809122654-codex-gpt-5.4-mini-51163d4aec",
-    "claimGeneration": "lease-c8ce32850235",
-    "issuedAt": "2026-08-09T13:52:57.896Z",
-    "expiresAt": "2026-08-09T14:22:57.896Z",
-    "scopeDigest": "sha256:134289ba0e67bccd35d50ab00dfac380c7d8039aab6d0787354de6ad8d0757c2",
+    "laneSessionId": "lane-20260809155009-codex-gpt-5.4-mini-db284d8035",
+    "claimGeneration": "lease-5c814f8693c3",
+    "issuedAt": "2026-08-09T16:03:25.289Z",
+    "expiresAt": "2026-08-09T16:33:25.289Z",
+    "scopeDigest": "sha256:7b4931c95481cc733d46277e7c6b075244733a85be60d96906c2a011122430ea",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-09T13:52:57.896Z"
+      "selectedAt": "2026-08-09T16:03:25.289Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-ERR-0010.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-ERR-0010/**",
           ".atm/history/tasks/TASK-ERR-0010.json",
-          "packages/cli/dist",
           "packages/cli/src/commands/git-index-ownership.ts",
           "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
           "packages/cli/src/commands/taskflow/close-orchestration.ts",
           "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
           "packages/cli/src/commands/tasks/close-window-lock.ts",
-          "release/atm-onefile/atm.mjs",
-          "release/atm-root-drop",
           "tests/cli/git-commit-task-scoped-staging.test.ts"
         ],
-        "digest": "sha256:989be0fbc6b1a10cd71c287334db19265b23e48e90bbff8a679a3af111438414"
+        "digest": "sha256:d851bd7c8e6beeffeb63da964c860904763049f6e679f8085afcbeb4c9c97d87"
       },
       {
         "kind": "lifecycle-operation",
@@ -346,5 +283,44 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0010",
+    "batchId": null,
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-bb55ded28b22846b",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0010.*",
+      ".atm/history/task-events/TASK-ERR-0010/**",
+      ".atm/history/tasks/TASK-ERR-0010.json",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e7e2c64a4f065981beea46bb061c1ba7732ff1b630c4deeed59132b21f9def4e",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260809155009-codex-gpt-5.4-mini-TASK-ERR-0010-f225c2c8db",
+    "laneSession": {
+      "laneSessionId": "lane-20260809155009-codex-gpt-5.4-mini-db284d8035",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809155009-codex-gpt-5.4-mini-db284d8035\""
+    },
+    "createdAt": "2026-08-09T15:50:11.607Z",
+    "status": "active"
+  },
+  "closedAt": "2026-08-09T16:04:00.291Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809155009-codex-gpt-5.4-mini-TASK-ERR-0010-f225c2c8db",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0010.closure-packet.json"
 }

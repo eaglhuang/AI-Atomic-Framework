@@ -1,0 +1,29 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-cbe21ae7d632",
+  "recordedAt": "2026-08-09T15:51:56.603Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-ERR-0010",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task TASK-ERR-0010 --actor codex-gpt-5.4-mini --status done --json",
+  "flags": [],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-TASK-ERR-0010-56c8182ebb",
+  "reason": "Direct close backend historical-delivery path.",
+  "skippedChecks": [
+    "protected-backend-surface"
+  ],
+  "touchedFiles": [],
+  "outcome": "failed",
+  "failureCode": "ATM_TASK_CLOSE_DIRTY_WORKTREE",
+  "emergencyUsePath": null,
+  "parentEventId": null,
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Authorized protected override failed before completion; inspect failureCode and retry through the normal lane when possible.",
+    "suggestedCommand": "node atm.mjs tasks close --task TASK-ERR-0010 --actor codex-gpt-5.4-mini --status done --json",
+    "deferredChecks": [
+      "protected-backend-surface"
+    ]
+  }
+}

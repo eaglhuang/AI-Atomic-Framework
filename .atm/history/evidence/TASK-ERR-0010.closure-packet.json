@@ -1,0 +1,184 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ERR-0010",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "3660af2ba3bc6affcd77ee8f7d2a7da9a32bf34d",
+  "governedTreeSha": "6c5826840024cd7a576d0b6ebefd1a8435b23748",
+  "targetCommitDelta": {
+    "currentCommitSha": "3660af2ba3bc6affcd77ee8f7d2a7da9a32bf34d",
+    "parentCommitShas": [
+      "3660af2ba3bc6affcd77ee8f7d2a7da9a32bf34d"
+    ],
+    "governedTreeSha": "6c5826840024cd7a576d0b6ebefd1a8435b23748",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T15-49-57-795Z-repair-claim-061f57d810e3.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T15-50-11-608Z-claim-9ff9f6c37ecb.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T16-03-25-576Z-renew-028962387f77.json",
+      ".atm/history/tasks/ATM-GOV-0287.json",
+      ".atm/history/tasks/ATM-GOV-0289.json",
+      ".atm/history/tasks/ATM-GOV-0290.json",
+      ".atm/history/tasks/ATM-GOV-0291.json",
+      ".atm/history/tasks/ATM-GOV-0296.json",
+      ".atm/history/tasks/ATM-GOV-0297.json",
+      ".atm/history/tasks/ATM-GOV-0298.json",
+      ".atm/history/tasks/ATM-GOV-0299.json",
+      ".atm/history/tasks/ATM-GOV-0300.json",
+      ".atm/history/tasks/ATM-GOV-0302.json",
+      ".atm/history/tasks/ATM-GOV-0303.json",
+      ".atm/history/tasks/ATM-GOV-0312.json",
+      ".atm/history/tasks/ATM-GOV-0314.json",
+      ".atm/history/tasks/ATM-GOV-0315.json",
+      ".atm/history/tasks/ATM-GOV-0316.json",
+      ".atm/history/tasks/ATM-GOV-0317.json",
+      ".atm/history/tasks/TASK-ERR-0010.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "packages/core/src/error-code-registry.generated.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bd2f4da12937c801247333ee02e9a7d8d37aa42a0157e3f58e55e9159c77ee5c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5776fe294b6d48dc40cbcc6545902a7b6a6993e80130ae5b1b8c5b622885f5fb",
+      "stderrSha256": "sha256:a424298d8ed7b337607b753b6d99bfb096621af3260f2141a7989c28b91ed181",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:30df4c76831f6d276aedcfb0e0af7b47768c8202502ce3177a1fc4cce071ea9a",
+      "stderrSha256": "sha256:00f6022a7c38129bb74958d8f11ecfc9783505a4f1cd2607a11c95bc6a8d2b56",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-09T16:04:00.287Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ERR-0010.*",
+      ".atm/history/task-events/TASK-ERR-0010/**",
+      ".atm/history/tasks/TASK-ERR-0010.json",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ERR-0010.json",
+  "closedAt": "2026-08-09T16:04:00.287Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809155009-codex-gpt-5.4-mini-TASK-ERR-0010-f225c2c8db",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "cb925c2b47c2b48f0578976f1e2355eb312b8f37",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-ERR-0010.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T12-24-17-351Z-import-8b717fc89bd2.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T12-26-53-246Z-reserve-6eabbd5771e9.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T12-26-53-249Z-promote-50ee6b1045a9.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T12-26-58-957Z-claim-4c7f59f17c48.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T12-27-29-348Z-release-4345930e75b3.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T12-27-40-308Z-reserve-b87e5d5f1bac.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T12-27-40-312Z-promote-df2937fab82f.json",
+      ".atm/history/task-events/TASK-ERR-0010/2026-08-09T12-27-46-541Z-claim-4ce6002d494d.json",
+      ".atm/history/tasks/TASK-ERR-0010.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
