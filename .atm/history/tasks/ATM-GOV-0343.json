@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0343",
   "title": "Preserve same-task retained WIP continuity across fresh lane reclaim",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -144,8 +144,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T20-29-49-992Z-renew-8da50107ad3d",
-  "lastTransitionAt": "2026-08-09T20:29:49.992Z",
+  "lastTransitionId": "2026-08-09T21-49-31-089Z-close-902ff3abca0e",
+  "lastTransitionAt": "2026-08-09T21:49:31.089Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T20:22:19.019Z",
@@ -154,7 +154,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-cdea6fc0ea60",
     "claimedAt": "2026-08-09T20:22:19.025Z",
-    "heartbeatAt": "2026-08-09T20:29:48.681Z",
+    "heartbeatAt": "2026-08-09T21:49:31.087Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0343.json",
@@ -162,33 +162,34 @@
       "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
       "tests/cli/claim-foreign-unstaged-wip.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260809202219-codex-gpt-5.4-mini-101e9bedcd",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809202219-codex-gpt-5.4-mini-101e9bedcd\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-09T20:22:19.025Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-5662faf895fab05d",
-    "ticketDigest": "sha256:5662faf895fab05d014bbb7f660ce2b45860d84ede071f511e320d2c1c4cc497",
+    "ticketId": "wat-b388d1f5ab8cbdba",
+    "ticketDigest": "sha256:b388d1f5ab8cbdbaf344162366d92606cb5f9f417dfb5c97f59e07616bd072f9",
     "taskId": "ATM-GOV-0343",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260809202219-codex-gpt-5.4-mini-101e9bedcd",
     "claimGeneration": "lease-cdea6fc0ea60",
-    "issuedAt": "2026-08-09T20:29:48.681Z",
-    "expiresAt": "2026-08-09T20:59:48.681Z",
+    "issuedAt": "2026-08-09T21:44:26.757Z",
+    "expiresAt": "2026-08-09T22:14:26.757Z",
     "scopeDigest": "sha256:f373f19e39e56dd6ec1d5c33368ddd0879b1fc79d70160e1e9361123ce4e7b91",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-09T20:29:48.681Z"
+      "selectedAt": "2026-08-09T21:44:26.757Z"
     },
     "grants": [
       {
@@ -266,5 +267,9 @@
     },
     "createdAt": "2026-08-09T20:22:29.241Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-09T21:49:31.087Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809202219-codex-gpt-5.4-mini-ATM-GOV-0343-c35c687780",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0343.closure-packet.json"
 }

@@ -1,0 +1,171 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0343",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d0e84fb0fdd3fddfa53bec24e382ee3811e0e2a1",
+  "governedTreeSha": "e60b0f3030027868da81460d763814341a704319",
+  "targetCommitDelta": {
+    "currentCommitSha": "d0e84fb0fdd3fddfa53bec24e382ee3811e0e2a1",
+    "parentCommitShas": [
+      "d0e84fb0fdd3fddfa53bec24e382ee3811e0e2a1"
+    ],
+    "governedTreeSha": "e60b0f3030027868da81460d763814341a704319",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0287.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0288.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0289.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0343.json",
+      ".atm/history/task-events/ATM-GOV-0287/2026-08-09T16-15-07-375Z-close-d1df72afacd9.json",
+      ".atm/history/task-events/ATM-GOV-0287/2026-08-09T16-15-07-463Z-lock-cleanup-84fe8bb12e34.json",
+      ".atm/history/task-events/ATM-GOV-0288/2026-08-09T16-20-32-610Z-close-28727a9ad53a.json",
+      ".atm/history/task-events/ATM-GOV-0288/2026-08-09T16-20-32-695Z-lock-cleanup-017eecb5ecfb.json",
+      ".atm/history/task-events/ATM-GOV-0289/2026-08-09T16-24-01-973Z-close-4772a7ffba58.json",
+      ".atm/history/task-events/ATM-GOV-0343/2026-08-09T21-44-27-129Z-renew-6845a3210bf6.json",
+      ".atm/history/tasks/ATM-GOV-0287.json",
+      ".atm/history/tasks/ATM-GOV-0289.json",
+      ".atm/history/tasks/ATM-GOV-0290.json",
+      ".atm/history/tasks/ATM-GOV-0291.json",
+      ".atm/history/tasks/ATM-GOV-0296.json",
+      ".atm/history/tasks/ATM-GOV-0297.json",
+      ".atm/history/tasks/ATM-GOV-0298.json",
+      ".atm/history/tasks/ATM-GOV-0299.json",
+      ".atm/history/tasks/ATM-GOV-0300.json",
+      ".atm/history/tasks/ATM-GOV-0302.json",
+      ".atm/history/tasks/ATM-GOV-0303.json",
+      ".atm/history/tasks/ATM-GOV-0312.json",
+      ".atm/history/tasks/ATM-GOV-0314.json",
+      ".atm/history/tasks/ATM-GOV-0315.json",
+      ".atm/history/tasks/ATM-GOV-0316.json",
+      ".atm/history/tasks/ATM-GOV-0317.json",
+      ".atm/history/tasks/ATM-GOV-0343.json",
+      ".atm/history/tasks/TASK-LANE-0023.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:abb8b0183b0aaa77311c04297c19c7cbd6bbcae3f315c8398895d9cf8c813e33",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:140430092f1720f25b18e0e17aea8ed271b4dddbb1e93b167ca3a1133daf11e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c920dbfa44da0987ea3f84fbbae7ad3919881a994eb0d33973f9e87ec1741e43",
+      "stderrSha256": "sha256:39ce03a3ea1a616da9aacbebfb543e87d9cfff48e307105b0a1263e043e5b98a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+    "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-09T21:49:31.082Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0343.*",
+      ".atm/history/task-events/ATM-GOV-0343/**",
+      ".atm/history/tasks/ATM-GOV-0343.json",
+      "packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "tests/cli/claim-foreign-unstaged-wip.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "tests/cli/claim-foreign-unstaged-wip.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0343.json",
+  "closedAt": "2026-08-09T21:49:31.083Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809202219-codex-gpt-5.4-mini-ATM-GOV-0343-c35c687780",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "2d3c6f5f8e6069385d5a6588bb665b3d183a1f3c",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0343.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0343/2026-08-09T20-22-04-987Z-import-88d08cadd0b3.json",
+      ".atm/history/task-events/ATM-GOV-0343/2026-08-09T20-22-19-019Z-reserve-e158898edc1c.json",
+      ".atm/history/task-events/ATM-GOV-0343/2026-08-09T20-22-19-021Z-promote-c1860c382f90.json",
+      ".atm/history/task-events/ATM-GOV-0343/2026-08-09T20-22-29-242Z-claim-537b97e98ccb.json",
+      ".atm/history/task-events/ATM-GOV-0343/2026-08-09T20-29-49-992Z-renew-8da50107ad3d.json",
+      ".atm/history/tasks/ATM-GOV-0343.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

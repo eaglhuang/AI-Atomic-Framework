@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T21-49-31-089Z-close-902ff3abca0e",
+  "taskId": "ATM-GOV-0343",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809202219-codex-gpt-5.4-mini-ATM-GOV-0343-c35c687780",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0343.json",
+  "taskSha256": "sha256:2b79698a5567074b1a587e0c69f5843677a56bf1ff860f5c8a322369e90aa855",
+  "createdAt": "2026-08-09T21:49:31.089Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0343 --actor codex-gpt-5.4-mini --status done --historical-delivery 2d3c6f5f8e6069385d5a6588bb665b3d183a1f3c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260809202219-codex-gpt-5.4-mini-ATM-GOV-0343-c35c687780",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0343.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+      "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-09T21:49:31.082Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0343.*",
+        ".atm/history/task-events/ATM-GOV-0343/**",
+        ".atm/history/tasks/ATM-GOV-0343.json",
+        "packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+        "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+        "tests/cli/claim-foreign-unstaged-wip.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
+        "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+        "tests/cli/claim-foreign-unstaged-wip.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
