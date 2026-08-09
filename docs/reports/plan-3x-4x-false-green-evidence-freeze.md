@@ -1,30 +1,25 @@
-# Plan 3.x / 4.x False-green Evidence Freeze
+# Plan 3.x / 4.x false-green evidence freeze
 
-Verdict: **remain-open**. This is an evidence-preservation snapshot, not a completion certificate.
+- Verdict: **remain-open**
+- Window: 2026-08-09T16:39:58.153Z → 2026-08-09T17:13:17.493Z
+- Raw receipt count: 12
+- Rescue worktrees held: 23
 
-## Observed baseline
+## Command receipts
 
-- Target and `origin/main`: `0d50ba508a866d92fc4e26501a060ac539024140`.
-- Planning repository: `4b32b63056fe5b15612e5d10b9bb644e788ac8bb`, with 60 dirty paths.
-- The target has 113 dirty paths. Its source transcript digest is intentionally marked unavailable instead of pretending that a mutable console transcript is sealed evidence.
-- The 23 rescue worktrees are all retained under evidence hold; their paths and HEADs are in the JSON companion report.
+| id | exit | timeout | elapsed ms | combined digest |
+|---|---:|---|---:|---|
+| target-head | 0 | false | 457 | `sha256:64960037089a32009bebee27c6079ef9688de2c9dc202f8bae807575f80754ac` |
+| origin-main-head | 0 | false | 444 | `sha256:fcc231c74f922d78e767bb4623d123e40d882e3d13c4eebe6f427e17a0c3ad4f` |
+| planning-head | 0 | false | 46 | `sha256:7612c2b4ba8cc1873b625147b4b7789f29dda9be820147091a839e9c3f916efd` |
+| target-status-porcelain | 0 | false | 459 | `sha256:0fbc16523ae5e058db4c295765190c9438c489494870f6b084f6365d2446469b` |
+| planning-status-porcelain | 0 | false | 512 | `sha256:a6d6e101c741d5799597c46b136d53df9cc9f0697e41f6d16341fe8a88d73feb` |
+| worktree-registry | 0 | false | 452 | `sha256:00d1fbe441fb7aa952ccf4968d63bfe95151be29814d3124ae2a410d2531fc5a` |
+| task-ledger-census | 0 | false | 8162 | `sha256:903ca178c1977a33317deaf277d4a5b19ff2d05de76dc3c8a59ea1bc9ecf4102` |
+| protected-override-census | 0 | false | 6222 | `sha256:5bfd3e778d691a31792465ab494915941cf1fadf6390c3855ad308500e6f9659` |
+| validate-test-facade | 0 | false | 230235 | `sha256:8dd5a74c03f6932ba60cdeb7f8cdc1e322a419be94c47ec58d25fe2086c07a02` |
+| validate-module-boundaries | 0 | false | 357 | `sha256:f216256e2bee2d7038267f996ac4e3c1bf943cc4016f084080c38c249ff903f0` |
+| validate-quick | 1 | false | 81221 | `sha256:e12e3773ae656832bf43af689d88969814bc1243a9e68b791e7fa406ab17fbec` |
+| validate-standard | 1 | false | 1670769 | `sha256:0fb22158112d12cfa462b048a7f6e2b32b2908c8b692a2f3efc92d6294299e55` |
 
-## Lineage and measurement
-
-`a548eb381` is credited as a real repair for the registry hash placeholder. It does not prove four-plan completion.
-
-The cold `validate-skew-matrix` observation took 176353 ms and exited 1. All six current CLI × Plugin SDK smoke cases failed `governance-entry-readiness`. This is a different failure class from the earlier hash placeholder and from the 120000 ms test-facade timeout margin.
-
-Warm and loaded comparisons were deliberately not run: after a deterministic readiness failure, additional timings would not measure the timeout policy. They must be repeated only after identity/governance readiness is isolated from the validator under test.
-
-## Newly observed first-principles failure
-
-ATM requires an explicit actor identity before a governed claim. The identity update changes the tracked actor registry, and framework doctor then blocks `governance-entry-readiness` until that registry is committed. Consequently, the required act of establishing the worker changes the validation baseline. This must be fixed as a governed contract, not hidden by a dirty-tree exemption.
-
-## Control-plane accounting
-
-The freeze itself made no product-state change and no rescue cleanup. Required control-plane writes were: initial task import; explicit actor identity; scoped claim; two path-bounded planning-source seals (`261d8936`, then `0fc02176`); and two single-use audited force-import repairs that preserved the active claim. The JSON companion names every operation, its time or commit, scope, and emergency lease where applicable.
-
-## Closure boundary
-
-`ATM-GOV-0325` remains unclosed. The initial null planning-source seal was repaired and the active ledger record now binds to `0fc02176`. Closure still requires fresh command-backed validators plus a decision on the identity/readiness defect; no task is promoted merely because the source seal is repaired.
+The JSON companion is authoritative for raw stdout/stderr. Non-zero and timeout receipts remain negative evidence; this artifact does not compute a completion verdict from them.
