@@ -253,6 +253,7 @@ function isPlainObject(value) {
 export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
     const contexts = new Map();
     const evidenceByPath = new Map();
+    const lockBackedRunnerReceipts = new Set();
     const linkedRunnerReceiptTaskId = (file, evidence, taskId) => {
         if (evidence?.schemaId !== 'atm.runnerSyncReceipt.v1' || !taskId)
             return taskId;
@@ -266,6 +267,7 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
                 const context = contexts.get(taskId) ?? { ledger: false, event: false };
                 context.event = true;
                 contexts.set(taskId, context);
+                lockBackedRunnerReceipts.add(file.toLowerCase());
                 return taskId;
             }
         }
@@ -314,7 +316,8 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
     const decisions = new Map();
     const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat()]);
     for (const [file, taskIds] of evidenceByPath) {
-        if (bundleTaskIds.size > 1) {
+        const isIndependentRunnerWitness = lockBackedRunnerReceipts.has(file) && taskIds.length === 1 && Boolean(contexts.get(taskIds[0])?.event);
+        if (bundleTaskIds.size > 1 && !isIndependentRunnerWitness) {
             decisions.set(file, { ok: false, taskId: null, reason: 'bundle-with-ambiguous-task-ids' });
             continue;
         }
