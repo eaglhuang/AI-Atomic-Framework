@@ -11,6 +11,7 @@ import { isClaimExpired, parseClaimRecord } from './task-ledger-readers.ts';
 import { compareClaimLifecycleOwners, type ClaimOwnerComparisonMode } from '../next/claim-admission.ts';
 import { pathMatchesTaskScope, uniqueSorted } from '../git-governance/commit-scope-policy.ts';
 import { classifyTerminalLifecycleOwnership } from '../../../../core/src/broker/historical-work-admission-attestation.ts';
+import { inspectReferencedLaneSession } from '../lane-session/resolve.ts';
 
 export type ClaimRepairIssueKind =
   | 'valid-active-claim'
@@ -21,7 +22,8 @@ export type ClaimRepairIssueKind =
   | 'dangling-direction-sidecar'
   | 'conflicting-lock-actor'
   | 'conflicting-session-lease'
-  | 'orphaned-active-session';
+  | 'orphaned-active-session'
+  | 'unresolved-claim-lane';
 
 export interface ClaimRepairIssue {
   readonly kind: ClaimRepairIssueKind;
@@ -163,6 +165,11 @@ export function diagnoseClaimRepairState(cwd: string, taskId: string, actorId?: 
   });
   const lockActorId = readLockActorId(governanceLock);
   const claimLaneSessionId = readLaneSessionId(claim);
+  const claimLaneAvailability = inspectReferencedLaneSession({
+    cwd: root,
+    laneSessionId: claimLaneSessionId,
+    now: nowIso,
+  });
   const lockLaneSessionId = readLaneSessionId(governanceLock);
   const sidecarPath = path.join(root, '.atm', 'runtime', 'task-direction-locks', `${taskId}.json`);
   const activeSession = resolveActorWorkSession(root, { taskId, includeNonActive: false });
@@ -189,7 +196,22 @@ export function diagnoseClaimRepairState(cwd: string, taskId: string, actorId?: 
       details: { code: 'ATM_TERMINAL_LIFECYCLE_OWNERSHIP_INCONSISTENT', reason: terminalOwnership.reason }
     });
   }
-  const hasValidActiveClaim = claim?.state === 'active' && !isClaimExpired(claim, nowIso);
+  const hasValidActiveClaim = claim?.state === 'active'
+    && !isClaimExpired(claim, nowIso)
+    && claimLaneAvailability.availability === 'available';
+
+  if (claim?.state === 'active' && !isClaimExpired(claim, nowIso) && claimLaneAvailability.availability !== 'available') {
+    issues.push({
+      kind: 'unresolved-claim-lane',
+      severity: 'repairable',
+      summary: `Active claim references a ${claimLaneAvailability.availability} lane session and cannot hold mutation authority.`,
+      details: {
+        claimLaneSessionId,
+        laneAvailability: claimLaneAvailability.availability,
+        recovery: 'release-and-reclaim',
+      },
+    });
+  }
 
   if (hasValidActiveClaim) {
     issues.push({
@@ -385,19 +407,19 @@ export async function applyClaimRepairWrite(input: {
     repairActions.push('released-expired-claim');
   }
 
-  if (issueKinds.has('stale-running-without-claim') || issueKinds.has('stale-claim-released')) {
+  if (issueKinds.has('stale-running-without-claim') || issueKinds.has('stale-claim-released') || issueKinds.has('unresolved-claim-lane')) {
     if (beforeStatus === 'running' || beforeStatus === 'review') {
       taskDocument.status = 'ready';
       repairActions.push('reset-status-to-ready');
     }
-    if (beforeClaim?.state === 'active' && issueKinds.has('stale-running-without-claim')) {
+    if (beforeClaim?.state === 'active' && (issueKinds.has('stale-running-without-claim') || issueKinds.has('unresolved-claim-lane'))) {
       taskDocument.claim = {
         ...beforeClaim,
         state: 'released',
         reason: input.reason,
         heartbeatAt: nowIso
       };
-      repairActions.push('released-stale-active-claim');
+      repairActions.push(issueKinds.has('unresolved-claim-lane') ? 'released-unresolved-lane-claim' : 'released-stale-active-claim');
     }
     if (typeof taskDocument.owner === 'string') {
       delete taskDocument.owner;

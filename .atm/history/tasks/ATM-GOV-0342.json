@@ -1,0 +1,289 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0342",
+  "title": "Restore lane-registry claim authority continuity",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0325"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/lane-session/resolve.ts",
+    "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+    "packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/lane-session/resolve.ts",
+    "packages/cli/src/commands/lane-session/adopt-rebind.ts",
+    "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+    "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts",
+    "packages/cli/src/commands/lane-session/__tests__/**",
+    "packages/cli/src/commands/tasks/__tests__/**"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the authority resolver and restore the prior lane registry behavior; repair receipts must remain append-only evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane-session-authority",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane-registry-claim-authority",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/lane-session/resolve.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0342-restore-lane-registry-claim-authority-continuity.task.md",
+    "sectionTitle": "ATM-GOV-0342",
+    "headingLine": 86,
+    "hash": "ee8da0d29e274ec1",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0342-restore-lane-registry-claim-authority-continuity.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ee8da0d29e274ec1ef99f1583f382ad10bb1db3af0aadfe27f5db49ccd0c7dd4",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T20:01:43.337Z"
+    }
+  },
+  "importedAt": "2026-08-09T20:01:43.337Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0325"
+    ],
+    "startConditions": [
+      "Preserve all foreign staged bytes and rescue-worktree evidence.",
+      "Diagnose the active claim, work session, governance lock, and lane-registry tuple before mutation."
+    ],
+    "softRelations": [
+      "TASK-LANE-0023",
+      "TASK-ERR-0007"
+    ],
+    "changedPublicSeams": [
+      "lane-session resolution and adoption",
+      "claim repair diagnosis and lifecycle recovery"
+    ],
+    "causalImpactEdges": [
+      "active-claim-to-lane-registry-authority",
+      "repair-diagnosis-to-renew-and-close-recovery"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-LANE-0023"
+    ],
+    "validatorReferences": [
+      "test_lane_registry_claim_authority_continuity_0342"
+    ],
+    "phaseOwner": "Wave-2-governance-substrate"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_lane_registry_claim_authority_continuity_0342",
+      "targetGroupId": "null",
+      "semanticKey": "lane_registry_claim_authority_continuity",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "active-claim-to-lane-registry-authority",
+        "repair-diagnosis-to-renew-and-close-recovery"
+      ],
+      "expectedRedPredicate": "a claim with a missing or stale registry lane is reported as valid-active and cannot be renewed or recovered",
+      "contributionResourceKey": "atm.lane-session-authority",
+      "responsibility": "task-required",
+      "dependencyEdge": "lane-registry-authority",
+      "contractEdge": "claim-authority-continuity",
+      "resourceKey": "atm.lane-session-authority"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_lane_registry_claim_authority_continuity_0342"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-09T20-02-23-236Z-claim-e6ad17d925e9",
+  "lastTransitionAt": "2026-08-09T20:02:23.236Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-09T20:02:12.001Z",
+  "promotedAt": "2026-08-09T20:02:12.004Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-bc68819fb856",
+    "claimedAt": "2026-08-09T20:02:12.008Z",
+    "heartbeatAt": "2026-08-09T20:02:12.008Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0342.json",
+      "packages/cli/src/commands/lane-session/__tests__/**",
+      "packages/cli/src/commands/lane-session/adopt-rebind.ts",
+      "packages/cli/src/commands/lane-session/resolve.ts",
+      "packages/cli/src/commands/tasks/__tests__/**",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260809200212-codex-gpt-5.4-mini-38283736f2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809200212-codex-gpt-5.4-mini-38283736f2\""
+    }
+  },
+  "startedAt": "2026-08-09T20:02:12.008Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-2682948d85278af1",
+    "ticketDigest": "sha256:2682948d85278af1d19bb3e5e029ce55ee84084acc9784f7c2906e512f0369c7",
+    "taskId": "ATM-GOV-0342",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809200212-codex-gpt-5.4-mini-38283736f2",
+    "claimGeneration": "lease-bc68819fb856",
+    "issuedAt": "2026-08-09T20:02:12.008Z",
+    "expiresAt": "2026-08-09T20:32:12.008Z",
+    "scopeDigest": "sha256:9a85422f3a2beb33169dcfecc621533c2fb1a5ade21a948a7fecfe580d897058",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-09T20:02:12.008Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0342.*",
+          ".atm/history/task-events/ATM-GOV-0342/**",
+          ".atm/history/tasks/ATM-GOV-0342.json",
+          "packages/cli/src/commands/lane-session/__tests__/**",
+          "packages/cli/src/commands/lane-session/adopt-rebind.ts",
+          "packages/cli/src/commands/lane-session/resolve.ts",
+          "packages/cli/src/commands/tasks/__tests__/**",
+          "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+          "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts"
+        ],
+        "digest": "sha256:94882a1fc4bf5e03112057c4270a2c39d77c9756c09f8f75e3d85e285e1679e0"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260809200212-codex-gpt-5.4-mini-ATM-GOV-0342-11cf370441",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0342",
+    "batchId": "batch-bf062e1586ae",
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-6c7f8588698293ae",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0342.*",
+      ".atm/history/task-events/ATM-GOV-0342/**",
+      ".atm/history/tasks/ATM-GOV-0342.json",
+      "packages/cli/src/commands/lane-session/__tests__/**",
+      "packages/cli/src/commands/lane-session/adopt-rebind.ts",
+      "packages/cli/src/commands/lane-session/resolve.ts",
+      "packages/cli/src/commands/tasks/__tests__/**",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c6b3d1cdba874f2b7d86118854b2ad722908c1e170a63516816bdb5bb1c997a5",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260809200212-codex-gpt-5.4-mini-ATM-GOV-0342-11cf370441",
+    "laneSession": {
+      "laneSessionId": "lane-20260809200212-codex-gpt-5.4-mini-38283736f2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809200212-codex-gpt-5.4-mini-38283736f2\""
+    },
+    "createdAt": "2026-08-09T20:02:23.235Z",
+    "status": "active"
+  }
+}

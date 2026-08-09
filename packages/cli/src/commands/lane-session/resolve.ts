@@ -16,6 +16,40 @@ export interface LaneSessionResolution {
   readonly envelope: LaneSessionEnvelope;
 }
 
+export type ReferencedLaneSessionAvailability =
+  | 'available'
+  | 'missing'
+  | 'released'
+  | 'expired';
+
+/**
+ * Read-only authority fact for lifecycle consumers.  A claim may name a lane,
+ * but that name is not authority unless the canonical lane store can still
+ * resolve it as usable at the observation time.
+ */
+export function inspectReferencedLaneSession(input: {
+  readonly cwd: string;
+  readonly laneSessionId: string | null | undefined;
+  readonly now?: string;
+}): {
+  readonly availability: ReferencedLaneSessionAvailability;
+  readonly session: LaneSessionDocument | null;
+} {
+  const laneSessionId = normalizeOptionalString(input.laneSessionId);
+  if (!laneSessionId) return { availability: 'missing', session: null };
+  const session = readLaneSession(input.cwd, laneSessionId);
+  if (!session) return { availability: 'missing', session: null };
+  if (session.status === 'released') {
+    return { availability: 'released', session };
+  }
+  if (session.status === 'expired') {
+    return { availability: 'expired', session };
+  }
+  return isUsableLaneSession(session, input.now)
+    ? { availability: 'available', session }
+    : { availability: 'expired', session };
+}
+
 export interface ResolveLaneSessionInput {
   readonly cwd: string;
   readonly laneSessionId?: string | null;
