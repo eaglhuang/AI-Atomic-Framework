@@ -124,7 +124,7 @@ const taskDocument = options.taskId
     ? readTaskDocument(options.cwd, options.taskId)
     : null;
 
-const { usesFrameworkClaimCommit, frameworkClaimFiles } = resolveFrameworkCommitAuthorityContext({
+const { usesFrameworkClaimCommit, frameworkClaimFiles, frameworkClaimTaskId } = resolveFrameworkCommitAuthorityContext({
   cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
 });
 
@@ -499,7 +499,11 @@ if (usesFrameworkClaimCommit) {
     }
   }
 
-const hookTaskId = resolveFrameworkHookTaskId({ taskId: options.taskId, actorId, frameworkClaimCommitFiles });
+const hookTaskId = resolveFrameworkHookTaskId({
+  taskId: options.taskId,
+  frameworkClaimTaskId,
+  frameworkClaimCommitFiles,
+});
 
 const trailers = [
     `ATM-Actor: ${actorId}`,

@@ -24,6 +24,8 @@ export interface FrameworkTempPublicationCapability {
 export interface FrameworkCommitAuthorityContext {
   readonly usesFrameworkClaimCommit: boolean;
   readonly frameworkClaimFiles: readonly string[] | null;
+  /** The exact live lock identity used by hook attribution; never reconstruct it from an actor id. */
+  readonly frameworkClaimTaskId: string | null;
 }
 
 /** Resolves the framework-only commit surface without exposing lock details to callers. */
@@ -40,6 +42,7 @@ export function resolveFrameworkCommitAuthorityContext(input: {
   return {
     usesFrameworkClaimCommit: !input.taskExists || capability !== null,
     frameworkClaimFiles: capability?.allowedFiles ?? null,
+    frameworkClaimTaskId: capability?.taskId ?? null,
   };
 }
 

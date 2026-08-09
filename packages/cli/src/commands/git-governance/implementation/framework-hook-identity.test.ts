@@ -4,7 +4,7 @@ import { resolveFrameworkHookTaskId } from './framework-hook-identity.ts';
 assert.equal(
   resolveFrameworkHookTaskId({
     taskId: 'TASK-GOV-0001',
-    actorId: 'agent-one',
+    frameworkClaimTaskId: 'ATM-FRAMEWORK-TEMP-agent-one-lane-lane-current',
     frameworkClaimCommitFiles: ['packages/core/src/example.ts']
   }),
   'TASK-GOV-0001',
@@ -13,16 +13,21 @@ assert.equal(
 assert.equal(
   resolveFrameworkHookTaskId({
     taskId: null,
-    actorId: 'agent one',
+    frameworkClaimTaskId: 'ATM-FRAMEWORK-TEMP-agent-one-lane-lane-current',
     frameworkClaimCommitFiles: ['packages/core/src/example.ts']
   }),
-  'ATM-FRAMEWORK-TEMP-agent-one',
-  'a non-empty temporary framework claim yields its stable work-item identity'
+  'ATM-FRAMEWORK-TEMP-agent-one-lane-lane-current',
+  'a non-empty temporary framework claim yields its exact lock work-item identity'
 );
 assert.equal(
-  resolveFrameworkHookTaskId({ taskId: null, actorId: 'agent-one', frameworkClaimCommitFiles: [] }),
+  resolveFrameworkHookTaskId({ taskId: null, frameworkClaimTaskId: 'ATM-FRAMEWORK-TEMP-agent-one-lane-lane-current', frameworkClaimCommitFiles: [] }),
   null,
   'an absent framework claim does not invent authority'
+);
+assert.equal(
+  resolveFrameworkHookTaskId({ taskId: null, frameworkClaimTaskId: null, frameworkClaimCommitFiles: ['packages/core/src/example.ts'] }),
+  null,
+  'a non-empty surface without a verified lock identity fails closed'
 );
 
 console.log('framework-hook-identity: ok');
