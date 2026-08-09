@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T09-18-03-855Z-scope-amendment-2f32f155365c",
+  "taskId": "TASK-ERR-0007",
+  "action": "scope-amendment",
+  "actorId": "claude-008-err-0007",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0007.json",
+  "taskSha256": "sha256:e04208c6bb7b061f53ca77828678923ae5d85ac0c641d46e95f73fbb90507340",
+  "createdAt": "2026-08-09T09:18:03.855Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0007 --actor claude-008-err-0007 --add packages/core/src/error-code-registry.generated.ts --reason \"npm run generate:error-codes is a declared TASK-ERR-0007 validator and regenerates this file from docs/governance/error-code-registry.json; the drift is exactly the registry digest plus the inlined entry added by this card.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "npm run generate:error-codes is a declared TASK-ERR-0007 validator and regenerates this file from docs/governance/error-code-registry.json; the drift is exactly the registry digest plus the inlined entry added by this card."
+  }
+}

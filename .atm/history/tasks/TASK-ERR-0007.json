@@ -1,0 +1,306 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0007",
+  "title": "Register planning-root ambiguity operator contract and recovery",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0325"
+  ],
+  "acceptance": [
+    "ACC-1: exact registry entry 的 trigger 與 emitter 一致；正常 explicit root、單一 canonical root、真正 ambiguity 三類 fixture 分流正確。",
+    "ACC-2: 錯誤輸出包含候選 roots、source availability 與安全下一步；不得自動 cleanup 或靜默選第一個目錄。",
+    "ACC-3: registry 更新後執行 generator，`docs/ERROR_CODES.md` 只由 generator 產生且與 registry 一致。",
+    "ACC-4: 0327 與 TMP-0008 引用同一 exact contract；缺 approval 時 recovery 只允許明確 planning root 與唯讀稽核。"
+  ],
+  "deliverables": [
+    "docs/ERROR_CODES.md",
+    "docs/governance/error-code-registry.json",
+    "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+    "packages/cli/src/commands/next/planning-root-preference.ts",
+    "packages/core/src/error-code-registry.generated.ts"
+  ],
+  "scopePaths": [
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "packages/cli/src/commands/next/planning-root-preference.ts",
+    "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+  ],
+  "validators": [
+    "npm run generate:error-codes",
+    "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-exact-entry-and-regenerate-docs-while-retaining-prefix-compatibility",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.error-code-registry",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 2 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "docs/governance/error-code-registry.json (2477 lines)",
+        "docs/ERROR_CODES.md (1759 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0007-register-planning-root-ambiguity-operator-contract-and-recovery.task.md",
+    "sectionTitle": "TASK-ERR-0007",
+    "headingLine": 71,
+    "hash": "60e185901c3bfa1e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0007-register-planning-root-ambiguity-operator-contract-and-recovery.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:60e185901c3bfa1ebf6953a76b986c2c3e4bdb33e5d10409183959a024178da3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:18:45.621Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:18:45.621Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0325"
+    ],
+    "startConditions": [
+      "The ambiguity trigger is reproduced with the sealed 23-worktree manifest.",
+      "Existing prefix-documented source behavior is preserved until exact registration is green."
+    ],
+    "softRelations": [
+      "ATM-GOV-0327",
+      "TASK-TMP-0008"
+    ],
+    "changedPublicSeams": [
+      "ATM_PLANNING_ROOT_AMBIGUOUS"
+    ],
+    "causalImpactEdges": [
+      "error-registry",
+      "generated-error-docs",
+      "cli-emitter",
+      "recovery-contract"
+    ],
+    "parallelFrontierInputs": [
+      "error-registry",
+      "source-emitter",
+      "reproduction"
+    ],
+    "validatorReferences": [
+      "generate-error-codes",
+      "validate-error-codes",
+      "planning-root-preference"
+    ],
+    "phaseOwner": "correction-wave-2-error-contract"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_planning_root_ambiguous_error_contract_0007",
+      "targetGroupId": null,
+      "semanticKey": "planning_root_ambiguous_error_contract",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "error-registry",
+        "generated-error-docs",
+        "cli-emitter",
+        "recovery-contract"
+      ],
+      "expectedRedPredicate": "ambiguity must emit the exact structured code and one safe non-destructive recovery route",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "ATM_PLANNING_ROOT_AMBIGUOUS",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_planning_root_ambiguous_error_contract_0007"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-09T21-52-28-075Z-close-5b74097477df",
+  "lastTransitionAt": "2026-08-09T21:52:28.075Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-09T20:36:29.637Z",
+  "promotedAt": "2026-08-09T20:36:29.640Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-99d89f92a42c",
+    "claimedAt": "2026-08-09T20:36:29.645Z",
+    "heartbeatAt": "2026-08-09T21:52:28.073Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-ERR-0007.json",
+      ".atm/history/evidence/TASK-ERR-0007.*",
+      ".atm/history/task-events/TASK-ERR-0007/**",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "packages/core/src/error-code-registry.generated.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260809203629-codex-gpt-5.4-mini-c2720ff950",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809203629-codex-gpt-5.4-mini-c2720ff950\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-09T09:02:04.787Z",
+  "startedByActor": "claude-008-err-0007",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6046fe4ad9c64594",
+    "ticketDigest": "sha256:6046fe4ad9c64594a786470833f1750ed6ffb08c692d4eacafc6b7d1d88978ca",
+    "taskId": "TASK-ERR-0007",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809203629-codex-gpt-5.4-mini-c2720ff950",
+    "claimGeneration": "lease-99d89f92a42c",
+    "issuedAt": "2026-08-09T21:50:37.319Z",
+    "expiresAt": "2026-08-09T22:20:37.319Z",
+    "scopeDigest": "sha256:51dbb34082b0d016301379d5f5a271703987214fe23218944fc4cdcbd23918a6",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-09T21:50:37.319Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-ERR-0007.*",
+          ".atm/history/task-events/TASK-ERR-0007/**",
+          ".atm/history/tasks/TASK-ERR-0007.json",
+          "docs/ERROR_CODES.md",
+          "docs/governance/error-code-registry.json",
+          "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+          "packages/cli/src/commands/next/planning-root-preference.ts",
+          "packages/core/src/error-code-registry.generated.ts"
+        ],
+        "digest": "sha256:43599053809becd45db70ffb8becfed98596db5a7ef71011371033a9ef8052a1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260809203629-codex-gpt-5.4-mini-TASK-ERR-0007-93f73901b5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0007",
+    "batchId": "batch-bf062e1586ae",
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-6c7f8588698293ae",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0007.*",
+      ".atm/history/task-events/TASK-ERR-0007/**",
+      ".atm/history/tasks/TASK-ERR-0007.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "packages/core/src/error-code-registry.generated.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5d9bd00ffff6a47818138a2554f5fa9a300a12e882d258757a88d6d45991a109",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260809203629-codex-gpt-5.4-mini-TASK-ERR-0007-93f73901b5",
+    "laneSession": {
+      "laneSessionId": "lane-20260809203629-codex-gpt-5.4-mini-c2720ff950",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809203629-codex-gpt-5.4-mini-c2720ff950\""
+    },
+    "createdAt": "2026-08-09T20:36:40.813Z",
+    "status": "active"
+  },
+  "closedAt": "2026-08-09T21:52:28.073Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809203629-codex-gpt-5.4-mini-TASK-ERR-0007-93f73901b5",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0007.closure-packet.json"
+}

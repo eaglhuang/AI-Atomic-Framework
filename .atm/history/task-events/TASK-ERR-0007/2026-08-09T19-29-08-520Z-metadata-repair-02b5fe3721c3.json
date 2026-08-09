@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T19-29-08-520Z-metadata-repair-02b5fe3721c3",
+  "taskId": "TASK-ERR-0007",
+  "action": "metadata-repair",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0007.json",
+  "taskSha256": "sha256:391578a7a0ab1cf52ed028dd2af46cd51ec6a0d1e21b7c55f2ba5b2e89b14924",
+  "createdAt": "2026-08-09T19:29:08.520Z",
+  "command": "node atm.mjs tasks scope repair-deliverables --task TASK-ERR-0007 --actor codex-gpt-5.4-mini --set docs/ERROR_CODES.md,docs/governance/error-code-registry.json,packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts,packages/cli/src/commands/next/planning-root-preference.ts,packages/core/src/error-code-registry.generated.ts --reason \"Align declared delivery contract with the existing planning-root implementation, regression test, exact registry entry, and generated registry artifact.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "task-metadata",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Align declared delivery contract with the existing planning-root implementation, regression test, exact registry entry, and generated registry artifact."
+  }
+}

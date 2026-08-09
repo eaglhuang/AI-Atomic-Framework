@@ -1,0 +1,1254 @@
+{
+  "taskId": "TASK-ERR-0007",
+  "updatedAt": "2026-08-09T19:37:33.954Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008-err-0007",
+      "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+      "createdAt": "2026-08-09T09:19:03.755Z",
+      "details": {
+        "actorId": "claude-008-err-0007",
+        "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.error-code-registry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:a97d3066dc86f0af3e99708cde06f0fd5cd4dc66fd3ddcbefe7f620083ddac1c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-09T09:19:02.952Z",
+            "finishedAt": "2026-08-09T09:19:03.753Z",
+            "durationMs": 801,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "c4716030e66e90e2a8df94378dee9a79bd458dfb",
+            "cacheKey": "sha256:6d7805f3c7055158f355065f66554fc1673dffbc34c6b73186e4adf84dce7a2e",
+            "generatedAt": "2026-08-09T09:19:03.753Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:6d7805f3c7055158f355065f66554fc1673dffbc34c6b73186e4adf84dce7a2e",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-09T09:19:03.753Z",
+              "observedAt": "2026-08-09T09:19:03.753Z",
+              "startedAt": "2026-08-09T09:19:02.952Z",
+              "finishedAt": "2026-08-09T09:19:03.753Z",
+              "durationMs": 801,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:3d77b1bbb6bd14f69363a0db2579516f4d11cf3bcc57dd7bdc8d84e70dc52b5f",
+              "outputDigest": "sha256:3d65e192d58ec26ab6bbc5b56662a38d2946f6a2925e9868fa440476a6160102",
+              "cache": {
+                "key": "sha256:6d7805f3c7055158f355065f66554fc1673dffbc34c6b73186e4adf84dce7a2e",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "c4716030e66e90e2a8df94378dee9a79bd458dfb",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:750d2dfed35801e25ce36942b8995012dc5a3b5f6a645bfffa67b3dde41502e2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run generate:error-codes",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008-err-0007",
+      "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+      "createdAt": "2026-08-09T09:19:10.608Z",
+      "details": {
+        "actorId": "claude-008-err-0007",
+        "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "generate:error-codes"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.error-code-registry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run generate:error-codes",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5710583b7200a9c27754b8f331e4aa82a7dae955d466883534342b2716c130a1",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-09T09:19:08.411Z",
+            "finishedAt": "2026-08-09T09:19:10.607Z",
+            "durationMs": 2196,
+            "cached": false,
+            "validators": [
+              "generate:error-codes"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "c4716030e66e90e2a8df94378dee9a79bd458dfb",
+            "cacheKey": "sha256:5979be154165bc581d4e8042d24caa92255b90cafa17c4225e81c7ad65f19368",
+            "generatedAt": "2026-08-09T09:19:10.607Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:5979be154165bc581d4e8042d24caa92255b90cafa17c4225e81c7ad65f19368",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-09T09:19:10.607Z",
+              "observedAt": "2026-08-09T09:19:10.607Z",
+              "startedAt": "2026-08-09T09:19:08.411Z",
+              "finishedAt": "2026-08-09T09:19:10.607Z",
+              "durationMs": 2196,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:eda9dc1b01de2871e0b8b378d4db6404ac3e56f9bb124c3a972f5ae6f9622ab9",
+              "outputDigest": "sha256:0f0b0d8ba41dd7aa1477131ed575a2f5d5785a95808b9b99786c7a6bcb716249",
+              "cache": {
+                "key": "sha256:5979be154165bc581d4e8042d24caa92255b90cafa17c4225e81c7ad65f19368",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run generate:error-codes",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "generate:error-codes"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "c4716030e66e90e2a8df94378dee9a79bd458dfb",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:60244c9c8419af36d80793944434564231c2a5465b855e1c8473c11e069fc74f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008-err-0007",
+      "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+      "createdAt": "2026-08-09T09:21:17.643Z",
+      "details": {
+        "actorId": "claude-008-err-0007",
+        "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.error-code-registry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:fed8af4a0a26a24018c73d0313fbc11b6036af5023820614c49c127e9a0182f5",
+            "stderrSha256": "sha256:b54a5e7249373f077888ef68844b33b515ff219674f2a811624dbee137aa1604",
+            "startedAt": "2026-08-09T09:20:04.722Z",
+            "finishedAt": "2026-08-09T09:21:17.642Z",
+            "durationMs": 72920,
+            "cached": false,
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "c4716030e66e90e2a8df94378dee9a79bd458dfb",
+            "cacheKey": "sha256:b80576d734b6c1373b1c34f0553659a2e217aeadc463a7f17776ebd8e154b592",
+            "generatedAt": "2026-08-09T09:21:17.642Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:b80576d734b6c1373b1c34f0553659a2e217aeadc463a7f17776ebd8e154b592",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-09T09:21:17.642Z",
+              "observedAt": "2026-08-09T09:21:17.642Z",
+              "startedAt": "2026-08-09T09:20:04.722Z",
+              "finishedAt": "2026-08-09T09:21:17.642Z",
+              "durationMs": 72920,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:fca7fff3e62f0701f91e989cec496409981af2beba9bf2bdc7817d5944618414",
+              "outputDigest": "sha256:98095889ccfb18a6e4f636eeb0352786ba8f40bf517aaf46a975c201c82eee52",
+              "cache": {
+                "key": "sha256:b80576d734b6c1373b1c34f0553659a2e217aeadc463a7f17776ebd8e154b592",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:cli",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:cli"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "c4716030e66e90e2a8df94378dee9a79bd458dfb",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:be93c985b1332fe205c2cc0f2e27a210405eb60ec05603aba32906921a049ac3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008-err-0007",
+      "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+      "createdAt": "2026-08-09T09:28:46.410Z",
+      "details": {
+        "actorId": "claude-008-err-0007",
+        "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.error-code-registry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-09T09:28:34.125Z",
+            "finishedAt": "2026-08-09T09:28:46.410Z",
+            "durationMs": 12285,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "8eb90af28177a93ffdb07f9bd398aac4876321d0",
+            "cacheKey": "sha256:d69abee83083b25b7efabc41e7e85ddb49dc76f21137d9251fb626eea8317ab5",
+            "generatedAt": "2026-08-09T09:28:46.410Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:d69abee83083b25b7efabc41e7e85ddb49dc76f21137d9251fb626eea8317ab5",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-09T09:28:46.410Z",
+              "observedAt": "2026-08-09T09:28:46.410Z",
+              "startedAt": "2026-08-09T09:28:34.125Z",
+              "finishedAt": "2026-08-09T09:28:46.410Z",
+              "durationMs": 12285,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:ce0fd4075b229f392d011dd288529ba06210c7e71552ff149df8e7bd0a63e7c5",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:d69abee83083b25b7efabc41e7e85ddb49dc76f21137d9251fb626eea8317ab5",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "8eb90af28177a93ffdb07f9bd398aac4876321d0",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d457d1e6bb0b5b995afa6779d1d7140de8e1009ab57f175d31604855b54c4d47",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008-err-0007",
+      "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+      "createdAt": "2026-08-09T09:33:54.119Z",
+      "details": {
+        "actorId": "claude-008-err-0007",
+        "sessionId": "session-20260809090204-claude-008-err-0007-TASK-ERR-0007-84c54345d2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.error-code-registry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-09T09:30:47.879Z",
+            "finishedAt": "2026-08-09T09:33:54.117Z",
+            "durationMs": 186238,
+            "cached": false,
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "8eb90af28177a93ffdb07f9bd398aac4876321d0",
+            "cacheKey": "sha256:8261ab7d84253c06bfee763f001e22d74e57e7bc19d1106e328263fe61796fac",
+            "generatedAt": "2026-08-09T09:33:54.117Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:8261ab7d84253c06bfee763f001e22d74e57e7bc19d1106e328263fe61796fac",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-09T09:33:54.117Z",
+              "observedAt": "2026-08-09T09:33:54.117Z",
+              "startedAt": "2026-08-09T09:30:47.879Z",
+              "finishedAt": "2026-08-09T09:33:54.117Z",
+              "durationMs": 186238,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:88131de1f262e339e25f498bfc2bf293248882fcceb93a6886501692145f639a",
+              "outputDigest": "sha256:be4bf9fa561d02eaa8ea014e9c342775cea0dc27cddc293655c129794de2a829",
+              "cache": {
+                "key": "sha256:8261ab7d84253c06bfee763f001e22d74e57e7bc19d1106e328263fe61796fac",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:git-head-evidence",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:git-head-evidence"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "8eb90af28177a93ffdb07f9bd398aac4876321d0",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e6d064a8aaac5c6835ee6b05741df956dcd71218a8d929576ba4791e00b9780b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Historical batch evidence hist-batch-2026-08-09T19-23-59-339Z for TASK-ERR-0007.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-23-59-339Z.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts"
+      ],
+      "evidenceFreshness": "historical-reference",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": null,
+      "createdAt": "2026-08-09T19:23:59.339Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "historical-reference",
+        "historicalBatch": {
+          "schemaId": "atm.historicalBatchTaskSlice.v1",
+          "batchId": "hist-batch-2026-08-09T19-23-59-339Z",
+          "commits": [
+            "3dfad6969f5d307e47c82fa6168eb6cabd2f274f"
+          ],
+          "matchedCommits": [
+            "3dfad6969f5d307e47c82fa6168eb6cabd2f274f"
+          ],
+          "matchedFiles": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts"
+          ],
+          "outOfScopeFiles": [
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "taskSliceOk": true,
+          "declaredDeliverables": [
+            "docs/governance/error-code-registry.json",
+            "docs/ERROR_CODES.md",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+          ],
+          "declaredScopeFiles": [
+            "docs/governance/error-code-registry.json",
+            "docs/ERROR_CODES.md",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+          ],
+          "matchedDeliverables": [
+            "docs/governance/error-code-registry.json",
+            "docs/ERROR_CODES.md",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+          ],
+          "missingCoverage": [],
+          "coverageStatus": "complete",
+          "validatorClaims": [
+            {
+              "gate": "generate:error-codes",
+              "kind": "taskSpecific",
+              "satisfied": false,
+              "requiredForClose": true
+            },
+            {
+              "gate": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+              "kind": "taskSpecific",
+              "satisfied": false,
+              "requiredForClose": true
+            },
+            {
+              "gate": "typecheck",
+              "kind": "batchWide",
+              "satisfied": true,
+              "requiredForClose": false
+            },
+            {
+              "gate": "validate:cli",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:git-head-evidence",
+              "kind": "batchWide",
+              "satisfied": true,
+              "requiredForClose": false
+            }
+          ],
+          "atomHealthClaims": [
+            {
+              "atomOrMapId": "atm.error-code-registry",
+              "kind": "owner",
+              "generatedByTask": true,
+              "validatorHealthy": false
+            }
+          ],
+          "okToRecordEvidence": true,
+          "okToCloseTask": false,
+          "diagnosticOnly": true
+        },
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "batchWideValidationPasses": [
+          "typecheck",
+          "validate:git-head-evidence"
+        ],
+        "advisoryValidationPasses": [],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "generatedAt": "2026-08-09T19:26:51.586Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-08-09T19:27:03.272Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6143615808ee0e07889108945ef0b2ce28104882410720cd765a5e728e19b9bd",
+            "stderrSha256": "sha256:bc54866a19bc2161a7ccad530f83cf63b06f640f714de954b1601272e23bf72c",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-08-09T19:27:42.066Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Fresh validator attestation slice hist-batch-2026-08-09T19-23-59-339Z for TASK-ERR-0007.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-23-59-339Z.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": null,
+      "createdAt": "2026-08-09T19:23:59.339Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck",
+          "validate:cli",
+          "validate:git-head-evidence"
+        ],
+        "historicalBatchValidatorAttestation": {
+          "schemaId": "atm.historicalBatchValidatorAttestation.v1",
+          "batchId": "hist-batch-2026-08-09T19-23-59-339Z",
+          "batchPath": ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-23-59-339Z.json",
+          "taskId": "TASK-ERR-0007",
+          "taskSpecificValidationPasses": [
+            "validate:cli"
+          ],
+          "batchWideValidationPasses": [
+            "typecheck",
+            "validate:git-head-evidence"
+          ],
+          "advisoryValidationPasses": []
+        },
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "generatedAt": "2026-08-09T19:26:51.586Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-08-09T19:27:03.272Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6143615808ee0e07889108945ef0b2ce28104882410720cd765a5e728e19b9bd",
+            "stderrSha256": "sha256:bc54866a19bc2161a7ccad530f83cf63b06f640f714de954b1601272e23bf72c",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-08-09T19:27:42.066Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Historical batch evidence hist-batch-2026-08-09T19-29-34-081Z for TASK-ERR-0007.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-29-34-081Z.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "packages/core/src/error-code-registry.generated.ts"
+      ],
+      "evidenceFreshness": "historical-reference",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": null,
+      "createdAt": "2026-08-09T19:29:34.081Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "historical-reference",
+        "historicalBatch": {
+          "schemaId": "atm.historicalBatchTaskSlice.v1",
+          "batchId": "hist-batch-2026-08-09T19-29-34-081Z",
+          "commits": [
+            "3dfad6969f5d307e47c82fa6168eb6cabd2f274f"
+          ],
+          "matchedCommits": [
+            "3dfad6969f5d307e47c82fa6168eb6cabd2f274f"
+          ],
+          "matchedFiles": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "outOfScopeFiles": [],
+          "taskSliceOk": true,
+          "declaredDeliverables": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "declaredScopeFiles": [
+            "docs/governance/error-code-registry.json",
+            "docs/ERROR_CODES.md",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "matchedDeliverables": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "missingCoverage": [],
+          "coverageStatus": "complete",
+          "validatorClaims": [
+            {
+              "gate": "generate:error-codes",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+              "kind": "taskSpecific",
+              "satisfied": false,
+              "requiredForClose": true
+            },
+            {
+              "gate": "typecheck",
+              "kind": "batchWide",
+              "satisfied": true,
+              "requiredForClose": false
+            },
+            {
+              "gate": "validate:cli",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:git-head-evidence",
+              "kind": "batchWide",
+              "satisfied": true,
+              "requiredForClose": false
+            }
+          ],
+          "atomHealthClaims": [
+            {
+              "atomOrMapId": "atm.error-code-registry",
+              "kind": "owner",
+              "generatedByTask": true,
+              "validatorHealthy": false
+            }
+          ],
+          "okToRecordEvidence": true,
+          "okToCloseTask": false,
+          "diagnosticOnly": true
+        },
+        "validationPasses": [
+          "generate:error-codes",
+          "validate:cli"
+        ],
+        "batchWideValidationPasses": [
+          "typecheck",
+          "validate:git-head-evidence"
+        ],
+        "advisoryValidationPasses": [],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "generatedAt": "2026-08-09T19:31:20.928Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run generate:error-codes",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ba5b11d37dcb595749b7b44a479ce2ee4304ab287f13a0ece04c305d4986b3ed",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "generate:error-codes"
+            ],
+            "generatedAt": "2026-08-09T19:31:21.872Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-08-09T19:31:30.607Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c920dbfa44da0987ea3f84fbbae7ad3919881a994eb0d33973f9e87ec1741e43",
+            "stderrSha256": "sha256:c4d436c9d308b36c839e0697a874f487a329f4bc1bab638ff966879042597e86",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-08-09T19:32:05.403Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Fresh validator attestation slice hist-batch-2026-08-09T19-29-34-081Z for TASK-ERR-0007.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-29-34-081Z.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": null,
+      "createdAt": "2026-08-09T19:29:34.081Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "generate:error-codes",
+          "typecheck",
+          "validate:cli",
+          "validate:git-head-evidence"
+        ],
+        "historicalBatchValidatorAttestation": {
+          "schemaId": "atm.historicalBatchValidatorAttestation.v1",
+          "batchId": "hist-batch-2026-08-09T19-29-34-081Z",
+          "batchPath": ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-29-34-081Z.json",
+          "taskId": "TASK-ERR-0007",
+          "taskSpecificValidationPasses": [
+            "generate:error-codes",
+            "validate:cli"
+          ],
+          "batchWideValidationPasses": [
+            "typecheck",
+            "validate:git-head-evidence"
+          ],
+          "advisoryValidationPasses": []
+        },
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "generatedAt": "2026-08-09T19:31:20.928Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run generate:error-codes",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ba5b11d37dcb595749b7b44a479ce2ee4304ab287f13a0ece04c305d4986b3ed",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "generate:error-codes"
+            ],
+            "generatedAt": "2026-08-09T19:31:21.872Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-08-09T19:31:30.607Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c920dbfa44da0987ea3f84fbbae7ad3919881a994eb0d33973f9e87ec1741e43",
+            "stderrSha256": "sha256:c4d436c9d308b36c839e0697a874f487a329f4bc1bab638ff966879042597e86",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-08-09T19:32:05.403Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Historical batch evidence hist-batch-2026-08-09T19-37-33-954Z for TASK-ERR-0007.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-37-33-954Z.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "packages/core/src/error-code-registry.generated.ts"
+      ],
+      "evidenceFreshness": "historical-reference",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": null,
+      "createdAt": "2026-08-09T19:37:33.954Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "historical-reference",
+        "historicalBatch": {
+          "schemaId": "atm.historicalBatchTaskSlice.v1",
+          "batchId": "hist-batch-2026-08-09T19-37-33-954Z",
+          "commits": [
+            "3dfad6969f5d307e47c82fa6168eb6cabd2f274f"
+          ],
+          "matchedCommits": [
+            "3dfad6969f5d307e47c82fa6168eb6cabd2f274f"
+          ],
+          "matchedFiles": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "outOfScopeFiles": [],
+          "taskSliceOk": true,
+          "declaredDeliverables": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "declaredScopeFiles": [
+            "docs/governance/error-code-registry.json",
+            "docs/ERROR_CODES.md",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "matchedDeliverables": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "missingCoverage": [],
+          "coverageStatus": "complete",
+          "validatorClaims": [
+            {
+              "gate": "generate:error-codes",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "typecheck",
+              "kind": "batchWide",
+              "satisfied": true,
+              "requiredForClose": false
+            },
+            {
+              "gate": "validate:cli",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:git-head-evidence",
+              "kind": "batchWide",
+              "satisfied": true,
+              "requiredForClose": false
+            }
+          ],
+          "atomHealthClaims": [
+            {
+              "atomOrMapId": "atm.error-code-registry",
+              "kind": "owner",
+              "generatedByTask": true,
+              "validatorHealthy": true
+            }
+          ],
+          "okToRecordEvidence": true,
+          "okToCloseTask": true,
+          "diagnosticOnly": false
+        },
+        "validationPasses": [
+          "generate:error-codes",
+          "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+          "validate:cli"
+        ],
+        "batchWideValidationPasses": [
+          "typecheck",
+          "validate:git-head-evidence"
+        ],
+        "advisoryValidationPasses": [],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:a97d3066dc86f0af3e99708cde06f0fd5cd4dc66fd3ddcbefe7f620083ddac1c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+            ],
+            "generatedAt": "2026-08-09T19:37:34.637Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "generatedAt": "2026-08-09T19:39:08.213Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run generate:error-codes",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ba5b11d37dcb595749b7b44a479ce2ee4304ab287f13a0ece04c305d4986b3ed",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "generate:error-codes"
+            ],
+            "generatedAt": "2026-08-09T19:39:09.136Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-08-09T19:39:18.383Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5fcbb38fa94d28688beca2dbc9a3bc683419f39c8884ae94b6659ad5197267ec",
+            "stderrSha256": "sha256:78f7c656a48448277878dfe2f4555fc304e6b0894ba8adb07ddb6c5a7cd6e19b",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-08-09T19:39:58.040Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Fresh validator attestation slice hist-batch-2026-08-09T19-37-33-954Z for TASK-ERR-0007.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-37-33-954Z.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": null,
+      "createdAt": "2026-08-09T19:37:33.954Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "generate:error-codes",
+          "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+          "typecheck",
+          "validate:cli",
+          "validate:git-head-evidence"
+        ],
+        "historicalBatchValidatorAttestation": {
+          "schemaId": "atm.historicalBatchValidatorAttestation.v1",
+          "batchId": "hist-batch-2026-08-09T19-37-33-954Z",
+          "batchPath": ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-37-33-954Z.json",
+          "taskId": "TASK-ERR-0007",
+          "taskSpecificValidationPasses": [
+            "generate:error-codes",
+            "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "validate:cli"
+          ],
+          "batchWideValidationPasses": [
+            "typecheck",
+            "validate:git-head-evidence"
+          ],
+          "advisoryValidationPasses": []
+        },
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:a97d3066dc86f0af3e99708cde06f0fd5cd4dc66fd3ddcbefe7f620083ddac1c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+            ],
+            "generatedAt": "2026-08-09T19:37:34.637Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "generatedAt": "2026-08-09T19:39:08.213Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run generate:error-codes",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ba5b11d37dcb595749b7b44a479ce2ee4304ab287f13a0ece04c305d4986b3ed",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "generate:error-codes"
+            ],
+            "generatedAt": "2026-08-09T19:39:09.136Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-08-09T19:39:18.383Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5fcbb38fa94d28688beca2dbc9a3bc683419f39c8884ae94b6659ad5197267ec",
+            "stderrSha256": "sha256:78f7c656a48448277878dfe2f4555fc304e6b0894ba8adb07ddb6c5a7cd6e19b",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-08-09T19:39:58.040Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    }
+  ]
+}
