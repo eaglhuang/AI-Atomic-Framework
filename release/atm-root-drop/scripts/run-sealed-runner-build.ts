@@ -28,7 +28,8 @@ import {
   type RunnerSyncReceipt,
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
-import { scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 export type BuildDecision = 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
@@ -121,6 +122,16 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     sealedSourceSha
   });
   assertRunnerSyncAdmission(admission);
+  const currentTaskId = admission.queueHeadOwnership.waitingTasks[0] ?? null;
+  const currentTask = currentTaskId
+    ? getActiveTasks(repoRoot).find((entry) => entry.taskId === currentTaskId.toUpperCase())
+    : null;
+  const beforeBuildSnapshot = captureRunnerBuildOutputSnapshot({
+    cwd: repoRoot,
+    buildTarget,
+    currentTaskId,
+    currentTaskAllowedFiles: currentTask?.allowedFiles
+  });
 
   const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
   const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({
@@ -162,7 +173,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null, beforeBuildSnapshot }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
@@ -204,7 +215,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     }
     runTimedInnerBuild(worktreeRoot, buildTarget, timings, buildDecision === 'incrementalBuild' ? incrementalPlan : null);
     tsBuildCache = persistTsBuildCache({ cwd: repoRoot, worktreeRoot, summary: tsBuildCache });
-    timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget));
+    timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, beforeBuildSnapshot.preexistingDirtyPaths));
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeBuildMetadataToReleaseManifests({
       cwd: repoRoot,
@@ -215,7 +226,8 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       incrementalPlan,
       runtimeTelemetryRef: null,
       tsBuildCache,
-      timings
+      timings,
+      preservePaths: beforeBuildSnapshot.preexistingDirtyPaths
     });
     const dominantPhaseSummary = summarizeDominantPhase(timings);
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
@@ -237,7 +249,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null, beforeBuildSnapshot }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision,
@@ -385,8 +397,11 @@ export function writeBuildMetadataToReleaseManifests(input: {
   readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
   readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
   readonly timings: SealedBuildTimings;
+  readonly preservePaths?: readonly string[];
 }): void {
+  const preserved = new Set(input.preservePaths ?? []);
   for (const relative of releaseManifestPaths) {
+    if (preserved.has(relative.replace(/\\/g, '/'))) continue;
     const absolute = path.join(input.cwd, relative);
     if (!existsSync(absolute)) continue;
     const manifest = readJsonRecord(absolute);
@@ -495,17 +510,21 @@ function runInnerBuild(buildTarget: BuildTarget): void {
   }
 }
 
-function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget): void {
+export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget, preservePaths: readonly string[] = []): void {
+  const preservedUnder = (root: string) => preservePaths
+    .filter((entry) => entry === root || entry.startsWith(`${root}/`))
+    .map((entry) => entry.slice(root.length).replace(/^\//, ''));
   if (buildTarget === 'full' || buildTarget === 'packages') {
     for (const packageName of readDirectoryNames(path.join(sourceRoot, 'packages'))) {
-      syncDirectoryHashChanged(path.join(sourceRoot, 'packages', packageName, 'dist'), path.join(targetRoot, 'packages', packageName, 'dist'));
+      const root = `packages/${packageName}/dist`;
+      syncDirectoryHashChanged(path.join(sourceRoot, root), path.join(targetRoot, root), { preserveRelativePaths: preservedUnder(root) });
     }
   }
   if (buildTarget === 'full' || buildTarget === 'root-drop') {
-    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-root-drop'), path.join(targetRoot, 'release', 'atm-root-drop'));
+    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-root-drop'), path.join(targetRoot, 'release', 'atm-root-drop'), { preserveRelativePaths: preservedUnder('release/atm-root-drop') });
   }
   if (buildTarget === 'full' || buildTarget === 'onefile') {
-    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'));
+    syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'), { preserveRelativePaths: preservedUnder('release/atm-onefile') });
   }
 }
 

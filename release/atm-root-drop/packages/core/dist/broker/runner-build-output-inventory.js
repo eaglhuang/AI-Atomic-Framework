@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 /** The stable output family of a sealed ATM runner build. */
 export function isRunnerBuildOutputPath(filePath) {
@@ -28,9 +28,7 @@ export function deriveRunnerBuildOutputInventory(input) {
  * not infer it from a dirty Git diff, which may contain another lane's work.
  */
 export function scanSealedRunnerBuildOutputInventory(input) {
-    const roots = publicationRoots(input.cwd, input.buildTarget);
-    const outputPaths = roots.flatMap((root) => listFiles(input.cwd, root));
-    outputPaths.push(...listTrackedFiles(input.cwd, roots));
+    const outputPaths = changedPathsSinceSnapshot(input.cwd, input.buildTarget, input.beforeBuildSnapshot);
     if (input.taskId)
         outputPaths.push(`.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`);
     return deriveRunnerBuildOutputInventory({
@@ -39,6 +37,17 @@ export function scanSealedRunnerBuildOutputInventory(input) {
         currentTaskId: input.taskId,
         ownership: outputPaths.map((entry) => ({ path: entry, ownerTaskId: input.taskId }))
     });
+}
+/** Capture byte identities before a sealed build mutates its output surfaces. */
+export function captureRunnerBuildOutputSnapshot(input) {
+    const roots = publicationRoots(input.cwd, input.buildTarget);
+    const members = Object.fromEntries(collectOutputPaths(input.cwd, roots).map((entry) => [entry, fileFingerprint(input.cwd, entry)]));
+    const allowedFiles = input.currentTaskAllowedFiles ?? [];
+    const hasCanonicalScope = Boolean(input.currentTaskId?.trim()) && allowedFiles.length > 0;
+    const preexistingDirtyPaths = listDirtyPaths(input.cwd)
+        .filter((entry) => Object.hasOwn(members, entry))
+        .filter((entry) => !hasCanonicalScope || !pathMatchesScope(entry, allowedFiles));
+    return { schemaId: 'atm.runnerBuildOutputSnapshot.v1', buildTarget: input.buildTarget, members, preexistingDirtyPaths };
 }
 export function buildRunnerBuildOutputInventory(input) {
     const ownershipByPath = new Map((input.ownership ?? []).map((entry) => [normalizePath(entry.path), entry]));
@@ -80,13 +89,11 @@ export function evaluateRunnerPublicationDisposition(input) {
     const dirtyInventoryPaths = publicationDirtyPaths.filter((entry) => inventoryPaths.has(entry));
     const extraOutputPaths = publicationDirtyPaths.filter((entry) => !inventoryPaths.has(entry));
     const terminalDisposition = input.terminalDisposition ?? null;
-    const disposition = extraOutputPaths.length > 0
-        ? 'inventory-incomplete'
-        : terminalDisposition === 'recovery-retained'
-            ? 'recovery-retained'
-            : dirtyInventoryPaths.length > 0
-                ? 'publication-pending'
-                : 'published';
+    const disposition = terminalDisposition === 'recovery-retained'
+        ? 'recovery-retained'
+        : dirtyInventoryPaths.length > 0
+            ? 'publication-pending'
+            : 'published';
     return {
         schemaId: 'atm.runnerPublicationDisposition.v1',
         disposition,
@@ -96,6 +103,56 @@ export function evaluateRunnerPublicationDisposition(input) {
         extraOutputPaths,
         terminalDisposition
     };
+}
+function changedPathsSinceSnapshot(cwd, buildTarget, before) {
+    if (before.schemaId !== 'atm.runnerBuildOutputSnapshot.v1' || before.buildTarget !== buildTarget) {
+        throw new Error('Runner build output snapshot does not match the sealed build target.');
+    }
+    const roots = publicationRoots(cwd, buildTarget);
+    const afterPaths = collectOutputPaths(cwd, roots);
+    const paths = uniquePaths([...Object.keys(before.members), ...afterPaths]);
+    return paths.filter((entry) => before.members[entry] !== fileFingerprint(cwd, entry));
+}
+function collectOutputPaths(cwd, roots) {
+    return uniquePaths([...roots.flatMap((root) => listFiles(cwd, root)), ...listTrackedFiles(cwd, roots)]);
+}
+function fileFingerprint(cwd, relativePath) {
+    const absolute = path.join(cwd, relativePath);
+    if (!existsSync(absolute))
+        return 'missing';
+    return `sha256:${createHash('sha256').update(readFileSync(absolute)).digest('hex')}`;
+}
+function listDirtyPaths(cwd) {
+    const collect = (args) => {
+        const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+        if ((result.status ?? 1) !== 0)
+            return [];
+        return String(result.stdout ?? '').split(/\r?\n/).map(normalizePath).filter(Boolean);
+    };
+    return uniquePaths([...collect(['diff', '--name-only']), ...collect(['diff', '--name-only', '--cached'])]);
+}
+export function pathMatchesScope(filePath, allowedFiles) {
+    const normalizedFile = normalizePath(filePath).toLowerCase();
+    return allowedFiles.some((candidate) => {
+        const normalizedCandidate = normalizePath(candidate).toLowerCase();
+        if (normalizedCandidate.includes('*')) {
+            const escaped = normalizedCandidate
+                .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+                .replace(/\*\*/g, '__ATM_DOUBLE_STAR__')
+                .replace(/\*/g, '[^/]*')
+                .replace(/__ATM_DOUBLE_STAR__/g, '.*');
+            return new RegExp(`^${escaped}$`).test(normalizedFile);
+        }
+        if (!normalizedCandidate)
+            return false;
+        if (normalizedFile === normalizedCandidate)
+            return true;
+        if (normalizedCandidate.endsWith('/'))
+            return normalizedFile.startsWith(normalizedCandidate);
+        if (!/\.[a-z0-9]+$/i.test(normalizedCandidate))
+            return normalizedFile.startsWith(`${normalizedCandidate}/`);
+        return false;
+    });
 }
 export function verifyRunnerBuildOutputParity(inventory, declaredPaths) {
     const observed = new Set(inventory.entries.map((entry) => entry.path));
