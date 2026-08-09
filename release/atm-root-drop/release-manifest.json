@@ -1257,6 +1257,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/branch-commit-window.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/broker-hook-bypass-preflight.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/command-router.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-command.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
@@ -1498,6 +1499,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-messages.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.js",
+    "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/host-opener-policy.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
@@ -4987,8 +4989,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 271,
-    "unchanged": 4681,
+    "copied": 274,
+    "unchanged": 4680,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6315,7 +6317,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:a3a79b6437986e8847697f6cb5dcf1757a9c3c2f41f4b859738eb1edf09532cf"
+    "digest": "sha256:38aacdb6372f945b72873cdf8dac104fde34d5b1e68eaf1c7174b9a4054eb42a"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -7546,6 +7548,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/branch-commit-window.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/broker-hook-bypass-preflight.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/command-router.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-command.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
@@ -7787,6 +7790,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-messages.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/host-opener-policy.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
@@ -11279,34 +11283,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:2105a529881b547524df4248a730f210700b9a633ac77f147f4d0f6727f4906d",
-  "sealedSourceCommit": "ce2f2cb2b454fcfe7d884978defc8ffe6f3b7737",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:af0a5b8893b30a9274943cce7367fde991abd66063654f7e6db24211ecd94ded",
-  "tsBuildCacheDigest": "sha256:afb51b356048812ad72fc2499965ad799f27c2821f7ced5455918d729f73f053",
+  "buildInputsTreeHash": "sha256:0e27210eed7849f346718e8ad226e844ea11df8d7cfcc7b24211a87f5309ea15",
+  "sealedSourceCommit": "7d4dd43601b7d5d8f34bc4ba7896bd6ebc2442d4",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:8545237e36e03b911a925de281b0721b65918f9eb3fe8b3e87b39224ae91e033",
+  "tsBuildCacheDigest": "sha256:8d9e8269dbce1580601091ce53c8bb78b8980ecfd8c2e96738491ad034dc83f6",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 19616,
-    "totalElapsedMs": 47011,
-    "dominanceRatio": 0.4173,
-    "phaseMedianMs": 1964,
-    "phaseP95Ms": 19616,
+    "dominantPhaseMs": 21475,
+    "totalElapsedMs": 54367,
+    "dominanceRatio": 0.395,
+    "phaseMedianMs": 1530,
+    "phaseP95Ms": 21475,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 59,
-    "skipDecision": 60,
-    "worktreeSetup": 10036,
-    "typescriptBuild": 9619,
-    "rootDropReleaseAssembly": 19616,
-    "onefileReleaseAssembly": 1964,
-    "artifactSync": 4858,
+    "inputHashCalculation": 69,
+    "skipDecision": 448,
+    "worktreeSetup": 9706,
+    "typescriptBuild": 15080,
+    "rootDropReleaseAssembly": 21475,
+    "onefileReleaseAssembly": 1530,
+    "artifactSync": 4278,
     "cleanup": 0,
-    "totalElapsed": 47011
+    "totalElapsed": 54367
   }
 }

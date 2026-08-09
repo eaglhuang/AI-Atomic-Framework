@@ -110,7 +110,7 @@ export function inspectPlanningAuthorityDelivery(input) {
     };
 }
 export function buildTaskflowClosePreflight(input) {
-    const summary = buildHistoricalClosePreflight({
+    const historicalSummary = buildHistoricalClosePreflight({
         cwd: input.cwd,
         taskId: input.taskId,
         actorId: input.actorId || '<actor>',
@@ -120,6 +120,10 @@ export function buildTaskflowClosePreflight(input) {
         waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
         waiverReason: input.waiverReason
     });
+    // The historical preflight delegates target-repo staged ownership to the
+    // canonical index provider. This layer only consumes that result, so a
+    // canonical empty result cannot revive a filename-derived false blocker.
+    const summary = historicalSummary;
     const standardsSpecBlocker = buildStandardsSpecReviewReceiptBlocker({
         cwd: input.cwd,
         taskId: input.taskId,

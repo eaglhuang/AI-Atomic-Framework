@@ -84,8 +84,11 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     taskId: input.taskId,
     stagedFiles,
   });
+  // An explicit stage-override lease authorizes the isolated commit
+  // transaction itself. Deferral is a separate fallback policy; tying lease
+  // authorization to --defer-foreign-staged silently bypasses park/restore.
   const indexLeaseAuthorization =
-    input.deferForeignStaged &&
+    Boolean(input.stageOverrideLease) &&
     gitIndexOwnership.foreignActiveStaged.length > 0
       ? authorizeGitIndexOverrideLease({
           cwd: input.cwd,

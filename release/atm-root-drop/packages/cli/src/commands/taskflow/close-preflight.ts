@@ -17,7 +17,7 @@ import {
 } from '../../../../core/src/evidence/phase-suite.ts';
 import { inspectStandardsSpecReviewReceipt, type ReviewAdvisoryReport } from '../../../../plugin-review-advisory/src/index.ts';
 import { detectHistoricalDeliveryCommit } from '../tasks/historical-delivery.ts';
-import { ATM_INDEX_FOREIGN_ACTIVE_STAGED, inspectGitIndexOwnership } from '../git-index-ownership.ts';
+import { ATM_INDEX_FOREIGN_ACTIVE_STAGED } from '../git-index-ownership.ts';
 import { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers, type HistoricalClosePreflightSummary } from './historical-close-preflight.ts';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { resolveTaskflowDeclaredFiles } from './task-scope.ts';
@@ -161,14 +161,10 @@ export function buildTaskflowClosePreflight(input: {
     waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
     waiverReason: input.waiverReason
   });
-  const sharedUnexpectedStagedTasks = buildSharedUnexpectedStagedTasks({
-    cwd: input.cwd,
-    taskId: input.taskId,
-    expectedStageFiles: (input.previewCommitBundle as { targetRepo?: { stageFiles?: readonly string[] } }).targetRepo?.stageFiles ?? []
-  });
-  const summary = sharedUnexpectedStagedTasks.length > 0
-    ? { ...historicalSummary, unexpectedStagedTasks: sharedUnexpectedStagedTasks }
-    : historicalSummary;
+  // The historical preflight delegates target-repo staged ownership to the
+  // canonical index provider. This layer only consumes that result, so a
+  // canonical empty result cannot revive a filename-derived false blocker.
+  const summary = historicalSummary;
   const standardsSpecBlocker = buildStandardsSpecReviewReceiptBlocker({
     cwd: input.cwd,
     taskId: input.taskId,
@@ -268,50 +264,6 @@ export function buildTaskflowClosePreflight(input: {
     };
   }
   return summary;
-}
-
-function buildSharedUnexpectedStagedTasks(input: {
-  readonly cwd: string;
-  readonly taskId: string;
-  readonly expectedStageFiles: readonly string[];
-}) {
-  const expected = new Set(input.expectedStageFiles.map((filePath) => filePath.replace(/\\/g, '/')));
-  const stagedFiles = readStagedFilesForOwnership(input.cwd)
-    .filter((filePath) => !expected.has(filePath));
-  const ownership = inspectGitIndexOwnership({
-    cwd: input.cwd,
-    taskId: input.taskId,
-    stagedFiles
-  });
-  const grouped = new Map<string, string[]>();
-  for (const entry of ownership.foreignActiveStaged) {
-    if (!entry.ownerTaskId) continue;
-    const bucket = grouped.get(entry.ownerTaskId) ?? [];
-    bucket.push(entry.path);
-    grouped.set(entry.ownerTaskId, bucket);
-  }
-  return [...grouped.entries()].map(([taskId, files]) => ({
-    taskId,
-    stagedFiles: [...new Set(files)].sort((left, right) => left.localeCompare(right)),
-    restoreChoice: `Do not silently unstage ${taskId}. Wait for the owner, request a Broker index lane, or use an explicit ATM stage-override lease if the human approved disrupting another active agent.`,
-    deferCommand: `node atm.mjs git lease stage-override --task ${input.taskId} --actor <actor-id> --paths ${files.map((filePath) => JSON.stringify(filePath)).join(',')} --reason "<human-approved reason>" --json`
-  }));
-}
-
-function readStagedFilesForOwnership(cwd: string): string[] {
-  try {
-    return execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMRT'], {
-      cwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe']
-    })
-      .split(/\r?\n/)
-      .map((filePath) => filePath.trim().replace(/\\/g, '/'))
-      .filter(Boolean)
-      .sort((left, right) => left.localeCompare(right));
-  } catch {
-    return [];
-  }
 }
 
 function buildStandardsSpecReviewReceiptBlocker(input: {

@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { listActorWorkSessions } from './actor-session.ts';
 import { readActiveTaskDirectionLocks } from './task-direction.ts';
+import { readWorkAdmissionTicket } from './git-governance/work-admission-check.ts';
 import { isPathAllowedByScope } from './work-channels.ts';
 
 export type GitIndexOwnershipClass =
@@ -170,12 +171,18 @@ export function inspectGitIndexOwnership(input: {
   const entries = stagedFiles.map((filePath): GitIndexOwnershipEntry => {
     const governanceTaskId = extractGovernanceTaskId(filePath);
     const lockOwner = activeLocks.find((lock) => isPathAllowedByScope(filePath, lock.allowedFiles)) ?? null;
+    const admissionOwner = activeLocks.find((lock) => {
+      const ticket = readWorkAdmissionTicket(input.cwd, lock.taskId);
+      const fileWriteScopes = ticket?.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
+      return isPathAllowedByScope(filePath, fileWriteScopes);
+    }) ?? null;
     // Shared evidence (for example git-head.jsonl) is not task-named.  Its
     // active direction lock is the authoritative owner, rather than the
     // filename prefix that happens to precede the first dot.
-    const ownerTaskId = lockOwner?.taskId ?? governanceTaskId ?? null;
-    const ownerActorId = lockOwner?.actorId ?? null;
-    const ownerSessionId = lockOwner?.sessionId ?? resolveOwnerSessionId(sessionsByTaskActor, ownerTaskId, ownerActorId);
+    const ownershipLock = lockOwner ?? admissionOwner;
+    const ownerTaskId = ownershipLock?.taskId ?? governanceTaskId ?? null;
+    const ownerActorId = ownershipLock?.actorId ?? null;
+    const ownerSessionId = ownershipLock?.sessionId ?? resolveOwnerSessionId(sessionsByTaskActor, ownerTaskId, ownerActorId);
     const stagedBlob = stagedBlobs.get(normalizeRelativePath(filePath).toLowerCase()) ?? null;
     if (ownerTaskId) {
       const normalizedOwner = normalizeTaskId(ownerTaskId);
