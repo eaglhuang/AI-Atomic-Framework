@@ -100,6 +100,23 @@ try {
   const appendedRecovery = JSON.parse(readFileSync(path.join(repo, '.atm/history/evidence/TASK-GIT-0022.runner-publication-recovery.json'), 'utf8'));
   assert.equal(appendedRecovery.records.length, 2);
   assert.equal(appendedRecovery.records[1].legacyReceiptPath, orphanPath);
+
+  const governanceReceiptPath = '.atm/history/evidence/ATM-GOV-0328.runner-sync-receipt.json';
+  write(governanceReceiptPath, receipt('0123456789abcdef0123456789abcdef01234567', 'governance orphan', {
+    receiptPath: governanceReceiptPath,
+    taskId: 'ATM-GOV-0328',
+    stewardWorkId: 'runner-sync-governance-orphan'
+  }));
+  const governanceDeleted = reconcileReceiptOnlyRunnerPublicationResidue({
+    cwd: repo,
+    taskId: 'TASK-GIT-0022',
+    actorId: 'captain',
+    receiptRef: governanceReceiptPath,
+    activeStewardWorkIds: []
+  });
+  assert.equal(governanceDeleted.decision, 'deleted-untracked-orphan');
+  assert.equal(governanceDeleted.legacyTaskId, 'ATM-GOV-0328');
+  assert.equal(existsSync(path.join(repo, governanceReceiptPath)), false);
   console.log('[runner-publication-reconciliation.test] ok');
 } finally {
   rmSync(repo, { recursive: true, force: true });

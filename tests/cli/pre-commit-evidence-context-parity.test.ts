@@ -68,4 +68,14 @@ function appendTaskBundle(root: string, taskId: string): string[] {
   assert.equal(inspectProtectedAtmStateChanges(fixture.root, combined).ok, false);
 }
 
+{
+  const fixture = taskBundle('ATM-GOV-0328', true, true);
+  const taskId = 'ATM-FRAMEWORK-TEMP-captain';
+  const receiptPath = `.atm/history/evidence/${taskId}.runner-sync-receipt.json`;
+  writeJson(fixture.root, receiptPath, { schemaId: 'atm.runnerSyncReceipt.v1', taskId, actorId: 'captain', outputInventory: { entries: [] } });
+  writeJson(fixture.root, `.atm/runtime/locks/${taskId}.lock.json`, { workItemId: taskId, actorId: 'captain', files: [receiptPath] });
+  const decision = classifyProtectedEvidenceBundle(fixture.root, [...fixture.staged, receiptPath]).decisions.get(receiptPath.toLowerCase());
+  assert.deepEqual(decision, { ok: true, taskId, reason: null });
+}
+
 console.log('pre-commit-evidence-context-parity: ok');

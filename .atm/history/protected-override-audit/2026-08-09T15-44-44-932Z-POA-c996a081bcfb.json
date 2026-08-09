@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-c996a081bcfb",
+  "recordedAt": "2026-08-09T15:44:44.932Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0328",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0328 --message \"fix(hook): bootstrap lock-backed runner receipt publication\n\nATM-Work-Admission: wat-49577a3fb7fad8c5 sha256:49577a3fb7fad8c57b3adb2107c4d6a137670ace2e8243cc5e01f93e1527bf5d\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0328-4938972fd6",
+  "reason": "Bootstrap generic runner-receipt context repair",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T15-44-44-930Z-EMG-ATM-GOV-0328-4938972fd6.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

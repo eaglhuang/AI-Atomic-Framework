@@ -174,7 +174,7 @@ function isPlainObject(value) { return typeof value === 'object' && value !== nu
  * or the evidence payload itself.
  */
 export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
-const contexts = new Map(); const evidenceByPath = new Map();
+const contexts = new Map(); const evidenceByPath = new Map(); const lockBackedRunnerReceipts = new Set();
 const linkedRunnerReceiptTaskId = (file, evidence, taskId) => {
 if (evidence?.schemaId !== 'atm.runnerSyncReceipt.v1' || !taskId) return taskId;
 const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
@@ -182,7 +182,7 @@ for (const entry of existsSync(lockRoot) ? readdirSync(lockRoot) : []) {
 if (!entry.endsWith('.lock.json')) continue;
 const lock = readJsonFile(path.join(lockRoot, entry));
 const declaredFiles = Array.isArray(lock?.files) ? lock.files.map(normalizeRelativePath) : [];
-if (lock?.workItemId === taskId && declaredFiles.includes(file) && lock?.actorId === evidence?.actorId) { const context = contexts.get(taskId) ?? { ledger: false, event: false }; context.event = true; contexts.set(taskId, context); return taskId; }
+if (lock?.workItemId === taskId && declaredFiles.includes(file) && lock?.actorId === evidence?.actorId) { const context = contexts.get(taskId) ?? { ledger: false, event: false }; context.event = true; contexts.set(taskId, context); lockBackedRunnerReceipts.add(file.toLowerCase()); return taskId; }
 }
 return taskId;
 };
@@ -202,7 +202,7 @@ evidenceByPath.set(lower, [...taskIds].sort((left, right) => left.localeCompare(
 }
 const decisions = new Map();
 const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat()]);
-for (const [file, taskIds] of evidenceByPath) { if (bundleTaskIds.size > 1) { decisions.set(file, { ok: false, taskId: null, reason: 'bundle-with-ambiguous-task-ids' }); continue; }
+for (const [file, taskIds] of evidenceByPath) { const isIndependentRunnerWitness = lockBackedRunnerReceipts.has(file) && taskIds.length === 1 && Boolean(contexts.get(taskIds[0])?.event); if (bundleTaskIds.size > 1 && !isIndependentRunnerWitness) { decisions.set(file, { ok: false, taskId: null, reason: 'bundle-with-ambiguous-task-ids' }); continue; }
 if (taskIds.length !== 1) { decisions.set(file, { ok: false, taskId: null, reason: taskIds.length === 0 ? 'evidence-without-semantic-task-id' : 'evidence-with-ambiguous-task-ids' }); continue; }
 const taskId = taskIds[0]; const context = contexts.get(taskId); decisions.set(file, context?.ledger || context?.event
 ? { ok: true, taskId, reason: null }
