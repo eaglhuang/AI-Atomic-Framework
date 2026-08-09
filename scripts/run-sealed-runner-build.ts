@@ -511,9 +511,12 @@ function runInnerBuild(buildTarget: BuildTarget): void {
 }
 
 export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget, preservePaths: readonly string[] = []): void {
-  const preservedUnder = (root: string) => preservePaths
-    .filter((entry) => entry === root || entry.startsWith(`${root}/`))
-    .map((entry) => entry.slice(root.length).replace(/^\//, ''));
+  // A runner-sync admission grants the selected generated target to this
+  // queue head.  Retaining pre-build dirty bytes beneath that same target
+  // would make the receipt describe the sealed worktree while the frozen
+  // runner keeps executing an older payload.  Foreign output is rejected by
+  // admission before this point; only non-target paths may remain preserved.
+  const preservedUnder = (_root: string) => [] as string[];
   if (buildTarget === 'full' || buildTarget === 'packages') {
     for (const packageName of readDirectoryNames(path.join(sourceRoot, 'packages'))) {
       const root = `packages/${packageName}/dist`;
