@@ -16,16 +16,16 @@
     ]
   },
   "targetCommit": "b18c7ff6a441d7c8a0f5fd1e82a632ec69467d77",
-  "governedTreeSha": "5b27d51d48fa713983b97c971c9c4b2f4cef9d76",
+  "governedTreeSha": "d02677fff4bfbe266059834757070f32d4fedde9",
   "targetCommitDelta": {
-    "currentCommitSha": "b18c7ff6a441d7c8a0f5fd1e82a632ec69467d77",
+    "currentCommitSha": "8e37076d2b0e185422e26399615243b55fdb57ff",
     "parentCommitShas": [
       "b18c7ff6a441d7c8a0f5fd1e82a632ec69467d77"
     ],
-    "governedTreeSha": "5b27d51d48fa713983b97c971c9c4b2f4cef9d76",
+    "governedTreeSha": "d02677fff4bfbe266059834757070f32d4fedde9",
     "changedFiles": [
-      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
       ".atm/history/evidence/ATM-GOV-0315.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0315.closure-packet.json",
       ".atm/history/evidence/ATM-GOV-0315.json",
       ".atm/history/evidence/git-head.jsonl",
       ".atm/history/task-events/ATM-GOV-0315/2026-07-31T15-06-09-104Z-import-b1e090b519c9.json",
@@ -34,22 +34,11 @@
       ".atm/history/task-events/ATM-GOV-0315/2026-08-08T22-50-40-939Z-reserve-9ff917052b7e.json",
       ".atm/history/task-events/ATM-GOV-0315/2026-08-08T22-50-40-941Z-promote-02105833c4e7.json",
       ".atm/history/task-events/ATM-GOV-0315/2026-08-08T22-50-43-917Z-claim-63911ae079f6.json",
-      ".atm/history/tasks/ATM-GOV-0288.json",
-      ".atm/history/tasks/ATM-GOV-0307.json",
-      ".atm/history/tasks/ATM-GOV-0313.json",
+      ".atm/history/task-events/ATM-GOV-0315/2026-08-08T22-54-46-264Z-close-ea60f81a63d0.json",
+      ".atm/history/task-events/ATM-GOV-0315/2026-08-08T22-54-46-443Z-lock-cleanup-ba7df6a583c3.json",
       ".atm/history/tasks/ATM-GOV-0315.json",
-      "artifacts/generated/skill-corpus-audit.json",
-      "packages/cli/dist/atm.d.ts",
       "packages/core/src/evidence/adapter-parity.ts",
       "packages/core/src/evidence/index.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-onefile/release-manifest.json",
-      "release/atm-root-drop/packages/cli/dist/atm.d.ts",
-      "release/atm-root-drop/packages/core/dist/evidence/index.js",
-      "release/atm-root-drop/packages/core/src/evidence/index.ts",
-      "release/atm-root-drop/release-manifest.json",
-      "release/atm-root-drop/templates/skills/atm-evidence.skill.md",
-      "schemas/evidence/adapter-parity.schema.json",
       "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
       "tests/cli/plan4-adapter-parity.test.ts"
     ]
@@ -136,5 +125,13 @@
   "sessionId": "session-20260808225040-codex-captain-2026-08-09-ATM-GOV-0315-9f260f9fae",
   "attestation": null,
   "historicalDeliveryProvenance": null,
-  "teamSummary": null
+  "teamSummary": null,
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-08-09T01:25:54.032Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "8e37076d2b0e185422e26399615243b55fdb57ff",
+    "repairedTargetCommitSha": "b18c7ff6a441d7c8a0f5fd1e82a632ec69467d77",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
+  }
 }
