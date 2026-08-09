@@ -381,8 +381,8 @@ export function isIgnorableFrameworkCommitStagingSideEffect(filePath: LegacyValu
   return isIgnorableTaskScopedDirtySideEffect(filePath);
 }
 
-export function autoStageFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyValue, apply: LegacyValue = true) {
-  const claimedFiles = new Set(readActiveFrameworkClaimFiles(cwd, actorId));
+export function autoStageFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyValue, apply: LegacyValue = true, claimedFilesOverride: readonly string[] | null = null) {
+  const claimedFiles = new Set(claimedFilesOverride ?? readActiveFrameworkClaimFiles(cwd, actorId));
   if (claimedFiles.size === 0) {
     return [];
   }
@@ -410,8 +410,8 @@ export function autoStageFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyVa
   return candidates;
 }
 
-export function inspectFrameworkScopedUnstagedCommit(cwd: LegacyValue, actorId: LegacyValue) {
-  const claimedFiles = new Set(readActiveFrameworkClaimFiles(cwd, actorId));
+export function inspectFrameworkScopedUnstagedCommit(cwd: LegacyValue, actorId: LegacyValue, claimedFilesOverride: readonly string[] | null = null) {
+  const claimedFiles = new Set(claimedFilesOverride ?? readActiveFrameworkClaimFiles(cwd, actorId));
   if (claimedFiles.size === 0) {
     return null;
   }
