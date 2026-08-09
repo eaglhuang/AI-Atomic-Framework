@@ -1,0 +1,366 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0012",
+  "title": "Reconcile released residue transaction with commit readiness",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-ERR-0010",
+    "TASK-LANE-0022"
+  ],
+  "acceptance": [
+    "ACC-1: Release, failed WIP preservation, reclaim, close and commit consume one lifecycle-derived residue decision; no caller independently infers released ownership from task id, filename or index status.",
+    "ACC-2: Protected staged bytes from a released task are either preserved byte-identically by the owning transaction or produce a broker ticket/recovery snapshot. An unrelated scoped commit never needs a stage override merely because no active owner remains.",
+    "ACC-3: A true active foreign owner remains protected and queues or fails closed as before; the repair does not widen commits or weaken index isolation.",
+    "ACC-4: If WIP preservation cannot create a verified commit SHA, release fails closed and the claim plus durable WIP ownership remain intact.",
+    "ACC-5: Same-task reclaim restores durable WIP ownership without converting it to unowned/foreign dirty WIP; discard remains explicit and destructive."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/generated-residue-policy.ts",
+    "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+    "packages/cli/src/commands/tasks/claim-work-admission.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "tests/cli/released-residue-transaction.test.ts",
+    "tests/cli/released-wip-reclaim-transaction.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+    "packages/cli/src/commands/tasks/generated-residue-policy.ts",
+    "packages/cli/src/commands/tasks/claim-work-admission.ts",
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "tests/cli/released-residue-transaction.test.ts",
+    "tests/cli/released-wip-reclaim-transaction.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/released-residue-transaction.test.ts",
+    "node --strip-types tests/cli/released-wip-reclaim-transaction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the transaction policy and tests together; retain snapshots and recovery receipts, never recreate protected bytes from an assumed worktree copy.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-index-ownership",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.released-residue-transaction",
+        "pattern": "Transaction Script",
+        "source": "packages/cli/src/commands/tasks/generated-residue-policy.ts",
+        "disposition": "inline",
+        "inlineReason": "The existing residue policy is the single decision boundary for lifecycle-derived ownership; another facade would duplicate commit and claim admission policy."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+        "packages/cli/src/commands/tasks/generated-residue-policy.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "tests/cli/released-residue-transaction.test.ts",
+        "tests/cli/released-wip-reclaim-transaction.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0012-released-residue-transaction-and-commit-readiness.task.md",
+    "sectionTitle": "TASK-ERR-0012",
+    "headingLine": 100,
+    "hash": "3349d5418181d396",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0012-released-residue-transaction-and-commit-readiness.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:3349d5418181d396225b26f123dd052039f33f4e6978911431a134a5cd9850d3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T17:23:58.293Z"
+    }
+  },
+  "importedAt": "2026-08-09T17:23:58.293Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-ERR-0010",
+      "TASK-LANE-0022"
+    ],
+    "startConditions": [
+      "wave-0-foreign-released-or-abandoned-staged-residue-reproduced"
+    ],
+    "softRelations": [
+      "ATM-GOV-0325",
+      "TASK-ERR-0007"
+    ],
+    "changedPublicSeams": [
+      "released-residue-transaction"
+    ],
+    "causalImpactEdges": [
+      "release-to-durable-residue-ownership",
+      "residue-to-brokered-commit-readiness",
+      "commit-readiness-to-closeback"
+    ],
+    "parallelFrontierInputs": [
+      "canonical-git-index",
+      "task-lifecycle-ledger",
+      "broker-index-lane"
+    ],
+    "validatorReferences": [
+      "test_released_residue_transaction_0012",
+      "test_released_wip_reclaim_0012",
+      "validate:cli"
+    ],
+    "phaseOwner": "correction-wave-2"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_released_residue_transaction_0012",
+      "targetGroupId": null,
+      "semanticKey": "released_residue_is_preserved_or_brokered_without_stage_override",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "release-to-durable-residue-ownership",
+        "residue-to-brokered-commit-readiness"
+      ],
+      "expectedRedPredicate": "a released task leaves protected staged residue and an unrelated scoped commit receives a bare refusal or mutates those bytes",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "released-residue-transaction",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_released_wip_reclaim_0012",
+      "targetGroupId": null,
+      "semanticKey": "failed_wip_preservation_never_releases_claim_or_ownerless_wip",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "release-to-durable-residue-ownership",
+        "commit-readiness-to-closeback"
+      ],
+      "expectedRedPredicate": "failed WIP commit releases a claim or same-task reclaim reports unowned dirty WIP without executable recovery",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "released-wip-continuity",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_released_residue_transaction_0012",
+    "test_released_wip_reclaim_0012"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck",
+    "validate:cli"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-90979fed9752",
+    "claimedAt": "2026-08-09T17:20:05.008Z",
+    "heartbeatAt": "2026-08-09T17:45:22.498Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-ERR-0012.*",
+      ".atm/history/task-events/TASK-ERR-0012/**",
+      ".atm/history/tasks/TASK-ERR-0012.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/tasks/generated-residue-policy.ts",
+      "packages/cli/src/commands/tasks/release-orchestrator.ts",
+      "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+      "tests/cli/released-residue-transaction.test.ts",
+      "tests/cli/released-wip-reclaim-transaction.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260809172005-codex-gpt-5.4-mini-9daaf416bd",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809172005-codex-gpt-5.4-mini-9daaf416bd\""
+    }
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "startedAt": "2026-08-09T17:20:05.008Z",
+  "startedBySessionId": "session-20260809172005-codex-gpt-5.4-mini-TASK-ERR-0012-c01b5e7c91",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0012",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0012.*",
+      ".atm/history/task-events/TASK-ERR-0012/**",
+      ".atm/history/tasks/TASK-ERR-0012.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/tasks/generated-residue-policy.ts",
+      "packages/cli/src/commands/tasks/release-orchestrator.ts",
+      "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+      "tests/cli/released-residue-transaction.test.ts",
+      "tests/cli/released-wip-reclaim-transaction.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0012-released-residue-transaction-and-commit-readiness.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/error-governance/",
+      "docs/ai_atomic_framework/error-governance/tasks/",
+      "docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0012-released-residue-transaction-and-commit-readiness.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "5a0a2c9ce3c519ddf731b064b0b81ba3548a7282082ead25fed734b68c1204e0",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260809172005-codex-gpt-5.4-mini-9daaf416bd",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809172005-codex-gpt-5.4-mini-9daaf416bd\""
+    },
+    "createdAt": "2026-08-09T17:20:15.239Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-09T17-45-23-116Z-renew-e94c8f945841",
+  "lastTransitionAt": "2026-08-09T17:45:23.116Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-4d7639fa14c3eee7",
+    "ticketDigest": "sha256:4d7639fa14c3eee7a39800933acb1ba228d34a9faba577ff02c2f3121ac392ed",
+    "taskId": "TASK-ERR-0012",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809172005-codex-gpt-5.4-mini-9daaf416bd",
+    "claimGeneration": "lease-90979fed9752",
+    "issuedAt": "2026-08-09T17:45:22.498Z",
+    "expiresAt": "2026-08-09T18:15:22.498Z",
+    "scopeDigest": "sha256:a892606b8f8150605fa60d6367cbf2fa2651eafc1da28108c25f828b64657f03",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-09T17:45:22.498Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-ERR-0012.*",
+          ".atm/history/task-events/TASK-ERR-0012/**",
+          ".atm/history/tasks/TASK-ERR-0012.json",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-index-ownership.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/tasks/claim-work-admission.ts",
+          "packages/cli/src/commands/tasks/foreign-dirty-wip-admission.ts",
+          "packages/cli/src/commands/tasks/generated-residue-policy.ts",
+          "packages/cli/src/commands/tasks/release-orchestrator.ts",
+          "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+          "tests/cli/released-residue-transaction.test.ts",
+          "tests/cli/released-wip-reclaim-transaction.test.ts"
+        ],
+        "digest": "sha256:64ad9543b86e74933f1381a1aba30ff5015dcfa714998dbe844555185ab1c892"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  }
+}

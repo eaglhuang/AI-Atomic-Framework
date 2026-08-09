@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-60ffe88c43dd",
+  "recordedAt": "2026-08-09T17:32:05.482Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-ERR-0012",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task TASK-ERR-0012 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/tasks/release-wip-transaction.ts,packages/cli/src/commands/tasks/claim-work-admission.ts --reason \"Reseal active direction scope after authoritative planning import replaced obsolete release and claim paths.\" --emergency-approval EMG-TASK-ERR-0012-82502ec495 --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-TASK-ERR-0012-82502ec495",
+  "reason": "Reseal active direction scope after authoritative planning import replaced obsolete release and claim paths.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T17-32-05-480Z-EMG-TASK-ERR-0012-82502ec495.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

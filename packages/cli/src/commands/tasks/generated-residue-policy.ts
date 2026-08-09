@@ -10,6 +10,14 @@ export interface GeneratedResidueTaskDisposition {
   readonly hasActiveClaim: boolean;
 }
 
+export interface ReleasedResidueTransactionPlan {
+  readonly schemaId: 'atm.releasedResidueTransactionPlan.v1';
+  readonly candidateTaskId: string;
+  readonly ownerTaskIds: readonly string[];
+  readonly disposition: 'park-and-restore' | 'not-eligible';
+  readonly reason: string;
+}
+
 function readJson(filePath: string): Record<string, unknown> | null {
   if (!existsSync(filePath)) return null;
   try {
@@ -64,6 +72,64 @@ export function isReleasedGeneratedBundleSafeToClean(
   disposition: GeneratedResidueTaskDisposition | null,
 ): boolean {
   if (!disposition || disposition.hasActiveClaim) return false;
-  if (disposition.lastLifecycleAction !== 'release' && disposition.lastLifecycleAction !== 'abandon') return false;
-  return disposition.status !== 'running' && disposition.status !== 'review';
+  const terminalStatus = disposition.status === 'done' || disposition.status === 'abandoned';
+  const releasedLifecycle = disposition.lastLifecycleAction === 'release' || disposition.lastLifecycleAction === 'abandon';
+  return (terminalStatus || releasedLifecycle) && disposition.status !== 'running' && disposition.status !== 'review';
+}
+
+/**
+ * Decides whether a foreign staged governance bundle can be isolated by the
+ * standard index park/restore transaction. This preserves every staged blob;
+ * it never authorizes deletion or inclusion in the candidate task's commit.
+ */
+export function planReleasedResidueTransaction(input: {
+  readonly cwd: string;
+  readonly candidateTaskId: string;
+  readonly ownerTaskIds: readonly string[];
+}): ReleasedResidueTransactionPlan {
+  const candidateTaskId = input.candidateTaskId.trim().toUpperCase();
+  const ownerTaskIds = [...new Set(input.ownerTaskIds
+    .map((taskId) => taskId.trim().toUpperCase())
+    .filter((taskId) => taskId && taskId !== candidateTaskId))]
+    .sort((left, right) => left.localeCompare(right));
+  const eligible = ownerTaskIds.length > 0 && ownerTaskIds.every((taskId) =>
+    isReleasedGeneratedBundleSafeToClean(readGeneratedResidueTaskDisposition(input.cwd, taskId)));
+  return {
+    schemaId: 'atm.releasedResidueTransactionPlan.v1',
+    candidateTaskId,
+    ownerTaskIds,
+    disposition: eligible ? 'park-and-restore' : 'not-eligible',
+    reason: eligible
+      ? 'Every foreign owner has a released or abandoned lifecycle disposition with no active claim; preserve staged blobs through the standard park/restore transaction.'
+      : 'At least one foreign owner is active, unresolved, or lacks a released lifecycle disposition; broker or explicit override authority remains required.'
+  };
+}
+
+/**
+ * Applies the one lifecycle-derived park/restore decision to every hook or
+ * commit caller that classifies generated residue.  Callers retain ownership
+ * of residue discovery; this module owns the cross-owner eligibility rule.
+ */
+export function reconcileReleasedResidueReport<T extends { readonly ownerTaskId?: string | null }, R extends {
+  readonly blockAndExplain: readonly T[];
+  readonly manualReview: readonly T[];
+}>(cwd: string, candidateTaskId: string, report: R): R {
+  const plan = planReleasedResidueTransaction({
+    cwd,
+    candidateTaskId,
+    ownerTaskIds: [...report.blockAndExplain, ...report.manualReview]
+      .map((entry) => entry.ownerTaskId ?? '')
+      .filter(Boolean),
+  });
+  if (plan.disposition !== 'park-and-restore') {
+    return report;
+  }
+  const transactionOwnerIds = new Set(plan.ownerTaskIds);
+  const isTransactionOwner = (entry: T) =>
+    transactionOwnerIds.has(String(entry.ownerTaskId ?? '').trim().toUpperCase());
+  return {
+    ...report,
+    blockAndExplain: report.blockAndExplain.filter((entry) => !isTransactionOwner(entry)),
+    manualReview: report.manualReview.filter((entry) => !isTransactionOwner(entry)),
+  };
 }

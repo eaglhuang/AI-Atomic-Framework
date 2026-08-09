@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T17-38-45-293Z-scope-amendment-8e31ea6137f5",
+  "taskId": "TASK-ERR-0012",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0012.json",
+  "taskSha256": "sha256:56787fd618ad8c9ea57936dd4ffd0e309b400ace7cc140b0ea74bca448fb5e42",
+  "createdAt": "2026-08-09T17:38:45.293Z",
+  "command": "node atm.mjs tasks scope repair --task TASK-ERR-0012 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/hook/pre-commit/implementation.ts --reason \"Pre-commit hook duplicates released-residue classification and must consume the task-owned lifecycle transaction plan.\" --emergency-approval EMG-TASK-ERR-0012-82502ec495 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Pre-commit hook duplicates released-residue classification and must consume the task-owned lifecycle transaction plan."
+  }
+}
