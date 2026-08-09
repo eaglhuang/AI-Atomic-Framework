@@ -1,0 +1,270 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0023",
+  "title": "Complete framework temporary publication capability lifecycle",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0022"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+    "packages/cli/src/commands/git-governance/work-admission-check.ts",
+    "packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+    "packages/cli/src/commands/git-governance/work-admission-check.ts",
+    "packages/cli/src/commands/framework-development/**",
+    "packages/cli/src/commands/git-governance/__tests__/**"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the capability-provider and bundle-resolution change, then rebuild and publish a receipt for the reverted sealed source.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.mutation-capability",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.framework-temp-publication-capability",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance/work-admission-check.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0023-framework-temp-publication-capability.task.md",
+    "sectionTitle": "TASK-LANE-0023",
+    "headingLine": 56,
+    "hash": "6d3df01aab27211b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0023-framework-temp-publication-capability.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:6d3df01aab27211bf67c9e011ad40428ce8e0b0727a1f6dac16245551014242e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T19:47:58.290Z"
+    }
+  },
+  "importedAt": "2026-08-09T19:47:58.290Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [
+    {
+      "caseId": "test_framework_temp_publication_capability_0023",
+      "targetGroupId": "null",
+      "semanticKey": "framework_temp_publication_capability",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "temporary-claim-publication-seam"
+      ],
+      "expectedRedPredicate": "a valid temporary claim cannot publish its sealed inventory",
+      "contributionResourceKey": "atm.mutation-capability",
+      "responsibility": "task-required",
+      "dependencyEdge": "runner-sync-publication",
+      "contractEdge": "temporary-claim-publication",
+      "resourceKey": "atm.mutation-capability"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_framework_temp_publication_capability_0023"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-09T20-50-13-917Z-claim-3efbf121fce7",
+  "lastTransitionAt": "2026-08-09T20:50:13.917Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-08-09T19:48:41.211Z",
+  "promotedAt": "2026-08-09T19:48:41.214Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-d51ea8297453",
+    "claimedAt": "2026-08-09T20:50:07.457Z",
+    "heartbeatAt": "2026-08-09T20:50:07.457Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+      "packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts",
+      "packages/cli/src/commands/git-governance/__tests__/work-admission-check.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260809205007-codex-gpt-5.4-mini-392d59ba25",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809205007-codex-gpt-5.4-mini-392d59ba25\""
+    }
+  },
+  "startedAt": "2026-08-09T19:48:41.219Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6dbe8de80792264d",
+    "ticketDigest": "sha256:6dbe8de80792264dda486257a02120223eecf006809a43c0195eb783fc0e0024",
+    "taskId": "TASK-LANE-0023",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809205007-codex-gpt-5.4-mini-392d59ba25",
+    "claimGeneration": "lease-d51ea8297453",
+    "issuedAt": "2026-08-09T20:50:07.457Z",
+    "expiresAt": "2026-08-09T21:20:07.457Z",
+    "scopeDigest": "sha256:11ea4ff3a7e4e1539c7947daec97d55dc44ccccfc0921d4d12be74c13b8b672c",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-09T20:50:07.457Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-LANE-0023.*",
+          ".atm/history/task-events/TASK-LANE-0023/**",
+          ".atm/history/tasks/TASK-LANE-0023.json",
+          "packages/cli/src/commands/framework-development/**",
+          "packages/cli/src/commands/git-governance/__tests__/**",
+          "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+          "packages/cli/src/commands/git-governance/work-admission-check.ts"
+        ],
+        "digest": "sha256:b4c080aeffbc55ae3b1d20bcd820e1136aa46ff882bdd89618dbfbcdfe715cf5"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260809205007-codex-gpt-5.4-mini-TASK-LANE-0023-dd1954eb57",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "TASK-LANE-0023",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809194841-codex-gpt-5.4-mini-f0655904c5",
+    "dirtyPaths": [
+      ".atm/history/tasks/TASK-LANE-0023.json",
+      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+      "packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts",
+      "packages/cli/src/commands/git-governance/__tests__/work-admission-check.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts"
+    ],
+    "retainedAt": "2026-08-09T20:45:27.270Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0023",
+    "batchId": "batch-bf062e1586ae",
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-6c7f8588698293ae",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0023.*",
+      ".atm/history/task-events/TASK-LANE-0023/**",
+      ".atm/history/tasks/TASK-LANE-0023.json",
+      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+      "packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts",
+      "packages/cli/src/commands/git-governance/__tests__/work-admission-check.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bd283e186950af561f274052078f96ec5a3e7f66f53a0df45588b3ebbc95872d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260809205007-codex-gpt-5.4-mini-TASK-LANE-0023-dd1954eb57",
+    "laneSession": {
+      "laneSessionId": "lane-20260809205007-codex-gpt-5.4-mini-392d59ba25",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809205007-codex-gpt-5.4-mini-392d59ba25\""
+    },
+    "createdAt": "2026-08-09T20:50:13.916Z",
+    "status": "active"
+  }
+}

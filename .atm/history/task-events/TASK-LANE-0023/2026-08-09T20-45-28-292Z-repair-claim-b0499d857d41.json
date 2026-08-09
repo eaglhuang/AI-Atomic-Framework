@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T20-45-28-292Z-repair-claim-b0499d857d41",
+  "taskId": "TASK-LANE-0023",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809194841-codex-gpt-5.4-mini-TASK-LANE-0023-020b74b995",
+  "fromStatus": "ready",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0023.json",
+  "taskSha256": "sha256:8186b0e5a93b60dde14a6cd1693d3c3afc6f51e7f8585bc72204c9d3781f468b",
+  "createdAt": "2026-08-09T20:45:28.292Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-LANE-0023 --actor codex-gpt-5.4-mini --write --reason \"Repair orphaned active session and unavailable canonical lane before resuming same-task retained WIP through a fresh governed claim.\" --json"
+}

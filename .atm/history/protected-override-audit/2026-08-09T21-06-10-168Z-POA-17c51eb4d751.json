@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-17c51eb4d751",
+  "recordedAt": "2026-08-09T21:06:10.168Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-LANE-0023",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task TASK-LANE-0023 --message \"fix(git): publish temporary framework capability\n\nATM-Work-Admission: wat-6dbe8de80792264d sha256:6dbe8de80792264dda486257a02120223eecf006809a43c0195eb783fc0e0024\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-8a112a8cf4",
+  "reason": "Independent required validations passed; source pre-commit misclassified intentional validator timeout regression receipts.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T21-06-10-166Z-EMG-GLOBAL-8a112a8cf4.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

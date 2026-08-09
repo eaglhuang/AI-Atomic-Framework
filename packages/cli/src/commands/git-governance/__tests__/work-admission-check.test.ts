@@ -3,6 +3,10 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { evaluateTaskWorkAdmissionGate } from '../work-admission-check.ts';
+import {
+  frameworkTempPublicationCapabilityCovers,
+  resolveFrameworkTempPublicationCapability,
+} from '../../framework-development/framework-temp-publication-capability.ts';
 
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-framework-temp-admission-'));
 const taskId = 'ATM-FRAMEWORK-TEMP-validator';
@@ -15,6 +19,22 @@ writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`),
   ttlSeconds: 3600,
   files: ['packages/cli/src/example.ts']
 }, null, 2)}\n`, 'utf8');
+
+const capability = resolveFrameworkTempPublicationCapability({
+  cwd,
+  taskId,
+  actorId: 'validator',
+  now: Date.parse('2026-08-09T14:53:00.000Z'),
+});
+assert.equal(capability?.taskId, taskId);
+assert.equal(frameworkTempPublicationCapabilityCovers(capability, ['packages/cli/src/example.ts']), true);
+assert.equal(frameworkTempPublicationCapabilityCovers(capability, ['packages/core/src/outside.ts']), false);
+assert.equal(resolveFrameworkTempPublicationCapability({
+  cwd,
+  taskId,
+  actorId: 'other-actor',
+  now: Date.parse('2026-08-09T14:53:00.000Z'),
+}), null);
 
 const admitted = evaluateTaskWorkAdmissionGate({
   cwd,

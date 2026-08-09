@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T20-19-07-337Z-repair-claim-551655d3fd7d",
+  "taskId": "TASK-LANE-0023",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809194841-codex-gpt-5.4-mini-TASK-LANE-0023-020b74b995",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0023.json",
+  "taskSha256": "sha256:4a700e843588dec98194e973c0ec6e1653c664691cd3a6055ad21823ad512e56",
+  "createdAt": "2026-08-09T20:19:07.337Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-LANE-0023 --actor codex-gpt-5.4-mini --write --reason \"Expired task claim references an unavailable canonical lane; reset authority through governed repair before a fresh claim.\" --json"
+}
