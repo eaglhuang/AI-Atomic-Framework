@@ -5,6 +5,7 @@ import { sanitizeTaskDirectionAllowedFiles } from '../task-direction.ts';
 import { normalizeRelativePath } from './task-file-io-helpers.ts';
 import { pathMatchesTaskScope } from './historical-delivery.ts';
 import { readCloseWindowStagedIndexLockReport } from './close-window-lock.ts';
+import { gitHeadEvidencePath, readLatestGitHeadReceiptTaskId } from '../git-head-evidence.ts';
 
 export interface TaskCloseScopedDiffIsolationReport {
   readonly schemaId: 'atm.taskCloseScopedDiffIsolation.v1';
@@ -157,6 +158,9 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   const allowedAdvisoryGovernanceFiles = new Set(
     uniqueStrings((input.allowedAdvisoryGovernanceFiles ?? []).map(normalizeRelativePath).filter(Boolean))
   );
+  if (readLatestGitHeadReceiptTaskId(input.cwd) === input.taskId) {
+    allowedAdvisoryGovernanceFiles.add(gitHeadEvidencePath);
+  }
   const allowedAdvisoryDirtyFiles = new Set(
     uniqueStrings((input.allowedAdvisoryDirtyFiles ?? []).map(normalizeRelativePath).filter(Boolean))
   );

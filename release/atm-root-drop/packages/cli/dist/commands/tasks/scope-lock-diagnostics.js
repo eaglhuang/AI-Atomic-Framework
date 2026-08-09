@@ -5,6 +5,7 @@ import { sanitizeTaskDirectionAllowedFiles } from '../task-direction.js';
 import { normalizeRelativePath } from './task-file-io-helpers.js';
 import { pathMatchesTaskScope } from './historical-delivery.js';
 import { readCloseWindowStagedIndexLockReport } from './close-window-lock.js';
+import { gitHeadEvidencePath, readLatestGitHeadReceiptTaskId } from '../git-head-evidence.js';
 function isHistoricalDeliveredFile(filePath, deliverableFiles, historicalDeliveredFiles) {
     return deliverableFiles.some((declared) => pathMatchesTaskScope(filePath, declared)
         && historicalDeliveredFiles.some((historical) => pathMatchesTaskScope(historical, declared)));
@@ -59,6 +60,9 @@ export function evaluateFrameworkCloseDirtyGuard(input) {
     const trackedDirtyFiles = uniqueStrings(input.trackedDirtyFiles.map(normalizeRelativePath).filter(Boolean));
     const historicalDeliveredFiles = uniqueStrings((input.historicalDeliveredFiles ?? []).map(normalizeRelativePath).filter(Boolean));
     const allowedAdvisoryGovernanceFiles = new Set(uniqueStrings((input.allowedAdvisoryGovernanceFiles ?? []).map(normalizeRelativePath).filter(Boolean)));
+    if (readLatestGitHeadReceiptTaskId(input.cwd) === input.taskId) {
+        allowedAdvisoryGovernanceFiles.add(gitHeadEvidencePath);
+    }
     const allowedAdvisoryDirtyFiles = new Set(uniqueStrings((input.allowedAdvisoryDirtyFiles ?? []).map(normalizeRelativePath).filter(Boolean)));
     const buckets = {
         scopeTrackedDirtyFiles: [],

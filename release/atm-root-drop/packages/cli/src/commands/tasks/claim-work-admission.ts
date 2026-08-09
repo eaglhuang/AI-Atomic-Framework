@@ -12,6 +12,7 @@ import { findActiveTaskQueue, writeTaskDirectionLock, type TaskDirectionLock } f
 import type { LaneSessionResolution } from '../lane-session/resolve.ts';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.ts';
 import { createClaimRecord } from './task-ledger-readers.ts';
+import { readLatestGitHeadReceiptTaskId } from '../git-head-evidence.ts';
 
 interface ClaimLifecyclePhase {
   readonly phase: string;
@@ -236,22 +237,11 @@ export function resolveTaskWorkAdmissionFiles(taskDocument: Record<string, unkno
 
 function taskLifecycleArtifactPaths(taskId: string, cwd?: string): readonly string[] {
   return [
-    ...(cwd && readGitHeadReceiptOwner(cwd) === taskId ? ['.atm/history/evidence/git-head.jsonl'] : []),
+    ...(cwd && readLatestGitHeadReceiptTaskId(cwd) === taskId ? ['.atm/history/evidence/git-head.jsonl'] : []),
     `.atm/history/evidence/${taskId}.*`,
     `.atm/history/task-events/${taskId}/**`,
     `.atm/history/tasks/${taskId}.json`
   ];
-}
-
-function readGitHeadReceiptOwner(cwd: string): string | null {
-  const receipt = path.join(cwd, '.atm/history/evidence/git-head.jsonl');
-  if (!existsSync(receipt)) return null;
-  try {
-    const entries = readFileSync(receipt, 'utf8').trim().split(/\r?\n/).filter(Boolean);
-    const latest = JSON.parse(entries.at(-1) ?? '{}') as { evidence?: Array<{ details?: { taskId?: unknown } }> };
-    const taskId = latest.evidence?.[0]?.details?.taskId;
-    return typeof taskId === 'string' && taskId.trim() ? taskId.trim() : null;
-  } catch { return null; }
 }
 
 function normalizeTaskId(value: unknown): string | null {

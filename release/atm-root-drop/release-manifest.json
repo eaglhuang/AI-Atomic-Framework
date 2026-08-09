@@ -1397,6 +1397,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/validate-atom-file-size.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/work-admission-check.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/work-admission-check.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-head-evidence.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/git-head-evidence.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-index-ownership.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/git-index-ownership.js",
@@ -5429,8 +5430,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 710,
-    "unchanged": 4684,
+    "copied": 715,
+    "unchanged": 4680,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6769,7 +6770,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:64f6b5d38096e311c0045b93d4473a07d1b97dbf551d5a1edf855f8f93001083"
+    "digest": "sha256:6069ae8c9a9bce379c1d03e8854b68a15ab95b60b0466c6ee874072bc9d9244f"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -8140,6 +8141,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/validate-atom-file-size.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/work-admission-check.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/work-admission-check.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-head-evidence.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/git-head-evidence.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-index-ownership.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/git-index-ownership.js",
@@ -12175,34 +12177,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:a1608123e7d65b3a91f1ae1acbff8eae53929421a88ae316a5ed6e922fbb4b1e",
-  "sealedSourceCommit": "2fc9a88378037059a7a76438655b3f951beeafa4",
+  "buildInputsTreeHash": "sha256:91af355d3462b93ed049bb54555e986659bf079e12bee315611a937960d12d00",
+  "sealedSourceCommit": "c65606e05a054219feacca75944e82c151374d58",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:e3b36015e4d6013c4f05b49dc4ee4c81c3120d1c8b518d10eb685b6f8b16980a",
-  "tsBuildCacheDigest": "sha256:c0a3e16b2a721f300dac5878d63f000aa222921d51583e49cb9021d4dfb8be1d",
+  "incrementalPlanDigest": "sha256:0d5421d3a831afdf0bdb4d1e3c7819f287a5c35bb1694cf362eadf25fd6f2095",
+  "tsBuildCacheDigest": "sha256:22aa448fcd61820c19a64593d69a988bb270d644bdd1aead87ec3760ff51522d",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 11853,
-    "totalElapsedMs": 29941,
-    "dominanceRatio": 0.3959,
-    "phaseMedianMs": 1008,
-    "phaseP95Ms": 11853,
+    "dominantPhaseMs": 9037,
+    "totalElapsedMs": 26157,
+    "dominanceRatio": 0.3455,
+    "phaseMedianMs": 826,
+    "phaseP95Ms": 9037,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 40,
-    "skipDecision": 39,
-    "worktreeSetup": 11853,
-    "typescriptBuild": 7668,
-    "rootDropReleaseAssembly": 2917,
-    "onefileReleaseAssembly": 1008,
-    "artifactSync": 1865,
+    "inputHashCalculation": 44,
+    "skipDecision": 50,
+    "worktreeSetup": 9037,
+    "typescriptBuild": 8987,
+    "rootDropReleaseAssembly": 2744,
+    "onefileReleaseAssembly": 826,
+    "artifactSync": 1863,
     "cleanup": 0,
-    "totalElapsed": 29941
+    "totalElapsed": 26157
   }
 }

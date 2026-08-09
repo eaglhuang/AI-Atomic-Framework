@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T18-12-28-687Z-scope-amendment-71fb91c39165",
+  "taskId": "TASK-ERR-0012",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0012.json",
+  "taskSha256": "sha256:7d7bf75f504eb73648380906b90ad760a603e1c7d67b1c2b0c0758eecfda0bbd",
+  "createdAt": "2026-08-09T18:12:28.687Z",
+  "command": "node atm.mjs tasks scope repair --task TASK-ERR-0012 --actor codex-gpt-5.4-mini --add \"packages/cli/dist/commands/git-head-evidence.d.ts,packages/cli/dist/commands/git-head-evidence.js,packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js,packages/cli/dist/commands/tasks/claim-work-admission.js,packages/cli/dist/commands/tasks/scope-lock-diagnostics.js,packages/cli/dist/commands/team/legacy/crew-decision-policy.d.ts,packages/cli/dist/commands/team/legacy/plan-orchestration.d.ts,packages/cli/dist/commands/team/legacy/planning-context.d.ts,packages/cli/dist/commands/team/legacy/team-run-runtime.d.ts,release/atm-root-drop/packages/cli/dist/commands/git-head-evidence.d.ts,release/atm-root-drop/packages/cli/dist/commands/git-head-evidence.js,release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js,release/atm-root-drop/packages/cli/dist/commands/tasks/claim-work-admission.js,release/atm-root-drop/packages/cli/dist/commands/tasks/scope-lock-diagnostics.js,release/atm-root-drop/packages/cli/dist/commands/team/legacy/crew-decision-policy.d.ts,release/atm-root-drop/packages/cli/dist/commands/team/legacy/plan-orchestration.d.ts,release/atm-root-drop/packages/cli/dist/commands/team/legacy/planning-context.d.ts,release/atm-root-drop/packages/cli/dist/commands/team/legacy/team-run-runtime.d.ts,release/atm-root-drop/packages/cli/src/commands/git-head-evidence.ts,release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts,release/atm-root-drop/packages/cli/src/commands/tasks/claim-work-admission.ts,release/atm-root-drop/packages/cli/src/commands/tasks/scope-lock-diagnostics.ts\" --reason \"Synchronize exact runner-sync-978a8a92 output inventory with W2 direction lock.\" --emergency-approval EMG-TASK-ERR-0012-548bd96a80 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Synchronize exact runner-sync-978a8a92 output inventory with W2 direction lock."
+  }
+}
