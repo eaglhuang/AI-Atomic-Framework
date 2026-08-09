@@ -170,7 +170,10 @@ export function inspectGitIndexOwnership(input: {
   const entries = stagedFiles.map((filePath): GitIndexOwnershipEntry => {
     const governanceTaskId = extractGovernanceTaskId(filePath);
     const lockOwner = activeLocks.find((lock) => isPathAllowedByScope(filePath, lock.allowedFiles)) ?? null;
-    const ownerTaskId = governanceTaskId ?? lockOwner?.taskId ?? null;
+    // Shared evidence (for example git-head.jsonl) is not task-named.  Its
+    // active direction lock is the authoritative owner, rather than the
+    // filename prefix that happens to precede the first dot.
+    const ownerTaskId = lockOwner?.taskId ?? governanceTaskId ?? null;
     const ownerActorId = lockOwner?.actorId ?? null;
     const ownerSessionId = lockOwner?.sessionId ?? resolveOwnerSessionId(sessionsByTaskActor, ownerTaskId, ownerActorId);
     const stagedBlob = stagedBlobs.get(normalizeRelativePath(filePath).toLowerCase()) ?? null;
@@ -443,6 +446,7 @@ function readStagedBlobMap(cwd: string, stagedFiles: readonly string[]) {
 
 function extractGovernanceTaskId(filePath: string): string | null {
   const normalized = normalizeRelativePath(filePath);
+  if (normalized.toLowerCase() === '.atm/history/evidence/git-head.jsonl') return null;
   const match = normalized.match(/^\.atm\/history\/(?:tasks|evidence|task-events)\/([^/.]+)(?:[/.]|$)/i);
   return match ? normalizeTaskId(match[1]!) : null;
 }
