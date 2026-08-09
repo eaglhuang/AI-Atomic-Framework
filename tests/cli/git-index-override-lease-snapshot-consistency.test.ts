@@ -24,6 +24,14 @@ try {
   mkdirSync(path.join(tempDir, path.dirname(stagedPath)), { recursive: true });
   writeFileSync(path.join(tempDir, stagedPath), '{"fixture":true}\n', 'utf8');
   mkdirSync(path.join(tempDir, '.atm/runtime/task-direction-locks'), { recursive: true });
+  mkdirSync(path.join(tempDir, '.atm/history/tasks'), { recursive: true });
+  writeFileSync(path.join(tempDir, '.atm/history/tasks', `${foreignTaskId}.json`), `${JSON.stringify({
+    workItemId: foreignTaskId,
+    workAdmissionTicket: {
+      schemaId: 'atm.workAdmissionTicket.v1',
+      grants: [{ kind: 'file-write', values: [stagedPath] }]
+    }
+  }, null, 2)}\n`, 'utf8');
   writeFileSync(path.join(tempDir, '.atm/runtime/task-direction-locks', `${foreignTaskId}.json`), `${JSON.stringify({
     schemaId: 'atm.taskDirectionLock.v1',
     specVersion: '0.1.0',
@@ -32,7 +40,7 @@ try {
     scopeKey: null,
     queueId: null,
     queueIndex: null,
-    allowedFiles: [stagedPath],
+    allowedFiles: [],
     planningReadOnlyPaths: [],
     planningMirrorPaths: [],
     allowPlanningMirror: false,
