@@ -16,30 +16,19 @@
     ]
   },
   "targetCommit": "1810e91ace110ccfb73cb0943fff3f7e842e1333",
-  "governedTreeSha": "aa7ff13b742c6e1ec39ee14e74b61cbd49aaa7ed",
+  "governedTreeSha": "124b751bdd45b5de692679181e623837a6927f82",
   "targetCommitDelta": {
-    "currentCommitSha": "1810e91ace110ccfb73cb0943fff3f7e842e1333",
+    "currentCommitSha": "1098efa9924e43b7f041e0fc19fc0879608402a3",
     "parentCommitShas": [
       "1810e91ace110ccfb73cb0943fff3f7e842e1333"
     ],
-    "governedTreeSha": "aa7ff13b742c6e1ec39ee14e74b61cbd49aaa7ed",
+    "governedTreeSha": "124b751bdd45b5de692679181e623837a6927f82",
     "changedFiles": [
-      ".atm/history/tasks/ATM-GOV-0293.json",
-      "artifacts/generated/skill-corpus-audit.json",
-      "packages/cli/dist/commands/test-catalog.js",
-      "packages/cli/dist/index.d.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-onefile/release-manifest.json",
-      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
-      "release/atm-root-drop/packages/cli/dist/commands/test-catalog.js",
-      "release/atm-root-drop/packages/cli/dist/index.d.ts",
-      "release/atm-root-drop/packages/cli/src/commands/test-catalog.ts",
-      "release/atm-root-drop/packages/core/dist/evidence/test-case-catalog.js",
-      "release/atm-root-drop/packages/core/dist/index.d.ts",
-      "release/atm-root-drop/packages/core/src/evidence/test-case-catalog.ts",
-      "release/atm-root-drop/release-manifest.json",
-      "release/atm-root-drop/schemas/validators/test-case-group.schema.json",
-      "release/atm-root-drop/tests/cli/test-case-catalog-shards.test.ts"
+      ".atm/history/evidence/ATM-GOV-0313.closure-packet.json",
+      ".atm/history/protected-override-audit/2026-08-08T17-32-21-622Z-POA-de58a8ec9a9d.json",
+      ".atm/history/protected-override-audit/2026-08-08T17-32-21-748Z-POA-dc991150bca5.json",
+      ".atm/history/task-events/ATM-GOV-0313/2026-08-08T17-32-21-625Z-close-cd0e0a409b29.json",
+      ".atm/history/tasks/ATM-GOV-0313.json"
     ]
   },
   "closedByCommand": "atm tasks close",
@@ -221,5 +210,13 @@
     "waivedOutOfScopeFiles": [],
     "waiverReason": null
   },
-  "teamSummary": null
+  "teamSummary": null,
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-08-09T01:41:17.972Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "1098efa9924e43b7f041e0fc19fc0879608402a3",
+    "repairedTargetCommitSha": "1810e91ace110ccfb73cb0943fff3f7e842e1333",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
+  }
 }
