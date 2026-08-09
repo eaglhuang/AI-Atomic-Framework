@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.historicalWorkAdmissionProvenance.v1",
+  "commitSha": "3f6b8a1eea8bf944610375efcd939a2972199347",
+  "actorId": "codex-captain-2026-08-09",
+  "taskId": "TASK-GIT-0024",
+  "reason": "Forward attestation for the scoped historical admission evidence and validator closure repair commit created under explicit emergency approval.",
+  "approval": "User authorized emergency hook bypass and broker conflict override; both one-use leases produced protected override audit receipts.",
+  "validation": [
+    "node atm.mjs doctor --json",
+    "node --strip-types scripts/audit-hash-placeholders.ts --mode validate",
+    "node --strip-types scripts/validate-package-skeleton.ts --mode validate",
+    "node --strip-types scripts/validate-governance-projections.ts --mode validate"
+  ],
+  "followUp": "Preserve this evidence with the historical work-admission attestation ledger before protected push."
+}
