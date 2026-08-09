@@ -1684,6 +1684,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/historical-context.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/historical-context.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-lock.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-lock.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/closeout-provenance.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/closeout-signaling.js",
@@ -5148,8 +5149,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 434,
-    "unchanged": 4679,
+    "copied": 428,
+    "unchanged": 4686,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6476,7 +6477,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:a176a667d6e2f9803d1fd1bd089d531ecb9d360d99140b05d884c4e1a56d9772"
+    "digest": "sha256:d39e480595f25fd8bbc1e833f8a7daa842f18d53a4cb21daf204c3a2728588a3"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -8134,6 +8135,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/historical-context.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/historical-context.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-lock.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-lock.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/closeout-provenance.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/closeout-signaling.js",
@@ -11601,34 +11603,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:0a3aa61dd28b07cfdc97d41e37ab7123cbdddef83085118d216b47cb018fa0e1",
-  "sealedSourceCommit": "a3009dc8262c98bd13813d952eaca80dcccd8d36",
+  "buildInputsTreeHash": "sha256:174355b832f921bd86043e91a57c11b7522d6271044e3a91f1799fcecf794221",
+  "sealedSourceCommit": "f2f264e12a7a4346f4bd51d5a2fcce2da367b336",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:c8b4d42d27f3c37cd643887e42d3906269ca07ae07c18e47fba88d439767468f",
-  "tsBuildCacheDigest": "sha256:921e04852c4ba26fcd3684308af250ebbdb9d3c668220b9864855d737c3ee995",
+  "incrementalPlanDigest": "sha256:40708a157c0661bb8dd00590a230e5f4853eb6b9d9a85c0e85c4a4e3e9cdc5cc",
+  "tsBuildCacheDigest": "sha256:45bc44870f43b8ecc003166e657701584ec036941aefa059c5160482f5aa6d5c",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 20544,
-    "totalElapsedMs": 55186,
-    "dominanceRatio": 0.3723,
-    "phaseMedianMs": 1498,
-    "phaseP95Ms": 20544,
+    "dominantPhaseMs": 21349,
+    "totalElapsedMs": 54130,
+    "dominanceRatio": 0.3944,
+    "phaseMedianMs": 1500,
+    "phaseP95Ms": 21349,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 53,
-    "skipDecision": 56,
-    "worktreeSetup": 9425,
-    "typescriptBuild": 16374,
-    "rootDropReleaseAssembly": 20544,
-    "onefileReleaseAssembly": 1498,
-    "artifactSync": 5280,
+    "inputHashCalculation": 388,
+    "skipDecision": 57,
+    "worktreeSetup": 9150,
+    "typescriptBuild": 15054,
+    "rootDropReleaseAssembly": 21349,
+    "onefileReleaseAssembly": 1500,
+    "artifactSync": 5150,
     "cleanup": 0,
-    "totalElapsed": 55186
+    "totalElapsed": 54130
   }
 }

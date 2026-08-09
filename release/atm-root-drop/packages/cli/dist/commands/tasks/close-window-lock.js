@@ -4,6 +4,7 @@ import path from 'node:path';
 import { normalizeTaskId } from './task-import-validators.js';
 import { normalizeRelativePath } from './task-file-io-helpers.js';
 import { CliError, quoteCliValue, relativePathFrom } from '../shared.js';
+import { inspectGitIndexOwnership } from '../git-index-ownership.js';
 export const CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID = 'atm.closeWindowStagedIndexLock.v1';
 function resolveGitExecutable() {
     const configured = process.env.ATM_GIT_EXECUTABLE?.trim();
@@ -55,14 +56,18 @@ export function inspectForeignStagedTasksForCloseWindow(input) {
     const expected = new Set(uniqueSorted(input.expectedStageFiles));
     const stagedFiles = readStagedFiles(input.cwd);
     const unexpected = stagedFiles.filter((filePath) => !expected.has(filePath));
+    const ownership = inspectGitIndexOwnership({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        stagedFiles: unexpected
+    });
     const grouped = new Map();
-    for (const filePath of unexpected) {
-        const foreignTaskId = extractGovernanceTaskId(filePath);
-        if (!foreignTaskId || foreignTaskId === normalizeTaskId(input.taskId))
+    for (const entry of ownership.foreignActiveStaged) {
+        if (!entry.ownerTaskId)
             continue;
-        const bucket = grouped.get(foreignTaskId) ?? [];
-        bucket.push(filePath);
-        grouped.set(foreignTaskId, bucket);
+        const bucket = grouped.get(entry.ownerTaskId) ?? [];
+        bucket.push(entry.path);
+        grouped.set(entry.ownerTaskId, bucket);
     }
     return [...grouped.entries()].map(([foreignTaskId, files]) => {
         const uniqueFiles = uniqueSorted(files);
