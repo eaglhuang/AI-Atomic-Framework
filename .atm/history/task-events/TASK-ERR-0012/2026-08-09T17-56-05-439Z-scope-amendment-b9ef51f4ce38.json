@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T17-56-05-439Z-scope-amendment-b9ef51f4ce38",
+  "taskId": "TASK-ERR-0012",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0012.json",
+  "taskSha256": "sha256:ec3c41c2e51acf301abc1d3ae816e87cd300dbe9a9b1e7587755cef9a507c437",
+  "createdAt": "2026-08-09T17:56:05.439Z",
+  "command": "node atm.mjs tasks scope repair --task TASK-ERR-0012 --actor codex-gpt-5.4-mini --add \"packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js,packages/cli/dist/commands/hook/pre-commit/implementation.js,release/atm-onefile/atm.mjs,release/atm-onefile/release-manifest.json,release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js,release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js,release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts,release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts,release/atm-root-drop/release-manifest.json\" --reason \"Admit only the sealed runner receipt inventory outputs declared by the authoritative task card.\" --emergency-approval EMG-TASK-ERR-0012-8c361a0923 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Admit only the sealed runner receipt inventory outputs declared by the authoritative task card."
+  }
+}

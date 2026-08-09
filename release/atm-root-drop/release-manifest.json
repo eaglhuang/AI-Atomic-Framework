@@ -1785,6 +1785,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/generated-residue-policy.test.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/generated-residue-policy.test.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js",
@@ -1872,6 +1873,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gate.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gates.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gates.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/generated-residue-policy.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/generated-residue-policy.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.js",
@@ -4976,6 +4978,8 @@
     "release/atm-root-drop/tests/cli/receipt-bound-shared-delivery-commit.test.ts",
     "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
     "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
+    "release/atm-root-drop/tests/cli/released-residue-transaction.test.ts",
+    "release/atm-root-drop/tests/cli/released-wip-reclaim-transaction.test.ts",
     "release/atm-root-drop/tests/cli/residue-status.test.ts",
     "release/atm-root-drop/tests/cli/restricted-execution-gateway.test.ts",
     "release/atm-root-drop/tests/cli/rft-atomization-metrics.test.ts",
@@ -5425,8 +5429,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 705,
-    "unchanged": 4685,
+    "copied": 710,
+    "unchanged": 4684,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6765,7 +6769,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:5f8685dbb35f8f07c78fb3fd3b00bc68dd5e59b25e4cdcb4aec909db6078c25b"
+    "digest": "sha256:64f6b5d38096e311c0045b93d4473a07d1b97dbf551d5a1edf855f8f93001083"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -8524,6 +8528,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/generated-residue-policy.test.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/generated-residue-policy.test.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js",
@@ -8611,6 +8616,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gate.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gates.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gates.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/generated-residue-policy.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/generated-residue-policy.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.js",
@@ -11715,6 +11721,8 @@
       "release/atm-root-drop/tests/cli/receipt-bound-shared-delivery-commit.test.ts",
       "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
       "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
+      "release/atm-root-drop/tests/cli/released-residue-transaction.test.ts",
+      "release/atm-root-drop/tests/cli/released-wip-reclaim-transaction.test.ts",
       "release/atm-root-drop/tests/cli/residue-status.test.ts",
       "release/atm-root-drop/tests/cli/restricted-execution-gateway.test.ts",
       "release/atm-root-drop/tests/cli/rft-atomization-metrics.test.ts",
@@ -12167,34 +12175,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:b87296c3ccb4fff6883df6d23fe8e3c8bbb85076a9fb3a940663f1217caa9189",
-  "sealedSourceCommit": "c826b29a5a9d5a91ea8f352fd00b4c2a00eb1f0d",
+  "buildInputsTreeHash": "sha256:a1608123e7d65b3a91f1ae1acbff8eae53929421a88ae316a5ed6e922fbb4b1e",
+  "sealedSourceCommit": "2fc9a88378037059a7a76438655b3f951beeafa4",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:16970cb03145c69c9319f050e62c2d2e4e345a453cb273a1167ef755f935101c",
-  "tsBuildCacheDigest": "sha256:481a4e5fa8a906057f2f84d74a3766203c29d434edc8ed9beb037cdbcfd815ab",
+  "incrementalPlanDigest": "sha256:e3b36015e4d6013c4f05b49dc4ee4c81c3120d1c8b518d10eb685b6f8b16980a",
+  "tsBuildCacheDigest": "sha256:c0a3e16b2a721f300dac5878d63f000aa222921d51583e49cb9021d4dfb8be1d",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "worktreeSetup",
-    "dominantPhaseMs": 10239,
-    "totalElapsedMs": 24036,
-    "dominanceRatio": 0.426,
-    "phaseMedianMs": 821,
-    "phaseP95Ms": 10239,
+    "dominantPhaseMs": 11853,
+    "totalElapsedMs": 29941,
+    "dominanceRatio": 0.3959,
+    "phaseMedianMs": 1008,
+    "phaseP95Ms": 11853,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 48,
-    "skipDecision": 45,
-    "worktreeSetup": 10239,
-    "typescriptBuild": 5745,
-    "rootDropReleaseAssembly": 3038,
-    "onefileReleaseAssembly": 821,
-    "artifactSync": 1796,
+    "inputHashCalculation": 40,
+    "skipDecision": 39,
+    "worktreeSetup": 11853,
+    "typescriptBuild": 7668,
+    "rootDropReleaseAssembly": 2917,
+    "onefileReleaseAssembly": 1008,
+    "artifactSync": 1865,
     "cleanup": 0,
-    "totalElapsed": 24036
+    "totalElapsed": 29941
   }
 }
