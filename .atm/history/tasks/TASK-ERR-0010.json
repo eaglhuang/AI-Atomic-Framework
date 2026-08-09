@@ -186,8 +186,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T12-27-46-541Z-claim-4ce6002d494d",
-  "lastTransitionAt": "2026-08-09T12:27:46.541Z",
+  "lastTransitionId": "2026-08-09T12-59-47-898Z-renew-fb505e7f789e",
+  "lastTransitionAt": "2026-08-09T12:59:47.898Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T12:27:40.308Z",
@@ -196,8 +196,8 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-c8ce32850235",
     "claimedAt": "2026-08-09T12:27:40.317Z",
-    "heartbeatAt": "2026-08-09T12:27:40.317Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-08-09T12:59:47.182Z",
+    "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/TASK-ERR-0010.json",
       ".atm/history/evidence/TASK-ERR-0010.*",
@@ -210,10 +210,9 @@
       "tests/cli/git-commit-task-scoped-staging.test.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260809122654-codex-gpt-5.4-mini-51163d4aec",
-      "status": "active",
+      "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809122654-codex-gpt-5.4-mini-51163d4aec\""
     }
@@ -258,26 +257,27 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-049a02c0d5777e0a",
-    "ticketDigest": "sha256:049a02c0d5777e0a7b5554387fb8a89739f27bf0d4fbf717ae763c5ac08cc724",
+    "ticketId": "wat-193a213718bb0945",
+    "ticketDigest": "sha256:193a213718bb09451691ab1e369a9fea64832e31440266ff8a662157ba039f57",
     "taskId": "TASK-ERR-0010",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260809122654-codex-gpt-5.4-mini-51163d4aec",
     "claimGeneration": "lease-c8ce32850235",
-    "issuedAt": "2026-08-09T12:27:40.317Z",
-    "expiresAt": "2026-08-09T12:57:40.317Z",
-    "scopeDigest": "sha256:7b4931c95481cc733d46277e7c6b075244733a85be60d96906c2a011122430ea",
+    "issuedAt": "2026-08-09T12:59:47.182Z",
+    "expiresAt": "2026-08-09T13:59:47.182Z",
+    "scopeDigest": "sha256:0937af98567496dcdd4bd678ae58bca98e33869e3000b05beb7a614ad226d4fb",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-09T12:27:40.317Z"
+      "selectedAt": "2026-08-09T12:59:47.182Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-ERR-0010.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-ERR-0010/**",
           ".atm/history/tasks/TASK-ERR-0010.json",
           "packages/cli/src/commands/git-index-ownership.ts",
@@ -287,7 +287,7 @@
           "packages/cli/src/commands/tasks/close-window-lock.ts",
           "tests/cli/git-commit-task-scoped-staging.test.ts"
         ],
-        "digest": "sha256:d851bd7c8e6beeffeb63da964c860904763049f6e679f8085afcbeb4c9c97d87"
+        "digest": "sha256:d771ac5f14bd0a376a2ad5998aea4f5873c0ae0726fa4ec8b4a16ff8385eb6dc"
       },
       {
         "kind": "lifecycle-operation",
