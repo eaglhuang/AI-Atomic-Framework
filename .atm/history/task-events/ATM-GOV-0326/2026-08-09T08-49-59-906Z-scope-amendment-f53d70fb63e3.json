@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T08-49-59-906Z-scope-amendment-f53d70fb63e3",
+  "taskId": "ATM-GOV-0326",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-20260809",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0326.json",
+  "taskSha256": "sha256:81ae80998e4261fa6f522963b038a15ca047b7ff75b517e1127699eac52c0a0c",
+  "createdAt": "2026-08-09T08:49:59.906Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0326 --actor codex-captain-20260809 --add \"packages/cli/src/commands/taskflow/close-orchestration.ts,packages/cli/src/commands/taskflow/implementation.ts,packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

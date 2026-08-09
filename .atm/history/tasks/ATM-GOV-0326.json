@@ -1,0 +1,319 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0326",
+  "title": "Reconcile planning target ledger projection and closure authority",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0325"
+  ],
+  "acceptance": [
+    "ACC-1: final validator 只能讀 planning-sealed 86-row authority 或其 digest-bound imported projection；716/660-byte shadow artifact 無法宣告完成。",
+    "ACC-2: 0313、0314、0315、0316、0317、0324 與 affected cards 經 `tasks status`／`taskflow diagnose` 得到合法 correction/reopen/reconcile disposition，禁止直接 reset。",
+    "ACC-3: source card、target ledger、projection、closure packet 的 task ID、status、delivery SHA、validation digest、close digest 一致；任何 stale/missing/conflicting 維持 not-complete。",
+    "ACC-4: 產生 `atm.authorityReconciliationReceipt.v1`，列出 canonical/retired authority、digest、reader paths、migration 與 rollback。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "schemas/governance/cross-authority-closeback.schema.json",
+    "tests/cli/cross-authority-closeback-authority.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/import-task.ts",
+    "packages/cli/src/commands/tasks/planning-root-authorship.ts",
+    "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "schemas/governance/cross-authority-closeback.schema.json",
+    "scripts/validate-taskflow-close-atomicity.ts",
+    "tests/cli/cross-authority-closeback-authority.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/cross-authority-closeback-authority.test.ts",
+    "node --strip-types scripts/validate-taskflow-close-atomicity.ts --mode validate"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-candidate-while-retaining-red-shadow-authority-fixture",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-cross-authority-closeback",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-cli-command-router-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0326-reconcile-planning-target-ledger-projection-and-closure-authority.task.md",
+    "sectionTitle": "ATM-GOV-0326",
+    "headingLine": 69,
+    "hash": "e6935418ebc25257",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0326-reconcile-planning-target-ledger-projection-and-closure-authority.task.md",
+      "planningCommitSha": "cde7a22a32d019fdb23741942797e888a389323b",
+      "contentDigest": "sha256:e6935418ebc252574dc8ecadbf2592aacd106acb417c580ececa3b37cac94143",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T09:09:39.912Z"
+    }
+  },
+  "importedAt": "2026-08-09T09:09:39.912Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0325"
+    ],
+    "startConditions": [
+      "Evidence freeze digest is sealed and current HEAD still matches its declared candidate.",
+      "Planning authority is available at C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization."
+    ],
+    "softRelations": [
+      "ATM-GOV-0327"
+    ],
+    "changedPublicSeams": [
+      "atm.crossAuthorityCloseback.v1",
+      "atm.authorityReconciliationReceipt.v1"
+    ],
+    "causalImpactEdges": [
+      "planning-source-authority",
+      "target-ledger-projection",
+      "closure-packet-authority"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-objective-matrix",
+      "target-task-ledger",
+      "planning-source-cards"
+    ],
+    "validatorReferences": [
+      "validate-task-import",
+      "validate-taskflow-close-atomicity",
+      "validate-git-head-evidence"
+    ],
+    "phaseOwner": "correction-wave-1"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_cross_authority_single_source_0326",
+      "targetGroupId": null,
+      "semanticKey": "cross_authority_single_source",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "planning-source-authority",
+        "target-ledger-projection",
+        "closure-packet-authority"
+      ],
+      "expectedRedPredicate": "a target shadow matrix or stale planning mirror cannot produce completion",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.crossAuthorityCloseback.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_cross_authority_single_source_0326"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_final_certification"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-captain-20260809",
+    "leaseId": "lease-1d5e23ef889f",
+    "claimedAt": "2026-08-09T08:37:18.641Z",
+    "heartbeatAt": "2026-08-09T09:10:58.057Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0326.*",
+      ".atm/history/task-events/ATM-GOV-0326/**",
+      ".atm/history/tasks/ATM-GOV-0326.json",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/planning-root-authorship.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "scripts/validate-taskflow-close-atomicity.ts",
+      "tests/cli/cross-authority-closeback-authority.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260809083719-codex-captain-20260809-b10112bd4f",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809083719-codex-captain-20260809-b10112bd4f\""
+    }
+  },
+  "owner": "codex-captain-20260809",
+  "startedAt": "2026-08-09T08:37:18.641Z",
+  "startedBySessionId": "session-20260809083718-codex-captain-20260809-ATM-GOV-0326-199653ddf7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0326",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0326.*",
+      ".atm/history/task-events/ATM-GOV-0326/**",
+      ".atm/history/tasks/ATM-GOV-0326.json",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "packages/cli/src/commands/tasks/planning-root-authorship.ts",
+      "schemas/governance/cross-authority-closeback.schema.json",
+      "scripts/validate-taskflow-close-atomicity.ts",
+      "tests/cli/cross-authority-closeback-authority.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0326-reconcile-planning-target-ledger-projection-and-closure-authority.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0326-reconcile-planning-target-ledger-projection-and-closure-authority.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "0909538ac7d57a7822d21d0652a6880ab5df2ae696135a0c5014519248203cbf",
+    "actorId": "codex-captain-20260809",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260809083719-codex-captain-20260809-b10112bd4f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809083719-codex-captain-20260809-b10112bd4f\""
+    },
+    "createdAt": "2026-08-09T08:37:28.136Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-09T09-10-58-675Z-renew-2738254e5c05",
+  "lastTransitionAt": "2026-08-09T09:10:58.675Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-00e065d6d671c0b8",
+    "ticketDigest": "sha256:00e065d6d671c0b8b1bb5354b094fc962401ab1e3e01713af80d072bd3082941",
+    "taskId": "ATM-GOV-0326",
+    "origin": "claim",
+    "actorId": "codex-captain-20260809",
+    "laneSessionId": "lane-20260809083719-codex-captain-20260809-b10112bd4f",
+    "claimGeneration": "lease-1d5e23ef889f",
+    "issuedAt": "2026-08-09T09:10:58.057Z",
+    "expiresAt": "2026-08-09T09:40:58.057Z",
+    "scopeDigest": "sha256:d27267a9aec3259aadd8fd446a8b946f509c3df826af8408f7ef468946a10db7",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-09T09:10:58.057Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0326.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0326/**",
+          ".atm/history/tasks/ATM-GOV-0326.json",
+          "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+          "packages/cli/src/commands/taskflow/cross-authority-closeback.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
+          "packages/cli/src/commands/tasks/import-task.ts",
+          "packages/cli/src/commands/tasks/planning-root-authorship.ts",
+          "schemas/governance/cross-authority-closeback.schema.json",
+          "scripts/validate-taskflow-close-atomicity.ts",
+          "tests/cli/cross-authority-closeback-authority.test.ts"
+        ],
+        "digest": "sha256:67624ed68856925afbd84aa0fa7439681160138928ba8db23c0810c7c63e344c"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  }
+}
