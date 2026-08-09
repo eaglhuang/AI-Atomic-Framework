@@ -227,7 +227,11 @@ export function runPreCommitHook(cwd: string) {
     findings: [...transactionReconciledResidueReport.blockAndExplain, ...transactionReconciledResidueReport.manualReview.filter((entry) => isActionableManualResidue(entry.path))],
     stagedFiles,
     committingTaskId: residueTaskId,
-    activeLockTaskIds: new Set(readActiveTaskDirectionLocks(root).map((lock) => lock.taskId.trim().toUpperCase())),
+    activeLockTaskIds: new Set(
+      readActiveTaskDirectionLocks(root)
+        .map((lock) => typeof lock.taskId === 'string' ? lock.taskId.trim().toUpperCase() : '')
+        .filter(Boolean),
+    ),
     hasActiveClaim: (ownerTaskId: string) => {
       try {
         const taskDocument = JSON.parse(readFileSync(path.join(root, '.atm', 'history', 'tasks', `${ownerTaskId}.json`), 'utf8')) as Record<string, unknown>;
