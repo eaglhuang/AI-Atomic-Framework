@@ -240,21 +240,19 @@ export function pathMatchesScope(filePath: string, allowedFiles: readonly string
   const normalizedFile = normalizePath(filePath).toLowerCase();
   return allowedFiles.some((candidate) => {
     const normalizedCandidate = normalizePath(candidate).toLowerCase();
-    if (normalizedCandidate.endsWith('/**')) {
-      const prefix = normalizedCandidate.slice(0, -3);
-      return normalizedFile === prefix || normalizedFile.startsWith(`${prefix}/`);
+    if (normalizedCandidate.includes('*')) {
+      const escaped = normalizedCandidate
+        .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+        .replace(/\*\*/g, '__ATM_DOUBLE_STAR__')
+        .replace(/\*/g, '[^/]*')
+        .replace(/__ATM_DOUBLE_STAR__/g, '.*');
+      return new RegExp(`^${escaped}$`).test(normalizedFile);
     }
-    if (normalizedCandidate.endsWith('/*')) {
-      const prefix = normalizedCandidate.slice(0, -2);
-      const remainder = normalizedFile.startsWith(`${prefix}/`) ? normalizedFile.slice(prefix.length + 1) : '';
-      return remainder.length > 0 && !remainder.includes('/');
-    }
-    if (normalizedCandidate.endsWith('.*')) {
-      const prefix = normalizedCandidate.slice(0, -2);
-      const remainder = normalizedFile.startsWith(`${prefix}.`) ? normalizedFile.slice(prefix.length + 1) : '';
-      return remainder.length > 0 && !remainder.includes('/');
-    }
-    return normalizedFile === normalizedCandidate;
+    if (!normalizedCandidate) return false;
+    if (normalizedFile === normalizedCandidate) return true;
+    if (normalizedCandidate.endsWith('/')) return normalizedFile.startsWith(normalizedCandidate);
+    if (!/\.[a-z0-9]+$/i.test(normalizedCandidate)) return normalizedFile.startsWith(`${normalizedCandidate}/`);
+    return false;
   });
 }
 
