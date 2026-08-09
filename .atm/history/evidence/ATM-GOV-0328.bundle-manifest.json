@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0328",
+  "updatedAt": "2026-08-09T10:24:14.389Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types scripts/run-validators.ts standard --filter validate-skew-matrix --json",
+    "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+    "validate:test-facade"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4608582129bd51282ea88af8846cceafc2c06b8b0b4649c18d6aeb7ca2a43539",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/test-facade-timeout-policy.test.ts"
+      ],
+      "generatedAt": "2026-08-09T10:04:06.677Z",
+      "startedAt": "2026-08-09T10:04:06.320Z",
+      "finishedAt": "2026-08-09T10:04:06.677Z",
+      "durationMs": 357,
+      "runnerKind": "dev-source",
+      "sourceCommit": "928d04716c2d4a314e5303e7c4d2712c36076e8d",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:test-facade",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8ff7eebf013676e940b88b591179b7730add9769632b51fc3a9af55717be4903",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:test-facade"
+      ],
+      "generatedAt": "2026-08-09T10:07:59.724Z",
+      "startedAt": "2026-08-09T10:04:18.751Z",
+      "finishedAt": "2026-08-09T10:07:59.724Z",
+      "durationMs": 220973,
+      "runnerKind": "dev-source",
+      "sourceCommit": "928d04716c2d4a314e5303e7c4d2712c36076e8d",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-validators.ts standard --filter validate-skew-matrix --json --performance-output docs/reports/test-facade-performance-margin.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b164b72c068804fd49a96e2e7649a4fbcf5889707411f383d348f3261d1ee04d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-09T10:11:25.112Z",
+      "startedAt": "2026-08-09T10:08:08.227Z",
+      "finishedAt": "2026-08-09T10:11:25.112Z",
+      "durationMs": 196885,
+      "runnerKind": "dev-source",
+      "sourceCommit": "928d04716c2d4a314e5303e7c4d2712c36076e8d",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-validators.ts standard --filter validate-skew-matrix --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:448d845823c6fdc39b15dc4d73dc60ba5116207ac299689c00a4f51046c0c6ce",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/run-validators.ts standard --filter validate-skew-matrix --json"
+      ],
+      "generatedAt": "2026-08-09T10:24:14.388Z",
+      "startedAt": "2026-08-09T10:20:57.030Z",
+      "finishedAt": "2026-08-09T10:24:14.388Z",
+      "durationMs": 197358,
+      "runnerKind": "dev-source",
+      "sourceCommit": "148ea422056b40cdac94f4029ae50ca2d2491582",
+      "cached": false
+    }
+  ],
+  "artifactPaths": [
+    "docs/reports/test-facade-performance-margin.json"
+  ]
+}
