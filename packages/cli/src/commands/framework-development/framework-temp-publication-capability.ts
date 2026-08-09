@@ -94,6 +94,7 @@ function toCapability(cwd: string, lock: FrameworkTempLockProjection): Framework
     // callers cannot accidentally publish bytes without their receipt.
     allowedFiles: [
       ...lock.files.map((scope) => normalizeDirectoryScope(cwd, scope)),
+      `.atm/history/evidence/${lock.workItemId}.runner-sync-receipt.json`,
       ...(lock.linkedTaskId
         ? [`.atm/history/evidence/${lock.linkedTaskId}.runner-sync-receipt.json`]
         : []),

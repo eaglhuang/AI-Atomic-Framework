@@ -66,6 +66,9 @@ assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
   '.atm/history/evidence/ATM-GOV-0342.runner-sync-receipt.json',
 ]), true);
 assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
+  `.atm/history/evidence/${taskId}.runner-sync-receipt.json`,
+]), true, 'a temporary build receipt must always be publishable by its own lock');
+assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
   '.atm/history/evidence/ATM-GOV-0344.runner-sync-receipt.json',
 ]), true, 'queue/receipt-bound terminal continuation must be publishable without reopening its task');
 
