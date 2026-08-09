@@ -13,24 +13,32 @@
     "ACC-2: Protected staged bytes from a released task are either preserved byte-identically by the owning transaction or produce a broker ticket/recovery snapshot. An unrelated scoped commit never needs a stage override merely because no active owner remains.",
     "ACC-3: A true active foreign owner remains protected and queues or fails closed as before; the repair does not widen commits or weaken index isolation.",
     "ACC-4: If WIP preservation cannot create a verified commit SHA, release fails closed and the claim plus durable WIP ownership remain intact.",
-    "ACC-5: Same-task reclaim restores durable WIP ownership without converting it to unowned/foreign dirty WIP; discard remains explicit and destructive."
+    "ACC-5: Same-task reclaim restores durable WIP ownership without converting it to unowned/foreign dirty WIP; discard remains explicit and destructive.",
+    "ACC-6: A Git-head receipt is advisory at close only when its latest parseable record durably identifies the closing task. Missing, malformed, stale, or foreign receipts remain blocking; claim admission and close use the same reader."
   ],
   "deliverables": [
     "packages/cli/src/commands/tasks/generated-residue-policy.ts",
     "packages/cli/src/commands/tasks/release-wip-transaction.ts",
     "packages/cli/src/commands/tasks/claim-work-admission.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+    "packages/cli/src/commands/git-head-evidence.ts",
     "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
     "packages/cli/src/commands/hook/pre-commit/implementation.ts",
     "release/atm-onefile/atm.mjs",
     "release/atm-onefile/release-manifest.json",
     "release/atm-root-drop/release-manifest.json",
     "tests/cli/released-residue-transaction.test.ts",
-    "tests/cli/released-wip-reclaim-transaction.test.ts"
+    "tests/cli/released-wip-reclaim-transaction.test.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
   ],
   "scopePaths": [
     "packages/cli/src/commands/tasks/release-wip-transaction.ts",
     "packages/cli/src/commands/tasks/generated-residue-policy.ts",
     "packages/cli/src/commands/tasks/claim-work-admission.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/git-head-evidence.ts",
     "packages/cli/src/commands/git-index-ownership.ts",
     "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
     "packages/cli/src/commands/hook/pre-commit/implementation.ts",
@@ -45,7 +53,8 @@
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
     "release/atm-root-drop/release-manifest.json",
     "tests/cli/released-residue-transaction.test.ts",
-    "tests/cli/released-wip-reclaim-transaction.test.ts"
+    "tests/cli/released-wip-reclaim-transaction.test.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/released-residue-transaction.test.ts",
@@ -89,6 +98,10 @@
         "packages/cli/src/commands/tasks/release-wip-transaction.ts",
         "packages/cli/src/commands/tasks/generated-residue-policy.ts",
         "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "packages/cli/src/commands/git-head-evidence.ts",
         "packages/cli/src/commands/git-index-ownership.ts",
         "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
         "packages/cli/src/commands/hook/pre-commit/implementation.ts",
@@ -103,7 +116,8 @@
         "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
         "release/atm-root-drop/release-manifest.json",
         "tests/cli/released-residue-transaction.test.ts",
-        "tests/cli/released-wip-reclaim-transaction.test.ts"
+        "tests/cli/released-wip-reclaim-transaction.test.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
       ]
     }
   ],
@@ -112,20 +126,20 @@
   "source": {
     "planPath": "error-governance/tasks/TASK-ERR-0012-released-residue-transaction-and-commit-readiness.task.md",
     "sectionTitle": "TASK-ERR-0012",
-    "headingLine": 116,
-    "hash": "26143de78f8399db",
+    "headingLine": 131,
+    "hash": "9a6f4dcd4b09543f",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "error-governance/tasks/TASK-ERR-0012-released-residue-transaction-and-commit-readiness.task.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:26143de78f8399db34bf35b8e3ea92f98d17d345dfec2731265b16c672e21ce0",
+      "contentDigest": "sha256:9a6f4dcd4b09543f005f1c455d97e70986dc4a609fed35e26af145042634fe3d",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-09T17:56:03.022Z"
+      "sealedAt": "2026-08-09T18:05:13.774Z"
     }
   },
-  "importedAt": "2026-08-09T17:56:03.022Z",
+  "importedAt": "2026-08-09T18:05:13.774Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
@@ -202,6 +216,24 @@
       "dependencyEdge": null,
       "contractEdge": "released-wip-continuity",
       "resourceKey": null
+    },
+    {
+      "caseId": "test_git_head_receipt_close_ownership_0012",
+      "targetGroupId": null,
+      "semanticKey": "latest_git_head_receipt_is_advisory_only_for_its_current_closing_task",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "commit-readiness-to-closeback"
+      ],
+      "expectedRedPredicate": "a current task's generated Git-head receipt blocks its own close, or a foreign or malformed receipt is treated as close-owned",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "git-head-receipt-ownership",
+      "resourceKey": null
     }
   ],
   "requiredTestCaseIds": [
@@ -238,7 +270,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-90979fed9752",
     "claimedAt": "2026-08-09T17:20:05.008Z",
-    "heartbeatAt": "2026-08-09T17:56:12.591Z",
+    "heartbeatAt": "2026-08-09T18:05:24.714Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-ERR-0012.*",
@@ -247,14 +279,19 @@
       "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
       "packages/cli/dist/commands/hook/pre-commit/implementation.js",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
       "packages/cli/src/commands/git-index-ownership.ts",
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
       "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
       "packages/cli/src/commands/tasks/foreign-dirty-wip-admission.ts",
       "packages/cli/src/commands/tasks/generated-residue-policy.ts",
       "packages/cli/src/commands/tasks/release-orchestrator.ts",
       "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
@@ -291,14 +328,19 @@
       "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
       "packages/cli/dist/commands/hook/pre-commit/implementation.js",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
       "packages/cli/src/commands/git-index-ownership.ts",
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
       "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
       "packages/cli/src/commands/tasks/foreign-dirty-wip-admission.ts",
       "packages/cli/src/commands/tasks/generated-residue-policy.ts",
       "packages/cli/src/commands/tasks/release-orchestrator.ts",
       "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
@@ -331,26 +373,26 @@
     "createdAt": "2026-08-09T17:20:15.239Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-09T17-56-12-922Z-renew-7224c1f072a4",
-  "lastTransitionAt": "2026-08-09T17:56:12.922Z",
+  "lastTransitionId": "2026-08-09T18-05-25-350Z-renew-53698892ae69",
+  "lastTransitionAt": "2026-08-09T18:05:25.350Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-64b3a38ce31d132c",
-    "ticketDigest": "sha256:64b3a38ce31d132c7f876455a3d0d8288c8fbb1727e01ee9f5849d31179bb2ce",
+    "ticketId": "wat-ebbc72287c5a9ca4",
+    "ticketDigest": "sha256:ebbc72287c5a9ca4592801f061461fffd15c2ff08c77c887c31b70ce5d5841d0",
     "taskId": "TASK-ERR-0012",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260809172005-codex-gpt-5.4-mini-9daaf416bd",
     "claimGeneration": "lease-90979fed9752",
-    "issuedAt": "2026-08-09T17:56:12.591Z",
-    "expiresAt": "2026-08-09T18:26:12.591Z",
-    "scopeDigest": "sha256:d36ba6f397b6fd388fec3a839635528297ba6c251bae3ae88842d4306c771a6d",
+    "issuedAt": "2026-08-09T18:05:24.714Z",
+    "expiresAt": "2026-08-09T18:35:24.714Z",
+    "scopeDigest": "sha256:35f7558d9a45337aceaf2cb2c12b45b8df7dcc889a6400e6e73be228a1d79bc9",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-09T17:56:12.591Z"
+      "selectedAt": "2026-08-09T18:05:24.714Z"
     },
     "grants": [
       {
@@ -363,14 +405,19 @@
           "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
           "packages/cli/dist/commands/hook/pre-commit/implementation.js",
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-head-evidence.ts",
           "packages/cli/src/commands/git-index-ownership.ts",
           "packages/cli/src/commands/hook/pre-commit/implementation.ts",
           "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+          "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
           "packages/cli/src/commands/tasks/claim-work-admission.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator.ts",
           "packages/cli/src/commands/tasks/foreign-dirty-wip-admission.ts",
           "packages/cli/src/commands/tasks/generated-residue-policy.ts",
           "packages/cli/src/commands/tasks/release-orchestrator.ts",
           "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+          "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
           "release/atm-onefile/atm.mjs",
           "release/atm-onefile/release-manifest.json",
           "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
@@ -381,7 +428,7 @@
           "tests/cli/released-residue-transaction.test.ts",
           "tests/cli/released-wip-reclaim-transaction.test.ts"
         ],
-        "digest": "sha256:d17f0e8492ef1061a17b2ad634d8830225a8e0eb5936a16e2a4f8508ecb27ddf"
+        "digest": "sha256:ca66106f2de3d984d61963d379aef9f3ee2467a59453c17adc2bd244d024d4ad"
       },
       {
         "kind": "lifecycle-operation",

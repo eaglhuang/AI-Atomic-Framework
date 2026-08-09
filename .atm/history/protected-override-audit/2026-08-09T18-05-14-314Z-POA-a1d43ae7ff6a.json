@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-a1d43ae7ff6a",
+  "recordedAt": "2026-08-09T18:05:14.314Z",
+  "actorId": null,
+  "taskId": "TASK-ERR-0012",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\error-governance\\tasks\\TASK-ERR-0012-released-residue-transaction-and-commit-readiness.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-GLOBAL-e117abc6c1",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T18-05-14-312Z-EMG-GLOBAL-e117abc6c1.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

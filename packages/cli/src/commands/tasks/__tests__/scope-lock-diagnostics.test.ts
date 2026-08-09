@@ -3,6 +3,9 @@ import {
   buildCloseScopedDiffIsolation,
   evaluateFrameworkCloseDirtyGuard
 } from '../scope-lock-diagnostics.ts';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 function fail(message: string): never {
   console.error(`[scope-lock-diagnostics.test] ${message}`);
@@ -86,6 +89,46 @@ const historicalEvidenceGuard = evaluateFrameworkCloseDirtyGuard({
 assert(historicalEvidenceGuard.ok, 'allowlisted same-task evidence must not block historical-delivery close');
 assert(historicalEvidenceGuard.governanceTrackedDirtyFiles.length === 0, 'allowlisted same-task evidence must leave governance blockers empty');
 assert(historicalEvidenceGuard.advisoryTrackedDirtyFiles.includes('.atm/history/evidence/TASK-CID-0056.json'), 'allowlisted same-task evidence must become advisory');
+
+const receiptFixture = mkdtempSync(path.join(os.tmpdir(), 'atm-git-head-owner-'));
+const receiptPath = path.join(receiptFixture, '.atm/history/evidence/git-head.jsonl');
+mkdirSync(path.dirname(receiptPath), { recursive: true });
+function writeReceipt(taskId: string | null) {
+  const details = taskId ? { taskId } : {};
+  writeFileSync(receiptPath, `${JSON.stringify({ evidence: [{ details }] })}\n`, 'utf8');
+}
+try {
+  writeReceipt('TASK-CID-0056');
+  const currentReceiptGuard = evaluateFrameworkCloseDirtyGuard({
+    cwd: receiptFixture,
+    taskId: 'TASK-CID-0056',
+    taskDeclaredFiles: declaredFiles,
+    trackedDirtyFiles: ['.atm/history/evidence/git-head.jsonl']
+  });
+  assert(currentReceiptGuard.ok, 'latest receipt for the closing task must be advisory');
+  assert(currentReceiptGuard.advisoryTrackedDirtyFiles.includes('.atm/history/evidence/git-head.jsonl'), 'current receipt must be reported as advisory');
+
+  writeReceipt('TASK-FOREIGN-0001');
+  const foreignReceiptGuard = evaluateFrameworkCloseDirtyGuard({
+    cwd: receiptFixture,
+    taskId: 'TASK-CID-0056',
+    taskDeclaredFiles: declaredFiles,
+    trackedDirtyFiles: ['.atm/history/evidence/git-head.jsonl']
+  });
+  assert(!foreignReceiptGuard.ok, 'foreign latest receipt must remain blocking');
+  assert(foreignReceiptGuard.governanceTrackedDirtyFiles.includes('.atm/history/evidence/git-head.jsonl'), 'foreign receipt must stay governance-blocking');
+
+  writeFileSync(receiptPath, '{not-json}\n', 'utf8');
+  const malformedReceiptGuard = evaluateFrameworkCloseDirtyGuard({
+    cwd: receiptFixture,
+    taskId: 'TASK-CID-0056',
+    taskDeclaredFiles: declaredFiles,
+    trackedDirtyFiles: ['.atm/history/evidence/git-head.jsonl']
+  });
+  assert(!malformedReceiptGuard.ok, 'malformed latest receipt must remain blocking');
+} finally {
+  rmSync(receiptFixture, { recursive: true, force: true });
+}
 
 const isolation = buildCloseScopedDiffIsolation({
   cwd: process.cwd(),

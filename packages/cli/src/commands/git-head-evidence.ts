@@ -11,6 +11,26 @@ export const gitHeadEvidencePaths = {
 };
 export const gitHeadEvidencePath = gitHeadEvidencePaths.jsonl;
 
+/**
+ * Returns the task identity asserted by the newest parseable governed Git-head
+ * receipt.  Callers must treat null as unowned: a path name, an older record,
+ * or malformed JSON is never an ownership grant.
+ */
+export function readLatestGitHeadReceiptTaskId(cwd: string): string | null {
+  const receipt = path.join(cwd, gitHeadEvidencePaths.jsonl);
+  if (!existsSync(receipt)) return null;
+  try {
+    const entries = readFileSync(receipt, 'utf8').trim().split(/\r?\n/).filter(Boolean);
+    const latest = JSON.parse(entries.at(-1) ?? '{}') as {
+      evidence?: Array<{ details?: { taskId?: unknown } }>;
+    };
+    const taskId = latest.evidence?.[0]?.details?.taskId;
+    return typeof taskId === 'string' && taskId.trim() ? taskId.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 export interface GitDetails {
   commitSha: string | null;
   treeSha: string | null;

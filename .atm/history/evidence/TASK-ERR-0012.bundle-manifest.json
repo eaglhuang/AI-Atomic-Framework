@@ -1,13 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-ERR-0012",
-  "updatedAt": "2026-08-09T17:53:56.779Z",
+  "updatedAt": "2026-08-09T18:01:23.541Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types tests/cli/released-residue-transaction.test.ts",
     "node --strip-types tests/cli/released-wip-reclaim-transaction.test.ts",
     "typecheck",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -71,6 +72,22 @@
       "startedAt": "2026-08-09T17:53:21.969Z",
       "finishedAt": "2026-08-09T17:53:56.778Z",
       "durationMs": 34809,
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-09T18:01:23.540Z",
+      "startedAt": "2026-08-09T18:00:19.175Z",
+      "finishedAt": "2026-08-09T18:01:23.540Z",
+      "durationMs": 64365,
       "runnerKind": "unknown",
       "sourceCommit": null,
       "cached": false
