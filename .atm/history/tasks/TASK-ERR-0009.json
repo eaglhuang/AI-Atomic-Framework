@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0009",
   "title": "Bound git-head admission to the verified receipt owner",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -158,8 +158,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-09T12-05-19-175Z-renew-3dcc00841af2",
-  "lastTransitionAt": "2026-08-09T12:05:19.175Z",
+  "lastTransitionId": "2026-08-09T12-18-30-332Z-close-4a264257c699",
+  "lastTransitionAt": "2026-08-09T12:18:30.332Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T11:59:11.836Z",
@@ -168,7 +168,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-a73455447f0f",
     "claimedAt": "2026-08-09T11:59:11.841Z",
-    "heartbeatAt": "2026-08-09T12:05:18.838Z",
+    "heartbeatAt": "2026-08-09T12:18:30.329Z",
     "ttlSeconds": 3600,
     "files": [
       ".atm/history/evidence/TASK-ERR-0009.*",
@@ -182,13 +182,14 @@
       "tests/cli/commit-attribution-concurrency-gates.test.ts",
       "tests/cli/git-head-admission-owner-boundary.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260809115911-codex-gpt-5.4-mini-3dddc8946e",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809115911-codex-gpt-5.4-mini-3dddc8946e\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-09T11:59:11.841Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -302,5 +303,9 @@
     },
     "createdAt": "2026-08-09T11:59:21.923Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-09T12:18:30.329Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809115911-codex-gpt-5.4-mini-TASK-ERR-0009-267bda618e",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0009.closure-packet.json"
 }

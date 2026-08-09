@@ -1,0 +1,166 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ERR-0009",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a28ae7030deb441de986dbf2749608e81d3dee75",
+  "governedTreeSha": "d4e44570f88a5faf698b11a18304b7e1dedd952b",
+  "targetCommitDelta": {
+    "currentCommitSha": "a28ae7030deb441de986dbf2749608e81d3dee75",
+    "parentCommitShas": [
+      "a28ae7030deb441de986dbf2749608e81d3dee75"
+    ],
+    "governedTreeSha": "d4e44570f88a5faf698b11a18304b7e1dedd952b",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0328.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0328.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/evidence/TASK-ERR-0008.bundle-manifest.json",
+      ".atm/history/evidence/TASK-ERR-0008.json",
+      ".atm/history/evidence/TASK-ERR-0009.bundle-manifest.json",
+      ".atm/history/evidence/TASK-ERR-0009.json",
+      ".atm/history/tasks/ATM-GOV-0328.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/git-head-admission-owner-boundary.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:632d10fae4f8fab83eaa5aa23af40cd00b976e9ce338c5df6e3eb9ed3bc49171",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c920dbfa44da0987ea3f84fbbae7ad3919881a994eb0d33973f9e87ec1741e43",
+      "stderrSha256": "sha256:891b5b3963767296720c2a6567357bc52274080ea5f05b2acf613f94e524ec20",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-09T12:18:30.325Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ERR-0009.*",
+      ".atm/history/task-events/TASK-ERR-0009/**",
+      ".atm/history/tasks/TASK-ERR-0009.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/git-head-admission-owner-boundary.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/git-head-admission-owner-boundary.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ERR-0009.json",
+  "closedAt": "2026-08-09T12:18:30.325Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809115911-codex-gpt-5.4-mini-TASK-ERR-0009-267bda618e",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a3009dc8262c98bd13813d952eaca80dcccd8d36",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "tests/cli/git-head-admission-owner-boundary.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-ERR-0009.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T11-58-16-326Z-import-333c6593c137.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T11-58-57-982Z-import-6ab0f63c1d14.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T11-59-11-836Z-reserve-6f5040cd0e4d.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T11-59-11-838Z-promote-6ec724f3d7ed.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T11-59-21-906Z-claim-691ab907389f.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T11-59-51-884Z-scope-amendment-954b10cda18c.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T12-00-12-277Z-scope-amendment-bbaeaf71b566.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T12-00-31-504Z-scope-amendment-bd95a6652b4b.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T12-01-38-750Z-scope-amendment-87604d6ac1b8.json",
+      ".atm/history/task-events/TASK-ERR-0009/2026-08-09T12-05-19-175Z-renew-3dcc00841af2.json",
+      ".atm/history/tasks/TASK-ERR-0009.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

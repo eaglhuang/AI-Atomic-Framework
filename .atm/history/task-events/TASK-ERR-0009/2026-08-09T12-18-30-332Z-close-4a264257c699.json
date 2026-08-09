@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T12-18-30-332Z-close-4a264257c699",
+  "taskId": "TASK-ERR-0009",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809115911-codex-gpt-5.4-mini-TASK-ERR-0009-267bda618e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0009.json",
+  "taskSha256": "sha256:bb59136d8e7504bbd618605713aaf72a2a088a36f956ef8a6d5b0d5ba6b81638",
+  "createdAt": "2026-08-09T12:18:30.332Z",
+  "command": "node atm.mjs tasks close --task TASK-ERR-0009 --actor codex-gpt-5.4-mini --status done --historical-delivery a3009dc8262c98bd13813d952eaca80dcccd8d36",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260809115911-codex-gpt-5.4-mini-TASK-ERR-0009-267bda618e",
+    "closurePacketPath": ".atm/history/evidence/TASK-ERR-0009.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-09T12:18:30.325Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-ERR-0009.*",
+        ".atm/history/task-events/TASK-ERR-0009/**",
+        ".atm/history/tasks/TASK-ERR-0009.json",
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "tests/cli/commit-attribution-concurrency-gates.test.ts",
+        "tests/cli/git-head-admission-owner-boundary.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "tests/cli/commit-attribution-concurrency-gates.test.ts",
+        "tests/cli/git-head-admission-owner-boundary.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
