@@ -111,10 +111,13 @@ export function nextPublicationPhase(phase) {
  * It selects the receipt that actually names dirty runner artifacts, never an
  * unrelated task's evidence receipt.
  */
-export function inspectRunnerPublicationDisposition(cwd) {
+export function inspectRunnerPublicationDisposition(cwd, receiptRef) {
     const dirtyPaths = readDirtyPaths(cwd);
     const receipts = readRunnerReceipts(cwd);
-    const selected = receipts.find((candidate) => {
+    const requested = receiptRef ? normalizeReceiptRef(receiptRef) : null;
+    const selected = (requested
+        ? receipts.find((candidate) => candidate.path === requested)
+        : null) ?? receipts.find((candidate) => {
         const members = new Set(candidate.inventory.entries.map((entry) => entry.path));
         return dirtyPaths.some((entry) => members.has(entry));
     }) ?? receipts[0] ?? null;

@@ -453,7 +453,9 @@ export function validateRunnerSyncReleaseReceipt(input: {
   if (mismatches.length > 0) {
     throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID: receipt does not match queued runner-sync steward fields: ${mismatches.join(', ')}.`);
   }
-  const publication = inspectRunnerPublicationDisposition(input.cwd);
+  // Release is receipt-addressed; never let a different dirty temporary
+  // receipt replace the queue-head receipt during publication validation.
+  const publication = inspectRunnerPublicationDisposition(input.cwd, receiptRef);
   if (!publication.ok && publication.code) {
     throw new Error(`${publication.code}: receipt ${receiptRef} cannot release ${input.stewardWorkId} while its sealed output inventory is ${publication.report.disposition}. inventoryDigest=${publication.report.inventoryDigest}.`);
   }
