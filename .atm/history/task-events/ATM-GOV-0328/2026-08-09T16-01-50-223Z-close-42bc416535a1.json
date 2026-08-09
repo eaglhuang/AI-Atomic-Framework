@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T16-01-50-223Z-close-42bc416535a1",
+  "taskId": "ATM-GOV-0328",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809093444-codex-gpt-5.4-mini-ATM-GOV-0328-4f33bb07ba",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0328.json",
+  "taskSha256": "sha256:d139b57b2b1e9a6e4353ff3c3b327d662ac3f6ac5c00383f6891a19a8989a457",
+  "createdAt": "2026-08-09T16:01:50.223Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0328 --actor codex-gpt-5.4-mini --status done --historical-delivery 0ffcff9bc0a00b333b016d1639756293d7bda1f7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260809093444-codex-gpt-5.4-mini-ATM-GOV-0328-4f33bb07ba",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0328.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/run-validators.ts standard --filter validate-skew-matrix --json",
+      "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:test-facade"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-09T16:01:50.216Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+        ".atm/history/evidence/ATM-GOV-0328.*",
+        ".atm/history/task-events/ATM-GOV-0328/**",
+        ".atm/history/tasks/ATM-GOV-0328.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/",
+        "docs/reports/test-facade-performance-margin.json",
+        "packages/cli/dist",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+        "packages/core/src/lane/wip-ownership-transition.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "scripts/run-validators/implementation.ts",
+        "scripts/validate-skew-matrix.ts",
+        "scripts/validate-test-facade.ts",
+        "scripts/validators.config.json",
+        "tests/cli/pre-commit-evidence-context-parity.test.ts",
+        "tests/cli/runner-publication-reconciliation.test.ts",
+        "tests/cli/test-facade-timeout-policy.test.ts",
+        "tests/skew/skew-matrix.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+        "packages/core/src/lane/wip-ownership-transition.ts",
+        "scripts/run-validators/implementation.ts",
+        "scripts/validate-skew-matrix.ts",
+        "scripts/validate-test-facade.ts",
+        "scripts/validators.config.json",
+        "tests/cli/pre-commit-evidence-context-parity.test.ts",
+        "tests/cli/runner-publication-reconciliation.test.ts",
+        "tests/cli/test-facade-timeout-policy.test.ts",
+        "tests/skew/skew-matrix.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
