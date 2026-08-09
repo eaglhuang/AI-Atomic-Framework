@@ -162,6 +162,10 @@ export function readBrokerConflictResolutionArtifact(input: LegacyValue) {
 }
 
 export function assertNoBrokerConflictBeforeHookBypass(options: LegacyValue) {
+  // A deferred transaction commits through an isolated index. Foreign live
+  // entries therefore cannot cross the bypass boundary; evaluating them here
+  // would reject the preservation mechanism rather than protect ownership.
+  if (options.deferForeignStaged === true) return;
   const { cwd, taskId } = options;
   const crossTaskBlock = detectCrossTaskMutation(
     cwd,

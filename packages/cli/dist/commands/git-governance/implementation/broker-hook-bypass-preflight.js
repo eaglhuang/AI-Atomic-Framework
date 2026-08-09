@@ -108,6 +108,11 @@ export function readBrokerConflictResolutionArtifact(input) {
     return { artifactPath: relativePathFrom(input.cwd, artifactPath), artifact };
 }
 export function assertNoBrokerConflictBeforeHookBypass(options) {
+    // A deferred transaction commits through an isolated index. Foreign live
+    // entries therefore cannot cross the bypass boundary; evaluating them here
+    // would reject the preservation mechanism rather than protect ownership.
+    if (options.deferForeignStaged === true)
+        return;
     const { cwd, taskId } = options;
     const crossTaskBlock = detectCrossTaskMutation(cwd, taskId, "git commit --no-verify");
     if (!crossTaskBlock)

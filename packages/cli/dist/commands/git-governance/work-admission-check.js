@@ -1,8 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { readFrameworkTempLockProjection } from '../framework-development/framework-temp-lock-projection.js';
+import { frameworkTempPublicationCapabilityCovers, resolveFrameworkTempPublicationCapability, } from '../framework-development/framework-temp-publication-capability.js';
 import { checkWorkAdmissionTicket, createWorkAdmissionCoverageReceipt, issueWorkAdmissionTicket } from '../../../../core/dist/broker/work-admission-ticket.js';
-import { pathMatchesWriteScope } from '../../../../core/dist/broker/write-scope-policy.js';
 /**
  * Boundary adapter for the single claim-issued authority.  It deliberately
  * owns no policy: callers supply the observed operation/files and receive the
@@ -35,19 +34,21 @@ export function evaluateWorkAdmissionGate(input) {
 function issueFrameworkTempAdmissionTicket(input) {
     const now = input.now ?? new Date().toISOString();
     const nowMs = Date.parse(now);
-    const lock = readFrameworkTempLockProjection(input.cwd, nowMs).find((candidate) => candidate.workItemId === input.taskId
-        && candidate.actorId === input.actorId
-        && candidate.disposition === 'foreign-live'
-        && input.files.every((file) => candidate.files.some((scope) => pathMatchesWriteScope(file, scope))));
-    if (!lock || lock.ttlSeconds === null || lock.heartbeatAt === null)
+    const capability = resolveFrameworkTempPublicationCapability({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        actorId: input.actorId,
+        now: nowMs,
+    });
+    if (!capability || !frameworkTempPublicationCapabilityCovers(capability, input.files))
         return null;
-    const remainingSeconds = Math.max(1, Math.floor((Date.parse(lock.heartbeatAt) + lock.ttlSeconds * 1000 - nowMs) / 1000));
+    const remainingSeconds = Math.max(1, Math.floor((Date.parse(capability.heartbeatAt) + capability.ttlSeconds * 1000 - nowMs) / 1000));
     return issueWorkAdmissionTicket({
-        taskId: lock.workItemId,
-        actorId: lock.actorId,
-        laneSessionId: lock.laneSessionId,
-        claimGeneration: `framework-lock:${lock.heartbeatAt}`,
-        allowedFiles: lock.files,
+        taskId: capability.taskId,
+        actorId: capability.actorId,
+        laneSessionId: capability.laneSessionId,
+        claimGeneration: `framework-lock:${capability.heartbeatAt}`,
+        allowedFiles: capability.allowedFiles,
         runnerSelection: { runnerKind: 'frozen', runnerRef: 'framework-mode-lock', selectedAt: now },
         now,
         ttlSeconds: remainingSeconds
@@ -101,9 +102,12 @@ function issueLegacyActiveTaskAdmissionTicket(input) {
  */
 export function evaluateTaskWorkAdmissionGate(input) {
     const task = readTaskAdmissionContext(input.cwd, input.taskId);
-    const frameworkTemp = task ? null : readFrameworkTempLockProjection(input.cwd).find((candidate) => candidate.workItemId === input.taskId
-        && candidate.disposition === 'foreign-live'
-        && input.files.every((file) => candidate.files.some((scope) => pathMatchesWriteScope(file, scope))));
+    const frameworkTemp = task ? null : resolveFrameworkTempPublicationCapability({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        actorId: null,
+        now: input.now ? Date.parse(input.now) : undefined,
+    });
     return evaluateWorkAdmissionGate({
         ...input,
         actorId: task?.actorId ?? frameworkTemp?.actorId ?? '',

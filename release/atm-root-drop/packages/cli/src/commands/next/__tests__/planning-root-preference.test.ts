@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync, type Dirent } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, type Dirent } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
   applyCanonicalSiblingPreference,
   isDerivativeSiblingRepoName,
-  resolveCandidatePlanningRoots
+  PLANNING_ROOT_AMBIGUOUS_CODE,
+  resolveCandidatePlanningRoots,
+  selectPlanningRoot
 } from '../planning-root-preference.ts';
 
 function fakeReadDir(parentDir: string, names: readonly string[]): (directoryPath: string) => readonly Dirent[] {
@@ -76,6 +78,159 @@ try {
   assert.equal(manual.roots.length, 1);
 } finally {
   rmSync(sandbox, { recursive: true, force: true });
+}
+
+// TASK-ERR-0007 operator contract for planning-root ambiguity.
+// caseId: test_planning_root_ambiguous_error_contract_0007
+// semanticKey: planning_root_ambiguous_error_contract
+// coversAcceptance: ACC-1, ACC-2, ACC-3, ACC-4
+// contractEdge: ATM_PLANNING_ROOT_AMBIGUOUS
+{
+  const registry = JSON.parse(
+    readFileSync(path.join(process.cwd(), 'docs', 'governance', 'error-code-registry.json'), 'utf8')
+  ) as {
+    readonly entries: readonly {
+      readonly code: string;
+      readonly category: string;
+      readonly retryable: boolean;
+      readonly requiresHumanApproval: boolean;
+      readonly remediation: readonly string[];
+      readonly sourceOwner?: string;
+    }[];
+  };
+
+  // ACC-1 / ACC-3: the emitted code must have an exact registry contract, not only prefix coverage.
+  const registryEntry = registry.entries.find((entry) => entry.code === PLANNING_ROOT_AMBIGUOUS_CODE);
+  assert.ok(registryEntry, 'ATM_PLANNING_ROOT_AMBIGUOUS must have an exact registry entry');
+  assert.equal(registryEntry?.category, 'planning');
+  assert.equal(registryEntry?.retryable, true);
+  assert.equal(registryEntry?.requiresHumanApproval, false);
+  assert.equal(
+    registryEntry?.sourceOwner,
+    'packages/cli/src/commands/next/planning-root-preference.ts',
+    'registry sourceOwner must name the emitter'
+  );
+
+  const contractSandbox = mkdtempSync(path.join(tmpdir(), 'planning-root-contract-'));
+  try {
+    const makeRepo = (name: string, withPlanningRoot: boolean): string => {
+      const repo = path.join(contractSandbox, name);
+      if (withPlanningRoot) {
+        mkdirSync(path.join(repo, 'docs', 'ai_atomic_framework'), { recursive: true });
+        writeFileSync(path.join(repo, 'docs', 'ai_atomic_framework', 'marker.txt'), 'ok', 'utf8');
+      } else {
+        mkdirSync(repo, { recursive: true });
+      }
+      return repo;
+    };
+
+    // Fixture class 1: an explicit planning root always wins and never fails closed.
+    const explicitHome = makeRepo('ExplicitHome', false);
+    const explicitRoot = path.join(makeRepo('ExplicitPlanning', true), 'docs', 'ai_atomic_framework');
+    const explicitSelection = selectPlanningRoot(explicitHome, {
+      explicitRoot,
+      readDir: fakeReadDir(contractSandbox, ['ExplicitHome', 'ExplicitPlanning']),
+      exists: existsSync
+    });
+    assert.equal(explicitSelection.status, 'explicit');
+    assert.equal(explicitSelection.failClosed, false);
+    assert.deepEqual([...explicitSelection.resolvedRoots], [path.resolve(explicitRoot)]);
+    assert.deepEqual([...explicitSelection.ambiguities], []);
+
+    // Fixture class 2: one canonical base directory resolves its derivatives without ambiguity.
+    const canonicalHome = makeRepo('CanonicalHome', false);
+    makeRepo('CanonicalPlan', true);
+    makeRepo('CanonicalPlan-derivative', true);
+    const canonicalSelection = selectPlanningRoot(canonicalHome, {
+      readDir: fakeReadDir(contractSandbox, ['CanonicalHome', 'CanonicalPlan', 'CanonicalPlan-derivative']),
+      exists: existsSync
+    });
+    assert.equal(canonicalSelection.status, 'canonical');
+    assert.equal(canonicalSelection.failClosed, false);
+    assert.deepEqual([...canonicalSelection.ambiguities], []);
+    assert.equal(
+      canonicalSelection.resolvedRoots.some((entry) => entry.includes('CanonicalPlan-derivative')),
+      false,
+      'derivative root must not be offered once a canonical base exists'
+    );
+
+    // Fixture class 3: a true prefix family with no canonical base must fail closed.
+    const ambiguousHome = makeRepo('AmbiguousHome', false);
+    makeRepo('Rescue-alpha', true);
+    makeRepo('Rescue-beta', true);
+    const ambiguousSelection = selectPlanningRoot(ambiguousHome, {
+      readDir: fakeReadDir(contractSandbox, ['AmbiguousHome', 'Rescue-alpha', 'Rescue-beta']),
+      exists: existsSync
+    });
+
+    assert.equal(ambiguousSelection.status, 'ambiguous');
+    // ACC-2: fail closed. No root may be handed back for the caller to guess with.
+    assert.equal(ambiguousSelection.failClosed, true);
+    assert.deepEqual([...ambiguousSelection.resolvedRoots], []);
+    assert.equal(ambiguousSelection.ambiguities.length, 1);
+
+    const ambiguity = ambiguousSelection.ambiguities[0]!;
+    assert.equal(ambiguity.code, PLANNING_ROOT_AMBIGUOUS_CODE);
+    assert.equal(ambiguity.prefix, 'Rescue');
+    assert.deepEqual([...ambiguity.siblingRepoDirs], ['Rescue-alpha', 'Rescue-beta']);
+
+    // ACC-2: diagnostics carry candidate roots and source availability, not just directory names.
+    assert.equal(ambiguity.candidates.length, 2);
+    for (const candidate of ambiguity.candidates) {
+      assert.ok(path.isAbsolute(candidate.planningRoot), 'candidate must expose an absolute planning root');
+      assert.ok(path.isAbsolute(candidate.repoDir), 'candidate must expose an absolute repo dir');
+      assert.equal(candidate.sourceAvailable, true, 'candidate must report source availability');
+    }
+    assert.deepEqual(
+      ambiguity.candidates.map((candidate) => candidate.repoDirName),
+      ['Rescue-alpha', 'Rescue-beta']
+    );
+
+    // ACC-2 / ACC-4: exactly one safe non-destructive recovery route, and cleanup stays owner-approved.
+    const recovery = ambiguity.recovery;
+    assert.equal(recovery.code, PLANNING_ROOT_AMBIGUOUS_CODE);
+    assert.equal(recovery.retryable, registryEntry?.retryable);
+    assert.equal(recovery.requiresHumanApproval, registryEntry?.requiresHumanApproval);
+    assert.equal(recovery.safeNextSteps.length, 1, 'exactly one safe non-destructive recovery route');
+    assert.match(recovery.safeNextSteps[0] ?? '', /--planning-root/);
+    assert.ok(
+      recovery.readOnlyInspectionSteps.length >= 1,
+      'ambiguous roots must be inspectable before any owner-approved cleanup'
+    );
+    assert.ok(
+      recovery.forbiddenActions.includes('auto-cleanup-ambiguous-planning-roots'),
+      'automatic cleanup must be forbidden'
+    );
+    assert.ok(
+      recovery.forbiddenActions.includes('silently-select-first-planning-root'),
+      'silently selecting the first directory must be forbidden'
+    );
+    for (const step of [...recovery.safeNextSteps, ...recovery.readOnlyInspectionSteps]) {
+      assert.doesNotMatch(step, /\brm\b|\brmdir\b|--force|worktree remove|--no-verify/);
+    }
+
+    // ACC-1: the emitter detail must agree with the registered trigger wording.
+    assert.match(ambiguity.detail, /Multiple sibling planning repos share prefix "Rescue"/);
+    assert.ok(
+      (registryEntry?.remediation ?? []).some((line) => line.includes('--planning-root')),
+      'registry remediation must publish the same explicit-root recovery route as the emitter'
+    );
+
+    // Deep module: callers consume one object; they never re-scan or splice message text.
+    const legacyResolution = resolveCandidatePlanningRoots(ambiguousHome, {
+      readDir: fakeReadDir(contractSandbox, ['AmbiguousHome', 'Rescue-alpha', 'Rescue-beta']),
+      exists: existsSync
+    });
+    assert.equal(legacyResolution.warnings.length, 1);
+    assert.equal(legacyResolution.warnings[0]?.code, PLANNING_ROOT_AMBIGUOUS_CODE);
+    assert.deepEqual(
+      [...(legacyResolution.warnings[0]?.siblingRepoDirs ?? [])],
+      [...ambiguity.siblingRepoDirs],
+      'legacy warning shape must stay compatible with the registered contract'
+    );
+  } finally {
+    rmSync(contractSandbox, { recursive: true, force: true });
+  }
 }
 
 console.log('[planning-root-preference.test] ok');

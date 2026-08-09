@@ -38,6 +38,7 @@ import { inspectHistoricalLedgerRestoreStagedArtifacts, inspectMirrorSyncOnlySta
 import { autoStageFrameworkClaimFiles, inspectFrameworkScopedUnstagedCommit, inspectTaskScopedStagedGovernanceBundle, inspectTaskScopedUnstagedCommit, isFrameworkGeneratedArtifactAllowed, isIgnorableFrameworkCommitStagingSideEffect, readActiveFrameworkClaimFiles, readReleaseGeneratedArtifactPaths } from './task-scope-staging.ts';
 import { resolveFrameworkHookTaskId } from './framework-hook-identity.ts';
 import { executeGitCommit } from './commit-execution.ts';
+import { resolveFrameworkCommitAuthorityContext } from '../../framework-development/framework-temp-publication-capability.ts';
 type LegacyValue = ReturnType<typeof JSON.parse>;
 export function runGitCommit(options: LegacyValue) {
   const resolvedActor = resolveActorId(
@@ -88,15 +89,7 @@ if (options.noVerify) {
         "Governed git hook bypass for emergency recovery.",
       command: commitCommand,
     });
-    assertNoBrokerConflictBeforeHookBypass({
-      cwd: options.cwd,
-      taskId: options.taskId,
-      actorId,
-      brokerConflictOverrideApproval: options.brokerConflictOverrideApproval,
-      brokerConflictResolutionPath: options.brokerConflictResolutionPath,
-      reason: options.overrideReason,
-      command: commitCommand,
-    });
+    assertNoBrokerConflictBeforeHookBypass({ cwd: options.cwd, taskId: options.taskId, actorId, deferForeignStaged: options.deferForeignStaged, brokerConflictOverrideApproval: options.brokerConflictOverrideApproval, brokerConflictResolutionPath: options.brokerConflictResolutionPath, reason: options.overrideReason, command: commitCommand });
   }
 
 const actorRecord = findActorByResolvedId(options.cwd, resolvedActor);
@@ -130,6 +123,10 @@ const gitEmail = profile.gitEmail;
 const taskDocument = options.taskId
     ? readTaskDocument(options.cwd, options.taskId)
     : null;
+
+const { usesFrameworkClaimCommit, frameworkClaimFiles } = resolveFrameworkCommitAuthorityContext({
+  cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
+});
 
 const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
 
@@ -369,16 +366,17 @@ if (options.taskId && taskDocument && !bypassesActiveSession) {
   }
 
 const autoStagedFrameworkPaths =
-    options.taskId === null && options.autoStage
-      ? autoStageFrameworkClaimFiles(options.cwd, actorId, !options.dryRun)
+    usesFrameworkClaimCommit && options.autoStage
+      ? autoStageFrameworkClaimFiles(options.cwd, actorId, !options.dryRun, frameworkClaimFiles)
       : [];
 
 let frameworkClaimCommitFiles: readonly string[] = [];
 
-if (options.taskId === null) {
+if (usesFrameworkClaimCommit) {
     const frameworkStagingInspection = inspectFrameworkScopedUnstagedCommit(
       options.cwd,
       actorId,
+      frameworkClaimFiles,
     );
     if (options.dryRun && options.autoStage) {
       if (
@@ -415,10 +413,7 @@ if (options.taskId === null) {
             "git commit dry-run for the active framework claim resolved the governed commit surface without mutating the index.",
             {
               actorId,
-              frameworkClaimFiles: readActiveFrameworkClaimFiles(
-                options.cwd,
-                actorId,
-              ),
+              frameworkClaimFiles: frameworkClaimFiles ?? readActiveFrameworkClaimFiles(options.cwd, actorId),
               autoStageCandidates: autoStagedFrameworkPaths,
               outOfScopeStagedFiles:
                 frameworkStagingInspection?.kind === "mixed-scope"
@@ -431,11 +426,8 @@ if (options.taskId === null) {
           action: "commit",
           dryRun: true,
           actorId,
-          taskId: null,
-          frameworkClaimFiles: readActiveFrameworkClaimFiles(
-            options.cwd,
-            actorId,
-          ),
+          taskId: options.taskId,
+          frameworkClaimFiles: frameworkClaimFiles ?? readActiveFrameworkClaimFiles(options.cwd, actorId),
           autoStageCandidates: autoStagedFrameworkPaths,
           stagedFiles: readStagedFiles(options.cwd),
           copyableCommitCommand: buildCopyableGitCommitCommand({
@@ -487,7 +479,7 @@ if (options.taskId === null) {
       );
     }
     const claimedFiles = new Set(
-      readActiveFrameworkClaimFiles(options.cwd, actorId),
+      frameworkClaimFiles ?? readActiveFrameworkClaimFiles(options.cwd, actorId),
     );
     if (claimedFiles.size > 0) {
       const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(

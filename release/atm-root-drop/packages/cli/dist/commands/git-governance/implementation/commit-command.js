@@ -15,6 +15,7 @@ import { inspectHistoricalLedgerRestoreStagedArtifacts, inspectMirrorSyncOnlySta
 import { autoStageFrameworkClaimFiles, inspectFrameworkScopedUnstagedCommit, inspectTaskScopedStagedGovernanceBundle, inspectTaskScopedUnstagedCommit, isFrameworkGeneratedArtifactAllowed, isIgnorableFrameworkCommitStagingSideEffect, readActiveFrameworkClaimFiles, readReleaseGeneratedArtifactPaths } from './task-scope-staging.js';
 import { resolveFrameworkHookTaskId } from './framework-hook-identity.js';
 import { executeGitCommit } from './commit-execution.js';
+import { resolveFrameworkCommitAuthorityContext } from '../../framework-development/framework-temp-publication-capability.js';
 export function runGitCommit(options) {
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
     if (!resolvedActor) {
@@ -44,15 +45,7 @@ export function runGitCommit(options) {
                 "Governed git hook bypass for emergency recovery.",
             command: commitCommand,
         });
-        assertNoBrokerConflictBeforeHookBypass({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            actorId,
-            brokerConflictOverrideApproval: options.brokerConflictOverrideApproval,
-            brokerConflictResolutionPath: options.brokerConflictResolutionPath,
-            reason: options.overrideReason,
-            command: commitCommand,
-        });
+        assertNoBrokerConflictBeforeHookBypass({ cwd: options.cwd, taskId: options.taskId, actorId, deferForeignStaged: options.deferForeignStaged, brokerConflictOverrideApproval: options.brokerConflictOverrideApproval, brokerConflictResolutionPath: options.brokerConflictResolutionPath, reason: options.overrideReason, command: commitCommand });
     }
     const actorRecord = findActorByResolvedId(options.cwd, resolvedActor);
     const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord, {
@@ -73,6 +66,9 @@ export function runGitCommit(options) {
     const taskDocument = options.taskId
         ? readTaskDocument(options.cwd, options.taskId)
         : null;
+    const { usesFrameworkClaimCommit, frameworkClaimFiles } = resolveFrameworkCommitAuthorityContext({
+        cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
+    });
     const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
     const stagedMirrorSync = options.taskId
         ? inspectMirrorSyncOnlyStagedArtifacts(options.cwd, options.taskId)
@@ -243,12 +239,12 @@ export function runGitCommit(options) {
             });
         }
     }
-    const autoStagedFrameworkPaths = options.taskId === null && options.autoStage
-        ? autoStageFrameworkClaimFiles(options.cwd, actorId, !options.dryRun)
+    const autoStagedFrameworkPaths = usesFrameworkClaimCommit && options.autoStage
+        ? autoStageFrameworkClaimFiles(options.cwd, actorId, !options.dryRun, frameworkClaimFiles)
         : [];
     let frameworkClaimCommitFiles = [];
-    if (options.taskId === null) {
-        const frameworkStagingInspection = inspectFrameworkScopedUnstagedCommit(options.cwd, actorId);
+    if (usesFrameworkClaimCommit) {
+        const frameworkStagingInspection = inspectFrameworkScopedUnstagedCommit(options.cwd, actorId, frameworkClaimFiles);
         if (options.dryRun && options.autoStage) {
             if (frameworkStagingInspection?.kind === "mixed-scope" &&
                 !options.deferForeignStaged &&
@@ -270,7 +266,7 @@ export function runGitCommit(options) {
                 messages: [
                     message("info", "ATM_GIT_COMMIT_FRAMEWORK_DRY_RUN", "git commit dry-run for the active framework claim resolved the governed commit surface without mutating the index.", {
                         actorId,
-                        frameworkClaimFiles: readActiveFrameworkClaimFiles(options.cwd, actorId),
+                        frameworkClaimFiles: frameworkClaimFiles ?? readActiveFrameworkClaimFiles(options.cwd, actorId),
                         autoStageCandidates: autoStagedFrameworkPaths,
                         outOfScopeStagedFiles: frameworkStagingInspection?.kind === "mixed-scope"
                             ? frameworkStagingInspection.outOfScopeStagedFiles
@@ -281,8 +277,8 @@ export function runGitCommit(options) {
                     action: "commit",
                     dryRun: true,
                     actorId,
-                    taskId: null,
-                    frameworkClaimFiles: readActiveFrameworkClaimFiles(options.cwd, actorId),
+                    taskId: options.taskId,
+                    frameworkClaimFiles: frameworkClaimFiles ?? readActiveFrameworkClaimFiles(options.cwd, actorId),
                     autoStageCandidates: autoStagedFrameworkPaths,
                     stagedFiles: readStagedFiles(options.cwd),
                     copyableCommitCommand: buildCopyableGitCommitCommand({
@@ -318,7 +314,7 @@ export function runGitCommit(options) {
                 },
             });
         }
-        const claimedFiles = new Set(readActiveFrameworkClaimFiles(options.cwd, actorId));
+        const claimedFiles = new Set(frameworkClaimFiles ?? readActiveFrameworkClaimFiles(options.cwd, actorId));
         if (claimedFiles.size > 0) {
             const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(options.cwd);
             frameworkClaimCommitFiles = uniqueSorted(readStagedFiles(options.cwd).filter((filePath) => (!options.deferForeignStaged && isIgnorableFrameworkCommitStagingSideEffect(filePath)) ||

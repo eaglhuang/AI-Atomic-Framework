@@ -871,6 +871,33 @@
       "sourceOwner": "packages/cli/src/commands/runner-mode"
     },
     {
+      "code": "ATM_PLANNING_ROOT_AMBIGUOUS",
+      "category": "planning",
+      "shortDescription": "More than one plausible sibling planning root exists and no explicit or canonical root resolves the selection.",
+      "trigger": "Two or more sibling repository directories share a planning-root prefix, no canonical base directory of that prefix exists, and the caller supplied no explicit planning root.",
+      "commonCauses": [
+        "Recovery, rescue, or experiment worktrees were created beside the canonical planning repository and were never removed.",
+        "A planning repository was copied or renamed so several prefixed siblings now expose docs/ai_atomic_framework.",
+        "A command that needs a planning root was run without --planning-root while several candidates were present."
+      ],
+      "remediation": [
+        "Re-run the command with an explicit planning root, for example --planning-root <absolute-planning-root>.",
+        "Inspect every candidate reported in the error diagnostics before changing anything on disk; all ambiguous roots are preserved.",
+        "Removing or consolidating the extra sibling roots is owner-approved cleanup and is never performed automatically by ATM."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "requiredEvidence": [
+        "The candidate planning roots and their source availability as reported by the emitter."
+      ],
+      "relatedCommands": [
+        "node atm.mjs next --json",
+        "node atm.mjs doctor --json"
+      ],
+      "registryOwner": "TASK-ERR-0007",
+      "sourceOwner": "packages/cli/src/commands/next/planning-root-preference.ts"
+    },
+    {
       "code": "ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE",
       "category": "protected-governance-state",
       "shortDescription": "A write would destructively change protected governance state instead of applying an allowed lifecycle or reconcile update.",

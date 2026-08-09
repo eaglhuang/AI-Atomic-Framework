@@ -28,6 +28,14 @@ export interface ClaimDirtyWipBlocker {
   readonly ownerLaneSessionId: string | null;
 }
 
+type DirtyPathOwner = {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly sessionId: string | null;
+  readonly laneSessionId: string | null;
+  readonly authority: 'active-claim' | 'retained-wip';
+};
+
 export function inspectClaimDirtyWipAdmission(input: {
   readonly cwd: string;
   readonly task: ImportedTaskSummary;
@@ -43,7 +51,7 @@ export function inspectClaimDirtyWipAdmission(input: {
     .filter((file) => candidateFiles.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file)));
   const blockers = uniqueSorted(intersectingFiles).flatMap((file): ClaimDirtyWipBlocker[] => {
     const owner = findDirtyPathOwner(input.cwd, file);
-    if (isOwnedByRequestingLane(owner, input.actorId, input.laneSessionId)) return [];
+    if (isOwnedByRequestingClaim(owner, input.task.workItemId, input.actorId, input.laneSessionId)) return [];
     return [{
       file,
       ownership: owner ? 'foreign' : 'unowned',
@@ -126,7 +134,7 @@ function readGitNames(cwd: string, args: readonly string[]): readonly string[] {
   return uniqueSorted(String(result.stdout ?? '').split(/\r?\n/).map(normalizeWorkPath).filter(Boolean));
 }
 
-function findDirtyPathOwner(cwd: string, file: string): { taskId: string; actorId: string; sessionId: string | null; laneSessionId: string | null } | null {
+function findDirtyPathOwner(cwd: string, file: string): DirtyPathOwner | null {
   const taskDir = path.join(cwd, '.atm', 'history', 'tasks');
   if (!existsSync(taskDir)) return null;
   for (const entry of readdirSync(taskDir).filter((name) => name.endsWith('.json')).sort()) {
@@ -143,7 +151,7 @@ function findDirtyPathOwner(cwd: string, file: string): { taskId: string; actorI
   return null;
 }
 
-function readActiveClaimOwner(cwd: string, taskId: string, claim: Record<string, unknown> | null, file: string): { taskId: string; actorId: string; sessionId: string | null; laneSessionId: string | null } | null {
+function readActiveClaimOwner(cwd: string, taskId: string, claim: Record<string, unknown> | null, file: string): DirtyPathOwner | null {
   if (!claim || claim.state !== 'active') return null;
   const files = Array.isArray(claim.files) ? claim.files.map((value) => normalizeWorkPath(String(value))).filter(Boolean) : [];
   if (!files.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file))) return null;
@@ -152,10 +160,10 @@ function readActiveClaimOwner(cwd: string, taskId: string, claim: Record<string,
   const leaseId = typeof claim.leaseId === 'string' ? claim.leaseId.trim() : null;
   const session = leaseId ? resolveActorWorkSession(cwd, { claimLeaseId: leaseId, includeNonActive: true }) : null;
   const laneSession = claim.laneSession && typeof claim.laneSession === 'object' && !Array.isArray(claim.laneSession) ? claim.laneSession as Record<string, unknown> : null;
-  return { taskId, actorId, sessionId: session?.sessionId ?? null, laneSessionId: typeof laneSession?.laneSessionId === 'string' ? laneSession.laneSessionId : session?.guidanceSessionId ?? null };
+  return { taskId, actorId, sessionId: session?.sessionId ?? null, laneSessionId: typeof laneSession?.laneSessionId === 'string' ? laneSession.laneSessionId : session?.guidanceSessionId ?? null, authority: 'active-claim' };
 }
 
-function readRetainedWipOwner(task: Record<string, unknown>, taskId: string, file: string): { taskId: string; actorId: string; sessionId: null; laneSessionId: string } | null {
+function readRetainedWipOwner(task: Record<string, unknown>, taskId: string, file: string): DirtyPathOwner | null {
   const retention = task.wipOwnership && typeof task.wipOwnership === 'object' && !Array.isArray(task.wipOwnership)
     ? task.wipOwnership as Record<string, unknown>
     : null;
@@ -164,11 +172,12 @@ function readRetainedWipOwner(task: Record<string, unknown>, taskId: string, fil
   const laneSessionId = typeof retention.laneSessionId === 'string' ? retention.laneSessionId.trim() : '';
   const dirtyPaths = Array.isArray(retention.dirtyPaths) ? retention.dirtyPaths.map((value) => normalizeWorkPath(String(value))).filter(Boolean) : [];
   if (!actorId || !laneSessionId || !dirtyPaths.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file))) return null;
-  return { taskId, actorId, sessionId: null, laneSessionId };
+  return { taskId, actorId, sessionId: null, laneSessionId, authority: 'retained-wip' };
 }
 
-function isOwnedByRequestingLane(owner: ReturnType<typeof findDirtyPathOwner>, actorId: string, laneSessionId?: string | null): boolean {
+function isOwnedByRequestingClaim(owner: DirtyPathOwner | null, taskId: string, actorId: string, laneSessionId?: string | null): boolean {
   if (!owner || owner.actorId !== actorId) return false;
+  if (owner.authority === 'retained-wip') return owner.taskId === taskId;
   if (!laneSessionId) return true;
   return owner.laneSessionId === laneSessionId;
 }

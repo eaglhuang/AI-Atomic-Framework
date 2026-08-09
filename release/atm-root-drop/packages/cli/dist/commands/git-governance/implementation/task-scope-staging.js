@@ -269,8 +269,8 @@ export function isIgnorableFrameworkCommitStagingSideEffect(filePath) {
     }
     return isIgnorableTaskScopedDirtySideEffect(filePath);
 }
-export function autoStageFrameworkClaimFiles(cwd, actorId, apply = true) {
-    const claimedFiles = new Set(readActiveFrameworkClaimFiles(cwd, actorId));
+export function autoStageFrameworkClaimFiles(cwd, actorId, apply = true, claimedFilesOverride = null) {
+    const claimedFiles = new Set(claimedFilesOverride ?? readActiveFrameworkClaimFiles(cwd, actorId));
     if (claimedFiles.size === 0) {
         return [];
     }
@@ -284,8 +284,8 @@ export function autoStageFrameworkClaimFiles(cwd, actorId, apply = true) {
     }
     return candidates;
 }
-export function inspectFrameworkScopedUnstagedCommit(cwd, actorId) {
-    const claimedFiles = new Set(readActiveFrameworkClaimFiles(cwd, actorId));
+export function inspectFrameworkScopedUnstagedCommit(cwd, actorId, claimedFilesOverride = null) {
+    const claimedFiles = new Set(claimedFilesOverride ?? readActiveFrameworkClaimFiles(cwd, actorId));
     if (claimedFiles.size === 0) {
         return null;
     }
