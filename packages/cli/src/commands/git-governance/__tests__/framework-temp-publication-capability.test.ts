@@ -19,6 +19,7 @@ writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`),
   heartbeatAt: '2026-08-09T14:52:53.900Z',
   ttlSeconds: 3600,
   laneSessionId: 'lane-publication',
+  linkedTaskId: 'ATM-GOV-0342',
   files: ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'],
 }, null, 2)}\n`, 'utf8');
 
@@ -34,6 +35,9 @@ assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
   'release/atm-root-drop/atm.mjs',
 ]), true);
 assert.equal(frameworkTempPublicationCapabilityCovers(capability, ['packages/core/src/outside.ts']), false);
+assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
+  '.atm/history/evidence/ATM-GOV-0342.runner-sync-receipt.json',
+]), true);
 
 const admitted = evaluateTaskWorkAdmissionGate({
   cwd,

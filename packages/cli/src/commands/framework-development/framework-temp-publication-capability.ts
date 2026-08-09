@@ -78,7 +78,15 @@ function toCapability(cwd: string, lock: FrameworkTempLockProjection): Framework
     laneSessionId: lock.laneSessionId,
     heartbeatAt: lock.heartbeatAt,
     ttlSeconds: lock.ttlSeconds,
-    allowedFiles: lock.files.map((scope) => normalizeDirectoryScope(cwd, scope)),
+    // A runner-sync receipt is part of the sealed publication proof, not
+    // optional residue. Keep this derivation at the capability boundary so
+    // callers cannot accidentally publish bytes without their receipt.
+    allowedFiles: [
+      ...lock.files.map((scope) => normalizeDirectoryScope(cwd, scope)),
+      ...(lock.linkedTaskId
+        ? [`.atm/history/evidence/${lock.linkedTaskId}.runner-sync-receipt.json`]
+        : []),
+    ],
   };
 }
 

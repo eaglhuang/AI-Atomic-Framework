@@ -57,7 +57,7 @@ import {
   inspectProtectedGovernanceStateDestructiveChanges,
 } from "../protected-governance-state.ts";
 
-import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, deferForeignStagedFiles, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles, stageTaskScopedBundleFiles } from './git-index-transaction.ts';
+import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, deferStagedFilePaths, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles, stageTaskScopedBundleFiles } from './git-index-transaction.ts';
 
 import { parseTaskClaim } from './identity-check-command.ts';
 
@@ -80,6 +80,11 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     trailers: input.trailers,
   });
   let stagedFiles = readStagedFiles(input.cwd);
+  // `--defer-foreign-staged` promises an isolated commit transaction.  The
+  // complete pre-existing index is therefore the preservation boundary: a
+  // path that happens to look like current-task evidence must not leak into
+  // the new commit merely because ownership classification is incomplete.
+  const preexistingStagedFiles = [...stagedFiles];
   let gitIndexOwnership = inspectGitIndexOwnership({
     cwd: input.cwd,
     taskId: input.taskId,
@@ -131,19 +136,17 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   let deferredForeignStagedFiles: readonly string[] = [];
   if (
     input.deferForeignStaged &&
-    unexpectedStagedTasks.length > 0 &&
+    preexistingStagedFiles.length > 0 &&
     input.apply &&
     !hasAuthorizedIndexLease &&
     (protectedForeignStagedOwnershipFiles.length === 0 ||
       (protectedForeignDeferAuthorized || lifecycleAuthorizedForeignDefer))
   ) {
-    deferredForeignStagedFiles = uniqueSorted(
-      unexpectedStagedTasks.flatMap((entry: LegacyValue) => entry.stagedFiles),
-    );
-    deferredForeignStagedSnapshot = deferForeignStagedFiles(
+    deferredForeignStagedFiles = preexistingStagedFiles;
+    deferredForeignStagedSnapshot = deferStagedFilePaths(
       input.cwd,
       input.taskId,
-      unexpectedStagedTasks,
+      preexistingStagedFiles,
     );
     stagedFiles = readStagedFiles(input.cwd);
     gitIndexOwnership = inspectGitIndexOwnership({
