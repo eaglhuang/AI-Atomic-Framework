@@ -28,7 +28,7 @@ import {
   type RunnerSyncReceipt,
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
-import { scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 export type BuildDecision = 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
@@ -121,6 +121,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     sealedSourceSha
   });
   assertRunnerSyncAdmission(admission);
+  const beforeBuildSnapshot = captureRunnerBuildOutputSnapshot({ cwd: repoRoot, buildTarget });
 
   const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
   const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({
@@ -162,7 +163,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null, beforeBuildSnapshot }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
@@ -237,7 +238,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null, beforeBuildSnapshot }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision,

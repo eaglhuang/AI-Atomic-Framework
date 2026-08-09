@@ -32,9 +32,10 @@ try {
   assert.deepEqual(pending.report.extraOutputPaths, []);
 
   write('release/atm-onefile/release-manifest.json', '{}\n');
-  const incomplete = inspectRunnerPublicationDisposition(repo);
-  assert.equal(incomplete.code, 'ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE');
-  assert.deepEqual(incomplete.report.extraOutputPaths, ['release/atm-onefile/release-manifest.json']);
+  const foreignWip = inspectRunnerPublicationDisposition(repo);
+  assert.equal(foreignWip.code, 'ATM_RUNNER_PUBLICATION_PENDING');
+  assert.equal(foreignWip.report.disposition, 'publication-pending');
+  assert.deepEqual(foreignWip.report.extraOutputPaths, ['release/atm-onefile/release-manifest.json']);
   console.log('[runner-publication-disposition-gate.test] ok');
 } finally {
   rmSync(repo, { recursive: true, force: true });

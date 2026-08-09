@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import {
+  captureRunnerBuildOutputSnapshot,
   deriveRunnerBuildOutputInventory,
   evaluateRunnerPublicationDisposition,
+  scanSealedRunnerBuildOutputInventory,
   verifyRunnerBuildOutputParity
 } from '../../packages/core/src/broker/runner-build-output-inventory.ts';
 import { buildRunnerSyncReceipt } from '../../scripts/runner-sync-incremental-build.ts';
@@ -62,10 +68,38 @@ assert.equal(pending.disposition, 'publication-pending');
 assert.deepEqual(pending.dirtyInventoryPaths, ['packages/cli/dist/atm.js']);
 assert.deepEqual(pending.extraOutputPaths, []);
 
-const incomplete = evaluateRunnerPublicationDisposition({
+const foreignWip = evaluateRunnerPublicationDisposition({
   inventory,
   dirtyPaths: ['release/atm-onefile/release-manifest.json']
 });
-assert.equal(incomplete.disposition, 'inventory-incomplete');
-assert.deepEqual(incomplete.extraOutputPaths, ['release/atm-onefile/release-manifest.json']);
+assert.equal(foreignWip.disposition, 'published');
+assert.deepEqual(foreignWip.extraOutputPaths, ['release/atm-onefile/release-manifest.json']);
+
+const fixtureRoot = mkdtempSync(path.join(tmpdir(), 'atm-runner-inventory-'));
+const git = (...args: string[]) => {
+  const result = spawnSync('git', args, { cwd: fixtureRoot, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+};
+mkdirSync(path.join(fixtureRoot, 'release', 'atm-onefile'), { recursive: true });
+writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'atm.mjs'), 'base\n');
+writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'release-manifest.json'), 'base\n');
+git('init');
+git('config', 'user.email', 'test@example.invalid');
+git('config', 'user.name', 'ATM test');
+git('add', '.');
+git('commit', '-m', 'fixture');
+writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'release-manifest.json'), 'foreign-wip\n');
+const snapshot = captureRunnerBuildOutputSnapshot({ cwd: fixtureRoot, buildTarget: 'onefile' });
+writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'atm.mjs'), 'generated-by-build\n');
+const deltaInventory = scanSealedRunnerBuildOutputInventory({
+  cwd: fixtureRoot,
+  buildTarget: 'onefile',
+  sealedSourceSha: '0123456789abcdef0123456789abcdef01234567',
+  taskId: 'TASK-ERR-0011',
+  beforeBuildSnapshot: snapshot
+});
+assert.deepEqual(deltaInventory.entries.map((entry) => entry.path), [
+  '.atm/history/evidence/TASK-ERR-0011.runner-sync-receipt.json',
+  'release/atm-onefile/atm.mjs'
+]);
 console.log('[runner-publication-inventory-parity.test] ok');

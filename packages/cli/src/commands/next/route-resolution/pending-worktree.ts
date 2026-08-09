@@ -126,7 +126,7 @@ export function checkPendingTaskArtifactScopeExpansion(input: {
   const staleRecoveryInputFiles = stagedOrTracked
     .filter(outsideScope)
     .filter(isStaleRecoveryInputPath);
-  const stagedExpansion = stagedOrTracked
+  const trackedForeignWip = stagedOrTracked
     .filter(outsideScope)
     .filter((entry) => !isAdvisoryOutsideScopePath(entry) && !isStaleRecoveryInputPath(entry))
     .filter((entry) => looksLikeTaskArtifact(entry, input.task));
@@ -135,30 +135,10 @@ export function checkPendingTaskArtifactScopeExpansion(input: {
     .filter((entry) => !isAdvisoryOutsideScopePath(entry))
     .filter((entry) => looksLikeTaskArtifact(entry, input.task));
 
-  if (stagedExpansion.length > 0) {
-    throw new CliError(
-      'ATM_TASK_SCOPE_EXPANSION_REQUIRED',
-      `Task ${input.task.workItemId} has staged or modified deliverable-like files outside targetWork.allowedFiles; update the task scope/deliverables instead of editing runtime locks.`,
-      {
-        exitCode: 1,
-        details: {
-          taskId: input.task.workItemId,
-          outsideAllowedFiles: stagedExpansion,
-          advisoryTrackedFiles,
-          staleRecoveryInputFiles,
-          ignoredUntrackedFiles: untrackedExpansion,
-          allowedFiles,
-          requiredAction: 'Add these real deliverables to the task card frontmatter scope/deliverables (then re-import) or run `node atm.mjs tasks scope --add <paths>`; do not edit runtime locks.',
-          notAllowed: 'Do not edit .atm/runtime/locks/** or task direction lock JSON to bypass this scope mismatch.'
-        }
-      }
-    );
-  }
-
   return {
     schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
     ignoredUntrackedFiles: untrackedExpansion,
-    advisoryTrackedFiles,
+    advisoryTrackedFiles: uniqueSorted([...advisoryTrackedFiles, ...trackedForeignWip]),
     staleRecoveryInputFiles,
     deferredForeignResidue
   };
