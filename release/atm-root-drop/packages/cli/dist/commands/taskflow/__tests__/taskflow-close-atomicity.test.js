@@ -5,6 +5,19 @@ import os from 'node:os';
 import path from 'node:path';
 import { runNext } from '../../next.js';
 import { runTaskflow } from '../../taskflow.js';
+async function withLaneCapability(laneSessionId, callback) {
+    const previous = process.env.ATM_LANE_SESSION_ID;
+    process.env.ATM_LANE_SESSION_ID = laneSessionId;
+    try {
+        return await callback();
+    }
+    finally {
+        if (previous === undefined)
+            delete process.env.ATM_LANE_SESSION_ID;
+        else
+            process.env.ATM_LANE_SESSION_ID = previous;
+    }
+}
 function writeJson(filePath, value) {
     mkdirSync(path.dirname(filePath), { recursive: true });
     writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
@@ -91,6 +104,9 @@ async function makeCloseAtomicityFixture(label) {
     execFileSync('git', ['commit', '-m', 'base planning'], { cwd: planningRepo, stdio: 'ignore' });
     const claim = await runNext(['--cwd', targetRepo, '--claim', '--actor', 'validator', '--task', taskId, '--claim-intent', 'write']);
     assert.equal(claim.ok, true);
+    const laneSessionId = claim.evidence.laneSession?.laneSessionId;
+    if (typeof laneSessionId !== 'string')
+        throw new Error('claim must mint an owner lane capability');
     writeText(path.join(targetRepo, 'src/deliver.txt'), 'delivery content\n');
     writeJson(path.join(targetRepo, '.atm/history/evidence', `${taskId}.json`), {
         taskId,
@@ -117,12 +133,13 @@ async function makeCloseAtomicityFixture(label) {
         targetRepo,
         planningRepo,
         taskId,
+        laneSessionId,
         profilePath: path.join(planningRepo, 'taskflow.profile.json'),
         planPath
     };
 }
 const successFixture = await makeCloseAtomicityFixture('success');
-const successClose = await runTaskflow([
+const successClose = await withLaneCapability(successFixture.laneSessionId, () => runTaskflow([
     'close',
     '--cwd', successFixture.targetRepo,
     '--profile', successFixture.profilePath,
@@ -130,7 +147,7 @@ const successClose = await runTaskflow([
     '--actor', 'validator',
     '--write',
     '--json'
-]);
+]));
 assert.equal(successClose.ok, true, 'successful close write must report ok');
 assert.equal(successClose.evidence.closeWriteTransaction.phase, 'committed');
 assert.equal(successClose.evidence.closeWriteTransaction.ok, true);
@@ -143,7 +160,7 @@ const hookPath = path.join(hookDir, 'pre-commit');
 writeText(hookPath, '#!/bin/sh\nexit 1\n');
 chmodSync(hookPath, 0o755);
 execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: rollbackFixture.planningRepo, stdio: 'ignore' });
-const rollbackClose = await runTaskflow([
+const rollbackClose = await withLaneCapability(rollbackFixture.laneSessionId, () => runTaskflow([
     'close',
     '--cwd', rollbackFixture.targetRepo,
     '--profile', rollbackFixture.profilePath,
@@ -151,7 +168,7 @@ const rollbackClose = await runTaskflow([
     '--actor', 'validator',
     '--write',
     '--json'
-]);
+]));
 assert.equal(rollbackClose.ok, false, 'commit-bundle failure must fail closed at taskflow layer');
 assert.equal(rollbackClose.evidence.closeWriteTransaction.phase, 'rolled_back');
 assert.ok(rollbackClose.evidence.closeWriteTransaction.rolledBackArtifacts.length > 0);

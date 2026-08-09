@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { resolveTaskflowCloseBackend, resolveTaskflowCloseMode, taskflowCloseEvidenceValidators, taskflowCloseGovernanceEvidenceValidator } from '../tasks/surface-invariants.js';
@@ -9,6 +10,7 @@ import { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestPathForTask, 
 import { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory } from '../tasks/historical-delivery.js';
 import { resolveStoredPlanningPath } from '../planning-repo-root.js';
 import { assertPlanningSourceSealValid } from '../tasks/import-task.js';
+import { executeTaskCloseSaga } from './cross-authority-closeback.js';
 function buildTasksCloseCommand(input) {
     const parts = ['node atm.mjs tasks close', `--task ${input.taskId}`, `--actor ${input.actorId}`, '--status done', '--json'];
     for (const ref of input.historicalDeliveryRefs ?? []) {
@@ -53,6 +55,14 @@ function buildTasksRepairClosureCommand(taskId, actorId) { const parts = ['node 
 } return parts.join(' '); }
 function buildTasksStatusCommand(taskId) { return `node atm.mjs tasks status --task ${taskId} --json`; }
 function buildRosterClosebackCommand(input) { return `node atm.mjs tasks roster update --index ${input.indexPath} --from ${input.fromPath} --json`; }
+function gitScalar(cwd, args) { try {
+    return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim() || null;
+}
+catch {
+    return null;
+} }
+function digest(value) { return `sha256:${createHash('sha256').update(`${JSON.stringify(value, null, 2)}\n`).digest('hex')}`; }
+export function buildAuthorityReconciliation(input) { const source = input.taskDocument.source && typeof input.taskDocument.source === 'object' ? input.taskDocument.source : {}; const seal = source.planningSourceSeal && typeof source.planningSourceSeal === 'object' ? source.planningSourceSeal : {}; const planningAbsolute = input.planningMirrorPath ? resolveStoredPlanningPath(input.cwd, input.planningMirrorPath).absolutePath : null; const planningRoot = planningAbsolute ? gitScalar(path.dirname(planningAbsolute), ['rev-parse', '--show-toplevel']) : null; const targetHead = gitScalar(input.cwd, ['rev-parse', 'HEAD']); const planningHead = planningRoot ? gitScalar(planningRoot, ['rev-parse', 'HEAD']) : null; return executeTaskCloseSaga({ taskId: input.taskId, actorId: input.actorId, sourceIdentity: `${String(seal.repoIdentity ?? 'unavailable')}:${String(seal.contentDigest ?? 'unavailable')}`, targetFiles: input.targetFiles, planningFiles: input.planningFiles, targetBundleDigest: digest(input.targetFiles), planningPatchDigest: digest(input.planningFiles), planStatusTransition: null, acceptanceEvidenceDigest: null }, { target: { name: 'target', repoRoot: input.cwd.replace(/\\/g, '/'), head: targetHead, sourceDigest: typeof seal.contentDigest === 'string' ? seal.contentDigest : null, writeable: Boolean(targetHead) }, planning: { name: 'planning', repoRoot: planningRoot?.replace(/\\/g, '/') ?? '', head: planningHead, sourceDigest: typeof seal.contentDigest === 'string' ? seal.contentDigest : null, writeable: Boolean(planningRoot && planningHead) } }); }
 function buildTaskflowCloseRecoveryLane(input) { return { owner: input.owner, disposition: input.disposition, command: input.command, reason: input.reason, forbiddenActions: [`Do not bypass the ${input.owner} gate with raw git commands.`, 'Do not use --force, --no-verify, or manual .atm edits unless an explicit emergency lane says so.', 'Do not mutate another authority while this blocker owns the recovery lane.'], emergency: input.emergency === true }; }
 function buildTaskflowCloseRecoveryLanes(input) { const lanes = []; if (input.closebackPathResolution && !['source-plan-path', 'task-direction-fallback', 'profile-root-fallback', 'ledger-only-target'].includes(input.closebackPathResolution.route)) {
     lanes.push(buildTaskflowCloseRecoveryLane({ owner: 'planning', disposition: 'recover', command: input.closebackPathResolution.planningMirrorPath ? buildTasksImportCommand(input.closebackPathResolution.planningMirrorPath) : null, reason: input.closebackPathResolution.diagnostics.messages.join(' ') || 'Recover the planning closeback path before writing close state.' }));
@@ -106,6 +116,7 @@ export function buildClosebackPlan(input) {
             followUpSteps.push('roster-closeback-follow-up-command');
         }
     }
+    const authorityReconciliation = input.cwd && input.taskDocument ? buildAuthorityReconciliation({ cwd: input.cwd, taskId: input.taskId, actorId: input.actorId, taskDocument: input.taskDocument, planningMirrorPath, targetFiles: input.targetFiles ?? [], planningFiles: input.planningFiles ?? (planningMirrorPath ? [planningMirrorPath] : []) }) : undefined;
     const historicalDeliveryRequired = closeMode === 'historical-delivery-close'
         || (closeMode === 'normal-close' && input.diagnosis.triangulation.liveLedger.status !== 'done');
     const evidenceValidators = [...taskflowCloseEvidenceValidators];
@@ -119,7 +130,7 @@ export function buildClosebackPlan(input) {
             required: historicalDeliveryRequired && input.historicalDeliveryRefs.length === 0 && backendSurface === 'tasks-close', refs: input.historicalDeliveryRefs, validatorSurfaces: ['atm.frameworkDeliveryWindow.v1', 'tasks close scoped-diff isolation']
         }, planningAuthorityDeliveryGate,
         waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true, waiverReason: input.waiverReason ?? null, evidenceValidators, residue: { bucket: input.diagnosis.bucket, truth: input.diagnosis.truth, residue: input.diagnosis.residue, reason: input.diagnosis.reason, nextCommand: input.diagnosis.nextCommand }, amendmentHistory: [...(input.diagnosis.triangulation.amendmentHistory ?? [])],
-        closebackPathResolution: input.closebackPathResolution, legalRecoveryLanes: closeRecovery.legalRecoveryLanes, nextLegalRecoveryLane: closeRecovery.nextLegalRecoveryLane, forbiddenActions: closeRecovery.forbiddenActions };
+        closebackPathResolution: input.closebackPathResolution, authorityReconciliation, legalRecoveryLanes: closeRecovery.legalRecoveryLanes, nextLegalRecoveryLane: closeRecovery.nextLegalRecoveryLane, forbiddenActions: closeRecovery.forbiddenActions };
 }
 export function buildTaskflowCloseDiagnostics(input) {
     const codes = [];
