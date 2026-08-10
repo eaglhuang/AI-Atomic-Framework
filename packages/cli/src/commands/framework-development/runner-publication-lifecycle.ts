@@ -3,12 +3,26 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import {
+  captureRunnerBuildOutputSnapshot,
   deriveRunnerBuildOutputInventory,
   evaluateRunnerPublicationDisposition,
+  planRunnerPublicationTakeover,
   validateRunnerBuildOutputInventory,
   type RunnerBuildOutputInventory,
+  type RunnerBuildOutputTarget,
+  type RunnerPublicationTakeoverPlan,
   type RunnerPublicationDispositionReport
 } from '../../../../core/src/broker/runner-build-output-inventory.ts';
+
+/** Persist a queue-head approved, digest-bound replacement plan for orphaned generated output. */
+export function authorizeRunnerPublicationTakeover(input: { readonly cwd: string; readonly taskId: string; readonly sealedSourceSha: string; readonly buildTarget: RunnerBuildOutputTarget; readonly currentTaskAllowedFiles: readonly string[] }): RunnerPublicationTakeoverPlan {
+  const snapshot = captureRunnerBuildOutputSnapshot({ cwd: input.cwd, buildTarget: input.buildTarget, currentTaskId: input.taskId, currentTaskAllowedFiles: input.currentTaskAllowedFiles });
+  const plan = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot });
+  if (plan.entries.length === 0) throw new Error('ATM_RUNNER_PUBLICATION_PENDING: takeover requires at least one pre-existing generated publication member.');
+  const receiptPath = path.join(input.cwd, '.atm', 'history', 'evidence', `${input.taskId}.runner-publication-takeover.json`);
+  writeFileSync(receiptPath, `${JSON.stringify(plan, null, 2)}\n`, 'utf8');
+  return plan;
+}
 
 /**
  * Sealed runner publication lifecycle.

@@ -30,6 +30,20 @@ export interface RunnerBuildOutputSnapshot {
   readonly preexistingDirtyPaths: readonly string[];
 }
 
+/**
+ * A queue-head approved replacement of pre-existing generated publication
+ * bytes.  It is intentionally a plan, rather than a broad "force" switch:
+ * every replacement stays bound to the sealed source and the exact bytes that
+ * were observed before the build began.
+ */
+export interface RunnerPublicationTakeoverPlan {
+  readonly schemaId: 'atm.runnerPublicationTakeoverPlan.v1';
+  readonly sealedSourceSha: string;
+  readonly snapshotDigest: string;
+  readonly entries: readonly { readonly path: string; readonly observedDigest: string }[];
+  readonly digest: string;
+}
+
 export type RunnerPublicationDisposition =
   | 'published'
   | 'publication-pending'
@@ -136,6 +150,54 @@ export function captureRunnerBuildOutputSnapshot(input: {
     .filter((entry) => Object.hasOwn(members, entry))
     .filter((entry) => !hasCanonicalScope || !pathMatchesScope(entry, allowedFiles));
   return { schemaId: 'atm.runnerBuildOutputSnapshot.v1', buildTarget: input.buildTarget, members, preexistingDirtyPaths };
+}
+
+/** Create the immutable payload a broker must persist before a takeover. */
+export function planRunnerPublicationTakeover(input: {
+  readonly sealedSourceSha: string;
+  readonly snapshot: RunnerBuildOutputSnapshot;
+}): RunnerPublicationTakeoverPlan {
+  const entries = uniquePaths(input.snapshot.preexistingDirtyPaths)
+    .map((entry) => ({ path: entry, observedDigest: input.snapshot.members[entry] ?? 'missing' }));
+  if (entries.some((entry) => !isRunnerPublicationArtifactPath(entry.path) || entry.observedDigest === 'missing')) {
+    throw new Error('Runner publication takeover can only name pre-existing generated publication members with an observed digest.');
+  }
+  const sealedSourceSha = input.sealedSourceSha.trim();
+  const snapshotDigest = digestSnapshot(input.snapshot);
+  return {
+    schemaId: 'atm.runnerPublicationTakeoverPlan.v1',
+    sealedSourceSha,
+    snapshotDigest,
+    entries,
+    digest: digestTakeoverPlan({ sealedSourceSha, snapshotDigest, entries })
+  };
+}
+
+/** Reject stale, broadened, or hand-edited takeovers before any bytes move. */
+export function validateRunnerPublicationTakeoverPlan(input: {
+  readonly plan: unknown;
+  readonly sealedSourceSha: string;
+  readonly snapshot: RunnerBuildOutputSnapshot;
+}): { readonly ok: boolean; readonly plan: RunnerPublicationTakeoverPlan | null; readonly reason: string | null } {
+  if (!input.plan || typeof input.plan !== 'object' || Array.isArray(input.plan)) return { ok: false, plan: null, reason: 'plan must be an object' };
+  const raw = input.plan as Record<string, unknown>;
+  if (raw.schemaId !== 'atm.runnerPublicationTakeoverPlan.v1' || !Array.isArray(raw.entries)) return { ok: false, plan: null, reason: 'plan schema or entries are invalid' };
+  const sealedSourceSha = typeof raw.sealedSourceSha === 'string' ? raw.sealedSourceSha.trim() : '';
+  const snapshotDigest = typeof raw.snapshotDigest === 'string' ? raw.snapshotDigest.trim() : '';
+  const entries = raw.entries.map((entry) => {
+    const value = entry && typeof entry === 'object' && !Array.isArray(entry) ? entry as Record<string, unknown> : {};
+    return { path: typeof value.path === 'string' ? normalizePath(value.path) : '', observedDigest: typeof value.observedDigest === 'string' ? value.observedDigest : '' };
+  });
+  if (!sealedSourceSha || !snapshotDigest || entries.some((entry) => !entry.path || !entry.observedDigest) || JSON.stringify(entries) !== JSON.stringify([...entries].sort((a, b) => a.path.localeCompare(b.path)))) {
+    return { ok: false, plan: null, reason: 'plan entries must be complete, unique, and sorted' };
+  }
+  const plan: RunnerPublicationTakeoverPlan = { schemaId: 'atm.runnerPublicationTakeoverPlan.v1', sealedSourceSha, snapshotDigest, entries, digest: typeof raw.digest === 'string' ? raw.digest.trim() : '' };
+  if (plan.digest !== digestTakeoverPlan(plan)) return { ok: false, plan: null, reason: 'plan digest is invalid' };
+  if (plan.sealedSourceSha !== input.sealedSourceSha.trim()) return { ok: false, plan: null, reason: 'plan sealed source does not match this build' };
+  if (plan.snapshotDigest !== digestSnapshot(input.snapshot)) return { ok: false, plan: null, reason: 'plan snapshot does not match current pre-build bytes' };
+  const expected = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot: input.snapshot });
+  if (plan.digest !== expected.digest) return { ok: false, plan: null, reason: 'plan does not cover exactly the current pre-existing publication members' };
+  return { ok: true, plan, reason: null };
 }
 
 export function buildRunnerBuildOutputInventory(input: {
@@ -328,6 +390,19 @@ export function validateRunnerBuildOutputInventory(value: unknown): RunnerBuildO
 function digestInventory(sealedSourceSha: string, entries: readonly RunnerBuildOutputInventoryEntry[]): string {
   const payload = JSON.stringify({ sealedSourceSha, entries });
   return `sha256:${createHash('sha256').update(payload).digest('hex')}`;
+}
+
+function digestSnapshot(snapshot: RunnerBuildOutputSnapshot): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify({ buildTarget: snapshot.buildTarget, members: snapshot.members, preexistingDirtyPaths: uniquePaths(snapshot.preexistingDirtyPaths) })).digest('hex')}`;
+}
+
+function digestTakeoverPlan(plan: Pick<RunnerPublicationTakeoverPlan, 'sealedSourceSha' | 'snapshotDigest' | 'entries'>): string {
+  const payload = {
+    sealedSourceSha: plan.sealedSourceSha,
+    snapshotDigest: plan.snapshotDigest,
+    entries: plan.entries
+  };
+  return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
 }
 
 function uniquePaths(paths: readonly string[]): string[] {

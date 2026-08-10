@@ -7,7 +7,9 @@ import {
   captureRunnerBuildOutputSnapshot,
   deriveRunnerBuildOutputInventory,
   evaluateRunnerPublicationDisposition,
+  planRunnerPublicationTakeover,
   scanSealedRunnerBuildOutputInventory,
+  validateRunnerPublicationTakeoverPlan,
   verifyRunnerBuildOutputParity
 } from '../../packages/core/src/broker/runner-build-output-inventory.ts';
 import { buildRunnerSyncReceipt } from '../../scripts/runner-sync-incremental-build.ts';
@@ -99,6 +101,20 @@ const snapshot = captureRunnerBuildOutputSnapshot({
   currentTaskAllowedFiles: ['release/atm-onefile/atm.mjs']
 });
 assert.deepEqual(snapshot.preexistingDirtyPaths, ['release/atm-onefile/release-manifest.json']);
+const takeoverPlan = planRunnerPublicationTakeover({
+  sealedSourceSha: '0123456789abcdef0123456789abcdef01234567',
+  snapshot
+});
+assert.equal(validateRunnerPublicationTakeoverPlan({
+  plan: takeoverPlan,
+  sealedSourceSha: '0123456789abcdef0123456789abcdef01234567',
+  snapshot
+}).ok, true);
+assert.equal(validateRunnerPublicationTakeoverPlan({
+  plan: { ...takeoverPlan, sealedSourceSha: 'fedcba9876543210fedcba9876543210fedcba98' },
+  sealedSourceSha: '0123456789abcdef0123456789abcdef01234567',
+  snapshot
+}).ok, false);
 writeFileSync(path.join(fixtureRoot, 'release', 'atm-onefile', 'atm.mjs'), 'generated-by-build\n');
 const deltaInventory = scanSealedRunnerBuildOutputInventory({
   cwd: fixtureRoot,

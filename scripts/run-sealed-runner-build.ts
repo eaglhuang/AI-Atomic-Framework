@@ -28,7 +28,7 @@ import {
   type RunnerSyncReceipt,
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
-import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory, validateRunnerPublicationTakeoverPlan } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
@@ -133,6 +133,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     currentTaskId,
     currentTaskAllowedFiles: currentTask?.allowedFiles
   });
+  const takeoverPaths = readValidatedPublicationTakeover({ cwd: repoRoot, taskId: currentTaskId, sealedSourceSha, snapshot: beforeBuildSnapshot });
 
   const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
   const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({
@@ -219,7 +220,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     const artifactSync = timePhase(
       timings,
       'artifactSyncMs',
-      () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, beforeBuildSnapshot.preexistingDirtyPaths),
+      () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, beforeBuildSnapshot.preexistingDirtyPaths.filter((entry) => !takeoverPaths.includes(entry))),
     );
     if (artifactSync.preservedPaths.length > 0) {
       throw new Error(
@@ -290,6 +291,18 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     });
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
   }
+}
+
+function readValidatedPublicationTakeover(input: { readonly cwd: string; readonly taskId: string | null; readonly sealedSourceSha: string; readonly snapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot> }): readonly string[] {
+  if (!input.taskId || input.snapshot.preexistingDirtyPaths.length === 0) return [];
+  const relative = `.atm/history/evidence/${input.taskId}.runner-publication-takeover.json`;
+  const absolute = path.join(input.cwd, relative);
+  if (!existsSync(absolute)) return [];
+  let document: unknown;
+  try { document = JSON.parse(readFileSync(absolute, 'utf8')); } catch { fail(`Runner publication takeover receipt is not valid JSON: ${relative}`, 1); }
+  const validated = validateRunnerPublicationTakeoverPlan({ plan: document, sealedSourceSha: input.sealedSourceSha, snapshot: input.snapshot });
+  if (!validated.ok || !validated.plan) fail(`Runner publication takeover receipt is invalid: ${validated.reason ?? relative}`, 1);
+  return validated.plan.entries.map((entry) => entry.path);
 }
 
 function runTimedInnerBuild(
