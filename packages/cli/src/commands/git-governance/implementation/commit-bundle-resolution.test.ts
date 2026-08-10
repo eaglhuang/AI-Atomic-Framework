@@ -42,6 +42,7 @@ const bundle = resolveTaskScopedCommitBundle({
 });
 
 assert.equal(existsSync(foreignManifest), true, 'foreign released bundle residue must survive another task commit transaction');
+assert.equal(bundle.ok, true, `completed foreign residue must not block a path-bounded commit: ${bundle.blockedCode} ${bundle.blockedSummary}`);
 assert.ok(bundle.skippedExternalDirtyFiles.includes('.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'));
 
 writeFileSync(foreignManifest, '{"schemaId":"fixture"}\n');
