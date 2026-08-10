@@ -21,7 +21,7 @@ import {
 } from '../packages/core/src/broker/runner-version-contract.ts';
 import type { BuildDecision, BuildTarget, SealedBuildTimings } from './run-sealed-runner-build.ts';
 import { buildRunnerSyncBuildObservation, summarizeDominantPhase } from './runner-sync-observability.ts';
-import { buildRunnerSyncReleaseCommand, resolveTemporaryStewardLinks, uniqueReceiptTaskIds } from './runner-sync-receipt-continuation.ts';
+import { buildRunnerSyncReleaseCommand, resolveRunnerSyncReceiptOwnerTaskId, resolveTemporaryStewardLinks, uniqueReceiptTaskIds } from './runner-sync-receipt-continuation.ts';
 export { buildRunnerSyncBuildObservation, persistTsBuildCache, prepareTsBuildCache, summarizeDominantPhase, writeRunnerBuildRuntimeTelemetry } from './runner-sync-observability.ts';
 
 const releaseManifestPaths = [
@@ -287,10 +287,11 @@ export function buildRunnerSyncReceipt(input: {
   readonly tsBuildCache?: TsBuildCacheSummary | null;
   readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
   readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
+  readonly receiptTaskId?: string | null;
   readonly timings: SealedBuildTimings;
   readonly publishedAt?: string;
 }): RunnerSyncReceipt {
-  const taskId = input.admission.queueHeadOwnership.waitingTasks[0] ?? '';
+  const taskId = input.receiptTaskId?.trim() || input.admission.queueHeadOwnership.waitingTasks[0] || '';
   const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
   if (!taskId || !stewardWorkId) {
     throw new Error('ATM_RUNNER_SYNC_RECEIPT_INVALID: queue-head task and steward work id are required to publish a runner-sync receipt.');
@@ -486,12 +487,14 @@ export function writeRunnerSyncReceipt(input: {
   readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
   readonly timings: SealedBuildTimings;
 }): string {
+  const linkedTaskIds = uniqueReceiptTaskIds([
+    ...(input.linkedTaskIds ?? []),
+    ...resolveTemporaryStewardLinks(input.cwd, input.admission.queueHeadOwnership.waitingTasks)
+  ]);
   const receipt = buildRunnerSyncReceipt({
     ...input,
-    linkedTaskIds: uniqueReceiptTaskIds([
-      ...(input.linkedTaskIds ?? []),
-      ...resolveTemporaryStewardLinks(input.cwd, input.admission.queueHeadOwnership.waitingTasks)
-    ])
+    linkedTaskIds,
+    receiptTaskId: resolveRunnerSyncReceiptOwnerTaskId(input.cwd, input.admission.queueHeadOwnership.waitingTasks)
   });
   const relative = path.join('.atm', 'history', 'evidence', `${receipt.taskId}.runner-sync-receipt.json`);
   const absolute = path.join(input.cwd, relative);

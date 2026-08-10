@@ -9,6 +9,7 @@ export type EmergencyPermissionId =
   | 'backend.waiver.historicalDeliveryOutOfScope'
   | 'backend.runnerRecovery'
   | 'backend.brokerConflictOverride'
+  | 'backend.gitIndexLockRecovery'
   | 'backend.gitHookBypass';
 
 export interface EmergencyPermissionDefinition {
@@ -166,6 +167,20 @@ export const emergencyPermissionRegistry: readonly EmergencyPermissionDefinition
     requiresHumanApprovalText: true,
     auditRequired: true,
     validatorTags: ['emergency-broker-conflict-override', 'team-broker-resolution']
+  },
+  {
+    id: 'backend.gitIndexLockRecovery',
+    summary: 'Remove a stale Git index lock after an explicit human quiescence confirmation.',
+    protectedSurfaces: ['git recover-index-lock --force-index-lock-recovery'],
+    normalLane: 'wait for the active Git writer to finish',
+    riskTier: 'high',
+    defaultTtlMinutes: 10,
+    defaultMaxUses: 1,
+    requiresTaskId: true,
+    requiresActor: true,
+    requiresHumanApprovalText: true,
+    auditRequired: true,
+    validatorTags: ['emergency-git-index-lock-recovery']
   },
   {
     id: 'backend.gitHookBypass',

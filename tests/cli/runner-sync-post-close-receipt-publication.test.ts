@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -134,6 +134,32 @@ try {
   assert.deepEqual(entriesAfterRepublish, ['ATM-GOV-0256.runner-sync-receipt.json'], 'republication must stay a single governed file, not accumulate residue');
   const onDiskAfterRepublish = JSON.parse(readFileSync(path.join(repo, expectedReceiptRef), 'utf8'));
   assert.equal(onDiskAfterRepublish.decisionReason, 'revalidated no-op');
+
+  const tempTaskId = 'ATM-FRAMEWORK-TEMP-captain-a';
+  const linkedDeliveryTaskId = 'ATM-GOV-0257';
+  const temporaryAdmission = fixtureAdmission({
+    runnerSyncSteward: {
+      ...admission.runnerSyncSteward,
+      stewardWorkId: 'runner-sync-fixture',
+      queuePosition: 1,
+      suggestedNextAction: 'run runner sync',
+      requestedSurfaces: ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'],
+      waitingTasks: [tempTaskId, linkedDeliveryTaskId],
+      requests: [
+        { taskId: tempTaskId, actorId: 'release-steward', requestedSurfaces: ['release/atm-onefile/atm.mjs'] },
+        { taskId: linkedDeliveryTaskId, actorId: 'release-steward', requestedSurfaces: ['release/atm-root-drop'] }
+      ]
+    },
+    queueHeadOwnership: {
+      ...admission.queueHeadOwnership,
+      waitingTasks: [tempTaskId, linkedDeliveryTaskId]
+    }
+  });
+  const lockPath = path.join(repo, '.atm', 'runtime', 'locks', `${tempTaskId}.lock.json`);
+  mkdirSync(path.dirname(lockPath), { recursive: true });
+  writeFileSync(lockPath, `${JSON.stringify({ workItemId: tempTaskId, linkedTaskId: linkedDeliveryTaskId })}\n`, 'utf8');
+  const linkedReceiptRef = writeRunnerSyncReceipt({ ...receiptInput, admission: temporaryAdmission });
+  assert.equal(linkedReceiptRef, `.atm/history/evidence/${linkedDeliveryTaskId}.runner-sync-receipt.json`, 'a temporary queue head must publish through its single durable delivery link');
 
   console.log('[runner-sync-post-close-receipt-publication.test] ok');
 } finally {

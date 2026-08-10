@@ -21,6 +21,20 @@ export function resolveTemporaryStewardLinks(cwd: string, memberTaskIds: readonl
   }));
 }
 
+/**
+ * A temporary framework claim is a publication capability, not the durable
+ * delivery owner.  When the queue head is such a claim and has exactly one
+ * recorded delivery link, publish the canonical receipt under that delivery
+ * task.  Ambiguity deliberately falls back to the queue head so callers do
+ * not invent an owner.
+ */
+export function resolveRunnerSyncReceiptOwnerTaskId(cwd: string, memberTaskIds: readonly string[]): string {
+  const queueHeadTaskId = memberTaskIds[0]?.trim() ?? '';
+  if (!queueHeadTaskId) return '';
+  const deliveryTaskIds = resolveTemporaryStewardLinks(cwd, [queueHeadTaskId]);
+  return deliveryTaskIds.length === 1 ? deliveryTaskIds[0]! : queueHeadTaskId;
+}
+
 function quoteCliArg(value: string): string { return JSON.stringify(value); }
 
 export function buildRunnerSyncReleaseCommand(input: {
