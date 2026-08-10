@@ -60,8 +60,7 @@ export type RunnerInputSegment = (typeof RUNNER_INPUT_SEGMENTS)[number];
 export const RUNNER_GENERATED_OUTPUT_PREFIXES = ['packages/cli/dist/'] as const;
 export const RUNNER_INPUT_TREE_PATHS = [
   'packages', 'scripts', 'templates', 'schemas', 'atomic_workbench',
-  'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json',
-  ...RUNNER_GENERATED_OUTPUT_PREFIXES.map((prefix) => `:(exclude)${prefix}**`)
+  'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json'
 ] as const;
 
 export function isRunnerGeneratedOutputPath(path: string): boolean {
