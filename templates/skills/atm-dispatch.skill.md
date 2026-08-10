@@ -54,6 +54,18 @@ Treat ATM parallel governance as a tiered authority model:
   shared write window. A bare refusal at a shared-write gate is charter debt
   (INV-ATM-008), not a design choice.
 
+## Minimum Queue Residency
+
+Apply `INV-ATM-011` to every queue decision. Treat a queue as a scarce-resource
+boundary, not work ownership: identify the irreducible shared interval, move all
+separable work outside it, and queue only a ready candidate. Completion or
+invalidation must release capacity immediately.
+
+Do not solve avoidable queue time with agent polling, long-lived reservation, or
+path-only serialization. Require observable readiness and current-state evidence
+at the boundary; broker tickets, locks, leases, publication flows, and commits
+are implementations of this principle, not exceptions to it.
+
 The only standing serialization exceptions are the four owner-ruled cases in
 `docs/governance/parallel-governance-charter.md` (one lane session per task
 card; dependency gates block code only, never documents; the single-branch

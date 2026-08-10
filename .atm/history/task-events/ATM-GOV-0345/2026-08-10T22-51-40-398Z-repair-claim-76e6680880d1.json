@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-10T22-51-40-398Z-repair-claim-76e6680880d1",
+  "taskId": "ATM-GOV-0345",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260810000724-codex-gpt-5.4-mini-ATM-GOV-0345-11cb3f3a5d",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:e7c60168d39496988f8b53b01d67be84b1fc71c70ecd7d34fb78c412b7074e8b",
+  "createdAt": "2026-08-10T22:51:40.398Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --write --reason \"Repair expired same-owner claim and dangling lock before consuming the human-approved one-time hook-bypass commit lease.\" --json"
+}

@@ -19,7 +19,6 @@ import {
 } from '../../packages/core/src/broker/runner-sync-session.ts';
 import {
   computeAggregateInputTreeHash,
-  RUNNER_SYNC_ERROR_CODES,
   RUNNER_INPUT_GRAPH_SCHEMA,
   type RunnerInputGraph,
   type RunnerInputGraphNode
@@ -66,22 +65,22 @@ const started = startRunnerSyncSession(
 );
 assert.equal(started.allowed, true);
 assert.equal(started.state.schemaId, RUNNER_SYNC_SESSION_STATE_SCHEMA);
-assert.equal(started.state.phase, 'building');
+assert.equal(started.state.phase, 'prepared');
 assert.deepEqual([...started.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
-assert.ok(started.state.buildLease);
+assert.equal(started.state.buildLease, null);
 
 // 2. Lease renewal within TTL extends the lease.
 const renewed = renewRunnerSyncSession(started.state, fixedPorts('2026-07-27T08:30:00.000Z'));
 assert.equal(renewed.allowed, true);
-assert.equal(renewed.action, 'renew-lease');
-assert.ok(renewed.state.buildLease && renewed.state.buildLease.expiresAt > started.state.buildLease!.expiresAt);
+assert.equal(renewed.action, 'wait');
+assert.equal(renewed.state.buildLease, null);
 
 // 3. Lease expired → ATM_RUNNER_SYNC_STEWARD_LEASE_EXPIRED with resume path, no drop.
 const expired = renewRunnerSyncSession(started.state, fixedPorts('2026-07-27T10:00:00.000Z'));
-assert.equal(expired.allowed, false);
-assert.equal(expired.errorCode, RUNNER_SYNC_ERROR_CODES.stewardLeaseExpired);
-assert.equal(expired.action, 'resume-build');
-assert.ok(expired.recoveryCommand && expired.recoveryCommand.includes('resume'));
+assert.equal(expired.allowed, true);
+assert.equal(expired.errorCode, null);
+assert.equal(expired.action, 'wait');
+assert.equal(expired.state.buildLease, null);
 // The manifest (member attribution) survives an expired lease.
 assert.deepEqual([...expired.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
 

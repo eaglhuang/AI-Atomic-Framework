@@ -55,6 +55,26 @@ function terminateProcessTree(child: ChildProcess): void {
   }
 }
 
+/**
+ * Windows reports the process as exited before every descendant has released
+ * its working-directory handle.  Teardown is not an assertion waiver: it has
+ * a short, bounded barrier and rethrows the last filesystem error if the
+ * process tree has not actually quiesced.
+ */
+async function removeFixtureWithRetry(target: string): Promise<void> {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      rmSync(target, { recursive: true, force: true, maxRetries: 0 });
+      return;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+  throw lastError;
+}
+
 async function makeKillAfterTargetCommitFixture() {
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-close-crash-kill-after-target-'));
   const targetRepo = path.join(tempRoot, 'target');
@@ -304,7 +324,7 @@ try {
     'taskflow close can converge the dirty planning closeback without changing the target deliverable'
   );
 } finally {
-  rmSync(killFixture.tempRoot, { recursive: true, force: true });
+  await removeFixtureWithRetry(killFixture.tempRoot);
 }
 
 console.log('[taskflow-close-crash-matrix] ok');

@@ -261,7 +261,12 @@ export function runPreCommitHook(cwd: string) {
   });
   const gitIndexDiagnostic = inspectGitIndexAccess(root);
   const encodingReport = scanEncoding(root, stagedFiles);
-  const frameworkStatus = createFrameworkModeStatus({ cwd: root, files: stagedFiles });
+  const frameworkStatus = createFrameworkModeStatus({
+    cwd: root,
+    files: stagedFiles,
+    taskId: committingTaskIdForHook,
+    actorId: process.env.ATM_COMMIT_ACTOR_ID
+  });
   const allowAdopterInfrastructureSync = isAdopterInfrastructureSyncCommit(
     stagedFiles.length > 0 ? stagedFiles : frameworkStatus.changedFiles
   );

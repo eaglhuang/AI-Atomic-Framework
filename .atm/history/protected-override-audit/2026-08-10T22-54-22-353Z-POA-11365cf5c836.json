@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-11365cf5c836",
+  "recordedAt": "2026-08-10T22:54:22.353Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0345 --message \"fix(runner): make publication handoff atomic\n\nATM-Work-Admission: wat-105f94b3679c0b07 sha256:105f94b3679c0b07b99e4bd65fa6eec936afd6ebd7236cbc6443cbdd533ba7cf\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0345-3e4c7c7d43",
+  "reason": "Frozen hook bootstrap circularity; task-scoped source repair is validated and must land before the hook can enforce it.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-10T22-54-22-351Z-EMG-ATM-GOV-0345-3e4c7c7d43.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

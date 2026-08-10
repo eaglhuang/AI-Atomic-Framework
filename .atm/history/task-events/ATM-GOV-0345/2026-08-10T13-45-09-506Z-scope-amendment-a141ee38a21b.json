@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-10T13-45-09-506Z-scope-amendment-a141ee38a21b",
+  "taskId": "ATM-GOV-0345",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:2fda43b435f562dd24eab1be10973dba054e9b29ca29b90a4547fab158552ab7",
+  "createdAt": "2026-08-10T13:45:09.506Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/broker/parser.ts,packages/cli/src/commands/command-specs/broker.spec.ts,packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts,tests/cli/runner-publication-reconciliation.test.ts\" --reason \"A governed runner-publication takeover needs a broker command parser, public command contract, durable lifecycle receipt writer, and end-to-end fail-closed regression; these are one transaction boundary.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "A governed runner-publication takeover needs a broker command parser, public command contract, durable lifecycle receipt writer, and end-to-end fail-closed regression; these are one transaction boundary."
+  }
+}

@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as {
@@ -13,17 +12,14 @@ for (const scriptName of ['build', 'build:packages', 'build:root-drop-release', 
   );
 }
 
-const gateRun = spawnSync(process.execPath, ['--strip-types', 'scripts/run-sealed-runner-build.ts', 'packages'], {
-  cwd: process.cwd(),
-  encoding: 'utf8',
-  env: {
-    ...process.env,
-    ATM_ACTOR_ID: 'runner-sync-build-script-test'
-  }
-});
+const source = readFileSync('scripts/run-sealed-runner-build.ts', 'utf8');
+const candidateBuild = source.indexOf('runTimedInnerBuild(worktreeRoot');
+const publicationAdmission = source.indexOf('const publication = resolveSealedRunnerPublication({', candidateBuild);
+const publicationSync = source.indexOf('syncGeneratedArtifacts(worktreeRoot, repoRoot', publicationAdmission);
 
-assert.notEqual(gateRun.status, 0, 'build admission must fail without queue-head ownership');
-assert.match(gateRun.stderr, /ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED|ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED/);
-assert.match(gateRun.stderr, /runner-sync queue-head reservation|foreign non-release WIP|broker runner-sync enqueue/);
+assert.ok(candidateBuild >= 0, 'sealed runner build must still construct its candidate in the detached worktree');
+assert.ok(publicationAdmission > candidateBuild, 'runner-sync admission must occur after isolated candidate construction, never before the long build');
+assert.ok(publicationSync > publicationAdmission, 'canonical artifact sync must occur only after queue-head publication admission succeeds');
+assert.match(source, /The detached worktree build is intentionally queue-free/);
 
 console.log('[runner-sync-build-script-admission] ok');

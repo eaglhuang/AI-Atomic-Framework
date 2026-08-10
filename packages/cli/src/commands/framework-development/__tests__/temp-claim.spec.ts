@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -6,8 +7,10 @@ import {
   buildFrameworkStaleCleanupCommand,
   buildFrameworkTempClaimCommand,
   classifyFrameworkStaleLock,
-  isFrameworkStaleLockReleasable
+  isFrameworkStaleLockReleasable,
+  runFrameworkTempClaim
 } from '../temp-claim.ts';
+import { createFrameworkModeStatus, runFrameworkMode } from '../closure-packet-schema.ts';
 
 function tempRoot(): string {
   const root = mkdtempSync(path.join(os.tmpdir(), 'atm-temp-claim-'));
@@ -34,6 +37,45 @@ function writeTask(root: string, taskId: string, status: string) {
   writeFileSync(
     path.join(root, '.atm', 'history', 'tasks', `${taskId}.json`),
     JSON.stringify({ id: taskId, workItemId: taskId, status }, null, 2)
+  );
+}
+
+function initializeGitRoot(root: string) {
+  execFileSync('git', ['init', '--quiet', root]);
+}
+
+function initializeFrameworkRoot(root: string) {
+  writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'ai-atomic-framework' }), 'utf8');
+  mkdirSync(path.join(root, 'packages', 'core', 'src'), { recursive: true });
+  mkdirSync(path.join(root, 'packages', 'cli', 'src'), { recursive: true });
+  writeFileSync(path.join(root, 'packages', 'core', 'src', 'index.ts'), '', 'utf8');
+  writeFileSync(path.join(root, 'packages', 'cli', 'src', 'atm.ts'), '', 'utf8');
+}
+
+function writeDirectionLock(root: string, taskId: string, actorId: string, laneSessionId: string) {
+  writeFileSync(
+    path.join(root, '.atm', 'runtime', 'locks', `${taskId}.lock.json`),
+    JSON.stringify({
+      taskDirectionLock: {
+        schemaId: 'atm.taskDirectionLock.v1',
+        specVersion: '0.1.0',
+        taskId,
+        batchId: null,
+        scopeKey: null,
+        queueId: null,
+        queueIndex: null,
+        allowedFiles: ['x.ts'],
+        planningReadOnlyPaths: [],
+        planningMirrorPaths: [],
+        allowPlanningMirror: false,
+        promptHash: null,
+        actorId,
+        sessionId: null,
+        laneSession: { laneSessionId, status: 'active', source: 'test', exportHint: 'test' },
+        createdAt: '2026-08-10T00:00:00.000Z',
+        status: 'active'
+      }
+    }, null, 2)
   );
 }
 
@@ -148,4 +190,62 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
   assert.equal(staleLock?.laneSessionId, 'lane-a');
   assert.match(staleLock?.detail ?? '', /lane lane-a/);
   assert.match(buildFrameworkStaleCleanupCommand(staleLock!, ['x.ts'], 'continue'), /--lane-session "lane-a"/);
+}
+
+{
+  const root = tempRoot();
+  initializeGitRoot(root);
+  writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
+
+  const result = await runFrameworkTempClaim(root, 'agent-one', ['x.ts'], 'unit test', 'TASK-A', 'lane-a');
+  assert.equal(result.ok, true);
+  assert.equal((result.evidence as { linkedTaskId?: string }).linkedTaskId, 'TASK-A');
+}
+
+{
+  const root = tempRoot();
+  initializeGitRoot(root);
+  writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
+
+  await assert.rejects(
+    async () => await runFrameworkMode(['claim', '--cwd', root, '--actor', 'agent-one', '--task', 'TASK-B', '--files', 'x.ts', '--lane-session', 'lane-a']),
+    (error: unknown) => Boolean(error && typeof error === 'object' && (error as { code?: string }).code === 'ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_INVALID'),
+    'an explicit task must be proved by the actor and lane rather than trusted blindly'
+  );
+}
+
+{
+  const root = tempRoot();
+  initializeGitRoot(root);
+  writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
+  writeDirectionLock(root, 'TASK-B', 'agent-one', 'lane-a');
+
+  await assert.rejects(
+    () => runFrameworkTempClaim(root, 'agent-one', ['x.ts'], 'unit test', null, 'lane-a'),
+    (error: unknown) => Boolean(error && typeof error === 'object' && (error as { code?: string }).code === 'ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_AMBIGUOUS'),
+    'multiple active tasks in one lane must fail closed rather than choose by recency'
+  );
+}
+
+{
+  const root = tempRoot();
+  initializeFrameworkRoot(root);
+  writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
+  writeDirectionLock(root, 'TASK-B', 'agent-one', 'lane-a');
+  writeLock(root, 'agent-one', {
+    linkedTaskId: 'TASK-A',
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 3600
+  });
+  writeTask(root, 'TASK-A', 'running');
+  writeTask(root, 'TASK-B', 'running');
+
+  const report = createFrameworkModeStatus({
+    cwd: root,
+    files: ['packages/cli/src/atm.ts'],
+    taskId: 'TASK-A',
+    actorId: 'agent-one'
+  });
+  assert.deepEqual(report.activeLocks, ['.atm/runtime/locks/TASK-A.lock.json']);
+  assert.equal(report.staleLocks.length, 0, 'a known committing task must not be blocked by another active task direction');
 }

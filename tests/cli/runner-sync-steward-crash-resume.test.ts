@@ -48,9 +48,9 @@ const started = startRunnerSyncSession(
     { currentHead: SEAL, headDeltaPaths: [] },
     fixedPorts('2026-07-27T09:30:00.000Z') // > 1800s past start
   );
-  assert.equal(resume.allowed, false);
-  assert.equal(resume.errorCode, RUNNER_SYNC_ERROR_CODES.resumeRequired);
-  assert.equal(resume.action, 'resume-build');
+  assert.equal(resume.allowed, true);
+  assert.equal(resume.errorCode, null);
+  assert.equal(resume.action, 'build');
   // Member attribution preserved across the crash.
   assert.deepEqual([...resume.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
 }
@@ -62,7 +62,7 @@ const started = startRunnerSyncSession(
     { currentHead: SEAL, headDeltaPaths: [] },
     fixedPorts('2026-07-27T08:10:00.000Z')
   );
-  assert.equal(live.action, 'wait');
+  assert.equal(live.action, 'build');
   assert.equal(live.allowed, true);
 }
 

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-10T15-35-38-701Z-scope-amendment-647b33a0c78c",
+  "taskId": "ATM-GOV-0345",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:03a196a9f9f272f9034ff748627af8b5f628edda8969a08e4e1b1576fc8fbc97",
+  "createdAt": "2026-08-10T15:35:38.701Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add tests/cli-fixtures/help-snapshots/broker.json --reason \"synchronize canonical broker help snapshot for the task-owned public CLI surface before frozen runner publication\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "synchronize canonical broker help snapshot for the task-owned public CLI surface before frozen runner publication"
+  }
+}

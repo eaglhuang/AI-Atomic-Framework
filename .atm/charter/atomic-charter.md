@@ -5,8 +5,8 @@
 > resolved through a governed charter waiver proposal (`behavior.evolve` +
 > `charterWaiver` + `HumanReviewDecision`), not by silent override.
 
-**Charter version**: 2.4.0
-**Last amended**: 2026-07-22T03:10:00.000Z
+**Charter version**: 2.5.0
+**Last amended**: 2026-08-10T14:20:00.000Z
 **Machine-readable invariants**: `.atm/charter/charter-invariants.json`
 **Normative design schedule**: `.atm/charter/atm-first-principles.md` (version 1.0.0)
 **Schedule SHA-256**: `sha256:4936539324d5c04a3275eda735a75f9af6bf8bdce83cb5584420fdf43d33f7e2`
@@ -55,6 +55,7 @@ See `charter-invariants.json` for the machine-readable form used by ATM guards.
 | INV-ATM-008 | Broker tickets, not refusals | doctor |
 | INV-ATM-009 | Generalized repair and data-driven policy | doctor |
 | INV-ATM-010 | Single canonical worktree and compose-first shared writes | doctor |
+| INV-ATM-011 | Minimum queue residency | doctor |
 
 ### INV-ATM-008 — Broker tickets, not refusals (parallel governance principle)
 
@@ -102,6 +103,21 @@ substrate after steward apply. The closed exceptions are emergency/anomaly
 recovery, historical read-only discrimination, and non-development sealed
 packaging; each exception requires a named receipt and cannot perform normal
 governed contribution writes.
+
+### INV-ATM-011 — Minimum queue residency
+
+Queueing is a scarce-resource boundary, never a work-ownership model. Every
+queue design must minimize residency to the irreducible interval during which a
+specific shared resource cannot be safely parallelized, composed, deferred, or
+made private. All separable preparation, computation, validation, and staging
+must occur outside that interval before a worker joins the queue.
+
+The design must make the boundary observable and prove it is minimal: admission
+binds a ready candidate to current state, the shared transition has explicit
+success and failure outcomes, and completion or invalidation releases capacity
+immediately. A queue may not substitute for polling, long-lived reservation,
+or avoidable serialization. A particular broker, lock, lease, publish flow, or
+commit mechanism is only one implementation of this invariant, not its meaning.
 
 ---
 

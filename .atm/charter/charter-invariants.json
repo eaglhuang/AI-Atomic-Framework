@@ -4,13 +4,13 @@
   "specVersion": "0.1.0",
   "migration": {
     "strategy": "additive",
-    "fromVersion": "2.3.0",
-    "notes": "Add single canonical worktree and compose-first shared writes as INV-ATM-010."
+    "fromVersion": "2.4.0",
+    "notes": "Add minimum queue residency as INV-ATM-011."
   },
-  "charterVersion": "2.4.0",
+  "charterVersion": "2.5.0",
   "projectName": "ai-atomic-framework",
-  "lastAmendedAt": "2026-07-22T03:10:00.000Z",
-  "charterHash": "sha256:df63086114ed2a4d717122f4ab049d418e25061e1c5e7ba228c47dc86ad95d08",
+  "lastAmendedAt": "2026-08-10T14:20:00.000Z",
+  "charterHash": "sha256:0197f13999d8e124de782eb964eaa85fad0d56198bb7e20c77023764e387448b",
   "firstPrinciplesHash": "sha256:4936539324d5c04a3275eda735a75f9af6bf8bdce83cb5584420fdf43d33f7e2",
   "scheduleA": {
     "scheduleId": "schedule-a-economic-thresholds",
@@ -183,6 +183,15 @@
         "governance"
       ],
       "rationale": "Logical intent and compose evidence, not Git topology or path-only locking, are the basis for safe parallel work. A single canonical worktree preserves comparable code state while a neutral steward prevents concurrent physical writes from losing attribution or updates."
+    },
+    {
+      "id": "INV-ATM-011",
+      "title": "Minimum queue residency",
+      "rule": "Queueing is a scarce-resource boundary, never a work-ownership model. Every queue design must minimize residency to the irreducible interval during which a specific shared resource cannot be safely parallelized, composed, deferred, or made private. All separable preparation, computation, validation, and staging must occur outside that interval before a worker joins the queue. The design must make the boundary observable and prove it is minimal: admission binds a ready candidate to current state, the shared transition has explicit success and failure outcomes, and completion or invalidation releases capacity immediately. A queue may not substitute for polling, long-lived reservation, or avoidable serialization. A particular broker, lock, lease, publish flow, or commit mechanism is only one implementation of this invariant, not its meaning.",
+      "enforcement": "doctor",
+      "breakingChange": false,
+      "tags": ["parallel", "critical-section", "queue", "lease", "residency"],
+      "rationale": "A queue held during work that can be parallelized turns coordination into artificial serialization and false blocking. Treating queue residency as a minimized, measured critical interval preserves safety while keeping capacity available for independent work."
     }
   ]
 }

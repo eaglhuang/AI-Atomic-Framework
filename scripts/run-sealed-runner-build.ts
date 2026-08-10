@@ -4,11 +4,6 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
-  assertRunnerSyncAdmission,
-  inspectRunnerSyncAdmission,
-  type RunnerSyncAdmissionReport
-} from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
-import {
   buildRunnerSyncReleaseCommand,
   buildRunnerSyncBuildObservation,
   buildRunnerSyncReceipt,
@@ -28,9 +23,10 @@ import {
   type RunnerSyncReceipt,
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
-import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory, validateRunnerPublicationTakeoverPlan } from '../packages/core/src/broker/runner-build-output-inventory.ts';
-import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
+import { scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
+import { resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
@@ -117,24 +113,6 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
 
-  const admission = inspectRunnerSyncAdmission({
-    cwd: repoRoot,
-    stewardActorId: actorId,
-    sealedSourceSha
-  });
-  assertRunnerSyncAdmission(admission);
-  const currentTaskId = admission.queueHeadOwnership.waitingTasks[0] ?? null;
-  const currentTask = currentTaskId
-    ? getActiveTasks(repoRoot).find((entry) => entry.taskId === currentTaskId.toUpperCase())
-    : null;
-  const beforeBuildSnapshot = captureRunnerBuildOutputSnapshot({
-    cwd: repoRoot,
-    buildTarget,
-    currentTaskId,
-    currentTaskAllowedFiles: currentTask?.allowedFiles
-  });
-  const takeoverPaths = readValidatedPublicationTakeover({ cwd: repoRoot, taskId: currentTaskId, sealedSourceSha, snapshot: beforeBuildSnapshot });
-
   const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
   const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({
     cwd: repoRoot,
@@ -142,6 +120,12 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     buildInputsTreeHash
   }));
   if (cacheDecision.decision === 'cacheHitSkip') {
+    const publication = resolveSealedRunnerPublication({
+      cwd: repoRoot,
+      stewardActorId: actorId,
+      sealedSourceSha,
+      buildTarget
+    });
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     const dominantPhaseSummary = summarizeDominantPhase(timings);
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
@@ -171,11 +155,11 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     }));
     const receiptRef = writeRunnerSyncReceipt({
       cwd: repoRoot,
-      admission,
+      admission: publication.admission,
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null, beforeBuildSnapshot, includeDirtyPublicationMembers: true }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: publication.currentTaskId, beforeBuildSnapshot: publication.beforeBuildSnapshot, includeDirtyPublicationMembers: true }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
@@ -186,7 +170,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       timings,
       dominantPhaseSummary
     });
-    releaseRunnerSyncSteward({ cwd: repoRoot, admission, receiptRef });
+    releaseRunnerSyncSteward({ cwd: repoRoot, admission: publication.admission, receiptRef });
     console.log(`[sealed-runner-build] cacheHitSkip ${buildTarget} from ${sealedSourceSha}`);
     return;
   }
@@ -217,10 +201,19 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     }
     runTimedInnerBuild(worktreeRoot, buildTarget, timings, buildDecision === 'incrementalBuild' ? incrementalPlan : null);
     tsBuildCache = persistTsBuildCache({ cwd: repoRoot, worktreeRoot, summary: tsBuildCache });
+    // The detached worktree build is intentionally queue-free.  The queue is a
+    // publication mutex, not a build reservation: only acquire/revalidate it
+    // after the candidate is complete and immediately before root mutation.
+    const publication = resolveSealedRunnerPublication({
+      cwd: repoRoot,
+      stewardActorId: actorId,
+      sealedSourceSha,
+      buildTarget
+    });
     const artifactSync = timePhase(
       timings,
       'artifactSyncMs',
-      () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, beforeBuildSnapshot.preexistingDirtyPaths.filter((entry) => !takeoverPaths.includes(entry))),
+      () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, publication.beforeBuildSnapshot.preexistingDirtyPaths.filter((entry) => !publication.takeoverPaths.includes(entry))),
     );
     if (artifactSync.preservedPaths.length > 0) {
       throw new Error(
@@ -238,7 +231,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       runtimeTelemetryRef: null,
       tsBuildCache,
       timings,
-      preservePaths: beforeBuildSnapshot.preexistingDirtyPaths
+      preservePaths: publication.beforeBuildSnapshot.preexistingDirtyPaths
     });
     const dominantPhaseSummary = summarizeDominantPhase(timings);
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
@@ -256,11 +249,11 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     });
     const receiptRef = writeRunnerSyncReceipt({
       cwd: repoRoot,
-      admission,
+      admission: publication.admission,
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null, beforeBuildSnapshot, includeDirtyPublicationMembers: true }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: publication.currentTaskId, beforeBuildSnapshot: publication.beforeBuildSnapshot, includeDirtyPublicationMembers: true }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision,
@@ -271,7 +264,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       timings,
       dominantPhaseSummary
     });
-    releaseRunnerSyncSteward({ cwd: repoRoot, admission, receiptRef });
+    releaseRunnerSyncSteward({ cwd: repoRoot, admission: publication.admission, receiptRef });
     console.log(`[sealed-runner-build] ${buildDecision} ${buildTarget} from ${sealedSourceSha}`);
   } finally {
     // CRITICAL: unlink the node_modules junction BEFORE git worktree remove.
@@ -291,18 +284,6 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     });
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
   }
-}
-
-function readValidatedPublicationTakeover(input: { readonly cwd: string; readonly taskId: string | null; readonly sealedSourceSha: string; readonly snapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot> }): readonly string[] {
-  if (!input.taskId || input.snapshot.preexistingDirtyPaths.length === 0) return [];
-  const relative = `.atm/history/evidence/${input.taskId}.runner-publication-takeover.json`;
-  const absolute = path.join(input.cwd, relative);
-  if (!existsSync(absolute)) return [];
-  let document: unknown;
-  try { document = JSON.parse(readFileSync(absolute, 'utf8')); } catch { fail(`Runner publication takeover receipt is not valid JSON: ${relative}`, 1); }
-  const validated = validateRunnerPublicationTakeoverPlan({ plan: document, sealedSourceSha: input.sealedSourceSha, snapshot: input.snapshot });
-  if (!validated.ok || !validated.plan) fail(`Runner publication takeover receipt is invalid: ${validated.reason ?? relative}`, 1);
-  return validated.plan.entries.map((entry) => entry.path);
 }
 
 function runTimedInnerBuild(
