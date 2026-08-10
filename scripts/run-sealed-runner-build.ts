@@ -216,7 +216,16 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     }
     runTimedInnerBuild(worktreeRoot, buildTarget, timings, buildDecision === 'incrementalBuild' ? incrementalPlan : null);
     tsBuildCache = persistTsBuildCache({ cwd: repoRoot, worktreeRoot, summary: tsBuildCache });
-    timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, beforeBuildSnapshot.preexistingDirtyPaths));
+    const artifactSync = timePhase(
+      timings,
+      'artifactSyncMs',
+      () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, beforeBuildSnapshot.preexistingDirtyPaths),
+    );
+    if (artifactSync.preservedPaths.length > 0) {
+      throw new Error(
+        `Runner publication incomplete: preserved foreign generated outputs were not replaced by sealed build ${sealedSourceSha}: ${artifactSync.preservedPaths.join(', ')}`,
+      );
+    }
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeBuildMetadataToReleaseManifests({
       cwd: repoRoot,
@@ -499,7 +508,7 @@ function runInnerBuild(buildTarget: BuildTarget): void {
   }
 }
 
-export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget, preservePaths: readonly string[] = []): void {
+export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget, preservePaths: readonly string[] = []): { readonly preservedPaths: readonly string[] } {
   // Preserve only paths explicitly classified by the pre-build snapshot.
   // Admission decides whether that foreign WIP may coexist with this build;
   // synchronisation must never silently overwrite it. Unlisted generated
@@ -519,6 +528,7 @@ export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, b
   if (buildTarget === 'full' || buildTarget === 'onefile') {
     syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'), { preserveRelativePaths: preservedUnder('release/atm-onefile') });
   }
+  return { preservedPaths: [...preservePaths].sort((left, right) => left.localeCompare(right)) };
 }
 
 
