@@ -71,7 +71,10 @@ export function readGeneratedResidueTaskDisposition(cwd: string, taskId: string)
     status: normalize(ledger.status),
     claimState,
     lastLifecycleAction: latestLifecycleAction(cwd, normalizedTaskId),
-    hasActiveClaim: claimState === 'active' || claimState === 'claimed' || Boolean(claim?.owner),
+    // `owner` is durable attribution retained after close/release; it is not
+    // lease liveness.  Only the explicit claim state may prevent a completed
+    // foreign receipt from being preserved as external residue.
+    hasActiveClaim: claimState === 'active' || claimState === 'claimed',
   };
 }
 

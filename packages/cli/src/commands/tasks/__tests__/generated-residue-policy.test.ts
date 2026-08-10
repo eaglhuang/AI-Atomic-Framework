@@ -27,6 +27,15 @@ const releasedRepo = makeRepo('TASK-GENERIC-1', {
 const releasedDisposition = readGeneratedResidueTaskDisposition(releasedRepo, 'TASK-GENERIC-1');
 assert.equal(isReleasedGeneratedBundleSafeToClean(releasedDisposition), true);
 
+const terminalOwnerRepo = makeRepo('TASK-GENERIC-TERMINAL', {
+  taskId: 'TASK-GENERIC-TERMINAL', status: 'done', claim: { state: 'released', owner: 'prior-agent' },
+}, { action: 'release', createdAt: '2026-08-09T13:07:48.728Z' });
+assert.equal(
+  isReleasedGeneratedBundleSafeToClean(readGeneratedResidueTaskDisposition(terminalOwnerRepo, 'TASK-GENERIC-TERMINAL')),
+  true,
+  'terminal owner attribution must not be mistaken for an active lease',
+);
+
 const activeRepo = makeRepo('TASK-GENERIC-2', {
   taskId: 'TASK-GENERIC-2', status: 'running', claim: { state: 'active', owner: 'agent' },
 }, { action: 'release', createdAt: '2026-08-09T13:07:48.728Z' });
