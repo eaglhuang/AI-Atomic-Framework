@@ -52,6 +52,23 @@ export const RUNNER_INPUT_SEGMENTS = [
 
 export type RunnerInputSegment = (typeof RUNNER_INPUT_SEGMENTS)[number];
 
+/**
+ * Generated runner outputs must never become sealed inputs of the generation
+ * that produced them.  Keeping this as declarative path data makes both delta
+ * classification and input hashing share the same boundary.
+ */
+export const RUNNER_GENERATED_OUTPUT_PREFIXES = ['packages/cli/dist/'] as const;
+export const RUNNER_INPUT_TREE_PATHS = [
+  'packages', 'scripts', 'templates', 'schemas', 'atomic_workbench',
+  'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json',
+  ...RUNNER_GENERATED_OUTPUT_PREFIXES.map((prefix) => `:(exclude)${prefix}**`)
+] as const;
+
+export function isRunnerGeneratedOutputPath(path: string): boolean {
+  const normalized = normalizePath(path);
+  return RUNNER_GENERATED_OUTPUT_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+}
+
 /** Prefixes / exact files that map a repo path to a runner input segment. */
 const SEGMENT_PREFIXES: readonly { readonly segment: RunnerInputSegment; readonly test: (p: string) => boolean }[] = [
   { segment: 'packages', test: (p) => p.startsWith('packages/') },
@@ -184,7 +201,7 @@ export interface RunnerAffectingClassification {
 /** Map a single repo-relative path to its runner input segment, or null. */
 export function classifyRunnerPathSegment(path: string): RunnerInputSegment | null {
   const normalized = normalizePath(path);
-  if (!normalized) return null;
+  if (!normalized || isRunnerGeneratedOutputPath(normalized)) return null;
   for (const entry of SEGMENT_PREFIXES) {
     if (entry.test(normalized)) return entry.segment;
   }

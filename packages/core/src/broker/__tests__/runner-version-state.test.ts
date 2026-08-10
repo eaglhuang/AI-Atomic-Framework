@@ -5,6 +5,7 @@ import {
   transitionRunnerVersion,
   acquireRunnerVersionLease
 } from '../runner-version-state.ts';
+import { classifyRunnerAffectingPaths, isRunnerGeneratedOutputPath } from '../runner-version-contract.ts';
 
 function testInitialStateIsInDev() {
   const s = createRunnerVersionStream('runner-v0.x');
@@ -48,10 +49,21 @@ function testLeaseAllowedOnlyOnLiveStates() {
   assert.equal(denied.ok, false);
 }
 
+function testGeneratedRunnerOutputsDoNotInvalidateTheirOwnSeal() {
+  assert.equal(isRunnerGeneratedOutputPath('packages/cli/dist/commands/taskflow/implementation.js'), true);
+  const classification = classifyRunnerAffectingPaths([
+    'packages/cli/dist/commands/taskflow/implementation.js',
+    'packages/cli/src/commands/taskflow/implementation.ts'
+  ]);
+  assert.deepEqual(classification.runnerAffecting, ['packages/cli/src/commands/taskflow/implementation.ts']);
+  assert.deepEqual(classification.nonRunnerAffecting, ['packages/cli/dist/commands/taskflow/implementation.js']);
+}
+
 testInitialStateIsInDev();
 testHappyPathLifecycle();
 testIllegalTransitionFailsClosed();
 testRollbackReturnsToInDev();
 testLeaseAllowedOnlyOnLiveStates();
+testGeneratedRunnerOutputsDoNotInvalidateTheirOwnSeal();
 
 console.log('runner version state tests: ok');
