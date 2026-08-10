@@ -105,8 +105,13 @@ export function scanSealedRunnerBuildOutputInventory(input: {
   readonly sealedSourceSha: string;
   readonly taskId: string | null;
   readonly beforeBuildSnapshot: RunnerBuildOutputSnapshot;
+  /** A queue-head sealed build owns the publication roots it has admitted. */
+  readonly includeDirtyPublicationMembers?: boolean;
 }): RunnerBuildOutputInventory {
   const outputPaths = changedPathsSinceSnapshot(input.cwd, input.buildTarget, input.beforeBuildSnapshot);
+  if (input.includeDirtyPublicationMembers) {
+    outputPaths.push(...listDirtyPaths(input.cwd).filter(isRunnerPublicationArtifactPath));
+  }
   if (input.taskId) outputPaths.push(`.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`);
   return deriveRunnerBuildOutputInventory({
     sealedSourceSha: input.sealedSourceSha,
@@ -193,6 +198,8 @@ export function evaluateRunnerPublicationDisposition(input: {
 
   const disposition: RunnerPublicationDisposition = terminalDisposition === 'recovery-retained'
       ? 'recovery-retained'
+      : extraOutputPaths.length > 0
+        ? 'inventory-incomplete'
       : dirtyInventoryPaths.length > 0
         ? 'publication-pending'
         : 'published';

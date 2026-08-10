@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0345",
   "title": "Make sealed runner publication atomic across task close and queue release",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0344"
@@ -199,8 +199,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-10T12-29-30-440Z-renew-378838059713",
-  "lastTransitionAt": "2026-08-10T12:29:30.440Z",
+  "lastTransitionId": "2026-08-10T12-41-01-593Z-close-893b74fb6bd7",
+  "lastTransitionAt": "2026-08-10T12:41:01.593Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-09T22:53:33.062Z",
   "promotedAt": "2026-08-09T22:53:33.066Z",
@@ -208,7 +208,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-6d2e9eae3593",
     "claimedAt": "2026-08-10T00:07:24.567Z",
-    "heartbeatAt": "2026-08-10T12:29:29.952Z",
+    "heartbeatAt": "2026-08-10T12:41:01.590Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0345.*",
@@ -254,13 +254,14 @@
       "tests/cli/git-index-lock-recovery.test.ts",
       "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260810000724-codex-gpt-5.4-mini-dde73647fb",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260810000724-codex-gpt-5.4-mini-dde73647fb\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-09T22:53:33.071Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -465,5 +466,9 @@
     },
     "createdAt": "2026-08-10T02:24:01.476Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-10T12:41:01.590Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260810000724-codex-gpt-5.4-mini-ATM-GOV-0345-11cb3f3a5d",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0345.closure-packet.json"
 }

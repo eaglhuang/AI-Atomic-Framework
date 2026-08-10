@@ -73,7 +73,8 @@ const foreignWip = evaluateRunnerPublicationDisposition({
   inventory,
   dirtyPaths: ['release/atm-onefile/release-manifest.json']
 });
-assert.equal(foreignWip.disposition, 'published');
+assert.equal(foreignWip.ok, false);
+assert.equal(foreignWip.disposition, 'inventory-incomplete');
 assert.deepEqual(foreignWip.extraOutputPaths, ['release/atm-onefile/release-manifest.json']);
 
 const fixtureRoot = mkdtempSync(path.join(tmpdir(), 'atm-runner-inventory-'));
@@ -109,6 +110,19 @@ const deltaInventory = scanSealedRunnerBuildOutputInventory({
 assert.deepEqual(deltaInventory.entries.map((entry) => entry.path), [
   '.atm/history/evidence/TASK-ERR-0011.runner-sync-receipt.json',
   'release/atm-onefile/atm.mjs'
+]);
+const sealedInventory = scanSealedRunnerBuildOutputInventory({
+  cwd: fixtureRoot,
+  buildTarget: 'onefile',
+  sealedSourceSha: '0123456789abcdef0123456789abcdef01234567',
+  taskId: 'TASK-ERR-0011',
+  beforeBuildSnapshot: snapshot,
+  includeDirtyPublicationMembers: true
+});
+assert.deepEqual(sealedInventory.entries.map((entry) => entry.path), [
+  '.atm/history/evidence/TASK-ERR-0011.runner-sync-receipt.json',
+  'release/atm-onefile/atm.mjs',
+  'release/atm-onefile/release-manifest.json'
 ]);
 const sourceRoot = path.join(fixtureRoot, 'build-output');
 mkdirSync(path.join(sourceRoot, 'release', 'atm-onefile'), { recursive: true });
