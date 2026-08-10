@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-10T00-06-03-682Z-repair-claim-3be18263b4f8",
+  "taskId": "ATM-GOV-0345",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809225333-codex-gpt-5.4-mini-ATM-GOV-0345-fc66ab7a4b",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:8509d89fab9ee5567d75f00fe43a177e0c57c21ffe8448f37dc9a6f3a8d63bf9",
+  "createdAt": "2026-08-10T00:06:03.682Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --write --reason \"Expired lane lease requires governed release-and-reclaim recovery before sealed runner publication; do not synthesize a heartbeat.\" --json"
+}

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T23-06-19-877Z-scope-amendment-5dd3fe5f927c",
+  "taskId": "ATM-GOV-0345",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:da465a7c9062da7d2bfbb8c2053ea8253f6640f599194340916b90b640e7f836",
+  "createdAt": "2026-08-09T23:06:19.877Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/git-governance/implementation/commit-command.ts,packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts\" --reason \"The observed foreign bundle deletion occurs in the governed defer-foreign-staged commit transaction; its transaction owner must restore foreign worktree state on every guard failure.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The observed foreign bundle deletion occurs in the governed defer-foreign-staged commit transaction; its transaction owner must restore foreign worktree state on every guard failure."
+  }
+}

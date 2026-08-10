@@ -1,0 +1,368 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0345",
+  "title": "Make sealed runner publication atomic across task close and queue release",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0344"
+  ],
+  "acceptance": [
+    "ACC-1: A close requiring runner publication cannot terminally release the only authority needed to publish its sealed receipt; the state machine exposes either `published` or a durable, receipt-bound continuation.",
+    "ACC-2: A valid continuation can publish and release a closed task's queue-head without reopening/reclaiming that task, while an invalid digest, wrong queue-head, or foreign receipt fails closed.",
+    "ACC-3: Foreign staged governance entries survive publication success and every injected failure with identical index metadata and worktree bytes.",
+    "ACC-4: The regression demonstrates the prior red predicate, then a green execution under the same case ID and candidate SHA.",
+    "ACC-5: `validate:cli` and the two focused tests pass using the frozen runner after a sealed runner-sync build/release receipt is committed.",
+    "ACC-6: ATM-GOV-0344's existing receipt and queue can be reconciled using the generalized recovery path; no task-specific branch is introduced."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert the lifecycle delivery commit, rebuild sealed artifacts from the reverted HEAD, and release only the receipt that matches that HEAD.",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-publication-lifecycle",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-publication-lifecycle",
+        "pattern": "Transactional state machine",
+        "source": "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "disposition": "inline",
+        "inlineReason": "The existing lifecycle module is the intended public deep module; repair must strengthen its transaction contract rather than add a parallel coordinator."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0345-make-sealed-runner-publication-atomic-across-task-close-and-queue-release.task.md",
+    "sectionTitle": "ATM-GOV-0345",
+    "headingLine": 104,
+    "hash": "34c91927a7901b1c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0345-make-sealed-runner-publication-atomic-across-task-close-and-queue-release.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:34c91927a7901b1c1a790f7dd69f792e4a5a0454e5e31295f77a68ab6b5cd839",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T22:53:14.130Z"
+    }
+  },
+  "importedAt": "2026-08-09T22:53:14.130Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0344 closeback exposes a runner-sync queue entry whose receipt remains publication-pending."
+    ],
+    "startConditions": [
+      "Preserve foreign staged governance entries byte-for-byte.",
+      "Use the canonical worktree and the broker queue; do not reopen a completed task merely to publish generated artifacts."
+    ],
+    "softRelations": [
+      "ATM-GOV-0327 rescue-worktree audit remains independent and must not be absorbed into this card."
+    ],
+    "changedPublicSeams": [
+      "sealed-runner-publication-lifecycle",
+      "runner-sync-steward-release",
+      "taskflow-close-runner-publication-handoff"
+    ],
+    "causalImpactEdges": [
+      "close-success -> publication-receipt ownership -> generated-artifact commit -> broker release",
+      "close-failure -> no ledger completion and no release-artifact publication"
+    ],
+    "parallelFrontierInputs": [
+      "runner-sync queue-head receipt for ATM-GOV-0344",
+      "foreign staged governance state"
+    ],
+    "validatorReferences": [
+      "test_runner_publication_close_handoff_0345",
+      "test_taskflow_close_crash_matrix",
+      "validate=cli"
+    ],
+    "phaseOwner": "Wave-2-closeout-atomicity"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_runner_publication_close_handoff_0345",
+      "targetGroupId": "null",
+      "semanticKey": "closed_task_publication_handoff",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "close-success -> publication-receipt ownership -> generated-artifact commit -> broker release"
+      ],
+      "expectedRedPredicate": "a completed task leaves a queue entry whose receipt cannot be published or released without recreating task ownership",
+      "contributionResourceKey": "runner-sync-steward-queue",
+      "responsibility": "task-required",
+      "dependencyEdge": "taskflow-close-runner-publication-handoff",
+      "contractEdge": "sealed-runner-publication-lifecycle",
+      "resourceKey": "runner-sync-steward-queue"
+    },
+    {
+      "caseId": "test_taskflow_close_crash_matrix_0345",
+      "targetGroupId": "null",
+      "semanticKey": "close_failure_has_no_terminal_or_publication_side_effect",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "close-failure -> no ledger completion and no release-artifact publication"
+      ],
+      "expectedRedPredicate": "an injected close failure advances terminal ledger state or alters foreign staged index entries",
+      "contributionResourceKey": "close-window-index",
+      "responsibility": "task-required",
+      "dependencyEdge": "taskflow-close-runner-publication-handoff",
+      "contractEdge": "close-failure-atomicity",
+      "resourceKey": "close-window-index"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_runner_publication_close_handoff_0345",
+    "test_taskflow_close_crash_matrix_0345"
+  ],
+  "phaseTestCaseIds": [
+    "test_taskflow_close_crash_matrix"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-10T00-20-53-647Z-renew-f4d0ecd5bfc3",
+  "lastTransitionAt": "2026-08-10T00:20:53.647Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-08-09T22:53:33.062Z",
+  "promotedAt": "2026-08-09T22:53:33.066Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-6d2e9eae3593",
+    "claimedAt": "2026-08-10T00:07:24.567Z",
+    "heartbeatAt": "2026-08-10T00:20:52.828Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0345.*",
+      ".atm/history/task-events/ATM-GOV-0345/**",
+      ".atm/history/tasks/ATM-GOV-0345.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "scripts/run-sealed-runner-build.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260810000724-codex-gpt-5.4-mini-dde73647fb",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260810000724-codex-gpt-5.4-mini-dde73647fb\""
+    }
+  },
+  "startedAt": "2026-08-09T22:53:33.071Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-e7850b8e7e6c27a0",
+    "ticketDigest": "sha256:e7850b8e7e6c27a0c22165d1ec3b517de9bdfe9c6a646a6362987eb1df213c10",
+    "taskId": "ATM-GOV-0345",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260810000724-codex-gpt-5.4-mini-dde73647fb",
+    "claimGeneration": "lease-6d2e9eae3593",
+    "issuedAt": "2026-08-10T00:20:52.828Z",
+    "expiresAt": "2026-08-10T00:50:52.828Z",
+    "scopeDigest": "sha256:6a06a3935a25a24affc3e97804bc044af83250ac71e416d2a6dd76731878fe60",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-10T00:20:52.828Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0345.*",
+          ".atm/history/task-events/ATM-GOV-0345/**",
+          ".atm/history/tasks/ATM-GOV-0345.json",
+          "packages/cli/src/commands/broker/steward-queues.ts",
+          "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+          "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+          "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "scripts/run-sealed-runner-build.ts"
+        ],
+        "digest": "sha256:b71ff767cd662eb184e956ce04d3c433df50f951e05484e113becab848eb83c9"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260810000724-codex-gpt-5.4-mini-ATM-GOV-0345-11cb3f3a5d",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0345",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809225333-codex-gpt-5.4-mini-07d686dcfd",
+    "dirtyPaths": [
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T22-53-14-737Z-import-903f5442317d.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T22-53-33-062Z-reserve-c5d69729a938.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T22-53-33-066Z-promote-002ee7c30dc8.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T22-53-38-965Z-claim-1285718609bb.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T22-57-02-864Z-renew-4b04e4bd05b1.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T22-57-51-456Z-scope-amendment-528ed6c898df.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T23-02-41-796Z-renew-71cf20492184.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T23-03-29-075Z-scope-amendment-cbff7c69630d.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T23-06-19-877Z-scope-amendment-5dd3fe5f927c.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T23-07-10-818Z-scope-amendment-548e0b75e2a6.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T23-26-59-769Z-scope-amendment-a60d56d63db1.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T23-34-36-148Z-scope-amendment-f0b9e443d49f.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T23-35-39-562Z-renew-349489df800d.json",
+      ".atm/history/task-events/ATM-GOV-0345/2026-08-09T23-46-38-789Z-scope-amendment-65a678cc05fe.json",
+      ".atm/history/tasks/ATM-GOV-0345.json"
+    ],
+    "retainedAt": "2026-08-10T00:06:02.750Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0345",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0345.*",
+      ".atm/history/task-events/ATM-GOV-0345/**",
+      ".atm/history/tasks/ATM-GOV-0345.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "scripts/run-sealed-runner-build.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0345-make-sealed-runner-publication-atomic-across-task-close-and-queue-release.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0345-make-sealed-runner-publication-atomic-across-task-close-and-queue-release.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "aa8c41d7e99286810b09c18754d8ff2ddd50d81850e3f118019408ccc29a32dd",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260810000724-codex-gpt-5.4-mini-dde73647fb",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260810000724-codex-gpt-5.4-mini-dde73647fb\""
+    },
+    "createdAt": "2026-08-10T00:07:32.618Z",
+    "status": "active"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T23-34-36-148Z-scope-amendment-f0b9e443d49f",
+  "taskId": "ATM-GOV-0345",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:932b84d75ba264d667e7857a2560c5f266f97fee68626ed019ac9c7f653bce1a",
+  "createdAt": "2026-08-09T23:34:36.148Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/git-governance/implementation/framework-hook-identity.ts,packages/cli/src/commands/git-governance/implementation/framework-hook-identity.test.ts,packages/cli/src/commands/hook/pre-commit/support.ts\" --reason \"The frozen-runner receipt failure proves that exact lane-bound framework lock identity must flow through hook attribution and protected evidence classification; these are linked lifecycle seams.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The frozen-runner receipt failure proves that exact lane-bound framework lock identity must flow through hook attribution and protected evidence classification; these are linked lifecycle seams."
+  }
+}

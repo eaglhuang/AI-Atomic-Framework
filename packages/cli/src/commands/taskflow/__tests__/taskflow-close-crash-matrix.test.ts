@@ -128,6 +128,8 @@ async function makeKillAfterTargetCommitFixture() {
 
   const claim = await runNext(['--cwd', targetRepo, '--claim', '--actor', 'validator', '--task', taskId, '--claim-intent', 'write']);
   assert.equal(claim.ok, true);
+  const laneSessionId = (claim.evidence as { laneSession?: { laneSessionId?: unknown } }).laneSession?.laneSessionId;
+  if (typeof laneSessionId !== 'string') throw new Error('claim must mint an owner lane capability');
   writeText(path.join(targetRepo, 'src/deliver.txt'), 'delivery after crash\n');
   writeJson(path.join(targetRepo, '.atm/history/evidence', `${taskId}.json`), {
     taskId,
@@ -155,6 +157,7 @@ async function makeKillAfterTargetCommitFixture() {
     targetRepo,
     planningRepo,
     taskId,
+    laneSessionId,
     profilePath: path.join(planningRepo, 'taskflow.profile.json'),
     planPath
   };
@@ -233,9 +236,25 @@ try {
   const child = spawn(process.execPath, ['--strip-types', driverPath, killFixture.targetRepo, killFixture.profilePath, killFixture.taskId], {
     cwd: path.resolve('.'),
     detached: process.platform !== 'win32',
-    stdio: ['ignore', 'pipe', 'pipe']
+    stdio: ['ignore', 'pipe', 'pipe'],
+    env: { ...process.env, ATM_LANE_SESSION_ID: killFixture.laneSessionId }
   });
-  await waitForFile(markerPath, 20_000);
+  let driverStdout = '';
+  let driverStderr = '';
+  child.stdout?.setEncoding('utf8');
+  child.stderr?.setEncoding('utf8');
+  child.stdout?.on('data', (chunk: string) => { driverStdout += chunk; });
+  child.stderr?.on('data', (chunk: string) => { driverStderr += chunk; });
+  try {
+    await waitForFile(markerPath, 20_000);
+  } catch (error) {
+    throw new Error([
+      error instanceof Error ? error.message : String(error),
+      `close-driver exitCode: ${child.exitCode ?? 'running'}`,
+      `close-driver stdout:\n${driverStdout || '(empty)'}`,
+      `close-driver stderr:\n${driverStderr || '(empty)'}`
+    ].join('\n'));
+  }
   const targetCommitAfterCrash = git(killFixture.targetRepo, ['rev-parse', 'HEAD']);
   assert.notEqual(
     targetCommitAfterCrash,

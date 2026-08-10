@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T23-03-29-075Z-scope-amendment-cbff7c69630d",
+  "taskId": "ATM-GOV-0345",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:9822b4a0f2d4c8593c4f12484bb5671fb23c7142abd00d43489f6758c3334feb",
+  "createdAt": "2026-08-09T23:03:29.075Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts,packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts\" --reason \"Receipt-bound terminal runner continuation is enforced at the framework publication capability boundary; its focused regression belongs to the same sealed lifecycle atom.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Receipt-bound terminal runner continuation is enforced at the framework publication capability boundary; its focused regression belongs to the same sealed lifecycle atom."
+  }
+}
