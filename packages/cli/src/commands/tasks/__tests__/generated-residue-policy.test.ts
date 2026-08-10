@@ -4,7 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   isReleasedGeneratedBundleSafeToClean,
+  planReleasedResidueTransaction,
   readGeneratedResidueTaskDisposition,
+  reconcileReleasedResidueReport,
 } from '../generated-residue-policy.ts';
 
 function writeJson(filePath: string, value: unknown): void {
@@ -34,5 +36,33 @@ const ambiguousRepo = makeRepo('TASK-GENERIC-3', {
   taskId: 'TASK-GENERIC-3', status: 'open', claim: { state: 'released' },
 });
 assert.equal(isReleasedGeneratedBundleSafeToClean(readGeneratedResidueTaskDisposition(ambiguousRepo, 'TASK-GENERIC-3')), false);
+
+const nullIdentityPlan = planReleasedResidueTransaction({
+  cwd: ambiguousRepo,
+  candidateTaskId: null as unknown as string,
+  ownerTaskIds: [null as unknown as string],
+});
+assert.equal(nullIdentityPlan.disposition, 'not-eligible');
+
+const terminalForeignReport = reconcileReleasedResidueReport(releasedRepo, null as unknown as string, {
+  autoCleanSafe: [],
+  blockAndExplain: [{ path: '.atm/history/evidence/TASK-GENERIC-1.closure-packet.json', ownerTaskId: 'TASK-GENERIC-1' }],
+  manualReview: [{ path: '.atm/history/task-events/TASK-GENERIC-1/close.json', ownerTaskId: 'TASK-GENERIC-1' }],
+});
+assert.deepEqual(terminalForeignReport.blockAndExplain, []);
+assert.deepEqual(terminalForeignReport.manualReview, []);
+
+writeJson(path.join(releasedRepo, '.atm', 'history', 'tasks', 'TASK-GENERIC-ACTIVE.json'), {
+  taskId: 'TASK-GENERIC-ACTIVE', status: 'running', claim: { state: 'active', owner: 'agent' },
+});
+const mixedForeignReport = reconcileReleasedResidueReport(releasedRepo, 'TASK-CANDIDATE', {
+  autoCleanSafe: [],
+  blockAndExplain: [
+    { path: '.atm/history/evidence/TASK-GENERIC-1.closure-packet.json', ownerTaskId: 'TASK-GENERIC-1' },
+    { path: '.atm/history/evidence/TASK-GENERIC-ACTIVE.closure-packet.json', ownerTaskId: 'TASK-GENERIC-ACTIVE' },
+  ],
+  manualReview: [],
+});
+assert.deepEqual(mixedForeignReport.blockAndExplain.map((entry) => entry.ownerTaskId), ['TASK-GENERIC-ACTIVE']);
 
 console.log('generated-residue-policy: ok');

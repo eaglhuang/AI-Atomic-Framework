@@ -5,7 +5,7 @@ import {
   transitionRunnerVersion,
   acquireRunnerVersionLease
 } from '../runner-version-state.ts';
-import { classifyRunnerAffectingPaths, isRunnerGeneratedOutputPath } from '../runner-version-contract.ts';
+import { classifyRunnerAffectingPaths, filterRunnerInputTreeListing, isRunnerGeneratedOutputPath } from '../runner-version-contract.ts';
 
 function testInitialStateIsInDev() {
   const s = createRunnerVersionStream('runner-v0.x');
@@ -58,6 +58,7 @@ function testGeneratedRunnerOutputsDoNotInvalidateTheirOwnSeal() {
   ]);
   assert.deepEqual(classification.runnerAffecting, ['packages/cli/src/commands/taskflow/implementation.ts']);
   assert.deepEqual(classification.nonRunnerAffecting, ['packages/cli/dist/commands/taskflow/implementation.js']);
+  assert.equal(filterRunnerInputTreeListing('100644 blob a\tpackages/core/dist/x.js\0' + '100644 blob b\tpackages/core/src/x.ts\0'), '100644 blob b\tpackages/core/src/x.ts\0');
 }
 
 testInitialStateIsInDev();
