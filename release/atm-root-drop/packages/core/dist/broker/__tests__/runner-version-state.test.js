@@ -1,6 +1,7 @@
 // TASK-MAO-0017: tests for the runner version stream state machine.
 import assert from 'node:assert/strict';
 import { createRunnerVersionStream, transitionRunnerVersion, acquireRunnerVersionLease } from '../runner-version-state.js';
+import { classifyRunnerAffectingPaths, isRunnerGeneratedOutputPath } from '../runner-version-contract.js';
 function testInitialStateIsInDev() {
     const s = createRunnerVersionStream('runner-v0.x');
     assert.equal(s.state, 'in-dev');
@@ -38,9 +39,19 @@ function testLeaseAllowedOnlyOnLiveStates() {
     const denied = acquireRunnerVersionLease(s, 'agent', 60);
     assert.equal(denied.ok, false);
 }
+function testGeneratedRunnerOutputsDoNotInvalidateTheirOwnSeal() {
+    assert.equal(isRunnerGeneratedOutputPath('packages/cli/dist/commands/taskflow/implementation.js'), true);
+    const classification = classifyRunnerAffectingPaths([
+        'packages/cli/dist/commands/taskflow/implementation.js',
+        'packages/cli/src/commands/taskflow/implementation.ts'
+    ]);
+    assert.deepEqual(classification.runnerAffecting, ['packages/cli/src/commands/taskflow/implementation.ts']);
+    assert.deepEqual(classification.nonRunnerAffecting, ['packages/cli/dist/commands/taskflow/implementation.js']);
+}
 testInitialStateIsInDev();
 testHappyPathLifecycle();
 testIllegalTransitionFailsClosed();
 testRollbackReturnsToInDev();
 testLeaseAllowedOnlyOnLiveStates();
+testGeneratedRunnerOutputsDoNotInvalidateTheirOwnSeal();
 console.log('runner version state tests: ok');

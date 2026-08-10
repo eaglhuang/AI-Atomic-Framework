@@ -43,6 +43,20 @@ export const RUNNER_INPUT_SEGMENTS = [
     'atomicWorkbench',
     'rootConfig'
 ];
+/**
+ * Generated runner outputs must never become sealed inputs of the generation
+ * that produced them.  Keeping this as declarative path data makes both delta
+ * classification and input hashing share the same boundary.
+ */
+export const RUNNER_GENERATED_OUTPUT_PREFIXES = ['packages/cli/dist/'];
+export const RUNNER_INPUT_TREE_PATHS = [
+    'packages', 'scripts', 'templates', 'schemas', 'atomic_workbench',
+    'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json'
+];
+export function isRunnerGeneratedOutputPath(path) {
+    const normalized = normalizePath(path);
+    return RUNNER_GENERATED_OUTPUT_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+}
 /** Prefixes / exact files that map a repo path to a runner input segment. */
 const SEGMENT_PREFIXES = [
     { segment: 'packages', test: (p) => p.startsWith('packages/') },
@@ -66,7 +80,7 @@ export function isTrustedRunnerVersionLifecycleState(state) {
 /** Map a single repo-relative path to its runner input segment, or null. */
 export function classifyRunnerPathSegment(path) {
     const normalized = normalizePath(path);
-    if (!normalized)
+    if (!normalized || isRunnerGeneratedOutputPath(normalized))
         return null;
     for (const entry of SEGMENT_PREFIXES) {
         if (entry.test(normalized))

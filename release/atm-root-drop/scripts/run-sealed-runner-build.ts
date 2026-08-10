@@ -30,6 +30,8 @@ import {
 } from './runner-sync-incremental-build.ts';
 import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
+import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
+export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
 export type BuildDecision = 'built' | 'cacheHitSkip' | 'incrementalBuild' | 'fullRebuild';
@@ -46,7 +48,6 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const invokedAsCli = process.argv[1] !== undefined
   && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
 const releaseManifestPaths = [path.join('release', 'atm-root-drop', 'release-manifest.json'), path.join('release', 'atm-onefile', 'release-manifest.json')] as const;
-const buildInputPaths = ['packages', 'scripts', 'templates', 'schemas', 'atomic_workbench', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json'] as const;
 
 /**
  * Remove a path without following directory junctions/symlinks.
@@ -342,18 +343,6 @@ function timePhase<T>(timings: SealedBuildTimings, phase: keyof Omit<SealedBuild
 
 function elapsedSince(startedAt: number): number {
   return Math.max(0, Date.now() - startedAt);
-}
-
-export function computeBuildInputsTreeHash(cwd: string, commitSha = 'HEAD'): string {
-  const result = spawnSync('git', ['ls-tree', '-r', '-z', commitSha, '--', ...buildInputPaths], {
-    cwd,
-    encoding: 'buffer',
-    stdio: ['ignore', 'pipe', 'pipe']
-  });
-  if ((result.status ?? 1) !== 0 || result.error) {
-    fail(`Unable to compute sealed build input tree hash: ${String(result.stderr || result.error || '')}`, result.status ?? 1);
-  }
-  return `sha256:${createHash('sha256').update(result.stdout).digest('hex')}`;
 }
 
 export function inspectBuildCache(input: {
