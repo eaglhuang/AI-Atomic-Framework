@@ -21,6 +21,7 @@ import {
 } from '../packages/core/src/broker/runner-version-contract.ts';
 import type { BuildDecision, BuildTarget, SealedBuildTimings } from './run-sealed-runner-build.ts';
 import { buildRunnerSyncBuildObservation, summarizeDominantPhase } from './runner-sync-observability.ts';
+import { buildRunnerSyncReleaseCommand, resolveTemporaryStewardLinks, uniqueReceiptTaskIds } from './runner-sync-receipt-continuation.ts';
 export { buildRunnerSyncBuildObservation, persistTsBuildCache, prepareTsBuildCache, summarizeDominantPhase, writeRunnerBuildRuntimeTelemetry } from './runner-sync-observability.ts';
 
 const releaseManifestPaths = [
@@ -120,6 +121,8 @@ export type RunnerSyncReceipt = {
   /** Immutable publication membership for the sealed build, not a best-effort diff. */
   readonly outputInventory: RunnerBuildOutputInventory;
   readonly memberTaskIds: readonly string[];
+  /** Durable task continuations represented by a temporary framework steward. */
+  readonly linkedTaskIds: readonly string[];
   readonly groupManifest: CoalescedGroupManifest;
   readonly childReceipts: readonly ChildReceipt[];
   readonly childAttribution: {
@@ -273,6 +276,7 @@ export function buildRunnerSyncReceipt(input: {
   readonly actorId: string;
   readonly actorIdentitySource?: RunnerSyncReceipt['actorIdentity']['source'];
   readonly sealedSourceSha: string;
+  readonly linkedTaskIds?: readonly string[];
   readonly outputInventory?: RunnerBuildOutputInventory;
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
@@ -324,6 +328,7 @@ export function buildRunnerSyncReceipt(input: {
       currentTaskId: taskId
     }),
     memberTaskIds: session.release.state.groupManifest.memberTaskIds,
+    linkedTaskIds: uniqueReceiptTaskIds(input.linkedTaskIds ?? []),
     groupManifest: session.release.state.groupManifest,
     childReceipts: session.release.state.childReceipts,
     childAttribution: buildChildAttribution(session.release.state),
@@ -468,6 +473,7 @@ export function writeRunnerSyncReceipt(input: {
   readonly actorId: string;
   readonly actorIdentitySource?: RunnerSyncReceipt['actorIdentity']['source'];
   readonly sealedSourceSha: string;
+  readonly linkedTaskIds?: readonly string[];
   readonly outputInventory?: RunnerBuildOutputInventory;
   readonly buildTarget: BuildTarget;
   readonly buildInputsTreeHash: string;
@@ -480,7 +486,13 @@ export function writeRunnerSyncReceipt(input: {
   readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
   readonly timings: SealedBuildTimings;
 }): string {
-  const receipt = buildRunnerSyncReceipt(input);
+  const receipt = buildRunnerSyncReceipt({
+    ...input,
+    linkedTaskIds: uniqueReceiptTaskIds([
+      ...(input.linkedTaskIds ?? []),
+      ...resolveTemporaryStewardLinks(input.cwd, input.admission.queueHeadOwnership.waitingTasks)
+    ])
+  });
   const relative = path.join('.atm', 'history', 'evidence', `${receipt.taskId}.runner-sync-receipt.json`);
   const absolute = path.join(input.cwd, relative);
   mkdirSync(path.dirname(absolute), { recursive: true });
@@ -488,15 +500,7 @@ export function writeRunnerSyncReceipt(input: {
   return relative.replace(/\\/g, '/');
 }
 
-export function buildRunnerSyncReleaseCommand(input: {
-  readonly taskId: string;
-  readonly stewardWorkId: string;
-  readonly receiptRef: string;
-  readonly receiptDigest?: string | null;
-}): string {
-  const digest = input.receiptDigest ? ` --receipt-digest ${quoteCliArg(input.receiptDigest)}` : '';
-  return `node atm.mjs broker runner-sync release --task ${quoteCliArg(input.taskId)} --steward-work-id ${quoteCliArg(input.stewardWorkId)} --receipt-ref ${quoteCliArg(input.receiptRef)}${digest} --json`;
-}
+export { buildRunnerSyncReleaseCommand } from './runner-sync-receipt-continuation.ts';
 
 export function syncDirectoryHashChanged(source: string, target: string, options?: { readonly preserveRelativePaths?: readonly string[] }): void {
   if (!existsSync(source)) return;
@@ -545,10 +549,6 @@ export function phaseTimingsRecord(timings: SealedBuildTimings): {
 
 export function digestJson(value: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
-}
-
-function quoteCliArg(value: string): string {
-  return JSON.stringify(String(value ?? ''));
 }
 
 function readPreviousSealedSourceSha(cwd: string): string | null {

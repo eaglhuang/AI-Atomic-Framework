@@ -1513,6 +1513,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/host-opener-policy.js",
+    "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/markdown-paths.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/profile-loader.js",
@@ -3860,6 +3861,7 @@
     "release/atm-root-drop/scripts/run-validators/implementation.ts",
     "release/atm-root-drop/scripts/runner-sync-incremental-build.ts",
     "release/atm-root-drop/scripts/runner-sync-observability.ts",
+    "release/atm-root-drop/scripts/runner-sync-receipt-continuation.ts",
     "release/atm-root-drop/scripts/runner-version-selection-replay.ts",
     "release/atm-root-drop/scripts/scan-broker-runs.ts",
     "release/atm-root-drop/scripts/skew-matrix.config.json",
@@ -5028,8 +5030,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 307,
-    "unchanged": 4686,
+    "copied": 311,
+    "unchanged": 4684,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6375,7 +6377,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:17fb9503acb10ee1b945673e67fc8ccc8ef6f813f23c059032f2128fd551e691"
+    "digest": "sha256:63014873d41f57440e205b252cc0d10796b4fcb83f0f24bea95e9a62a83665f4"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -7862,6 +7864,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/cross-authority-closeback.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/host-opener-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/markdown-paths.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/profile-loader.js",
@@ -10209,6 +10212,7 @@
       "release/atm-root-drop/scripts/run-validators/implementation.ts",
       "release/atm-root-drop/scripts/runner-sync-incremental-build.ts",
       "release/atm-root-drop/scripts/runner-sync-observability.ts",
+      "release/atm-root-drop/scripts/runner-sync-receipt-continuation.ts",
       "release/atm-root-drop/scripts/runner-version-selection-replay.ts",
       "release/atm-root-drop/scripts/scan-broker-runs.ts",
       "release/atm-root-drop/scripts/skew-matrix.config.json",
@@ -11379,5 +11383,35 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
+  },
+  "buildInputsTreeHash": "sha256:884d688984f3037a0a774b21fb66d42e693b3302b9246019ad25832c22d6056f",
+  "sealedSourceCommit": "fdad99bfb2f8f5b8439349afeec98dd5068745ca",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "missing-previous-sealed-source",
+  "incrementalPlanDigest": "sha256:68b07ca6ea2264c68a3ede6f48385e90c641de199a0870f5bebcfac2f3c452ab",
+  "tsBuildCacheDigest": "sha256:ef464d1a9f86013087d51021870cf8f9740c73239da8677a0d93ab11b24c44ca",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "rootDropReleaseAssembly",
+    "dominantPhaseMs": 22967,
+    "totalElapsedMs": 57953,
+    "dominanceRatio": 0.3963,
+    "phaseMedianMs": 2139,
+    "phaseP95Ms": 22967,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
+  },
+  "phaseTimingsMs": {
+    "inputHashCalculation": 55,
+    "skipDecision": 10,
+    "worktreeSetup": 12872,
+    "typescriptBuild": 11114,
+    "rootDropReleaseAssembly": 22967,
+    "onefileReleaseAssembly": 2139,
+    "artifactSync": 5348,
+    "cleanup": 0,
+    "totalElapsed": 57953
   }
 }

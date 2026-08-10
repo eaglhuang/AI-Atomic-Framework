@@ -254,6 +254,21 @@ catch {
 } }
 function normalizeReceiptStringArray(value) { return Array.isArray(value) ? uniqueSorted(value.filter((entry) => typeof entry === 'string').map((entry) => entry.trim())) : []; }
 function objectRecord(value) { return value && typeof value === 'object' && !Array.isArray(value) ? value : null; }
+function resolveTaskRunnerReceipt(cwd, taskId) {
+    const directRef = `.atm/history/evidence/${taskId}.runner-sync-receipt.json`;
+    const direct = readJsonRecordIfExists(path.join(cwd, directRef));
+    if (direct)
+        return { receiptRef: directRef, receipt: direct };
+    const evidenceDir = path.join(cwd, '.atm', 'history', 'evidence');
+    if (!existsSync(evidenceDir))
+        return { receiptRef: directRef, receipt: null };
+    const linked = readdirSync(evidenceDir).filter((entry) => entry.endsWith('.runner-sync-receipt.json')).flatMap((entry) => {
+        const receiptRef = `.atm/history/evidence/${entry}`;
+        const receipt = readJsonRecordIfExists(path.join(evidenceDir, entry));
+        return receipt && normalizeReceiptStringArray(receipt.linkedTaskIds).includes(taskId) ? [{ receiptRef, receipt }] : [];
+    });
+    return linked.length === 1 ? linked[0] : { receiptRef: directRef, receipt: null };
+}
 function validateReceiptAttribution(receipt, runnerInputTreeHash) {
     const memberTaskIds = normalizeReceiptStringArray(receipt.memberTaskIds);
     if (memberTaskIds.length === 0)
@@ -272,12 +287,12 @@ function validateReceiptAttribution(receipt, runnerInputTreeHash) {
     return null;
 }
 function inspectRunnerReceiptPublicationClosure(input) {
-    const receiptRef = `.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`;
-    const receiptPath = path.join(input.cwd, receiptRef);
+    const resolvedReceipt = resolveTaskRunnerReceipt(input.cwd, input.taskId);
+    const receiptRef = resolvedReceipt.receiptRef;
     const currentHead = readCurrentGitHead(input.cwd);
     const missing = (reason, extra) => ({ schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'missing', receiptRef, sealedSourceSha: null, currentHead, receiptRunnerInputTreeHash: null, currentRunnerInputTreeHash: null, headDeltaPaths: [], runnerAffectingDeltaPaths: [], nonRunnerAffectingDeltaPaths: [], reason, ...extra });
     const rebuild = (reason, extra) => ({ schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'rebuild-required', receiptRef, sealedSourceSha: null, currentHead, receiptRunnerInputTreeHash: null, currentRunnerInputTreeHash: null, headDeltaPaths: [], runnerAffectingDeltaPaths: [], nonRunnerAffectingDeltaPaths: [], reason, ...extra });
-    const receipt = readJsonRecordIfExists(receiptPath);
+    const receipt = resolvedReceipt.receipt;
     if (!receipt)
         return missing('No durable runner-sync receipt exists for this task.');
     const sealedSourceSha = typeof receipt.sealedSourceSha === 'string' && receipt.sealedSourceSha.trim() ? receipt.sealedSourceSha.trim() : null;
