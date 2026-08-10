@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-10T00-56-12-445Z-scope-amendment-61f585874477",
+  "taskId": "ATM-GOV-0345",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:0e5e1cec67c6ed22f6eb9c213ea699554a2088c4284ed371ca20ce2b1236a5bf",
+  "createdAt": "2026-08-10T00:56:12.445Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add scripts/runner-sync-receipt-continuation.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

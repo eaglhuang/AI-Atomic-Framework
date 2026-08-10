@@ -87,6 +87,7 @@ try {
     actorId: 'release-steward',
     actorIdentitySource: 'explicit' as const,
     sealedSourceSha: '1'.repeat(40),
+    linkedTaskIds: ['ATM-GOV-0256'],
     buildTarget: 'full' as const,
     buildInputsTreeHash: 'sha256:' + 'a'.repeat(64),
     buildDecision: 'cacheHitSkip' as const,
@@ -103,6 +104,7 @@ try {
   const receipt = buildRunnerSyncReceipt(receiptInput);
   assert.equal(receipt.schemaId, 'atm.runnerSyncReceipt.v1');
   assert.equal(receipt.taskId, 'ATM-GOV-0256');
+  assert.deepEqual(receipt.linkedTaskIds, ['ATM-GOV-0256'], 'receipt must preserve the durable delivery-task continuation independently from the steward work item');
   assert.equal(receipt.stewardWorkId, 'runner-sync-fixture');
   assert.match(receipt.autoReleaseCommand, /^node atm\.mjs broker runner-sync release --task "ATM-GOV-0256" --steward-work-id "runner-sync-fixture" --receipt-ref ".*" --json$/);
   const expectedReceiptRef = '.atm/history/evidence/ATM-GOV-0256.runner-sync-receipt.json';

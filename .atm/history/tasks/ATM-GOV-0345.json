@@ -199,8 +199,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-10T00-20-53-647Z-renew-f4d0ecd5bfc3",
-  "lastTransitionAt": "2026-08-10T00:20:53.647Z",
+  "lastTransitionId": "2026-08-10T00-56-12-445Z-scope-amendment-61f585874477",
+  "lastTransitionAt": "2026-08-10T00:56:12.445Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-09T22:53:33.062Z",
   "promotedAt": "2026-08-09T22:53:33.066Z",
@@ -208,23 +208,28 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-6d2e9eae3593",
     "claimedAt": "2026-08-10T00:07:24.567Z",
-    "heartbeatAt": "2026-08-10T00:20:52.828Z",
+    "heartbeatAt": "2026-08-10T00:50:48.337Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0345.*",
       ".atm/history/task-events/ATM-GOV-0345/**",
       ".atm/history/tasks/ATM-GOV-0345.json",
+      "packages/cli/src/atm.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
-      "scripts/run-sealed-runner-build.ts"
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "scripts/runner-sync-receipt-continuation.ts",
+      "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
     ],
     "state": "active",
     "laneSession": {
       "laneSessionId": "lane-20260810000724-codex-gpt-5.4-mini-dde73647fb",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260810000724-codex-gpt-5.4-mini-dde73647fb\""
     }
@@ -234,20 +239,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-e7850b8e7e6c27a0",
-    "ticketDigest": "sha256:e7850b8e7e6c27a0c22165d1ec3b517de9bdfe9c6a646a6362987eb1df213c10",
+    "ticketId": "wat-5e019871c525e6e8",
+    "ticketDigest": "sha256:5e019871c525e6e8b2741e3e386954588a2c678dddb8d5c3894ae1ca25322198",
     "taskId": "ATM-GOV-0345",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260810000724-codex-gpt-5.4-mini-dde73647fb",
     "claimGeneration": "lease-6d2e9eae3593",
-    "issuedAt": "2026-08-10T00:20:52.828Z",
-    "expiresAt": "2026-08-10T00:50:52.828Z",
-    "scopeDigest": "sha256:6a06a3935a25a24affc3e97804bc044af83250ac71e416d2a6dd76731878fe60",
+    "issuedAt": "2026-08-10T00:50:48.337Z",
+    "expiresAt": "2026-08-10T01:20:48.337Z",
+    "scopeDigest": "sha256:d4cde348b792b6e2f19d97b9e9fa6ac81339b13248085d47126466ba6fe1a1aa",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-10T00:20:52.828Z"
+      "selectedAt": "2026-08-10T00:50:48.337Z"
     },
     "grants": [
       {
@@ -256,6 +261,7 @@
           ".atm/history/evidence/ATM-GOV-0345.*",
           ".atm/history/task-events/ATM-GOV-0345/**",
           ".atm/history/tasks/ATM-GOV-0345.json",
+          "packages/cli/src/atm.ts",
           "packages/cli/src/commands/broker/steward-queues.ts",
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
@@ -263,7 +269,7 @@
           "packages/cli/src/commands/taskflow/close-orchestration.ts",
           "scripts/run-sealed-runner-build.ts"
         ],
-        "digest": "sha256:b71ff767cd662eb184e956ce04d3c433df50f951e05484e113becab848eb83c9"
+        "digest": "sha256:ee1ff89bd6fae3d1d0b158a8be4860c9caf905d2ea2acec7a9c83da58df7ae60"
       },
       {
         "kind": "lifecycle-operation",
@@ -336,12 +342,17 @@
       ".atm/history/evidence/ATM-GOV-0345.*",
       ".atm/history/task-events/ATM-GOV-0345/**",
       ".atm/history/tasks/ATM-GOV-0345.json",
+      "packages/cli/src/atm.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
-      "scripts/run-sealed-runner-build.ts"
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "scripts/runner-sync-receipt-continuation.ts",
+      "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
     ],
     "planningReadOnlyPaths": [
       "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0345-make-sealed-runner-publication-atomic-across-task-close-and-queue-release.task.md"
@@ -353,7 +364,7 @@
       "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0345-make-sealed-runner-publication-atomic-across-task-close-and-queue-release.task.md"
     ],
     "allowPlanningMirror": false,
-    "promptHash": "aa8c41d7e99286810b09c18754d8ff2ddd50d81850e3f118019408ccc29a32dd",
+    "promptHash": "fb8c5cea2f955f81db5b70d8e770ebd704cb3949b83aebfca0ca7258be0eff16",
     "actorId": "codex-gpt-5.4-mini",
     "sessionId": null,
     "laneSession": {
@@ -362,7 +373,7 @@
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260810000724-codex-gpt-5.4-mini-dde73647fb\""
     },
-    "createdAt": "2026-08-10T00:07:32.618Z",
+    "createdAt": "2026-08-10T00:20:53.715Z",
     "status": "active"
   }
 }
