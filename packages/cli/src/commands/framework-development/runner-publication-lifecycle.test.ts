@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { evaluateRunnerPublicationContinuation } from './runner-publication-lifecycle.ts';
+import { resolveRunnerPublicationCloseHandoff } from './runner-publication-close-handoff.ts';
+import { deriveRunnerBuildOutputInventory } from '../../../../core/src/broker/runner-build-output-inventory.ts';
 
 const valid = evaluateRunnerPublicationContinuation({
   taskId: 'ATM-GOV-0344',

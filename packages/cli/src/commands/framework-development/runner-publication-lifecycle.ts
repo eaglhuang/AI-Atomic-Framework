@@ -179,6 +179,7 @@ export interface RunnerPublicationInspection {
   readonly report: RunnerPublicationDispositionReport;
 }
 
+
 export interface RunnerPublicationReceiptReconciliation {
   readonly schemaId: 'atm.runnerPublicationReceiptReconciliation.v1';
   readonly taskId: string;

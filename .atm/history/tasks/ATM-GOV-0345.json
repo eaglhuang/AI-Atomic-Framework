@@ -199,8 +199,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-10T02-29-05-716Z-scope-amendment-245f81fc1f18",
-  "lastTransitionAt": "2026-08-10T02:29:05.716Z",
+  "lastTransitionId": "2026-08-10T02-59-06-540Z-scope-amendment-97000111dd62",
+  "lastTransitionAt": "2026-08-10T02:59:06.540Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-09T22:53:33.062Z",
   "promotedAt": "2026-08-09T22:53:33.066Z",
@@ -208,7 +208,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-6d2e9eae3593",
     "claimedAt": "2026-08-10T00:07:24.567Z",
-    "heartbeatAt": "2026-08-10T02:24:00.874Z",
+    "heartbeatAt": "2026-08-10T02:48:20.747Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0345.*",
@@ -216,6 +216,7 @@
       ".atm/history/tasks/ATM-GOV-0345.json",
       "packages/cli/src/atm.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
       "packages/cli/src/commands/git-governance/implementation/git-config-port.ts",
@@ -225,6 +226,7 @@
       "packages/cli/src/commands/hook/git-index-diagnostics.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
       "packages/cli/src/commands/taskflow/implementation.ts",
       "packages/cli/src/commands/tasks/__tests__/generated-residue-policy.test.ts",
       "packages/cli/src/commands/tasks/generated-residue-policy.ts",
@@ -249,20 +251,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-8e1c50d68888633d",
-    "ticketDigest": "sha256:8e1c50d68888633d9e9c696ec964975da8a4f57d2d427afb5e131c4cf6db3a57",
+    "ticketId": "wat-1a53b4c74a40aa52",
+    "ticketDigest": "sha256:1a53b4c74a40aa52bc662d764185548662f824745e5dc8350d9bf7b8a9fb6d0e",
     "taskId": "ATM-GOV-0345",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260810000724-codex-gpt-5.4-mini-dde73647fb",
     "claimGeneration": "lease-6d2e9eae3593",
-    "issuedAt": "2026-08-10T02:24:00.874Z",
-    "expiresAt": "2026-08-10T02:54:00.874Z",
-    "scopeDigest": "sha256:2332104cc88cff8ddf41ab236c3e6d43c2e4b3b82488026783d526a4307ee080",
+    "issuedAt": "2026-08-10T02:48:20.747Z",
+    "expiresAt": "2026-08-10T03:18:20.747Z",
+    "scopeDigest": "sha256:044adc5a4ee1eef2cc99f75b8586f3c6faad860b9b4ae448b6585c068e65e8de",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-10T02:24:00.874Z"
+      "selectedAt": "2026-08-10T02:48:20.747Z"
     },
     "grants": [
       {
@@ -276,6 +278,7 @@
           "packages/cli/src/commands/broker/steward-queues.ts",
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-config-port.ts",
           "packages/cli/src/commands/git-governance/implementation/identity-check-command.test.ts",
           "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
           "packages/cli/src/commands/hook/__tests__/git-index-diagnostics.test.ts",
@@ -293,7 +296,7 @@
           "scripts/runner-sync-receipt-continuation.ts",
           "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
         ],
-        "digest": "sha256:29d5b2bf3f1b5218d53d3552010a5802727443a3430f6a768188984d05bb4d03"
+        "digest": "sha256:3e33aab2d14b62354b5d964c8f5f3c9da954da63ed3cab5f5f8125e5b67f966b"
       },
       {
         "kind": "lifecycle-operation",
@@ -369,6 +372,7 @@
       ".atm/history/tasks/ATM-GOV-0345.json",
       "packages/cli/src/atm.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
       "packages/cli/src/commands/git-governance/implementation/git-config-port.ts",
@@ -378,6 +382,7 @@
       "packages/cli/src/commands/hook/git-index-diagnostics.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
       "packages/cli/src/commands/taskflow/implementation.ts",
       "packages/cli/src/commands/tasks/__tests__/generated-residue-policy.test.ts",
       "packages/cli/src/commands/tasks/generated-residue-policy.ts",
