@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-10T15-41-33-157Z-close-487d1952aef7",
+  "taskId": "ATM-GOV-0327",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809215336-codex-gpt-5.4-mini-ATM-GOV-0327-d090ce94a1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0327.json",
+  "taskSha256": "sha256:70c9d9daa02b2189445812b980736f771c5723d738ce62c6d1f85acdec62c78a",
+  "createdAt": "2026-08-10T15:41:33.157Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0327 --actor codex-gpt-5.4-mini --status done --historical-delivery aa5c555b3c88ea920e360195048836d9e598ca30",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260809215336-codex-gpt-5.4-mini-ATM-GOV-0327-d090ce94a1",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0327.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "node --strip-types tests/cli/rescue-worktree-normal-write-classification.test.ts",
+      "typecheck",
+      "validate:charter",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-10T15:41:33.149Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/catalog/registry/actors.json",
+        ".atm/history/evidence/ATM-GOV-0327.*",
+        ".atm/history/task-events/ATM-GOV-0327/**",
+        ".atm/history/tasks/ATM-GOV-0327.json",
+        "docs/reports/plan-3x-4x-governance-bypass-disposition.json",
+        "docs/reports/plan-3x-4x-rescue-worktree-audit.json",
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+        "packages/cli/src/commands/hook/__tests__/git-hooks-installer.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "packages/cli/src/commands/hook/git-hooks-installer.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/team-gate-findings.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "scripts/analyze-captain-parallel-ledger.ts",
+        "scripts/captain-parallel-ledger-report.ts",
+        "scripts/governance-bypass-audit.ts",
+        "tests/cli/git-hook-runtime-env.test.ts",
+        "tests/cli/rescue-worktree-normal-write-classification.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+        "packages/cli/src/commands/hook/__tests__/git-hooks-installer.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "packages/cli/src/commands/hook/git-hooks-installer.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/team-gate-findings.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "scripts/analyze-captain-parallel-ledger.ts",
+        "scripts/captain-parallel-ledger-report.ts",
+        "scripts/governance-bypass-audit.ts",
+        "tests/cli/git-hook-runtime-env.test.ts",
+        "tests/cli/rescue-worktree-normal-write-classification.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

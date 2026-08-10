@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0327",
   "title": "Audit governance bypasses and classify rescue worktree history",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0325",
@@ -169,8 +169,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-10T15-31-06-311Z-scope-amendment-c5a469b314ef",
-  "lastTransitionAt": "2026-08-10T15:31:06.311Z",
+  "lastTransitionId": "2026-08-10T15-41-33-157Z-close-487d1952aef7",
+  "lastTransitionAt": "2026-08-10T15:41:33.157Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T21:53:36.016Z",
@@ -179,7 +179,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-510beb69855c",
     "claimedAt": "2026-08-09T21:53:36.023Z",
-    "heartbeatAt": "2026-08-10T15:27:32.947Z",
+    "heartbeatAt": "2026-08-10T15:41:33.154Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/catalog/registry/actors.json",
@@ -204,13 +204,14 @@
       "tests/cli/git-hook-runtime-env.test.ts",
       "tests/cli/rescue-worktree-normal-write-classification.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260809215336-codex-gpt-5.4-mini-2687feca4c",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809215336-codex-gpt-5.4-mini-2687feca4c\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-09T21:53:36.023Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -343,5 +344,9 @@
     },
     "createdAt": "2026-08-09T21:53:48.533Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-10T15:41:33.154Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260809215336-codex-gpt-5.4-mini-ATM-GOV-0327-d090ce94a1",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0327.closure-packet.json"
 }
