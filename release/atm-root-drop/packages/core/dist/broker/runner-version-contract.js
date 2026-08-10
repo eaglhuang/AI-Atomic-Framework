@@ -48,14 +48,14 @@ export const RUNNER_INPUT_SEGMENTS = [
  * that produced them.  Keeping this as declarative path data makes both delta
  * classification and input hashing share the same boundary.
  */
-export const RUNNER_GENERATED_OUTPUT_PREFIXES = ['packages/cli/dist/'];
+export const RUNNER_GENERATED_OUTPUT_PREFIXES = ['packages/*/dist/'];
 export const RUNNER_INPUT_TREE_PATHS = [
     'packages', 'scripts', 'templates', 'schemas', 'atomic_workbench',
     'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json'
 ];
 export function isRunnerGeneratedOutputPath(path) {
     const normalized = normalizePath(path);
-    return RUNNER_GENERATED_OUTPUT_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+    return /^packages\/[^/]+\/dist\//.test(normalized);
 }
 /** Prefixes / exact files that map a repo path to a runner input segment. */
 const SEGMENT_PREFIXES = [

@@ -41,6 +41,7 @@ function testLeaseAllowedOnlyOnLiveStates() {
 }
 function testGeneratedRunnerOutputsDoNotInvalidateTheirOwnSeal() {
     assert.equal(isRunnerGeneratedOutputPath('packages/cli/dist/commands/taskflow/implementation.js'), true);
+    assert.equal(isRunnerGeneratedOutputPath('packages/core/dist/broker/runner-version-contract.js'), true);
     const classification = classifyRunnerAffectingPaths([
         'packages/cli/dist/commands/taskflow/implementation.js',
         'packages/cli/src/commands/taskflow/implementation.ts'
