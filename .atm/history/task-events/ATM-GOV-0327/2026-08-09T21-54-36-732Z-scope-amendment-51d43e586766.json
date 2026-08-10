@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T21-54-36-732Z-scope-amendment-51d43e586766",
+  "taskId": "ATM-GOV-0327",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0327.json",
+  "taskSha256": "sha256:9a5860e66075185e41a434ec49c8bce11a8929a1643fc82e62452b034ff40141",
+  "createdAt": "2026-08-09T21:54:36.732Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0327 --actor codex-gpt-5.4-mini --add \"docs/reports/plan-3x-4x-rescue-worktree-audit.json,tests/cli/rescue-worktree-normal-write-classification.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

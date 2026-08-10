@@ -1,0 +1,347 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0327",
+  "title": "Audit governance bypasses and classify rescue worktree history",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0325",
+    "TASK-ERR-0007"
+  ],
+  "acceptance": [
+    "ACC-1: 每個 bypass row 具有 actor、command、time、task、files、HEAD before/after、approval、receipt、normal-route availability、result、disposition。",
+    "ACC-2: `approvedBy: NONE`、missing receipt 或聊天授權一律不是批准；unknown 不得轉 pass。",
+    "ACC-3: 精確 23/23 rescue paths 與 detached HEAD 都映射到用途、repair commit、write history；正常 contribution write 無具名例外時判 INV-ATM-010 violation。",
+    "ACC-4: INV-ATM-008/010 各有 command-backed verdict；cleanup 保持在 TASK-TMP-0008 且尚未被本卡執行。"
+  ],
+  "deliverables": [
+    "docs/reports/plan-3x-4x-governance-bypass-disposition.json",
+    "docs/reports/plan-3x-4x-rescue-worktree-audit.json",
+    "tests/cli/rescue-worktree-normal-write-classification.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/analyze-captain-parallel-ledger.ts",
+    "scripts/captain-parallel-ledger-report.ts",
+    "packages/cli/src/commands/next/planning-root-preference.ts",
+    "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+    "docs/reports/plan-3x-4x-governance-bypass-disposition.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/rescue-worktree-normal-write-classification.test.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+    "node --strip-types scripts/validate-charter.ts --mode validate"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "retain-audit-events-and-return-to-queue-only",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.parallel-governance-audit",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.rescue-worktree-classifier",
+        "pattern": "Policy Object",
+        "source": "scripts/analyze-captain-parallel-ledger.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0327-audit-governance-bypasses-and-classify-rescue-worktree-history.task.md",
+    "sectionTitle": "ATM-GOV-0327",
+    "headingLine": 77,
+    "hash": "c097bb3ade176c43",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0327-audit-governance-bypasses-and-classify-rescue-worktree-history.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:c097bb3ade176c4389e1c0f4d6dff5fbf920d6d839d0bb3a108093b065a5d42b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:21:52.943Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:21:52.943Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0325",
+      "TASK-ERR-0007"
+    ],
+    "startConditions": [
+      "Evidence-hold manifest exists for every rescue worktree.",
+      "The exact planning-root ambiguity ErrorCode contract is registry-backed."
+    ],
+    "softRelations": [
+      "TASK-TMP-0008"
+    ],
+    "changedPublicSeams": [
+      "atm.governanceBypassDisposition.v1",
+      "atm.rescueWorktreeAudit.v1"
+    ],
+    "causalImpactEdges": [
+      "override-audit",
+      "emergency-audit",
+      "rescue-write-classification",
+      "inv-atm-008",
+      "inv-atm-010"
+    ],
+    "parallelFrontierInputs": [
+      "protected-override-shards",
+      "lease-receipts",
+      "git-log",
+      "worktree-registry"
+    ],
+    "validatorReferences": [
+      "validate-framework-development-governance",
+      "validate-captain-dispatch-protocol",
+      "validate-charter"
+    ],
+    "phaseOwner": "correction-wave-2"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_rescue_worktree_inv010_classification_0327",
+      "targetGroupId": null,
+      "semanticKey": "rescue_worktree_inv010_classification",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "override-audit",
+        "emergency-audit",
+        "rescue-write-classification",
+        "inv-atm-008",
+        "inv-atm-010"
+      ],
+      "expectedRedPredicate": "any unapproved normal contribution write from a detached rescue worktree remains a blocker",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.rescueWorktreeAudit.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_rescue_worktree_inv010_classification_0327"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-10T15-31-06-311Z-scope-amendment-c5a469b314ef",
+  "lastTransitionAt": "2026-08-10T15:31:06.311Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-09T21:53:36.016Z",
+  "promotedAt": "2026-08-09T21:53:36.019Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-510beb69855c",
+    "claimedAt": "2026-08-09T21:53:36.023Z",
+    "heartbeatAt": "2026-08-10T15:27:32.947Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/ATM-GOV-0327.*",
+      ".atm/history/task-events/ATM-GOV-0327/**",
+      ".atm/history/tasks/ATM-GOV-0327.json",
+      "docs/reports/plan-3x-4x-governance-bypass-disposition.json",
+      "docs/reports/plan-3x-4x-rescue-worktree-audit.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+      "packages/cli/src/commands/hook/__tests__/git-hooks-installer.spec.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/git-hooks-installer.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/team-gate-findings.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/governance-bypass-audit.ts",
+      "tests/cli/git-hook-runtime-env.test.ts",
+      "tests/cli/rescue-worktree-normal-write-classification.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260809215336-codex-gpt-5.4-mini-2687feca4c",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809215336-codex-gpt-5.4-mini-2687feca4c\""
+    }
+  },
+  "startedAt": "2026-08-09T21:53:36.023Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-8d173759041cb200",
+    "ticketDigest": "sha256:8d173759041cb200e8bc5b7a88f5a137230d8cd8dacb71002fce41e9e56bc061",
+    "taskId": "ATM-GOV-0327",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260809215336-codex-gpt-5.4-mini-2687feca4c",
+    "claimGeneration": "lease-510beb69855c",
+    "issuedAt": "2026-08-10T15:27:32.947Z",
+    "expiresAt": "2026-08-10T15:57:32.947Z",
+    "scopeDigest": "sha256:fe21dfca02a55b03f72a774a8e2fba0a069f451f9302bcc5f5bc55ff52ff23cc",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-10T15:27:32.947Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/catalog/registry/actors.json",
+          ".atm/history/evidence/ATM-GOV-0327.*",
+          ".atm/history/task-events/ATM-GOV-0327/**",
+          ".atm/history/tasks/ATM-GOV-0327.json",
+          "docs/reports/plan-3x-4x-governance-bypass-disposition.json",
+          "docs/reports/plan-3x-4x-rescue-worktree-audit.json",
+          "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+          "packages/cli/src/commands/hook/__tests__/git-hooks-installer.spec.ts",
+          "packages/cli/src/commands/hook/git-hooks-installer.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/hook/pre-commit/team-gate-findings.ts",
+          "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+          "packages/cli/src/commands/next/planning-root-preference.ts",
+          "scripts/analyze-captain-parallel-ledger.ts",
+          "scripts/captain-parallel-ledger-report.ts",
+          "scripts/governance-bypass-audit.ts",
+          "tests/cli/git-hook-runtime-env.test.ts",
+          "tests/cli/rescue-worktree-normal-write-classification.test.ts"
+        ],
+        "digest": "sha256:18ef969af8175d08d6a7c5d91903a66d34ede6c2a0f91387ce237b8c8e3f02ea"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260809215336-codex-gpt-5.4-mini-ATM-GOV-0327-d090ce94a1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0327",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/ATM-GOV-0327.*",
+      ".atm/history/task-events/ATM-GOV-0327/**",
+      ".atm/history/tasks/ATM-GOV-0327.json",
+      "docs/reports/plan-3x-4x-governance-bypass-disposition.json",
+      "docs/reports/plan-3x-4x-rescue-worktree-audit.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+      "packages/cli/src/commands/hook/__tests__/git-hooks-installer.spec.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "packages/cli/src/commands/hook/git-hooks-installer.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/team-gate-findings.ts",
+      "packages/cli/src/commands/hook/pre-push.ts",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "scripts/analyze-captain-parallel-ledger.ts",
+      "scripts/captain-parallel-ledger-report.ts",
+      "scripts/governance-bypass-audit.ts",
+      "tests/cli/git-hook-runtime-env.test.ts",
+      "tests/cli/rescue-worktree-normal-write-classification.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0327-audit-governance-bypasses-and-classify-rescue-worktree-history.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0327-audit-governance-bypasses-and-classify-rescue-worktree-history.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "f719578769ba583edcde2c5fbeb8330e6f366dedaafcce123adb372345af2b42",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260809215336-codex-gpt-5.4-mini-2687feca4c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809215336-codex-gpt-5.4-mini-2687feca4c\""
+    },
+    "createdAt": "2026-08-09T21:53:48.533Z",
+    "status": "active"
+  }
+}

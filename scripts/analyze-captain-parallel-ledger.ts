@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { renderMarkdown } from './captain-parallel-ledger-report.ts';
+import { buildGovernanceBypassAudit, writeJsonReport } from './governance-bypass-audit.ts';
 import { buildPlanPerformanceReport, validateRealPairedAbV4, type PlanPerformanceReport } from './plan-performance-report-v3.ts';
 
 type TaskTransition = {
@@ -150,6 +151,8 @@ const lockRoot = args.get('lock-root') ?? '.atm/runtime/locks';
 const coverageReportPath = args.get('coverage-report') ?? null;
 const sealedCohortsPath = args.get('sealed-cohorts') ?? 'scripts/fixtures/parallel-admission-scale/sealed-cohorts.json';
 const reportPath = args.get('report') ?? null;
+const bypassReportPath = args.get('bypass-report') ?? null;
+const rescueReportPath = args.get('rescue-report') ?? null;
 const validate = args.has('validate');
 const requireSealedCohorts = args.has('require-sealed-cohorts');
 const tasks = loadTaskTransitions(eventRoot);
@@ -220,6 +223,15 @@ if (reportPath) {
   const parent = slash.includes('/') ? slash.slice(0, slash.lastIndexOf('/')) : '';
   if (parent) mkdirSync(parent, { recursive: true });
   writeFileSync(reportPath, renderMarkdown(result), 'utf8');
+}
+if (bypassReportPath || rescueReportPath) {
+  const audit = buildGovernanceBypassAudit({
+    cwd: process.cwd(),
+    protectedOverrideRoot: args.get('protected-override-root') ?? '.atm/history/protected-override-audit',
+    worktreePorcelain: args.get('worktree-porcelain') ?? null
+  });
+  if (bypassReportPath) writeJsonReport(bypassReportPath, audit.bypassDisposition);
+  if (rescueReportPath) writeJsonReport(rescueReportPath, audit.rescueWorktreeAudit);
 }
 
 function loadTaskTransitions(root: string): Map<string, TaskTransition[]> {

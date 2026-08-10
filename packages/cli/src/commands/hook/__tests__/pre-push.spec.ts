@@ -10,7 +10,7 @@ import {
 import { createCommitRangeGuardReport } from '../commit-range-guard.ts';
 import {
   runRequiredFrameworkValidators,
-  triageForeignTaskflowValidatorRuns
+  triageForeignValidatorRuns
 } from '../pre-push.ts';
 
 const cwd = process.cwd();
@@ -31,7 +31,7 @@ if (headSha && parentSha) {
 const validators = runRequiredFrameworkValidators(cwd, []);
 assert.equal(validators.length, 0);
 
-const triage = triageForeignTaskflowValidatorRuns({
+const triage = triageForeignValidatorRuns({
   cwd,
   stagedFiles: ['README.md'],
   activeDirectionLocks: [],
@@ -39,6 +39,27 @@ const triage = triageForeignTaskflowValidatorRuns({
 });
 assert.equal(triage.blockingRuns.length, 0);
 assert.equal(triage.advisoryFindings.length, 0);
+
+const foreignBrokerTriage = triageForeignValidatorRuns({
+  cwd,
+  stagedFiles: ['docs/reports/audit.json'],
+  committingTaskId: 'ATM-GOV-0327',
+  activeDirectionLocks: [{
+    taskId: 'ATM-GOV-0345',
+    allowedFiles: ['packages/cli/src/commands/broker/steward-queues.ts']
+  }] as any,
+  failedRuns: [{
+    command: 'npm run validate:cli',
+    cwd,
+    exitCode: 1,
+    stdoutSha256: 'fixture',
+    stderrSha256: 'fixture',
+    stdoutPreview: 'broker --help usage snapshot must match fixture',
+    stderrPreview: ''
+  }]
+});
+assert.equal(foreignBrokerTriage.blockingRuns.length, 0);
+assert.equal(foreignBrokerTriage.advisoryFindings[0]?.code, 'ATM_HOOK_FOREIGN_COMMAND_SURFACE_WIP_ADVISORY');
 
 {
   const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-pre-push-attest-suggestion-'));

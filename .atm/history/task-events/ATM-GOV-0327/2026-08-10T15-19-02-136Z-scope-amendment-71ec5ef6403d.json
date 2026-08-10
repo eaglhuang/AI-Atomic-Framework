@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-10T15-19-02-136Z-scope-amendment-71ec5ef6403d",
+  "taskId": "ATM-GOV-0327",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0327.json",
+  "taskSha256": "sha256:6a16548a6fd79d0478dd8aa20fe29d427ea22ab8ea3903092f0c7fba47238789",
+  "createdAt": "2026-08-10T15:19:02.136Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0327 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/git-governance/implementation/commit-execution.ts,packages/cli/src/commands/hook/pre-commit/implementation.ts\" --reason \"prevent self-index-write during governed commit hook closeout\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "prevent self-index-write during governed commit hook closeout"
+  }
+}
