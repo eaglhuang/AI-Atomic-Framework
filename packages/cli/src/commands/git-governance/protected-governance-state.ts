@@ -35,12 +35,13 @@ export function classifyProtectedGovernanceStatePath(filePath: string): Pick<Pro
   return null;
 }
 
-function listDiffNames(cwd: string, args: readonly string[]): string[] {
+function listDiffNames(cwd: string, args: readonly string[], env?: NodeJS.ProcessEnv): string[] {
   try {
     return execFileSync('git', [...args, '-z'], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env
     }).split('\0').map(normalizeRelativePath).filter(Boolean);
   } catch {
     return [];
@@ -50,10 +51,12 @@ function listDiffNames(cwd: string, args: readonly string[]): string[] {
 export function inspectProtectedGovernanceStateDestructiveChanges(input: {
   readonly cwd: string;
   readonly taskId: string;
+  /** Optional isolated candidate index used by a sealed commit transaction. */
+  readonly env?: NodeJS.ProcessEnv;
 }): ProtectedGovernanceStateReport {
   const deleted = new Set([
-    ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D']),
-    ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'])
+    ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D'], input.env),
+    ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'], input.env)
   ]);
   const violations: ProtectedGovernanceStateViolation[] = [];
   for (const filePath of [...deleted].sort()) {

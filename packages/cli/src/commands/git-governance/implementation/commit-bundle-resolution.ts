@@ -20,7 +20,7 @@ import {
 
 import { readResolutionAuthorizedForeignTaskIds } from "../../broker-conflict-resolution.ts";
 
-import { sealCommitBundleFromLiveIndex } from "./sealed-commit-attribution.ts";
+import { mergeSealedCommitBundles, sealCommitBundleFromCandidateIndex, sealCommitBundleFromLiveIndex, withWorktreeCandidateIndex } from "./sealed-commit-attribution.ts";
 
 import {
   ATM_INDEX_FOREIGN_ACTIVE_STAGED,
@@ -288,7 +288,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     typeof source.planPath === "string"
       ? normalizeRelativePath(source.planPath)
       : "";
-  const protectedGovernanceStateReport =
+  let protectedGovernanceStateReport =
     inspectProtectedGovernanceStateDestructiveChanges({
       cwd: input.cwd,
       taskId: input.taskId,
@@ -331,7 +331,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       : [];
   let blockedCode = null;
   let blockedSummary = null;
-  if (!protectedGovernanceStateReport.ok) {
+  if (!protectedGovernanceStateReport.ok && !(input.autoStage && stageCandidates.length > 0)) {
     blockedCode = ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE;
     blockedSummary = protectedGovernanceStateReport.summary;
   } else if (
@@ -368,14 +368,38 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     blockedCode = "ATM_GIT_COMMIT_CLOSEOUT_ONLY_MUTATION";
     blockedSummary = `Task ${input.taskId} holds a closeout-only claim but the commit bundle contains source mutations: ${closeoutOnlyMutationFiles.join(", ")}. Re-claim with --claim-intent write before committing new source changes.`;
   }
-  if (!blockedCode && input.apply && stageCandidates.length > 0) {
-    stageTaskScopedBundleFiles(input.cwd, stageCandidates, process.env);
-    stagedFiles = readStagedFiles(input.cwd);
-    gitIndexOwnership = inspectGitIndexOwnership({
+  const liveSealedBundle = sealCommitBundleFromLiveIndex({
+    cwd: input.cwd,
+    paths: commitFilesWithGovernanceEvidence,
+    provenance: "task-scope",
+  });
+  const sealedBundle = input.autoStage && stageCandidates.length > 0
+    ? withWorktreeCandidateIndex({
       cwd: input.cwd,
-      taskId: input.taskId,
-      stagedFiles,
-    });
+      paths: stageCandidates,
+      run: (env) => {
+        protectedGovernanceStateReport = inspectProtectedGovernanceStateDestructiveChanges({ cwd: input.cwd, taskId: input.taskId, env });
+        return mergeSealedCommitBundles(
+          liveSealedBundle,
+          sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: stageCandidates }),
+          { supersedingPaths: stageCandidates, surface: "auto-stage-worktree-overlay" },
+        );
+      },
+    })
+    : liveSealedBundle;
+  if (!blockedCode && !protectedGovernanceStateReport.ok) {
+    blockedCode = ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE;
+    blockedSummary = protectedGovernanceStateReport.summary;
+  }
+  const liveIndexStageCandidates = stageCandidates.filter(
+    (filePath: LegacyValue) => !inScopeStagedDeletions.includes(filePath),
+  );
+  // `apply` promises that an admitted auto-stage bundle is immediately
+  // commit-ready where the shared index has no contrary entry. A stale
+  // deletion is preserved for the isolated commit wrapper to supersede in its
+  // own transaction; resolver admission must never rewrite that shared state.
+  if (!blockedCode && input.apply && input.autoStage && liveIndexStageCandidates.length > 0) {
+    stageTaskScopedBundleFiles(input.cwd, liveIndexStageCandidates, process.env);
   }
   if (unexpectedStagedTasks.length > 0) {
     governanceBundleWarnings.push(
@@ -410,11 +434,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     // inspected. The commit executor assembles from this seal, so a concurrent
     // writer replacing content behind an admitted path afterwards cannot ride
     // along under an already-approved path.
-    sealedBundle: sealCommitBundleFromLiveIndex({
-      cwd: input.cwd,
-      paths: commitFilesWithGovernanceEvidence,
-      provenance: "task-scope",
-    }),
+    sealedBundle,
     apply: input.apply,
     stagingStrategy: input.autoStage
       ? "explicit-pathspec-git-add"

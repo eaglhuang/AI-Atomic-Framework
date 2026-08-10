@@ -86,6 +86,31 @@ export function sealCommitBundleFromLiveIndex(input: {
 }
 
 /**
+ * Seal an explicit task-owned worktree overlay without touching the shared
+ * index.  Auto-stage admission uses this so a stale shared-index entry cannot
+ * turn a present protected artifact into a tombstone before the transaction
+ * gets its isolated candidate index.
+ */
+export function withWorktreeCandidateIndex<T>(input: {
+  readonly cwd: string;
+  readonly paths: readonly string[];
+  readonly run: (env: NodeJS.ProcessEnv) => T;
+}): T {
+  const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-worktree-candidate-index-'));
+  const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
+  try {
+    runGitCommandWithEnv(input.cwd, ['read-tree', 'HEAD'], env, [...QUIET_STDIO]);
+    if (paths.length > 0) {
+      runGitCommandWithEnv(input.cwd, ['add', '-A', '-f', '--', ...paths], env, [...QUIET_STDIO]);
+    }
+    return input.run(env);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
+/**
  * Paths the index removes relative to the base tree, sealed with their
  * pre-image mode so the tombstone still carries identity.
  */
