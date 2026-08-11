@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-11T02-33-40-950Z-repair-claim-7069e8d499a7",
+  "taskId": "ATM-GOV-0345",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260810225205-codex-gpt-5.4-mini-ATM-GOV-0345-b3403b9465",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:58f3015aefa293e235380d0dbd9612012c9cd223e1cd66097772862f284ddf50",
+  "createdAt": "2026-08-11T02:33:40.950Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --write --reason \"Repair expired same-actor claim whose lane-session record is absent; preserve task continuity and coalesce runner publication at current sealed source.\" --json"
+}

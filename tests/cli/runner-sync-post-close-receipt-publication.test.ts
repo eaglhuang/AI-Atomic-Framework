@@ -104,6 +104,7 @@ try {
   const receipt = buildRunnerSyncReceipt(receiptInput);
   assert.equal(receipt.schemaId, 'atm.runnerSyncReceipt.v1');
   assert.equal(receipt.taskId, 'ATM-GOV-0256');
+  assert.equal(receipt.publicationDisposition, 'published', 'a successful sealed build must publish an explicit terminal disposition for the release gate');
   assert.deepEqual(receipt.linkedTaskIds, ['ATM-GOV-0256'], 'receipt must preserve the durable delivery-task continuation independently from the steward work item');
   assert.equal(receipt.stewardWorkId, 'runner-sync-fixture');
   assert.match(receipt.autoReleaseCommand, /^node atm\.mjs broker runner-sync release --task "ATM-GOV-0256" --steward-work-id "runner-sync-fixture" --receipt-ref ".*" --json$/);
@@ -125,6 +126,7 @@ try {
   const onDisk = JSON.parse(readFileSync(path.join(repo, expectedReceiptRef), 'utf8'));
   assert.equal(onDisk.schemaId, 'atm.runnerSyncReceipt.v1');
   assert.equal(onDisk.buildDecision, 'cacheHitSkip');
+  assert.equal(onDisk.publicationDisposition, 'published');
 
   // 3. Re-publishing (e.g. a subsequent no-op revalidation) overwrites the same
   // governed file in place instead of accumulating a second disposition.

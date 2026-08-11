@@ -23,7 +23,6 @@ import type { BuildDecision, BuildTarget, SealedBuildTimings } from './run-seale
 import { buildRunnerSyncBuildObservation, summarizeDominantPhase } from './runner-sync-observability.ts';
 import { buildRunnerSyncReleaseCommand, resolveRunnerSyncReceiptOwnerTaskId, resolveTemporaryStewardLinks, uniqueReceiptTaskIds } from './runner-sync-receipt-continuation.ts';
 export { buildRunnerSyncBuildObservation, persistTsBuildCache, prepareTsBuildCache, summarizeDominantPhase, writeRunnerBuildRuntimeTelemetry } from './runner-sync-observability.ts';
-
 const releaseManifestPaths = [
   path.join('release', 'atm-root-drop', 'release-manifest.json'),
   path.join('release', 'atm-onefile', 'release-manifest.json')
@@ -111,6 +110,7 @@ export type RunnerSyncReceipt = {
   readonly schemaId: 'atm.runnerSyncReceipt.v1';
   readonly specVersion: '0.1.0';
   readonly taskId: string;
+  readonly publicationDisposition: 'published';
   readonly actorId: string;
   readonly actorIdentity: {
     readonly actorId: string;
@@ -248,7 +248,6 @@ export function planRunnerIncrementalBuild(input: {
   };
 }
 
-
 export function writeJsonWithRetry(input: {
   readonly filePath: string;
   readonly value: unknown;
@@ -316,6 +315,7 @@ export function buildRunnerSyncReceipt(input: {
     schemaId: 'atm.runnerSyncReceipt.v1',
     specVersion: '0.1.0',
     taskId,
+    publicationDisposition: 'published',
     actorId: input.actorId,
     actorIdentity: {
       actorId: input.actorId,
