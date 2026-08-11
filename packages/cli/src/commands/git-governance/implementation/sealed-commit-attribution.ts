@@ -31,11 +31,6 @@ import {
 } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
 import { CliError } from '../../shared.ts';
 import { runGitCommand, runGitCommandWithEnv } from './git-process-port.ts';
-import {
-  captureLiveIndexSnapshot,
-  reconcileCommittedPathsInLiveIndex,
-  type LiveIndexReconciliation
-} from './live-index-reconciliation.ts';
 
 const QUIET_STDIO = ['ignore', 'pipe', 'pipe'] as const;
 /** `<mode> <objectId> <stage>\t<path>` as emitted by `git ls-files -s`. */
@@ -343,8 +338,6 @@ export interface SealedCommitIndexOutcome<T> {
   readonly sealSource: SealedCommitSealSource['kind'];
   /** Non-null only on the diagnostic route, and carried into the receipt. */
   readonly liveIndexSealDiagnostic: { readonly reason: string } | null;
-  /** Task paths advanced to the new HEAD without overwriting concurrent bytes. */
-  readonly liveIndexReconciliation: LiveIndexReconciliation;
 }
 
 /**
@@ -437,19 +430,12 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
       actorId: input.actorId,
       taskId: input.taskId
     });
-    const liveIndexSnapshot = captureLiveIndexSnapshot(input.cwd, bundle.entries.map((entry) => entry.path));
-    const result = input.run(env);
-    const liveIndexReconciliation = reconcileCommittedPathsInLiveIndex({
-      cwd: input.cwd,
-      snapshot: liveIndexSnapshot
-    });
     return {
-      result,
+      result: input.run(env),
       bundle,
       proof,
       sealSource: sealSource.kind,
-      liveIndexSealDiagnostic: sealSource.kind === 'live-index-diagnostic' ? { reason: sealSource.reason } : null,
-      liveIndexReconciliation
+      liveIndexSealDiagnostic: sealSource.kind === 'live-index-diagnostic' ? { reason: sealSource.reason } : null
     };
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
