@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-510f4514aeb4",
+  "recordedAt": "2026-08-11T12:19:16.984Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-ERR-0013",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task TASK-ERR-0013 --message \"test(governance): verify sealed auto-stage audit bundle\n\nATM-Work-Admission: wat-7fb7ced12a8e8c6f sha256:7fb7ced12a8e8c6fcfa07fa1623944f980481907e036e97b2d1155957b238bc9\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-ERR-0013-2c679c2e21",
+  "reason": "Bootstrap circularity: frozen hook cannot consume explicit task-bound temporary claim.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T12-19-16-983Z-EMG-TASK-ERR-0013-2c679c2e21.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

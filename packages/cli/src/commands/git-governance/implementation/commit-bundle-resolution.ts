@@ -57,7 +57,7 @@ import {
   inspectProtectedGovernanceStateDestructiveChanges,
 } from "../protected-governance-state.ts";
 
-import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles } from './git-index-transaction.ts';
+import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, deferStagedFilePaths, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles, stageTaskScopedBundleFiles } from './git-index-transaction.ts';
 
 import { parseTaskClaim } from './identity-check-command.ts';
 
@@ -143,10 +143,25 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       (protectedForeignDeferAuthorized || lifecycleAuthorizedForeignDefer))
   ) {
     deferredForeignStagedFiles = preexistingStagedFiles;
-    // The later sealed candidate index already contains only `commitFiles`.
-    // Removing and restoring foreign entries in the shared index adds a broad
-    // contention window without changing that candidate tree. Keep the live
-    // index untouched; the sealed transaction is the isolation boundary.
+    deferredForeignStagedSnapshot = deferStagedFilePaths(
+      input.cwd,
+      input.taskId,
+      preexistingStagedFiles,
+    );
+    stagedFiles = readStagedFiles(input.cwd);
+    gitIndexOwnership = inspectGitIndexOwnership({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      stagedFiles,
+    });
+    unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(
+      input.cwd,
+      input.taskId,
+      declaredScope,
+      stagedFiles,
+    );
+    protectedForeignStagedOwnershipFiles =
+      buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   }
   const dirtyFiles = listTaskScopedWorktreeDirtyFiles(input.cwd);
   const activeDeferredSnapshot = normalizeRelativePath(
@@ -281,6 +296,11 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     typeof source.planPath === "string"
       ? normalizeRelativePath(source.planPath)
       : "";
+  let protectedGovernanceStateReport =
+    inspectProtectedGovernanceStateDestructiveChanges({
+      cwd: input.cwd,
+      taskId: input.taskId,
+    });
   const governanceBundleWarnings = [];
   const commitAttributionStageCandidates = unstagedDirtyFiles.filter(
     (filePath: LegacyValue) => isCommitAttributionSideEffectPath(filePath),
@@ -303,11 +323,6 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     shouldStageGovernedGitHeadEvidenceBeforeCommit(commitFiles)
       ? uniqueSorted([...commitFiles, gitHeadEvidencePath])
       : commitFiles;
-  let protectedGovernanceStateReport = inspectProtectedGovernanceStateDestructiveChanges({
-    cwd: input.cwd,
-    taskId: input.taskId,
-    commitFiles: commitFilesWithGovernanceEvidence,
-  });
   const closeoutOnlyMutationFiles =
     claimIntent === "closeout-only"
       ? uniqueSorted(
@@ -371,12 +386,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       cwd: input.cwd,
       paths: stageCandidates,
       run: (env) => {
-        protectedGovernanceStateReport = inspectProtectedGovernanceStateDestructiveChanges({
-          cwd: input.cwd,
-          taskId: input.taskId,
-          env,
-          commitFiles: commitFilesWithGovernanceEvidence,
-        });
+        protectedGovernanceStateReport = inspectProtectedGovernanceStateDestructiveChanges({ cwd: input.cwd, taskId: input.taskId, env });
         return mergeSealedCommitBundles(
           liveSealedBundle,
           sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: stageCandidates }),
@@ -389,9 +399,16 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     blockedCode = ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE;
     blockedSummary = protectedGovernanceStateReport.summary;
   }
-  // Auto-stage is assembled solely in the sealed candidate index. Writing the
-  // same paths into the shared index is both unnecessary for the eventual
-  // commit and a concurrency hazard for unrelated lanes.
+  const liveIndexStageCandidates = stageCandidates.filter(
+    (filePath: LegacyValue) => !inScopeStagedDeletions.includes(filePath),
+  );
+  // `apply` promises that an admitted auto-stage bundle is immediately
+  // commit-ready where the shared index has no contrary entry. A stale
+  // deletion is preserved for the isolated commit wrapper to supersede in its
+  // own transaction; resolver admission must never rewrite that shared state.
+  if (!blockedCode && input.apply && input.autoStage && liveIndexStageCandidates.length > 0) {
+    stageTaskScopedBundleFiles(input.cwd, liveIndexStageCandidates, process.env);
+  }
   if (unexpectedStagedTasks.length > 0) {
     governanceBundleWarnings.push(
       `Foreign staged tasks remain in the shared index but will be excluded from the governed commit bundle: ${unexpectedStagedTasks.map((entry: LegacyValue) => entry.taskId).join(", ")}`,

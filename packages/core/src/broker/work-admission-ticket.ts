@@ -12,7 +12,7 @@ export type WorkAdmissionRecoveryMode = 'auto' | 'enabled' | 'disabled';
 export type ResolvedWorkAdmissionRecoveryMode = Exclude<WorkAdmissionRecoveryMode, 'auto'>;
 export type WorkAdmissionGrantKind = 'file-write' | 'lifecycle-operation' | 'process-manifest';
 export type WorkAdmissionOperation = 'write' | 'stage' | 'commit' | 'close' | 'push';
-export type WorkAdmissionOrigin = 'claim' | 'task-import' | 'repair-closure';
+export type WorkAdmissionOrigin = 'claim' | 'task-import';
 
 export interface WorkAdmissionRunnerSelection {
   readonly runnerKind: 'frozen' | 'source-first';

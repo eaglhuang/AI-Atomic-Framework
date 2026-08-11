@@ -146,8 +146,6 @@ export function evaluateTaskWorkAdmissionGate(input: {
   readonly now?: string;
 }): WorkAdmissionGateResult {
   const task = readTaskAdmissionContext(input.cwd, input.taskId);
-  const persistedTicket = readWorkAdmissionTicket(input.cwd, input.taskId);
-  const terminalRepairTicket = persistedTicket?.origin === 'repair-closure' ? persistedTicket : null;
   const frameworkTemp = task ? null : resolveFrameworkTempPublicationCapability({
     cwd: input.cwd,
     taskId: input.taskId,
@@ -156,35 +154,9 @@ export function evaluateTaskWorkAdmissionGate(input: {
   });
   return evaluateWorkAdmissionGate({
     ...input,
-    actorId: terminalRepairTicket?.actorId ?? task?.actorId ?? frameworkTemp?.actorId ?? '',
-    laneSessionId: terminalRepairTicket?.laneSessionId ?? task?.laneSessionId ?? frameworkTemp?.laneSessionId ?? null,
-    claimGeneration: terminalRepairTicket?.claimGeneration ?? task?.claimGeneration ?? (frameworkTemp?.heartbeatAt ? `framework-lock:${frameworkTemp.heartbeatAt}` : null)
-  });
-}
-
-/**
- * Creates the one durable authority that bridges a closure-packet repair to
- * its follow-up governed commit.  Terminal repairs intentionally do not
- * resurrect a released claim; the persisted ticket is the bounded authority.
- */
-export function issueRepairClosureAdmissionTicket(input: {
-  readonly cwd: string;
-  readonly taskId: string;
-  readonly actorId: string;
-  readonly laneSessionId?: string | null;
-  readonly now?: string;
-}): WorkAdmissionTicket {
-  const task = readTaskDocument(input.cwd, input.taskId);
-  const now = input.now ?? new Date().toISOString();
-  return issueWorkAdmissionTicket({
-    taskId: input.taskId,
-    origin: 'repair-closure',
-    actorId: input.actorId,
-    laneSessionId: input.laneSessionId ?? process.env.ATM_LANE_SESSION_ID ?? null,
-    claimGeneration: `repair-closure:${now}`,
-    allowedFiles: resolveLegacyTaskAdmissionFiles(task ?? {}, input.taskId),
-    runnerSelection: { runnerKind: 'frozen', runnerRef: 'repair-closure', selectedAt: now },
-    now
+    actorId: task?.actorId ?? frameworkTemp?.actorId ?? '',
+    laneSessionId: task?.laneSessionId ?? frameworkTemp?.laneSessionId ?? null,
+    claimGeneration: task?.claimGeneration ?? (frameworkTemp?.heartbeatAt ? `framework-lock:${frameworkTemp.heartbeatAt}` : null)
   });
 }
 

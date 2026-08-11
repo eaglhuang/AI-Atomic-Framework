@@ -161,9 +161,11 @@ export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
     };
     appendGitHeadEvidenceJsonl(evidenceAbsolute, payload);
   }
-  // The caller owns a sealed candidate index. Staging evidence into the live
-  // index as well would create an unrelated shared-index write and can race
-  // with a foreign lane without contributing to the committed tree.
+  runGitCommand(
+    cwd,
+    ["add", "--", gitHeadEvidencePath],
+    ["ignore", "pipe", "pipe"],
+  );
   runGitCommandWithEnv(cwd, ["add", "--", gitHeadEvidencePath], env, [
     "ignore",
     "pipe",
