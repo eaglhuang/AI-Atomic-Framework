@@ -194,6 +194,50 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
 
 {
   const root = tempRoot();
+  writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
+  writeDirectionLock(root, 'TASK-B', 'agent-one', 'lane-b');
+  writeLock(root, 'agent-one', {
+    workItemId: 'ATM-FRAMEWORK-TEMP-agent-one-lane-lane-a',
+    linkedTaskId: 'TASK-A',
+    laneSessionId: 'lane-a',
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 3600
+  });
+  writeTask(root, 'TASK-A', 'running');
+  writeTask(root, 'TASK-B', 'running');
+
+  assert.equal(
+    classifyFrameworkStaleLock(root, 'agent-one', { laneSessionId: 'lane-a' }),
+    null,
+    'stale-lock audit must resolve the task inside the lock lane instead of treating other lanes as ambiguous'
+  );
+}
+
+{
+  const root = tempRoot();
+  writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
+  writeDirectionLock(root, 'TASK-B', 'agent-one', 'lane-b');
+  writeLock(root, 'agent-one', {
+    workItemId: 'ATM-FRAMEWORK-TEMP-agent-one',
+    linkedTaskId: 'TASK-A',
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 3600
+  });
+  writeTask(root, 'TASK-A', 'running');
+  writeTask(root, 'TASK-B', 'running');
+
+  const legacyLock = classifyFrameworkStaleLock(root, 'agent-one');
+  assert.equal(legacyLock?.kind, 'still-active');
+  assert.equal(legacyLock?.currentTaskId, null);
+  assert.equal(
+    legacyLock?.linkedTaskId,
+    'TASK-A',
+    'read-only stale-lock audit must retain durable linkage without guessing among active lanes'
+  );
+}
+
+{
+  const root = tempRoot();
   initializeGitRoot(root);
   writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
 

@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-ace6f94b60de",
+  "recordedAt": "2026-08-11T12:19:28.919Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-ERR-0013",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task TASK-ERR-0013 --message \"test(governance): verify sealed auto-stage audit bundle\n\nATM-Work-Admission: wat-7fb7ced12a8e8c6f sha256:7fb7ced12a8e8c6fcfa07fa1623944f980481907e036e97b2d1155957b238bc9\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-ERR-0013-2c679c2e21",
+  "reason": "Bootstrap circularity: frozen hook cannot consume explicit task-bound temporary claim.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T12-19-16-983Z-EMG-TASK-ERR-0013-2c679c2e21.json",
+  "parentEventId": "POA-510f4514aeb4",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
