@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0329",
+  "updatedAt": "2026-08-11T15:59:49.749Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/plan-3x-4x-validator-profile-coverage.test.ts",
+    "validate-module-boundaries",
+    "validate-test-facade"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan-3x-4x-validator-profile-coverage.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cdbfc31b108bc4cea13c62656772fec993db07082f7285f302a0640191226679",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan-3x-4x-validator-profile-coverage.test.ts"
+      ],
+      "generatedAt": "2026-08-11T15:45:16.672Z",
+      "startedAt": "2026-08-11T15:45:16.349Z",
+      "finishedAt": "2026-08-11T15:45:16.672Z",
+      "durationMs": 323,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0aa82239bec0757f09eae7f42c6f2475ba0006e3",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:test-facade",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8ff7eebf013676e940b88b591179b7730add9769632b51fc3a9af55717be4903",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate-test-facade"
+      ],
+      "generatedAt": "2026-08-11T15:59:40.076Z",
+      "startedAt": "2026-08-11T15:59:02.907Z",
+      "finishedAt": "2026-08-11T15:59:40.076Z",
+      "durationMs": 37169,
+      "runnerKind": "dev-source",
+      "sourceCommit": "8edd23226e2441928099d49bfc622f3f91b8798b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:module-boundaries",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c2572c1e7856660cc42ad190f7379197d36602fc4e782e4d6ef103b9d761919a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate-module-boundaries"
+      ],
+      "generatedAt": "2026-08-11T15:59:49.748Z",
+      "startedAt": "2026-08-11T15:59:48.826Z",
+      "finishedAt": "2026-08-11T15:59:49.748Z",
+      "durationMs": 922,
+      "runnerKind": "dev-source",
+      "sourceCommit": "8edd23226e2441928099d49bfc622f3f91b8798b",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

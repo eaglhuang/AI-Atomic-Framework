@@ -1,1 +1,34 @@
-{"schemaId":"atm.testCaseGroup.v1","specVersion":"0.1.0","groupId":"test_group_plan4_causal_neighborhood","theme":"Plan 4 causal neighborhood","resourceKey":"plan4.causal-neighborhood","maintainers":["atom-core-evidence"],"cases":[{"caseId":"test_atm_gov_0294_causal_neighborhood","semanticKey":"plan4_causal_neighborhood","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2","ACC-4"]},{"caseId":"test_atm_gov_0294_factor_combinations","semanticKey":"plan4_factor_combinations","responsibility":"task-required","coversAcceptance":["ACC-3","ACC-5"]}]}
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_causal_neighborhood",
+  "theme": "Plan 4 causal neighborhood",
+  "resourceKey": "plan4.causal-neighborhood",
+  "maintainers": ["atom-core-evidence"],
+  "cases": [
+    {
+      "caseId": "test_task_atm_gov_0294_plan4_causal_neighborhood_08bbea47",
+      "semanticKey": "plan4_causal_neighborhood",
+      "command": "node --strip-types tests/cli/plan4-causal-neighborhood-compiler.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1", "ACC-2", "ACC-4"]
+    },
+    {
+      "caseId": "test_task_atm_gov_0294_plan4_factor_combinations_a49c3111",
+      "semanticKey": "plan4_factor_combinations",
+      "command": "node --strip-types tests/cli/plan4-factor-combination-generator.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-3", "ACC-5"]
+    }
+  ],
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_atm_gov_0294_causal_neighborhood",
+      "canonicalCaseId": "test_task_atm_gov_0294_plan4_causal_neighborhood_08bbea47"
+    },
+    {
+      "legacyCaseId": "test_atm_gov_0294_factor_combinations",
+      "canonicalCaseId": "test_task_atm_gov_0294_plan4_factor_combinations_a49c3111"
+    }
+  ]
+}

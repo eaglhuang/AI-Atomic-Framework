@@ -1,29 +1,22 @@
 {
-  "schemaId": "atm.testCatalogShard.v1",
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
   "groupId": "test_group_plan4_obligation_inventory",
+  "theme": "Plan 4 obligation inventory drift detection",
+  "resourceKey": "plan4.obligation-inventory",
+  "maintainers": ["atom-core-evidence"],
   "cases": [
     {
       "caseId": "test_task_atm_gov_0279_obligation_inventory_drift_detector_54fc3f05",
       "semanticKey": "obligation_inventory_drift_detector",
       "command": "node --strip-types tests/cli/plan4-obligation-inventory.test.ts",
       "responsibility": "task-required",
-      "coversAcceptance": [
-        "ACC-1",
-        "ACC-2",
-        "ACC-3",
-        "ACC-4",
-        "ACC-5"
-      ],
+      "coversAcceptance": ["ACC-1", "ACC-2", "ACC-3", "ACC-4", "ACC-5"],
       "coversImpactEdges": [
         "source seams and validators -> obligation inventory entries",
         "obligation inventory digest -> inventory drift detector",
         "inventory drift detector -> coverage certificate freshness"
-      ],
-      "pathTriggers": [
-        "packages/core/src/evidence/obligation-inventory.ts",
-        "schemas/evidence/obligation-inventory.schema.json"
-      ],
-      "groupId": "test_group_plan4_obligation_inventory"
+      ]
     }
   ],
   "legacyAliases": [

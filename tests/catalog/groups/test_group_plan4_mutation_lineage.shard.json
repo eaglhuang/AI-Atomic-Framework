@@ -1,12 +1,34 @@
 {
-  "schemaId": "atm.testCatalogGroup.v1",
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
   "groupId": "test_group_plan4_mutation_lineage",
-  "title": "Plan 4.0 mutation adapter, lineage, and equivalence governance",
-  "caseIds": [
-    "test_atm_gov_0306_replayable_mutation_lineage_7c2e91a4",
-    "test_atm_gov_0306_equivalence_and_fail_closed_adapter_9b18d0e3"
+  "theme": "Plan 4 mutation adapter, lineage, and equivalence governance",
+  "resourceKey": "plan4.mutation-lineage",
+  "maintainers": ["atom-core-evidence"],
+  "cases": [
+    {
+      "caseId": "test_task_atm_gov_0306_replayable_mutation_lineage_08bf66e4",
+      "semanticKey": "replayable_mutation_lineage",
+      "command": "node --strip-types tests/cli/plan4-mutation-adapter.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1", "ACC-2", "ACC-3"]
+    },
+    {
+      "caseId": "test_task_atm_gov_0306_equivalence_and_fail_closed_adapter_3a04d6af",
+      "semanticKey": "equivalence_and_fail_closed_adapter",
+      "command": "node --strip-types tests/cli/plan4-mutation-lineage-equivalence.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-4", "ACC-5"]
+    }
   ],
-  "taskIds": [
-    "ATM-GOV-0306"
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_atm_gov_0306_replayable_mutation_lineage_7c2e91a4",
+      "canonicalCaseId": "test_task_atm_gov_0306_replayable_mutation_lineage_08bf66e4"
+    },
+    {
+      "legacyCaseId": "test_atm_gov_0306_equivalence_and_fail_closed_adapter_9b18d0e3",
+      "canonicalCaseId": "test_task_atm_gov_0306_equivalence_and_fail_closed_adapter_3a04d6af"
+    }
   ]
 }

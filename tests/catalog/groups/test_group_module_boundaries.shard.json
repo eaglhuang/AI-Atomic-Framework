@@ -1,12 +1,17 @@
 {
-  "schemaId": "atm.testGroupShard.v1",
+  "schemaId": "atm.testCaseGroup.v1",
   "specVersion": "0.1.0",
   "groupId": "test_group_module_boundaries",
-  "title": "Module boundary topology",
-  "caseIds": [
-    "test_task_skl_0035_module_boundary_topology_b6c94fb2"
-  ],
-  "commands": [
-    "node --strip-types tests/cli/module-boundary-topology.test.ts"
+  "theme": "Module boundary topology",
+  "resourceKey": "module-boundaries",
+  "maintainers": ["atm-architecture"],
+  "cases": [
+    {
+      "caseId": "test_task_skl_0035_module_boundary_topology_b6c94fb2",
+      "semanticKey": "module_boundary_topology",
+      "command": "node --strip-types tests/cli/module-boundary-topology.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1"]
+    }
   ]
 }

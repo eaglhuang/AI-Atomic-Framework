@@ -6,8 +6,7 @@
   "resourceKey": "plan4.final-certification",
   "maintainers": ["atm-core"],
   "cases": [
-    {"caseId":"test_task_atm_gov_0317_four_plan_certificate_5b9d2e71","semanticKey":"plan4_four_plan_objective_certificate","command":"node --strip-types tests/cli/plan4-final-certification.test.ts"},
-    {"caseId":"test_task_atm_gov_0317_legacy_retirement_gate_8a4f1c36","semanticKey":"plan4_legacy_authority_retirement_gate","command":"node --strip-types tests/cli/plan4-final-certification.test.ts"}
-  ],
-  "taskIds": ["ATM-GOV-0317"]
+    {"caseId":"test_task_atm_gov_0317_four_plan_certificate_5b9d2e71","semanticKey":"plan4_four_plan_objective_certificate","command":"node --strip-types tests/cli/plan4-final-certification.test.ts","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2"],"coversImpactEdges":["unresolved matrix row -> final verdict blocked"]},
+    {"caseId":"test_task_atm_gov_0317_legacy_retirement_gate_8a4f1c36","semanticKey":"plan4_legacy_authority_retirement_gate","command":"node --strip-types tests/cli/plan4-final-certification.test.ts","responsibility":"task-required","coversAcceptance":["ACC-3","ACC-4"],"coversImpactEdges":["unresolved matrix row -> final verdict blocked"]}
+  ]
 }

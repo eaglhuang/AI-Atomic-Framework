@@ -157,10 +157,13 @@ assert.equal(inconclusive.failClosed?.code, ATM_MUTATION_ADAPTER_INCONCLUSIVE);
 // Catalog shard registers both required case ids for this task.
 const shard = JSON.parse(
   readFileSync('tests/catalog/groups/test_group_plan4_mutation_lineage.shard.json', 'utf8')
-) as { groupId: string; caseIds: string[]; taskIds: string[] };
+) as { groupId: string; cases: Array<{ caseId: string }>; legacyAliases: Array<{ legacyCaseId: string; canonicalCaseId: string }> };
 assert.equal(shard.groupId, 'test_group_plan4_mutation_lineage');
-assert.deepEqual(shard.taskIds, ['ATM-GOV-0306']);
-assert.ok(shard.caseIds.includes('test_atm_gov_0306_replayable_mutation_lineage_7c2e91a4'));
-assert.ok(shard.caseIds.includes('test_atm_gov_0306_equivalence_and_fail_closed_adapter_9b18d0e3'));
+assert.ok(shard.cases.some((entry) => entry.caseId === 'test_task_atm_gov_0306_replayable_mutation_lineage_08bf66e4'));
+assert.ok(shard.cases.some((entry) => entry.caseId === 'test_task_atm_gov_0306_equivalence_and_fail_closed_adapter_3a04d6af'));
+assert.ok(shard.legacyAliases.some((entry) =>
+  entry.legacyCaseId === 'test_atm_gov_0306_replayable_mutation_lineage_7c2e91a4'
+  && entry.canonicalCaseId === 'test_task_atm_gov_0306_replayable_mutation_lineage_08bf66e4'
+));
 
 console.log('plan4-mutation-lineage-equivalence: ok');

@@ -68,8 +68,14 @@ jobs:
       - name: Validate bridge minor policy
         run: node --experimental-strip-types scripts/validate-bridge-minor.ts --mode validate
 
-      - name: Compute gate standard
-        run: npm run validate:standard
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
 
       - name: Build release artifacts
         run: |
@@ -87,6 +93,18 @@ jobs:
         run: |
           npm run validate:root-drop-release
           npm run validate:onefile-release
+          npm run validate:runner-reproducibility
+
+      - name: Smoke frozen runners
+        run: |
+          node release/atm-onefile/atm.mjs --version
+          node release/atm-root-drop/atm.mjs --version
+
+      - name: Compute gate full with resumable receipt
+        run: npm run validate:full -- --run-id "release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+      - name: Verify npm package contents
+        run: npm pack --workspaces --dry-run
 
       - name: Set npm package versions from tag
         shell: bash

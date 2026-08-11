@@ -1,5 +1,5 @@
 export const VALIDATION_OBLIGATION_MAP_SCHEMA_ID = 'atm.validationObligationMap.v1' as const;
-export const VALIDATION_OBLIGATION_MAP_VERSION = '2026-07-14.phase1' as const;
+export const VALIDATION_OBLIGATION_MAP_VERSION = '2026-08-11.profile-responsibility' as const;
 
 export interface ValidationObligationRule {
   id: string;
@@ -69,6 +69,19 @@ export const VALIDATION_OBLIGATION_RULES: readonly ValidationObligationRule[] = 
     ],
     validators: ['validate-test-facade'],
     rationale: 'Path-scoped validator selection is the public cost-control lane for task validation.'
+  },
+  {
+    id: 'validator-profile-responsibility',
+    description: 'Validator catalog, profile, and CI/release declarations must prove their module-boundary ownership.',
+    patterns: [
+      'scripts/test-catalog.config.json',
+      'scripts/validators.config.json',
+      'tests/catalog/groups/**',
+      '.github/workflows/ci.yml',
+      '.github/workflows/release-npm.yml'
+    ],
+    validators: ['validate-module-boundaries'],
+    rationale: 'Profile selection and release coverage are declarative module boundaries; the owning validator must run whenever those declarations change.'
   },
   {
     id: 'typescript-static',

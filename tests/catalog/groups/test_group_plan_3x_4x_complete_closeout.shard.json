@@ -1,0 +1,45 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan_3x_4x_complete_closeout",
+  "theme": "Plan 3.x and Plan 4 closure profile responsibility",
+  "resourceKey": "plan-3x-4x-validator-profile-coverage",
+  "maintainers": ["atm-validator-governance"],
+  "supportedSeams": [
+    "atm.testCaseCatalog.v1",
+    "atm.validatorProfileResponsibility.v1"
+  ],
+  "dependencyEdges": [
+    "catalog-ownership",
+    "profile-selection",
+    "ci-coverage",
+    "release-gates"
+  ],
+  "cases": [
+    {
+      "caseId": "test_task_atm_gov_0329_plan_3x_4x_catalog_profile_coverage_fad18eba",
+      "semanticKey": "plan_3x_4x_catalog_profile_coverage",
+      "responsibility": "task-required",
+      "command": "node --strip-types tests/cli/plan-3x-4x-validator-profile-coverage.test.ts",
+      "coversAcceptance": ["ACC-1", "ACC-2", "ACC-3", "ACC-4", "ACC-5"],
+      "coversImpactEdges": [
+        "catalog-ownership",
+        "profile-selection",
+        "ci-coverage",
+        "release-gates"
+      ]
+    }
+  ],
+  "aliases": [],
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_plan_3x_4x_catalog_profile_coverage_0329",
+      "canonicalCaseId": "test_task_atm_gov_0329_plan_3x_4x_catalog_profile_coverage_fad18eba"
+    }
+  ],
+  "lineage": [],
+  "costBudgetMs": 30000,
+  "timeoutMs": 60000,
+  "quarantine": false,
+  "checkpointPolicy": "task-required"
+}

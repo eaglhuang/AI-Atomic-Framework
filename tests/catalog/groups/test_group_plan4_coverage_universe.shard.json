@@ -1,12 +1,34 @@
 {
-  "schemaId": "atm.testCatalogGroup.v1",
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
   "groupId": "test_group_plan4_coverage_universe",
-  "title": "Plan 4.0 coverage universe compiler",
-  "caseIds": [
-    "test_atm_gov_0280_coverage_universe_canonical_ids_dfd2a214",
-    "test_atm_gov_0280_reachability_status_mapping_f54a35be"
+  "theme": "Plan 4 coverage universe compiler",
+  "resourceKey": "plan4.coverage-universe",
+  "maintainers": ["atom-core-evidence"],
+  "cases": [
+    {
+      "caseId": "test_task_atm_gov_0280_coverage_universe_canonical_ids_f3c9b3f3",
+      "semanticKey": "coverage_universe_canonical_ids",
+      "command": "node --strip-types tests/cli/plan4-coverage-universe-compiler.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1", "ACC-2"]
+    },
+    {
+      "caseId": "test_task_atm_gov_0280_reachability_status_mapping_cf4f3c0d",
+      "semanticKey": "reachability_status_mapping",
+      "command": "node --strip-types tests/cli/plan4-coverage-universe-compiler.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-3", "ACC-4", "ACC-5"]
+    }
   ],
-  "taskIds": [
-    "ATM-GOV-0280"
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_atm_gov_0280_coverage_universe_canonical_ids_dfd2a214",
+      "canonicalCaseId": "test_task_atm_gov_0280_coverage_universe_canonical_ids_f3c9b3f3"
+    },
+    {
+      "legacyCaseId": "test_atm_gov_0280_reachability_status_mapping_f54a35be",
+      "canonicalCaseId": "test_task_atm_gov_0280_reachability_status_mapping_cf4f3c0d"
+    }
   ]
 }

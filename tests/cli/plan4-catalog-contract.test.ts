@@ -43,13 +43,28 @@ const shardFiles = readdirSync(groupsRoot).filter((name) => name.endsWith('.shar
 assert.ok(shardFiles.length >= 3, 'expected shard files under tests/catalog/groups');
 
 const namespaceOffenders: string[] = [];
+const rawSchemaFailures: string[] = [];
+const requiredCaseFailures: string[] = [];
 for (const name of shardFiles) {
   const raw = JSON.parse(readFileSync(path.join(groupsRoot, name), 'utf8')) as Record<string, unknown>;
+  if (!validateSchema(raw)) {
+    rawSchemaFailures.push(`${name}::${JSON.stringify(validateSchema.errors)}`);
+  }
   for (const entry of Array.isArray(raw.cases) ? raw.cases : []) {
     const caseId = String((entry as Record<string, unknown>)?.caseId ?? '');
     if (!caseIdPattern.test(caseId)) namespaceOffenders.push(`${name}::${caseId}`);
+    const testCase = entry as Record<string, unknown>;
+    if (!testCase.responsibility) requiredCaseFailures.push(`${name}::${caseId}::missing-responsibility`);
+    if (testCase.responsibility === 'task-required') {
+      if (!String(testCase.command ?? '').trim()) requiredCaseFailures.push(`${name}::${caseId}::missing-command`);
+      const coverageCount = (Array.isArray(testCase.coversAcceptance) ? testCase.coversAcceptance.length : 0)
+        + (Array.isArray(testCase.coversImpactEdges) ? testCase.coversImpactEdges.length : 0);
+      if (coverageCount === 0) requiredCaseFailures.push(`${name}::${caseId}::zero-coverage`);
+    }
   }
 }
+assert.deepEqual(rawSchemaFailures, [], `raw shard schema failures:\n${rawSchemaFailures.join('\n')}`);
+assert.deepEqual(requiredCaseFailures, [], `required case contract failures:\n${requiredCaseFailures.join('\n')}`);
 assert.equal(
   namespaceOffenders.length,
   0,
@@ -190,20 +205,8 @@ const UNREACHABLE_SHARD_REGISTER: readonly {
   readonly groupId: string;
   readonly schemaId: string;
   readonly hiddenCaseIds: number;
-}[] = [
-  { groupId: 'test_group_diagnostic_loop', schemaId: 'atm.testCatalogGroupShard.v1', hiddenCaseIds: 2 },
-  { groupId: 'test_group_editor_skill_overlay', schemaId: 'atm.testCatalogGroupShard.v1', hiddenCaseIds: 2 },
-  { groupId: 'test_group_engineering_method_profiles', schemaId: 'atm.testGroupShard.v1', hiddenCaseIds: 1 },
-  { groupId: 'test_group_incident_learning_skill', schemaId: 'atm.testGroupShard.v1', hiddenCaseIds: 2 },
-  { groupId: 'test_group_module_boundaries', schemaId: 'atm.testGroupShard.v1', hiddenCaseIds: 1 },
-  { groupId: 'test_group_plan4_coverage_semantics', schemaId: 'atm.testCatalogShard.v1', hiddenCaseIds: 1 },
-  { groupId: 'test_group_plan4_coverage_universe', schemaId: 'atm.testCatalogGroup.v1', hiddenCaseIds: 2 },
-  { groupId: 'test_group_plan4_mutation_lineage', schemaId: 'atm.testCatalogGroup.v1', hiddenCaseIds: 2 },
-  { groupId: 'test_group_plan4_obligation_inventory', schemaId: 'atm.testCatalogShard.v1', hiddenCaseIds: 1 },
-  { groupId: 'test_group_plan4_quality_gauntlet', schemaId: 'atm.testCatalogGroup.v1', hiddenCaseIds: 2 },
-  { groupId: 'test_group_plan4_validator_selection', schemaId: 'atm.testCatalogGroup.v1', hiddenCaseIds: 2 }
-];
-const EXPECTED_HIDDEN_CASE_ID_TOTAL = 18;
+}[] = [];
+const EXPECTED_HIDDEN_CASE_ID_TOTAL = 0;
 
 const reachability = reportShardReachability(root);
 assert.equal(reachability.length, shardFiles.length, 'reachability must report every shard file on disk');
@@ -217,7 +220,7 @@ const observedUnreachable = reachability
 assert.deepEqual(
   observedUnreachable,
   [...UNREACHABLE_SHARD_REGISTER].sort((left, right) => left.groupId.localeCompare(right.groupId)),
-  'unreachable-shard register drifted; read the KNOWN-DEBT REGISTER comment above before touching it'
+  'every shard must use the canonical reachable schema'
 );
 
 // The debt is quantified, not merely listed.
@@ -258,7 +261,11 @@ assert.equal(resolveLegacyCaseId('test_never_existed', legacyAliases), null);
 for (const file of [
   'test_group_commit_attribution.shard.json',
   'test_group_plan4_coverage_semantics.shard.json',
-  'test_group_plan4_obligation_inventory.shard.json'
+  'test_group_plan4_obligation_inventory.shard.json',
+  'test_group_plan4_coverage_universe.shard.json',
+  'test_group_plan4_mutation_lineage.shard.json',
+  'test_group_plan4_quality_gauntlet.shard.json',
+  'test_group_plan4_validator_selection.shard.json'
 ]) {
   const raw = JSON.parse(readFileSync(path.join(groupsRoot, file), 'utf8')) as Record<string, unknown>;
   const entries = Array.isArray(raw.legacyAliases) ? raw.legacyAliases : [];

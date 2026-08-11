@@ -58,7 +58,7 @@ function readRepoFile(relativePath: string): string {
 }
 
 {
-  const runnerSource = readRepoFile('scripts/run-validators.ts');
+  const runnerSource = readRepoFile('scripts/run-validators/implementation.ts');
   assert.match(runnerSource, /resolveValidationObligations/);
   assert.match(runnerSource, /createSealedCommitCanaryPlan/);
   assert.match(runnerSource, /obligationMap/);

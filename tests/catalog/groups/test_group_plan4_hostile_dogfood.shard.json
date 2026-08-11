@@ -6,8 +6,7 @@
   "resourceKey": "plan4.hostile-dogfood",
   "maintainers": ["atm-core"],
   "cases": [
-    {"caseId":"test_task_atm_gov_0316_hostile_parallel_6f3a8b20","semanticKey":"plan4_hostile_dual_captain_parallel","command":"node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts"},
-    {"caseId":"test_task_atm_gov_0316_phase_exit_saturation_1c7e5a94","semanticKey":"plan4_recurrence_saturation_phase_exit","command":"node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts"}
-  ],
-  "taskIds": ["ATM-GOV-0316"]
+    {"caseId":"test_task_atm_gov_0316_hostile_parallel_6f3a8b20","semanticKey":"plan4_hostile_dual_captain_parallel","command":"node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2"],"coversImpactEdges":["shared-index/CAS/queue race -> fail-closed recovery evidence"]},
+    {"caseId":"test_task_atm_gov_0316_phase_exit_saturation_1c7e5a94","semanticKey":"plan4_recurrence_saturation_phase_exit","command":"node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts","responsibility":"task-required","coversAcceptance":["ACC-2","ACC-3","ACC-4"],"coversImpactEdges":["shared-index/CAS/queue race -> fail-closed recovery evidence"]}
+  ]
 }

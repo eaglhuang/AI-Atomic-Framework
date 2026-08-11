@@ -1,8 +1,17 @@
 {
-  "schemaId": "atm.testGroupShard.v1",
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
   "groupId": "test_group_engineering_method_profiles",
-  "taskId": "TASK-SKL-0034",
-  "caseIds": [
-    "test_task_skl_0034_method_profile_fidelity_19e253da"
+  "theme": "Engineering change method profiles",
+  "resourceKey": "engineering-method-profiles",
+  "maintainers": ["atm-skills"],
+  "cases": [
+    {
+      "caseId": "test_task_skl_0034_method_profile_fidelity_19e253da",
+      "semanticKey": "method_profile_fidelity",
+      "command": "node --strip-types tests/cli/engineering-change-method-profiles.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1"]
+    }
   ]
 }

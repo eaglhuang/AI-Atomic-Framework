@@ -1,8 +1,34 @@
 {
-  "schemaId": "atm.testCatalogShard.v1",
-  "groupId": "plan4-structural-coverage",
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_structural_coverage",
+  "theme": "Plan 4 structural coverage",
+  "resourceKey": "plan4.structural-coverage",
+  "maintainers": ["atom-core-evidence"],
   "cases": [
-    { "caseId": "test_atm_gov_0288_structural_coverage_projection_6fd1f8aa", "taskId": "ATM-GOV-0288", "coversAcceptance": ["ACC-1", "ACC-2", "ACC-4"] },
-    { "caseId": "test_atm_gov_0288_denominator_reconciliation_fail_closed_8a92d31f", "taskId": "ATM-GOV-0288", "coversAcceptance": ["ACC-3", "ACC-4"] }
+    {
+      "caseId": "test_task_atm_gov_0288_plan4_structural_coverage_projection_04125d2e",
+      "semanticKey": "plan4_structural_coverage_projection",
+      "command": "node --strip-types tests/cli/plan4-structural-coverage.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1", "ACC-2", "ACC-4"]
+    },
+    {
+      "caseId": "test_task_atm_gov_0288_plan4_denominator_reconciliation_fail_closed_c58e4547",
+      "semanticKey": "plan4_denominator_reconciliation_fail_closed",
+      "command": "node --strip-types tests/cli/plan4-denominator-reconciliation.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-3", "ACC-4"]
+    }
+  ],
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_atm_gov_0288_structural_coverage_projection_6fd1f8aa",
+      "canonicalCaseId": "test_task_atm_gov_0288_plan4_structural_coverage_projection_04125d2e"
+    },
+    {
+      "legacyCaseId": "test_atm_gov_0288_denominator_reconciliation_fail_closed_8a92d31f",
+      "canonicalCaseId": "test_task_atm_gov_0288_plan4_denominator_reconciliation_fail_closed_c58e4547"
+    }
   ]
 }

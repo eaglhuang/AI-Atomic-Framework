@@ -1,1 +1,34 @@
-{"schemaId":"atm.testCaseGroup.v1","specVersion":"0.1.0","groupId":"test_group_plan4_fault_fingerprint","theme":"Plan 4 fault fingerprint","resourceKey":"plan4.fault-fingerprint","maintainers":["atom-core-evidence"],"cases":[{"caseId":"test_atm_gov_0293_stable_fault_fingerprint_6f0a31bb","semanticKey":"plan4_stable_fault_fingerprint","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-4"]},{"caseId":"test_atm_gov_0293_family_match_confidence_gate_4ae90c25","semanticKey":"plan4_family_match_confidence_gate","responsibility":"task-required","coversAcceptance":["ACC-2","ACC-3","ACC-5","ACC-6","ACC-7"]}]}
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_fault_fingerprint",
+  "theme": "Plan 4 fault fingerprint",
+  "resourceKey": "plan4.fault-fingerprint",
+  "maintainers": ["atom-core-evidence"],
+  "cases": [
+    {
+      "caseId": "test_task_atm_gov_0293_plan4_stable_fault_fingerprint_43d9869b",
+      "semanticKey": "plan4_stable_fault_fingerprint",
+      "command": "node --strip-types tests/cli/plan4-fault-fingerprint.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1", "ACC-4"]
+    },
+    {
+      "caseId": "test_task_atm_gov_0293_plan4_family_match_confidence_gate_03fda645",
+      "semanticKey": "plan4_family_match_confidence_gate",
+      "command": "node --strip-types tests/cli/plan4-semantic-family-match.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-2", "ACC-3", "ACC-5", "ACC-6", "ACC-7"]
+    }
+  ],
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_atm_gov_0293_stable_fault_fingerprint_6f0a31bb",
+      "canonicalCaseId": "test_task_atm_gov_0293_plan4_stable_fault_fingerprint_43d9869b"
+    },
+    {
+      "legacyCaseId": "test_atm_gov_0293_family_match_confidence_gate_4ae90c25",
+      "canonicalCaseId": "test_task_atm_gov_0293_plan4_family_match_confidence_gate_03fda645"
+    }
+  ]
+}

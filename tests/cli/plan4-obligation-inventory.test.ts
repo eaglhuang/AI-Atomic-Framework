@@ -17,7 +17,7 @@ const baseEntries = [
     sourceRefs: [{ kind: 'task' as const, ref: 'ATM-GOV-0279' }],
     validatorRefs: [{
       command: 'node --strip-types tests/cli/plan4-obligation-inventory.test.ts',
-      caseId: 'test_atm_gov_0279_obligation_inventory_drift_detector_5c7f6251'
+      caseId: 'test_task_atm_gov_0279_obligation_inventory_drift_detector_54fc3f05'
     }],
     observedAt: '2026-07-31T00:00:00.000Z'
   },
@@ -29,7 +29,7 @@ const baseEntries = [
     sourceRefs: [{ kind: 'schema' as const, ref: 'schemas/evidence/obligation-inventory.schema.json' }],
     validatorRefs: [{
       command: 'node --strip-types tests/cli/plan4-obligation-inventory.test.ts',
-      caseId: 'test_atm_gov_0279_obligation_inventory_drift_detector_5c7f6251'
+      caseId: 'test_task_atm_gov_0279_obligation_inventory_drift_detector_54fc3f05'
     }],
     observedAt: '2026-07-31T00:00:00.000Z'
   }
@@ -73,7 +73,7 @@ const current = createObligationInventory({
       sourceRefs: [{ kind: 'seam', ref: 'atm.inventoryDriftDetector.v1' }],
       validatorRefs: [{
         command: 'node --strip-types tests/cli/plan4-obligation-inventory.test.ts',
-        caseId: 'test_atm_gov_0279_obligation_inventory_drift_detector_5c7f6251'
+        caseId: 'test_task_atm_gov_0279_obligation_inventory_drift_detector_54fc3f05'
       }],
       observedAt: '2026-07-31T00:10:00.000Z'
     }
@@ -116,7 +116,7 @@ assert.ok(schema.properties.entries.items.required.includes('validatorRefs'));
 
 const shard = JSON.parse(readFileSync('tests/catalog/groups/test_group_plan4_obligation_inventory.shard.json', 'utf8'));
 const testCase = shard.cases.find((entry: { caseId?: string }) =>
-  entry.caseId === 'test_atm_gov_0279_obligation_inventory_drift_detector_5c7f6251'
+  entry.caseId === 'test_task_atm_gov_0279_obligation_inventory_drift_detector_54fc3f05'
 );
 assert.ok(testCase, 'catalog shard must include the task-required obligation inventory test case');
 assert.ok(testCase.coversAcceptance.includes('ACC-5'));

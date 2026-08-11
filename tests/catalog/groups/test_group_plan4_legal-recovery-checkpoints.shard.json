@@ -1,1 +1,34 @@
-{"schemaId":"atm.testCaseGroup.v1","specVersion":"0.1.0","groupId":"test_group_plan4_legal_recovery_checkpoints","theme":"Plan 4 legal recovery checkpoints","resourceKey":"plan4.legal-recovery-checkpoints","maintainers":["atom-core-evidence"],"cases":[{"caseId":"test_atm_gov_0287_recovery_projection","semanticKey":"plan4_legal_recovery_projection","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2","ACC-5"]},{"caseId":"test_atm_gov_0287_recovery_negative","semanticKey":"plan4_legal_recovery_negative","responsibility":"task-required","coversAcceptance":["ACC-3","ACC-4"]}]}
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_legal_recovery_checkpoints",
+  "theme": "Plan 4 legal recovery checkpoints",
+  "resourceKey": "plan4.legal-recovery-checkpoints",
+  "maintainers": ["atom-core-evidence"],
+  "cases": [
+    {
+      "caseId": "test_task_atm_gov_0287_plan4_legal_recovery_projection_3deaae8a",
+      "semanticKey": "plan4_legal_recovery_projection",
+      "command": "node --strip-types tests/cli/plan4-legal-recovery-checkpoints.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-1", "ACC-2", "ACC-5"]
+    },
+    {
+      "caseId": "test_task_atm_gov_0287_plan4_legal_recovery_negative_e6aebb66",
+      "semanticKey": "plan4_legal_recovery_negative",
+      "command": "node --strip-types tests/cli/plan4-legal-recovery-checkpoints.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": ["ACC-3", "ACC-4"]
+    }
+  ],
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_atm_gov_0287_recovery_projection",
+      "canonicalCaseId": "test_task_atm_gov_0287_plan4_legal_recovery_projection_3deaae8a"
+    },
+    {
+      "legacyCaseId": "test_atm_gov_0287_recovery_negative",
+      "canonicalCaseId": "test_task_atm_gov_0287_plan4_legal_recovery_negative_e6aebb66"
+    }
+  ]
+}
