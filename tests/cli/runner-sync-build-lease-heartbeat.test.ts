@@ -54,7 +54,7 @@ const buildResult: BuildResult = {
   } as RunnerInputGraph
 };
 
-assert.equal(shouldAutoReleaseRunnerSyncSteward({}), false);
+assert.equal(shouldAutoReleaseRunnerSyncSteward({}), true);
 assert.equal(shouldAutoReleaseRunnerSyncSteward({ ATM_RUNNER_SYNC_AUTO_RELEASE: '0' }), false);
 assert.equal(shouldAutoReleaseRunnerSyncSteward({ ATM_RUNNER_SYNC_AUTO_RELEASE: '1' }), true);
 
@@ -242,6 +242,78 @@ assert.equal(finalized.childReceipts.length, 3);
     receiptDigest: null
   }), /ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING/);
   assert.equal(queued.queue.groups.length, 1, 'release validation failure must not clear the queue fixture');
+
+  const tempTaskId = 'ATM-FRAMEWORK-TEMP-captain';
+  const durableTaskId = 'TASK-ERR-0013';
+  const delegatedQueue = enqueueRunnerSyncStewardRequest(null, {
+    taskId: tempTaskId,
+    actorId: 'captain',
+    sealedSourceSha: SEAL,
+    requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+    createdAt: '2026-07-27T08:03:00.000Z',
+    heartbeatAt: '2026-07-27T08:03:00.000Z'
+  }).queue;
+  const delegatedGroup = delegatedQueue.groups[0]!;
+  const delegatedAdmission = {
+    ...admission,
+    runnerSyncSteward: {
+      ...admission.runnerSyncSteward,
+      stewardWorkId: delegatedGroup.stewardWorkId,
+      requestedSurfaces: delegatedGroup.requestedSurfaces,
+      waitingTasks: delegatedGroup.waitingTasks,
+      requests: delegatedGroup.requests
+    },
+    queueHeadOwnership: {
+      ...admission.queueHeadOwnership,
+      stewardWorkId: delegatedGroup.stewardWorkId,
+      waitingTasks: delegatedGroup.waitingTasks
+    }
+  };
+  const delegatedReceipt = buildRunnerSyncReceipt({
+    admission: delegatedAdmission,
+    actorId: 'captain',
+    sealedSourceSha: SEAL,
+    linkedTaskIds: [durableTaskId],
+    receiptTaskId: durableTaskId,
+    buildTarget: 'full',
+    buildInputsTreeHash: INPUT_DIGEST,
+    buildDecision: 'built',
+    decisionReason: 'delegated fixture',
+    timings: {
+      startedAt: 0,
+      inputHashCalculationMs: 1,
+      skipDecisionMs: 1,
+      worktreeSetupMs: 1,
+      typescriptBuildMs: 1,
+      rootDropAssemblyMs: 1,
+      onefileAssemblyMs: 1,
+      artifactSyncMs: 1,
+      cleanupMs: 1,
+      totalElapsedMs: 8
+    },
+    publishedAt: '2026-07-27T08:04:00.000Z'
+  });
+  assert.equal(delegatedReceipt.taskId, durableTaskId);
+  assert.deepEqual([...delegatedReceipt.memberTaskIds], [tempTaskId]);
+  assert.deepEqual([...delegatedReceipt.linkedTaskIds], [durableTaskId]);
+  const delegatedReceiptRef = writeTempReceipt(receiptRepo, delegatedReceipt);
+  assert.doesNotThrow(() => validateRunnerSyncReleaseReceipt({
+    cwd: receiptRepo,
+    queue: delegatedQueue,
+    taskId: tempTaskId,
+    stewardWorkId: delegatedGroup.stewardWorkId,
+    receiptRef: delegatedReceiptRef,
+    receiptDigest: null
+  }), 'an explicitly linked durable receipt owner must be releasable by its actual temporary queue member');
+  assert.throws(() => validateRunnerSyncReleaseReceipt({
+    cwd: receiptRepo,
+    queue: delegatedQueue,
+    taskId: tempTaskId,
+    stewardWorkId: delegatedGroup.stewardWorkId,
+    receiptRef: writeTempReceipt(receiptRepo, { ...delegatedReceipt, linkedTaskIds: [] }),
+    receiptDigest: null
+  }), /ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID.*taskId/,
+  'delegated receipt attribution must fail closed when the durable link is absent');
 
   assert.throws(() => validateRunnerSyncReleaseReceipt({
     cwd: receiptRepo,

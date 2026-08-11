@@ -470,7 +470,7 @@ export function validateRunnerSyncReleaseReceipt(input: {
   const expectedSurfaces = normalizeReceiptStringArray(group.requestedSurfaces);
   const mismatches = [
     receipt.schemaId === 'atm.runnerSyncReceipt.v1' ? null : 'schemaId',
-    receipt.taskId === input.taskId ? null : 'taskId',
+    receiptRepresentsRunnerSyncQueueTask(receipt, input.taskId) ? null : 'taskId',
     receipt.actorId === ownerRequest.actorId ? null : 'actorId',
     receipt.stewardWorkId === input.stewardWorkId ? null : 'stewardWorkId',
     receipt.sealedSourceSha === group.sealedSourceSha ? null : 'sealedSourceSha',
@@ -504,6 +504,16 @@ export function validateRunnerSyncReleaseReceipt(input: {
     receiptRef: receiptRef.replace(/\\/g, '/'),
     receiptDigest: digest
   };
+}
+
+function receiptRepresentsRunnerSyncQueueTask(receipt: Record<string, unknown>, queueTaskId: string): boolean {
+  const receiptTaskId = typeof receipt.taskId === 'string' ? receipt.taskId.trim() : '';
+  if (!receiptTaskId) return false;
+  if (receiptTaskId === queueTaskId) return true;
+
+  const memberTaskIds = normalizeReceiptStringArray(receipt.memberTaskIds);
+  const linkedTaskIds = normalizeReceiptStringArray(receipt.linkedTaskIds);
+  return memberTaskIds.includes(queueTaskId) && linkedTaskIds.includes(receiptTaskId);
 }
 
 function validateRunnerSyncReleaseFinalizableReceipt(input: {

@@ -162,6 +162,13 @@ try {
   writeFileSync(lockPath, `${JSON.stringify({ workItemId: tempTaskId, linkedTaskId: linkedDeliveryTaskId })}\n`, 'utf8');
   const linkedReceiptRef = writeRunnerSyncReceipt({ ...receiptInput, admission: temporaryAdmission });
   assert.equal(linkedReceiptRef, `.atm/history/evidence/${linkedDeliveryTaskId}.runner-sync-receipt.json`, 'a temporary queue head must publish through its single durable delivery link');
+  const linkedReceipt = JSON.parse(readFileSync(path.join(repo, linkedReceiptRef), 'utf8'));
+  assert.equal(linkedReceipt.taskId, linkedDeliveryTaskId, 'the receipt file remains owned by the durable delivery task');
+  assert.equal(
+    linkedReceipt.autoReleaseCommand,
+    buildRunnerSyncReleaseCommand({ taskId: tempTaskId, stewardWorkId: 'runner-sync-fixture', receiptRef: linkedReceiptRef }),
+    'the release command must name the actual queue member while referencing the durable receipt path'
+  );
 
   console.log('[runner-sync-post-close-receipt-publication.test] ok');
 } finally {

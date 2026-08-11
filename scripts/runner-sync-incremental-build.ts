@@ -290,9 +290,10 @@ export function buildRunnerSyncReceipt(input: {
   readonly timings: SealedBuildTimings;
   readonly publishedAt?: string;
 }): RunnerSyncReceipt {
-  const taskId = input.receiptTaskId?.trim() || input.admission.queueHeadOwnership.waitingTasks[0] || '';
+  const queueTaskId = input.admission.queueHeadOwnership.waitingTasks[0] || '';
+  const taskId = input.receiptTaskId?.trim() || queueTaskId;
   const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
-  if (!taskId || !stewardWorkId) {
+  if (!queueTaskId || !taskId || !stewardWorkId) {
     throw new Error('ATM_RUNNER_SYNC_RECEIPT_INVALID: queue-head task and steward work id are required to publish a runner-sync receipt.');
   }
   const brokerTicket = input.brokerTicket ?? normalizeBrokerTicket(input.admission);
@@ -371,7 +372,7 @@ export function buildRunnerSyncReceipt(input: {
       maxAttempts: 4
     },
     autoReleaseCommand: buildRunnerSyncReleaseCommand({
-      taskId,
+      taskId: queueTaskId,
       stewardWorkId,
       receiptRef: path.join('.atm', 'history', 'evidence', `${taskId}.runner-sync-receipt.json`).replace(/\\/g, '/')
     }),
