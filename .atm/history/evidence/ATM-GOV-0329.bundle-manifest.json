@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0329",
-  "updatedAt": "2026-08-11T16:16:39.603Z",
+  "updatedAt": "2026-08-11T16:26:34.348Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types tests/cli/plan-3x-4x-validator-profile-coverage.test.ts",
@@ -10,7 +10,9 @@
     "validate-module-boundaries",
     "validate-test-facade",
     "validate:cli",
-    "validate:git-head-evidence"
+    "validate:git-head-evidence",
+    "validate:module-boundaries",
+    "validate:test-facade"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -155,6 +157,38 @@
       "finishedAt": "2026-08-11T16:16:39.602Z",
       "durationMs": 66116,
       "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:module-boundaries",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c2572c1e7856660cc42ad190f7379197d36602fc4e782e4d6ef103b9d761919a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:module-boundaries"
+      ],
+      "generatedAt": "2026-08-11T16:25:13.164Z",
+      "startedAt": "2026-08-11T16:25:10.685Z",
+      "finishedAt": "2026-08-11T16:25:13.164Z",
+      "durationMs": 2479,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:test-facade",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8ff7eebf013676e940b88b591179b7730add9769632b51fc3a9af55717be4903",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:test-facade"
+      ],
+      "generatedAt": "2026-08-11T16:26:34.347Z",
+      "startedAt": "2026-08-11T16:25:19.319Z",
+      "finishedAt": "2026-08-11T16:26:34.347Z",
+      "durationMs": 75028,
+      "runnerKind": "frozen-runner",
       "sourceCommit": null,
       "cached": false
     }

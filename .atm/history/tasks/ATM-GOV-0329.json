@@ -198,7 +198,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-0c9ff315aafa",
     "claimedAt": "2026-08-11T09:09:57.966Z",
-    "heartbeatAt": "2026-08-11T16:05:08.309Z",
+    "heartbeatAt": "2026-08-11T16:32:19.560Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0329.*",
@@ -208,6 +208,8 @@
       ".github/workflows/release-npm.yml",
       "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
       "packages/cli/src/commands/evidence/command-runs.ts",
+      "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
       "packages/cli/src/commands/validation-obligations.ts",
       "scripts/run-validators/implementation.ts",
       "scripts/test-catalog.config.json",
@@ -290,6 +292,8 @@
       ".github/workflows/release-npm.yml",
       "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
       "packages/cli/src/commands/evidence/command-runs.ts",
+      "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
       "packages/cli/src/commands/validation-obligations.ts",
       "scripts/run-validators/implementation.ts",
       "scripts/test-catalog.config.json",
@@ -367,36 +371,41 @@
     "createdAt": "2026-08-11T09:10:09.188Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-11T16-19-29-113Z-scope-amendment-806e40cb3060",
-  "lastTransitionAt": "2026-08-11T16:19:29.113Z",
+  "lastTransitionId": "2026-08-11T16-32-19-984Z-renew-82514ed67a09",
+  "lastTransitionAt": "2026-08-11T16:32:19.984Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-85aa817b83bc18ab",
-    "ticketDigest": "sha256:85aa817b83bc18ab706ba167f0ac21432a1790d67f1bacab0574695529ddf57a",
+    "ticketId": "wat-54cf4a5cdced7261",
+    "ticketDigest": "sha256:54cf4a5cdced72619d94cdadabb5f97b8d74c9b205ac6ac45eaffdd22fdddb52",
     "taskId": "ATM-GOV-0329",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260811090958-codex-gpt-5.4-mini-008f9af8df",
     "claimGeneration": "lease-0c9ff315aafa",
-    "issuedAt": "2026-08-11T16:05:08.309Z",
-    "expiresAt": "2026-08-11T16:35:08.309Z",
-    "scopeDigest": "sha256:ff45ff494b4ec1960ed72ec61e1234e92dd8d49a9dd85d7b80d5f85e5798f076",
+    "issuedAt": "2026-08-11T16:32:19.560Z",
+    "expiresAt": "2026-08-11T17:02:19.560Z",
+    "scopeDigest": "sha256:f424432bf94711374049d77458eca08c1c3c5582a275aabbb03e58cd4e25413f",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-11T16:05:08.309Z"
+      "selectedAt": "2026-08-11T16:32:19.560Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0329.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0329/**",
           ".atm/history/tasks/ATM-GOV-0329.json",
           ".github/workflows/ci.yml",
           ".github/workflows/release-npm.yml",
+          "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+          "packages/cli/src/commands/evidence/command-runs.ts",
+          "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+          "packages/cli/src/commands/taskflow/write-readiness.ts",
           "packages/cli/src/commands/validation-obligations.ts",
           "scripts/run-validators/implementation.ts",
           "scripts/test-catalog.config.json",
@@ -452,7 +461,7 @@
           "tests/cli/plan4-obligation-inventory.test.ts",
           "tests/cli/validation-obligation-map.test.ts"
         ],
-        "digest": "sha256:359cdbf4862f8c759c6da50115497413221e543c7e80634c7a87a7d628cfafbf"
+        "digest": "sha256:f90669819fd2d681e47b20066a7b88d28ea797b3d5d47bb95601b5fed4f1e6e6"
       },
       {
         "kind": "lifecycle-operation",

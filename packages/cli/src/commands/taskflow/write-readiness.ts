@@ -199,7 +199,11 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
     cwd: input.cwd,
     taskId: input.taskId,
     operation: 'close',
-    files: input.declaredFiles,
+    // Admission governs files this target-repository close will mutate. The
+    // declaration set also contains planning/read-only authority paths; those
+    // are validated by the planning closeback authority and must not make a
+    // target ticket fail scope coverage.
+    files: input.previewCommitBundle.targetDeliveryFiles,
     producingAtmCommand: 'node atm.mjs taskflow close --write --json'
   });
 
