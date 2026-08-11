@@ -64,6 +64,7 @@ import { parseTaskClaim, readTaskDocument } from './identity-check-command.ts';
 import { isIgnorableCommitStagingSideEffect, isTaskOwnedProtectedOverrideAuditPath } from './task-scope-staging.ts';
 
 import { runWithSealedTaskScopedCommitIndex } from './sealed-commit-attribution.ts';
+import { recordLiveIndexReconciliation } from './live-index-reconciliation.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
@@ -521,12 +522,18 @@ export function recordGitIndexRestoreFailure(cwd: LegacyValue, input: LegacyValu
  * before `run` may create a commit. An empty bundle is not a licence to commit
  * the live shared index, and neither is an absent one: the caller passes the
  * seal source it decided on, and an unnamed source fails closed.
+ *
+ * The commit result is returned alongside the live-index reconciliation rather
+ * than in place of it. Reconciliation is the postcondition that decides whether
+ * the shared index is actually clean afterwards, so a caller that only ever
+ * sees the commit result cannot tell a clean index from one holding retained
+ * paths it does not own.
  */
 export function withTaskScopedCommitIndex(cwd: LegacyValue, files: LegacyValue, actorId: LegacyValue, taskId: LegacyValue, run: LegacyValue, sealSource: LegacyValue) {
   const normalizedFiles = uniqueSorted(
     files.map(normalizeRelativePath).filter(Boolean),
   );
-  return runWithSealedTaskScopedCommitIndex({
+  const outcome = runWithSealedTaskScopedCommitIndex({
     cwd,
     paths: normalizedFiles,
     provenance: "task-scope",
@@ -545,7 +552,13 @@ export function withTaskScopedCommitIndex(cwd: LegacyValue, files: LegacyValue, 
       return staged?.evidencePath ? [staged.evidencePath] : [];
     },
     run,
-  }).result;
+  });
+  const liveIndexReconciliation = outcome.liveIndexReconciliation;
+  return {
+    result: outcome.result,
+    liveIndexReconciliation,
+    liveIndexReconciliationRecordPath: recordLiveIndexReconciliation(cwd, taskId, liveIndexReconciliation),
+  };
 }
 
 export function stageTaskScopedBundleFiles(cwd: LegacyValue, files: LegacyValue, env: LegacyValue) {

@@ -1,0 +1,336 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0014",
+  "title": "Make live-index reconciliation exception safe, observable, and argv bounded",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 A commit error raised after HEAD advanced still reconciles the live index, and the original error reaches the caller unswallowed.",
+    "ACC-2 A commit error raised before HEAD advanced performs no reconciliation and leaves the index byte-identical.",
+    "ACC-3 The production caller receives a small stable result carrying reconciled paths, retained paths, retention reasons, and any reconciliation failure, so a non-clean index is never reported as clean.",
+    "ACC-4 Pathspec batching is derived from an argv byte estimate and a platform budget, preserves sort order, dedupe, and result equivalence, and is identical in interface on Windows and POSIX.",
+    "ACC-5 A single pathspec that alone exceeds the budget fails closed with a diagnosable error rather than producing a truncated or silently partial run."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+    "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+    "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+    "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+    "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+    "node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts",
+    "npm run typecheck",
+    "npm run validate:module-boundaries"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the transaction boundary, the batching module, and both focused tests together. Never restore index bytes by hand, and never resolve a batching failure by retry, reset, or stash.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.live-index-reconciliation",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.pathspec-argv-budget",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0014-make-live-index-reconciliation-exception-safe-observable-and-argv-bounded.task.md",
+    "sectionTitle": "TASK-ERR-0014",
+    "headingLine": 99,
+    "hash": "847b5d924684893e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0014-make-live-index-reconciliation-exception-safe-observable-and-argv-bounded.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:847b5d924684893e01e26dfafba012b04ddc0efaedf5411e01d74c807618ad18",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-11T15:08:31.599Z"
+    }
+  },
+  "importedAt": "2026-08-11T15:08:31.599Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "governed-commit-advances-head-through-a-sealed-candidate-index"
+    ],
+    "softRelations": [
+      "TASK-ERR-0013",
+      "ATM-GOV-0346"
+    ],
+    "changedPublicSeams": [
+      "live-index-reconciliation-transaction",
+      "pathspec-argv-budget"
+    ],
+    "causalImpactEdges": [
+      "commit-error-after-head-advance-to-reconciled-live-index",
+      "retained-path-to-operator-visible-result",
+      "oversized-path-bundle-to-bounded-git-invocations"
+    ],
+    "parallelFrontierInputs": [
+      "canonical-git-index",
+      "sealed-commit-bundle",
+      "worktree-bytes"
+    ],
+    "validatorReferences": [
+      "test_reconcile_after_commit_error_0014",
+      "test_retained_path_observability_0014",
+      "test_pathspec_argv_batching_0014"
+    ],
+    "phaseOwner": "correction-wave-0-unblock"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_reconcile_after_commit_error_0014",
+      "targetGroupId": null,
+      "semanticKey": "commit_error_after_head_advance_still_reconciles_live_index",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "commit-error-after-head-advance-to-reconciled-live-index"
+      ],
+      "expectedRedPredicate": "run() throws after creating the commit, HEAD has advanced, and the live index keeps pre-commit blobs because reconciliation was skipped",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "live-index-reconciliation-transaction",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_retained_path_observability_0014",
+      "targetGroupId": null,
+      "semanticKey": "retained_paths_and_reasons_reach_the_production_caller",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "retained-path-to-operator-visible-result"
+      ],
+      "expectedRedPredicate": "withTaskScopedCommitIndex returns only .result, so a concurrent-index-change retention is computed and discarded",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "live-index-reconciliation-transaction",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_pathspec_argv_batching_0014",
+      "targetGroupId": null,
+      "semanticKey": "oversized_path_bundles_split_into_budget_bounded_git_invocations",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "oversized-path-bundle-to-bounded-git-invocations"
+      ],
+      "expectedRedPredicate": "a release-style path bundle is splatted into one git invocation whose argv exceeds the Windows CreateProcess budget",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "pathspec-argv-budget",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_reconcile_after_commit_error_0014",
+    "test_retained_path_observability_0014",
+    "test_pathspec_argv_batching_0014"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck",
+    "validate:module-boundaries"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-11T15-42-17-722Z-renew-a2a3c97d7665",
+  "lastTransitionAt": "2026-08-11T15:42:17.722Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008-err-0014",
+  "reservedAt": "2026-08-11T15:13:27.599Z",
+  "promotedAt": "2026-08-11T15:13:27.604Z",
+  "claim": {
+    "actorId": "claude-008-err-0014",
+    "leaseId": "lease-5b74b03b7d79",
+    "claimedAt": "2026-08-11T15:13:27.609Z",
+    "heartbeatAt": "2026-08-11T15:42:16.703Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-ERR-0014.json",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260811151327-claude-008-err-0014-584feebd7d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811151327-claude-008-err-0014-584feebd7d\""
+    }
+  },
+  "startedAt": "2026-08-11T15:13:27.609Z",
+  "startedByActor": "claude-008-err-0014",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-2e0be3c23941c453",
+    "ticketDigest": "sha256:2e0be3c23941c453e89ab52f2884f4e35a3ebba34fc8d6c490bf7a07c74a9191",
+    "taskId": "TASK-ERR-0014",
+    "origin": "claim",
+    "actorId": "claude-008-err-0014",
+    "laneSessionId": "lane-20260811151327-claude-008-err-0014-584feebd7d",
+    "claimGeneration": "lease-5b74b03b7d79",
+    "issuedAt": "2026-08-11T15:42:16.703Z",
+    "expiresAt": "2026-08-11T16:12:16.703Z",
+    "scopeDigest": "sha256:49ba3a4cbfc490d7f466f80c3a72f93f0fce3f5177d6d277ef3ca419bc1bac22",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-11T15:42:16.703Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-ERR-0014.*",
+          ".atm/history/task-events/TASK-ERR-0014/**",
+          ".atm/history/tasks/TASK-ERR-0014.json",
+          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+          "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+          "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
+        ],
+        "digest": "sha256:d90abd15d39445324c38f2c76c3bb2537a05227908792e875f8d6d2bb582b22b"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260811151327-claude-008-err-0014-TASK-ERR-0014-56192e6803",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0014",
+    "batchId": null,
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-bb55ded28b22846b",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0014.*",
+      ".atm/history/task-events/TASK-ERR-0014/**",
+      ".atm/history/tasks/TASK-ERR-0014.json",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c1e511e7d75e820698c524186a2f8fcec6d9710f318dd9650f5b7fd42185e1b4",
+    "actorId": "claude-008-err-0014",
+    "sessionId": "session-20260811151327-claude-008-err-0014-TASK-ERR-0014-56192e6803",
+    "laneSession": {
+      "laneSessionId": "lane-20260811151327-claude-008-err-0014-584feebd7d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811151327-claude-008-err-0014-584feebd7d\""
+    },
+    "createdAt": "2026-08-11T15:13:42.321Z",
+    "status": "active"
+  }
+}

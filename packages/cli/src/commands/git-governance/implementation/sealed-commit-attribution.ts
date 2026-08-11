@@ -32,8 +32,10 @@ import {
 import { CliError } from '../../shared.ts';
 import { runGitCommand, runGitCommandWithEnv } from './git-process-port.ts';
 import {
+  attachLiveIndexReconciliation,
   captureLiveIndexSnapshot,
-  reconcileCommittedPathsInLiveIndex,
+  readHeadCommit,
+  reconcileLiveIndexAfterCommitAttempt,
   type LiveIndexReconciliation
 } from './live-index-reconciliation.ts';
 
@@ -437,11 +439,31 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
       actorId: input.actorId,
       taskId: input.taskId
     });
+    // The candidate index leaves the live index behind whether `run` returns or
+    // throws, and a commit that failed downstream of its own commit object has
+    // still moved HEAD. So the snapshot and the pre-attempt HEAD are taken
+    // before the attempt, and the same boundary settles both exits: it decides
+    // on HEAD movement rather than on control flow, and it never converts an
+    // index problem into a commit failure or a commit failure into silence.
     const liveIndexSnapshot = captureLiveIndexSnapshot(input.cwd, bundle.entries.map((entry) => entry.path));
-    const result = input.run(env);
-    const liveIndexReconciliation = reconcileCommittedPathsInLiveIndex({
+    const headBeforeCommit = readHeadCommit(input.cwd);
+    let result: T;
+    try {
+      result = input.run(env);
+    } catch (commitError) {
+      throw attachLiveIndexReconciliation(
+        commitError,
+        reconcileLiveIndexAfterCommitAttempt({
+          cwd: input.cwd,
+          snapshot: liveIndexSnapshot,
+          headBefore: headBeforeCommit
+        })
+      );
+    }
+    const liveIndexReconciliation = reconcileLiveIndexAfterCommitAttempt({
       cwd: input.cwd,
-      snapshot: liveIndexSnapshot
+      snapshot: liveIndexSnapshot,
+      headBefore: headBeforeCommit
     });
     return {
       result,
