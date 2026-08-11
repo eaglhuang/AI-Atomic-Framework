@@ -21,7 +21,7 @@ import {
 } from "../commit-scope-policy.ts";
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from "../../shared.ts";
 import { assertNoBrokerConflictBeforeHookBypass } from './broker-hook-bypass-preflight.ts';
-import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles, recordGitIndexRestoreFailure, rollbackNewlyStagedLiveIndexResidue, stageTaskScopedBundleFiles, withTaskScopedCommitIndex } from './git-index-transaction.ts';
+import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles, recordGitIndexRestoreFailure, rollbackNewlyStagedLiveIndexResidue, withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { assertNoStdinPathspecGitAddPreflight, createSanitizedGitEnv, gitCommitAttemptStatusRelativePath, readGitCommitAttemptStatus, resolveGitCommitTimeoutMs, shouldStageGovernedGitHeadEvidenceBeforeCommit, stageTrackedActorRegistryIfNeeded, writeGitCommitAttemptStatus } from './git-process-port.ts';
 import { buildIdentitySetRequiredCommand, parseTaskClaim, readTaskDocument, requireExplicitGitActor, resolveGitGovernanceSession, resolveGitIdentityProfile } from './identity-check-command.ts';
 import { isHeadRaceCommitFailure, readHeadBranchRef, readHeadCommitSha } from './push-command.ts';
@@ -277,19 +277,16 @@ if (options.taskId && taskDocument && !bypassesActiveSession) {
         },
       );
     }
-    // A defer transaction parks the pre-existing shared index before it
-    // resolves this task's bundle. Re-stage only the admitted candidates so
-    // the ordinary staged-bundle guard observes the same current-task bytes
-    // that the sealed candidate index will commit. This never restores or
-    // stages foreign paths; their snapshot remains the preservation boundary.
-    if (options.autoStage && bundleReport.stageFiles.length > 0) {
-      stageTaskScopedBundleFiles(options.cwd, bundleReport.stageFiles, process.env);
-    }
-    const stagedBundleInspection = inspectTaskScopedStagedGovernanceBundle(
-      options.cwd,
-      options.taskId,
-      taskDocument,
-    );
+    // `--auto-stage` assembles and verifies the bundle in a sealed candidate
+    // index. Re-staging it in the shared index is redundant and lets foreign
+    // lanes contend on bytes this commit will never consume.
+    const stagedBundleInspection = options.autoStage
+      ? { ok: true, code: '', summary: '', warnings: [], details: {} }
+      : inspectTaskScopedStagedGovernanceBundle(
+        options.cwd,
+        options.taskId,
+        taskDocument,
+      );
     if (!stagedBundleInspection.ok) {
       cleanupDeferredForeignStagedSnapshot(
         options.cwd,
@@ -311,11 +308,13 @@ if (options.taskId && taskDocument && !bypassesActiveSession) {
         },
       );
     }
-    const stagingInspection = inspectTaskScopedUnstagedCommit(
-      options.cwd,
-      options.taskId,
-      taskDocument,
-    );
+    const stagingInspection = options.autoStage
+      ? null
+      : inspectTaskScopedUnstagedCommit(
+        options.cwd,
+        options.taskId,
+        taskDocument,
+      );
     if (stagingInspection?.kind === "staging-required") {
       cleanupDeferredForeignStagedSnapshot(
         options.cwd,

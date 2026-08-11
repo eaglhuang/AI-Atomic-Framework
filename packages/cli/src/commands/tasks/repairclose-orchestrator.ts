@@ -9,6 +9,7 @@ import { recordStaleRunnerOverride } from './close-governance.ts';
 import { readJsonRecord, taskPathFor } from './task-file-io-helpers.ts';
 import { parseAllowStaleRunnerFlag } from './task-option-parsers.ts';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.ts';
+import { issueRepairClosureAdmissionTicket } from '../git-governance/work-admission-check.ts';
 
 interface ParsedRepairClosureOptions {
   readonly cwd: string;
@@ -28,6 +29,11 @@ export async function runTasksRepairClosure(argv: string[]): Promise<CommandResu
   const resolvedActor = options.actorId ? resolveActorId(options.actorId, options.cwd) : null;
   let emergencyUse: EmergencyUseEvidence = null;
   if (!options.dryRun) {
+    const staleGate = assertRunnerFreshForWriteAction({
+      cwd: options.cwd,
+      action: 'tasks-repair-closure-write',
+      allowStaleRunner: options.allowStaleRunner
+    });
     emergencyUse = assertEmergencyApproval({
       cwd: options.cwd,
       surface: 'tasks repair-closure',
@@ -41,11 +47,6 @@ export async function runTasksRepairClosure(argv: string[]): Promise<CommandResu
       ],
       reason: 'Direct closure packet repair backend mutation.',
       command: `node atm.mjs tasks repair-closure --task ${options.taskId} --json`
-    });
-    const staleGate = assertRunnerFreshForWriteAction({
-      cwd: options.cwd,
-      action: 'tasks-repair-closure-write',
-      allowStaleRunner: options.allowStaleRunner
     });
     if (options.allowStaleRunner && staleGate.warning) {
       await recordStaleRunnerOverride({
@@ -65,9 +66,9 @@ export async function runTasksRepairClosure(argv: string[]): Promise<CommandResu
     amend: options.amend,
     scopeTaskId: options.scopeTaskId
   });
-  let transitionPath: string | null = null;
+  let repairAuthority: ReturnType<typeof writeRepairClosureTransition> = null;
   if (!options.dryRun) {
-    transitionPath = writeRepairClosureTransition({
+    repairAuthority = writeRepairClosureTransition({
       cwd: options.cwd,
       taskId: options.taskId,
       actorId: resolvedActor?.actorId ?? null,
@@ -98,14 +99,18 @@ export async function runTasksRepairClosure(argv: string[]): Promise<CommandResu
           repairedHead: result.repairedHead,
           upstreamStatus: result.upstreamStatus,
           nextActionCommand: result.nextActionCommand,
-          remediation: result.remediation
+          remediation: result.remediation,
+          workAdmissionTicketId: repairAuthority?.workAdmissionTicket?.ticketId ?? null,
+          workAdmissionTicketDigest: repairAuthority?.workAdmissionTicket?.ticketDigest ?? null,
+          workAdmissionTicketExpiresAt: repairAuthority?.workAdmissionTicket?.expiresAt ?? null
         }
       )
     ],
     evidence: {
       result,
       emergencyUse,
-      transitionPath,
+      transitionPath: repairAuthority?.transitionPath ?? null,
+      workAdmissionTicket: repairAuthority?.workAdmissionTicket ?? null,
       nextAction: !options.dryRun && stagedOnly ? {
         kind: 'governed-commit-required',
         command: result.nextActionCommand,
@@ -122,10 +127,17 @@ function writeRepairClosureTransition(input: {
   readonly taskId: string;
   readonly actorId: string | null;
   readonly command: string;
-}): string | null {
+}): { readonly transitionPath: string; readonly workAdmissionTicket: ReturnType<typeof issueRepairClosureAdmissionTicket> | null } | null {
   const taskPath = taskPathFor(input.cwd, input.taskId);
   if (!existsSync(taskPath)) return null;
   const taskDocument = readJsonRecord(taskPath);
+  if (input.actorId) {
+    taskDocument.workAdmissionTicket = issueRepairClosureAdmissionTicket({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      actorId: input.actorId
+    });
+  }
   const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
   const transitionPath = writeTaskDocumentWithTransition({
     cwd: input.cwd,
@@ -139,7 +151,17 @@ function writeRepairClosureTransition(input: {
     command: input.command
   });
   execFileSync('git', ['-C', input.cwd, 'add', '--', taskPath, transitionPath], { stdio: 'ignore' });
-  return transitionPath;
+  return {
+    transitionPath,
+    workAdmissionTicket: isRepairTicket(taskDocument.workAdmissionTicket)
+      ? taskDocument.workAdmissionTicket
+      : null
+  };
+}
+
+function isRepairTicket(value: unknown): value is ReturnType<typeof issueRepairClosureAdmissionTicket> {
+  return Boolean(value && typeof value === 'object'
+    && (value as { schemaId?: unknown }).schemaId === 'atm.workAdmissionTicket.v1');
 }
 
 function parseRepairClosureOptions(argv: string[]): ParsedRepairClosureOptions {

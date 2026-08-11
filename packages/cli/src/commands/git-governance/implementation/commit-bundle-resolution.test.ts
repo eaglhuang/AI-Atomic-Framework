@@ -45,6 +45,27 @@ assert.equal(existsSync(foreignManifest), true, 'foreign released bundle residue
 assert.equal(bundle.ok, true, `completed foreign residue must not block a path-bounded commit: ${bundle.blockedCode} ${bundle.blockedSummary}`);
 assert.ok(bundle.skippedExternalDirtyFiles.includes('.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'));
 
+// A retained foreign deletion must likewise stay out of a different task's
+// bounded commit.  The safety gate protects destructive writes that enter the
+// commit, not unrelated index residue that the transaction explicitly parks.
+execFileSync('git', ['rm', '--cached', '--', '.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'], { cwd });
+writeFileSync(path.join(cwd, 'src', 'delivery.ts'), 'export const delivery = "current";\n');
+const foreignDeletionBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: 'TASK-CURRENT',
+  actorId: 'test-actor',
+  taskDocument: JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-CURRENT.json'), 'utf8')),
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: true,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.equal(foreignDeletionBundle.ok, true, `foreign retained deletion must not block a bounded commit: ${foreignDeletionBundle.blockedCode} ${foreignDeletionBundle.blockedSummary}`);
+assert.ok(foreignDeletionBundle.skippedExternalDirtyFiles.includes('.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'));
+execFileSync('git', ['reset', '--', '.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'], { cwd });
 writeFileSync(foreignManifest, '{"schemaId":"fixture"}\n');
 
 // A shared index can legitimately be stale while the task-owned worktree is
