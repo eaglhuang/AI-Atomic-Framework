@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-11T09-06-48-089Z-close-5ebf369f1fe8",
+  "taskId": "ATM-GOV-0346",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260810233132-codex-gpt-5.4-mini-ATM-GOV-0346-c986934dab",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0346.json",
+  "taskSha256": "sha256:5b60ac95fb9f7cbd6e0fec97c27aafcd9fbf9ced0643d8fd6425408c5450a73c",
+  "createdAt": "2026-08-11T09:06:48.089Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0346 --actor codex-gpt-5.4-mini --status done --historical-delivery 1b280685d9ed3508497f1c46d6f0211fbb0ca98a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260810233132-codex-gpt-5.4-mini-ATM-GOV-0346-c986934dab",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0346.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node",
+      "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+      "node --strip-types tests/skew/skew-matrix.test.ts",
+      "node scripts/run-validators.ts standard --filter validate-skew-matrix --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:test-facade"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-11T09:06:48.080Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".github/workflows/version-skew-matrix.yml",
+        "scripts/run-validators/implementation.ts",
+        "scripts/validate-test-facade.ts",
+        "scripts/validators.config.json",
+        "tests/cli/test-facade-timeout-policy.test.ts",
+        "tests/cli/validator-observed-lifecycle.test.ts",
+        "tests/cli/validator-run-resume-and-status.test.ts",
+        "tests/skew/skew-matrix.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/run-validators/implementation.ts",
+        "scripts/validate-test-facade.ts",
+        "scripts/validators.config.json",
+        "tests/cli/test-facade-timeout-policy.test.ts",
+        "tests/cli/validator-observed-lifecycle.test.ts",
+        "tests/cli/validator-run-resume-and-status.test.ts",
+        "tests/skew/skew-matrix.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

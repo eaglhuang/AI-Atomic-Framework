@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0346",
   "title": "Stabilize validate-skew-matrix timeout boundary and CI facade closure",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -186,8 +186,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-11T03-54-40-300Z-renew-e5026e76fa88",
-  "lastTransitionAt": "2026-08-11T03:54:40.300Z",
+  "lastTransitionId": "2026-08-11T09-06-48-089Z-close-5ebf369f1fe8",
+  "lastTransitionAt": "2026-08-11T09:06:48.089Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-10T12:38:40.092Z",
   "promotedAt": "2026-08-10T12:38:40.099Z",
@@ -195,7 +195,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-7fc202aabc5d",
     "claimedAt": "2026-08-10T23:31:32.638Z",
-    "heartbeatAt": "2026-08-11T03:54:39.114Z",
+    "heartbeatAt": "2026-08-11T09:06:48.087Z",
     "ttlSeconds": 1800,
     "files": [
       "scripts/run-validators/implementation.ts",
@@ -207,34 +207,35 @@
       "tests/cli/validator-run-resume-and-status.test.ts",
       "tests/skew/skew-matrix.test.ts"
     ],
-    "state": "active",
-    "reason": "Captain takeover after the released predecessor lease expired: retain and complete the existing task-scoped Wave 3 timeout-policy WIP without discard or force-claim."
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-08-10T12:38:40.109Z",
   "startedByActor": "claude-008-gov-0346",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-16f31de2f6a85c36",
-    "ticketDigest": "sha256:16f31de2f6a85c365df207ff53ad3b2b133505248a0338e990857ebee8cea74e",
+    "ticketId": "wat-7de1a2ada0fc48be",
+    "ticketDigest": "sha256:7de1a2ada0fc48be025b0eb5f43b8e4557b6e81f75f4659a36a0ad5b2b8bc28a",
     "taskId": "ATM-GOV-0346",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": null,
     "claimGeneration": "lease-7fc202aabc5d",
-    "issuedAt": "2026-08-11T03:54:39.114Z",
-    "expiresAt": "2026-08-11T04:24:39.114Z",
-    "scopeDigest": "sha256:81b121a47e8b09f503f97f99a3526010c4c8b957c8df19fbc399314528047402",
+    "issuedAt": "2026-08-11T08:58:41.424Z",
+    "expiresAt": "2026-08-11T09:28:41.424Z",
+    "scopeDigest": "sha256:0f3d538a37204c12c08b44f44e27051406068e2a1a7a1e235a877bf20d183142",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-11T03:54:39.114Z"
+      "selectedAt": "2026-08-11T08:58:41.424Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0346.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0346/**",
           ".atm/history/tasks/ATM-GOV-0346.json",
           ".github/workflows/version-skew-matrix.yml",
@@ -246,7 +247,7 @@
           "tests/cli/validator-run-resume-and-status.test.ts",
           "tests/skew/skew-matrix.test.ts"
         ],
-        "digest": "sha256:5be8f06a51e50529a7c9f9b09085f34c2f8a43d3fdea87ab12a34de87526684a"
+        "digest": "sha256:bea1facc76814418d57aec15995630156917f73e179834d2ad2440c4fe4c6fca"
       },
       {
         "kind": "lifecycle-operation",
@@ -297,5 +298,9 @@
     "retainedAt": "2026-08-10T22:55:23.546Z",
     "transitionClass": "release-wip-retained"
   },
-  "owner": "codex-gpt-5.4-mini"
+  "owner": "codex-gpt-5.4-mini",
+  "closedAt": "2026-08-11T09:06:48.087Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260810233132-codex-gpt-5.4-mini-ATM-GOV-0346-c986934dab",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0346.closure-packet.json"
 }
