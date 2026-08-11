@@ -36,7 +36,6 @@ import {
   extractTaskDeliverableFiles,
   evaluateTaskDeliverableGate,
   existingTaskCloseArtifacts,
-  stageTaskCloseArtifacts,
   taskDeliveryPrincipleText
 } from './close-helpers/close-artifact-staging.ts';
 import { createClosureTransitionMetadata } from './close-helpers/task-transition-writer.ts';
@@ -505,7 +504,6 @@ export async function runTasksClose(argv: string[]) {
     transitionPath,
     closurePacketPath
   ]);
-  stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
   if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
     const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
     await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));

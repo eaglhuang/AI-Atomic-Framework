@@ -110,6 +110,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     : process.env.AGENT_IDENTITY?.trim()
       ? 'AGENT_IDENTITY'
       : 'fallback';
+  const publicationTaskId = process.env.ATM_RUNNER_PUBLICATION_TASK?.trim() || null;
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
 
@@ -124,7 +125,8 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       cwd: repoRoot,
       stewardActorId: actorId,
       sealedSourceSha,
-      buildTarget
+      buildTarget,
+      publicationTaskId
     });
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     const dominantPhaseSummary = summarizeDominantPhase(timings);
@@ -208,7 +210,8 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       cwd: repoRoot,
       stewardActorId: actorId,
       sealedSourceSha,
-      buildTarget
+      buildTarget,
+      publicationTaskId
     });
     const artifactSync = timePhase(
       timings,

@@ -44,6 +44,29 @@ assert.equal(existsSync(foreignManifest), true, 'foreign generated bundle residu
 assert.equal(bundle.ok, true, `un-staged foreign residue must not block a path-bounded commit: ${bundle.blockedCode} ${bundle.blockedSummary}`);
 assert.ok(bundle.skippedExternalDirtyFiles.includes('.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'));
 
+// A task-shaped diagnostic without a semantic task identity cannot pass the
+// protected-evidence hook. Preserve it, but keep it out of an auto-staged
+// task bundle rather than teaching callers to forge task context into it.
+const contextlessEvidence = path.join(cwd, '.atm', 'history', 'evidence', 'TASK-CURRENT.runner-publication-takeover.json');
+writeFileSync(contextlessEvidence, '{"schemaId":"atm.runnerPublicationTakeoverPlan.v1","sealedSourceSha":"fixture"}\n');
+const contextlessEvidenceBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: 'TASK-CURRENT',
+  actorId: 'test-actor',
+  taskDocument: JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-CURRENT.json'), 'utf8')),
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.equal(contextlessEvidenceBundle.ok, true);
+assert.ok(!contextlessEvidenceBundle.stageFiles.includes('.atm/history/evidence/TASK-CURRENT.runner-publication-takeover.json'));
+assert.ok(!contextlessEvidenceBundle.commitFiles.includes('.atm/history/evidence/TASK-CURRENT.runner-publication-takeover.json'));
+assert.equal(existsSync(contextlessEvidence), true, 'contextless diagnostic bytes must remain available for inspection');
+
 // A retained foreign deletion must likewise stay out of a different task's
 // bounded commit.  The safety gate protects destructive writes that enter the
 // commit, not unrelated index residue that the transaction explicitly parks.

@@ -36,7 +36,9 @@ assert.ok(
 
 const fixtureRoot = mkdtempSync(path.join(tmpdir(), 'atm-runner-publication-'));
 const lockRoot = path.join(fixtureRoot, '.atm', 'runtime', 'locks');
+const taskRoot = path.join(fixtureRoot, '.atm', 'history', 'tasks');
 mkdirSync(lockRoot, { recursive: true });
+mkdirSync(taskRoot, { recursive: true });
 const now = '2026-08-11T12:00:00.000Z';
 const writeLock = (name: string, taskId: string, heartbeatAt: string) => writeFileSync(
   path.join(lockRoot, name),
@@ -50,14 +52,15 @@ const writeLock = (name: string, taskId: string, heartbeatAt: string) => writeFi
   'utf8'
 );
 try {
-  writeLock('active.lock.json', 'ATM-FRAMEWORK-TEMP-runner-steward-lane-a', '2026-08-11T11:59:00.000Z');
+  writeLock('active.lock.json', 'ATM-GOV-0345', '2026-08-11T11:59:00.000Z');
+  writeFileSync(path.join(taskRoot, 'ATM-GOV-0345.json'), JSON.stringify({ claim: { state: 'active', actorId: 'runner-steward', heartbeatAt: '2026-08-11T11:59:50.000Z', ttlSeconds: 300 } }), 'utf8');
   writeLock('expired.lock.json', 'ATM-FRAMEWORK-TEMP-runner-steward-lane-old', '2026-08-11T11:00:00.000Z');
-  assert.equal(resolveActiveRunnerPublicationTask({ cwd: fixtureRoot, actorId: 'runner-steward', now }), 'ATM-FRAMEWORK-TEMP-runner-steward-lane-a');
+  assert.equal(resolveActiveRunnerPublicationTask({ cwd: fixtureRoot, actorId: 'runner-steward', now, taskId: 'ATM-GOV-0345' }), 'ATM-GOV-0345');
 
-  writeLock('ambiguous.lock.json', 'ATM-FRAMEWORK-TEMP-runner-steward-lane-b', '2026-08-11T11:59:30.000Z');
+  writeLock('ambiguous.lock.json', 'ATM-GOV-0346', '2026-08-11T11:59:30.000Z');
   assert.throws(
     () => resolveActiveRunnerPublicationTask({ cwd: fixtureRoot, actorId: 'runner-steward', now }),
-    /exactly one active framework release claim.*found 2/
+    /exactly one active release-surface claim.*found 2/
   );
 } finally {
   rmSync(fixtureRoot, { recursive: true, force: true });

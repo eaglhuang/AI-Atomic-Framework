@@ -23,6 +23,7 @@ export function resolveSealedRunnerPublication(input: {
   readonly stewardActorId: string;
   readonly sealedSourceSha: string;
   readonly buildTarget: RunnerBuildOutputTarget;
+  readonly publicationTaskId?: string | null;
 }): {
   readonly admission: RunnerSyncAdmissionReport;
   readonly currentTaskId: string | null;
@@ -65,6 +66,7 @@ export function ensureRunnerPublicationReservation(input: {
   readonly stewardActorId: string;
   readonly sealedSourceSha: string;
   readonly buildTarget: RunnerBuildOutputTarget;
+  readonly publicationTaskId?: string | null;
 }): RunnerSyncAdmissionReport {
   const inspect = () => inspectRunnerSyncAdmission({
     cwd: input.cwd,
@@ -86,7 +88,8 @@ export function ensureRunnerPublicationReservation(input: {
   const taskId = resolveActiveRunnerPublicationTask({
     cwd: input.cwd,
     actorId: input.stewardActorId,
-    now: new Date().toISOString()
+    now: new Date().toISOString(),
+    taskId: input.publicationTaskId
   });
   const surfaces = publicationSurfaces(input.buildTarget);
   runAtm(input.cwd, [
@@ -117,6 +120,7 @@ export function resolveActiveRunnerPublicationTask(input: {
   readonly cwd: string;
   readonly actorId: string;
   readonly now: string;
+  readonly taskId?: string | null;
 }): string {
   const lockRoot = path.join(input.cwd, '.atm', 'runtime', 'locks');
   const nowMs = Date.parse(input.now);
@@ -130,14 +134,18 @@ export function resolveActiveRunnerPublicationTask(input: {
         const heartbeatAt = Date.parse(String(lock.heartbeatAt ?? lock.lockedAt ?? ''));
         const ttlSeconds = Number(lock.ttlSeconds ?? 0);
         const files = Array.isArray(lock.files) ? lock.files.map(String) : [];
-        const active = Number.isFinite(nowMs)
+        const lockActive = Number.isFinite(nowMs)
           && Number.isFinite(heartbeatAt)
           && Number.isFinite(ttlSeconds)
           && nowMs < heartbeatAt + ttlSeconds * 1000;
-        return taskId.startsWith('ATM-FRAMEWORK-TEMP-')
-          && actorId === input.actorId
-          && active
-          && files.some((file) => file === 'release/atm-onefile/atm.mjs' || file === 'release/atm-root-drop')
+        const explicitlyRequested = input.taskId?.trim();
+        return actorId === input.actorId
+          && (explicitlyRequested
+            ? hasActiveLedgerClaim(input.cwd, taskId, input.actorId, nowMs)
+            : lockActive)
+          && (explicitlyRequested
+            ? taskId === explicitlyRequested
+            : files.some((file) => file === 'release/atm-onefile/atm.mjs' || file === 'release/atm-root-drop'))
           ? [taskId]
           : [];
       } catch {
@@ -147,9 +155,19 @@ export function resolveActiveRunnerPublicationTask(input: {
     : [];
   const unique = [...new Set(candidates)].sort();
   if (unique.length !== 1) {
-    throw new Error(`Runner publication requires exactly one active framework release claim for ${input.actorId}; found ${unique.length}.`);
+    throw new Error(`Runner publication requires exactly one active release-surface claim for ${input.actorId}; found ${unique.length}.`);
   }
   return unique[0];
+}
+
+function hasActiveLedgerClaim(cwd: string, taskId: string, actorId: string, nowMs: number): boolean {
+  try {
+    const task = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`), 'utf8')) as { claim?: Record<string, unknown> };
+    const claim = task.claim;
+    const heartbeatAt = Date.parse(String(claim?.heartbeatAt ?? claim?.claimedAt ?? ''));
+    const ttlSeconds = Number(claim?.ttlSeconds ?? 0);
+    return claim?.state === 'active' && claim.actorId === actorId && Number.isFinite(nowMs) && Number.isFinite(heartbeatAt) && Number.isFinite(ttlSeconds) && nowMs < heartbeatAt + ttlSeconds * 1000;
+  } catch { return false; }
 }
 
 function publicationSurfaces(buildTarget: RunnerBuildOutputTarget): readonly string[] {
