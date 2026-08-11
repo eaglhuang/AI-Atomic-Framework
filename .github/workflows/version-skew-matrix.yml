@@ -8,6 +8,11 @@ on:
       - 'scripts/validate-skew-matrix.ts'
       - 'fixtures/skew/**'
       - 'tests/skew/**'
+      - 'tests/cli/test-facade-timeout-policy.test.ts'
+      - 'scripts/validators.config.json'
+      - 'scripts/run-validators.ts'
+      - 'scripts/run-validators/**'
+      - 'scripts/validate-test-facade.ts'
       - 'packages/cli/**'
       - 'packages/plugin-sdk/**'
       - 'packages/adapter-local-git/**'
@@ -35,17 +40,34 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # CI must consume the same timeout contract as local validation. This step
+      # fails the job if the shared policy is missing, if a timeout is no longer
+      # fail-closed, or if a non-zero validator exit is laundered into a pass.
+      - name: Verify validator timeout policy contract
+        run: node --experimental-strip-types tests/cli/test-facade-timeout-policy.test.ts
+
       - name: Run skew matrix smoke tests
         run: |
           mkdir -p skew-output
           node --experimental-strip-types scripts/validate-skew-matrix.ts --mode validate --summary skew-output/skew-summary.json
+
+      # Run the same validator through the governed facade so the timeout that
+      # bounds it in CI is the one derived from the declared policy, and record
+      # the decision as an artefact. Retrying or ignoring this result is
+      # forbidden: the facade exit code is the terminal verdict.
+      - name: Run skew matrix through the governed validator facade
+        run: |
+          node --experimental-strip-types scripts/run-validators.ts standard \
+            --filter validate-skew-matrix --json > skew-output/facade-summary.json
 
       - name: Upload skew summary artefact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: version-skew-summary
-          path: skew-output/skew-summary.json
+          path: |
+            skew-output/skew-summary.json
+            skew-output/facade-summary.json
           if-no-files-found: warn
 
       - name: Append skew summary

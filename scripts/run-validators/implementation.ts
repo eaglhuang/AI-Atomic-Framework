@@ -5,7 +5,143 @@ import { evaluateValidationContract, type ValidationContractCatalog, type Valida
 if (!existsSync(configPath)) { throw new Error( `validators config missing: ${path.relative(root, configPath)}`, ); } const config: any = JSON.parse(readFileSync(configPath, "utf8")); const validatorMap = new Map( config.validators.map((entry: any) => [entry.name, entry]), ); const selectionFamilies = Array.isArray(config.selectionFamilies) ? config.selectionFamilies : [];
 const DEFAULT_FAST_VALIDATOR_BUDGET_MS = 10_000; const DEFAULT_SLOW_VALIDATOR_BUDGET_MS = 90_000; const VALIDATOR_RUNS_ROOT = path.join( root, ".atm", "runtime", "validator-runs", ); const runningValidatorChildren = new Set<ReturnType<typeof spawn>>(); function killChild( child: ReturnType<typeof spawn>, signal: NodeJS.Signals | number | string = "SIGTERM", ): void { if (process.platform === "win32") {
 if (child.pid) { const result = spawnSync( "taskkill", ["/F", "/T", "/PID", String(child.pid)], { stdio: "ignore" }, ); if (result.status === 0) { return; } } } try { child.kill(signal as NodeJS.Signals); } catch {} } function killAllRunningValidatorChildren(signal: NodeJS.Signals): void { for (const runningChild of runningValidatorChildren) { killChild(runningChild, signal); } } process.on("SIGINT", () => {
-killAllRunningValidatorChildren("SIGTERM"); process.exit(130); }); process.on("SIGTERM", () => { killAllRunningValidatorChildren("SIGTERM"); process.exit(143); }); process.on("exit", () => { for (const runningChild of runningValidatorChildren) { killChild(runningChild, "SIGTERM"); } }); export async function runValidatorsCli( argv: string[] = process.argv.slice(2), ): Promise<number> {
+killAllRunningValidatorChildren("SIGTERM"); process.exit(130); }); process.on("SIGTERM", () => { killAllRunningValidatorChildren("SIGTERM"); process.exit(143); }); process.on("exit", () => { for (const runningChild of runningValidatorChildren) { killChild(runningChild, "SIGTERM"); } }); // Validator timeout policy seam.
+//
+// One contract decides how long any validator may run, why that number was
+// chosen, and how a terminated validator is classified. It is deliberately a
+// pure function of declared metadata so that it can be tested without spawning
+// anything, and so that no incident, machine, task id, or validator name is
+// ever encoded in the runner. A validator that is slow enough to sit near the
+// boundary declares its measured slow-path envelope (`observedSlowPathMs`);
+// the shared safety margin then turns that measurement into a timeout.
+export const VALIDATOR_TIMEOUT_POLICY_SCHEMA_ID = "atm.validatorTimeoutPolicy.v1";
+export const VALIDATOR_TIMEOUT_EXIT_CODE = 124;
+const DEFAULT_TIMEOUT_SAFETY_MARGIN_MULTIPLIER = 2.5;
+const DEFAULT_TIMEOUT_BUDGET_MULTIPLIER = 3;
+const DEFAULT_MINIMUM_TIMEOUT_MS = 120_000;
+
+export interface ValidatorTimeoutPolicyDefaults {
+  readonly schemaId: string;
+  readonly safetyMarginMultiplier: number;
+  readonly budgetMultiplier: number;
+  readonly minimumTimeoutMs: number;
+  readonly fastValidatorBudgetMs: number;
+  readonly slowValidatorBudgetMs: number;
+}
+
+export interface ValidatorTimeoutPolicy {
+  readonly schemaId: string;
+  readonly validatorName: string | null;
+  readonly timeoutMs: number;
+  readonly source: "cli-override" | "observed-envelope" | "budget-derived";
+  readonly safetyMarginMultiplier: number;
+  readonly budgetMultiplier: number;
+  readonly minimumTimeoutMs: number;
+  readonly observedSlowPathMs: number | null;
+  readonly budgetMs: number | null;
+}
+
+function positiveNumberOr(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+export function resolveValidatorTimeoutPolicyDefaults(
+  source: any,
+): ValidatorTimeoutPolicyDefaults {
+  const policy = source?.timeoutPolicy ?? {};
+  const performance = source?.performanceDefaults ?? {};
+  return {
+    schemaId: VALIDATOR_TIMEOUT_POLICY_SCHEMA_ID,
+    safetyMarginMultiplier: positiveNumberOr(
+      policy.safetyMarginMultiplier,
+      DEFAULT_TIMEOUT_SAFETY_MARGIN_MULTIPLIER,
+    ),
+    budgetMultiplier: positiveNumberOr(
+      policy.budgetMultiplier,
+      DEFAULT_TIMEOUT_BUDGET_MULTIPLIER,
+    ),
+    minimumTimeoutMs: Math.ceil(
+      positiveNumberOr(policy.minimumTimeoutMs, DEFAULT_MINIMUM_TIMEOUT_MS),
+    ),
+    fastValidatorBudgetMs: positiveNumberOr(
+      performance.fastValidatorBudgetMs,
+      DEFAULT_FAST_VALIDATOR_BUDGET_MS,
+    ),
+    slowValidatorBudgetMs: positiveNumberOr(
+      performance.slowValidatorBudgetMs,
+      DEFAULT_SLOW_VALIDATOR_BUDGET_MS,
+    ),
+  };
+}
+
+export function resolveValidatorTimeoutPolicy({
+  validator,
+  defaults,
+  overrideMs = null,
+}: {
+  validator: any;
+  defaults: ValidatorTimeoutPolicyDefaults;
+  overrideMs?: number | null;
+}): ValidatorTimeoutPolicy {
+  const validatorName = validator?.name ? String(validator.name) : null;
+  const observedSlowPathMs = Number.isFinite(validator?.observedSlowPathMs)
+    ? Number(validator.observedSlowPathMs)
+    : null;
+  const budgetMs = Number.isFinite(validator?.performanceBudgetMs)
+    ? Number(validator.performanceBudgetMs)
+    : validator?.slow === true
+      ? defaults.slowValidatorBudgetMs
+      : defaults.fastValidatorBudgetMs;
+  const base = {
+    schemaId: VALIDATOR_TIMEOUT_POLICY_SCHEMA_ID,
+    validatorName,
+    safetyMarginMultiplier: defaults.safetyMarginMultiplier,
+    budgetMultiplier: defaults.budgetMultiplier,
+    minimumTimeoutMs: defaults.minimumTimeoutMs,
+    observedSlowPathMs,
+    budgetMs,
+  };
+  // An explicit caller override is honoured verbatim so that tests and
+  // operators can force a genuine timeout; it is reported, never hidden.
+  if (Number.isFinite(overrideMs) && Number(overrideMs) > 0) {
+    return { ...base, timeoutMs: Math.ceil(Number(overrideMs)), source: "cli-override" };
+  }
+  if (observedSlowPathMs !== null) {
+    return {
+      ...base,
+      timeoutMs: Math.max(
+        defaults.minimumTimeoutMs,
+        Math.ceil(observedSlowPathMs * defaults.safetyMarginMultiplier),
+      ),
+      source: "observed-envelope",
+    };
+  }
+  return {
+    ...base,
+    timeoutMs: Math.max(
+      defaults.minimumTimeoutMs,
+      Math.ceil(budgetMs * defaults.budgetMultiplier),
+    ),
+    source: "budget-derived",
+  };
+}
+
+// A killed validator is a timeout regardless of the exit status the OS reports,
+// and a validator that chooses the timeout exit code by itself is still an
+// ordinary failure. Neither one may become a pass.
+export function classifyValidatorTermination({
+  exitCode,
+  timedOut,
+}: {
+  exitCode: number;
+  timedOut: boolean;
+}): "passed" | "failed" | "timeout" {
+  if (timedOut === true) return "timeout";
+  return exitCode === 0 ? "passed" : "failed";
+}
+
+export async function runValidatorsCli( argv: string[] = process.argv.slice(2), ): Promise<number> {
 const parsedCli = parseCliArgs(argv); if (parsedCli.status) { runStatusQueryAndExit(parsedCli); } const profileConfig = resolveProfileConfig(parsedCli.profile); const parallel = resolveParallelSetting(parsedCli, profileConfig); const resolvedFocusPaths = resolveFocusPaths( parsedCli.focusPaths, parsedCli.focusChanged, ); const testCatalog = readTestCatalog(root, { validatorsConfig: config });
 const baseCatalogSelection = resolveCatalogValidatorSelection( parsedCli.profile, [], ); const focusedCatalogSelection = resolveCatalogValidatorSelection( parsedCli.profile, resolvedFocusPaths, ); const focusedValidationObligations = resolveValidationObligations(resolvedFocusPaths); const baseProfileValidatorNames = baseCatalogSelection.names; const focusedProfileValidatorNames = focusedCatalogSelection.names;
 const selectedNames = applyFilters( focusedProfileValidatorNames, parsedCli.filters, ); const selectedCatalogEntryByValidatorName = new Map( [...baseCatalogSelection.entries, ...focusedCatalogSelection.entries] .filter((entry) => entry.validatorName) .map((entry) => [String(entry.validatorName), entry]), ); const selectedCatalogEntries = selectedNames
@@ -97,14 +233,14 @@ validator.name, ) ?? { schemaId: "atm.validatorRunReceipt.v1", validatorName: va
 attempt: options.runContext.attempt, startedAt: new Date().toISOString(), status: "running", }, ], }); } if (cacheEnabled) { const cached = readValidatorCache(cacheKey); if (cached) { const cachedResult = { ...cached, cached: true, cacheDecision: "cache-hit", durationMs: 0, envelope: { ...cached.envelope, durationMs: 0 }, }; if (options.runContext) { persistValidatorReceiptResult({ runContext: options.runContext,
 validatorName: validator.name, fingerprint: runFingerprint, result: cachedResult, status: "passed", }); } persistCanonicalValidationReceipt({ validator, command, result: cachedResult, status: "passed", }); resolve(cachedResult); return; } } let stdout = ""; let stderr = ""; let spawnError: string | null = null; let settled = false; let timedOut = false; let child: ReturnType<typeof spawn>; try { child = spawn(
 process.execPath, ["--strip-types", validatorPath, "--mode", mode, ...normalizeValidatorArgs(validator)], { cwd: root, stdio: ["ignore", "pipe", "pipe"] }, ); } catch (error) { finalize(1, formatSpawnError(error)); return; } runningValidatorChildren.add(child); // Every validator must be bounded by metadata-derived policy. This keeps new validators from hanging the profile without adding incident-specific names to the scheduler.
-const timeoutMs = Number.isFinite(options.validatorTimeoutMs) ? Number(options.validatorTimeoutMs) : resolveValidatorTimeoutMs(validator); const timeoutHandle = timeoutMs !== null ? setTimeout(() => { if (settled) return;
-timedOut = true; killChild(child, "SIGTERM"); }, timeoutMs) : null; child.stdout?.on("data", (chunk) => { stdout += String(chunk); }); child.stderr?.on("data", (chunk) => { stderr += String(chunk); }); child.on("error", (error) => { finalize(1, `${error.name}: ${error.message}`); }); child.on("close", (code) => { finalize(timedOut ? 124 : (code ?? 1)); }); function finalize( exitCode: number,
+const timeoutPolicy = resolveTimeoutPolicyFor( validator, Number.isFinite(options.validatorTimeoutMs) ? Number(options.validatorTimeoutMs) : null, ); const timeoutMs = timeoutPolicy.timeoutMs; const timeoutHandle = timeoutMs !== null ? setTimeout(() => { if (settled) return;
+timedOut = true; killChild(child, "SIGTERM"); }, timeoutMs) : null; child.stdout?.on("data", (chunk) => { stdout += String(chunk); }); child.stderr?.on("data", (chunk) => { stderr += String(chunk); }); child.on("error", (error) => { finalize(1, `${error.name}: ${error.message}`); }); child.on("close", (code) => { finalize(timedOut ? VALIDATOR_TIMEOUT_EXIT_CODE : (code ?? 1)); }); function finalize( exitCode: number,
 immediateSpawnError: string | null = null, ) { if (settled) return; settled = true; runningValidatorChildren.delete(child); if (timeoutHandle) { clearTimeout(timeoutHandle); } spawnError = immediateSpawnError ?? (timedOut ? `Validator exceeded timeout budget of ${timeoutMs}ms and was killed.` : spawnError); const durationMs = Date.now() - startedAt; const envelope = createValidatorFailureEnvelope({
 validatorName: validator.name, command, entry: validator.entry, mode, ok: exitCode === 0, exitCode, durationMs, stdout, stderr, spawnError, }); if (!options.json) { if (stdout) { process.stdout.write(stdout); } if (stderr) { process.stderr.write(stderr); } if (!envelope.ok) { process.stderr.write(
 `[validator-envelope:${validator.name}] ${JSON.stringify({ requiredCommand: envelope.requiredCommand, blockingFindings: envelope.blockingFindings, repairHints: envelope.repairHints }, null, 2)}\n`, ); } } const result = { name: validator.name, entry: validator.entry, tags: validator.tags ?? [], slow: validator.slow === true, performanceBudgetMs: Number.isFinite(validator.performanceBudgetMs)
 ? Number(validator.performanceBudgetMs) : null, catalogKey: validator.catalogKey ?? null, capability: validator.capability ?? "validator", family: validator.family ?? null, scope: validator.scope ?? null, dedupeKeys: validator.dedupeKeys ?? [], catalogCostBudgetMs: Number.isFinite(validator.catalogCostBudgetMs) ? Number(validator.catalogCostBudgetMs) : null, mode, ok: exitCode === 0, exitCode, durationMs, command,
-cacheKey, cached: false, cacheDecision: cacheEnabled ? "cache-miss" : "cache-bypass", timedOut, requiredCommand: envelope.requiredCommand, blockingFindings: envelope.blockingFindings, envelope, }; if (options.runContext) { persistValidatorReceiptResult({ runContext: options.runContext, validatorName: validator.name, fingerprint: runFingerprint, result, status: timedOut ? "timeout" : result.ok === true ? "passed"
-: "failed", }); } persistCanonicalValidationReceipt({ validator, command, result, status: timedOut ? "timeout" : result.ok === true ? "passed" : "failed", }); if (options.cache && result.ok === true) { writeValidatorCache(cacheKey, result); } resolve(result); } }); } function markReceiptReuseResult( result: any, source: "run-local" | "canonical", ) { return { ...result, resumedFromReceipt: source === "run-local",
+cacheKey, cached: false, cacheDecision: cacheEnabled ? "cache-miss" : "cache-bypass", timedOut, timeoutPolicy, terminationClass: classifyValidatorTermination({ exitCode, timedOut }), // The shared failure envelope reduces every non-zero exit to "exited with N". A timeout is a different diagnosis, so carry its cause and the decision that produced it rather than letting it read as an ordinary validator failure.
+timeoutDiagnostic: timedOut ? { schemaId: "atm.validatorTimeoutDiagnostic.v1", code: "ATM_VALIDATOR_TIMEOUT", validatorName: validator.name, detail: `Validator exceeded timeout budget of ${timeoutMs}ms and was killed.`, timeoutMs, timeoutSource: timeoutPolicy.source, observedDurationMs: durationMs, requiredCommand: envelope.requiredCommand, } : null, requiredCommand: envelope.requiredCommand, blockingFindings: envelope.blockingFindings, envelope, }; const terminationStatus = classifyValidatorTermination({ exitCode, timedOut }); if (options.runContext) { persistValidatorReceiptResult({ runContext: options.runContext, validatorName: validator.name, fingerprint: runFingerprint, result, status: terminationStatus, }); } persistCanonicalValidationReceipt({ validator, command, result, status: terminationStatus, }); if (options.cache && result.ok === true) { writeValidatorCache(cacheKey, result); } resolve(result); } }); } function markReceiptReuseResult( result: any, source: "run-local" | "canonical", ) { return { ...result, resumedFromReceipt: source === "run-local",
 reusedFromCanonicalReceipt: source === "canonical", durationMs: 0, cached: result.cached === true, envelope: { ...result.envelope, durationMs: 0 }, }; } function persistCanonicalValidationReceipt({ validator, command, result, status, }: { validator: any; command: string; result: Record<string, unknown>; status: ValidationReceiptStatus; }) { const receipt = buildValidationReceiptInput({ cwd: root,
 validatorName: validator.name, command, status, ok: result.ok === true, gitHead: readGitHead(), result, scopePaths: resolveValidationReceiptScopePaths(validator), }); writeValidationReceipt(root, receipt); } function resolveValidationReceiptScopePaths(validator: any): string[] { const paths = new Set<string>(); if (typeof validator.entry === "string" && validator.entry.trim()) {
 paths.add(normalizeFocusPath(validator.entry)); } paths.add("scripts/run-validators.ts"); paths.add("scripts/validators.config.json"); for (const entry of Array.isArray(validator.scope) ? validator.scope : []) { if (typeof entry === "string" && entry.trim()) { paths.add(normalizeFocusPath(entry)); } } for (const key of Array.isArray(validator.dedupeKeys) ? validator.dedupeKeys : []) {
@@ -122,8 +258,12 @@ profileConfig, performanceBudgetOverrides, performanceBaselineSummary, duplicate
 const usageTelemetry = createValidatorUsageTelemetry({ results, dag: resolvedDag, profile, mode, }); const lifecycleTelemetry = buildValidatorLifecycleSummary({ profile, mode, durationMs, validators: results, usageTelemetry, dag: resolvedDag, config, }); const schedulerDiagnostics = createValidatorSchedulerDiagnostics(results); return { schemaId: "atm.validatorRunSummary.v1", profile, mode, total: results.length, passed, failed, durationMs, filters, focusPaths: focusPaths ?? [],
 focusMode: focusMode ?? "none", baseValidatorCount: baseValidatorCount ?? results.length, focusReducedValidatorCount: focusReducedValidatorCount ?? results.length, parallel, legacy, cache, skipSlow, run: runContext ? { schemaId: "atm.validatorRunCheckpoint.v1", enabled: true, runId: runContext.runId, resumed: runContext.resumed === true, attempt: runContext.attempt,
 runDir: path.relative(root, runContext.runDir).replace(/\\/g, "/"), summaryPath: path .relative(root, runContext.summaryPath) .replace(/\\/g, "/"), } : { schemaId: "atm.validatorRunCheckpoint.v1", enabled: false }, baselinePath: baselinePath ?? null, performanceBaselinePath: performanceBaselinePath ?? null, baselineFingerprintCount: baselineFingerprintCount ?? 0,
-cached: results.filter((entry: any) => entry.cached === true).length, resumed: results.filter((entry: any) => entry.resumedFromReceipt === true) .length, selection, performance, dag: resolvedDag, schedulerDiagnostics, usageTelemetry, lifecycleTelemetry, validatorLifecycle: lifecycleTelemetry, requiredCommand: firstRequiredCommand(envelopes), blockingFindings, baselineFailures, currentTaskFailures, environmentFindings, currentTaskFindings,
-currentTaskOk: currentTaskFindings.length === 0 && environmentFindings.length === 0, taskLevelOk: currentTaskFindings.length === 0 && environmentFindings.length === 0, focusedValidatorCommand: buildFocusedValidatorCommand(results), validators: results, }; } function createValidatorSchedulerDiagnostics(results: any[]) { const isolatedReruns = results.filter((entry: any) => entry.isolationRerun === true); const recovered = isolatedReruns.filter((entry: any) => entry.parallelContentionClassification === "resource-contention-suspected"); const trueFailures = isolatedReruns.filter((entry: any) => entry.parallelContentionClassification === "true-validator-failure"); return { schemaId: "atm.validatorSchedulerDiagnostics.v1", isolationRerunCount: isolatedReruns.length, recoveredParallelFailureCount: recovered.length, trueFailureAfterIsolationCount: trueFailures.length, classification: recovered.length > 0 && trueFailures.length === 0 ? "validator-resource-contention" : trueFailures.length > 0 ? "true-validator-failure" : "not-needed", recoveredValidators: recovered.map((entry: any) => entry.name), trueFailureValidators: trueFailures.map((entry: any) => entry.name), recommendation: recovered.length > 0 ? "Add or refine resourceLocks/executionMode for recovered validators so future standard validation serializes shared fixtures before first failure." : null, }; } function emitSummary(summary: any, jsonMode: any) { if (jsonMode) { process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`); return; }
+cached: results.filter((entry: any) => entry.cached === true).length, resumed: results.filter((entry: any) => entry.resumedFromReceipt === true) .length, selection, performance, timeoutPolicy: createTimeoutPolicyReport(results), dag: resolvedDag, schedulerDiagnostics, usageTelemetry, lifecycleTelemetry, validatorLifecycle: lifecycleTelemetry, requiredCommand: firstRequiredCommand(envelopes), blockingFindings, baselineFailures, currentTaskFailures, environmentFindings, currentTaskFindings,
+currentTaskOk: currentTaskFindings.length === 0 && environmentFindings.length === 0, taskLevelOk: currentTaskFindings.length === 0 && environmentFindings.length === 0, focusedValidatorCommand: buildFocusedValidatorCommand(results), validators: results, }; } // CI and operators consume this instead of re-deriving the boundary themselves:
+// it reports the shared contract plus, per validator, the decision that bounded
+// it and how much of the envelope was actually used.
+function createTimeoutPolicyReport(results: any[]) { const defaults = resolveValidatorTimeoutPolicyDefaults(config); const validators = results .filter((entry: any) => entry?.timeoutPolicy) .map((entry: any) => ({ name: entry.name, timeoutMs: entry.timeoutPolicy.timeoutMs, source: entry.timeoutPolicy.source, observedSlowPathMs: entry.timeoutPolicy.observedSlowPathMs, durationMs: Number(entry.durationMs ?? 0), headroomMs: entry.timeoutPolicy.timeoutMs - Number(entry.durationMs ?? 0), terminationClass: entry.terminationClass ?? null, })); return { schemaId: VALIDATOR_TIMEOUT_POLICY_SCHEMA_ID, safetyMarginMultiplier: defaults.safetyMarginMultiplier, budgetMultiplier: defaults.budgetMultiplier, minimumTimeoutMs: defaults.minimumTimeoutMs, timedOutValidators: validators.filter((entry) => entry.terminationClass === "timeout").map((entry) => entry.name), validators, }; }
+function createValidatorSchedulerDiagnostics(results: any[]) { const isolatedReruns = results.filter((entry: any) => entry.isolationRerun === true); const recovered = isolatedReruns.filter((entry: any) => entry.parallelContentionClassification === "resource-contention-suspected"); const trueFailures = isolatedReruns.filter((entry: any) => entry.parallelContentionClassification === "true-validator-failure"); return { schemaId: "atm.validatorSchedulerDiagnostics.v1", isolationRerunCount: isolatedReruns.length, recoveredParallelFailureCount: recovered.length, trueFailureAfterIsolationCount: trueFailures.length, classification: recovered.length > 0 && trueFailures.length === 0 ? "validator-resource-contention" : trueFailures.length > 0 ? "true-validator-failure" : "not-needed", recoveredValidators: recovered.map((entry: any) => entry.name), trueFailureValidators: trueFailures.map((entry: any) => entry.name), recommendation: recovered.length > 0 ? "Add or refine resourceLocks/executionMode for recovered validators so future standard validation serializes shared fixtures before first failure." : null, }; } function emitSummary(summary: any, jsonMode: any) { if (jsonMode) { process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`); return; }
 const status = summary.failed === 0 ? "ok" : "failed"; process.stdout.write( `[validators:${summary.profile}] ${status} (passed=${summary.passed}, failed=${summary.failed}, total=${summary.total}, cached=${summary.cached}, durationMs=${summary.durationMs})\n`, ); for (const warning of summary.performance?.warnings ?? []) { process.stderr.write(
 `[validators:${summary.profile}:performance] ${warning.code} ${warning.message}\n`, ); } } function normalizeValidatorArgs(validator: any): string[] { return Array.isArray(validator?.args) ? validator.args.map(String).filter(Boolean) : []; } function buildValidatorCommand(validator: any, mode: string): string { return [`node --strip-types ${normalizeCommandPath(validator.entry)}`, "--mode", mode, ...normalizeValidatorArgs(validator)].filter(Boolean).join(" "); } function normalizeCommandPath(relativePath: string): string { return relativePath.split(path.sep).join("/"); } function normalizeFocusPath(relativePath: string): string { return String(relativePath || "") .replace(/\\/g, "/") .replace(/^\.\//, ""); } function focusPatternMatches( pattern: string, candidatePath: string,
 ): boolean { const escaped = String(pattern || "") .replace(/\\/g, "/") .replace(/[|\\{}()[\]^$+?.]/g, "\\$&") .replace(/\*\*/g, "::DOUBLE_STAR::") .replace(/\*/g, "[^/]*") .replace(/::DOUBLE_STAR::/g, ".*"); return new RegExp(`^${escaped}$`, "i").test(candidatePath); } function readChangedPaths(): string[] { const result = spawnSync( "git", ["status", "--porcelain=v1", "--untracked-files=all"],
@@ -172,8 +312,7 @@ grouped.set(entry.familyId, bucket); } return [...grouped.values()].sort((left: 
 (family: any) => String(family?.id ?? "") === String(entry.family), ); return { id: String(entry.family), label: String(configured?.label ?? entry.family), description: String(configured?.description ?? ""), }; } const tags = Array.isArray(entry?.tags) ? entry.tags.map((tag: any) => String(tag).toLowerCase()) : []; for (const family of selectionFamilies) { const matchTags = Array.isArray(family?.matchTags)
 ? family.matchTags.map((tag: any) => String(tag).toLowerCase()) : []; if (matchTags.some((tag: string) => tags.includes(tag))) { return { id: String(family.id), label: String(family.label ?? family.id), description: String(family.description ?? ""), }; } } return { id: "misc", label: "Miscellaneous", description: "Validators not yet assigned to a managed family.", }; } function resolveValidatorDurationBudget(
 entry: any, fastValidatorBudgetMs: number, slowValidatorBudgetMs: number, ): number { if (Number.isFinite(entry?.performanceBudgetMs)) { return Number(entry.performanceBudgetMs); } const configEntry: any = validatorMap.get(entry?.name); if (Number.isFinite(configEntry?.performanceBudgetMs)) { return Number(configEntry.performanceBudgetMs); } return entry?.slow === true ? slowValidatorBudgetMs : fastValidatorBudgetMs;
-} function resolvePerformanceDefaults() { const defaults = config.performanceDefaults ?? {}; return { fastValidatorBudgetMs: Number.isFinite(defaults.fastValidatorBudgetMs) ? Number(defaults.fastValidatorBudgetMs) : DEFAULT_FAST_VALIDATOR_BUDGET_MS, slowValidatorBudgetMs: Number.isFinite(defaults.slowValidatorBudgetMs) ? Number(defaults.slowValidatorBudgetMs) : DEFAULT_SLOW_VALIDATOR_BUDGET_MS, }; } function resolveValidatorTimeoutMs(validator: any): number { if (Number.isFinite(validator?.performanceTimeoutMs)) { return Math.max(1_000, Number(validator.performanceTimeoutMs)); } const configEntry: any = validatorMap.get(validator?.name); if (Number.isFinite(configEntry?.performanceTimeoutMs)) { return Math.max(1_000, Number(configEntry.performanceTimeoutMs)); } const defaults = resolvePerformanceDefaults(); const budgetMs = resolveValidatorDurationBudget( validator, defaults.fastValidatorBudgetMs, defaults.slowValidatorBudgetMs, ); // Timeout is a fail-safe, not the performance budget. Keep it metadata-derived and wide enough for loaded Windows machines while performance warnings still flag slow validators.
-return Math.max(120_000, Math.ceil(budgetMs * 3)); }
+} function resolvePerformanceDefaults() { const defaults = config.performanceDefaults ?? {}; return { fastValidatorBudgetMs: Number.isFinite(defaults.fastValidatorBudgetMs) ? Number(defaults.fastValidatorBudgetMs) : DEFAULT_FAST_VALIDATOR_BUDGET_MS, slowValidatorBudgetMs: Number.isFinite(defaults.slowValidatorBudgetMs) ? Number(defaults.slowValidatorBudgetMs) : DEFAULT_SLOW_VALIDATOR_BUDGET_MS, }; } function resolveTimeoutPolicyFor( validator: any, overrideMs: number | null, ): ValidatorTimeoutPolicy { const configEntry: any = validatorMap.get(validator?.name) ?? {}; return resolveValidatorTimeoutPolicy({ validator: { ...configEntry, ...validator }, defaults: resolveValidatorTimeoutPolicyDefaults(config), overrideMs, }); }
 function buildFocusedValidatorCommand( results: readonly any[], ): string | null { const failingCurrentTask = results.find( (entry) => (entry.envelope?.currentTaskFailures ?? []).length > 0, ); if (failingCurrentTask?.command) { return String(failingCurrentTask.command); } const firstFailed = results.find((entry) => entry.ok !== true); if (firstFailed?.command) { return String(firstFailed.command); } return null; }
 function safeFileSha256(filePath: string): string | null { try { return `sha256:${crypto.createHash("sha256").update(readFileSync(filePath)).digest("hex")}`; } catch { return null; } } function isEnvironmentFinding(finding: any): boolean { const code = String(finding?.code ?? ""); const source = String(finding?.source ?? ""); const classification = String(finding?.classification ?? ""); return (
 classification === "environment" || source === "environment" || source === "git-index" || code.startsWith("ATM_ENV_") || code.startsWith("ATM_GIT_INDEX_") ); } function isBaselineFinding(finding: any): boolean { return ( String(finding?.classification ?? "") === "baseline" || String(finding?.source ?? "") === "baseline" ); } function dedupeFindings(findings: readonly any[]): readonly any[] {

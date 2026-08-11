@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-10T22-55-24-539Z-repair-claim-21bcf02a8732",
+  "taskId": "ATM-GOV-0346",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260810123840-claude-008-gov-0346-ATM-GOV-0346-f3988a3dd0",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0346.json",
+  "taskSha256": "sha256:04f1cff42038c4f13853b7162cc999fc1590fd6ca061dddba0a74baee784c673",
+  "createdAt": "2026-08-10T22:55:24.539Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0346 --actor codex-gpt-5.4-mini --write --reason \"Take over the expired runner-sync queue-head claim so the dead owner lease cannot serialize the release surface indefinitely; preserve existing WIP for validation and governed completion.\" --json"
+}
