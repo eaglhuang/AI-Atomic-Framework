@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-11T23-21-40-180Z-scope-amendment-f9c744b4492e",
+  "taskId": "ATM-GOV-0348",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0348",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0348.json",
+  "taskSha256": "sha256:c90b2d75e7353ebadbbf2045aa7c224e3b47a7ed9fba714f5e314b6a30d19908",
+  "createdAt": "2026-08-11T23:21:40.180Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0348 --actor claude-008-gov-0348 --add tests/cli/work-admission-ticket-deferred-index-parity.test.ts --reason \"ATM-GOV-0348 changes the admission-selection contract this test pins; the assertion encodes the defect under repair\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0348 changes the admission-selection contract this test pins; the assertion encodes the defect under repair"
+  }
+}

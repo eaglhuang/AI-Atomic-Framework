@@ -1,0 +1,312 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0348",
+  "title": "Scope commit work admission to the ticket bundle, not the whole staged index",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 A governed commit whose bundle lies wholly inside the ticket grant is admitted regardless of unrelated paths present in the shared index, with no flag required.",
+    "ACC-2 Admission still denies when a path the commit would actually write is outside the grant. Scoping the selection must not become a way to smuggle an out-of-scope path past the gate.",
+    "ACC-3 `--defer-foreign-staged` continues to control whether foreign staged entries are snapshotted and unstaged. It no longer controls whether admission is ticket-scoped, and it is no longer required to commit in-scope work.",
+    "ACC-4 Foreign staged bytes are unchanged, byte for byte, across an admitted commit taken without any deferral flag."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "tests/cli/commit-admission-ticket-scoped-selection.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "tests/cli/commit-admission-ticket-scoped-selection.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/commit-admission-ticket-scoped-selection.test.ts",
+    "node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts",
+    "npm run typecheck",
+    "npm run validate:module-boundaries"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/core/src/broker/work-admission-ticket.ts",
+    "packages/cli/src/commands/git-governance/implementation/**"
+  ],
+  "nonGoals": [
+    "Weakening the admission gate itself. The gate is correct; only what the commit path feeds it is wrong.",
+    "Changing what a commit actually writes. The sealed candidate index already decides that."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the selection change and its regression together. Never resolve an admission denial by unstaging, resetting, or stashing another lane's paths.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.work-admission-ticket",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.commit-admission-file-selection",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "The narrow change is to make ticket-scope filtering unconditional and leave\n`deferForeignStaged` governing only the unstaging behaviour. Verify against\nACC-2 before assuming that is sufficient: the sealed bundle, not the admission\nlist, is what bounds the commit contents, so confirm that a genuinely\nout-of-scope bundle entry is still rejected on the scoped path.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0348-scope-commit-work-admission-to-the-ticket-bundle-not-the-whole-index.task.md",
+    "sectionTitle": "ATM-GOV-0348",
+    "headingLine": 86,
+    "hash": "d285a8014c66c583",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0348-scope-commit-work-admission-to-the-ticket-bundle-not-the-whole-index.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:d285a8014c66c583c97aea5a206f1d51dde4e2c68278f3013bb7bd9c4258e1a8",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-11T23:04:18.620Z"
+    }
+  },
+  "importedAt": "2026-08-11T23:04:18.620Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "governed-commit-runs-while-foreign-paths-sit-in-the-shared-index"
+    ],
+    "softRelations": [
+      "ATM-GOV-0328",
+      "TASK-ERR-0010",
+      "TASK-ERR-0014"
+    ],
+    "changedPublicSeams": [
+      "commit-work-admission-file-selection"
+    ],
+    "causalImpactEdges": [
+      "foreign-staged-path-to-commit-admission-denial",
+      "admission-denial-to-coerced-foreign-index-mutation"
+    ],
+    "parallelFrontierInputs": [
+      "canonical-git-index",
+      "work-admission-ticket",
+      "sealed-commit-bundle"
+    ],
+    "validatorReferences": [
+      "test_commit_admission_ticket_scoped_selection_0348"
+    ],
+    "phaseOwner": "correction-wave-0-unblock"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_commit_admission_ticket_scoped_selection_0348",
+      "targetGroupId": null,
+      "semanticKey": "commit_admission_reads_the_ticket_bundle_not_the_whole_staged_index",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "foreign-staged-path-to-commit-admission-denial",
+        "admission-denial-to-coerced-foreign-index-mutation"
+      ],
+      "expectedRedPredicate": "a governed commit whose own bundle is fully in scope is denied with ATM_WRITE_TICKET_SCOPE_VIOLATION solely because an unrelated task's path is staged",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "commit-work-admission-file-selection",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_foreign_staged_bytes_survive_scoped_admission_0348",
+      "targetGroupId": null,
+      "semanticKey": "foreign_staged_bytes_are_unchanged_across_an_unflagged_admitted_commit",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "admission-denial-to-coerced-foreign-index-mutation"
+      ],
+      "expectedRedPredicate": "committing in-scope work requires a deferral flag that unstages another lane's paths, so foreign staged bytes cannot survive untouched",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "commit-work-admission-file-selection",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_commit_admission_ticket_scoped_selection_0348",
+    "test_foreign_staged_bytes_survive_scoped_admission_0348"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck",
+    "validate:module-boundaries"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-11T23-27-19-941Z-renew-d8780d82c5cc",
+  "lastTransitionAt": "2026-08-11T23:27:19.941Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008-gov-0348",
+  "reservedAt": "2026-08-11T23:06:21.804Z",
+  "promotedAt": "2026-08-11T23:06:21.808Z",
+  "claim": {
+    "actorId": "claude-008-gov-0348",
+    "leaseId": "lease-a085448bf4a8",
+    "claimedAt": "2026-08-11T23:06:21.814Z",
+    "heartbeatAt": "2026-08-11T23:27:18.740Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0348.*",
+      ".atm/history/task-events/ATM-GOV-0348/**",
+      ".atm/history/tasks/ATM-GOV-0348.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "tests/cli/commit-admission-ticket-scoped-selection.test.ts",
+      "tests/cli/work-admission-ticket-deferred-index-parity.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260811230622-claude-008-gov-0348-db3eefc126",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811230622-claude-008-gov-0348-db3eefc126\""
+    }
+  },
+  "startedAt": "2026-08-11T23:06:21.814Z",
+  "startedByActor": "claude-008-gov-0348",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-171acd0c12488351",
+    "ticketDigest": "sha256:171acd0c12488351f4750ec1cbe734088754182c97a22518111603086ab09f6f",
+    "taskId": "ATM-GOV-0348",
+    "origin": "claim",
+    "actorId": "claude-008-gov-0348",
+    "laneSessionId": "lane-20260811230622-claude-008-gov-0348-db3eefc126",
+    "claimGeneration": "lease-a085448bf4a8",
+    "issuedAt": "2026-08-11T23:27:18.740Z",
+    "expiresAt": "2026-08-11T23:57:18.740Z",
+    "scopeDigest": "sha256:d8ad8fbec64dfc7fb0011eaf8b43f7f77bcb803dfb8821c154784dd96b88b89d",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-11T23:27:18.740Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0348.*",
+          ".atm/history/task-events/ATM-GOV-0348/**",
+          ".atm/history/tasks/ATM-GOV-0348.json",
+          "packages/cli/src/commands/git-governance.ts",
+          "tests/cli/commit-admission-ticket-scoped-selection.test.ts",
+          "tests/cli/work-admission-ticket-deferred-index-parity.test.ts"
+        ],
+        "digest": "sha256:f5db496215e7bba682b090c05bb2851d2e9d1f9c03f0313a11f0e349cd2a5fdc"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260811230621-claude-008-gov-0348-ATM-GOV-0348-3ea249c78c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0348",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0348.*",
+      ".atm/history/task-events/ATM-GOV-0348/**",
+      ".atm/history/tasks/ATM-GOV-0348.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "tests/cli/commit-admission-ticket-scoped-selection.test.ts",
+      "tests/cli/work-admission-ticket-deferred-index-parity.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0348-scope-commit-work-admission-to-the-ticket-bundle-not-the-whole-index.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0348-scope-commit-work-admission-to-the-ticket-bundle-not-the-whole-index.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "1727baa49108553ad4c38aed9f620dffda9229e16e6f3a58e7fa84b222a0b87a",
+    "actorId": "claude-008-gov-0348",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260811230622-claude-008-gov-0348-db3eefc126",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811230622-claude-008-gov-0348-db3eefc126\""
+    },
+    "createdAt": "2026-08-11T23:06:38.076Z",
+    "status": "active"
+  }
+}
