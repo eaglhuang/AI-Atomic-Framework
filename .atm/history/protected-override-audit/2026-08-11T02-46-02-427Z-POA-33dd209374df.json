@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-33dd209374df",
+  "recordedAt": "2026-08-11T02:46:02.427Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0345 --message \"fix(runner): mark sealed publication terminal\n\nATM-Work-Admission: wat-7b899fd21b49f4fa sha256:7b899fd21b49f4fa4d3108b4652b3f67433ca154e165a6fd0a68a041dda0a1ff\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0345-06cb8ea636",
+  "reason": "Frozen pre-commit cannot bind the explicit wrapper task when the same actor has ATM-GOV-0290 and ATM-GOV-0345 active; commit the focused bootstrap repair with governed ticket and audit.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T02-45-39-696Z-EMG-ATM-GOV-0345-06cb8ea636.json",
+  "parentEventId": "POA-0fe3e143b188",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

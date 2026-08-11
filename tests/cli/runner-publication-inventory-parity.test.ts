@@ -71,6 +71,14 @@ assert.equal(pending.disposition, 'publication-pending');
 assert.deepEqual(pending.dirtyInventoryPaths, ['packages/cli/dist/atm.js']);
 assert.deepEqual(pending.extraOutputPaths, []);
 
+const published = evaluateRunnerPublicationDisposition({
+  inventory,
+  dirtyPaths: ['packages/cli/dist/atm.js'],
+  terminalDisposition: 'published'
+});
+assert.equal(published.disposition, 'published');
+assert.equal(published.ok, true);
+
 const foreignWip = evaluateRunnerPublicationDisposition({
   inventory,
   dirtyPaths: ['release/atm-onefile/release-manifest.json']

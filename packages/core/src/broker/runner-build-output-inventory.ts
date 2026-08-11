@@ -260,7 +260,9 @@ export function evaluateRunnerPublicationDisposition(input: {
 
   const disposition: RunnerPublicationDisposition = terminalDisposition === 'recovery-retained'
       ? 'recovery-retained'
-      : extraOutputPaths.length > 0
+      : terminalDisposition === 'published' && extraOutputPaths.length === 0
+        ? 'published'
+        : extraOutputPaths.length > 0
         ? 'inventory-incomplete'
       : dirtyInventoryPaths.length > 0
         ? 'publication-pending'

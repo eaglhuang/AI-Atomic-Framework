@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-34f5f6d01208",
+  "recordedAt": "2026-08-11T02:53:50.741Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0345 --message \"fix(runner): honor published receipt disposition\n\nATM-Work-Admission: wat-7b899fd21b49f4fa sha256:7b899fd21b49f4fa4d3108b4652b3f67433ca154e165a6fd0a68a041dda0a1ff\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0345-c319fb6bf5",
+  "reason": "Frozen pre-commit task-binding ambiguity blocks final generic publication repair; prior approved lease was consumed before commit by a stale-index staging failure.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T02-53-50-739Z-EMG-ATM-GOV-0345-c319fb6bf5.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

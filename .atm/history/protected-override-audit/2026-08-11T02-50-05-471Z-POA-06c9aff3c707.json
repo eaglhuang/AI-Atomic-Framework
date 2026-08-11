@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-06c9aff3c707",
+  "recordedAt": "2026-08-11T02:50:05.471Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0345 --message \"fix(runner): honor published receipt disposition\n\nATM-Work-Admission: wat-7b899fd21b49f4fa sha256:7b899fd21b49f4fa4d3108b4652b3f67433ca154e165a6fd0a68a041dda0a1ff\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0345-2f88830bd9",
+  "reason": "Frozen pre-commit remains unable to bind explicit task with concurrent same-actor directions; commit the final generic runner publication lifecycle repair with ticket and audit.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T02-50-05-470Z-EMG-ATM-GOV-0345-2f88830bd9.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
