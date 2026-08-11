@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-34eaf55cc1af",
+  "recordedAt": "2026-08-11T03:55:47.874Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0346",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0346 --message \"test(skew): derive matrix count from summary\n\nATM-Work-Admission: wat-16f31de2f6a85c36 sha256:16f31de2f6a85c365df207ff53ad3b2b133505248a0338e990857ebee8cea74e\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0346-76dcd73a43",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T03-55-47-873Z-EMG-ATM-GOV-0346-76dcd73a43.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

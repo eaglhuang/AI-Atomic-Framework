@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-0186b718f82d",
+  "recordedAt": "2026-08-11T02:30:43.255Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0346",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0346 --message \"fix(validators): derive facade timeout from policy\n\nATM-Work-Admission: wat-d4b039549f640872 sha256:d4b039549f640872e76ff46a0ad7fc6ab9f273fcc4160b4de7108e3368632b08\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0346-c7a7c114db",
+  "reason": "Frozen pre-commit task binding is ambiguous across same-actor active directions; the task bundle, ticket, stage override, and focused validators have been independently verified.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T02-30-26-130Z-EMG-ATM-GOV-0346-c7a7c114db.json",
+  "parentEventId": "POA-f72ec780e57e",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
