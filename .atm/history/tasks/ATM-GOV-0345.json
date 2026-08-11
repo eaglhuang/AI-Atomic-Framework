@@ -90,14 +90,14 @@
       "planningCommitSha": null,
       "contentDigest": "sha256:34c91927a7901b1c1a790f7dd69f792e4a5a0454e5e31295f77a68ab6b5cd839",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-09T22:53:14.130Z"
+      "sealedAt": "2026-08-11T17:51:34.926Z"
     }
   },
-  "importedAt": "2026-08-09T22:53:14.130Z",
+  "importedAt": "2026-08-11T17:51:34.926Z",
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -199,58 +199,72 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-11T02-49-20-592Z-scope-amendment-a33ee2c4ef56",
-  "lastTransitionAt": "2026-08-11T02:49:20.592Z",
+  "lastTransitionId": "2026-08-11T23-30-46-090Z-scope-amendment-5e707558d142",
+  "lastTransitionAt": "2026-08-11T23:30:46.090Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-08-09T22:53:33.062Z",
-  "promotedAt": "2026-08-09T22:53:33.066Z",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-11T17:52:13.830Z",
+  "promotedAt": "2026-08-11T17:52:13.834Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-6ee5c880bda1",
-    "claimedAt": "2026-08-11T02:33:54.405Z",
-    "heartbeatAt": "2026-08-11T02:35:28.022Z",
+    "leaseId": "lease-5791eae59642",
+    "claimedAt": "2026-08-11T17:52:13.839Z",
+    "heartbeatAt": "2026-08-11T23:25:48.780Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0345.*",
       ".atm/history/task-events/ATM-GOV-0345/**",
       ".atm/history/tasks/ATM-GOV-0345.json",
+      "packages/cli/src/commands/__tests__/task-direction-queue.test.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/task-direction/active-locks.ts",
+      "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
-      "packages/core/src/broker/runner-build-output-inventory.ts",
-      "scripts/runner-sync-incremental-build.ts",
-      "tests/cli/runner-publication-inventory-parity.test.ts",
-      "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "scripts/__tests__/sealed-runner-publication.test.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/sealed-runner-publication.ts",
+      "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+      "tests/cli/runner-sync-build-script-admission.test.ts"
     ],
     "state": "active",
     "laneSession": {
-      "laneSessionId": "lane-20260811023354-codex-gpt-5.4-mini-a0415b3ea5",
+      "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
       "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811023354-codex-gpt-5.4-mini-a0415b3ea5\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
     }
   },
-  "startedAt": "2026-08-09T22:53:33.071Z",
+  "startedAt": "2026-08-11T17:52:13.839Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-7b899fd21b49f4fa",
-    "ticketDigest": "sha256:7b899fd21b49f4fa4d3108b4652b3f67433ca154e165a6fd0a68a041dda0a1ff",
+    "ticketId": "wat-85f1536fae1ef57a",
+    "ticketDigest": "sha256:85f1536fae1ef57a6eee4ed3de009911d342e648371921f659eb181b19383d7c",
     "taskId": "ATM-GOV-0345",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260811023354-codex-gpt-5.4-mini-a0415b3ea5",
-    "claimGeneration": "lease-6ee5c880bda1",
-    "issuedAt": "2026-08-11T02:35:28.022Z",
-    "expiresAt": "2026-08-11T03:05:28.022Z",
-    "scopeDigest": "sha256:b13244e21c63a9ab850a3a0fe8e1658ebed8ae451798b402bcfa8525339d39c3",
+    "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
+    "claimGeneration": "lease-5791eae59642",
+    "issuedAt": "2026-08-11T23:25:48.780Z",
+    "expiresAt": "2026-08-11T23:55:48.780Z",
+    "scopeDigest": "sha256:9bcb89001675b96a68ea7150c11a2794bf3dcd82ab26f5f24b00086fc162312b",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-11T02:35:28.022Z"
+      "selectedAt": "2026-08-11T23:25:48.780Z"
     },
     "grants": [
       {
@@ -259,13 +273,27 @@
           ".atm/history/evidence/ATM-GOV-0345.*",
           ".atm/history/task-events/ATM-GOV-0345/**",
           ".atm/history/tasks/ATM-GOV-0345.json",
+          "packages/cli/src/commands/__tests__/task-direction-queue.test.ts",
           "packages/cli/src/commands/broker/steward-queues.ts",
+          "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+          "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/task-direction.ts",
+          "packages/cli/src/commands/task-direction/active-locks.ts",
           "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
-          "packages/cli/src/commands/taskflow/close-orchestration.ts"
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+          "scripts/__tests__/sealed-runner-publication.test.ts",
+          "scripts/run-sealed-runner-build.ts",
+          "scripts/sealed-runner-publication.ts",
+          "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+          "tests/cli/runner-sync-build-script-admission.test.ts"
         ],
-        "digest": "sha256:a956770062541c4ee85ff66ac4351a28952ccf0490da5d2d3d1bd994142ce60d"
+        "digest": "sha256:60626a00b7269f4dd1530b331dff00025bc47ed482697f4d8d4d04b63e185c57"
       },
       {
         "kind": "lifecycle-operation",
@@ -287,31 +315,19 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "disabled",
+      "resolvedMode": "enabled",
       "reasons": [
-        "low-risk-task"
+        "complex-task"
       ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
   },
-  "startedBySessionId": "session-20260811023354-codex-gpt-5.4-mini-ATM-GOV-0345-e591152637",
-  "wipOwnership": {
-    "schemaId": "atm.retainedWipOwnership.v1",
-    "taskId": "ATM-GOV-0345",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260810225206-codex-gpt-5.4-mini-4458b2108e",
-    "dirtyPaths": [
-      ".atm/history/evidence/git-head.jsonl"
-    ],
-    "retainedAt": "2026-08-11T02:33:40.350Z",
-    "transitionClass": "release-wip-retained"
-  },
-  "owner": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260811175213-codex-gpt-5.4-mini-ATM-GOV-0345-92ad6dbc94",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -324,15 +340,28 @@
       ".atm/history/evidence/ATM-GOV-0345.*",
       ".atm/history/task-events/ATM-GOV-0345/**",
       ".atm/history/tasks/ATM-GOV-0345.json",
+      "packages/cli/src/commands/__tests__/task-direction-queue.test.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/task-direction/active-locks.ts",
+      "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
-      "packages/core/src/broker/runner-build-output-inventory.ts",
-      "scripts/runner-sync-incremental-build.ts",
-      "tests/cli/runner-publication-inventory-parity.test.ts",
-      "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "scripts/__tests__/sealed-runner-publication.test.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/sealed-runner-publication.ts",
+      "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+      "tests/cli/runner-sync-build-script-admission.test.ts"
     ],
     "planningReadOnlyPaths": [
       "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0345-make-sealed-runner-publication-atomic-across-task-close-and-queue-release.task.md"
@@ -348,12 +377,12 @@
     "actorId": "codex-gpt-5.4-mini",
     "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260811023354-codex-gpt-5.4-mini-a0415b3ea5",
+      "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811023354-codex-gpt-5.4-mini-a0415b3ea5\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
     },
-    "createdAt": "2026-08-11T02:34:09.510Z",
+    "createdAt": "2026-08-11T17:52:25.202Z",
     "status": "active"
   }
 }

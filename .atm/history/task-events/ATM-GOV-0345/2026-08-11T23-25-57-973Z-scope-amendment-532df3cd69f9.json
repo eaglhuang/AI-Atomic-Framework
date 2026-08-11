@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-11T23-25-57-973Z-scope-amendment-532df3cd69f9",
+  "taskId": "ATM-GOV-0345",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:319aa75bfe94564cc09e63f91ea6a00d1d7b92ac04f504471212013eee77bcf0",
+  "createdAt": "2026-08-11T23:25:57.973Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/taskflow/historical-close-preflight.ts,packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts\" --reason \"ACC-3 close preflight incorrectly blocks foreign released staged residue even though the existing isolated transaction can park and restore it byte-identically; add the policy seam and focused regression.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ACC-3 close preflight incorrectly blocks foreign released staged residue even though the existing isolated transaction can park and restore it byte-identically; add the policy seam and focused regression."
+  }
+}

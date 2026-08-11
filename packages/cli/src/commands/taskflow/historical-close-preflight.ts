@@ -66,6 +66,12 @@ export interface UnexpectedNonBundleStagedRepoReport {
   readonly stagedFiles: readonly string[];
   readonly restoreCommand: string;
   readonly deferredForeignFiles: readonly string[];
+  /**
+   * Non-active ATM artifacts can be parked by the close transaction and
+   * restored from their staged blob identities.  They are reported rather
+   * than treated as an operator-actionable blocker.
+   */
+  readonly parkableReleasedGovernanceFiles: readonly string[];
 }
 
 export interface HistoricalCloseWriteRollbackSummary {
@@ -227,20 +233,33 @@ function buildUnexpectedNonBundleStagedFiles(input: {
     const expected = new Set(existingBundleFiles(repo.repoRoot, repo.stageFiles));
     const stagedFiles = readStagedFiles(repo.repoRoot);
     const deferredForeignFiles = listForeignActiveFiles(input.targetRepoRoot, input.taskId, stagedFiles);
+    const ownership = inspectGitIndexOwnership({
+      cwd: repo.repoRoot,
+      taskId: input.taskId,
+      stagedFiles
+    });
+    const parkableReleasedGovernanceFiles = uniqueStrings(ownership.entries
+      .filter((entry) =>
+        entry.ownership === 'foreign-released-or-abandoned'
+        || entry.ownership === 'unknown-governance-artifact'
+      )
+      .map((entry) => entry.path));
     const unexpected = stagedFiles.filter((file) => {
       if (expected.has(file)) return false;
       if (isSameTaskAdvisoryStagedFile(input.taskId, file)) return false;
       if (deferredForeignFiles.includes(file)) return false;
+      if (parkableReleasedGovernanceFiles.includes(file)) return false;
       const foreignTaskId = extractGovernanceTaskId(file);
       return !foreignTaskId || foreignTaskId === normalizeTaskId(input.taskId);
     });
-    if (unexpected.length === 0) continue;
+    if (unexpected.length === 0 && parkableReleasedGovernanceFiles.length === 0) continue;
     reports.push({
       repoRoot: repo.repoRoot,
       repoKind: repo.repoKind,
       stagedFiles: uniqueStrings(unexpected),
       restoreCommand: `node atm.mjs git lease stage-override --task ${input.taskId} --actor <actor-id> --paths ${unexpected.map((entry) => JSON.stringify(entry)).join(',')} --reason "<human-approved reason>" --json`,
-      deferredForeignFiles
+      deferredForeignFiles,
+      parkableReleasedGovernanceFiles
     });
   }
   return reports;
@@ -249,19 +268,20 @@ function buildUnexpectedNonBundleStagedFiles(input: {
 function buildUnexpectedNonBundleStagedBlocker(
   reports: readonly UnexpectedNonBundleStagedRepoReport[]
 ): HistoricalClosePreflightBlocker | null {
-  if (reports.length === 0) return null;
-  const files = uniqueStrings(reports.flatMap((entry) => entry.stagedFiles));
+  const blockingReports = reports.filter((entry) => entry.stagedFiles.length > 0);
+  if (blockingReports.length === 0) return null;
+  const files = uniqueStrings(blockingReports.flatMap((entry) => entry.stagedFiles));
   return {
     id: 'unexpectedStagedNonBundleFiles',
     code: 'ATM_TASKFLOW_PRECLOSE_UNEXPECTED_STAGED_FILES',
     summary: `Git index contains staged files outside the close bundle (${files.join(', ')}). taskflow close --write will fail with INDEX_NOT_ISOLATED until they are unstaged or committed separately.`,
     files,
-    remediationChoices: reports.map((entry) => ({
+    remediationChoices: blockingReports.map((entry) => ({
       id: 'restore-accidental-staged' as const,
       summary: `Unstage unrelated files in the ${entry.repoKind} repo only; do not use broad git reset.`,
       requiredCommand: entry.restoreCommand
     })),
-    requiredCommand: reports[0]?.restoreCommand ?? null
+    requiredCommand: blockingReports[0]?.restoreCommand ?? null
   };
 }
 

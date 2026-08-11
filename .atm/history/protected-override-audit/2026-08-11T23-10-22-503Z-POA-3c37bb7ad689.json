@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-3c37bb7ad689",
+  "recordedAt": "2026-08-11T23:10:22.503Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0345 --message \"fix(taskflow): make close and runner publication atomic\n\nATM-Work-Admission: wat-35c643245c7bbf2e sha256:35c643245c7bbf2ec24ed6ec5f291afccb161206706f6618b19ec651a639e1a8\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0345-7ae3e835a3",
+  "reason": "Frozen runner bootstrap circularity; isolated index preserves foreign staged bytes.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T23-10-22-501Z-EMG-ATM-GOV-0345-7ae3e835a3.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

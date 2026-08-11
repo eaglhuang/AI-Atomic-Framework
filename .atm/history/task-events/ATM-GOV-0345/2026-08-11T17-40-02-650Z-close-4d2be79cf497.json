@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-11T17-40-02-650Z-close-4d2be79cf497",
+  "taskId": "ATM-GOV-0345",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260811023354-codex-gpt-5.4-mini-ATM-GOV-0345-e591152637",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0345.json",
+  "taskSha256": "sha256:99f45140e08ae978c01cada91c32e599c37915f1264b4af0b40a51c4e10f8887",
+  "createdAt": "2026-08-11T17:40:02.650Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --status done --historical-delivery 6380bf8e4d4b636e9719108194ce6b7ec87a8f97",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260811023354-codex-gpt-5.4-mini-ATM-GOV-0345-e591152637",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0345.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-11T17:40:02.637Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0345.*",
+        ".atm/history/task-events/ATM-GOV-0345/**",
+        ".atm/history/tasks/ATM-GOV-0345.json",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-publication-inventory-parity.test.ts",
+        "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/runner-publication-inventory-parity.test.ts",
+        "tests/cli/runner-sync-post-close-receipt-publication.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-a1534c4f2d57",
+  "recordedAt": "2026-08-11T17:05:16.397Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/next.ts,packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts --reason \"Explicit task claim must be honored before any stale batch queue selection; repair scope after released direction snapshot blocked normal amendment.\" --emergency-approval EMG-ATM-GOV-0345-8c5da27652 --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0345-8c5da27652",
+  "reason": "Explicit task claim must be honored before any stale batch queue selection; repair scope after released direction snapshot blocked normal amendment.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T17-05-16-395Z-EMG-ATM-GOV-0345-8c5da27652.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

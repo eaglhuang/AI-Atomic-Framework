@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-2c264ef60ad2",
+  "recordedAt": "2026-08-11T18:19:09.958Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0345 --message \"fix(taskflow): make close artifact staging atomic\n\nATM-Work-Admission: wat-477f45c599d6721a sha256:477f45c599d6721a3773f57685b53e2d4b2f6fdeb4d21c2d2750d33ea34ae63c\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0345-ce2641725b",
+  "reason": "Bootstrap circularity: frozen hook cannot load the verified source repair that makes the hook's stale-lock and contextless-evidence blocks disappear.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "failed",
+  "failureCode": "ATM_GIT_COMMIT_FAILED",
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T18-18-56-806Z-EMG-ATM-GOV-0345-ce2641725b.json",
+  "parentEventId": "POA-f426c17146b7",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Git commit failed after an authorized hook bypass; fix the commit error and retry without --no-verify when hooks can pass.",
+    "suggestedCommand": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0345 --message \"fix(taskflow): make close artifact staging atomic\n\nATM-Work-Admission: wat-477f45c599d6721a sha256:477f45c599d6721a3773f57685b53e2d4b2f6fdeb4d21c2d2750d33ea34ae63c\" --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
