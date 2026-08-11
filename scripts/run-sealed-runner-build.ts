@@ -27,6 +27,7 @@ import { scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broke
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 import { resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
+import { isSealedBuildOutputPath } from './sealed-build-output-ownership.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
@@ -39,7 +40,6 @@ export {
   type RunnerIncrementalBuildPlan,
   type RunnerSyncReceipt
 } from './runner-sync-incremental-build.ts';
-
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const invokedAsCli = process.argv[1] !== undefined
   && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
@@ -213,7 +213,15 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     const artifactSync = timePhase(
       timings,
       'artifactSyncMs',
-      () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, publication.beforeBuildSnapshot.preexistingDirtyPaths.filter((entry) => !publication.takeoverPaths.includes(entry))),
+      () => syncGeneratedArtifacts(
+        worktreeRoot,
+        repoRoot,
+        buildTarget,
+        publication.beforeBuildSnapshot.preexistingDirtyPaths.filter((entry) =>
+          !publication.takeoverPaths.includes(entry)
+          && !isSealedBuildOutputPath(entry, buildTarget),
+        ),
+      ),
     );
     if (artifactSync.preservedPaths.length > 0) {
       throw new Error(
@@ -524,7 +532,6 @@ export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, b
   }
   return { preservedPaths: [...preservePaths].sort((left, right) => left.localeCompare(right)) };
 }
-
 
 export function hydratePackageDistFromCurrentRootDrop(input: { readonly cwd: string; readonly worktreeRoot: string; }): void {
   const currentRootDropPackages = path.join(input.cwd, 'release', 'atm-root-drop', 'packages');
