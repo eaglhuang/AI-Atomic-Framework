@@ -189,7 +189,7 @@ export function normalizeCommandRunInput(value: unknown, label: string): Command
 export function normalizeRunnerKind(value: string | null | undefined) {
   const normalized = String(value ?? '').trim().toLowerCase();
   if (normalized === 'dev' || normalized === 'source' || normalized === 'dev-source' || normalized === 'atm.dev.mjs') return 'dev-source';
-  if (normalized === 'frozen' || normalized === 'release' || normalized === 'stable' || normalized === 'atm.mjs') return 'frozen-runner';
+  if (normalized === 'frozen' || normalized === 'frozen-runner' || normalized === 'release' || normalized === 'stable' || normalized === 'atm.mjs') return 'frozen-runner';
   if (normalized === 'external' || normalized === 'host') return 'external';
   return 'unknown';
 }
