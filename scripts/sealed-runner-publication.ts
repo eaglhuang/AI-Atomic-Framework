@@ -1,4 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import {
   assertRunnerSyncAdmission,
@@ -28,11 +29,7 @@ export function resolveSealedRunnerPublication(input: {
   readonly beforeBuildSnapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
   readonly takeoverPaths: readonly string[];
 } {
-  const admission = inspectRunnerSyncAdmission({
-    cwd: input.cwd,
-    stewardActorId: input.stewardActorId,
-    sealedSourceSha: input.sealedSourceSha
-  });
+  const admission = ensureRunnerPublicationReservation(input);
   assertRunnerSyncAdmission(admission);
   const currentTaskId = admission.queueHeadOwnership.waitingTasks[0] ?? null;
   const currentTask = currentTaskId
@@ -55,6 +52,110 @@ export function resolveSealedRunnerPublication(input: {
       snapshot: beforeBuildSnapshot
     })
   };
+}
+
+/**
+ * Acquire the runner-sync mutex at the publication boundary, after the sealed
+ * candidate has been built.  Framework claims declare ownership; they must not
+ * force callers to reserve the globally serialized publication queue while a
+ * detached, private build is still running.
+ */
+export function ensureRunnerPublicationReservation(input: {
+  readonly cwd: string;
+  readonly stewardActorId: string;
+  readonly sealedSourceSha: string;
+  readonly buildTarget: RunnerBuildOutputTarget;
+}): RunnerSyncAdmissionReport {
+  const inspect = () => inspectRunnerSyncAdmission({
+    cwd: input.cwd,
+    stewardActorId: input.stewardActorId,
+    sealedSourceSha: input.sealedSourceSha
+  });
+  const initial = inspect();
+  if (initial.queueHeadOwnership.ok) return initial;
+  if (initial.runnerSyncSteward) {
+    runAtm(input.cwd, [
+      'broker', 'runner-sync', 'cleanup',
+      '--actor', input.stewardActorId,
+      '--json'
+    ], 'Runner publication stale-queue reconciliation');
+    const reconciled = inspect();
+    if (reconciled.queueHeadOwnership.ok || reconciled.runnerSyncSteward) return reconciled;
+  }
+
+  const taskId = resolveActiveRunnerPublicationTask({
+    cwd: input.cwd,
+    actorId: input.stewardActorId,
+    now: new Date().toISOString()
+  });
+  const surfaces = publicationSurfaces(input.buildTarget);
+  runAtm(input.cwd, [
+    'broker', 'runner-sync', 'enqueue',
+    '--task', taskId,
+    '--actor', input.stewardActorId,
+    '--sealed-source-sha', input.sealedSourceSha,
+    ...surfaces.flatMap((surface) => ['--surface', surface]),
+    '--json'
+  ], 'Runner publication queue acquisition');
+  return inspect();
+}
+
+function runAtm(cwd: string, argv: readonly string[], operation: string): void {
+  const result = spawnSync(process.execPath, [path.join(cwd, 'atm.mjs'), ...argv], {
+    cwd,
+    env: process.env,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if ((result.status ?? 1) !== 0) {
+    const detail = String(result.stderr || result.stdout || '').trim();
+    throw new Error(`${operation} failed: ${detail || `exit ${result.status ?? 1}`}`);
+  }
+}
+
+export function resolveActiveRunnerPublicationTask(input: {
+  readonly cwd: string;
+  readonly actorId: string;
+  readonly now: string;
+}): string {
+  const lockRoot = path.join(input.cwd, '.atm', 'runtime', 'locks');
+  const nowMs = Date.parse(input.now);
+  const candidates = existsSync(lockRoot)
+    ? readdirSync(lockRoot, { withFileTypes: true }).flatMap((entry) => {
+      if (!entry.isFile() || !entry.name.endsWith('.lock.json')) return [];
+      try {
+        const lock = JSON.parse(readFileSync(path.join(lockRoot, entry.name), 'utf8')) as Record<string, unknown>;
+        const taskId = String(lock.workItemId ?? '');
+        const actorId = String(lock.actorId ?? lock.lockedBy ?? '');
+        const heartbeatAt = Date.parse(String(lock.heartbeatAt ?? lock.lockedAt ?? ''));
+        const ttlSeconds = Number(lock.ttlSeconds ?? 0);
+        const files = Array.isArray(lock.files) ? lock.files.map(String) : [];
+        const active = Number.isFinite(nowMs)
+          && Number.isFinite(heartbeatAt)
+          && Number.isFinite(ttlSeconds)
+          && nowMs < heartbeatAt + ttlSeconds * 1000;
+        return taskId.startsWith('ATM-FRAMEWORK-TEMP-')
+          && actorId === input.actorId
+          && active
+          && files.some((file) => file === 'release/atm-onefile/atm.mjs' || file === 'release/atm-root-drop')
+          ? [taskId]
+          : [];
+      } catch {
+        return [];
+      }
+    })
+    : [];
+  const unique = [...new Set(candidates)].sort();
+  if (unique.length !== 1) {
+    throw new Error(`Runner publication requires exactly one active framework release claim for ${input.actorId}; found ${unique.length}.`);
+  }
+  return unique[0];
+}
+
+function publicationSurfaces(buildTarget: RunnerBuildOutputTarget): readonly string[] {
+  if (buildTarget === 'onefile') return ['release/atm-onefile/atm.mjs'];
+  if (buildTarget === 'root-drop') return ['release/atm-root-drop'];
+  return ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'];
 }
 
 function readValidatedPublicationTakeover(input: {
