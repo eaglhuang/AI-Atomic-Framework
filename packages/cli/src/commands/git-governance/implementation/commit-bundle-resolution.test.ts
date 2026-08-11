@@ -17,15 +17,14 @@ writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-CURRENT.json'), `
   workItemId: 'TASK-CURRENT', status: 'running', scopePaths: ['src/delivery.ts', '.atm/history/evidence/TASK-CURRENT.runner-sync-receipt.json'],
   claim: { actorId: 'test-actor', leaseId: 'lease-current', claimedAt: '2026-08-09T00:00:00.000Z', heartbeatAt: new Date().toISOString(), ttlSeconds: 3600, files: ['src/delivery.ts', '.atm/history/evidence/TASK-CURRENT.runner-sync-receipt.json'], state: 'active' },
 })}\n`);
-writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-FOREIGN.json'), `${JSON.stringify({ workItemId: 'TASK-FOREIGN', status: 'done' })}\n`);
+writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-FOREIGN.json'), `${JSON.stringify({ workItemId: 'TASK-FOREIGN', status: 'planned' })}\n`);
 const foreignManifest = path.join(cwd, '.atm', 'history', 'evidence', 'TASK-FOREIGN.bundle-manifest.json');
 writeFileSync(foreignManifest, '{"schemaId":"fixture"}\n');
 execFileSync('git', ['add', '.'], { cwd });
 execFileSync('git', ['commit', '-qm', 'fixture'], { cwd });
 
-// Recreate a foreign generated residue exactly as a completed task can leave
-// it in the shared worktree. The current task's deferred commit must not erase
-// it, even if the residue is individually safe for its owning lifecycle.
+// An unclaimed foreign generated manifest may remain in a shared worktree.
+// Preserve it without turning a path-bounded commit into a global refusal.
 writeFileSync(foreignManifest, '{"schemaId":"fixture","residue":true}\n');
 const bundle = resolveTaskScopedCommitBundle({
   cwd,
@@ -36,13 +35,13 @@ const bundle = resolveTaskScopedCommitBundle({
   trailers: [],
   apply: true,
   autoStage: false,
-  deferForeignStaged: true,
+  deferForeignStaged: false,
   stageOverrideLease: null,
   brokerConflictResolutionPath: null,
 });
 
-assert.equal(existsSync(foreignManifest), true, 'foreign released bundle residue must survive another task commit transaction');
-assert.equal(bundle.ok, true, `completed foreign residue must not block a path-bounded commit: ${bundle.blockedCode} ${bundle.blockedSummary}`);
+assert.equal(existsSync(foreignManifest), true, 'foreign generated bundle residue must survive another task commit transaction');
+assert.equal(bundle.ok, true, `un-staged foreign residue must not block a path-bounded commit: ${bundle.blockedCode} ${bundle.blockedSummary}`);
 assert.ok(bundle.skippedExternalDirtyFiles.includes('.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'));
 
 // A retained foreign deletion must likewise stay out of a different task's

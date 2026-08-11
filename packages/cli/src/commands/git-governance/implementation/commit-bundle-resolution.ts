@@ -194,6 +194,16 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   const deferredForeignStagedSet = new Set(
     deferredForeignStagedFiles.map(normalizeRelativePath),
   );
+  const stagedSet = new Set(stagedFiles);
+  const preservedForeignUnstagedResidue = new Set(
+    reconciledResidueReport.blockAndExplain
+      .filter((entry: LegacyValue) =>
+        entry.ownerTaskId?.trim().toUpperCase() !== input.taskId.toUpperCase()
+        && isDeferrableForeignGovernanceResidue(input.taskId, entry)
+        && !stagedSet.has(normalizeRelativePath(entry.path)),
+      )
+      .map((entry: LegacyValue) => normalizeRelativePath(entry.path)),
+  );
   const blockedResidue = reconciledResidueReport.blockAndExplain.filter(
     (entry: LegacyValue) =>
       !deferredForeignStagedSet.has(normalizeRelativePath(entry.path)) &&
@@ -201,6 +211,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
         input.deferForeignStaged &&
         isDeferrableForeignGovernanceResidue(input.taskId, entry)
       ) &&
+      !preservedForeignUnstagedResidue.has(normalizeRelativePath(entry.path)) &&
       !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry),
   );
   const manualReviewResidue = reconciledResidueReport.manualReview.filter(
@@ -210,13 +221,13 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
         input.deferForeignStaged &&
         isDeferrableForeignGovernanceResidue(input.taskId, entry)
       ) &&
+      !preservedForeignUnstagedResidue.has(normalizeRelativePath(entry.path)) &&
       !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry),
   );
   const effectiveDirtyFiles =
     autoCleanedResidue.length > 0
       ? listTaskScopedWorktreeDirtyFiles(input.cwd)
       : dirtyFiles;
-  const stagedSet = new Set(stagedFiles);
   const trackedUnstagedSet = new Set(readUnstagedFiles(input.cwd));
   const unstagedDirtyFiles = uniqueSorted([
     ...effectiveDirtyFiles.filter((filePath: LegacyValue) => !stagedSet.has(filePath)),

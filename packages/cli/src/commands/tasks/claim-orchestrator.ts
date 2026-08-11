@@ -15,7 +15,7 @@ import { taskPathFor } from './task-file-io-helpers.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired } from './task-ledger-readers.ts';
 import { parseClaimLifecycleOptions } from './task-option-parsers.ts';
 import { resolveTaskClaimIntent } from './claim-intent.ts';
-import { completeTaskClaimWithWorkAdmission, resealWorkAdmissionTicketForRenewal } from './claim-work-admission.ts';
+import { completeTaskClaimWithWorkAdmission, resealWorkAdmissionTicketForRenewal, restoreReleasedDirectionLockForRenewal } from './claim-work-admission.ts';
 import { writeTakeoverEvidence } from './takeover-evidence.ts';
 import { assertPlanningSourceSealValid } from './import-task.ts';
 import { resolveLaneSession } from '../lane-session/resolve.ts';
@@ -266,6 +266,14 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       claim: renewed,
       nowIso
     });
+    const directionLockRecovery = restoreReleasedDirectionLockForRenewal({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId,
+      claim: renewed,
+      taskDocument,
+      nowIso
+    });
     const sessionRecord = updateActorWorkSessionState({
       cwd: options.cwd,
       actorId,
@@ -302,6 +310,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
         actorId,
         claim: renewed,
         workAdmissionTicket,
+        directionLockRecovery,
         transitionPath,
         sessionId: sessionRecord?.session.sessionId ?? null,
         session: sessionRecord?.session ?? null
