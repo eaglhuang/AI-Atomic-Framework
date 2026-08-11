@@ -93,4 +93,30 @@ const staleIndexBundle = resolveTaskScopedCommitBundle({
 });
 assert.equal(staleIndexBundle.ok, true, `auto-stage must not mistake a task-owned worktree overlay for a protected deletion: ${staleIndexBundle.blockedCode} ${staleIndexBundle.blockedSummary}`);
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=D'], { cwd, encoding: 'utf8' }).trim(), '.atm/history/evidence/TASK-CURRENT.runner-sync-receipt.json');
+
+// A tracked path may have both staged and unstaged changes. Auto-stage means
+// the worktree is authoritative for that task path; subtracting every staged
+// path from the overlay would silently commit the older index blob.
+execFileSync('git', ['add', '--', 'src/delivery.ts'], { cwd });
+writeFileSync(path.join(cwd, 'src', 'delivery.ts'), 'export const delivery = "worktree-overlay";\n');
+const stagedDeliveryBlob = execFileSync('git', ['rev-parse', ':src/delivery.ts'], { cwd, encoding: 'utf8' }).trim();
+const worktreeDeliveryBlob = execFileSync('git', ['hash-object', '--', 'src/delivery.ts'], { cwd, encoding: 'utf8' }).trim();
+assert.notEqual(stagedDeliveryBlob, worktreeDeliveryBlob, 'fixture must be MM with different blobs');
+const mmBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: 'TASK-CURRENT',
+  actorId: 'test-actor',
+  taskDocument: JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-CURRENT.json'), 'utf8')),
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+const sealedDelivery = mmBundle.sealedBundle.entries.find((entry: { path: string }) => entry.path === 'src/delivery.ts');
+assert.ok(mmBundle.stageFiles.includes('src/delivery.ts'), 'MM path must remain in auto-stage worktree overlay');
+assert.equal(sealedDelivery?.blobId, worktreeDeliveryBlob, 'sealed candidate must use worktree bytes for MM path');
+assert.notEqual(sealedDelivery?.blobId, stagedDeliveryBlob, 'older staged blob must not override worktree bytes');
 console.log('commit-bundle-resolution: foreign released residue preserved');

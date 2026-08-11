@@ -120,17 +120,16 @@ assert.ok(
   'foreign-task audit event must not block this commit either (it should simply be left alone)'
 );
 
-// `resolveTaskScopedCommitBundle` only stages files (git add); finish the
-// commit itself to prove the staged audit event actually lands in history.
-runGit(repo, ['commit', '-m', 'feat: opt-14 fixture commit']);
-const committedFiles = runGit(repo, ['show', '--stat', '--name-only', 'HEAD']).trim().split(/\r?\n/);
+// Auto-stage now assembles a sealed candidate index rather than mutating the
+// shared fixture index. Its immutable bundle is the pre-commit authority.
+const committedFiles = report.sealedBundle.entries.map((entry: { path: string }) => entry.path);
 assert.ok(
   committedFiles.includes(ownedAudit.eventPath.replace(/\\/g, '/')),
-  `this-task audit event must actually land in the commit: ${JSON.stringify(committedFiles)}`
+  `this-task audit event must land in the sealed commit bundle: ${JSON.stringify(committedFiles)}`
 );
 assert.ok(
   !committedFiles.includes(foreignAudit.eventPath.replace(/\\/g, '/')),
-  `foreign-task audit event must not land in this commit: ${JSON.stringify(committedFiles)}`
+  `foreign-task audit event must not land in the sealed commit bundle: ${JSON.stringify(committedFiles)}`
 );
 
 console.log('[protected-override-audit-staging:test] ok');

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-11T14-11-12-713Z-scope-amendment-b2d58e9cbc24",
+  "taskId": "TASK-ERR-0013",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0013.json",
+  "taskSha256": "sha256:a421192aa27d5ee4a55190d2766666440cbae559f6b47b2b9b8e2f65b2e8630c",
+  "createdAt": "2026-08-11T14:11:12.713Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0013 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts --reason \"MM auto-stage classification must read the authoritative unstaged diff instead of subtracting every staged path; helper belongs to the Git index adapter seam.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "MM auto-stage classification must read the authoritative unstaged diff instead of subtracting every staged path; helper belongs to the Git index adapter seam."
+  }
+}

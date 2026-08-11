@@ -57,7 +57,7 @@ import {
   inspectProtectedGovernanceStateDestructiveChanges,
 } from "../protected-governance-state.ts";
 
-import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles } from './git-index-transaction.ts';
+import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles, readUnstagedFiles } from './git-index-transaction.ts';
 
 import { parseTaskClaim } from './identity-check-command.ts';
 
@@ -217,9 +217,11 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       ? listTaskScopedWorktreeDirtyFiles(input.cwd)
       : dirtyFiles;
   const stagedSet = new Set(stagedFiles);
-  const unstagedDirtyFiles = effectiveDirtyFiles.filter(
-    (filePath: LegacyValue) => !stagedSet.has(filePath),
-  );
+  const trackedUnstagedSet = new Set(readUnstagedFiles(input.cwd));
+  const unstagedDirtyFiles = uniqueSorted([
+    ...effectiveDirtyFiles.filter((filePath: LegacyValue) => !stagedSet.has(filePath)),
+    ...effectiveDirtyFiles.filter((filePath: LegacyValue) => trackedUnstagedSet.has(filePath)),
+  ]);
   const inScopeUnstagedDirty = unstagedDirtyFiles.filter(
     (filePath: LegacyValue) =>
       !isRuntimeCommitSideEffect(filePath) &&

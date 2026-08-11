@@ -144,6 +144,24 @@ export function readStagedFiles(cwd: LegacyValue) {
   }
 }
 
+/**
+ * Read tracked worktree changes independently of staged state. A path may be
+ * both staged and unstaged (`MM`); callers that implement auto-stage must keep
+ * that path in the worktree overlay instead of treating the staged entry as
+ * authoritative.
+ */
+export function readUnstagedFiles(cwd: LegacyValue) {
+  try {
+    return runGitCommand(cwd, ["diff", "--name-only", "--diff-filter=ACMRTD"])
+      .split(/\r?\n/)
+      .map(normalizeRelativePath)
+      .filter(Boolean)
+      .sort((left: LegacyValue, right: LegacyValue) => left.localeCompare(right));
+  } catch {
+    return [];
+  }
+}
+
 export function rollbackNewlyStagedLiveIndexResidue(cwd: LegacyValue, stagedBeforeAttempt: LegacyValue) {
   const beforeSet = new Set(stagedBeforeAttempt);
   const stagedAfterAttempt = readStagedFiles(cwd);
