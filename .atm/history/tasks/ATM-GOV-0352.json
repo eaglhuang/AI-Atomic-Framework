@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0352",
   "title": "Disclose close-window staged-index blockers at taskflow close dry-run",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -219,8 +219,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T16-03-52-877Z-renew-05f1c9b5e1ff",
-  "lastTransitionAt": "2026-08-12T16:03:52.877Z",
+  "lastTransitionId": "2026-08-12T16-36-58-620Z-close-753f16c32b36",
+  "lastTransitionAt": "2026-08-12T16:36:58.620Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-12T15:12:10.929Z",
   "promotedAt": "2026-08-12T15:12:10.933Z",
@@ -228,7 +228,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-a46aa5a94338",
     "claimedAt": "2026-08-12T15:12:23.739Z",
-    "heartbeatAt": "2026-08-12T16:03:52.126Z",
+    "heartbeatAt": "2026-08-12T16:36:58.618Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0352.json",
@@ -240,40 +240,40 @@
       "packages/cli/src/commands/tasks/close-window-lock.ts",
       "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812151223-codex-gpt-5.4-mini-ee928f3013",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812151223-codex-gpt-5.4-mini-ee928f3013\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T13:39:44.009Z",
   "startedByActor": "claude-008-gov-0352",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-9eef8a005cbeae32",
-    "ticketDigest": "sha256:9eef8a005cbeae3229061f34e70a87c3ef879431f277c89f2cade0d244a8e7bb",
+    "ticketId": "wat-5266c04ebd945a24",
+    "ticketDigest": "sha256:5266c04ebd945a24d81ce87d04254fac27a2ad1c5fddce6b6c3bedd4b7856345",
     "taskId": "ATM-GOV-0352",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260812151223-codex-gpt-5.4-mini-ee928f3013",
     "claimGeneration": "lease-a46aa5a94338",
-    "issuedAt": "2026-08-12T16:03:52.126Z",
-    "expiresAt": "2026-08-12T16:33:52.126Z",
-    "scopeDigest": "sha256:decb4f9d79e341f36926abef18530f94ca9be250e05559bf42dcfdebb32f9057",
+    "issuedAt": "2026-08-12T16:36:01.159Z",
+    "expiresAt": "2026-08-12T17:06:01.159Z",
+    "scopeDigest": "sha256:2d659e7b37c09953cc1bdf07cdc024aebd8406346007f62a0070e84356517bbf",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T16:03:52.126Z"
+      "selectedAt": "2026-08-12T16:36:01.159Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0352.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0352/**",
           ".atm/history/tasks/ATM-GOV-0352.json",
           "packages/cli/src/commands/taskflow/__tests__/dryrun/close-window-staged-index-disclosure.spec.ts",
@@ -282,7 +282,7 @@
           "packages/cli/src/commands/tasks/close-window-lock.ts",
           "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts"
         ],
-        "digest": "sha256:4ac203aee3055bf082e06fb207f9cc91bc8ed4bcfb69d0d7c0ab484af9b4fbe2"
+        "digest": "sha256:5e840c3cad9d97b51d5e8725ae3fb2409e7b051762a01a840f1e5cd86c06350b"
       },
       {
         "kind": "lifecycle-operation",
@@ -361,5 +361,9 @@
     },
     "createdAt": "2026-08-12T15:12:28.729Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-12T16:36:58.618Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812151223-codex-gpt-5.4-mini-ATM-GOV-0352-bf00d1142a",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0352.closure-packet.json"
 }
