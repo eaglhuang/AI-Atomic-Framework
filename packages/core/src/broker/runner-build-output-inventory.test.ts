@@ -47,7 +47,22 @@ try {
     ownerTaskId: null,
     ownerActorId: null
   });
-  console.log('[runner-build-output-inventory] preserves foreign dirty ownership');
+  const adoptedInventory = scanSealedRunnerBuildOutputInventory({
+    cwd: repo,
+    buildTarget: 'onefile',
+    sealedSourceSha: 'a'.repeat(40),
+    taskId: 'TASK-CURRENT',
+    beforeBuildSnapshot: snapshot,
+    includeDirtyPublicationMembers: true,
+    takeoverPaths: ['release/atm-onefile/atm.mjs']
+  });
+  assert.deepEqual(adoptedInventory.entries.find((item) => item.path === 'release/atm-onefile/atm.mjs'), {
+    path: 'release/atm-onefile/atm.mjs',
+    disposition: 'owned-current',
+    ownerTaskId: 'TASK-CURRENT',
+    ownerActorId: null
+  });
+  console.log('[runner-build-output-inventory] preserves foreign ownership until an exact takeover is supplied');
 } finally {
   rmSync(repo, { recursive: true, force: true });
 }
