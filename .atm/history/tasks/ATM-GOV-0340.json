@@ -1,0 +1,323 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0340",
+  "title": "Rebuild backlog census and close every open-like disposition",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0339"
+  ],
+  "acceptance": [
+    "ACC-1: 解釋並消除 378/384、169/167 等歷史 count divergence；輸出 total/open-like/terminal/unclassified、histogram、sorted-open-like-ID digest。",
+    "ACC-2: Markdown 由 shard 生成且 byte-consistent；禁止手改 projection 增列或改狀態。",
+    "ACC-3: 每個 open-like item 只有三種 disposition：generic family+owning repair card+test+fresh evidence；durable duplicate/non-confirmed rationale；owner-approved deferred exception。",
+    "ACC-4: 2026-08-09-001..005、2026-07-31-002..012、runner-sync protected-state、stale/mixed batch、warm latency、crash matrix 全有 terminal evidence。",
+    "ACC-5: `unclassified=0` 且 `open-like=0` 才通過；任何 deferred exception 仍使整體 NOT COMPLETE。"
+  ],
+  "deliverables": [
+    "scripts/validate-backlog-census.ts",
+    "tests/cli/backlog-census-authority.test.ts",
+    "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.items/",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "scripts/validate-governance-projections.ts",
+    "scripts/validate-backlog-census.ts",
+    "schemas/skills/incident-learning-candidate.schema.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/backlog-census-authority.test.ts",
+    "node --strip-types scripts/validate-governance-projections.ts",
+    "node --strip-types scripts/validate-backlog-census.ts --mode validate"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "retain-item-shards-and-regenerate-projection-from-authority",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.backlog-projection",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0340-rebuild-backlog-census-and-close-every-open-like-disposition.task.md",
+    "sectionTitle": "ATM-GOV-0340",
+    "headingLine": 71,
+    "hash": "45bc793149dc4333",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0340-rebuild-backlog-census-and-close-every-open-like-disposition.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:45bc793149dc4333cdefbb9260fbd48ee61eb02842606cc25d4b710a3bb44604",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:48.680Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:48.680Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0339"
+    ],
+    "startConditions": [
+      "Hostile dogfood and saturation have produced terminal incident candidates.",
+      "Backlog item shards are available as the sole record authority."
+    ],
+    "softRelations": [
+      "ATM-GOV-0341"
+    ],
+    "changedPublicSeams": [
+      "atm.backlogCensus.v1"
+    ],
+    "causalImpactEdges": [
+      "shard-authority",
+      "projection-parity",
+      "open-like-disposition",
+      "incident-learning"
+    ],
+    "parallelFrontierInputs": [
+      "backlog-shards",
+      "projection",
+      "dogfood-incidents",
+      "correction-reports"
+    ],
+    "validatorReferences": [
+      "validate-governance-projections",
+      "validate-backlog-census"
+    ],
+    "phaseOwner": "closeout-wave-9"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_backlog_census_shard_authority_0340",
+      "targetGroupId": null,
+      "semanticKey": "backlog_census_shard_authority",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "shard-authority",
+        "projection-parity",
+        "open-like-disposition"
+      ],
+      "expectedRedPredicate": "projection-only row count drift missing shard or unclassified status fails census",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.backlogCensus.v1",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_backlog_incident_learning_disposition_0340",
+      "targetGroupId": null,
+      "semanticKey": "backlog_incident_learning_disposition",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "incident-learning",
+        "open-like-disposition"
+      ],
+      "expectedRedPredicate": "candidate-only fix claim deferred exception or missing generic family keeps open-like nonzero",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.backlogCensus.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_backlog_census_shard_authority_0340",
+    "test_backlog_incident_learning_disposition_0340"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_final_certification"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T19-11-45-116Z-scope-amendment-fae4c62660cd",
+  "lastTransitionAt": "2026-08-12T19:11:45.116Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T19:11:21.551Z",
+  "promotedAt": "2026-08-12T19:11:21.555Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-a1b263954618",
+    "claimedAt": "2026-08-12T19:11:21.560Z",
+    "heartbeatAt": "2026-08-12T19:11:21.560Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0340.*",
+      ".atm/history/task-events/ATM-GOV-0340/**",
+      ".atm/history/tasks/ATM-GOV-0340.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+      "schemas/skills/incident-learning-candidate.schema.json",
+      "scripts/validate-backlog-census.ts",
+      "scripts/validate-governance-projections.ts",
+      "tests/cli/backlog-census-authority.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260812185740-codex-gpt-5.4-mini-538d26f40a",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812185740-codex-gpt-5.4-mini-538d26f40a\""
+    }
+  },
+  "startedAt": "2026-08-12T19:11:21.560Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-bcbd8f7c7ce8532b",
+    "ticketDigest": "sha256:bcbd8f7c7ce8532be44d8d825f5853aa1885ceb5a4e55ee8ac66c7341bdbf5cf",
+    "taskId": "ATM-GOV-0340",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812185740-codex-gpt-5.4-mini-538d26f40a",
+    "claimGeneration": "lease-a1b263954618",
+    "issuedAt": "2026-08-12T19:11:21.560Z",
+    "expiresAt": "2026-08-12T19:41:21.560Z",
+    "scopeDigest": "sha256:7d1afed8c5b046170784dc12d08a3dfda4ae4dbe82317c8c1885631e44450d03",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T19:11:21.560Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0340.*",
+          ".atm/history/task-events/ATM-GOV-0340/**",
+          ".atm/history/tasks/ATM-GOV-0340.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/",
+          "docs/governance/atm-bug-and-optimization-backlog.md",
+          "schemas/skills/incident-learning-candidate.schema.json",
+          "scripts/validate-backlog-census.ts",
+          "scripts/validate-governance-projections.ts"
+        ],
+        "digest": "sha256:a6133fafc15b62f8488dfa165cd1f7e1479a9945006a6c3925cdff828c47962b"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260812191121-codex-gpt-5.4-mini-ATM-GOV-0340-3f4ab85fac",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0340",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-10395367f05d06ab",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0340.*",
+      ".atm/history/task-events/ATM-GOV-0340/**",
+      ".atm/history/tasks/ATM-GOV-0340.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+      "schemas/skills/incident-learning-candidate.schema.json",
+      "scripts/validate-backlog-census.ts",
+      "scripts/validate-governance-projections.ts",
+      "tests/cli/backlog-census-authority.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0340-rebuild-backlog-census-and-close-every-open-like-disposition.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0340-rebuild-backlog-census-and-close-every-open-like-disposition.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812185740-codex-gpt-5.4-mini-538d26f40a",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812185740-codex-gpt-5.4-mini-538d26f40a\""
+    },
+    "createdAt": "2026-08-12T19:11:26.457Z",
+    "status": "active"
+  }
+}

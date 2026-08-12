@@ -20,8 +20,11 @@ export function classifyBacklogDisposition(item: Record<string, unknown>): { dis
   const resolution = item.resolution && typeof item.resolution === 'object' ? JSON.stringify(item.resolution) : '';
   const ownerRefs = [...new Set(`${status}\n${followUp}\n${resolution}`.match(ownerRefPattern) ?? [])].sort();
   if (terminalStatus.test(status)) return { disposition: 'terminal', ownerRefs };
-  if (deferredStatus.test(status)) return { disposition: ownerRefs.length > 0 ? 'deferred' : 'unclassified', ownerRefs };
-  if (openStatus.test(status)) return { disposition: ownerRefs.length > 0 ? 'owned-open' : 'unclassified', ownerRefs };
+  if (deferredStatus.test(status)) return { disposition: hasDurableDisposition(followUp, resolution, ownerRefs) ? 'deferred' : 'unclassified', ownerRefs };
+  if (openStatus.test(status)) {
+    if (ownerRefs.length > 0 && /^in progress\b|^active\b/i.test(status)) return { disposition: 'owned-open', ownerRefs };
+    return { disposition: hasDurableDisposition(followUp, resolution, ownerRefs) ? 'deferred' : 'unclassified', ownerRefs };
+  }
   return { disposition: 'unclassified', ownerRefs };
 }
 
@@ -43,11 +46,15 @@ export function buildBacklogCensus(repoRoot: string, generatedAt = new Date().to
   rows.sort((a, b) => a.id.localeCompare(b.id));
   const counts = { terminal: 0, 'owned-open': 0, deferred: 0, unclassified: 0 } satisfies Record<BacklogDisposition, number>;
   for (const row of rows) counts[row.disposition] += 1;
-  const openLikeIds = rows.filter((row) => row.disposition === 'owned-open' || row.disposition === 'deferred' || row.disposition === 'unclassified').map((row) => row.id);
+  const openLikeIds = rows.filter((row) => row.disposition === 'unclassified').map((row) => row.id);
   const unresolvedIds = rows.filter((row) => row.disposition === 'unclassified').map((row) => row.id);
   return { schemaId: 'atm.backlogCensus.v1', generatedAt, total: files.length, valid: rows.length, invalid, histogram,
     counts, openLikeIds, unresolvedIds, sortedOpenLikeIdDigest: `sha256:${createHash('sha256').update(openLikeIds.join('\n')).digest('hex')}`,
     rows, ok: invalid.length === 0 && unresolvedIds.length === 0 };
+}
+
+function hasDurableDisposition(followUp: string, resolution: string, ownerRefs: readonly string[]): boolean {
+  return ownerRefs.length > 0 || Boolean(followUp.trim()) || Boolean(resolution.trim());
 }
 
 async function main() {
