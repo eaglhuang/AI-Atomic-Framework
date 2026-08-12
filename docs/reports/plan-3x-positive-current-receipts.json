@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:f38c5ab7dea30961f3e7a54beea67ec2fb8f07a91f3af4043ba47896535c1856"
+      "digest": "sha256:de89d145cb964414e095607296b18e8d34177e3c768ab606ba9753e4fd2e1978"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:bc5c81aa4d790472682d67e562113e5da58cd4fdfbdf77635797c7da03e429de"
+      "digest": "sha256:0f3b1226ab1ccaa1a9cfb8b0a49c6649aa1a13bbf70526bd8a70f9744cd1698a"
     }
   ],
   "totals": {
     "freshCommandRows": 34,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 13,
-    "objectiveAlignedNegativeControlRowsConsumed": 2,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 14,
+    "objectiveAlignedNegativeControlRowsConsumed": 3,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
     "remainingUncoveredRows": 22,
-    "sourceRowsMutatedByThisReport": 13
+    "sourceRowsMutatedByThisReport": 14
   },
   "commandReceipts": [
     {
@@ -139,6 +139,20 @@
         "\"failClosed\": true",
         "\"commandBackedCount\": 420"
       ]
+    },
+    {
+      "id": "plan32-provenance-mismatch-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-provenance-mismatch.ts --json",
+      "exitCode": 0,
+      "verdict": "provenance-mismatch-fail-closed",
+      "rowsCovered": [
+        "P32-OBJ-19"
+      ],
+      "stdoutAnchors": [
+        "atm.plan32ProvenanceMismatchValidation.v1",
+        "\"failClosed\": true",
+        "task-provenance-mismatch"
+      ]
     }
   ],
   "positiveRows": [
@@ -215,6 +229,12 @@
       "sourceReplayAction": "recomputed row status after binding the validator receipt to the source replay evidence tuple"
     },
     {
+      "objectiveId": "P32-OBJ-19",
+      "title": "Provenance mismatch fails closed",
+      "receiptIds": ["plan32-provenance-mismatch-fail-closed"],
+      "sourceReplayAction": "recomputed row status because the current provenance-mismatch validator proves mismatched git-head provenance fails closed"
+    },
+    {
       "objectiveId": "P32-OBJ-22",
       "title": "Missing rows cannot pass",
       "receiptIds": ["atm3-final-closure-negative-controls"],
@@ -232,7 +252,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Thirteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Fourteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

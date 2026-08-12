@@ -3,11 +3,11 @@
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:30:00.000Z",
   "status": "fresh-command-replay-partially-consumed",
-  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 13 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
+  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 14 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:f38c5ab7dea30961f3e7a54beea67ec2fb8f07a91f3af4043ba47896535c1856"
+      "digest": "sha256:de89d145cb964414e095607296b18e8d34177e3c768ab606ba9753e4fd2e1978"
     },
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
@@ -19,18 +19,18 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:578a93ce578df4bcccdf3e05eec70cac23f9d3ce5fe1fd349ad3858b86a8e530"
+      "digest": "sha256:2fa9f7d89f58aad7c5342fa7b18c2d648966571b6be1b71bbd405d743d492308"
     }
   ],
   "familyDisposition": {
     "proofFamilyId": "fresh-command-replay-needed",
     "sourceRowCount": 34,
-    "focusedCommandsExecuted": 9,
-    "commandsGreen": 9,
-    "rowsConsumedIntoSourceReplay": 13,
+    "focusedCommandsExecuted": 10,
+    "commandsGreen": 10,
+    "rowsConsumedIntoSourceReplay": 14,
     "rowsCertifiedCompleteByTheseReceipts": 0,
     "remainingRowsInFamily": 34,
-    "reasonRowsRemainOpen": "Thirteen current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
+    "reasonRowsRemainOpen": "Fourteen current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
   },
   "commandRuns": [
     {
@@ -95,6 +95,13 @@
       "exitCode": 0,
       "stdoutPreview": "[validate-plan30-protected-closure] ok cells=420 failClosed=true",
       "semanticBoundary": "objective-aligned protected fault fail-closed evidence, not completion evidence for Plan 3.0"
+    },
+    {
+      "id": "plan32-provenance-mismatch-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-provenance-mismatch.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-provenance-mismatch] ok verdict=fail-closed diagnostics=head-mismatch,task-provenance-mismatch",
+      "semanticBoundary": "objective-aligned provenance mismatch fail-closed evidence, not completion evidence for Plan 3.2"
     }
   ],
   "nextExecutionOrder": [

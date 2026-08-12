@@ -19,7 +19,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:578a93ce578df4bcccdf3e05eec70cac23f9d3ce5fe1fd349ad3858b86a8e530",
+      "digest": "sha256:2fa9f7d89f58aad7c5342fa7b18c2d648966571b6be1b71bbd405d743d492308",
       "planId": "3.2",
       "expectedRows": 29
     }
@@ -27,8 +27,8 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsVerified": 13,
-    "sourceRowsNotComplete": 56,
+    "sourceRowsVerified": 14,
+    "sourceRowsNotComplete": 55,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
     "proofFamilies": 5
@@ -37,7 +37,7 @@
     {
       "id": "verified-current-receipt",
       "status": "verified",
-      "rowCount": 13,
+      "rowCount": 14,
       "meaning": "The row now has a current command-backed receipt or objective-aligned negative-control receipt replayed into the source objective report.",
       "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
       "rowRefs": [
@@ -53,6 +53,7 @@
         "P31-OBJ-03",
         "P32-OBJ-01",
         "P32-OBJ-11",
+        "P32-OBJ-19",
         "P32-OBJ-22"
       ]
     },
@@ -141,12 +142,10 @@
     {
       "id": "negative-control-only",
       "status": "not-complete",
-      "rowCount": 1,
+      "rowCount": 0,
       "meaning": "The row currently proves fail-closed behavior or a negative fixture. That is necessary guard evidence, but not positive completion evidence.",
       "nextExecutionRule": "Keep the negative test, then add a separate positive current receipt before allowing the source row to become verified.",
-      "rowRefs": [
-        "P32-OBJ-19"
-      ]
+      "rowRefs": []
     }
   ],
   "planSummaries": [
@@ -179,14 +178,14 @@
     {
       "planId": "3.2",
       "rows": 29,
-      "verifiedRows": 3,
-      "notCompleteRows": 26,
+      "verifiedRows": 4,
+      "notCompleteRows": 25,
       "proofFamilyCounts": {
-        "verified-current-receipt": 3,
+        "verified-current-receipt": 4,
         "fresh-command-replay-needed": 11,
         "governed-state-replay-needed": 12,
         "runner-release-parity-needed": 2,
-        "negative-control-only": 1
+        "negative-control-only": 0
       }
     }
   ],
