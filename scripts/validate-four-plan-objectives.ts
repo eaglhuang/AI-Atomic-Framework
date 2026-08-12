@@ -12,7 +12,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const defaultMatrixPath = path.join(root, 'governance-optimization', 'plan-3x-4x-objective-audit-2026-07-31.json');
 
 function parseArgs(argv: string[]) {
-  const options = { mode: 'validate', input: defaultMatrixPath, json: false };
+  const options = { mode: 'validate', input: defaultMatrixPath, json: false, plan: null as string | null };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--mode') {
@@ -23,12 +23,16 @@ function parseArgs(argv: string[]) {
       options.input = path.resolve(root, String(argv[++index] ?? ''));
       continue;
     }
+    if (arg === '--plan') {
+      options.plan = String(argv[++index] ?? '');
+      continue;
+    }
     if (arg === '--json') {
       options.json = true;
       continue;
     }
     if (arg === '--help' || arg === '-h') {
-      console.log('Usage: node --strip-types scripts/validate-four-plan-objectives.ts --mode validate [--input <json>] [--json]');
+      console.log('Usage: node --strip-types scripts/validate-four-plan-objectives.ts --mode validate [--input <json>] [--plan 3.0|3.1|3.2|4.0] [--json]');
       process.exit(0);
     }
   }
@@ -108,18 +112,24 @@ function main() {
   if (options.mode !== 'validate') throw new Error(`unsupported mode: ${options.mode}`);
   if (!existsSync(options.input)) throw new Error(`objective audit input missing: ${path.relative(root, options.input)}`);
   const parsed = JSON.parse(readFileSync(options.input, 'utf8').replace(/^\uFEFF/, ''));
+  const rows = rowsFromAudit(parsed).filter((row) => options.plan ? row.planId === normalizePlanId(options.plan) : true);
   const verdict = buildFourPlanObjectiveVerdict({
     generatedAt: new Date(0).toISOString(),
-    rows: rowsFromAudit(parsed)
+    rows
   });
+  const outputVerdict = options.plan ? {
+    ...verdict,
+    findings: verdict.findings.filter((finding) => finding.includes(normalizePlanId(options.plan))),
+    status: verdict.findings.some((finding) => finding.includes(normalizePlanId(options.plan))) ? 'not-ready' : 'ready'
+  } : verdict;
   if (options.json) {
-    console.log(JSON.stringify(verdict, null, 2));
-  } else if (verdict.status === 'ready') {
-    console.log(`[validate-four-plan-objectives] ok ${JSON.stringify(verdict.observedDenominators)} digest=${verdict.sortedRowDigest}`);
+    console.log(JSON.stringify(outputVerdict, null, 2));
+  } else if (outputVerdict.status === 'ready') {
+    console.log(`[validate-four-plan-objectives] ok ${JSON.stringify(outputVerdict.observedDenominators)} digest=${outputVerdict.sortedRowDigest}`);
   } else {
-    console.error(`[validate-four-plan-objectives] failed: ${verdict.findings.join('; ')}`);
+    console.error(`[validate-four-plan-objectives] failed: ${outputVerdict.findings.join('; ')}`);
   }
-  process.exit(verdict.status === 'ready' ? 0 : 1);
+  process.exit(outputVerdict.status === 'ready' ? 0 : 1);
 }
 
 main();
