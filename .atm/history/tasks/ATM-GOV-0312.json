@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0312",
   "title": "Coverage certificate, quality vector, and explicit non-claims",
-  "status": "done",
+  "status": "running",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0318",
@@ -103,17 +103,15 @@
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0312-coverage-certificate-quality-vector-and-explicit-non-claims.task.md",
-      "planningCommitSha": null,
+      "planningCommitSha": "5ab9c1863ae0667c137ac77110b81ed1ffc5f3fa",
       "contentDigest": "sha256:c081eca6706495bfba342621646cef2660a4d6df63266854c91e6c8b5ec31ec7",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-31T15:43:09.314Z"
+      "sealedAt": "2026-08-09T16:08:30.014Z"
     }
   },
-  "importedAt": "2026-07-31T15:43:09.314Z",
+  "importedAt": "2026-08-09T16:08:30.014Z",
   "workAdmission": {
-    "recoveryMode": "auto",
-    "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    "recoveryMode": "auto"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -225,17 +223,17 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-08T22-28-40-148Z-lock-cleanup-6beb917f09c3",
-  "lastTransitionAt": "2026-08-08T22:28:40.148Z",
+  "lastTransitionId": "2026-08-12T09-33-22-808Z-claim-334051a7a9df",
+  "lastTransitionAt": "2026-08-12T09:33:22.808Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-captain-2026-08-09",
-  "reservedAt": "2026-08-08T22:23:50.593Z",
-  "promotedAt": "2026-08-08T22:23:50.596Z",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T09:33:18.514Z",
+  "promotedAt": "2026-08-12T09:33:18.518Z",
   "claim": {
-    "actorId": "codex-captain-2026-08-09",
-    "leaseId": "lease-7dcb1f6a16a1",
-    "claimedAt": "2026-08-08T22:23:50.601Z",
-    "heartbeatAt": "2026-08-08T22:28:39.693Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-1d2f31f6499e",
+    "claimedAt": "2026-08-12T09:33:18.524Z",
+    "heartbeatAt": "2026-08-12T09:33:18.524Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0312.json",
@@ -247,102 +245,25 @@
       "tests/cli/plan4-coverage-certificate.test.ts",
       "tests/cli/plan4-quality-vector.test.ts"
     ],
-    "state": "released",
+    "state": "active",
+    "intent": "closeout-only",
     "laneSession": {
-      "laneSessionId": "lane-20260808222350-codex-captain-2026-08-09-d271ad3fae",
+      "laneSessionId": "lane-20260812093319-codex-gpt-5.4-mini-a84f7adbd5",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808222350-codex-captain-2026-08-09-d271ad3fae\""
-    },
-    "reason": "closed"
-  },
-  "startedAt": "2026-08-08T22:23:50.601Z",
-  "startedByActor": "codex-captain-2026-08-09",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-8ecce17124305903",
-    "ticketDigest": "sha256:8ecce1712430590326a7821b5f1705f2bc85b91bfc63911e760c5c07a6b2fc39",
-    "taskId": "ATM-GOV-0312",
-    "origin": "claim",
-    "actorId": "codex-captain-2026-08-09",
-    "laneSessionId": "lane-20260808222350-codex-captain-2026-08-09-d271ad3fae",
-    "claimGeneration": "lease-7dcb1f6a16a1",
-    "issuedAt": "2026-08-08T22:23:50.601Z",
-    "expiresAt": "2026-08-08T22:53:50.601Z",
-    "scopeDigest": "sha256:a066fdbe552bfcf17d398dccac70b2e0525a2918334dbcfce37043599b684df6",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-08T22:23:50.601Z"
-    },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/ATM-GOV-0312.*",
-          ".atm/history/evidence/git-head.jsonl",
-          ".atm/history/task-events/ATM-GOV-0312/**",
-          ".atm/history/tasks/ATM-GOV-0312.json",
-          "packages/core/src/evidence/coverage-certificate.ts",
-          "packages/core/src/evidence/index.ts",
-          "packages/core/src/evidence/quality-vector.ts",
-          "schemas/evidence/quality-certificate.schema.json",
-          "tests/catalog/groups/test_group_plan4_quality_certificate.shard.json",
-          "tests/cli/plan4-coverage-certificate.test.ts",
-          "tests/cli/plan4-quality-vector.test.ts"
-        ],
-        "digest": "sha256:39a7c6e29d916cfabe0a07bbe63cb1848c4726ea4c62194dcf5d98b1d02fbae5"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [
-      {
-        "path": "artifacts/generated/skill-corpus-audit.json",
-        "observedDigest": "sha256:0d5ed1bc03405a6875f8a6a9695c02ed6a43f7c6224758da6074392dd538e08b",
-        "producerTaskId": "TASK-SKL-0028",
-        "artifactSchemaId": "atm.skillCorpusAudit.v1",
-        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
-        "sourceDigest": "sha256:0ffedd9d1b17c336126113c0470433dfd3f5f6bfa74dfccff7f447b593ea5f2c"
-      }
-    ],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "enabled",
-      "reasons": [
-        "shared-surface"
-      ],
-      "maxSavePoints": 2,
-      "perTaskByteBudget": 16777216,
-      "repositoryByteBudget": 268435456,
-      "handoffTtlSeconds": 604800,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812093319-codex-gpt-5.4-mini-a84f7adbd5\""
     }
   },
-  "startedBySessionId": "session-20260808222350-codex-captain-2026-08-09-ATM-GOV-0312-3ba3ae2c2a",
+  "startedAt": "2026-08-12T09:33:18.524Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260812093318-codex-gpt-5.4-mini-ATM-GOV-0312-2113f790c2",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0312",
-    "batchId": "batch-e641205eb5c4",
-    "scopeKey": "tasks-0670222abab7",
-    "queueId": "queue-f9f3c875d9098cdd",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-221d8a9c999b32de",
     "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0312.*",
@@ -360,22 +281,15 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "14c4e549c8dc2ca9963870cafce4241252e49a297f14b74c1fb7cebb70d07117",
-    "actorId": "codex-captain-2026-08-09",
-    "sessionId": "session-20260808222350-codex-captain-2026-08-09-ATM-GOV-0312-3ba3ae2c2a",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260812093318-codex-gpt-5.4-mini-ATM-GOV-0312-2113f790c2",
     "laneSession": {
-      "laneSessionId": "lane-20260808222350-codex-captain-2026-08-09-d271ad3fae",
+      "laneSessionId": "lane-20260812093319-codex-gpt-5.4-mini-a84f7adbd5",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808222350-codex-captain-2026-08-09-d271ad3fae\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812093319-codex-gpt-5.4-mini-a84f7adbd5\""
     },
-    "createdAt": "2026-08-08T22:24:01.569Z",
-    "status": "released",
-    "released": true,
-    "releasedAt": "2026-08-08T22:28:40.145Z",
-    "releasedBy": "codex-captain-2026-08-09"
-  },
-  "closedAt": "2026-08-08T22:28:39.693Z",
-  "closedByActor": "codex-captain-2026-08-09",
-  "closedBySessionId": "session-20260808222350-codex-captain-2026-08-09-ATM-GOV-0312-3ba3ae2c2a",
-  "closurePacket": ".atm/history/evidence/ATM-GOV-0312.closure-packet.json"
+    "createdAt": "2026-08-12T09:33:22.807Z",
+    "status": "active"
+  }
 }
