@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T18-48-38-349Z-close-7b1e95b23870",
+  "taskId": "ATM-GOV-0337",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812183620-codex-gpt-5.4-mini-ATM-GOV-0337-e62a2cc5e1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0337.json",
+  "taskSha256": "sha256:2a36f1233677a4908f6608d17b0bb688b4dacffaec667947cbf0011247bd4cd8",
+  "createdAt": "2026-08-12T18:48:38.349Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0337 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812183620-codex-gpt-5.4-mini-ATM-GOV-0337-e62a2cc5e1",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0337.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/core/real-shadow-comparison.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T18:48:38.339Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0337.*",
+        ".atm/history/task-events/ATM-GOV-0337/**",
+        ".atm/history/tasks/ATM-GOV-0337.json",
+        "docs/reports/plan4-real-shadow-comparison.json",
+        "packages/core/src/evidence/shadow-comparison.ts",
+        "packages/core/src/maps/shadow-comparator.ts",
+        "schemas/evidence/shadow-comparison.schema.json",
+        "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+        "tests/cli/plan4-shadow-comparison.test.ts",
+        "tests/core/real-shadow-comparison.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/shadow-comparison.ts",
+        "packages/core/src/maps/shadow-comparator.ts",
+        "schemas/evidence/shadow-comparison.schema.json",
+        "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+        "tests/cli/plan4-shadow-comparison.test.ts",
+        "tests/core/real-shadow-comparison.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

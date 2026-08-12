@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0337",
   "title": "Run real selected-versus-full shadow comparison",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0336"
@@ -153,8 +153,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T18-38-43-595Z-renew-3b721a1ebed4",
-  "lastTransitionAt": "2026-08-12T18:38:43.595Z",
+  "lastTransitionId": "2026-08-12T18-48-38-543Z-lock-cleanup-dbc61ae53df0",
+  "lastTransitionAt": "2026-08-12T18:48:38.543Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T18:36:20.105Z",
@@ -163,7 +163,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-883db4329f5d",
     "claimedAt": "2026-08-12T18:36:20.112Z",
-    "heartbeatAt": "2026-08-12T18:38:42.939Z",
+    "heartbeatAt": "2026-08-12T18:48:38.347Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0337.*",
@@ -177,13 +177,14 @@
       "tests/cli/plan4-shadow-comparison.test.ts",
       "tests/core/real-shadow-comparison.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
       "status": "active",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T18:36:20.112Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -295,6 +296,13 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
     },
     "createdAt": "2026-08-12T18:36:24.459Z",
-    "status": "active"
-  }
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T18:48:38.541Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-12T18:48:38.347Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812183620-codex-gpt-5.4-mini-ATM-GOV-0337-e62a2cc5e1",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0337.closure-packet.json"
 }
