@@ -61,13 +61,13 @@
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0316-plan-4-0-hostile-dual-captain-dogfood-and-phase-exit-saturation.task.md",
-      "planningCommitSha": null,
+      "planningCommitSha": "5ab9c1863ae0667c137ac77110b81ed1ffc5f3fa",
       "contentDigest": "sha256:7389862e05cd20ff4d9e06fe88f761ae35e1393b01e950e3ed60c8b4c6a275c5",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-31T15:19:45.315Z"
+      "sealedAt": "2026-08-09T16:09:52.276Z"
     }
   },
-  "importedAt": "2026-07-31T15:19:45.315Z",
+  "importedAt": "2026-08-09T16:09:52.276Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
@@ -161,68 +161,121 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-08T23-00-50-444Z-lock-cleanup-7266006a0f2e",
-  "lastTransitionAt": "2026-08-08T23:00:50.444Z",
+  "lastTransitionId": "2026-08-12T13-09-10-565Z-lock-cleanup-7b0f1abc658e",
+  "lastTransitionAt": "2026-08-12T13:09:10.565Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-captain-2026-08-09",
-  "reservedAt": "2026-08-08T22:56:47.220Z",
-  "promotedAt": "2026-08-08T22:56:47.223Z",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T12:32:37.417Z",
+  "promotedAt": "2026-08-12T12:32:37.421Z",
   "claim": {
-    "actorId": "codex-captain-2026-08-09",
-    "leaseId": "lease-d6db0d7739d8",
-    "claimedAt": "2026-08-08T22:56:47.226Z",
-    "heartbeatAt": "2026-08-08T23:00:50.247Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-46c9b5ddf2e3",
+    "claimedAt": "2026-08-12T12:32:37.424Z",
+    "heartbeatAt": "2026-08-12T13:09:10.441Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0316.*",
+      ".atm/history/task-events/ATM-GOV-0316/**",
       ".atm/history/tasks/ATM-GOV-0316.json",
       "packages/cli/src",
       "packages/core/src",
+      "scripts/run-sealed-runner-build.test.ts",
+      "scripts/run-sealed-runner-build.ts",
       "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
-      "tests/cli/plan4-hostile-dual-captain.test.ts"
+      "tests/cli/plan4-hostile-dual-captain.test.ts",
+      "tests/cli/taskflow-stale-runner-lane.test.ts"
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf\""
+      "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812102637-codex-gpt-5.4-mini-68074efbfd\""
     },
     "reason": "closed"
   },
-  "startedAt": "2026-08-08T22:56:47.226Z",
-  "startedByActor": "codex-captain-2026-08-09",
+  "startedAt": "2026-08-12T12:32:37.424Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260812123237-codex-gpt-5.4-mini-ATM-GOV-0316-2a16ba7ecd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0316",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-7fa1a58ddaf12223",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0316.*",
+      ".atm/history/task-events/ATM-GOV-0316/**",
+      ".atm/history/tasks/ATM-GOV-0316.json",
+      "packages/cli/src",
+      "packages/core/src",
+      "scripts/run-sealed-runner-build.test.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+      "tests/cli/plan4-hostile-dual-captain.test.ts",
+      "tests/cli/taskflow-stale-runner-lane.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0316-plan-4-0-hostile-dual-captain-dogfood-and-phase-exit-saturation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0316-plan-4-0-hostile-dual-captain-dogfood-and-phase-exit-saturation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812102637-codex-gpt-5.4-mini-68074efbfd\""
+    },
+    "createdAt": "2026-08-12T12:32:38.672Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T13:09:10.562Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-25c662371b5299bf",
-    "ticketDigest": "sha256:25c662371b5299bf32c084df04108710e3d725df4296c71a788d8ae384cc8aee",
+    "ticketId": "wat-4ab31d3ff6bd9082",
+    "ticketDigest": "sha256:4ab31d3ff6bd9082530dffae878aa6fc62ad6e7dc633f939cb8d35cd206a8e9f",
     "taskId": "ATM-GOV-0316",
     "origin": "claim",
-    "actorId": "codex-captain-2026-08-09",
-    "laneSessionId": "lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf",
-    "claimGeneration": "lease-d6db0d7739d8",
-    "issuedAt": "2026-08-08T22:56:47.226Z",
-    "expiresAt": "2026-08-08T23:26:47.226Z",
-    "scopeDigest": "sha256:4c457166e33deb7cfc273d97e219c41f03f15b1e330dff363842cc033627543a",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
+    "claimGeneration": "lease-46c9b5ddf2e3",
+    "issuedAt": "2026-08-12T13:01:41.926Z",
+    "expiresAt": "2026-08-12T13:31:41.926Z",
+    "scopeDigest": "sha256:d427dcd8e56fc2460f8678dcc9dd77d3fb581056530902e1eaf0ef8174e42c32",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-08T22:56:47.226Z"
+      "selectedAt": "2026-08-12T13:01:41.926Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0316.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0316/**",
           ".atm/history/tasks/ATM-GOV-0316.json",
           "packages/cli/src",
           "packages/core/src",
+          "scripts/run-sealed-runner-build.test.ts",
+          "scripts/run-sealed-runner-build.ts",
           "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
-          "tests/cli/plan4-hostile-dual-captain.test.ts"
+          "tests/cli/plan4-hostile-dual-captain.test.ts",
+          "tests/cli/taskflow-stale-runner-lane.test.ts"
         ],
-        "digest": "sha256:b85c1bc35fa5f0818b95ba38d100c51ded1872d80ea0484e337131118b0885c5"
+        "digest": "sha256:50199e1d447a31fbd04c16c8b859fbe22079f2a5e6846893acda1587c41835b0"
       },
       {
         "kind": "lifecycle-operation",
@@ -241,16 +294,7 @@
         "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
       }
     ],
-    "deferredForeignResidue": [
-      {
-        "path": "artifacts/generated/skill-corpus-audit.json",
-        "observedDigest": "sha256:0d5ed1bc03405a6875f8a6a9695c02ed6a43f7c6224758da6074392dd538e08b",
-        "producerTaskId": "TASK-SKL-0028",
-        "artifactSchemaId": "atm.skillCorpusAudit.v1",
-        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
-        "sourceDigest": "sha256:0ffedd9d1b17c336126113c0470433dfd3f5f6bfa74dfccff7f447b593ea5f2c"
-      }
-    ],
+    "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
       "resolvedMode": "enabled",
@@ -265,44 +309,8 @@
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
   },
-  "startedBySessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
-    "taskId": "ATM-GOV-0316",
-    "batchId": "batch-e641205eb5c4",
-    "scopeKey": "tasks-0670222abab7",
-    "queueId": "queue-529cb54757e2c5bc",
-    "queueIndex": 0,
-    "allowedFiles": [
-      ".atm/history/evidence/ATM-GOV-0316.*",
-      ".atm/history/task-events/ATM-GOV-0316/**",
-      ".atm/history/tasks/ATM-GOV-0316.json",
-      "packages/cli/src",
-      "packages/core/src",
-      "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
-      "tests/cli/plan4-hostile-dual-captain.test.ts"
-    ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
-    "allowPlanningMirror": false,
-    "promptHash": "689ca4ec93877f9aec68e85fcb93732ff4cc15914fd8899de80558e0683eddaa",
-    "actorId": "codex-captain-2026-08-09",
-    "sessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
-    "laneSession": {
-      "laneSessionId": "lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808225647-codex-captain-2026-08-09-1e1742c9bf\""
-    },
-    "createdAt": "2026-08-08T22:56:50.315Z",
-    "status": "released",
-    "released": true,
-    "releasedAt": "2026-08-08T23:00:50.442Z",
-    "releasedBy": "codex-captain-2026-08-09"
-  },
-  "closedAt": "2026-08-08T23:00:50.248Z",
-  "closedByActor": "codex-captain-2026-08-09",
-  "closedBySessionId": "session-20260808225647-codex-captain-2026-08-09-ATM-GOV-0316-abe003e73c",
+  "closedAt": "2026-08-12T13:09:10.441Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812123237-codex-gpt-5.4-mini-ATM-GOV-0316-2a16ba7ecd",
   "closurePacket": ".atm/history/evidence/ATM-GOV-0316.closure-packet.json"
 }

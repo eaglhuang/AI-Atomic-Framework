@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-7a732d29e2bc",
+  "recordedAt": "2026-08-12T12:51:02.406Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0316",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0316 --actor codex-gpt-5.4-mini --add scripts/run-sealed-runner-build.ts,scripts/run-sealed-runner-build.test.ts --reason \"Add the runner publication synchronization regression that prevents overwriting pre-existing generated WIP.\" --emergency-approval EMG-ATM-GOV-0316-865f41d6a2 --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0316-865f41d6a2",
+  "reason": "Add the runner publication synchronization regression that prevents overwriting pre-existing generated WIP.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T12-51-02-405Z-EMG-ATM-GOV-0316-865f41d6a2.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

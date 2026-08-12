@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T12-51-02-409Z-scope-amendment-9823529cb7e3",
+  "taskId": "ATM-GOV-0316",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0316.json",
+  "taskSha256": "sha256:b5f37bb9a7745efd8b9d8ee22a60ac358c78d4c0143f33f00b3b4d041ffcc05c",
+  "createdAt": "2026-08-12T12:51:02.409Z",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0316 --actor codex-gpt-5.4-mini --add \"scripts/run-sealed-runner-build.ts,scripts/run-sealed-runner-build.test.ts\" --reason \"Add the runner publication synchronization regression that prevents overwriting pre-existing generated WIP.\" --emergency-approval EMG-ATM-GOV-0316-865f41d6a2 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Add the runner publication synchronization regression that prevents overwriting pre-existing generated WIP."
+  }
+}

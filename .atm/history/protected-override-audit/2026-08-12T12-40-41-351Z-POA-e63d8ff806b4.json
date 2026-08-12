@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-e63d8ff806b4",
+  "recordedAt": "2026-08-12T12:40:41.351Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0316",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0316 --actor codex-gpt-5.4-mini --add tests/cli/taskflow-stale-runner-lane.test.ts --reason \"Repair the stale-runner fixture so its receipt models the current generic task-owned output inventory contract.\" --emergency-approval EMG-ATM-GOV-0316-c7c816cf25 --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0316-c7c816cf25",
+  "reason": "Repair the stale-runner fixture so its receipt models the current generic task-owned output inventory contract.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T12-40-41-349Z-EMG-ATM-GOV-0316-c7c816cf25.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

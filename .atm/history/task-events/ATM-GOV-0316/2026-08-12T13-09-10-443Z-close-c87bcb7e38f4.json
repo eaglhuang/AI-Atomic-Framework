@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T13-09-10-443Z-close-c87bcb7e38f4",
+  "taskId": "ATM-GOV-0316",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812123237-codex-gpt-5.4-mini-ATM-GOV-0316-2a16ba7ecd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0316.json",
+  "taskSha256": "sha256:a55a1146d6f76be0cd3421c0604db143f226da3aa15102f40017604ff6c4ba78",
+  "createdAt": "2026-08-12T13:09:10.443Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0316 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6 --historical-delivery 1d9d9e391a6e56eb7365e4796ca9f71fe5eb0e8c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812123237-codex-gpt-5.4-mini-ATM-GOV-0316-2a16ba7ecd",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0316.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-hostile-dual-captain.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T13:09:10.434Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0316.*",
+        ".atm/history/task-events/ATM-GOV-0316/**",
+        ".atm/history/tasks/ATM-GOV-0316.json",
+        "packages/cli/src",
+        "packages/core/src",
+        "scripts/run-sealed-runner-build.test.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+        "tests/cli/plan4-hostile-dual-captain.test.ts",
+        "tests/cli/taskflow-stale-runner-lane.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src",
+        "packages/core/src",
+        "scripts/run-sealed-runner-build.test.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "tests/catalog/groups/test_group_plan4_hostile_dogfood.shard.json",
+        "tests/cli/plan4-hostile-dual-captain.test.ts",
+        "tests/cli/taskflow-stale-runner-lane.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
