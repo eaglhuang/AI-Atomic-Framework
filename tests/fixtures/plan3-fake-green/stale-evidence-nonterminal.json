@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.plan3StaleEvidenceNonterminalFixture.v1",
+  "specVersion": "0.1.0",
+  "evidence": {
+    "kind": "stale-reference",
+    "source": "historical-closure-packet",
+    "freshCommandReceipt": null,
+    "currentDigest": null,
+    "currentHead": null
+  },
+  "expectedVerdict": "not-complete",
+  "forbiddenVerdicts": ["verified", "pass", "complete"],
+  "diagnostics": ["stale-evidence-is-nonterminal", "stale-reference-must-not-green"]
+}

@@ -46,7 +46,7 @@ function main() {
   const verifiedRefs = new Set((verifiedFamily?.rowRefs ?? []).map(String));
   const positiveRows = Array.isArray(report.positiveRows) ? report.positiveRows : [];
   const positiveRefs = positiveRows.map((row: any) => String(row.objectiveId));
-  if (positiveRefs.length !== 19) findings.push(`positive row count mismatch: expected 19, observed ${positiveRefs.length}`);
+  if (positiveRefs.length !== 20) findings.push(`positive row count mismatch: expected 20, observed ${positiveRefs.length}`);
   if (new Set(positiveRefs).size !== positiveRefs.length) findings.push('duplicate positive rows');
   for (const rowRef of positiveRefs) {
     if (!verifiedRefs.has(rowRef)) findings.push(`positive row was not consumed into verified-current-receipt family: ${rowRef}`);
@@ -54,7 +54,7 @@ function main() {
   if (report.totals?.freshCommandRows !== freshFamily?.rowCount) findings.push('freshCommandRows mismatch');
   if (report.totals?.positiveReceiptRowsReadyForSourceRecompute !== 0) findings.push('positiveReceiptRowsReadyForSourceRecompute must be zero after consumption');
   if (report.totals?.positiveReceiptRowsConsumedIntoSourceReplay !== positiveRefs.length) findings.push('positiveReceiptRowsConsumedIntoSourceReplay mismatch');
-  if (report.totals?.objectiveAlignedNegativeControlRowsConsumed !== 6) findings.push('objectiveAlignedNegativeControlRowsConsumed mismatch');
+  if (report.totals?.objectiveAlignedNegativeControlRowsConsumed !== 7) findings.push('objectiveAlignedNegativeControlRowsConsumed mismatch');
   if (report.totals?.sourceRowsMutatedByThisReport !== positiveRefs.length) findings.push('sourceRowsMutatedByThisReport mismatch');
 
   const commandRuns = Array.isArray(report.commandReceipts) ? report.commandReceipts : [];

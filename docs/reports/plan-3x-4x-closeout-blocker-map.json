@@ -15,7 +15,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:2f167d542e748c3f4f9de09eb3f2a6f3e2442ebe953264f35dba2069e8955347"
+      "digest": "sha256:1c2b85c1430a75068e81e19d5569d934aa9056468d7b639fe4246481f9ce484f"
     },
     {
       "path": "docs/reports/plan-4-foundation-replay.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:a9ad9e3381b331896628950786ab83c02af3c1f8b97754e3beda804f859351f0"
+      "digest": "sha256:f07e2aa1c59f80bf3508b26aa1000cd956c9ad83d5576b09128eeb6dad9912b8"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:44b4bda87458cdc940c5c0f79d0d6cf452fdbbc2de95d3563747628b5587a3c0"
+      "digest": "sha256:e6a20e776d285f9ef905dccbe838dade2bd2ffba90cb55c3ef4ca872855fb115"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
@@ -59,12 +59,12 @@
     },
     {
       "path": "docs/reports/plan-3x-positive-current-receipts.json",
-      "digest": "sha256:1e3ac7e52db0c8c2388f57998f16105a75ab4d016335ea13d0228cd3c5cf08a2"
+      "digest": "sha256:20f44efae7d39afb22bb6c6dfb9aab92627ff31eaccdcb35fcb0b5c698ad6cff"
     }
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 67,
+    "unresolvedObjectiveRows": 66,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -78,8 +78,8 @@
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
     "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
-    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 19,
-    "plan3xObjectiveAlignedNegativeControlRowsConsumed": 6,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 20,
+    "plan3xObjectiveAlignedNegativeControlRowsConsumed": 7,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
     "backlogNeedsTaskCardBeforeFinalRelease": 133
@@ -105,9 +105,9 @@
       "planId": "3.2",
       "source": "docs/reports/plan-3-2-objective-replay.json",
       "objectiveRows": 29,
-      "verifiedRows": 9,
-      "unresolvedRows": 20,
-      "primaryBlocker": "HEAD CAS, row-addressability, timeout non-terminal behavior, public-attestation boundary, unknown-evidence rejection, machine-readable blocker structure, dashboard consumption, provenance mismatch rejection, and missing-row rejection have current evidence consumed into source replay; remaining shared closure controls, sealed bundle, and provenance rows are represented but not terminally consumed"
+      "verifiedRows": 10,
+      "unresolvedRows": 19,
+      "primaryBlocker": "HEAD CAS, row-addressability, timeout non-terminal behavior, stale-evidence rejection, public-attestation boundary, unknown-evidence rejection, machine-readable blocker structure, dashboard consumption, provenance mismatch rejection, and missing-row rejection have current evidence consumed into source replay; remaining shared closure controls, sealed bundle, and provenance rows are represented but not terminally consumed"
     },
     {
       "planId": "4.0",
@@ -123,7 +123,7 @@
       "id": "B1-current-row-proof",
       "scope": ["Plan 3.0", "Plan 3.1", "Plan 3.2"],
       "status": "partial-source-recomputed",
-      "reason": "replay reports establish denominator and row evidence surfaces; nineteen Plan 3.x rows now have current objective-aligned receipts consumed into source replay, while the aggregate source replay verdict remains not-complete",
+      "reason": "replay reports establish denominator and row evidence surfaces; twenty Plan 3.x rows now have current objective-aligned receipts consumed into source replay, while the aggregate source replay verdict remains not-complete",
       "requiredOutcome": "continue executing docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
     },
     {
