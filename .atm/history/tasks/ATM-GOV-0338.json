@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0338",
   "title": "Prove six-editor adapter parity from sealed source",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0337"
@@ -162,8 +162,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T18-50-30-800Z-scope-amendment-ac0867550cf8",
-  "lastTransitionAt": "2026-08-12T18:50:30.800Z",
+  "lastTransitionId": "2026-08-12T18-56-12-339Z-lock-cleanup-3ab7f5c26bad",
+  "lastTransitionAt": "2026-08-12T18:56:12.339Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T18:49:24.772Z",
@@ -172,7 +172,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-61b4d4773205",
     "claimedAt": "2026-08-12T18:49:24.781Z",
-    "heartbeatAt": "2026-08-12T18:49:24.781Z",
+    "heartbeatAt": "2026-08-12T18:56:12.134Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0338.*",
@@ -190,14 +190,14 @@
       "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
       "tests/cli/six-editor-adapter-parity.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
       "status": "active",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T18:49:24.781Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -313,6 +313,13 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
     },
     "createdAt": "2026-08-12T18:49:29.528Z",
-    "status": "active"
-  }
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T18:56:12.336Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-12T18:56:12.134Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812184924-codex-gpt-5.4-mini-ATM-GOV-0338-2f0e134b99",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0338.closure-packet.json"
 }

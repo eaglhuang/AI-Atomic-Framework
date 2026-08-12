@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T18-56-12-136Z-close-5c051bb934cc",
+  "taskId": "ATM-GOV-0338",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812184924-codex-gpt-5.4-mini-ATM-GOV-0338-2f0e134b99",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0338.json",
+  "taskSha256": "sha256:4007e5e28139d4a5cea896dff3731b77a3832a6aaa4c4ac7947ca38af1d2672d",
+  "createdAt": "2026-08-12T18:56:12.136Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0338 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812184924-codex-gpt-5.4-mini-ATM-GOV-0338-2f0e134b99",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0338.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/six-editor-adapter-parity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T18:56:12.125Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0338.*",
+        ".atm/history/task-events/ATM-GOV-0338/**",
+        ".atm/history/tasks/ATM-GOV-0338.json",
+        ".claude/skills/",
+        ".cursor/rules/skills/",
+        ".gemini/commands/",
+        ".github/instructions/",
+        "docs/reports/plan4-six-editor-adapter-parity.json",
+        "integrations/",
+        "packages/core/src/evidence/adapter-parity.ts",
+        "scripts/validate-integration-adapter.ts",
+        "templates/skills/",
+        "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+        "tests/cli/six-editor-adapter-parity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "integrations/",
+        "packages/core/src/evidence/adapter-parity.ts",
+        "scripts/validate-integration-adapter.ts",
+        "templates/skills/",
+        "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+        "tests/cli/six-editor-adapter-parity.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
