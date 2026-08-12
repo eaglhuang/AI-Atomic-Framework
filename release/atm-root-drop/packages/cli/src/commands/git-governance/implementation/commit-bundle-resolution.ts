@@ -59,7 +59,7 @@ import {
   inspectProtectedGovernanceStateDestructiveChanges,
 } from "../protected-governance-state.ts";
 
-import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles, readUnstagedFiles } from './git-index-transaction.ts';
+import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, deferStagedFilePaths, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles, readUnstagedFiles } from './git-index-transaction.ts';
 
 import { parseTaskClaim } from './identity-check-command.ts';
 import { createCommitAuthorityPolicy } from './commit-authority-scopes.ts';
@@ -186,14 +186,22 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     preexistingStagedFiles.length > 0 &&
     input.apply &&
     !hasAuthorizedIndexLease &&
+    (protectedForeignDeferAuthorized || lifecycleAuthorizedForeignDefer) &&
     (protectedForeignStagedOwnershipFiles.length === 0 ||
       (protectedForeignDeferAuthorized || lifecycleAuthorizedForeignDefer))
   ) {
     deferredForeignStagedFiles = preexistingStagedFiles;
-    // The later sealed candidate index already contains only `commitFiles`.
-    // Removing and restoring foreign entries in the shared index adds a broad
-    // contention window without changing that candidate tree. Keep the live
-    // index untouched; the sealed transaction is the isolation boundary.
+    deferredForeignStagedSnapshot = deferStagedFilePaths(
+      input.cwd,
+      input.taskId,
+      preexistingStagedFiles,
+    );
+    stagedFiles = readStagedFiles(input.cwd);
+    gitIndexOwnership = inspectGitIndexOwnership({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      stagedFiles,
+    });
   }
   const dirtyFiles = listTaskScopedWorktreeDirtyFiles(input.cwd);
   const activeDeferredSnapshot = normalizeRelativePath(

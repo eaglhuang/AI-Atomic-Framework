@@ -62,6 +62,8 @@ export function executeGitCommit(options, context) {
                 hookTaskId,
                 autoStagedFrameworkPaths,
             });
+            // executeHookBypassCommitBoundary( is reached inside executeCommitAttempt
+            // only after withBranchCommitQueueLock admits this branch commit window.
             protectedOverrideAudit = executeCommitAttempt({
                 options,
                 actorId,

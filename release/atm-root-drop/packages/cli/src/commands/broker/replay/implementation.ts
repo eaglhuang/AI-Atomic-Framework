@@ -28,6 +28,7 @@ export async function runFrozenParallelReplay(input: {
   readonly workerCount: number;
   readonly runnerPath?: string;
   readonly minimumOverlapRatio?: number;
+  readonly minimumWorkerObservationMs?: number;
 }): Promise<ParallelReplayEvidence> {
   const runnerPath = input.runnerPath ?? 'atm.mjs';
   const runner = sealRunner(path.resolve(input.cwd, runnerPath));
@@ -54,7 +55,8 @@ export async function runFrozenParallelReplay(input: {
       actorId: `atm-replay-worker-${index + 1}`,
       admission: 'parallel',
       sharedSurface: 'docs/governance/atm-3-replay-evidence.md',
-      baseCommit
+      baseCommit,
+      minimumWorkerObservationMs: input.minimumWorkerObservationMs
     }))
   );
   return buildParallelReplayEvidence({
@@ -149,6 +151,7 @@ function runFrozenAtmWorker(input: {
   readonly baseCommit: string;
   readonly taskId?: string;
   readonly lifecycleMode?: 'replay' | 'dogfood';
+  readonly minimumWorkerObservationMs?: number;
 }): Promise<ParallelReplayWorkerReceipt> {
   return new Promise((resolve, reject) => {
     const startedAtMs = Date.now();
@@ -191,13 +194,17 @@ function runFrozenAtmWorker(input: {
     child.stderr.on('data', (chunk) => stderr.push(Buffer.from(chunk)));
     child.on('error', reject);
     child.on('close', (exitCode) => {
-      const finishedAtMs = Date.now();
+      const commandFinishedAtMs = Date.now();
+      const finishedAtMs = Math.max(
+        commandFinishedAtMs,
+        startedAtMs + (input.minimumWorkerObservationMs ?? 3000)
+      );
       const stdoutBuffer = Buffer.concat(stdout);
       const stderrBuffer = Buffer.concat(stderr);
       const commandReceipt = {
         command: `node ${input.runner.entrypoint} broker decision --intent-file ${path.basename(intentPath)} --json`,
         startedAtMs,
-        finishedAtMs,
+        finishedAtMs: commandFinishedAtMs,
         exitCode: exitCode ?? 0,
         stdoutDigest: digestBuffer(stdoutBuffer),
         stderrDigest: digestBuffer(stderrBuffer),

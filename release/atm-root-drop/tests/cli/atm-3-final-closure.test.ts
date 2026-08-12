@@ -1,172 +1,120 @@
 import assert from 'node:assert/strict';
-import { buildAtm3FinalClosureVerdictFromEvidence } from '../../packages/cli/src/commands/broker/parallel-admission/final-verdict.ts';
-import { buildPlan3FinalClosureVerdict } from '../../packages/cli/src/commands/broker/replay/final-closure-reader.ts';
-import { buildParallelReplayDogfoodEvidence, buildParallelReplayEvidence, buildParallelReplayScenario } from '../../packages/core/src/broker/replay/index.ts';
+import { spawnSync } from 'node:child_process';
 
-const scenario = buildParallelReplayScenario({
-  scenarioId: 'atm-3-final-closure',
-  generatedAt: '2026-07-21T00:00:00.000Z',
-  runner: { entrypoint: 'atm.mjs', digest: `sha256:${'a'.repeat(64)}` },
-  thresholds: {
-    starvationThresholdMs: 30000,
-    thresholdSource: 'paired-baseline-evidence',
-    minimumParallelOverlapRatio: 0.3,
-    maximumSerializedAdmissionRatio: 0.7
-  },
-  coverage: { digest: `sha256:${'b'.repeat(64)}` },
-  historicalInputs: [{ arm: 'AB' }, { arm: 'BA' }],
-  failureShapes: []
-});
+const good = spawnSync(process.execPath, [
+  '--strip-types',
+  'scripts/validate-atm-3-final-closure.ts',
+  '--mode',
+  'validate',
+  '--json'
+], { encoding: 'utf8' });
 
-const replayEvidence = buildParallelReplayEvidence({
-  scenario,
-  workerReceipts: [
-    {
-      workerId: 'a',
-      actorId: 'a',
-      processId: 1,
-      startedAtMs: 0,
-      finishedAtMs: 100,
-      runner: scenario.runner,
-      admission: 'parallel',
-      sideEffects: ['broker-decision:execute-now'],
-      exitCode: 0,
-      stdoutDigest: 'sha256:ok',
-      stderrDigest: 'sha256:ok',
-      commandReceipts: commandReceipts('a', 0, 100, 210)
-    },
-    {
-      workerId: 'b',
-      actorId: 'b',
-      processId: 2,
-      startedAtMs: 5,
-      finishedAtMs: 95,
-      runner: scenario.runner,
-      admission: 'parallel',
-      sideEffects: ['broker-decision:execute-now'],
-      exitCode: 0,
-      stdoutDigest: 'sha256:ok',
-      stderrDigest: 'sha256:ok',
-      commandReceipts: commandReceipts('b', 5, 95, 210)
-    }
-  ],
-  serialMakespanMs: 250,
-  parallelMakespanMs: 100,
-  costRatio: 1.02,
-  realTaskDogfood: dogfoodEvidence()
-});
+assert.equal(good.status, 0, good.stderr || good.stdout);
+const goodJson = JSON.parse(good.stdout);
+assert.equal(goodJson.schemaId, 'atm.planObjectiveReplayValidation.v1');
+assert.equal(goodJson.ok, true);
+assert.equal(goodJson.planId, '3.0');
+assert.equal(goodJson.rowCount, 17);
+assert.equal(goodJson.notComplete, 17);
 
-const verdict = buildAtm3FinalClosureVerdictFromEvidence({
-  actorId: 'tester',
-  replayEvidence,
-  inheritedAcceptanceOpenCount: 0,
-  blockerBacklogIds: [],
-  readinessProbeFailures: [],
-  realTaskDogfoodIntersection: ['docs/governance/atm-3-replay-evidence.md'],
-  rollbackExercised: true,
-  sourceFrozenReleaseParity: true,
-  now: '2026-07-21T00:00:00.000Z'
-});
+const plan31 = spawnSync(process.execPath, [
+  '--strip-types',
+  'scripts/validate-atm-3-final-closure.ts',
+  '--mode',
+  'validate',
+  '--plan',
+  '3.1',
+  '--expect-rows',
+  '23',
+  '--input',
+  'docs/reports/plan-3-1-objective-replay.json',
+  '--json'
+], { encoding: 'utf8' });
 
-assert.equal(verdict.schemaId, 'atm.atm3FinalClosureVerdict.v1');
-assert.equal(verdict.decision, 'close');
-assert.equal(verdict.circuitBreakerAction, 'reset-with-digest');
-assert.equal(verdict.blockers.length, 0);
-assert.match(verdict.evidenceDigest, /^sha256:[a-f0-9]{64}$/);
-assert.equal(verdict.policyAfterDecision.tripped, false);
-assert.equal(verdict.policyAfterDecision.resetEvidenceDigest, verdict.evidenceDigest);
+assert.equal(plan31.status, 0, plan31.stderr || plan31.stdout);
+const plan31Json = JSON.parse(plan31.stdout);
+assert.equal(plan31Json.schemaId, 'atm.planObjectiveReplayValidation.v1');
+assert.equal(plan31Json.ok, true);
+assert.equal(plan31Json.planId, '3.1');
+assert.equal(plan31Json.rowCount, 23);
+assert.equal(plan31Json.notComplete, 23);
 
-const noDogfoodEvidence = buildParallelReplayEvidence({
-  scenario,
-  workerReceipts: replayEvidence.workerReceipts,
-  serialMakespanMs: 250,
-  parallelMakespanMs: 100,
-  costRatio: 1.02
-});
-const noDogfoodVerdict = buildAtm3FinalClosureVerdictFromEvidence({
-  actorId: 'tester',
-  replayEvidence: noDogfoodEvidence,
-  inheritedAcceptanceOpenCount: 0,
-  blockerBacklogIds: [],
-  readinessProbeFailures: [],
-  realTaskDogfoodIntersection: ['docs/governance/atm-3-replay-evidence.md'],
-  rollbackExercised: true,
-  sourceFrozenReleaseParity: true
-});
-assert.equal(noDogfoodVerdict.decision, 'remain-open');
-assert.equal(noDogfoodVerdict.blockers.some((entry) => entry.includes('real-task dogfood lifecycle evidence missing')), true);
+const fakeGreen = spawnSync(process.execPath, [
+  '--strip-types',
+  'scripts/validate-atm-3-final-closure.ts',
+  '--mode',
+  'validate',
+  '--input',
+  'tests/fixtures/plan3-fake-green/plan30-incomplete-objective.json',
+  '--json'
+], { encoding: 'utf8' });
 
-const noReceiptEvidence = buildParallelReplayEvidence({
-  scenario,
-  workerReceipts: replayEvidence.workerReceipts.map(({ commandReceipts: _commandReceipts, ...worker }) => worker),
-  serialMakespanMs: 250,
-  parallelMakespanMs: 100,
-  costRatio: 1.02
-});
-const noReceiptVerdict = buildAtm3FinalClosureVerdictFromEvidence({
-  actorId: 'tester',
-  replayEvidence: noReceiptEvidence,
-  inheritedAcceptanceOpenCount: 0,
-  blockerBacklogIds: [],
-  readinessProbeFailures: [],
-  realTaskDogfoodIntersection: ['docs/governance/atm-3-replay-evidence.md'],
-  rollbackExercised: true,
-  sourceFrozenReleaseParity: true
-});
-assert.equal(noReceiptVerdict.decision, 'remain-open');
-assert.equal(noReceiptVerdict.blockers.some((entry) => entry.includes('real multiprocess replay evidence missing')), true);
+assert.notEqual(fakeGreen.status, 0, 'fake-green fixture must fail closed');
+const fakeJson = JSON.parse(fakeGreen.stdout);
+assert.equal(fakeJson.ok, false);
+assert(fakeJson.findings.some((entry: string) => entry.includes('expected 17 objective rows')));
+assert(fakeJson.findings.some((entry: string) => entry.includes('complete verdict requires every row verified')));
 
-const plan31Verdict = buildPlan3FinalClosureVerdict({
-  cwd: process.cwd(),
-  generatedAt: '2026-07-29T00:00:00.000Z',
-  requiredIntersection: ['docs/governance/atm-3-replay-evidence.md']
-});
-assert.equal(plan31Verdict.schemaId, 'atm.plan3FinalClosureVerdict.v1');
-assert.equal(plan31Verdict.immutableHistoryPolicy.historicalTerminalStatusIsSemanticEvidence, false);
-assert.equal(plan31Verdict.immutableHistoryPolicy.producerHealthyLabelsTrusted, false);
-assert.match(plan31Verdict.digest, /^sha256:[a-f0-9]{64}$/);
-assert.ok(plan31Verdict.sourceAvailability.some((source) => source.id === 'validator-governance-verdict'));
-assert.ok(plan31Verdict.counters.sourcesTotal >= plan31Verdict.counters.sourcesAvailable);
-assert.equal(
-  plan31Verdict.verdict === 'close',
-  plan31Verdict.blockers.length === 0,
-  'Plan 3.1 close verdict must be derived from canonical blockers, not caller-provided healthy flags'
-);
+const fakePlan31 = spawnSync(process.execPath, [
+  '--strip-types',
+  'scripts/validate-atm-3-final-closure.ts',
+  '--mode',
+  'validate',
+  '--plan',
+  '3.1',
+  '--expect-rows',
+  '23',
+  '--input',
+  'tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json',
+  '--json'
+], { encoding: 'utf8' });
 
-console.log('atm 3 final closure verdict ok');
+assert.notEqual(fakePlan31.status, 0, 'Plan 3.1 fake-green fixture must fail closed');
+const fakePlan31Json = JSON.parse(fakePlan31.stdout);
+assert.equal(fakePlan31Json.ok, false);
+assert(fakePlan31Json.findings.some((entry: string) => entry.includes('expected 23 objective rows')));
+assert(fakePlan31Json.findings.some((entry: string) => entry.includes('complete verdict requires every row verified')));
 
-function commandReceipts(workerId: string, startedAtMs: number, finishedAtMs: number, count: number) {
-  return Array.from({ length: count }, (_, index) => ({
-    command: `node atm.mjs broker decision --intent-file ${workerId}-${index}.json --json`,
-    startedAtMs,
-    finishedAtMs,
-    exitCode: 0,
-    stdoutDigest: 'sha256:ok',
-    stderrDigest: 'sha256:ok',
-    brokerTicketState: 'execute-now',
-    waitedMs: 0
-  }));
-}
+const plan32 = spawnSync(process.execPath, [
+  '--strip-types',
+  'scripts/validate-atm-3-final-closure.ts',
+  '--mode',
+  'validate',
+  '--plan',
+  '3.2',
+  '--expect-rows',
+  '29',
+  '--input',
+  'docs/reports/plan-3-2-objective-replay.json',
+  '--json'
+], { encoding: 'utf8' });
 
-function dogfoodEvidence() {
-  return buildParallelReplayDogfoodEvidence({
-    declaredIntersection: ['docs/governance/atm-3-replay-evidence.md'],
-    traces: ['ATM-DOGFOOD-A', 'ATM-DOGFOOD-B'].map((taskId, index) => ({
-      taskId,
-      actorId: `captain-${index + 1}`,
-      declaredIntersection: ['docs/governance/atm-3-replay-evidence.md'],
-      preservedIntersection: true,
-      canonicalTicketState: 'execute-now',
-      waitedMs: index,
-      successorWakeup: true,
-      lifecycle: [
-        'claim:registered-task',
-        'canonical-ticket:execute-now',
-        'proposal:isolated',
-        'compose:shared-surface',
-        'successor-wakeup:auto',
-        'close-packet:sealed'
-      ]
-    }))
-  });
-}
+assert.equal(plan32.status, 0, plan32.stderr || plan32.stdout);
+const plan32Json = JSON.parse(plan32.stdout);
+assert.equal(plan32Json.schemaId, 'atm.planObjectiveReplayValidation.v1');
+assert.equal(plan32Json.ok, true);
+assert.equal(plan32Json.planId, '3.2');
+assert.equal(plan32Json.rowCount, 29);
+assert.equal(plan32Json.notComplete, 29);
+
+const fakePlan32 = spawnSync(process.execPath, [
+  '--strip-types',
+  'scripts/validate-atm-3-final-closure.ts',
+  '--mode',
+  'validate',
+  '--plan',
+  '3.2',
+  '--expect-rows',
+  '29',
+  '--input',
+  'tests/fixtures/plan3-fake-green/plan32-incomplete-objective.json',
+  '--json'
+], { encoding: 'utf8' });
+
+assert.notEqual(fakePlan32.status, 0, 'Plan 3.2 fake-green fixture must fail closed');
+const fakePlan32Json = JSON.parse(fakePlan32.stdout);
+assert.equal(fakePlan32Json.ok, false);
+assert(fakePlan32Json.findings.some((entry: string) => entry.includes('expected 29 objective rows')));
+assert(fakePlan32Json.findings.some((entry: string) => entry.includes('complete verdict requires every row verified')));
+
+console.log('atm 3 final closure replay ok');
