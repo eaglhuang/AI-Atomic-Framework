@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0335",
+  "updatedAt": "2026-08-12T18:23:38.541Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "validate:atm-3-final-closure",
+    "validate:four-plan-objectives"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.2 --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:42e631d4dcbfc206d1524016b371cef94c2365156cdc45888f8ace0962b28041",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:four-plan-objectives"
+      ],
+      "generatedAt": "2026-08-12T18:23:32.776Z",
+      "startedAt": "2026-08-12T18:23:32.128Z",
+      "finishedAt": "2026-08-12T18:23:32.776Z",
+      "durationMs": 648,
+      "runnerKind": "dev-source",
+      "sourceCommit": "238f65c8a18bb6d6efe02f2f2e2404e2556362cd",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.2 --expect-rows 29 --input docs/reports/plan-3-2-objective-replay.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e15bef958d053a0dc1bda23da8a5322769e86cbed60a1e3864a291738f70b61f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:atm-3-final-closure"
+      ],
+      "generatedAt": "2026-08-12T18:23:35.433Z",
+      "startedAt": "2026-08-12T18:23:34.804Z",
+      "finishedAt": "2026-08-12T18:23:35.433Z",
+      "durationMs": 629,
+      "runnerKind": "dev-source",
+      "sourceCommit": "238f65c8a18bb6d6efe02f2f2e2404e2556362cd",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aa41125c023da88ec1409b93b9879965d8edf478582d808b2591ad327ef421e9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-12T18:23:38.540Z",
+      "startedAt": "2026-08-12T18:23:37.477Z",
+      "finishedAt": "2026-08-12T18:23:38.540Z",
+      "durationMs": 1063,
+      "runnerKind": "dev-source",
+      "sourceCommit": "238f65c8a18bb6d6efe02f2f2e2404e2556362cd",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
