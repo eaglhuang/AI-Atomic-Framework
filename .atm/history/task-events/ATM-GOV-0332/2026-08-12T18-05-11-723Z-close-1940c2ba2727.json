@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T18-05-11-723Z-close-1940c2ba2727",
+  "taskId": "ATM-GOV-0332",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812175106-codex-gpt-5.4-mini-ATM-GOV-0332-7e3b07464d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0332.json",
+  "taskSha256": "sha256:3e1c0f0d175ca22df1de034d1b3a5c2d9778e0b8e4ad92ae46808fdf51cdb285",
+  "createdAt": "2026-08-12T18:05:11.723Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0332 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812175106-codex-gpt-5.4-mini-ATM-GOV-0332-7e3b07464d",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0332.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/four-plan-objective-denominator.test.ts",
+      "node --strip-types tests/cli/plan-closeout-dashboard-rebuild.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:four-plan-objectives",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T18:05:11.714Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0332.*",
+        ".atm/history/task-events/ATM-GOV-0332/**",
+        ".atm/history/tasks/ATM-GOV-0332.json",
+        "packages/cli/src/commands/task-view.ts",
+        "packages/core/src/broker/replay/dashboard.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/plan-closeout-dashboard.ts",
+        "packages/core/src/evidence/validator-lifecycle.ts",
+        "schemas/evidence/",
+        "scripts/run-validators/implementation.ts",
+        "scripts/validate-four-plan-objectives.ts",
+        "tests/cli/four-plan-objective-denominator.test.ts",
+        "tests/cli/plan-closeout-dashboard-rebuild.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/task-view.ts",
+        "packages/core/src/broker/replay/dashboard.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/plan-closeout-dashboard.ts",
+        "packages/core/src/evidence/validator-lifecycle.ts",
+        "schemas/evidence/",
+        "scripts/run-validators/implementation.ts",
+        "scripts/validate-four-plan-objectives.ts",
+        "tests/cli/four-plan-objective-denominator.test.ts",
+        "tests/cli/plan-closeout-dashboard-rebuild.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
