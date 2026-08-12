@@ -1,0 +1,126 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0349",
+  "updatedAt": "2026-08-12T05:44:43.420Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d1d0bfdc70e4642f953120cfe9b8935ab0aeb89994c306398fef147d85ba331",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+      ],
+      "generatedAt": "2026-08-12T05:32:54.995Z",
+      "startedAt": "2026-08-12T05:32:53.788Z",
+      "finishedAt": "2026-08-12T05:32:54.995Z",
+      "durationMs": 1207,
+      "runnerKind": "dev-source",
+      "sourceCommit": "843878a1e4da3c1971e1687a1cf609a79406ec19",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-12T05:33:09.861Z",
+      "startedAt": "2026-08-12T05:33:00.338Z",
+      "finishedAt": "2026-08-12T05:33:09.861Z",
+      "durationMs": 9523,
+      "runnerKind": "dev-source",
+      "sourceCommit": "843878a1e4da3c1971e1687a1cf609a79406ec19",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d1d0bfdc70e4642f953120cfe9b8935ab0aeb89994c306398fef147d85ba331",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+      ],
+      "generatedAt": "2026-08-12T05:41:03.463Z",
+      "startedAt": "2026-08-12T05:41:02.979Z",
+      "finishedAt": "2026-08-12T05:41:03.463Z",
+      "durationMs": 484,
+      "runnerKind": "dev-source",
+      "sourceCommit": "843878a1e4da3c1971e1687a1cf609a79406ec19",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5e5769b66a1b4982aa44023e654535d93f3fb3620555086b133a328bb3f6c1cc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-12T05:41:10.752Z",
+      "startedAt": "2026-08-12T05:41:10.467Z",
+      "finishedAt": "2026-08-12T05:41:10.752Z",
+      "durationMs": 285,
+      "runnerKind": "dev-source",
+      "sourceCommit": "843878a1e4da3c1971e1687a1cf609a79406ec19",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-12T05:41:25.449Z",
+      "startedAt": "2026-08-12T05:41:16.427Z",
+      "finishedAt": "2026-08-12T05:41:25.449Z",
+      "durationMs": 9022,
+      "runnerKind": "dev-source",
+      "sourceCommit": "843878a1e4da3c1971e1687a1cf609a79406ec19",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e7a59d78b6f4896dd376890f34d9eb5e0084742e780f1a40e09496e8f3c53a04",
+      "stderrSha256": "sha256:b2508debcfb5442e9d8dc13b9e5fb4cbdc34848e11b91d646920da5120e3ae5e",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-12T05:43:01.736Z",
+      "startedAt": "2026-08-12T05:42:19.942Z",
+      "finishedAt": "2026-08-12T05:43:01.736Z",
+      "durationMs": 41794,
+      "runnerKind": "dev-source",
+      "sourceCommit": "843878a1e4da3c1971e1687a1cf609a79406ec19",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-12T05:44:43.419Z",
+      "startedAt": "2026-08-12T05:43:08.925Z",
+      "finishedAt": "2026-08-12T05:44:43.419Z",
+      "durationMs": 94494,
+      "runnerKind": "dev-source",
+      "sourceCommit": "843878a1e4da3c1971e1687a1cf609a79406ec19",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

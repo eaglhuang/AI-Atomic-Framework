@@ -3,7 +3,18 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { categorizeCheckpointCloseFailure } from '../../packages/cli/src/commands/batch/implementation.ts';
+import { buildBatchCheckpointRunnerRecoveryArgs, categorizeCheckpointCloseFailure } from '../../packages/cli/src/commands/batch/runner-recovery-forwarding.ts';
+
+assert.deepEqual(
+  buildBatchCheckpointRunnerRecoveryArgs('EMG-RECOVERY-VALID'),
+  ['--emergency-approval', 'EMG-RECOVERY-VALID', '--allow-stale-runner'],
+  'a supplied recovery approval must make the batch adapter request the protected stale-runner path'
+);
+assert.deepEqual(
+  buildBatchCheckpointRunnerRecoveryArgs(null),
+  [],
+  'without an approval the batch adapter must preserve the stale-runner fail-closed default'
+);
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-batch-checkpoint-recovery-'));
 mkdirSync(repo, { recursive: true });

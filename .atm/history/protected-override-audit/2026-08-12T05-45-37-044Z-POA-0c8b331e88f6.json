@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-0c8b331e88f6",
+  "recordedAt": "2026-08-12T05:45:37.044Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0349",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0349 --message \"fix(batch): bridge runner recovery through protected close\n\nATM-Work-Admission: wat-241bf7c1b8a42f2c sha256:241bf7c1b8a42f2c86818b14e6e98e6887dc816b12b8660e0c1f706fdec8443d\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0349-998e619be7",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T05-45-37-042Z-EMG-ATM-GOV-0349-998e619be7.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

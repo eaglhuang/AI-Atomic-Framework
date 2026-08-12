@@ -1,0 +1,304 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0349",
+  "title": "Bridge batch checkpoint runner recovery through verified lease",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: With a valid, task-scoped `backend.runnerRecovery` emergency approval, batch checkpoint forwards the approval and stale-runner recovery intent to its existing protected close call; the close layer validates and consumes the lease.",
+    "ACC-2: Without an approval, batch checkpoint does not inject `--allow-stale-runner`; stale runner remains fail-closed.",
+    "ACC-3: An approval for another permission, task, actor, or expired lease remains rejected by the existing protected gate; this adapter adds no bypass or task-specific exception.",
+    "ACC-4: The focused regression proves ACC-1 through ACC-3 using the public batch checkpoint invocation boundary, not only a source-text assertion.",
+    "ACC-5: The implementation introduces no long queue or polling. Runner-sync is acquired only after a checkpoint has produced a committed source candidate ready for sealed publication."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+    "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+    "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target-repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the adapter forwarding and its focused regression; protected close retains its independent lease validation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.batch-checkpoint-adapter",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.batch-checkpoint-runner-recovery-forwarding",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/batch/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+        "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "- Reuse the existing emergency-gate contract and `tasks close` stale-runner option. Do not parse lease files, infer permissions from lease IDs, or embed task IDs in control flow.\n- Extract the argument-forwarding policy from the 624-line batch adapter into `runner-recovery-forwarding.ts`; keep the adapter responsible only for invocation wiring. Do not change runner-sync scheduling, task lifecycle semantics, or broad runner publication policy in this card.\n- Before closing, run the required focused test and typecheck. Use fresh command-backed evidence tied to the declared case id.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-08-12T05:26:21.453Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"governance-optimization/tasks/ATM-GOV-0349-bridge-batch-checkpoint-runner-recovery-through-verified-lease.task.md\",\"contentDigest\":\"sha256:d2142abd9fdff835214007d347a422a6b6454744ff944b42ab39107d73f3a8dc\"} -->",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0349-bridge-batch-checkpoint-runner-recovery-through-verified-lease.task.md",
+    "sectionTitle": "ATM-GOV-0349",
+    "headingLine": 78,
+    "hash": "af5cf6c6210a4535",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0349-bridge-batch-checkpoint-runner-recovery-through-verified-lease.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:af5cf6c6210a45356e8dfc7406fa9c1813fa9aa72276299ed826cf658b29ea48",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-12T05:28:58.882Z"
+    }
+  },
+  "importedAt": "2026-08-12T05:28:58.882Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0299 has a validated but uncheckpointed batch-head delivery because the frozen runner is stale."
+    ],
+    "startConditions": [
+      "A batch checkpoint must forward recovery intent only when the operator supplied an emergency approval.",
+      "The downstream protected close surface remains the sole authority that validates the lease permission and consumes it."
+    ],
+    "softRelations": [
+      "ATM-GOV-0299 is the first recovery consumer of this adapter.",
+      "ATM-GOV-0345 remains the broad runner-publication integration card; this card owns only the batch adapter seam."
+    ],
+    "changedPublicSeams": [
+      "atm.batch.checkpoint.runnerRecoveryForwarding"
+    ],
+    "causalImpactEdges": [
+      "batch-checkpoint-to-protected-close-runner-recovery"
+    ],
+    "parallelFrontierInputs": [
+      "runner-sync queue is required only for the subsequent sealed build, never while the batch adapter performs private validation."
+    ],
+    "validatorReferences": [
+      "test_atm_gov_0349_batch_runner_recovery_lease_4e0b52d1"
+    ],
+    "phaseOwner": "Wave 3 recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0349_batch_runner_recovery_lease_4e0b52d1",
+      "targetGroupId": "null",
+      "semanticKey": "batch_checkpoint_runner_recovery_lease",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "batch-checkpoint-to-protected-close-runner-recovery"
+      ],
+      "expectedRedPredicate": "a stale frozen runner blocks a batch checkpoint even when a valid recovery lease is supplied",
+      "contributionResourceKey": "batch-checkpoint-runner-recovery",
+      "responsibility": "task-required",
+      "dependencyEdge": "batch-checkpoint-to-protected-close-runner-recovery",
+      "contractEdge": "atm.batch.checkpoint.runnerRecoveryForwarding",
+      "resourceKey": "batch-checkpoint-runner-recovery"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0349_batch_runner_recovery_lease_4e0b52d1"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T05-38-35-363Z-renew-c39203648d8d",
+  "lastTransitionAt": "2026-08-12T05:38:35.363Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T05:29:27.767Z",
+  "promotedAt": "2026-08-12T05:29:27.773Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-642a341964bd",
+    "claimedAt": "2026-08-12T05:29:27.779Z",
+    "heartbeatAt": "2026-08-12T05:38:34.933Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0349.*",
+      ".atm/history/task-events/ATM-GOV-0349/**",
+      ".atm/history/tasks/ATM-GOV-0349.json",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145\""
+    }
+  },
+  "startedAt": "2026-08-12T05:29:27.779Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-241bf7c1b8a42f2c",
+    "ticketDigest": "sha256:241bf7c1b8a42f2c86818b14e6e98e6887dc816b12b8660e0c1f706fdec8443d",
+    "taskId": "ATM-GOV-0349",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145",
+    "claimGeneration": "lease-642a341964bd",
+    "issuedAt": "2026-08-12T05:38:34.933Z",
+    "expiresAt": "2026-08-12T06:08:34.933Z",
+    "scopeDigest": "sha256:7d47f18e6f858f3d63fb291c57f53b667da897119b9de46c3b1a13f2da324a5f",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T05:38:34.933Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0349.*",
+          ".atm/history/task-events/ATM-GOV-0349/**",
+          ".atm/history/tasks/ATM-GOV-0349.json",
+          "packages/cli/src/commands/batch/implementation.ts",
+          "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
+          "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+        ],
+        "digest": "sha256:dd53dc44695b19530cc1a3a3d52d2c9e28a47782e41d49ff957bfbe1c4f858a0"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260812052927-codex-gpt-5.4-mini-ATM-GOV-0349-4b9513c918",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0349",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0349.*",
+      ".atm/history/task-events/ATM-GOV-0349/**",
+      ".atm/history/tasks/ATM-GOV-0349.json",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0349-bridge-batch-checkpoint-runner-recovery-through-verified-lease.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0349-bridge-batch-checkpoint-runner-recovery-through-verified-lease.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "ba8225647989777d7677add65c644906ff09acb2c388fce6776d97b7dc974d3f",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145\""
+    },
+    "createdAt": "2026-08-12T05:29:41.901Z",
+    "status": "active"
+  }
+}
