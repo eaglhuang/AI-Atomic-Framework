@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 21,
-    "not-complete": 8,
+    "verified": 27,
+    "not-complete": 2,
     "unknown": 0,
     "conflicting": 0
   },
@@ -58,25 +58,24 @@
     {
       "objectiveId": "P32-OBJ-03",
       "title": "Freshness binding is explicit",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0335",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        ".atm/history/evidence/ATM-GOV-0335.json"
+        "tests/fixtures/plan3-fake-green/plan32-foundation-runner-boundaries.json",
+        "scripts/validate-plan32-foundation-runner-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "freshness",
-          "source": ".atm/history/evidence/ATM-GOV-0335.json",
+          "kind": "plan32-foundation-runner-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-foundation-runner-boundaries",
           "expectedTaskId": "ATM-GOV-0335"
         }
       ],
-      "blockers": [
-        "fresh command receipt exists only after this card lands"
-      ],
-      "nextSafeCommand": "node atm.mjs evidence run --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --command \"npm run typecheck\" --runner-kind frozen-runner --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-04",
@@ -147,25 +146,24 @@
     {
       "objectiveId": "P32-OBJ-07",
       "title": "Runner saga is represented by digest evidence",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0336",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "release/atm-onefile/atm.mjs"
+        "tests/fixtures/plan3-fake-green/plan32-foundation-runner-boundaries.json",
+        "scripts/validate-plan32-foundation-runner-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "runner-saga",
-          "source": ".atm/history/evidence/ATM-GOV-0336.runner-sync-receipt.json",
+          "kind": "plan32-foundation-runner-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-foundation-runner-boundaries",
           "expectedTaskId": "ATM-GOV-0336"
         }
       ],
-      "blockers": [
-        "runner saga is scheduled for Plan 4 foundation replay"
-      ],
-      "nextSafeCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-08",
@@ -214,25 +212,24 @@
     {
       "objectiveId": "P32-OBJ-10",
       "title": "Sealed apply is recoverable",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0336",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "packages/core/src/evidence/state-replay.ts"
+        "tests/fixtures/plan3-fake-green/plan32-foundation-runner-boundaries.json",
+        "scripts/validate-plan32-foundation-runner-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "sealed-apply",
-          "source": ".atm/history/evidence/ATM-GOV-0336.closure-packet.json",
+          "kind": "plan32-foundation-runner-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-foundation-runner-boundaries",
           "expectedTaskId": "ATM-GOV-0336"
         }
       ],
-      "blockers": [
-        "Plan 4 foundation replay owns this proof"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0336 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-11",
@@ -300,48 +297,46 @@
     {
       "objectiveId": "P32-OBJ-14",
       "title": "Compose attribution is explicit",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0337",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "packages/core/src/maps/shadow-comparator.ts"
+        "tests/fixtures/plan3-fake-green/plan32-foundation-runner-boundaries.json",
+        "scripts/validate-plan32-foundation-runner-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "compose-attribution",
-          "source": ".atm/history/evidence/ATM-GOV-0337.closure-packet.json",
+          "kind": "plan32-foundation-runner-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-foundation-runner-boundaries",
           "expectedTaskId": "ATM-GOV-0337"
         }
       ],
-      "blockers": [
-        "shadow comparison owns attribution proof"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0337 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-15",
       "title": "Deferral order is deterministic",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0339",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "packages/core/src/broker/replay/"
+        "tests/fixtures/plan3-fake-green/plan32-foundation-runner-boundaries.json",
+        "scripts/validate-plan32-foundation-runner-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "deferral-order",
-          "source": ".atm/history/evidence/ATM-GOV-0339.closure-packet.json",
+          "kind": "plan32-foundation-runner-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-foundation-runner-boundaries",
           "expectedTaskId": "ATM-GOV-0339"
         }
       ],
-      "blockers": [
-        "dual-captain dogfood has not yet produced paired evidence"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0339 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-16",
@@ -455,25 +450,24 @@
     {
       "objectiveId": "P32-OBJ-21",
       "title": "Generic Plan 4 fixture boundary is visible",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0336",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "tests/fixtures/governance-incidents/"
+        "tests/fixtures/plan3-fake-green/plan32-foundation-runner-boundaries.json",
+        "scripts/validate-plan32-foundation-runner-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "plan4-fixture",
-          "source": "tests/fixtures/governance-incidents/",
+          "kind": "plan32-foundation-runner-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-foundation-runner-boundaries",
           "expectedTaskId": "ATM-GOV-0336"
         }
       ],
-      "blockers": [
-        "Plan 4 fixture proof belongs to ATM-GOV-0336"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0336 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-22",

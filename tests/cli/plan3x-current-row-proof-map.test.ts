@@ -9,18 +9,18 @@ assert.equal(report.status, 'current-row-proof-partially-verified');
 assert.equal(report.nonClaim, 'This map classifies every Plan 3.x objective row into its current proof family; verified rows are backed by current receipts, but this map does not certify any plan complete.');
 assert.equal(report.totals.plans, 3);
 assert.equal(report.totals.objectiveRows, 69);
-assert.equal(report.totals.sourceRowsVerified, 59);
-assert.equal(report.totals.sourceRowsNotComplete, 10);
+assert.equal(report.totals.sourceRowsVerified, 65);
+assert.equal(report.totals.sourceRowsNotComplete, 4);
 assert.equal(report.totals.rowsMappedToProofFamily, 69);
 assert.equal(report.totals.rowsCertifiedCompleteByThisMap, 0);
 assert.equal(report.totals.proofFamilies, 5);
 
 const families = new Map<string, any>(report.proofFamilies.map((entry: any) => [entry.id, entry]));
-assert.equal(families.get('verified-current-receipt')?.rowCount, 59);
+assert.equal(families.get('verified-current-receipt')?.rowCount, 65);
 assert.equal(families.get('verified-current-receipt')?.status, 'verified');
 assert.equal(families.get('fresh-command-replay-needed')?.rowCount, 0);
-assert.equal(families.get('governed-state-replay-needed')?.rowCount, 8);
-assert.equal(families.get('runner-release-parity-needed')?.rowCount, 2);
+assert.equal(families.get('governed-state-replay-needed')?.rowCount, 4);
+assert.equal(families.get('runner-release-parity-needed')?.rowCount, 0);
 assert.equal(families.get('negative-control-only')?.rowCount, 0);
 assert.equal(new Set(report.proofFamilies.flatMap((entry: any) => entry.rowRefs)).size, 69);
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.plan32FoundationRunnerBoundariesFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {"objectiveId": "P32-OBJ-03", "freshnessBindingExplicit": true, "staleRunnerMayGreen": false},
+    {"objectiveId": "P32-OBJ-07", "runnerSagaDigestPresent": true, "receiptTextMaySubstituteDigest": false},
+    {"objectiveId": "P32-OBJ-10", "sealedApplyRecoverable": true, "partialApplyMayGreen": false},
+    {"objectiveId": "P32-OBJ-14", "composeAttributionExplicit": true, "anonymousComposeAllowed": false},
+    {"objectiveId": "P32-OBJ-15", "deferralOrderDeterministic": true, "queueOrderCallerAsserted": false},
+    {"objectiveId": "P32-OBJ-21", "genericPlan4FixtureBoundaryVisible": true, "hostSpecificFixtureMayGreen": false}
+  ],
+  "expectedVerdict": "plan32-foundation-runner-boundaries-proven",
+  "diagnostics": [
+    "freshness-binding-explicit",
+    "runner-saga-digest",
+    "sealed-apply-recoverable",
+    "compose-attribution-explicit",
+    "deferral-order-deterministic",
+    "generic-plan4-fixture-boundary"
+  ]
+}

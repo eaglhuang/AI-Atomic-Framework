@@ -19,7 +19,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:44055110eb5a7ea69fb6e5885688e00758928fce07e627cb0cc67ebbf5d9681b",
+      "digest": "sha256:021e18c5c5c6573236ea1afb544d6279591cc12c32b4e705789df81a98864eaf",
       "planId": "3.2",
       "expectedRows": 29
     }
@@ -27,8 +27,8 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsVerified": 59,
-    "sourceRowsNotComplete": 10,
+    "sourceRowsVerified": 65,
+    "sourceRowsNotComplete": 4,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
     "proofFamilies": 5
@@ -37,7 +37,7 @@
     {
       "id": "verified-current-receipt",
       "status": "verified",
-      "rowCount": 59,
+      "rowCount": 65,
       "meaning": "The row now has a current command-backed receipt or objective-aligned negative-control receipt replayed into the source objective report.",
       "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
       "rowRefs": [
@@ -99,7 +99,13 @@
         "P32-OBJ-13",
         "P32-OBJ-17",
         "P32-OBJ-20",
-        "P32-OBJ-25"
+        "P32-OBJ-25",
+        "P32-OBJ-03",
+        "P32-OBJ-07",
+        "P32-OBJ-10",
+        "P32-OBJ-14",
+        "P32-OBJ-15",
+        "P32-OBJ-21"
       ]
     },
     {
@@ -113,30 +119,23 @@
     {
       "id": "governed-state-replay-needed",
       "status": "not-complete",
-      "rowCount": 8,
+      "rowCount": 4,
       "meaning": "The row depends on current ATM state, taskflow, closeback, backlog, broker, or lane facts rather than a standalone source validator.",
       "nextExecutionRule": "Use the row's ATM read/claim/closeback command only inside the relevant current task scope; do not infer completion from stale task status.",
       "rowRefs": [
         "P30-OBJ-15",
         "P30-OBJ-16",
         "P32-OBJ-06",
-        "P32-OBJ-10",
-        "P32-OBJ-14",
-        "P32-OBJ-15",
-        "P32-OBJ-21",
         "P32-OBJ-28"
       ]
     },
     {
       "id": "runner-release-parity-needed",
       "status": "not-complete",
-      "rowCount": 2,
+      "rowCount": 0,
       "meaning": "The row must bind current source, frozen runner, and release/adopter surface with digest-backed evidence.",
       "nextExecutionRule": "Build only when runner publication is actually required; otherwise use existing digest reports and a focused parity validator.",
-      "rowRefs": [
-        "P32-OBJ-03",
-        "P32-OBJ-07"
-      ]
+      "rowRefs": []
     },
     {
       "id": "negative-control-only",
@@ -177,13 +176,13 @@
     {
       "planId": "3.2",
       "rows": 29,
-      "verifiedRows": 21,
-      "notCompleteRows": 8,
+      "verifiedRows": 27,
+      "notCompleteRows": 2,
       "proofFamilyCounts": {
-        "verified-current-receipt": 21,
+        "verified-current-receipt": 27,
         "fresh-command-replay-needed": 0,
-        "governed-state-replay-needed": 6,
-        "runner-release-parity-needed": 2,
+        "governed-state-replay-needed": 2,
+        "runner-release-parity-needed": 0,
         "negative-control-only": 0
       }
     }

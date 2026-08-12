@@ -15,7 +15,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:44055110eb5a7ea69fb6e5885688e00758928fce07e627cb0cc67ebbf5d9681b"
+      "digest": "sha256:021e18c5c5c6573236ea1afb544d6279591cc12c32b4e705789df81a98864eaf"
     },
     {
       "path": "docs/reports/plan-4-foundation-replay.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:7c253a2dc41744b1481a5c8d21c0b91db5e89abde1a3245ba7171fd2320f5917"
+      "digest": "sha256:03457e9e3c4dc9642a53a7d6f665c3a72cc9e5003fea466246fbe5cea3670e3a"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:749582397415acdcf5a261fd8b61ec8f0e409d66e161ebb7262f833d53a4879e"
+      "digest": "sha256:b7a9783c440752f522ed5bc20811d924fc77cc2fe7aabbc5724264e4b6d4b027"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
@@ -59,12 +59,12 @@
     },
     {
       "path": "docs/reports/plan-3x-positive-current-receipts.json",
-      "digest": "sha256:0b197052af1f8a2f4ddb9a5c5b2a145444379e49ffcb7eeb1f65a9a0982f0a65"
+      "digest": "sha256:72f9c5903b469ce3456efb646eaa5c17a3bbaba9e2b390bcab2369df7dbf5b6b"
     }
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 27,
+    "unresolvedObjectiveRows": 21,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -78,7 +78,7 @@
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
     "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
-    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 59,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 65,
     "plan3xObjectiveAlignedNegativeControlRowsConsumed": 8,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
@@ -105,9 +105,9 @@
       "planId": "3.2",
       "source": "docs/reports/plan-3-2-objective-replay.json",
       "objectiveRows": 29,
-      "verifiedRows": 21,
-      "unresolvedRows": 8,
-      "primaryBlocker": "8 Plan 3.2 rows still require closeback, Plan 4 foundation, or runner-release parity receipts."
+      "verifiedRows": 27,
+      "unresolvedRows": 2,
+      "primaryBlocker": "2 Plan 3.2 rows still require terminal closeback provenance; foundation and runner boundary rows now have focused current receipts."
     },
     {
       "planId": "4.0",
