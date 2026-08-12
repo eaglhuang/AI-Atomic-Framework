@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0297",
   "title": "example/branch and mutation-survivor-directed generators",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0294",
@@ -173,8 +173,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T03-40-16-153Z-renew-6af12f31b138",
-  "lastTransitionAt": "2026-08-12T03:40:16.153Z",
+  "lastTransitionId": "2026-08-12T03-45-03-242Z-lock-cleanup-26a680f82471",
+  "lastTransitionAt": "2026-08-12T03:45:03.242Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T03:34:23.343Z",
@@ -183,7 +183,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-eecf5775eb33",
     "claimedAt": "2026-08-12T03:34:23.350Z",
-    "heartbeatAt": "2026-08-12T03:40:15.522Z",
+    "heartbeatAt": "2026-08-12T03:45:02.617Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0297.json",
@@ -194,13 +194,14 @@
       "tests/cli/plan4-example-branch-generators-negative.test.ts",
       "tests/cli/plan4-example-branch-generators.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T03:34:23.350Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -237,7 +238,10 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
     },
     "createdAt": "2026-08-12T03:34:25.500Z",
-    "status": "active"
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T03:45:03.238Z",
+    "releasedBy": "codex-gpt-5.4-mini"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -304,5 +308,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-12T03:45:02.617Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812033423-codex-gpt-5.4-mini-ATM-GOV-0297-a2a27b6d77",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0297.closure-packet.json"
 }
