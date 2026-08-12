@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0296",
   "title": "sandboxed test patch proposal, monotonic acceptance and minimization",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0322"
@@ -172,8 +172,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T03-25-11-506Z-renew-78d41808b2a4",
-  "lastTransitionAt": "2026-08-12T03:25:11.506Z",
+  "lastTransitionId": "2026-08-12T03-34-11-076Z-lock-cleanup-8c963d475927",
+  "lastTransitionAt": "2026-08-12T03:34:11.076Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T03:13:54.384Z",
@@ -182,7 +182,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-43e25e08f388",
     "claimedAt": "2026-08-12T03:13:54.394Z",
-    "heartbeatAt": "2026-08-12T03:25:10.542Z",
+    "heartbeatAt": "2026-08-12T03:34:10.873Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0296.json",
@@ -193,13 +193,14 @@
       "tests/cli/plan4-sandboxed-test-patch-negative.test.ts",
       "tests/cli/plan4-sandboxed-test-patch.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T03:13:54.394Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -236,31 +237,35 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
     },
     "createdAt": "2026-08-12T03:14:00.210Z",
-    "status": "active"
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T03:34:11.073Z",
+    "releasedBy": "codex-gpt-5.4-mini"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c91cdbe6607be40a",
-    "ticketDigest": "sha256:c91cdbe6607be40aebc28eac7f2a95a306f5f5505b135e5b5cbd0485dcf8321f",
+    "ticketId": "wat-fd3476410e83a916",
+    "ticketDigest": "sha256:fd3476410e83a916bed7cbfcb5657d99c9eca6459905e3fa4b9b5a3e198e1059",
     "taskId": "ATM-GOV-0296",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
     "claimGeneration": "lease-43e25e08f388",
-    "issuedAt": "2026-08-12T03:25:10.542Z",
-    "expiresAt": "2026-08-12T03:55:10.542Z",
-    "scopeDigest": "sha256:b66da262cc9b355078765a8bdc8603613a805693ce67930fb2f5106c75e33ebd",
+    "issuedAt": "2026-08-12T03:30:03.576Z",
+    "expiresAt": "2026-08-12T04:00:03.576Z",
+    "scopeDigest": "sha256:cefafea409db5554049847e8f6eded223a56e6e1adebdf4fc4a0ece63910f60c",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T03:25:10.542Z"
+      "selectedAt": "2026-08-12T03:30:03.576Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0296.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0296/**",
           ".atm/history/tasks/ATM-GOV-0296.json",
           "packages/core/src/evidence/index.ts",
@@ -270,7 +275,7 @@
           "tests/cli/plan4-sandboxed-test-patch-negative.test.ts",
           "tests/cli/plan4-sandboxed-test-patch.test.ts"
         ],
-        "digest": "sha256:ec658cdeb4b56428b7abd36676cd6f661f1aee8510e257421d4e12e1609e3b26"
+        "digest": "sha256:987a3007970710458d818c011ee1d7bc932ebac9f8e0327448aaa5244c57d7f3"
       },
       {
         "kind": "lifecycle-operation",
@@ -303,5 +308,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-12T03:34:10.873Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812031354-codex-gpt-5.4-mini-ATM-GOV-0296-06f7f6a739",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0296.closure-packet.json"
 }

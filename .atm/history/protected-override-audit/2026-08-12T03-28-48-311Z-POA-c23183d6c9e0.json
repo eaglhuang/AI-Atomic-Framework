@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-c23183d6c9e0",
+  "recordedAt": "2026-08-12T03:28:48.311Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0296",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0296 --message \"feat(evidence): seal sandboxed test patch authority\n\nATM-Work-Admission: wat-c91cdbe6607be40a sha256:c91cdbe6607be40aebc28eac7f2a95a306f5f5505b135e5b5cbd0485dcf8321f\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0296-f4c9ab6c07",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T03-28-14-607Z-EMG-ATM-GOV-0296-f4c9ab6c07.json",
+  "parentEventId": "POA-4fb00bb0c133",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

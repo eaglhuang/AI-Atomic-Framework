@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T03-34-10-885Z-close-25bcffce9e04",
+  "taskId": "ATM-GOV-0296",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812031354-codex-gpt-5.4-mini-ATM-GOV-0296-06f7f6a739",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0296.json",
+  "taskSha256": "sha256:9e711b650347b523db3741ee4608fcf11639bd035544be4ce5891152d2c2006a",
+  "createdAt": "2026-08-12T03:34:10.885Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0296 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812031354-codex-gpt-5.4-mini-ATM-GOV-0296-06f7f6a739",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0296.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-sandboxed-test-patch-negative.test.ts",
+      "node --strip-types tests/cli/plan4-sandboxed-test-patch.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T03:34:10.868Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0296.*",
+        ".atm/history/task-events/ATM-GOV-0296/**",
+        ".atm/history/tasks/ATM-GOV-0296.json",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/sandboxed-test-patch.ts",
+        "schemas/evidence/sandboxed-test-patch.schema.json",
+        "tests/catalog/groups/test_group_plan4_sandboxed-test-patch.shard.json",
+        "tests/cli/plan4-sandboxed-test-patch-negative.test.ts",
+        "tests/cli/plan4-sandboxed-test-patch.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/sandboxed-test-patch.ts",
+        "schemas/evidence/sandboxed-test-patch.schema.json",
+        "tests/catalog/groups/test_group_plan4_sandboxed-test-patch.shard.json",
+        "tests/cli/plan4-sandboxed-test-patch-negative.test.ts",
+        "tests/cli/plan4-sandboxed-test-patch.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
