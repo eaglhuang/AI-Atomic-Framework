@@ -16,6 +16,7 @@ import {
   buildCloseWriteRollbackSnapshot,
   rollbackCloseWriteTransaction
 } from '../close-orchestration.ts';
+import { chunkGitPathspecs } from '../commit-bundle-assembly.ts';
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -45,6 +46,11 @@ const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-close-window-lock-'));
 const repoRoot = path.join(tempRoot, 'target');
 
 try {
+  const longPathspecs = Array.from({ length: 200 }, (_, index) => `release/atm-root-drop/${String(index).padStart(4, '0')}/${'nested-path/'.repeat(20)}generated-file.ts`);
+  const pathspecChunks = chunkGitPathspecs(longPathspecs);
+  assert.ok(pathspecChunks.length > 1, 'large release bundles must be split before reaching the host argv ceiling');
+  assert.deepEqual(pathspecChunks.flat(), longPathspecs, 'chunking must preserve every path exactly once and in order');
+  assert.ok(pathspecChunks.every((chunk) => Buffer.byteLength(chunk.join('\0'), 'utf8') < 8_000), 'each pathspec chunk must stay inside the conservative argv budget');
   initGitRepo(repoRoot);
   writeJson(path.join(repoRoot, '.atm/config.json'), {
     schemaVersion: 'atm.config.v0.1',
