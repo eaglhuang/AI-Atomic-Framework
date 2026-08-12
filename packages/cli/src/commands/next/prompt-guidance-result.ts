@@ -67,8 +67,11 @@ export function buildPromptGuidanceNextResult(input: {
       }
     });
   }
-  const frameworkStatus = createFrameworkModeStatus({ cwd: input.cwd });
-  if (frameworkStatus.repoIdentity.isFrameworkRepo && isFrameworkMaintenancePrompt(prompt)) {
+  if (isFrameworkMaintenancePrompt(prompt)) {
+    const frameworkStatus = createFrameworkModeStatus({ cwd: input.cwd });
+    if (!frameworkStatus.repoIdentity.isFrameworkRepo) {
+      return buildGeneralPromptGuidanceResult(input, prompt);
+    }
     const claimCommand = buildFrameworkTempClaimCommand([], prompt);
     const nextAction: NextActionLike = {
       status: 'framework-temp-claim-required',
@@ -122,6 +125,13 @@ export function buildPromptGuidanceNextResult(input: {
       }
     });
   }
+  return buildGeneralPromptGuidanceResult(input, prompt);
+}
+
+function buildGeneralPromptGuidanceResult(
+  input: Parameters<typeof buildPromptGuidanceNextResult>[0],
+  prompt: string
+) {
   const nextAction: NextActionLike = {
     status: 'prompt-guidance-required',
     command: `node atm.mjs guide --goal ${quoteCliValue(prompt)} --cwd . --json`,
@@ -135,7 +145,7 @@ export function buildPromptGuidanceNextResult(input: {
     }),
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands(),
-    ...buildNonPlaybookRouteHints(input.cwd, prompt)
+    ...buildNonPlaybookRouteHints(input.cwd, prompt, { includeWorktreeDetails: false })
   };
   const userNotice = buildFirstUseUserNotice(nextAction);
   return makeResult({
