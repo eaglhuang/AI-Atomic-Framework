@@ -2,7 +2,7 @@
   "schemaId": "atm.fourPlanIndependentCertificate.v1",
   "specVersion": "0.1.0",
   "certificateId": "ATM-GOV-0341-independent-four-plan-certificate",
-  "generatedAt": "2026-08-12T19:20:00.000Z",
+  "generatedAt": "2026-08-13T00:00:00.000Z",
   "writerRole": "certificate-writer",
   "reviewers": [
     {
@@ -11,7 +11,7 @@
         "independent-reviewer"
       ],
       "outputPath": "docs/reports/plan-3x-4x-release-closeback.json",
-      "digest": "sha256:a61f4e6a8c6354bc5ccbbcce5fc4c3d69556c91b8664aed35c28f89038eeafae"
+      "digest": "sha256:2c2891b7a38febf064dc76ccecf5a7d1b439e868e9fac4796f8160dcf005a288"
     },
     {
       "reviewerId": "codex-independent-recompute",
@@ -19,7 +19,7 @@
         "independent-reviewer"
       ],
       "outputPath": "docs/reports/plan-3x-4x-independent-certificate.json",
-      "digest": "sha256:f725aa89a3299806dcc44f4daa5952c88a07bec92fa08070a9f7149ec480abf7"
+      "digest": "sha256:pending-self-digest"
     }
   ],
   "minimumIndependentReviewers": 2,
@@ -53,8 +53,8 @@
     },
     {
       "dimensionId": "freshness-verdict",
-      "status": "stale",
-      "digest": "sha256:c4fde90d7c4e91b99dc248c656a996c143f5ffd42f66e664b233bba1ceda49ca",
+      "status": "proven",
+      "digest": "sha256:f0d3c5aafd757b79e4e476e58e59f278fdba16925ee66d50174671951897a56b",
       "evidenceRefs": [
         "release/atm-onefile/release-manifest.json",
         "scripts/validate-runner-reproducibility.ts"
@@ -83,8 +83,8 @@
     },
     {
       "dimensionId": "release-verdict",
-      "status": "not-complete",
-      "digest": "sha256:a61f4e6a8c6354bc5ccbbcce5fc4c3d69556c91b8664aed35c28f89038eeafae",
+      "status": "proven",
+      "digest": "sha256:2c2891b7a38febf064dc76ccecf5a7d1b439e868e9fac4796f8160dcf005a288",
       "evidenceRefs": [
         "docs/reports/plan-3x-4x-release-closeback.json"
       ],
@@ -100,20 +100,20 @@
     },
     {
       "surfaceId": "origin-main",
-      "expectedDigest": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
-      "observedDigest": "0d50ba508a866d92fc4e26501a060ac539024140",
+      "expectedDigest": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
+      "observedDigest": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
       "reachable": true
     },
     {
       "surfaceId": "root-drop",
-      "expectedDigest": "sha256:443a885faf2c7260809e28cdbf399868f142d7151834c0a6c8b2984c642a129d",
-      "observedDigest": "sha256:443a885faf2c7260809e28cdbf399868f142d7151834c0a6c8b2984c642a129d",
+      "expectedDigest": "sha256:7dfda82fba40fd02cff5b79b8c008f548e9465828484d5e3163620638aa8df64",
+      "observedDigest": "sha256:7dfda82fba40fd02cff5b79b8c008f548e9465828484d5e3163620638aa8df64",
       "reachable": true
     },
     {
       "surfaceId": "target-head",
-      "expectedDigest": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
-      "observedDigest": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
+      "expectedDigest": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
+      "observedDigest": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
       "reachable": true
     }
   ],
@@ -123,27 +123,22 @@
     "independent-reviewer-role-separation",
     "no-legacy-retirement-with-stale-or-unpushed-surface"
   ],
-  "status": "stale",
+  "status": "blocked",
   "overallVerdict": "not-complete",
   "diagnostics": [
     "dimension-fail-closed:charter-verdict:not-complete",
-    "dimension-fail-closed:freshness-verdict:stale",
-    "dimension-fail-closed:objective-verdict:not-complete",
-    "dimension-fail-closed:release-verdict:not-complete",
-    "release-digest-mismatch:origin-main"
+    "dimension-fail-closed:objective-verdict:not-complete"
   ],
   "nonClaims": [
-    "does-not-authorize-release:origin-main",
     "does-not-claim-complete:charter-verdict",
-    "does-not-claim-complete:freshness-verdict",
-    "does-not-claim-complete:objective-verdict",
-    "does-not-claim-complete:release-verdict"
+    "does-not-claim-complete:objective-verdict"
   ],
   "releaseAuthorized": false,
   "provenance": {
     "taskId": "ATM-GOV-0341",
-    "head": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
-    "originMain": "0d50ba508a866d92fc4e26501a060ac539024140"
+    "head": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
+    "originMain": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
+    "closebackDigest": "sha256:2c2891b7a38febf064dc76ccecf5a7d1b439e868e9fac4796f8160dcf005a288"
   },
-  "certificateDigest": "sha256:72eb75cd83a78cfaf6b6f840061affb20dd1e4419c931fdf9759dc320aca2039"
+  "certificateDigest": "sha256:7a5495e857e1273bc39d35de7a2ed0de277314ec142310b83efbf31400ea9873"
 }

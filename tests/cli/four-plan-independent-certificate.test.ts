@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import Ajv2020 from 'ajv/dist/2020.js';
 import {
@@ -75,12 +76,19 @@ assert.equal(validateFourPlanIndependentCertificate(tampered).ok, false);
 
 const report = JSON.parse(readFileSync('docs/reports/plan-3x-4x-independent-certificate.json', 'utf8'));
 assert.equal(validateSchema(report), true, JSON.stringify(validateSchema.errors));
+assert.equal(validateFourPlanIndependentCertificate(report).diagnostics.includes('certificate-digest-mismatch'), false);
 assert.equal(report.overallVerdict, 'not-complete');
 assert.equal(report.releaseAuthorized, false);
-assert.ok(report.diagnostics.includes('release-digest-mismatch:origin-main'));
+assert.ok(report.diagnostics.includes('dimension-fail-closed:objective-verdict:not-complete'));
+assert.ok(report.diagnostics.includes('dimension-fail-closed:charter-verdict:not-complete'));
+assert.equal(report.diagnostics.includes('release-digest-mismatch:origin-main'), false);
 
 const closeback = JSON.parse(readFileSync('docs/reports/plan-3x-4x-release-closeback.json', 'utf8'));
-assert.equal(closeback.status, 'blocked');
+const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const originMain = execFileSync('git', ['rev-parse', 'origin/main'], { encoding: 'utf8' }).trim();
+assert.equal(closeback.targetHead, head);
+assert.equal(closeback.originMain, originMain);
+assert.equal(closeback.status, head === originMain ? 'pushed' : 'blocked');
 assert.equal(closeback.legacyAuthority.retired, false);
-assert.equal(closeback.remoteReachability.targetHeadReachableFromOriginMain, false);
+assert.equal(closeback.remoteReachability.targetHeadReachableFromOriginMain, head === originMain);
 console.log('four-plan-independent-certificate.test.ts: ok');

@@ -1,28 +1,28 @@
 {
   "schemaId": "atm.fourPlanReleaseCloseback.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-12T19:20:00.000Z",
+  "generatedAt": "2026-08-13T00:00:00.000Z",
   "taskId": "ATM-GOV-0341",
   "targetRepo": "C:/Users/User/AI-Atomic-Framework",
   "planningRepo": "C:/Users/User/3KLife",
-  "targetHead": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
-  "originMain": "0d50ba508a866d92fc4e26501a060ac539024140",
+  "targetHead": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
+  "originMain": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
   "remoteReachability": {
     "checked": true,
-    "targetHeadReachableFromOriginMain": false,
-    "status": "not-pushed"
+    "targetHeadReachableFromOriginMain": true,
+    "status": "pushed"
   },
   "releaseSurfaces": [
     {
       "surfaceId": "target-head",
-      "expectedDigest": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
-      "observedDigest": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
+      "expectedDigest": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
+      "observedDigest": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
       "reachable": true
     },
     {
       "surfaceId": "origin-main",
-      "expectedDigest": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
-      "observedDigest": "0d50ba508a866d92fc4e26501a060ac539024140",
+      "expectedDigest": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
+      "observedDigest": "9dc5a4dc32c2fbd4c9f1543ccf9bb1319c3d4428",
       "reachable": true
     },
     {
@@ -33,19 +33,19 @@
     },
     {
       "surfaceId": "root-drop",
-      "expectedDigest": "sha256:443a885faf2c7260809e28cdbf399868f142d7151834c0a6c8b2984c642a129d",
-      "observedDigest": "sha256:443a885faf2c7260809e28cdbf399868f142d7151834c0a6c8b2984c642a129d",
+      "expectedDigest": "sha256:7dfda82fba40fd02cff5b79b8c008f548e9465828484d5e3163620638aa8df64",
+      "observedDigest": "sha256:7dfda82fba40fd02cff5b79b8c008f548e9465828484d5e3163620638aa8df64",
       "reachable": true
     }
   ],
-  "status": "blocked",
+  "status": "pushed",
   "diagnostics": [
-    "target HEAD is not yet remote-reachable from origin/main",
-    "release is intentionally not authorized until final certificate is proven and push provenance exists"
+    "target HEAD is remote-reachable from origin/main",
+    "release surface parity is current; independent objective/charter verdicts still govern final completion"
   ],
   "legacyAuthority": {
     "retired": false,
     "reversible": true,
-    "reason": "Independent certificate is fail-closed; legacy authority remains active until release parity and objective completion are proven."
+    "reason": "Independent certificate remains fail-closed until objective and charter verdicts are proven; push provenance is current."
   }
 }
