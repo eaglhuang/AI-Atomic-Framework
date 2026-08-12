@@ -17,7 +17,10 @@ assert.equal(report.totals.plan3xCurrentRowProofMappedRows, 69);
 assert.equal(report.totals.plan3xCurrentRowProofFamilies, 4);
 assert.equal(report.totals.plan3xFreshCommandReceiptsGreen, 8);
 assert.equal(report.totals.plan3xFreshCommandRowsCertified, 0);
+assert.equal(report.totals.backlogReleaseBlockingNow, 0);
+assert.equal(report.totals.backlogNeedsTaskCardBeforeFinalRelease, 133);
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B1-current-row-proof')?.status, 'triaged');
+assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B4-backlog-disposition')?.status, 'separated');
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
   'B1-current-row-proof',
   'B4-backlog-disposition',

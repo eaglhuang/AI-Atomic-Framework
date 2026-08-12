@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.backlogReleaseBlockingSubset.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-13T04:45:00.000Z",
+  "status": "release-blocking-subset-separated",
+  "nonClaim": "This report separates release-blocking backlog risk from non-blocking deferred backlog; it does not close or rewrite backlog items.",
+  "sourceReports": [
+    {
+      "path": "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+      "digest": "sha256:a2074fc99dbc7ff8faf9ae3670839f73058cf4103082034dd2f1ff6331170906"
+    }
+  ],
+  "totals": {
+    "backlogTotal": 391,
+    "terminal": 219,
+    "deferred": 170,
+    "ownedOpen": 2,
+    "openLikeIds": 0,
+    "unresolvedIds": 0,
+    "releaseBlockingNow": 0,
+    "needsTaskCardBeforeFinalRelease": 133,
+    "ownerTrackedDeferred": 37
+  },
+  "dispositionRules": [
+    {
+      "id": "release-blocking-now",
+      "count": 0,
+      "rule": "Only invalid rows, openLikeIds, unresolvedIds, or explicit current release blockers can block the current closeout certificate immediately."
+    },
+    {
+      "id": "needs-task-card-before-final-release",
+      "count": 133,
+      "rule": "Deferred rows without ownerRefs are not immediate release blockers, but must be converted to task-card ownership or explicitly waived before a final releaseAuthorized=true certificate."
+    },
+    {
+      "id": "owner-tracked-deferred",
+      "count": 37,
+      "rule": "Deferred rows with ownerRefs are already carried by another task or follow-up lane and must not be double-counted as current release blockers."
+    }
+  ],
+  "statusHistogramForDeferred": {
+    "Open": 83,
+    "Needs task card": 79,
+    "Needs triage": 2,
+    "Partially fixed in source change pending release": 1,
+    "Deferred": 1,
+    "Has task card": 1,
+    "Mitigated in TASK-TEAM-0074; follow-up open": 1,
+    "Follow-up in TASK-TEAM-0084": 1,
+    "Partially fixed in ATM-GOV-0230": 1
+  },
+  "nextExecutionOrder": [
+    {
+      "id": "task-cardize-unowned-deferred",
+      "whyFirst": "133 deferred items have no ownerRefs; batching them into owner lanes is cheaper and safer than trying to fix every bug inside this closeout."
+    },
+    {
+      "id": "sample-owner-tracked-deferred",
+      "whySecond": "A small sample should confirm ownerRefs point to real follow-up tasks before final release."
+    },
+    {
+      "id": "recompute-backlog-census",
+      "whyThird": "Only after ownership exists should the backlog census and independent certificate be recomputed."
+    }
+  ],
+  "principlesApplied": [
+    "first-principles: release blocking means current unreconciled risk, not every deferred improvement ever recorded",
+    "deep-module: backlog census remains the source of truth while this report adds a release decision layer",
+    "80/20 execution: owner-map the deferred backlog instead of attempting 170 unrelated fixes in the closeout lane",
+    "false-green prevention: releaseAuthorized remains false until unowned deferred items are task-cardized or explicitly waived"
+  ]
+}

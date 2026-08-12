@@ -52,6 +52,10 @@
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
       "digest": "sha256:f049b078a679b66fd9f03103096381fb38a9249d146deace87a9a026b2355ead"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
+      "digest": "sha256:991fff85e018c6ab235207861728b8aa3cc07e9d2281e772ccf90de4a7fb9829"
     }
   ],
   "totals": {
@@ -68,7 +72,9 @@
     "plan3xCurrentRowProofMappedRows": 69,
     "plan3xCurrentRowProofFamilies": 4,
     "plan3xFreshCommandReceiptsGreen": 8,
-    "plan3xFreshCommandRowsCertified": 0
+    "plan3xFreshCommandRowsCertified": 0,
+    "backlogReleaseBlockingNow": 0,
+    "backlogNeedsTaskCardBeforeFinalRelease": 133
   },
   "planSummaries": [
     {
@@ -129,8 +135,9 @@
     {
       "id": "B4-backlog-disposition",
       "scope": ["ATM bug backlog"],
-      "reason": "backlog census is machine-readable and valid, but 170 deferred items remain non-terminal and two are owned-open",
-      "requiredOutcome": "keep deferred backlog out of release completion claims or close/task-card the subset that is release-blocking"
+      "status": "separated",
+      "reason": "backlog census is machine-readable and valid; release-blocking-now is zero, but 133 deferred items still need task-card ownership or waiver before final releaseAuthorized=true",
+      "requiredOutcome": "task-cardize or explicitly waive the 133 unowned deferred rows, then recompute backlog census and certificate"
     },
     {
       "id": "B5-release-certificate",
