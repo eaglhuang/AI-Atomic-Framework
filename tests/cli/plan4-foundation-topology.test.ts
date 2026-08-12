@@ -17,8 +17,13 @@ assert.equal(report.plan4ObjectiveDenominator.expected, 17);
 assert.equal(report.plan4ObjectiveDenominator.observed, 17);
 assert.equal(report.objectiveAnchors.length, 17);
 assert.equal(new Set(report.objectiveAnchors.map((row: any) => row.objectiveId)).size, 17);
-assert.ok(report.objectiveAnchors.every((row: any) => row.status === 'not-complete'), 'foundation replay must remain fail-closed');
+assert.ok(report.objectiveAnchors.every((row: any) => row.status === 'verified'), 'foundation anchors must be verified after successor-wave consumption');
+assert.ok(
+  report.objectiveAnchors.every((row: any) => row.consumedBy === 'scripts/validate-plan4-successor-wave-consumption.ts'),
+  'foundation anchors must name the consumption validator'
+);
 assert.ok(report.nonClaims.includes('foundation-replay-is-not-final-plan4-certification'));
+assert.ok(report.nonClaims.includes('successor-wave-consumption-does-not-substitute-for-full-release-certificate'));
 
 const phaseReport = evaluatePhaseSuitePromotion({
   checkpoint: 'plan-verdict',

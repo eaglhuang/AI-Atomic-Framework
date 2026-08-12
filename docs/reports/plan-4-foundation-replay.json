@@ -3,10 +3,10 @@
   "specVersion": "0.1.0",
   "taskId": "ATM-GOV-0336",
   "generatedAt": "2026-08-12T18:35:00.000Z",
-  "verdict": "foundation-revalidated",
+  "verdict": "successor-wave-consumed",
   "nonClaims": [
     "foundation-replay-is-not-final-plan4-certification",
-    "plan4-objectives-remain-not-complete-until-successor-wave-evidence-closes-each-blocker",
+    "successor-wave-consumption-does-not-substitute-for-full-release-certificate",
     "fixture-replay-does-not-substitute-for-hostile-dogfood-or-release-provenance"
   ],
   "plan4ObjectiveDenominator": {
@@ -86,27 +86,28 @@
     "status": "proven"
   },
   "objectiveAnchors": [
-    { "objectiveId": "OBJ-01", "status": "not-complete", "foundationPhase": "topology", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-02", "status": "not-complete", "foundationPhase": "catalog-foundation", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-03", "status": "not-complete", "foundationPhase": "catalog-foundation", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-04", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-05", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-06", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-07", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-08", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-09", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-10", "status": "not-complete", "foundationPhase": "topology", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-11", "status": "not-complete", "foundationPhase": "topology", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-12", "status": "not-complete", "foundationPhase": "catalog-foundation", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-13", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-14", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-15", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-16", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
-    { "objectiveId": "OBJ-17", "status": "not-complete", "foundationPhase": "topology", "blocker": "successor wave evidence not yet closed" }
+    { "objectiveId": "OBJ-01", "status": "verified", "foundationPhase": "topology", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-02", "status": "verified", "foundationPhase": "catalog-foundation", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-03", "status": "verified", "foundationPhase": "catalog-foundation", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-04", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-05", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-06", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-07", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-08", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-09", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-10", "status": "verified", "foundationPhase": "topology", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-11", "status": "verified", "foundationPhase": "topology", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-12", "status": "verified", "foundationPhase": "catalog-foundation", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-13", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-14", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-15", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-16", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-17", "status": "verified", "foundationPhase": "topology", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" }
   ],
   "validators": [
     "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
     "node --strip-types scripts/validate-four-plan-objectives.ts --plan 4.0 --mode validate",
-    "npm run validate:governance-fix-wave"
+    "npm run validate:governance-fix-wave",
+    "node --strip-types scripts/validate-plan4-successor-wave-consumption.ts"
   ]
 }

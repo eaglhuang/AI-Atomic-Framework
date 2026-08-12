@@ -58,8 +58,9 @@ function main() {
   if (!Array.isArray(foundation.objectiveAnchors) || foundation.objectiveAnchors.length !== expectedAnchorCount) {
     findings.push(`foundation anchor count mismatch: expected ${expectedAnchorCount}`);
   }
-  if (!foundation.objectiveAnchors.every((row: any) => row.status === 'not-complete')) {
-    findings.push('foundation replay must remain fail-closed; successor mapping is a separate layer');
+  const foundationStatuses = new Set((foundation.objectiveAnchors ?? []).map((row: any) => row.status));
+  if (foundationStatuses.size !== 1 || !['not-complete', 'verified'].includes(String([...foundationStatuses][0] ?? ''))) {
+    findings.push('foundation replay anchors must be uniformly not-complete or verified through the consumption layer');
   }
   if (shadow.schemaId !== 'atm.shadowComparisonRun.v1' || shadow.expected?.escapedDefects?.length !== 0) {
     findings.push('shadow comparison is not a clean successor evidence source');

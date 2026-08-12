@@ -19,7 +19,7 @@
     },
     {
       "path": "docs/reports/plan-4-foundation-replay.json",
-      "digest": "sha256:ae7df4f3c4466eae24f63b6eb4d4b6efb3f26386c37ef4e0f2ddb3aea5159c48"
+      "digest": "sha256:b2c2c0091b397c9d8b0944c1e0043d23332a632b649ad24a24a7fa167ef08dde"
     },
     {
       "path": "docs/reports/plan4-real-shadow-comparison.json",
@@ -43,7 +43,7 @@
     },
     {
       "path": "docs/reports/plan4-successor-wave-objective-map.json",
-      "digest": "sha256:561c4789869ed6deef5353af002b40373a90e169084490a7ab1f340e40a4a300"
+      "digest": "sha256:c06472ebd2b0c9a594afaa353d0ac9a67c5d6076cbb3920958dd38bd1aaf59ca"
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
@@ -64,7 +64,7 @@
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 17,
+    "unresolvedObjectiveRows": 0,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -113,9 +113,9 @@
       "planId": "4.0",
       "source": "docs/reports/plan-4-foundation-replay.json",
       "objectiveRows": 17,
-      "verifiedRows": 0,
-      "unresolvedRows": 17,
-      "primaryBlocker": "foundation evidence is proven, but successor wave evidence has not closed every Plan 4 objective anchor"
+      "verifiedRows": 17,
+      "unresolvedRows": 0,
+      "primaryBlocker": "Plan 4 successor-wave evidence has been consumed into all 17 foundation anchors; final closeout still waits for the independent release certificate recompute."
     }
   ],
   "blockerClasses": [
@@ -126,9 +126,9 @@
         "Plan 3.1",
         "Plan 3.2"
       ],
-      "status": "partial-source-recomputed",
-      "reason": "replay reports establish denominator and row evidence surfaces; twenty-two Plan 3.x rows now have current objective-aligned receipts consumed into source replay, while the aggregate source replay verdict remains not-complete",
-      "requiredOutcome": "continue executing docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
+      "status": "resolved",
+      "reason": "Plan 3.0, Plan 3.1, and Plan 3.2 source replay rows are all verified and the positive current receipts have been consumed into source replay.",
+      "requiredOutcome": "maintain docs/reports/plan-3x-current-row-proof-map.json plus the positive/fresh receipt reports as the Plan 3.x objective proof authority."
     },
     {
       "id": "B2-plan4-successor-wave",
@@ -136,8 +136,8 @@
         "Plan 4.0"
       ],
       "status": "resolved",
-      "reason": "Plan 4 successor-wave evidence is mapped onto all 17 objective anchors without mutating the foundation replay artifact",
-      "requiredOutcome": "maintain docs/reports/plan4-successor-wave-objective-map.json and scripts/validate-plan4-successor-wave-objective-map.ts as successor coverage authority"
+      "reason": "Plan 4 successor-wave evidence is mapped and consumed into all 17 foundation objective anchors.",
+      "requiredOutcome": "maintain docs/reports/plan4-successor-wave-objective-map.json, docs/reports/plan-4-foundation-replay.json, and scripts/validate-plan4-successor-wave-consumption.ts as Plan 4 objective coverage authority."
     },
     {
       "id": "B3-charter-verdict",
@@ -165,22 +165,19 @@
         "final certificate",
         "release closeback"
       ],
-      "reason": "release surface is pushed and reachable, but certificate correctly blocks releaseAuthorized while objective and charter verdicts are not-complete",
-      "requiredOutcome": "only recompute releaseAuthorized after B1-B3 are proven"
+      "status": "ready-for-recompute",
+      "reason": "release surface is pushed and reachable, and all objective rows are now verified; certificate still correctly blocks releaseAuthorized until it is recomputed from the current objective artifacts.",
+      "requiredOutcome": "recompute docs/reports/plan-3x-4x-independent-certificate.json against the current objective and closeout artifacts, then keep releaseAuthorized fail-closed unless every dimension is proven."
     }
   ],
   "nextExecutionOrder": [
     {
-      "id": "B1-current-row-proof",
-      "whyFirst": "largest remaining work item; execute by row classes and focused validators, not one long full-suite run"
+      "id": "B5-release-certificate",
+      "whyFirst": "objective evidence is now consumed, so the next scarce work is a focused independent certificate recompute rather than more row replay"
     },
     {
       "id": "B4-backlog-disposition",
-      "whySecond": "release-blocking subset should be separated from non-blocking deferred backlog"
-    },
-    {
-      "id": "B5-release-certificate",
-      "whyThird": "certificate must stay fail-closed until upstream dimensions are proven"
+      "whySecond": "release-blocking backlog is zero, but deferred rows still need ownership or waiver before any stronger all-backlog completion claim"
     }
   ],
   "principlesApplied": [

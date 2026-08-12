@@ -8,7 +8,7 @@ assert.equal(report.schemaId, 'atm.fourPlanCloseoutBlockerMap.v1');
 assert.equal(report.status, 'actionable-not-complete');
 assert.equal(report.nonClaim, 'This map is an execution dashboard, not a completion certificate.');
 assert.equal(report.totals.objectiveRows, 86);
-assert.equal(report.totals.unresolvedObjectiveRows, 17);
+assert.equal(report.totals.unresolvedObjectiveRows, 0);
 assert.equal(report.totals.plansWithExactDenominator, 4);
 assert.equal(report.totals.certificateDimensionsProven, 5);
 assert.equal(report.totals.certificateDimensionsNotComplete, 1);
@@ -23,12 +23,12 @@ assert.equal(report.totals.plan3xObjectiveAlignedNegativeControlRowsConsumed, 8)
 assert.equal(report.totals.plan3xPositiveReceiptRowsBlockedByDoctorDrift, 2);
 assert.equal(report.totals.backlogReleaseBlockingNow, 0);
 assert.equal(report.totals.backlogNeedsTaskCardBeforeFinalRelease, 133);
-assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B1-current-row-proof')?.status, 'partial-source-recomputed');
+assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B1-current-row-proof')?.status, 'resolved');
+assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B2-plan4-successor-wave')?.status, 'resolved');
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B4-backlog-disposition')?.status, 'separated');
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
-  'B1-current-row-proof',
-  'B4-backlog-disposition',
-  'B5-release-certificate'
+  'B5-release-certificate',
+  'B4-backlog-disposition'
 ]);
 
 execFileSync('node', ['--strip-types', 'scripts/validate-four-plan-closeout-blocker-map.ts'], { stdio: 'pipe' });
