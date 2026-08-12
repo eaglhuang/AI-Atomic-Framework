@@ -1,0 +1,30 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_foundation_topology",
+  "theme": "Plan 4.0 foundation topology replay",
+  "resourceKey": "plan4.foundation-topology",
+  "maintainers": [
+    "atm-core"
+  ],
+  "cases": [
+    {
+      "caseId": "test_plan4_foundation_topology_and_17_anchors_0336",
+      "semanticKey": "plan4_foundation_topology_and_17_anchors",
+      "command": "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
+      "responsibility": "task-required",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "plan4-topology",
+        "catalog-foundation",
+        "incident-corpus",
+        "quality-certificate"
+      ]
+    }
+  ]
+}

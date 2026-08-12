@@ -1,0 +1,146 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0336",
+  "updatedAt": "2026-08-12T18:34:41.639Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:four-plan-objectives",
+    "validate:git-head-evidence",
+    "validate:governance-fix-wave"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4e0a00fc93d85913db7adefd024c9eb6ef8a26ebd8f0f2a0469515432f883386",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan4-foundation-topology.test.ts"
+      ],
+      "generatedAt": "2026-08-12T18:31:27.573Z",
+      "startedAt": "2026-08-12T18:31:26.882Z",
+      "finishedAt": "2026-08-12T18:31:27.573Z",
+      "durationMs": 691,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 4.0 --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bb950ad416bb3737eb5e6ea53dacb36ee26d96ee5758527b708117a4a880e22c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:four-plan-objectives"
+      ],
+      "generatedAt": "2026-08-12T18:31:35.240Z",
+      "startedAt": "2026-08-12T18:31:34.588Z",
+      "finishedAt": "2026-08-12T18:31:35.240Z",
+      "durationMs": 652,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:governance-fix-wave",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:66864fb9237d503d430b852a0db846fbc43f69009921196594cd1aafd0449053",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:governance-fix-wave"
+      ],
+      "generatedAt": "2026-08-12T18:31:43.718Z",
+      "startedAt": "2026-08-12T18:31:42.155Z",
+      "finishedAt": "2026-08-12T18:31:43.718Z",
+      "durationMs": 1563,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-12T18:32:02.111Z",
+      "startedAt": "2026-08-12T18:31:53.404Z",
+      "finishedAt": "2026-08-12T18:32:02.111Z",
+      "durationMs": 8707,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1c8f8f1e8bf4146d716d2a5b8b9e5471e995ed8e3a2fedc0e3886eef82731846",
+      "stderrSha256": "sha256:21888cef123516b4a5d36876847f397811f560cd1ba45b56bb8070b847516cdf",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-12T18:32:25.936Z",
+      "startedAt": "2026-08-12T18:32:08.583Z",
+      "finishedAt": "2026-08-12T18:32:25.936Z",
+      "durationMs": 17353,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-12T18:33:21.413Z",
+      "startedAt": "2026-08-12T18:32:32.641Z",
+      "finishedAt": "2026-08-12T18:33:21.413Z",
+      "durationMs": 48772,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4e0a00fc93d85913db7adefd024c9eb6ef8a26ebd8f0f2a0469515432f883386",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan4-foundation-topology.test.ts"
+      ],
+      "generatedAt": "2026-08-12T18:34:25.482Z",
+      "startedAt": "2026-08-12T18:34:24.683Z",
+      "finishedAt": "2026-08-12T18:34:25.482Z",
+      "durationMs": 799,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-12T18:34:41.638Z",
+      "startedAt": "2026-08-12T18:34:32.962Z",
+      "finishedAt": "2026-08-12T18:34:41.638Z",
+      "durationMs": 8676,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

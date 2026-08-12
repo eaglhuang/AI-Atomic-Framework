@@ -1,0 +1,310 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0336",
+  "title": "Rebuild and revalidate the Plan 4 foundation chain",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0335"
+  ],
+  "acceptance": [
+    "ACC-1: 每個節點重新解析 causalDependencies/startConditions、planning seal、source/ledger/projection fidelity；0313 未 released 時 catalog-dependent 節點停止。",
+    "ACC-2: 0313 canonical catalog、alias/lineage migration、full catalog 與 closure attribution 全綠。",
+    "ACC-3: 0307 重播 009/010/011/270/0276/runner-sync/stale-mixed-batch；0324 對 2026-07-31-002..008 逐 bug 有 red/green、repair commit、rollback、fresh evidence。",
+    "ACC-4: 0312 不得 compensating score；17/17 section anchors 各具十項 tuple，unknown/hard blocker 使 phase blocked。"
+  ],
+  "deliverables": [
+    "docs/reports/plan-4-foundation-replay.json",
+    "docs/reports/plan-4-foundation-replay.md",
+    "tests/cli/plan4-foundation-topology.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/phase-suite.ts",
+    "packages/core/src/evidence/state-replay.ts",
+    "packages/core/src/evidence/quality-authority.ts",
+    "tests/catalog/groups/test_group_plan4_*.shard.json",
+    "tests/fixtures/governance-incidents/",
+    "docs/reports/plan-4-foundation-replay.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
+    "node --strip-types scripts/validate-four-plan-objectives.ts --plan 4.0 --mode validate",
+    "npm run validate:governance-fix-wave"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "preserve-failed-anchor-as-not-complete-and-restore-prior-policy-epoch",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.plan4-phase-suite",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0336-rebuild-and-revalidate-the-plan-4-foundation-chain.task.md",
+    "sectionTitle": "ATM-GOV-0336",
+    "headingLine": 64,
+    "hash": "6bb43acb900d057c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0336-rebuild-and-revalidate-the-plan-4-foundation-chain.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:6bb43acb900d057c5f06f5bdfab0af17152679637c460a089cba71c7e8c473f1",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:32.646Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:32.646Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0335"
+    ],
+    "startConditions": [
+      "Plan 3.0 3.1 and 3.2 are 17/17 23/23 and 29/29 verified.",
+      "Canonical catalog and observed-evidence production callers are green."
+    ],
+    "softRelations": [
+      "ATM-GOV-0337"
+    ],
+    "changedPublicSeams": [
+      "atm.plan4FoundationReplay.v1"
+    ],
+    "causalImpactEdges": [
+      "plan4-topology",
+      "catalog-foundation",
+      "incident-corpus",
+      "quality-certificate"
+    ],
+    "parallelFrontierInputs": [
+      "plan4-source-cards",
+      "task-ledger",
+      "incident-fixtures",
+      "validator-catalog"
+    ],
+    "validatorReferences": [
+      "validate-four-plan-objectives",
+      "validate-governance-fix-wave",
+      "validate-state-replay"
+    ],
+    "phaseOwner": "closeout-wave-7"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_plan4_foundation_topology_and_17_anchors_0336",
+      "targetGroupId": null,
+      "semanticKey": "plan4_foundation_topology_and_17_anchors",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "plan4-topology",
+        "catalog-foundation",
+        "incident-corpus",
+        "quality-certificate"
+      ],
+      "expectedRedPredicate": "skipped dependency stale mirror missing incident or compensating score fails Plan 4 foundation",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.plan4FoundationReplay.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_plan4_foundation_topology_and_17_anchors_0336"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_authority_foundation",
+    "test_group_plan4_incident_replay"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T18-30-59-626Z-renew-b1d02e5ce708",
+  "lastTransitionAt": "2026-08-12T18:30:59.626Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T18:28:47.591Z",
+  "promotedAt": "2026-08-12T18:28:47.594Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-ba30531df458",
+    "claimedAt": "2026-08-12T18:28:47.598Z",
+    "heartbeatAt": "2026-08-12T18:30:59.014Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0336.*",
+      ".atm/history/task-events/ATM-GOV-0336/**",
+      ".atm/history/tasks/ATM-GOV-0336.json",
+      "docs/reports/plan-4-foundation-replay.json",
+      "docs/reports/plan-4-foundation-replay.md",
+      "packages/core/src/evidence/phase-suite.ts",
+      "packages/core/src/evidence/quality-authority.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "tests/catalog/groups/test_group_plan4_*.shard.json",
+      "tests/cli/plan4-foundation-topology.test.ts",
+      "tests/fixtures/governance-incidents/"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
+    }
+  },
+  "startedAt": "2026-08-12T18:28:47.598Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-7b365ad5755dccbe",
+    "ticketDigest": "sha256:7b365ad5755dccbe2d6734d04f5eb7b038695904d17d62ea0d014ab6cbad5211",
+    "taskId": "ATM-GOV-0336",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+    "claimGeneration": "lease-ba30531df458",
+    "issuedAt": "2026-08-12T18:30:59.014Z",
+    "expiresAt": "2026-08-12T19:00:59.014Z",
+    "scopeDigest": "sha256:e19e78498055d8cc8006434639e1fef1f17dd72e9cc136a7115af9de0b01b736",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T18:30:59.014Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0336.*",
+          ".atm/history/task-events/ATM-GOV-0336/**",
+          ".atm/history/tasks/ATM-GOV-0336.json",
+          "docs/reports/plan-4-foundation-replay.json",
+          "docs/reports/plan-4-foundation-replay.md",
+          "packages/core/src/evidence/phase-suite.ts",
+          "packages/core/src/evidence/quality-authority.ts",
+          "packages/core/src/evidence/state-replay.ts",
+          "tests/catalog/groups/test_group_plan4_*.shard.json",
+          "tests/cli/plan4-foundation-topology.test.ts",
+          "tests/fixtures/governance-incidents/"
+        ],
+        "digest": "sha256:8197cd2e6ba6b05aa1e5cd0c4ce52c37dc7673708d0891699f5a7bfb2f165a22"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260812182847-codex-gpt-5.4-mini-ATM-GOV-0336-be3462fd82",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0336",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-131b267e09e7d29c",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0336.*",
+      ".atm/history/task-events/ATM-GOV-0336/**",
+      ".atm/history/tasks/ATM-GOV-0336.json",
+      "docs/reports/plan-4-foundation-replay.json",
+      "docs/reports/plan-4-foundation-replay.md",
+      "packages/core/src/evidence/phase-suite.ts",
+      "packages/core/src/evidence/quality-authority.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "tests/catalog/groups/test_group_plan4_*.shard.json",
+      "tests/cli/plan4-foundation-topology.test.ts",
+      "tests/fixtures/governance-incidents/"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0336-rebuild-and-revalidate-the-plan-4-foundation-chain.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0336-rebuild-and-revalidate-the-plan-4-foundation-chain.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
+    },
+    "createdAt": "2026-08-12T18:28:51.824Z",
+    "status": "active"
+  }
+}

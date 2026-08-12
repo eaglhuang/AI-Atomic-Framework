@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T18-30-52-816Z-scope-amendment-13375528883d",
+  "taskId": "ATM-GOV-0336",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0336.json",
+  "taskSha256": "sha256:4ffb8c8fe6d6c2bb956cbc8a83a3059b0ab954229b3de3828f67ad7f1b090230",
+  "createdAt": "2026-08-12T18:30:52.816Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0336 --actor codex-gpt-5.4-mini --add \"docs/reports/plan-4-foundation-replay.md,tests/cli/plan4-foundation-topology.test.ts\" --reason \"Add declared ATM-GOV-0336 deliverables omitted from imported scope: markdown replay summary and topology regression test.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add declared ATM-GOV-0336 deliverables omitted from imported scope: markdown replay summary and topology regression test."
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "schemaId": "atm.plan4FoundationReplay.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0336",
+  "generatedAt": "2026-08-12T18:35:00.000Z",
+  "verdict": "foundation-revalidated",
+  "nonClaims": [
+    "foundation-replay-is-not-final-plan4-certification",
+    "plan4-objectives-remain-not-complete-until-successor-wave-evidence-closes-each-blocker",
+    "fixture-replay-does-not-substitute-for-hostile-dogfood-or-release-provenance"
+  ],
+  "plan4ObjectiveDenominator": {
+    "planId": "Plan 4.0",
+    "expected": 17,
+    "observed": 17,
+    "status": "ready",
+    "source": "scripts/validate-four-plan-objectives.ts --plan 4.0 --mode validate"
+  },
+  "foundationTopology": {
+    "causalDependencies": [
+      "ATM-GOV-0335"
+    ],
+    "startConditions": [
+      "Plan 3.0, 3.1 and 3.2 replay artifacts exist and validate their denominators.",
+      "Plan 4.0 denominator has exactly 17 objective anchors.",
+      "Plan 4.0 foundation evidence remains fail-closed rather than declaring final certification."
+    ],
+    "publicSeam": "atm.plan4FoundationReplay.v1",
+    "deepModules": [
+      "packages/core/src/evidence/phase-suite.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "packages/core/src/evidence/quality-authority.ts"
+    ],
+    "impactEdges": [
+      "plan4-topology",
+      "catalog-foundation",
+      "incident-corpus",
+      "quality-certificate"
+    ]
+  },
+  "phaseSuite": {
+    "checkpoint": "plan-verdict",
+    "requiredCaseIds": [
+      "test_task_atm_gov_0321_authority_5c8e1d42",
+      "test_task_atm_gov_0321_epoch_capability_8a3f6b19",
+      "test_task_atm_gov_0307_state_replay_4f2d8c71",
+      "test_task_atm_gov_0307_incident_corpus_9a1e6b34",
+      "test_plan4_foundation_topology_and_17_anchors_0336"
+    ],
+    "satisfiedCaseIds": [
+      "test_task_atm_gov_0321_authority_5c8e1d42",
+      "test_task_atm_gov_0321_epoch_capability_8a3f6b19",
+      "test_task_atm_gov_0307_state_replay_4f2d8c71",
+      "test_task_atm_gov_0307_incident_corpus_9a1e6b34",
+      "test_plan4_foundation_topology_and_17_anchors_0336"
+    ],
+    "promotionAllowed": true,
+    "catalogPhaseCaseCount": 5
+  },
+  "incidentCorpus": {
+    "requiredFamilies": [
+      "active-batch-router",
+      "close-deferral-derived-manifest",
+      "import-frontmatter-fidelity",
+      "runner-sync-protected-state",
+      "sealed-deletion-tombstone",
+      "shared-index-commit-attribution",
+      "stale-mixed-batch"
+    ],
+    "requiredDogfoodSignals": [
+      "active-batch-routing",
+      "close-deferral",
+      "cross-lane-shared-index"
+    ],
+    "status": "proven"
+  },
+  "qualityAuthority": {
+    "authorityId": "plan4-foundation-authority",
+    "policyEpoch": "plan4-foundation-epoch-2026-08-12",
+    "protectedSurfaces": [
+      "phase-suite",
+      "state-replay",
+      "quality-authority",
+      "plan4-objective-denominator"
+    ],
+    "status": "proven"
+  },
+  "objectiveAnchors": [
+    { "objectiveId": "OBJ-01", "status": "not-complete", "foundationPhase": "topology", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-02", "status": "not-complete", "foundationPhase": "catalog-foundation", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-03", "status": "not-complete", "foundationPhase": "catalog-foundation", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-04", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-05", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-06", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-07", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-08", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-09", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-10", "status": "not-complete", "foundationPhase": "topology", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-11", "status": "not-complete", "foundationPhase": "topology", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-12", "status": "not-complete", "foundationPhase": "catalog-foundation", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-13", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-14", "status": "not-complete", "foundationPhase": "incident-corpus", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-15", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-16", "status": "not-complete", "foundationPhase": "quality-certificate", "blocker": "successor wave evidence not yet closed" },
+    { "objectiveId": "OBJ-17", "status": "not-complete", "foundationPhase": "topology", "blocker": "successor wave evidence not yet closed" }
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
+    "node --strip-types scripts/validate-four-plan-objectives.ts --plan 4.0 --mode validate",
+    "npm run validate:governance-fix-wave"
+  ]
+}
