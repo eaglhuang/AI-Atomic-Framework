@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-4bf00cae3269",
+  "recordedAt": "2026-08-12T06:08:23.752Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0350",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0350 --message \"fix(taskflow): unify current close evidence classification\n\nATM-Work-Admission: wat-a32bc4d49eb39929 sha256:a32bc4d49eb39929c06d0341ea229a381f1e5d83bc9d933a8f460c1cc24d62f8\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0350-b59ef41f9d",
+  "reason": "Scoped hook timeout after successful governed bundle dry-run",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T06-08-23-750Z-EMG-ATM-GOV-0350-b59ef41f9d.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
