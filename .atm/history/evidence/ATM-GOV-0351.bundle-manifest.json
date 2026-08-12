@@ -1,11 +1,17 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0351",
-  "updatedAt": "2026-08-12T07:15:00.996Z",
+  "updatedAt": "2026-08-12T07:36:54.432Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
-    "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts"
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -37,6 +43,102 @@
       "startedAt": "2026-08-12T07:14:44.318Z",
       "finishedAt": "2026-08-12T07:15:00.995Z",
       "durationMs": 16677,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:974173d6ff4cd6d2a3c8aa603d8f0c0a0c3af85f80cca6acd212e939353d4041",
+      "stderrSha256": "sha256:37ecaebd12b6186666aaa1466ce67f4c48d3b13319c4d76d8123ba09f73d5a94",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts"
+      ],
+      "generatedAt": "2026-08-12T07:25:53.076Z",
+      "startedAt": "2026-08-12T07:25:47.248Z",
+      "finishedAt": "2026-08-12T07:25:53.076Z",
+      "durationMs": 5828,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1f3d7d8bc5794d5056cada6ee3226f04fa7be9a120befde0d496b2faf225f39b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts"
+      ],
+      "generatedAt": "2026-08-12T07:30:09.350Z",
+      "startedAt": "2026-08-12T07:30:09.069Z",
+      "finishedAt": "2026-08-12T07:30:09.350Z",
+      "durationMs": 281,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3042e0fba5fb5c72835915b4f256effb27fafd05cf97ad409dc3ce17d69954e8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts"
+      ],
+      "generatedAt": "2026-08-12T07:30:18.413Z",
+      "startedAt": "2026-08-12T07:30:18.149Z",
+      "finishedAt": "2026-08-12T07:30:18.413Z",
+      "durationMs": 264,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-12T07:30:36.930Z",
+      "startedAt": "2026-08-12T07:30:28.531Z",
+      "finishedAt": "2026-08-12T07:30:36.930Z",
+      "durationMs": 8399,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1b88e05bef873a45ff86b57e7dcf284c038671543c2dae7058db2fd29156d01d",
+      "stderrSha256": "sha256:7e2d6550d52bc23b8cdb07da7944d3870f8aec19300974babc2d9b3693bb2bd2",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-12T07:35:10.612Z",
+      "startedAt": "2026-08-12T07:34:27.311Z",
+      "finishedAt": "2026-08-12T07:35:10.612Z",
+      "durationMs": 43301,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-12T07:36:54.431Z",
+      "startedAt": "2026-08-12T07:35:19.207Z",
+      "finishedAt": "2026-08-12T07:36:54.431Z",
+      "durationMs": 95224,
       "runnerKind": "frozen-runner",
       "sourceCommit": null,
       "cached": false

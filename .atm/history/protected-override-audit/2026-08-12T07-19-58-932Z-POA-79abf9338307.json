@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-79abf9338307",
+  "recordedAt": "2026-08-12T07:19:58.932Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0351",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0351 --message \"fix(taskflow): preserve deferred staged deletions\n\nATM-Work-Admission: wat-2d98410ab65b39ea sha256:2d98410ab65b39ea9e297255d78d411a2601b11bf88779bdbe332c0100bce0b6\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0351-8f4a10a3bc",
+  "reason": "Bootstrap circularity: the frozen runner cannot load the staged-deletion close-window repair until that source repair is committed and published; focused regression and typecheck passed.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T07-19-58-930Z-EMG-ATM-GOV-0351-8f4a10a3bc.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
