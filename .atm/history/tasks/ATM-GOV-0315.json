@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0315",
   "title": "Plan 4.0 six-editor runtime adapter parity canary",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0314"
@@ -178,8 +178,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T11-15-54-086Z-renew-0e29a33554e6",
-  "lastTransitionAt": "2026-08-12T11:15:54.086Z",
+  "lastTransitionId": "2026-08-12T12-30-30-775Z-lock-cleanup-a7d60f842e72",
+  "lastTransitionAt": "2026-08-12T12:30:30.775Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T11:04:03.026Z",
@@ -188,7 +188,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-8d436aed068f",
     "claimedAt": "2026-08-12T11:04:03.040Z",
-    "heartbeatAt": "2026-08-12T11:15:53.406Z",
+    "heartbeatAt": "2026-08-12T12:30:30.659Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0315.*",
@@ -206,13 +206,14 @@
       "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
       "tests/cli/plan4-adapter-parity.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812102637-codex-gpt-5.4-mini-68074efbfd\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T11:04:03.040Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -261,25 +262,28 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812102637-codex-gpt-5.4-mini-68074efbfd\""
     },
     "createdAt": "2026-08-12T11:04:05.673Z",
-    "status": "active"
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T12:30:30.773Z",
+    "releasedBy": "codex-gpt-5.4-mini"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-62ebe1e294491de5",
-    "ticketDigest": "sha256:62ebe1e294491de59e2c359b60fa27a52ed9a5023b3e00f8819b3d26e8972b9a",
+    "ticketId": "wat-77ea407e7a7aebe9",
+    "ticketDigest": "sha256:77ea407e7a7aebe903499ab3f1a0ff27e0202e82e542db789e9d0af5c0bce08d",
     "taskId": "ATM-GOV-0315",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
     "claimGeneration": "lease-8d436aed068f",
-    "issuedAt": "2026-08-12T11:15:53.406Z",
-    "expiresAt": "2026-08-12T11:45:53.406Z",
+    "issuedAt": "2026-08-12T12:27:48.346Z",
+    "expiresAt": "2026-08-12T12:57:48.346Z",
     "scopeDigest": "sha256:1264384f5fc3baa51e005d66aa09d70571ef65de6d147fba142c4f66e678fc1d",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T11:15:53.406Z"
+      "selectedAt": "2026-08-12T12:27:48.346Z"
     },
     "grants": [
       {
@@ -334,5 +338,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  }
+  },
+  "closedAt": "2026-08-12T12:30:30.659Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812110403-codex-gpt-5.4-mini-ATM-GOV-0315-fa30837f97",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0315.closure-packet.json"
 }

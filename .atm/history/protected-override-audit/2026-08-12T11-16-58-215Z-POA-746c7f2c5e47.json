@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-746c7f2c5e47",
+  "recordedAt": "2026-08-12T11:16:58.215Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0315",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0315 --message \"fix(integration): enforce six-editor parity evidence\n\nATM-Work-Admission: wat-62ebe1e294491de5 sha256:62ebe1e294491de59e2c359b60fa27a52ed9a5023b3e00f8819b3d26e8972b9a\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0315-a685340b39",
+  "reason": "Bootstrap circularity: frozen batch hook requires checkpoint before runner-source parity implementation can be saved.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T11-16-58-213Z-EMG-ATM-GOV-0315-a685340b39.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

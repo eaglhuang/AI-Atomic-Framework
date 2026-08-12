@@ -41,6 +41,18 @@ Treat ATM parallel governance as a tiered authority model:
   shared write window. A bare refusal at a shared-write gate is charter debt
   (INV-ATM-008), not a design choice.
 
+## Minimum Queue Residency
+
+Apply `INV-ATM-011` to every queue decision. Treat a queue as a scarce-resource
+boundary, not work ownership: identify the irreducible shared interval, move all
+separable work outside it, and queue only a ready candidate. Completion or
+invalidation must release capacity immediately.
+
+Do not solve avoidable queue time with agent polling, long-lived reservation, or
+path-only serialization. Require observable readiness and current-state evidence
+at the boundary; broker tickets, locks, leases, publication flows, and commits
+are implementations of this principle, not exceptions to it.
+
 The only standing serialization exceptions are the four owner-ruled cases in
 `docs/governance/parallel-governance-charter.md` (one lane session per task
 card; dependency gates block code only, never documents; the single-branch
@@ -382,6 +394,8 @@ governance defects go to the bug backlog first.
   Rule: Any code logic change, bug fix, or governance rule change must first be designed as the most general rule that correctly explains the observed failure class. Hard-coded special cases are allowed only with recorded evidence that the general rule is not currently safe, feasible, or economical, and that the exception is bounded and reversible. Data-shaped behavior, including thresholds, mappings, allowlists, routing choices, telemetry classifications, prompts, message text, fixtures, and domain content, must first be modeled outside control flow through schemas, registries, configuration, observed counters, or compact digest evidence instead of embedded changeable numbers or strings. The generalized solution must remain observable, testable, and no broader than the evidence supports.
 - `INV-ATM-010` ??**Single canonical worktree and compose-first shared writes** (enforcement: `doctor`, breaking change: no)
   Rule: Normal governed parallel development uses one canonical worktree, base, and HEAD. A shared physical file is compose-eligible rather than a file lock: workers declare bounded atom/CID/content-anchor/source-range intents and submit proposals, while the broker, format adapter, and transactional composer decide compose, revalidation, escalation, or queue. A neutral steward is the only shared-file writer and shared delivery records member attribution. Queueing or revalidation is a fallback for a true logical conflict, stale base/CAS failure, unsupported adapter, or fairness bound. AI workers must not use Git branches, detached worktrees, alternate indexes, merges, or rebases as normal concurrency/isolation mechanisms. The closed exceptions are emergency/anomaly recovery, historical read-only discrimination, and non-development sealed packaging; each requires a named receipt and cannot perform normal governed contribution writes.
+- `INV-ATM-011` ??**Minimum queue residency** (enforcement: `doctor`, breaking change: no)
+  Rule: Queueing is a scarce-resource boundary, never a work-ownership model. Every queue design must minimize residency to the irreducible interval during which a specific shared resource cannot be safely parallelized, composed, deferred, or made private. All separable preparation, computation, validation, and staging must occur outside that interval before a worker joins the queue. The design must make the boundary observable and prove it is minimal: admission binds a ready candidate to current state, the shared transition has explicit success and failure outcomes, and completion or invalidation releases capacity immediately. A queue may not substitute for polling, long-lived reservation, or avoidable serialization. A particular broker, lock, lease, publish flow, or commit mechanism is only one implementation of this invariant, not its meaning.
 
 ## Captain Dogfood Lessons (2026-07-14)
 

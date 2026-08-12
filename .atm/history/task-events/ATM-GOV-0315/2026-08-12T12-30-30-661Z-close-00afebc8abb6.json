@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T12-30-30-661Z-close-00afebc8abb6",
+  "taskId": "ATM-GOV-0315",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812110403-codex-gpt-5.4-mini-ATM-GOV-0315-fa30837f97",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0315.json",
+  "taskSha256": "sha256:f552e10a54a4bf1796deded02de023406c7cdd271e75b8f8d55faf8edd39f519",
+  "createdAt": "2026-08-12T12:30:30.661Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0315 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6 --historical-delivery ded45afb158f4f6b0d136aa68e92d8b7a78577cd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812110403-codex-gpt-5.4-mini-ATM-GOV-0315-fa30837f97",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0315.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-adapter-parity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T12:30:30.652Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0315.*",
+        ".atm/history/task-events/ATM-GOV-0315/**",
+        ".atm/history/tasks/ATM-GOV-0315.json",
+        ".claude",
+        ".cursor",
+        ".gemini",
+        ".github",
+        "GEMINI.md",
+        "integrations",
+        "packages/cli/src/commands",
+        "packages/core/src",
+        "packages/integration-gemini/src/index.ts",
+        "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+        "tests/cli/plan4-adapter-parity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands",
+        "packages/core/src",
+        "packages/integration-gemini/src/index.ts",
+        "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+        "tests/cli/plan4-adapter-parity.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
