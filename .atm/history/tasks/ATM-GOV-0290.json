@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0290",
   "title": "cyclomatic complexity, CRAP, module/interface size adapter",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0285"
@@ -172,8 +172,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T02-39-30-542Z-renew-8f6932b6bb6d",
-  "lastTransitionAt": "2026-08-12T02:39:30.542Z",
+  "lastTransitionId": "2026-08-12T02-45-30-256Z-close-f1414835acda",
+  "lastTransitionAt": "2026-08-12T02:45:30.256Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-09T16:25:11.916Z",
@@ -182,7 +182,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-d23facc9e0ef",
     "claimedAt": "2026-08-10T13:01:32.072Z",
-    "heartbeatAt": "2026-08-12T02:39:29.636Z",
+    "heartbeatAt": "2026-08-12T02:45:30.253Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0290.json",
@@ -193,13 +193,14 @@
       "tests/cli/plan4-complexity-interface-size-negative.test.ts",
       "tests/cli/plan4-complexity-interface-size.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260810000724-codex-gpt-5.4-mini-dde73647fb",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260810000724-codex-gpt-5.4-mini-dde73647fb\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-10T13:01:32.072Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -303,5 +304,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-12T02:45:30.253Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260810130132-codex-gpt-5.4-mini-ATM-GOV-0290-4e9f4765f1",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0290.closure-packet.json"
 }

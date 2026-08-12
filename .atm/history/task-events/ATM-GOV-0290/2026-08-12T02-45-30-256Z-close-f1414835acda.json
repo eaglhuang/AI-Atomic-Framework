@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T02-45-30-256Z-close-f1414835acda",
+  "taskId": "ATM-GOV-0290",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260810130132-codex-gpt-5.4-mini-ATM-GOV-0290-4e9f4765f1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0290.json",
+  "taskSha256": "sha256:e4f48ae7583618cb623d46825db1ac390e84a7de9838a183c66df9626dce3a1d",
+  "createdAt": "2026-08-12T02:45:30.256Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0290 --actor codex-gpt-5.4-mini --status done --historical-delivery 646947c2e34bd27dd8ae5b807952aa4c976b4e74",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260810130132-codex-gpt-5.4-mini-ATM-GOV-0290-4e9f4765f1",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0290.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-complexity-interface-size-negative.test.ts",
+      "node --strip-types tests/cli/plan4-complexity-interface-size.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T02:45:30.246Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0290.*",
+        ".atm/history/task-events/ATM-GOV-0290/**",
+        ".atm/history/tasks/ATM-GOV-0290.json",
+        "packages/core/src/evidence/complexity-interface-size.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/complexity-interface-size.schema.json",
+        "tests/catalog/groups/test_group_plan4_complexity-interface-size.shard.json",
+        "tests/cli/plan4-complexity-interface-size-negative.test.ts",
+        "tests/cli/plan4-complexity-interface-size.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/complexity-interface-size.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/complexity-interface-size.schema.json",
+        "tests/catalog/groups/test_group_plan4_complexity-interface-size.shard.json",
+        "tests/cli/plan4-complexity-interface-size-negative.test.ts",
+        "tests/cli/plan4-complexity-interface-size.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
