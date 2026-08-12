@@ -1,13 +1,29 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [],
-  "retainedPaths": [],
+  "reconciledPaths": [
+    ".atm/history/evidence/ATM-GOV-0345.live-index-reconciliation.json",
+    ".atm/history/evidence/ATM-GOV-0345.runner-sync-receipt.json",
+    ".atm/history/protected-override-audit/2026-08-11T23-10-22-503Z-POA-3c37bb7ad689.json",
+    ".atm/history/protected-override-audit/2026-08-11T23-11-25-395Z-POA-e16816a24a7f.json",
+    ".atm/history/task-events/ATM-GOV-0345/2026-08-11T23-08-49-252Z-scope-amendment-33b4cff69239.json",
+    ".atm/history/task-events/ATM-GOV-0345/2026-08-11T23-25-50-050Z-renew-f86650991d7e.json",
+    ".atm/history/task-events/ATM-GOV-0345/2026-08-11T23-25-57-973Z-scope-amendment-532df3cd69f9.json",
+    ".atm/history/task-events/ATM-GOV-0345/2026-08-11T23-30-46-090Z-scope-amendment-5e707558d142.json",
+    ".atm/history/task-events/ATM-GOV-0345/2026-08-12T00-02-40-504Z-renew-a600c150062e.json",
+    ".atm/history/tasks/ATM-GOV-0345.json",
+    "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts"
+  ],
+  "retainedPaths": [
+    {
+      "path": ".atm/history/evidence/git-head.jsonl",
+      "reason": "worktree-diverged"
+    }
+  ],
   "clean": false,
-  "failure": {
-    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
-    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,d4b24c715120c16513027d338cdc3a5abcb041fc,.atm/history/protected-override-audit/2026-08-11T18-19-09-958Z-POA-2c264ef60ad2.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
-  },
+  "failure": null,
   "taskId": "ATM-GOV-0345",
-  "createdAt": "2026-08-11T23:58:41.827Z"
+  "createdAt": "2026-08-12T00:17:12.217Z"
 }

@@ -259,8 +259,6 @@ export function acquireCloseWindowStagedIndexLock(input: {
   });
   const expectedStageFiles = new Set(uniqueSorted(input.expectedStageFiles));
   const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expectedStageFiles.has(filePath));
-  let foreignStagedSnapshotPath: string | null = null;
-  let foreignStagedEntries: readonly ForeignStagedIndexEntry[] = [];
   if (unexpectedStagedFiles.length > 0 && !input.deferForeignStaged) {
     return {
       schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
@@ -275,13 +273,9 @@ export function acquireCloseWindowStagedIndexLock(input: {
         : 'Close window blocked by staged entries outside the governed bundle; defer explicitly or reconcile the index before closing.'
     };
   }
-  if (unexpectedStagedFiles.length > 0 && input.deferForeignStaged) {
-    const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles);
-    foreignStagedSnapshotPath = deferred?.snapshotPath ?? null;
-    foreignStagedEntries = deferred?.entries ?? [];
-  }
-
-  const record: CloseWindowStagedIndexLockRecord = {
+  // Publish the coordination lease before touching Git's shared index.  The
+  // former order parked foreign entries first, leaving an index-lock race.
+  let record: CloseWindowStagedIndexLockRecord = {
     schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
     specVersion: '0.1.0',
     taskId: normalizeTaskId(input.taskId),
@@ -289,21 +283,35 @@ export function acquireCloseWindowStagedIndexLock(input: {
     acquiredAt: new Date().toISOString(),
     status: 'active',
     expectedStageFiles: uniqueSorted(input.expectedStageFiles),
-    foreignStagedSnapshotPath,
-    foreignStagedEntries,
+    foreignStagedSnapshotPath: null,
+    foreignStagedEntries: [],
     unexpectedStagedTasks,
     releasedAt: null,
     releaseOutcome: null
   };
   mkdirSync(path.dirname(lockPath), { recursive: true });
   writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+  try {
+    if (unexpectedStagedFiles.length > 0 && input.deferForeignStaged) {
+      const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles);
+      record = {
+        ...record,
+        foreignStagedSnapshotPath: deferred?.snapshotPath ?? null,
+        foreignStagedEntries: deferred?.entries ?? []
+      };
+      writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+    }
+  } catch (error) {
+    unlinkSync(lockPath);
+    throw error;
+  }
   return {
     schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
     ok: true,
     lockPath: relativePathFrom(input.cwd, lockPath),
     lock: record,
     unexpectedStagedTasks,
-    foreignStagedSnapshotPath,
+    foreignStagedSnapshotPath: record.foreignStagedSnapshotPath,
     blockedCode: null,
     blockedSummary: null
   };

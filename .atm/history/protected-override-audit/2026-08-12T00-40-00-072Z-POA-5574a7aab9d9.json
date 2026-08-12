@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-5574a7aab9d9",
+  "recordedAt": "2026-08-12T00:40:00.072Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/tasks/close-window-lock.ts,packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts --reason \"Normal scope add and its documented --claim-first recovery are unreachable because the active task direction lock was released and global historical line-budget revalidation blocks re-claim; add the two directly causal close-window repair files only.\" --emergency-approval EMG-ATM-GOV-0345-64ab457e9e --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0345-64ab457e9e",
+  "reason": "Normal scope add and its documented --claim-first recovery are unreachable because the active task direction lock was released and global historical line-budget revalidation blocks re-claim; add the two directly causal close-window repair files only.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T00-40-00-070Z-EMG-ATM-GOV-0345-64ab457e9e.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

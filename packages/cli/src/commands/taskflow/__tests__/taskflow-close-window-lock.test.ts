@@ -58,6 +58,25 @@ try {
   const foreignTaskId = 'TASK-FOREIGN-0002';
   const expectedStageFile = stageGovernanceFile(repoRoot, taskId);
   const foreignStageFile = stageGovernanceFile(repoRoot, foreignTaskId);
+  // Index ownership deliberately trusts a direction lock only when it has a
+  // matching live claim.  Model a real foreign writer rather than a stale
+  // lock-file residue, which must remain non-authoritative.
+  writeJson(path.join(repoRoot, foreignStageFile), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: foreignTaskId,
+    title: `${foreignTaskId} fixture`,
+    status: 'running',
+    claim: {
+      actorId: 'foreign-agent',
+      leaseId: 'lease-foreign-live',
+      claimedAt: new Date().toISOString(),
+      heartbeatAt: new Date().toISOString(),
+      ttlSeconds: 3600,
+      files: [foreignStageFile],
+      state: 'active'
+    }
+  });
+  execFileSync('git', ['add', foreignStageFile], { cwd: repoRoot, stdio: 'ignore' });
   writeJson(path.join(repoRoot, '.atm/runtime/locks', `${foreignTaskId}.lock.json`), {
     schemaId: 'atm.governanceScopeLock',
     workItemId: foreignTaskId,
