@@ -1,0 +1,156 @@
+{
+  "schemaId": "atm.plan4SuccessorWaveObjectiveMap.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-13T00:00:00.000Z",
+  "status": "successor-evidence-mapped",
+  "nonClaim": "This map proves successor-wave evidence coverage for Plan 4 anchors; it does not complete Plan 3.x objective rows.",
+  "sourceReports": [
+    {
+      "path": "docs/reports/plan-4-foundation-replay.json",
+      "digest": "sha256:ae7df4f3c4466eae24f63b6eb4d4b6efb3f26386c37ef4e0f2ddb3aea5159c48"
+    },
+    {
+      "path": "docs/reports/plan4-real-shadow-comparison.json",
+      "digest": "sha256:26a9074b8d5a8680f92ef7f284d2fbf7edd47490ec23fb58aac1c66be0cd5280"
+    },
+    {
+      "path": "docs/reports/plan4-six-editor-adapter-parity.json",
+      "digest": "sha256:b70410de1ac69a13a186d5d9dc8203d2bd7f78fdbeb61c66dbffcd3fe9086f47"
+    },
+    {
+      "path": "docs/reports/plan4-hostile-dogfood-saturation.json",
+      "digest": "sha256:216e9dbb835198890ced00bd9cb0838ada447408e5bd95a92a8faf01024cdd84"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+      "digest": "sha256:a2074fc99dbc7ff8faf9ae3670839f73058cf4103082034dd2f1ff6331170906"
+    }
+  ],
+  "totals": {
+    "foundationAnchors": 17,
+    "mappedAnchors": 17,
+    "unmappedAnchors": 0,
+    "sourceReports": 5
+  },
+  "objectiveMappings": [
+    {
+      "objectiveId": "OBJ-01",
+      "foundationPhase": "topology",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan-4-foundation-replay.json"],
+      "summary": "foundation topology has exact 17-anchor denominator and phase suite promotion evidence"
+    },
+    {
+      "objectiveId": "OBJ-02",
+      "foundationPhase": "catalog-foundation",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-six-editor-adapter-parity.json"],
+      "summary": "six editor adapter parity has compiler, manifest, install, verify, and frozen runner smoke evidence"
+    },
+    {
+      "objectiveId": "OBJ-03",
+      "foundationPhase": "catalog-foundation",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-six-editor-adapter-parity.json"],
+      "summary": "all six adapter projections share the same sealed source and compiler digest authority"
+    },
+    {
+      "objectiveId": "OBJ-04",
+      "foundationPhase": "incident-corpus",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan-4-foundation-replay.json", "docs/reports/plan4-hostile-dogfood-saturation.json"],
+      "summary": "required incident families are present and hostile branches cover shared-index, CAS, queue race, and provenance mismatch"
+    },
+    {
+      "objectiveId": "OBJ-05",
+      "foundationPhase": "incident-corpus",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-hostile-dogfood-saturation.json"],
+      "summary": "hostile dogfood preserves rollback and canonical worktree integrity across paired experiments"
+    },
+    {
+      "objectiveId": "OBJ-06",
+      "foundationPhase": "incident-corpus",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan-3x-4x-backlog-disposition-census.json"],
+      "summary": "backlog census is machine-readable, valid, and exposes terminal/deferred disposition counts without openLike residue"
+    },
+    {
+      "objectiveId": "OBJ-07",
+      "foundationPhase": "quality-certificate",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-real-shadow-comparison.json"],
+      "summary": "shadow comparison binds candidate digest, selected/full commands, false blocks, escaped defect policy, and negative controls"
+    },
+    {
+      "objectiveId": "OBJ-08",
+      "foundationPhase": "quality-certificate",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-real-shadow-comparison.json"],
+      "summary": "selected validators are separated from skipped long validators and escapedDefects remains empty"
+    },
+    {
+      "objectiveId": "OBJ-09",
+      "foundationPhase": "quality-certificate",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan-4-foundation-replay.json"],
+      "summary": "quality authority protects phase-suite, state-replay, quality-authority, and plan4 objective denominator surfaces"
+    },
+    {
+      "objectiveId": "OBJ-10",
+      "foundationPhase": "topology",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan-4-foundation-replay.json"],
+      "summary": "causal dependency from Plan 3.2 replay to Plan 4 foundation is explicit"
+    },
+    {
+      "objectiveId": "OBJ-11",
+      "foundationPhase": "topology",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-hostile-dogfood-saturation.json"],
+      "summary": "queue-race branch models minimum queue residency and immediate release after the bottleneck"
+    },
+    {
+      "objectiveId": "OBJ-12",
+      "foundationPhase": "catalog-foundation",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-six-editor-adapter-parity.json"],
+      "summary": "adapter parity validates framework-neutral source templates across Codex, Claude Code, Cursor, Copilot, Gemini, and Antigravity"
+    },
+    {
+      "objectiveId": "OBJ-13",
+      "foundationPhase": "incident-corpus",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-hostile-dogfood-saturation.json"],
+      "summary": "incident families have known-covered dispositions with maximumUnknownFamilies=0"
+    },
+    {
+      "objectiveId": "OBJ-14",
+      "foundationPhase": "incident-corpus",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan-3x-4x-backlog-disposition-census.json"],
+      "summary": "bug backlog disposition is observable as terminal, owned-open, and deferred counts without unclassified rows"
+    },
+    {
+      "objectiveId": "OBJ-15",
+      "foundationPhase": "quality-certificate",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-real-shadow-comparison.json", "docs/reports/plan-4-foundation-replay.json"],
+      "summary": "policy epoch and quality authority are digest-bound and negative controls are named"
+    },
+    {
+      "objectiveId": "OBJ-16",
+      "foundationPhase": "quality-certificate",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan4-real-shadow-comparison.json"],
+      "summary": "false-block accounting is diagnostic-only and does not replace full release validation"
+    },
+    {
+      "objectiveId": "OBJ-17",
+      "foundationPhase": "topology",
+      "status": "successor-evidence-present",
+      "evidenceRefs": ["docs/reports/plan-4-foundation-replay.json", "docs/reports/plan4-hostile-dogfood-saturation.json"],
+      "summary": "Plan 4 successor topology preserves fail-closed foundation semantics while proving successor coverage"
+    }
+  ]
+}

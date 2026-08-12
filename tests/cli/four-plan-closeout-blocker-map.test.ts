@@ -12,8 +12,8 @@ assert.equal(report.totals.unresolvedObjectiveRows, 86);
 assert.equal(report.totals.plansWithExactDenominator, 4);
 assert.equal(report.totals.certificateDimensionsProven, 5);
 assert.equal(report.totals.certificateDimensionsNotComplete, 1);
+assert.equal(report.totals.plan4SuccessorMappedAnchors, 17);
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
-  'B2-plan4-successor-wave',
   'B1-current-row-proof',
   'B4-backlog-disposition',
   'B5-release-certificate'
