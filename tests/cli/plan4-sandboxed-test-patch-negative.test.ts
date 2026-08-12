@@ -1,9 +1,15 @@
 import assert from 'node:assert/strict';
-import { compileSandboxedTestPatch } from '../../packages/core/src/evidence/sandboxed-test-patch.ts';
+import { compileSandboxedTestPatch, validateSandboxedTestPatch } from '../../packages/core/src/evidence/sandboxed-test-patch.ts';
 const authority = { authorityId: 'a', baseDigest: 'sha256:source', sealed: true as const };
-const stale = compileSandboxedTestPatch({ authority, patchId: 'p', sourceDigest: 'sha256:other', operations: [{ operationId: 'o', path: 'test.ts', start: 0, end: 1, replacement: 'x' }], requiredTestIds: ['t1'], passingTestIds: [] });
+const stale = compileSandboxedTestPatch({ authority, patchId: 'p', sourceDigest: 'sha256:other', operations: [{ operationId: 'o', path: 'test.ts', start: 0, end: 1, replacement: 'x' }], requiredTestIds: ['t1'], passingTestIds: ['t1'] });
 assert.equal(stale.status, 'stale');
 assert.match(stale.repairCommand ?? '', /restore/);
+assert.deepEqual(validateSandboxedTestPatch(stale), { ok: false, diagnostics: ['source-authority-drift'] });
 const contradictory = compileSandboxedTestPatch({ authority, patchId: 'p', sourceDigest: 'sha256:source', operations: [{ operationId: 'o', path: 'test.ts', start: 2, end: 1, replacement: 'x' }, { operationId: 'o', path: 'test.ts', start: 0, end: 1, replacement: 'x' }], requiredTestIds: ['t1'], passingTestIds: [] });
 assert.equal(contradictory.status, 'contradictory');
+const overlap = compileSandboxedTestPatch({ authority, patchId: 'p', sourceDigest: 'sha256:source', operations: [{ operationId: 'left', path: 'test.ts', start: 0, end: 2, replacement: 'x' }, { operationId: 'right', path: 'test.ts', start: 1, end: 3, replacement: 'y' }], requiredTestIds: ['t1'], passingTestIds: ['t1'] });
+assert.equal(overlap.status, 'contradictory');
+assert.ok(overlap.diagnostics.some((entry) => entry.startsWith('overlapping-operation:test.ts:left:right')));
+const tampered = { ...compileSandboxedTestPatch({ authority, patchId: 'p', sourceDigest: 'sha256:source', operations: [{ operationId: 'o', path: 'test.ts', start: 0, end: 1, replacement: 'x' }], requiredTestIds: ['t1'], passingTestIds: ['t1'], provenance: { actor: 'original' } }), provenance: { actor: 'substituted' } };
+assert.deepEqual(validateSandboxedTestPatch(tampered), { ok: false, diagnostics: ['result-digest-mismatch'] });
 console.log('plan4 sandboxed test patch negative: ok');

@@ -19,6 +19,8 @@ export interface SandboxPatchResult {
   readonly specVersion: '0.1.0';
   readonly patchId: string;
   readonly authority: PatchAuthority;
+  /** Observed digest of the exact source tree against which this patch was evaluated. */
+  readonly sourceDigest: string;
   readonly operations: readonly TestPatchOperation[];
   readonly minimizedOperationIds: readonly string[];
   readonly requiredTestIds: readonly string[];
@@ -41,17 +43,24 @@ export function compileSandboxedTestPatch(input: SandboxPatchInput): SandboxPatc
     seen.add(operation.operationId);
     if (!operation.path || operation.start < 0 || operation.end < operation.start) diagnostics.push(`invalid-operation:${operation.operationId}`);
   }
+  for (const [path, operations] of Object.entries(groupOperationsByPath(n.operations))) {
+    const ordered = [...operations].sort((left, right) => left.start - right.start || left.end - right.end || compareOperation(left, right));
+    for (let index = 1; index < ordered.length; index += 1) {
+      if (ordered[index]!.start < ordered[index - 1]!.end) diagnostics.push(`overlapping-operation:${path}:${ordered[index - 1]!.operationId}:${ordered[index]!.operationId}`);
+    }
+  }
   const passing = new Set(n.passingTestIds);
   for (const id of n.requiredTestIds) if (!passing.has(id)) diagnostics.push(`missing-test:${id}`);
   if (n.sourceDigest !== n.authority.baseDigest) diagnostics.push('source-authority-drift');
   const minimized = minimize(n.operations);
-  const status: SandboxedTestPatchStatus = diagnostics.some((entry) => entry.startsWith('duplicate-') || entry.startsWith('invalid-') || entry === 'authority-incomplete' || entry === 'patch-incomplete') ? 'contradictory' : diagnostics.some((entry) => entry === 'source-authority-drift') ? 'stale' : diagnostics.length ? 'blocked' : 'proven';
+  const status: SandboxedTestPatchStatus = diagnostics.some((entry) => entry.startsWith('duplicate-') || entry.startsWith('invalid-') || entry.startsWith('overlapping-operation:') || entry === 'authority-incomplete' || entry === 'patch-incomplete') ? 'contradictory' : diagnostics.some((entry) => entry === 'source-authority-drift') ? 'stale' : diagnostics.length ? 'blocked' : 'proven';
   const repairCommand = status === 'proven' ? null : 'restore the sealed source authority, repair patch/test evidence, then recompile in the sandbox';
   const result: SandboxPatchResult = {
     schemaId: SANDBOXED_TEST_PATCH_SCHEMA_ID,
     specVersion: '0.1.0',
     patchId: n.patchId,
     authority: n.authority,
+    sourceDigest: n.sourceDigest,
     operations: n.operations,
     minimizedOperationIds: minimized.map((operation) => operation.operationId),
     requiredTestIds: n.requiredTestIds,
@@ -60,17 +69,18 @@ export function compileSandboxedTestPatch(input: SandboxPatchInput): SandboxPatc
     status,
     diagnostics,
     repairCommand,
-    resultDigest: digest({ patchId: n.patchId, authority: n.authority, operations: n.operations, minimizedOperationIds: minimized.map((operation) => operation.operationId), requiredTestIds: n.requiredTestIds, passingTestIds: n.passingTestIds, status, diagnostics })
+    resultDigest: digest({ patchId: n.patchId, authority: n.authority, sourceDigest: n.sourceDigest, operations: n.operations, minimizedOperationIds: minimized.map((operation) => operation.operationId), requiredTestIds: n.requiredTestIds, passingTestIds: n.passingTestIds, provenance: n.provenance, status, diagnostics, repairCommand })
   };
   return result;
 }
 
 export const createSandboxedTestPatch = compileSandboxedTestPatch;
-export function replaySandboxedTestPatch(result: SandboxPatchResult): SandboxPatchResult { return compileSandboxedTestPatch({ authority: result.authority, patchId: result.patchId, operations: result.operations, requiredTestIds: result.requiredTestIds, passingTestIds: result.passingTestIds, sourceDigest: result.authority.baseDigest, provenance: result.provenance }); }
+export function replaySandboxedTestPatch(result: SandboxPatchResult): SandboxPatchResult { return compileSandboxedTestPatch({ authority: result.authority, patchId: result.patchId, operations: result.operations, requiredTestIds: result.requiredTestIds, passingTestIds: result.passingTestIds, sourceDigest: result.sourceDigest, provenance: result.provenance }); }
 export function validateSandboxedTestPatch(result: SandboxPatchResult) { const replay = replaySandboxedTestPatch(result); const diagnostics = [...result.diagnostics]; if (result.resultDigest !== replay.resultDigest) diagnostics.push('result-digest-mismatch'); if (result.status !== replay.status) diagnostics.push('status-mismatch'); return { ok: diagnostics.length === 0 && result.status === 'proven', diagnostics: [...new Set(diagnostics)] }; }
 
 function normalize(input: SandboxPatchInput) { return { authority: { authorityId: text(input.authority?.authorityId), baseDigest: text(input.authority?.baseDigest), sealed: input.authority?.sealed === true as true }, patchId: text(input.patchId), operations: [...(input.operations ?? [])].map((operation) => ({ operationId: text(operation.operationId), path: text(operation.path), start: Number(operation.start), end: Number(operation.end), replacement: String(operation.replacement ?? '') })).sort(compareOperation), requiredTestIds: [...(input.requiredTestIds ?? [])].map(text).filter(Boolean).sort(), passingTestIds: [...(input.passingTestIds ?? [])].map(text).filter(Boolean).sort(), sourceDigest: text(input.sourceDigest), provenance: input.provenance ?? {} }; }
 function minimize(operations: readonly TestPatchOperation[]) { return [...operations].sort((a, b) => (a.end - a.start) - (b.end - b.start) || compareOperation(a, b)); }
+function groupOperationsByPath(operations: readonly TestPatchOperation[]) { return operations.reduce<Record<string, TestPatchOperation[]>>((grouped, operation) => { (grouped[operation.path] ??= []).push(operation); return grouped; }, {}); }
 function compareOperation(a: TestPatchOperation, b: TestPatchOperation) { return [a.path, a.start, a.end, a.replacement, a.operationId].join('\u001f').localeCompare([b.path, b.start, b.end, b.replacement, b.operationId].join('\u001f')); }
 function text(value: unknown) { return String(value ?? '').trim(); }
 function digest(value: unknown) { return `sha256:${createHash('sha256').update(stableStringify(value)).digest('hex')}`; }
