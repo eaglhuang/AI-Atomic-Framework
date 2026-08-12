@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T17-59-43-152Z-scope-amendment-8eab4176a3b1",
+  "taskId": "ATM-GOV-0332",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0332.json",
+  "taskSha256": "sha256:f6c115ee7e76661240a27b06cef54973db26995d0cedde5029f4e261bec25bc1",
+  "createdAt": "2026-08-12T17:59:43.152Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0332 --actor codex-gpt-5.4-mini --add \"packages/core/src/evidence/plan-closeout-dashboard.ts,packages/core/src/evidence/index.ts,tests/cli/plan-closeout-dashboard-rebuild.test.ts,tests/cli/four-plan-objective-denominator.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

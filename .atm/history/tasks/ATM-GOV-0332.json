@@ -1,0 +1,346 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0332",
+  "title": "Build reproducible multi-layer evidence dashboards",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0329",
+    "ATM-GOV-0331"
+  ],
+  "acceptance": [
+    "ACC-1: 每層 schema 包含 identity、time/window/watermark、authority digest、denominator、correctness、performance、concurrency、validation、closure、backlog、governance、claims。",
+    "ACC-2: 相同 sealed raw inputs byte-stable 重建；`artifactPaths` 非空，獨立 validator 重算 digest。",
+    "ACC-3: unknown/unavailable/conflicting 顯式顯示，不省略、不補零、不沿用 stale counters。",
+    "ACC-4: `validate:four-plan-objectives` 直接讀 planning-sealed matrix，固定輸出 17/23/29/17、verified/not-complete/unknown 與 sorted-row digest。",
+    "ACC-5: missing/duplicate/縮分母、手工 overall status、shadow authority、digest mismatch 全部會紅。"
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/plan-closeout-dashboard.ts",
+    "packages/cli/src/commands/task-view.ts",
+    "schemas/evidence/plan-closeout-dashboard.schema.json",
+    "scripts/validate-four-plan-objectives.ts",
+    "tests/cli/plan-closeout-dashboard-rebuild.test.ts",
+    "tests/cli/four-plan-objective-denominator.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/task-view.ts",
+    "packages/core/src/broker/replay/dashboard.ts",
+    "packages/core/src/evidence/validator-lifecycle.ts",
+    "scripts/run-validators/implementation.ts",
+    "scripts/validate-four-plan-objectives.ts",
+    "schemas/evidence/"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan-closeout-dashboard-rebuild.test.ts",
+    "node --strip-types tests/cli/four-plan-objective-denominator.test.ts",
+    "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "emit-unavailable-dashboard-and-never-reuse-stale-counters",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.observability-dashboard",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-evidence-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0332-build-reproducible-multi-layer-evidence-dashboards.task.md",
+    "sectionTitle": "ATM-GOV-0332",
+    "headingLine": 74,
+    "hash": "d97a316e36fc042f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0332-build-reproducible-multi-layer-evidence-dashboards.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:d97a316e36fc042fd643fcae645be5798648dbaa35a16c58ebe22a7a836d1dcb",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:18.183Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:18.183Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0329",
+      "ATM-GOV-0331"
+    ],
+    "startConditions": [
+      "Validator profiles and observed evidence contracts are stable.",
+      "Dashboards are explicitly read-only projections and not completion authorities."
+    ],
+    "softRelations": [
+      "ATM-GOV-0333",
+      "ATM-GOV-0334",
+      "ATM-GOV-0335",
+      "ATM-GOV-0340"
+    ],
+    "changedPublicSeams": [
+      "atm.planCloseoutDashboard.v1",
+      "atm.fourPlanObjectiveVerdict.v1"
+    ],
+    "causalImpactEdges": [
+      "validator-dashboard",
+      "task-close-dashboard",
+      "dogfood-replay-dashboard",
+      "objective-denominator"
+    ],
+    "parallelFrontierInputs": [
+      "validator-receipts",
+      "task-ledger",
+      "close-receipts",
+      "replay-observations",
+      "planning-matrix"
+    ],
+    "validatorReferences": [
+      "validate-test-facade",
+      "validate-task-view-dashboard",
+      "validate-four-plan-objectives"
+    ],
+    "phaseOwner": "correction-wave-5"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_dashboard_raw_rebuild_byte_stable_0332",
+      "targetGroupId": null,
+      "semanticKey": "dashboard_raw_rebuild_byte_stable",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "validator-dashboard",
+        "task-close-dashboard",
+        "dogfood-replay-dashboard"
+      ],
+      "expectedRedPredicate": "hand-authored status stale counters or missing artifacts fail rebuild",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.planCloseoutDashboard.v1",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_four_plan_denominator_exact_0332",
+      "targetGroupId": null,
+      "semanticKey": "four_plan_denominator_exact",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "objective-denominator"
+      ],
+      "expectedRedPredicate": "denominator other than 17 23 29 and 17 or missing duplicate rows fails closed",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.fourPlanObjectiveVerdict.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_dashboard_raw_rebuild_byte_stable_0332",
+    "test_four_plan_denominator_exact_0332"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_final_certification"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T18-00-17-355Z-renew-c700e60bf2b7",
+  "lastTransitionAt": "2026-08-12T18:00:17.355Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T17:51:06.569Z",
+  "promotedAt": "2026-08-12T17:51:06.574Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-83fa339ad429",
+    "claimedAt": "2026-08-12T17:51:06.579Z",
+    "heartbeatAt": "2026-08-12T18:00:16.719Z",
+    "ttlSeconds": 3600,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0332.*",
+      ".atm/history/task-events/ATM-GOV-0332/**",
+      ".atm/history/tasks/ATM-GOV-0332.json",
+      "packages/cli/src/commands/task-view.ts",
+      "packages/core/src/broker/replay/dashboard.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/plan-closeout-dashboard.ts",
+      "packages/core/src/evidence/validator-lifecycle.ts",
+      "schemas/evidence/",
+      "scripts/run-validators/implementation.ts",
+      "scripts/validate-four-plan-objectives.ts",
+      "tests/cli/four-plan-objective-denominator.test.ts",
+      "tests/cli/plan-closeout-dashboard-rebuild.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812164021-codex-gpt-5.4-mini-c263c3e976\""
+    }
+  },
+  "startedAt": "2026-08-12T17:51:06.579Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d0cbc0168a558954",
+    "ticketDigest": "sha256:d0cbc0168a55895494d2860af67feebc200ff4e2081b8b2c9af919245601f99c",
+    "taskId": "ATM-GOV-0332",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
+    "claimGeneration": "lease-83fa339ad429",
+    "issuedAt": "2026-08-12T18:00:16.719Z",
+    "expiresAt": "2026-08-12T19:00:16.719Z",
+    "scopeDigest": "sha256:23985502cad4ddc2d6ebdf4db99bd84350bb7dfd25ba257439a9b3e4afae1f02",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T18:00:16.719Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0332.*",
+          ".atm/history/task-events/ATM-GOV-0332/**",
+          ".atm/history/tasks/ATM-GOV-0332.json",
+          "packages/cli/src/commands/task-view.ts",
+          "packages/core/src/broker/replay/dashboard.ts",
+          "packages/core/src/evidence/index.ts",
+          "packages/core/src/evidence/plan-closeout-dashboard.ts",
+          "packages/core/src/evidence/validator-lifecycle.ts",
+          "schemas/evidence/",
+          "scripts/run-validators/implementation.ts",
+          "scripts/validate-four-plan-objectives.ts",
+          "tests/cli/four-plan-objective-denominator.test.ts",
+          "tests/cli/plan-closeout-dashboard-rebuild.test.ts"
+        ],
+        "digest": "sha256:21af73a8866aee99413ca09f07a07e8e515e56429da3f0bd5160c8f8bb9bcdda"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260812175106-codex-gpt-5.4-mini-ATM-GOV-0332-7e3b07464d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0332",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0332.*",
+      ".atm/history/task-events/ATM-GOV-0332/**",
+      ".atm/history/tasks/ATM-GOV-0332.json",
+      "packages/cli/src/commands/task-view.ts",
+      "packages/core/src/broker/replay/dashboard.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/evidence/plan-closeout-dashboard.ts",
+      "packages/core/src/evidence/validator-lifecycle.ts",
+      "schemas/evidence/",
+      "scripts/run-validators/implementation.ts",
+      "scripts/validate-four-plan-objectives.ts",
+      "tests/cli/four-plan-objective-denominator.test.ts",
+      "tests/cli/plan-closeout-dashboard-rebuild.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0332-build-reproducible-multi-layer-evidence-dashboards.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0332-build-reproducible-multi-layer-evidence-dashboards.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "8a2066a1a30728569cda1da004f23191a1e59af8b5fc943d302ccd69307cb4c6",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812164021-codex-gpt-5.4-mini-c263c3e976\""
+    },
+    "createdAt": "2026-08-12T17:51:11.213Z",
+    "status": "active"
+  }
+}
