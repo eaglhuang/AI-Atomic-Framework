@@ -303,8 +303,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T06-59-30-613Z-scope-amendment-128b7e9bede6",
-  "lastTransitionAt": "2026-08-12T06:59:30.613Z",
+  "lastTransitionId": "2026-08-12T07-10-34-882Z-renew-5b4ec91b542b",
+  "lastTransitionAt": "2026-08-12T07:10:34.882Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T06:53:19.128Z",
@@ -313,7 +313,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-36c199c00013",
     "claimedAt": "2026-08-12T06:53:19.138Z",
-    "heartbeatAt": "2026-08-12T06:53:19.138Z",
+    "heartbeatAt": "2026-08-12T07:10:34.423Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0351.*",
@@ -345,10 +345,9 @@
       "packages/core/src/broker/cross-task-mutation-guard.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260812065319-codex-gpt-5.4-mini-ef346e9b2b",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812065319-codex-gpt-5.4-mini-ef346e9b2b\""
     }
@@ -358,26 +357,27 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-57bc3fca80e7467e",
-    "ticketDigest": "sha256:57bc3fca80e7467eae339d9791ee5e82b2c6e91ecce0b8ffde9546f3bddd7f22",
+    "ticketId": "wat-2d98410ab65b39ea",
+    "ticketDigest": "sha256:2d98410ab65b39ea9e297255d78d411a2601b11bf88779bdbe332c0100bce0b6",
     "taskId": "ATM-GOV-0351",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260812065319-codex-gpt-5.4-mini-ef346e9b2b",
     "claimGeneration": "lease-36c199c00013",
-    "issuedAt": "2026-08-12T06:53:19.138Z",
-    "expiresAt": "2026-08-12T07:23:19.138Z",
-    "scopeDigest": "sha256:2710e83e48565f1db3ee595eac1d115b562f17310da230d8eaa15037856e1e07",
+    "issuedAt": "2026-08-12T07:10:34.423Z",
+    "expiresAt": "2026-08-12T07:40:34.423Z",
+    "scopeDigest": "sha256:a4b7b27cc84d83263a5eea4055875f83a6a49ccca69872cb5910621191224cf7",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T06:53:19.138Z"
+      "selectedAt": "2026-08-12T07:10:34.423Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0351.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0351/**",
           ".atm/history/tasks/ATM-GOV-0351.json",
           "packages/cli/src/commands/command-specs/next.spec.ts",
@@ -385,13 +385,18 @@
           "packages/cli/src/commands/emergency/leases.ts",
           "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
           "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+          "packages/cli/src/commands/git-governance/implementation/command-router.ts",
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-selection.ts",
           "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts",
           "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
           "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.test.ts",
           "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.ts",
           "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
+          "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
           "packages/cli/src/commands/next.ts",
           "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
           "packages/cli/src/commands/next/claim-orchestration.ts",
@@ -400,7 +405,7 @@
           "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
           "packages/core/src/broker/cross-task-mutation-guard.ts"
         ],
-        "digest": "sha256:12ceb5572537ebc92344e7b34d3b105851aa1280179430c43dc78e93dd96c090"
+        "digest": "sha256:110f95151ece40ed5f51f415768c5e0e2e7293689da524e7bd3fb5ea0063204a"
       },
       {
         "kind": "lifecycle-operation",

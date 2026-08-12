@@ -1,0 +1,108 @@
+{
+  "taskId": "ATM-GOV-0351",
+  "updatedAt": "2026-08-12T07:10:44.640Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260812065319-codex-gpt-5.4-mini-ATM-GOV-0351-3f761032b4",
+      "createdAt": "2026-08-12T07:10:44.640Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260812065319-codex-gpt-5.4-mini-ATM-GOV-0351-3f761032b4",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-deferred-index-transaction",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/atm-evidence-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:683e2adc8b17dae07f7e1072cfaa8f1f71b04a5b0065d152cc3964b0de0ce0c6",
+            "stderrSha256": "sha256:7fa81dd529d215fefc78399d864ad52ff2bf9a419598a88e90f48258461d30b9",
+            "startedAt": "2026-08-12T07:10:43.760Z",
+            "finishedAt": "2026-08-12T07:10:44.639Z",
+            "durationMs": 879,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "cacheKey": "sha256:3c226f1987a712aeac96441e0eccf867d37acdb73954a79224a97821598d6154",
+            "generatedAt": "2026-08-12T07:10:44.639Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:3c226f1987a712aeac96441e0eccf867d37acdb73954a79224a97821598d6154",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-12T07:10:44.639Z",
+              "observedAt": "2026-08-12T07:10:44.639Z",
+              "startedAt": "2026-08-12T07:10:43.760Z",
+              "finishedAt": "2026-08-12T07:10:44.639Z",
+              "durationMs": 879,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:8b4cc3393117b087a3f219e7de786cd378568d99c67e1ad82e8ebb0f8125347a",
+              "outputDigest": "sha256:de7aad2a2f3b3839872c03d2afe44ab335cbf9cb225c0aaa51af09b17dff7f6a",
+              "cache": {
+                "key": "sha256:3c226f1987a712aeac96441e0eccf867d37acdb73954a79224a97821598d6154",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:83af316d6198247aa7371fb73a1b233b30f10d0e5156f154cd06f36fde45cbbb",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
