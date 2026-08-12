@@ -1,0 +1,201 @@
+{
+  "schemaId": "atm.plan3xCurrentRowProofMap.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-13T04:15:00.000Z",
+  "status": "current-row-proof-triaged",
+  "nonClaim": "This map classifies every Plan 3.x objective row into the next proof family; it does not certify any Plan 3.x row complete.",
+  "sourceReports": [
+    {
+      "path": "docs/reports/plan-3-0-objective-replay.json",
+      "digest": "sha256:e080a41f0f68672e83725d19286c064ac707a5208330433dae5c4d1ad0817f00",
+      "planId": "3.0",
+      "expectedRows": 17
+    },
+    {
+      "path": "docs/reports/plan-3-1-objective-replay.json",
+      "digest": "sha256:6212686585e15b2dc98d845f7637d461730e5e52666b3a6b2f038ccbe6953b8c",
+      "planId": "3.1",
+      "expectedRows": 23
+    },
+    {
+      "path": "docs/reports/plan-3-2-objective-replay.json",
+      "digest": "sha256:54f1ea49a99988b17082eab303833c8d0662fdb4acdd7adca4a9d37e1feb72b7",
+      "planId": "3.2",
+      "expectedRows": 29
+    }
+  ],
+  "totals": {
+    "plans": 3,
+    "objectiveRows": 69,
+    "sourceRowsNotComplete": 69,
+    "rowsMappedToProofFamily": 69,
+    "rowsCertifiedCompleteByThisMap": 0,
+    "proofFamilies": 4
+  },
+  "proofFamilies": [
+    {
+      "id": "fresh-command-replay-needed",
+      "status": "not-complete",
+      "rowCount": 45,
+      "meaning": "The row references historical, stale, descriptive, or shape-only evidence and needs a fresh command-backed receipt before it can become verified.",
+      "nextExecutionRule": "Run the row's nextSafeCommand or the shared validator named by the row, record command output/digest, then recompute the source replay row.",
+      "rowRefs": [
+        "P30-OBJ-01",
+        "P30-OBJ-02",
+        "P30-OBJ-03",
+        "P30-OBJ-04",
+        "P30-OBJ-05",
+        "P30-OBJ-06",
+        "P30-OBJ-07",
+        "P30-OBJ-08",
+        "P30-OBJ-09",
+        "P30-OBJ-10",
+        "P30-OBJ-11",
+        "P30-OBJ-12",
+        "P30-OBJ-13",
+        "P30-OBJ-14",
+        "P30-OBJ-17",
+        "P31-OBJ-01",
+        "P31-OBJ-02",
+        "P31-OBJ-05",
+        "P31-OBJ-06",
+        "P31-OBJ-07",
+        "P31-OBJ-08",
+        "P31-OBJ-09",
+        "P31-OBJ-11",
+        "P31-OBJ-12",
+        "P31-OBJ-13",
+        "P31-OBJ-14",
+        "P31-OBJ-15",
+        "P31-OBJ-17",
+        "P31-OBJ-18",
+        "P31-OBJ-19",
+        "P31-OBJ-20",
+        "P31-OBJ-22",
+        "P32-OBJ-01",
+        "P32-OBJ-02",
+        "P32-OBJ-04",
+        "P32-OBJ-05",
+        "P32-OBJ-08",
+        "P32-OBJ-09",
+        "P32-OBJ-11",
+        "P32-OBJ-16",
+        "P32-OBJ-18",
+        "P32-OBJ-23",
+        "P32-OBJ-24",
+        "P32-OBJ-26",
+        "P32-OBJ-27"
+      ]
+    },
+    {
+      "id": "governed-state-replay-needed",
+      "status": "not-complete",
+      "rowCount": 19,
+      "meaning": "The row depends on current ATM state, taskflow, closeback, backlog, broker, or lane facts rather than a standalone source validator.",
+      "nextExecutionRule": "Use the row's ATM read/claim/closeback command only inside the relevant current task scope; do not infer completion from stale task status.",
+      "rowRefs": [
+        "P30-OBJ-15",
+        "P30-OBJ-16",
+        "P31-OBJ-04",
+        "P31-OBJ-10",
+        "P31-OBJ-16",
+        "P31-OBJ-21",
+        "P31-OBJ-23",
+        "P32-OBJ-06",
+        "P32-OBJ-10",
+        "P32-OBJ-12",
+        "P32-OBJ-13",
+        "P32-OBJ-14",
+        "P32-OBJ-15",
+        "P32-OBJ-17",
+        "P32-OBJ-20",
+        "P32-OBJ-21",
+        "P32-OBJ-25",
+        "P32-OBJ-28",
+        "P32-OBJ-29"
+      ]
+    },
+    {
+      "id": "runner-release-parity-needed",
+      "status": "not-complete",
+      "rowCount": 2,
+      "meaning": "The row must bind current source, frozen runner, and release/adopter surface with digest-backed evidence.",
+      "nextExecutionRule": "Build only when runner publication is actually required; otherwise use existing digest reports and a focused parity validator.",
+      "rowRefs": [
+        "P32-OBJ-03",
+        "P32-OBJ-07"
+      ]
+    },
+    {
+      "id": "negative-control-only",
+      "status": "not-complete",
+      "rowCount": 3,
+      "meaning": "The row currently proves fail-closed behavior or a negative fixture. That is necessary guard evidence, but not positive completion evidence.",
+      "nextExecutionRule": "Keep the negative test, then add a separate positive current receipt before allowing the source row to become verified.",
+      "rowRefs": [
+        "P31-OBJ-03",
+        "P32-OBJ-19",
+        "P32-OBJ-22"
+      ]
+    }
+  ],
+  "planSummaries": [
+    {
+      "planId": "3.0",
+      "rows": 17,
+      "notCompleteRows": 17,
+      "proofFamilyCounts": {
+        "fresh-command-replay-needed": 15,
+        "governed-state-replay-needed": 2,
+        "runner-release-parity-needed": 0,
+        "negative-control-only": 0
+      }
+    },
+    {
+      "planId": "3.1",
+      "rows": 23,
+      "notCompleteRows": 23,
+      "proofFamilyCounts": {
+        "fresh-command-replay-needed": 17,
+        "governed-state-replay-needed": 5,
+        "runner-release-parity-needed": 0,
+        "negative-control-only": 1
+      }
+    },
+    {
+      "planId": "3.2",
+      "rows": 29,
+      "notCompleteRows": 29,
+      "proofFamilyCounts": {
+        "fresh-command-replay-needed": 13,
+        "governed-state-replay-needed": 12,
+        "runner-release-parity-needed": 2,
+        "negative-control-only": 2
+      }
+    }
+  ],
+  "nextExecutionOrder": [
+    {
+      "id": "fresh-command-replay-needed",
+      "whyFirst": "largest family; most rows can be advanced with focused validators instead of long full-suite runs"
+    },
+    {
+      "id": "governed-state-replay-needed",
+      "whySecond": "requires current ATM state reads and closeback facts after standalone evidence is reduced"
+    },
+    {
+      "id": "runner-release-parity-needed",
+      "whyThird": "only two rows require scarce build/publication bottlenecks; keep that queue residency minimal"
+    },
+    {
+      "id": "negative-control-only",
+      "whyLast": "guards are already useful but need paired positive receipts"
+    }
+  ],
+  "principlesApplied": [
+    "first-principles: a row is complete only when current evidence proves its objective, not when the row has prose or historical closure references",
+    "deep-module: the proof-family map becomes the stable interface between replay rows and concrete validators",
+    "80/20 execution: classify and batch proof work before spending time in governance queues or long full-suite validation",
+    "false-green prevention: all 69 rows remain not-complete until the positive evidence family for that row is actually satisfied"
+  ]
+}

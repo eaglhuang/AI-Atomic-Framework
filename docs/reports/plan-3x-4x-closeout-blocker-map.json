@@ -44,6 +44,10 @@
     {
       "path": "docs/reports/plan4-successor-wave-objective-map.json",
       "digest": "sha256:561c4789869ed6deef5353af002b40373a90e169084490a7ab1f340e40a4a300"
+    },
+    {
+      "path": "docs/reports/plan-3x-current-row-proof-map.json",
+      "digest": "sha256:ec981ed479f426f22a9c3f1cf667e249c5ca1424cbc3740cb035dca6b1438600"
     }
   ],
   "totals": {
@@ -56,7 +60,9 @@
     "backlogDeferred": 170,
     "certificateDimensionsProven": 5,
     "certificateDimensionsNotComplete": 1,
-    "plan4SuccessorMappedAnchors": 17
+    "plan4SuccessorMappedAnchors": 17,
+    "plan3xCurrentRowProofMappedRows": 69,
+    "plan3xCurrentRowProofFamilies": 4
   },
   "planSummaries": [
     {
@@ -96,8 +102,9 @@
     {
       "id": "B1-current-row-proof",
       "scope": ["Plan 3.0", "Plan 3.1", "Plan 3.2"],
+      "status": "triaged",
       "reason": "replay reports currently establish denominator and row evidence surfaces, but keep every row not-complete",
-      "requiredOutcome": "replace historical-only references with fresh command receipts per row class, then recompute objective verdict"
+      "requiredOutcome": "execute docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
     },
     {
       "id": "B2-plan4-successor-wave",

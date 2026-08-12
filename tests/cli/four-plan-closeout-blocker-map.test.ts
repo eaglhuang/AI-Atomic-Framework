@@ -13,6 +13,9 @@ assert.equal(report.totals.plansWithExactDenominator, 4);
 assert.equal(report.totals.certificateDimensionsProven, 5);
 assert.equal(report.totals.certificateDimensionsNotComplete, 1);
 assert.equal(report.totals.plan4SuccessorMappedAnchors, 17);
+assert.equal(report.totals.plan3xCurrentRowProofMappedRows, 69);
+assert.equal(report.totals.plan3xCurrentRowProofFamilies, 4);
+assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B1-current-row-proof')?.status, 'triaged');
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
   'B1-current-row-proof',
   'B4-backlog-disposition',
