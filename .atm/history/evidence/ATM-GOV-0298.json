@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0298",
-  "updatedAt": "2026-08-08T21:33:09.230Z",
+  "updatedAt": "2026-08-12T04:57:46.908Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -511,6 +511,429 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:ba8bbe0b547c3f4de2cb3066efb334761e1ef38bb0eb1ce4009070fb4f4f70de",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Property/metamorphic generator output is schema-valid, replayable, and tamper-evident.",
+      "artifactPaths": [
+        "packages/core/src/evidence/property-metamorphic-generators.ts",
+        "schemas/evidence/property-metamorphic-generators.schema.json",
+        "tests/cli/plan4-property-metamorphic-generators.test.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260812045208-codex-gpt-5.4-mini-ATM-GOV-0298-703a71dc4c",
+      "createdAt": "2026-08-12T04:55:55.412Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260812045208-codex-gpt-5.4-mini-ATM-GOV-0298-703a71dc4c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/plan4-property-metamorphic-generators.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/plan4-property-metamorphic-generators.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:21bf6409fb4b30fc91a79d673ff93167253cf10ff98e98250f8866491266afad",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-12T04:55:54.994Z",
+            "finishedAt": "2026-08-12T04:55:55.412Z",
+            "durationMs": 418,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/plan4-property-metamorphic-generators.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "158ee54261bb3cbe9b24c18349a436b6eb58f9d2",
+            "cacheKey": "sha256:74a649bf25004fd3fe10464c87b7335242cebe5e8a6bbcfd7986f755c88772ce",
+            "generatedAt": "2026-08-12T04:55:55.412Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:74a649bf25004fd3fe10464c87b7335242cebe5e8a6bbcfd7986f755c88772ce",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-12T04:55:55.412Z",
+              "observedAt": "2026-08-12T04:55:55.412Z",
+              "startedAt": "2026-08-12T04:55:54.994Z",
+              "finishedAt": "2026-08-12T04:55:55.412Z",
+              "durationMs": 418,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:3eed348be978056e070ae03a0d5ea0e87ec2b626f106c2e7909dde23013e5d17",
+              "outputDigest": "sha256:09a60a0217512acd2fbdfab7c9b5006c67fe0bdbaef9ea6b964f562f8cb87916",
+              "cache": {
+                "key": "sha256:74a649bf25004fd3fe10464c87b7335242cebe5e8a6bbcfd7986f755c88772ce",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/plan4-property-metamorphic-generators.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/plan4-property-metamorphic-generators.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "158ee54261bb3cbe9b24c18349a436b6eb58f9d2",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:66d52f9f2784e94e18172993ea042a6f067d0592549195b646cfb3802b19d5a4",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Negative property/metamorphic controls fail closed.",
+      "artifactPaths": [
+        "tests/cli/plan4-property-metamorphic-generators-negative.test.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260812045208-codex-gpt-5.4-mini-ATM-GOV-0298-703a71dc4c",
+      "createdAt": "2026-08-12T04:56:14.200Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260812045208-codex-gpt-5.4-mini-ATM-GOV-0298-703a71dc4c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/plan4-property-metamorphic-generators-negative.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/plan4-property-metamorphic-generators-negative.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0a0e84190403a7483823f1fd652e929e39ce27aa584eb121f1b2d5560198bc4c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-12T04:56:13.694Z",
+            "finishedAt": "2026-08-12T04:56:14.199Z",
+            "durationMs": 505,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/plan4-property-metamorphic-generators-negative.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "158ee54261bb3cbe9b24c18349a436b6eb58f9d2",
+            "cacheKey": "sha256:3d59820a045dffe41dfb6e985dea515c8d3d6c9b8296a8bff4bad6ee4a708d18",
+            "generatedAt": "2026-08-12T04:56:14.199Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:3d59820a045dffe41dfb6e985dea515c8d3d6c9b8296a8bff4bad6ee4a708d18",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-12T04:56:14.199Z",
+              "observedAt": "2026-08-12T04:56:14.199Z",
+              "startedAt": "2026-08-12T04:56:13.694Z",
+              "finishedAt": "2026-08-12T04:56:14.199Z",
+              "durationMs": 505,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:d5b19499cb1c56690e36ba499bfb36ae3a821578f02df65faa2654bcb403a998",
+              "outputDigest": "sha256:7c79afee2a1efe856da1df374850034f915ccb1004235f4c00a2b5445df679e4",
+              "cache": {
+                "key": "sha256:3d59820a045dffe41dfb6e985dea515c8d3d6c9b8296a8bff4bad6ee4a708d18",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/plan4-property-metamorphic-generators-negative.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/plan4-property-metamorphic-generators-negative.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "158ee54261bb3cbe9b24c18349a436b6eb58f9d2",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:761aa36c7aa9068f3cec6c58aa2f993c9703958abfd8556beb956c07712d0ea2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "TypeScript contract check for property/metamorphic generator pack.",
+      "artifactPaths": [
+        "packages/core/src/evidence/property-metamorphic-generators.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260812045208-codex-gpt-5.4-mini-ATM-GOV-0298-703a71dc4c",
+      "createdAt": "2026-08-12T04:56:32.125Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260812045208-codex-gpt-5.4-mini-ATM-GOV-0298-703a71dc4c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-12T04:56:20.959Z",
+            "finishedAt": "2026-08-12T04:56:32.124Z",
+            "durationMs": 11165,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "158ee54261bb3cbe9b24c18349a436b6eb58f9d2",
+            "cacheKey": "sha256:92058c9fd6bec84eb486302df5083600d9113a4ee729586d7f1766aceb4f033d",
+            "generatedAt": "2026-08-12T04:56:32.124Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:92058c9fd6bec84eb486302df5083600d9113a4ee729586d7f1766aceb4f033d",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-12T04:56:32.124Z",
+              "observedAt": "2026-08-12T04:56:32.124Z",
+              "startedAt": "2026-08-12T04:56:20.959Z",
+              "finishedAt": "2026-08-12T04:56:32.124Z",
+              "durationMs": 11165,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:2a9d7408bfda0a8461793b1e220a85eff776b0e73f0cce0b1844cb7e833af6d7",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:92058c9fd6bec84eb486302df5083600d9113a4ee729586d7f1766aceb4f033d",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "158ee54261bb3cbe9b24c18349a436b6eb58f9d2",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f60cae47c910b1014e84e98fe25c16f884983af5a2821d61e7b0ffa7e3c65b16",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "CLI validation confirms the generator-pack integration remains release-safe.",
+      "artifactPaths": [
+        "packages/core/src/evidence/property-metamorphic-generators.ts",
+        "schemas/evidence/property-metamorphic-generators.schema.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260812045208-codex-gpt-5.4-mini-ATM-GOV-0298-703a71dc4c",
+      "createdAt": "2026-08-12T04:57:46.908Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260812045208-codex-gpt-5.4-mini-ATM-GOV-0298-703a71dc4c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:30df4c76831f6d276aedcfb0e0af7b47768c8202502ce3177a1fc4cce071ea9a",
+            "stderrSha256": "sha256:91f9561b8113d7387e6822a8d0ee175f41f1da433852f3bee78d4b659ce2ea98",
+            "startedAt": "2026-08-12T04:56:37.264Z",
+            "finishedAt": "2026-08-12T04:57:46.907Z",
+            "durationMs": 69643,
+            "cached": false,
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "158ee54261bb3cbe9b24c18349a436b6eb58f9d2",
+            "cacheKey": "sha256:cdd8023132dc0ea8ce93acffe402c776364ea20c45dc2ce2e99c8bcf1079b550",
+            "generatedAt": "2026-08-12T04:57:46.907Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:cdd8023132dc0ea8ce93acffe402c776364ea20c45dc2ce2e99c8bcf1079b550",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-12T04:57:46.907Z",
+              "observedAt": "2026-08-12T04:57:46.907Z",
+              "startedAt": "2026-08-12T04:56:37.264Z",
+              "finishedAt": "2026-08-12T04:57:46.907Z",
+              "durationMs": 69643,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:a52f7234ccb7a2aea087c92f963714788eef85ab724af01958fbe4a5179240e7",
+              "outputDigest": "sha256:d1d9e89cf6731da7a9bb1b9568cb906d85adcf97bc7f02bccef26623d6942576",
+              "cache": {
+                "key": "sha256:cdd8023132dc0ea8ce93acffe402c776364ea20c45dc2ce2e99c8bcf1079b550",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:cli",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:cli"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "158ee54261bb3cbe9b24c18349a436b6eb58f9d2",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:3969da1563872955ee4b3936251090343e31e1ddedc51963e12006dd20e621d8",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
