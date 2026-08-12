@@ -1,49 +1,13 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [
-    ".atm/history/protected-override-audit/2026-08-12T13-45-06-389Z-POA-f7fcf37a0cd3.json",
-    ".atm/history/protected-override-audit/2026-08-12T14-31-38-969Z-POA-e35f49e01911.json",
-    ".atm/history/protected-override-audit/2026-08-12T14-31-39-395Z-POA-4d568080ab2f.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-09T08-22-14-539Z-import-fde95a156eb7.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T13-17-02-341Z-reserve-426deb10ce9d.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T13-17-02-345Z-promote-682fe9f09dae.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T13-17-06-708Z-claim-5c10d38e18c1.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T13-30-08-750Z-renew-8331c2621913.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T13-30-29-037Z-scope-amendment-93e80e5e5356.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T13-39-12-131Z-scope-amendment-a47753a20b2a.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T13-43-24-658Z-scope-amendment-f6fb4314e9df.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T14-05-30-780Z-renew-d2d7c8d71108.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T14-30-24-391Z-scope-amendment-cfc3b9cb6347.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T14-30-33-235Z-renew-3a30da525a75.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T14-33-10-561Z-scope-amendment-2e908a0d7d60.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T14-34-09-716Z-renew-320eed5dd4be.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T14-34-42-321Z-scope-amendment-97e2952dc2e8.json",
-    ".atm/history/task-events/ATM-GOV-0331/2026-08-12T14-35-55-667Z-renew-9efa833541ca.json",
-    ".atm/history/tasks/ATM-GOV-0331.json",
-    "docs/reports/evidence-shell-deletion-receipt.json",
-    "packages/cli/src/commands/evidence/observed-source-loader.ts",
-    "packages/cli/src/commands/evidence/verbs/run.ts",
-    "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.test.ts",
-    "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.ts",
-    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
-    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
-    "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
-    "packages/cli/src/commands/taskflow/close-orchestration.ts",
-    "packages/cli/src/commands/taskflow/close-preflight.ts",
-    "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
-    "packages/cli/src/commands/taskflow/implementation.ts",
-    "packages/core/src/evidence/validation-contract.ts",
-    "tests/cli/observed-evidence-production-callers.test.ts"
-  ],
-  "retainedPaths": [
-    {
-      "path": ".atm/history/evidence/git-head.jsonl",
-      "reason": "worktree-diverged"
-    }
-  ],
+  "reconciledPaths": [],
+  "retainedPaths": [],
   "clean": false,
-  "failure": null,
+  "failure": {
+    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
+    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,3ee5074ccd6a60be005ed4ea0e89578bf9feebd0,.atm/history/evidence/ATM-GOV-0331.live-index-reconciliation.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
+  },
   "taskId": "ATM-GOV-0331",
-  "createdAt": "2026-08-12T14:37:14.716Z"
+  "createdAt": "2026-08-12T14:42:54.630Z"
 }

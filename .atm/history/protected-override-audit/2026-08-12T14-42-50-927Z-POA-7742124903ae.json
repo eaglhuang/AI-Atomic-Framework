@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-7742124903ae",
+  "recordedAt": "2026-08-12T14:42:50.927Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0331",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0331 --message \"fix(git): consume hook bypass only at protected write boundary\n\nATM-Work-Admission: wat-65790124bf26a4fc sha256:65790124bf26a4fcb802fa2cd96725940075cb956e6b4da80d84d0ce5a1d2d9f\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0331-eef222d97f",
+  "reason": "Owner-approved bootstrap commit for the protected-write atom; focused validation and typecheck are green.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T14-42-50-926Z-EMG-ATM-GOV-0331-eef222d97f.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

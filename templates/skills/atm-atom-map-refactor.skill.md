@@ -52,14 +52,38 @@ card. ATM patrols this at import time via the advisory diagnostic
    - Adapter/Port
 4. Propose the owner module, public surface impact, focused test, and CLI
    regression.
-5. Extract only the atom already in task scope.
-6. Record adjacent refactors as follow-up work instead of widening the task.
+5. Build a responsibility map for the oversized module. When several adjacent
+   responsibilities form a cohesive map and are already authorized by the task,
+   extract the whole map in one pass instead of shaving off one tiny helper.
+6. Measure the projected facade size before editing. Treat 600 lines as the hard
+   trigger, never as the post-refactor target: normally leave 25-35% headroom
+   (about 390-450 lines for a 600-line ceiling).
+7. Extract only the cohesive atom map already in task scope.
+8. Record unrelated or unauthorized refactors as follow-up work instead of
+   widening the task.
 
 If the task is not a refactor or extraction task, still run steps 2-4 to
 produce an extraction candidate whenever the touched module exceeds 600 lines,
 then record it as `extract`, `follow-up-card`, or human-approved `inline` on
 the card. Do not turn an unrelated bug fix into a broad cleanup — propose,
 let the Captain/human decide, and default to opening the follow-up card.
+
+## Durable Headroom Rule
+
+- A line ceiling is an admission boundary, not a design target. A refactor that
+  leaves the owner at 550-600 lines usually defers the same problem and is not a
+  durable extraction.
+- Prefer a cohesive map of 2-4 atoms when the responsibility map supports it.
+  Each atom must have one owner, a narrow contract, and focused proof; never
+  combine unrelated responsibilities merely to remove more lines.
+- For a 600-line ceiling, target the remaining facade at 390-450 lines. If a
+  safe extraction cannot reach at least 20% headroom, record the constraint and
+  an explicit follow-up rather than claiming the size risk is resolved.
+- Estimate both moved lines and likely near-term growth. Select seams that move
+  policy, transaction, recovery, or result-assembly responsibilities—not just
+  constants, type aliases, or thin forwarding helpers.
+- Validate each extracted atom directly and keep one integration regression at
+  the facade. Line-count proof alone is never sufficient.
 
 ## Pattern Selection
 
@@ -94,10 +118,13 @@ Before implementing a refactor, produce a concise plan:
 
 ```text
 Atom:
+Atom map (2-4 cohesive responsibilities):
 Pattern:
 Owner module:
 Callers:
 Public surface:
+Before / projected-after lines:
+Headroom percentage:
 Focused test:
 CLI regression:
 Out of scope:
