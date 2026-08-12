@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0291",
   "title": "dependency graph, forbidden edge, cycle and public-interface bypass gate",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0285"
@@ -172,8 +172,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T02-50-32-883Z-renew-ef27e5373e0a",
-  "lastTransitionAt": "2026-08-12T02:50:32.883Z",
+  "lastTransitionId": "2026-08-12T03-13-42-235Z-lock-cleanup-f08ddc824258",
+  "lastTransitionAt": "2026-08-12T03:13:42.235Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T02:46:59.008Z",
@@ -182,7 +182,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-b3b0acc671bb",
     "claimedAt": "2026-08-12T02:46:59.022Z",
-    "heartbeatAt": "2026-08-12T02:50:32.314Z",
+    "heartbeatAt": "2026-08-12T03:13:42.051Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0291.json",
@@ -193,13 +193,14 @@
       "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
       "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T02:46:59.022Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -236,7 +237,10 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
     },
     "createdAt": "2026-08-12T02:47:04.762Z",
-    "status": "active"
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T03:13:42.231Z",
+    "releasedBy": "codex-gpt-5.4-mini"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -303,5 +307,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-12T03:13:42.051Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812024659-codex-gpt-5.4-mini-ATM-GOV-0291-58145a97cd",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0291.closure-packet.json"
 }

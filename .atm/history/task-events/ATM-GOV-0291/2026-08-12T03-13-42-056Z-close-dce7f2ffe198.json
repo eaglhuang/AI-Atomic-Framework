@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T03-13-42-056Z-close-dce7f2ffe198",
+  "taskId": "ATM-GOV-0291",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812024659-codex-gpt-5.4-mini-ATM-GOV-0291-58145a97cd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0291.json",
+  "taskSha256": "sha256:397a705f0c5e1fb3de9496929ea4f468ed839c64ba8b308ee27233803fccad29",
+  "createdAt": "2026-08-12T03:13:42.056Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0291 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812024659-codex-gpt-5.4-mini-ATM-GOV-0291-58145a97cd",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0291.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+      "node --strip-types tests/cli/plan4-dependency-graph-bypass-gate.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T03:13:42.042Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0291.*",
+        ".atm/history/task-events/ATM-GOV-0291/**",
+        ".atm/history/tasks/ATM-GOV-0291.json",
+        "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+        "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+        "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+        "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/dependency-graph-bypass-gate.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/dependency-graph-bypass-gate.schema.json",
+        "tests/catalog/groups/test_group_plan4_dependency-graph-bypass-gate.shard.json",
+        "tests/cli/plan4-dependency-graph-bypass-gate-negative.test.ts",
+        "tests/cli/plan4-dependency-graph-bypass-gate.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
