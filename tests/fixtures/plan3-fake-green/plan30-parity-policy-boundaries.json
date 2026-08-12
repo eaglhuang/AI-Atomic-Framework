@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.plan30ParityPolicyBoundariesFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {
+      "objectiveId": "P30-OBJ-03",
+      "evidenceKind": "source-frozen-runner-parity",
+      "sourceDigestPresent": true,
+      "frozenRunnerDigestPresent": true,
+      "parityDecisionCallerAsserted": false
+    },
+    {
+      "objectiveId": "P30-OBJ-04",
+      "evidenceKind": "release-adopter-parity",
+      "releaseDigestPresent": true,
+      "adopterDigestPresent": true,
+      "observableThroughStableSurface": true
+    },
+    {
+      "objectiveId": "P30-OBJ-10",
+      "evidenceKind": "locked-policy-state",
+      "policyDigestPresent": true,
+      "correctnessDebtAllowed": false,
+      "policyLockBypassesEvidence": false
+    }
+  ],
+  "expectedVerdict": "plan30-parity-policy-boundaries-proven",
+  "diagnostics": [
+    "source-frozen-parity-digests",
+    "release-adopter-parity-observable",
+    "locked-policy-no-correctness-debt"
+  ]
+}

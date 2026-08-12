@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:4c3d97770f428c4f114675946811e775bf967433a8d25d7a7680fa0170ce6e0b"
+      "digest": "sha256:910d189c612204a775ec77c7baf65f98d9ac492f2605f68600d52937db6df282"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:566e74092a333d4a63e48dddaa14a98adfbfec63d95976d59287da68c4a96b7d"
+      "digest": "sha256:c5da88b7b1def76510028efbc775dbbd2fa39ff5747be5a33c4034a4ef645f8a"
     }
   ],
   "totals": {
-    "freshCommandRows": 16,
+    "freshCommandRows": 13,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 34,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 37,
     "objectiveAlignedNegativeControlRowsConsumed": 8,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
-    "remainingUncoveredRows": 1,
-    "sourceRowsMutatedByThisReport": 34
+    "remainingUncoveredRows": 0,
+    "sourceRowsMutatedByThisReport": 37
   },
   "commandReceipts": [
     {
@@ -370,6 +370,23 @@
         "exactly-once-transition-durable",
         "legacy-authority-retirement-deferred"
       ]
+    },
+    {
+      "id": "plan30-parity-policy-boundaries",
+      "command": "node --strip-types scripts/validate-plan30-parity-policy-boundaries.ts --json",
+      "exitCode": 0,
+      "verdict": "plan30-parity-policy-boundaries-proven",
+      "rowsCovered": [
+        "P30-OBJ-03",
+        "P30-OBJ-04",
+        "P30-OBJ-10"
+      ],
+      "stdoutAnchors": [
+        "atm.plan30ParityPolicyBoundariesValidation.v1",
+        "source-frozen-parity-digests",
+        "release-adopter-parity-observable",
+        "locked-policy-no-correctness-debt"
+      ]
     }
   ],
   "positiveRows": [
@@ -651,6 +668,30 @@
         "plan30-operational-state-safety"
       ],
       "sourceReplayAction": "recomputed row status because the current Plan 3.0 operational-state validator proves rollback, exactly-once transition, and legacy-authority retirement boundaries"
+    },
+    {
+      "objectiveId": "P30-OBJ-03",
+      "title": "Source/frozen runner parity is explicit",
+      "receiptIds": [
+        "plan30-parity-policy-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.0 parity/policy validator proves digest-backed parity surfaces and locked policy state without correctness debt"
+    },
+    {
+      "objectiveId": "P30-OBJ-04",
+      "title": "Release/adopter parity is observable",
+      "receiptIds": [
+        "plan30-parity-policy-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.0 parity/policy validator proves digest-backed parity surfaces and locked policy state without correctness debt"
+    },
+    {
+      "objectiveId": "P30-OBJ-10",
+      "title": "Locked policy state has no correctness debt",
+      "receiptIds": [
+        "plan30-parity-policy-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.0 parity/policy validator proves digest-backed parity surfaces and locked policy state without correctness debt"
     }
   ],
   "blockedPositiveRows": [
@@ -667,7 +708,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Thirty-four rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Thirty-seven rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

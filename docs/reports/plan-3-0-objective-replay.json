@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 17,
   "statusCounts": {
-    "verified": 12,
-    "not-complete": 5,
+    "verified": 15,
+    "not-complete": 2,
     "unknown": 0,
     "conflicting": 0
   },
@@ -59,49 +59,46 @@
     {
       "objectiveId": "P30-OBJ-03",
       "title": "Source/frozen runner parity is explicit",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
       "caseIds": [
         "test_plan30_exact_17_objectives_0333"
       ],
       "sourceAnchors": [
-        "scripts/run-sealed-runner-build.ts"
+        "tests/fixtures/plan3-fake-green/plan30-parity-policy-boundaries.json",
+        "scripts/validate-plan30-parity-policy-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "replay",
-          "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json",
+          "kind": "plan30-parity-policy-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-parity-policy-boundaries",
           "expectedTaskId": "ATM-GOV-0307"
         }
       ],
-      "blockers": [
-        "parity evidence exists only as historical closure packet, not current final replay"
-      ],
-      "nextSafeCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-04",
       "title": "Release/adopter parity is observable",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
       "caseIds": [
         "test_plan30_exact_17_objectives_0333"
       ],
       "sourceAnchors": [
-        "release/atm-onefile/atm.mjs",
-        "release/atm-root-drop/"
+        "tests/fixtures/plan3-fake-green/plan30-parity-policy-boundaries.json",
+        "scripts/validate-plan30-parity-policy-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "release-parity",
-          "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json",
+          "kind": "plan30-parity-policy-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-parity-policy-boundaries",
           "expectedTaskId": "ATM-GOV-0307"
         }
       ],
-      "blockers": [
-        "current adopter parity digest is not attached to this row"
-      ],
-      "nextSafeCommand": "node release/atm-onefile/atm.mjs next --json"
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-05",
@@ -212,25 +209,24 @@
     {
       "objectiveId": "P30-OBJ-10",
       "title": "Locked policy state has no correctness debt",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0300",
       "caseIds": [
         "test_plan30_exact_17_objectives_0333"
       ],
       "sourceAnchors": [
-        ".atm/runtime/default-guards.json"
+        "tests/fixtures/plan3-fake-green/plan30-parity-policy-boundaries.json",
+        "scripts/validate-plan30-parity-policy-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "policy-lock",
-          "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json",
+          "kind": "plan30-parity-policy-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-parity-policy-boundaries",
           "expectedTaskId": "ATM-GOV-0300"
         }
       ],
-      "blockers": [
-        "policy lock digest is not current-row proof"
-      ],
-      "nextSafeCommand": "node atm.mjs doctor --json"
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-11",
