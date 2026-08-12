@@ -1,13 +1,54 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [],
-  "retainedPaths": [],
+  "reconciledPaths": [
+    ".atm/history/evidence/ATM-GOV-0351.bundle-manifest.json",
+    ".atm/history/evidence/ATM-GOV-0351.json",
+    ".atm/history/evidence/ATM-GOV-0351.live-index-reconciliation.json",
+    ".atm/history/evidence/ATM-GOV-0351.runner-sync-receipt.json",
+    ".atm/history/protected-override-audit/2026-08-12T06-58-57-185Z-POA-7752abf6dde9.json",
+    ".atm/history/protected-override-audit/2026-08-12T06-59-08-841Z-POA-7fce2320cf90.json",
+    ".atm/history/protected-override-audit/2026-08-12T07-01-01-286Z-POA-987b77c9f049.json",
+    ".atm/history/protected-override-audit/2026-08-12T07-01-19-731Z-POA-b9de8991033f.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-15-11-561Z-import-97b2263cc16a.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-26-29-327Z-import-99dfd6add246.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-29-16-041Z-import-e77691d69f48.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-43-52-168Z-import-b56d1ea7a700.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-53-19-128Z-reserve-27330c0a6f2c.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-53-19-132Z-promote-242504306a3c.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-53-38-447Z-claim-6e15106fc909.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-55-06-178Z-scope-amendment-04e6eab0261c.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-56-12-494Z-scope-amendment-e5514a4663ab.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-57-41-744Z-scope-amendment-dc52a578aa05.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T06-59-30-613Z-scope-amendment-128b7e9bede6.json",
+    ".atm/history/task-events/ATM-GOV-0351/2026-08-12T07-10-34-882Z-renew-5b4ec91b542b.json",
+    ".atm/history/tasks/ATM-GOV-0351.json",
+    "packages/cli/src/commands/command-specs/next.spec.ts",
+    "packages/cli/src/commands/emergency/gate.ts",
+    "packages/cli/src/commands/emergency/leases.ts",
+    "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+    "packages/cli/src/commands/git-governance/implementation/command-router.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-selection.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+    "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+    "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+    "packages/core/src/broker/cross-task-mutation-guard.ts"
+  ],
+  "retainedPaths": [
+    {
+      "path": ".atm/history/evidence/git-head.jsonl",
+      "reason": "worktree-diverged"
+    }
+  ],
   "clean": false,
-  "failure": {
-    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
-    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,23452a442080d216d7819530e5cc5168960f75b1,.atm/history/evidence/ATM-GOV-0351.bundle-manifest.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
-  },
+  "failure": null,
   "taskId": "ATM-GOV-0351",
-  "createdAt": "2026-08-12T07:12:13.456Z"
+  "createdAt": "2026-08-12T07:15:56.187Z"
 }

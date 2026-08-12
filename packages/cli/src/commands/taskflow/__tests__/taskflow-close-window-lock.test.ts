@@ -200,6 +200,28 @@ try {
   assert.equal(existsSync(path.join(repoRoot, deferred.foreignStagedSnapshotPath!)), false, 'close-window deferred snapshot must be auto-cleaned when the lock releases');
   execFileSync('git', ['restore', '--staged', '--', foreignStageFile], { cwd: repoRoot, stdio: 'ignore' });
 
+  // A staged deletion has no ls-files entry. It is still a real foreign index
+  // fact and must survive a deferred close exactly like an added or modified
+  // blob; treating its absence as an incomplete snapshot deadlocks closeout.
+  const foreignDeletionFile = 'foreign-deletion.txt';
+  writeFileSync(path.join(repoRoot, foreignDeletionFile), 'baseline\n', 'utf8');
+  execFileSync('git', ['add', '--', foreignDeletionFile], { cwd: repoRoot, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'foreign deletion baseline'], { cwd: repoRoot, stdio: 'ignore' });
+  execFileSync('git', ['rm', '--cached', '--', foreignDeletionFile], { cwd: repoRoot, stdio: 'ignore' });
+  const deletionDeferred = acquireCloseWindowStagedIndexLock({
+    cwd: repoRoot,
+    taskId,
+    actorId: 'fixture-agent',
+    expectedStageFiles: [expectedStageFile],
+    deferForeignStaged: true
+  });
+  assert.equal(deletionDeferred.ok, true);
+  assert.deepEqual(deletionDeferred.lock?.foreignStagedEntries, [{ path: foreignDeletionFile, mode: null, blobId: null }]);
+  assert.equal(execFileSync('git', ['diff', '--cached', '--name-only', '--', foreignDeletionFile], { cwd: repoRoot, encoding: 'utf8' }).trim(), '');
+  releaseCloseWindowStagedIndexLock({ cwd: repoRoot, taskId, actorId: 'fixture-agent', outcome: 'aborted' });
+  assert.equal(execFileSync('git', ['diff', '--cached', '--name-only', '--', foreignDeletionFile], { cwd: repoRoot, encoding: 'utf8' }).trim(), foreignDeletionFile);
+  execFileSync('git', ['restore', '--staged', '--', foreignDeletionFile], { cwd: repoRoot, stdio: 'ignore' });
+
   execFileSync('git', ['add', foreignStageFile], { cwd: repoRoot, stdio: 'ignore' });
   const recoveryDeferred = acquireCloseWindowStagedIndexLock({
     cwd: repoRoot,

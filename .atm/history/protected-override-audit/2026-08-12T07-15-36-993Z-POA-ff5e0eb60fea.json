@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-ff5e0eb60fea",
+  "recordedAt": "2026-08-12T07:15:36.993Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0351",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0351 --message \"test(git): record reconciliation recovery\n\nATM-Work-Admission: wat-2d98410ab65b39ea sha256:2d98410ab65b39ea9e297255d78d411a2601b11bf88779bdbe332c0100bce0b6\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0351-24959a3948",
+  "reason": "Normal hook exceeds the shared-worktree command window after the scoped candidate and frozen validations passed; one evidence-only commit is needed to replay live-index reconciliation.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T07-15-36-992Z-EMG-ATM-GOV-0351-24959a3948.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
