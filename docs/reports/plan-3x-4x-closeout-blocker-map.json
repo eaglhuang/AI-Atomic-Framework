@@ -15,7 +15,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:7558cca47699ad58c095d6454468d366206dbd7c9a4619bad0876248f3cb1f7b"
+      "digest": "sha256:d7bbdad0b3ab330b3408d41532e1dd55f009537136daf5acee38026b72b92292"
     },
     {
       "path": "docs/reports/plan-4-foundation-replay.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:318e59e8f2744b1938c37f828bc9f44aba1ffc5950fd86a73db4b031f8f4e268"
+      "digest": "sha256:72b87443b37bedd13f535ce6ba4451cbf06b6ed8672e99dd2596a0b91115a529"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:fb429147afecae08bde7a753c4638648343bfdd010dbc9a79fc554c59218cc10"
+      "digest": "sha256:0d7399ce8d816c0b8138eaa646d9e3eb5a0833f8acc61d5ac43cd079d918b957"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
@@ -59,12 +59,12 @@
     },
     {
       "path": "docs/reports/plan-3x-positive-current-receipts.json",
-      "digest": "sha256:bcc9f85b0d6227e0366f8e6fd1162542fcc6105d8080666c0d0d73d5a352a9ca"
+      "digest": "sha256:1fd59b38384642bc4f04866161fced5d9fd714149d673da01dc2adc4ff4d9548"
     }
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 64,
+    "unresolvedObjectiveRows": 63,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -78,7 +78,7 @@
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
     "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
-    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 22,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 23,
     "plan3xObjectiveAlignedNegativeControlRowsConsumed": 8,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
@@ -105,9 +105,9 @@
       "planId": "3.2",
       "source": "docs/reports/plan-3-2-objective-replay.json",
       "objectiveRows": 29,
-      "verifiedRows": 12,
-      "unresolvedRows": 17,
-      "primaryBlocker": "HEAD CAS, row-addressability, queue-only/no-override behavior, timeout non-terminal behavior, stale-evidence rejection, terminal verdict fail-closed behavior, public-attestation boundary, unknown-evidence rejection, machine-readable blocker structure, dashboard consumption, provenance mismatch rejection, and missing-row rejection have current evidence consumed into source replay; remaining shared closure controls, sealed bundle, and provenance rows are represented but not terminally consumed"
+      "verifiedRows": 13,
+      "unresolvedRows": 16,
+      "primaryBlocker": "16 Plan 3.2 rows still require governed-state, runner-parity, or fresh command receipts; queue residency minimality now has focused evidence"
     },
     {
       "planId": "4.0",
@@ -121,35 +121,50 @@
   "blockerClasses": [
     {
       "id": "B1-current-row-proof",
-      "scope": ["Plan 3.0", "Plan 3.1", "Plan 3.2"],
+      "scope": [
+        "Plan 3.0",
+        "Plan 3.1",
+        "Plan 3.2"
+      ],
       "status": "partial-source-recomputed",
       "reason": "replay reports establish denominator and row evidence surfaces; twenty-two Plan 3.x rows now have current objective-aligned receipts consumed into source replay, while the aggregate source replay verdict remains not-complete",
       "requiredOutcome": "continue executing docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
     },
     {
       "id": "B2-plan4-successor-wave",
-      "scope": ["Plan 4.0"],
+      "scope": [
+        "Plan 4.0"
+      ],
       "status": "resolved",
       "reason": "Plan 4 successor-wave evidence is mapped onto all 17 objective anchors without mutating the foundation replay artifact",
       "requiredOutcome": "maintain docs/reports/plan4-successor-wave-objective-map.json and scripts/validate-plan4-successor-wave-objective-map.ts as successor coverage authority"
     },
     {
       "id": "B3-charter-verdict",
-      "scope": ["AtomicCharter", "deep-module", "first-principles"],
+      "scope": [
+        "AtomicCharter",
+        "deep-module",
+        "first-principles"
+      ],
       "status": "resolved",
       "reason": "independent certificate now references the current charter verdict report instead of the legacy objective evidence matrix",
       "requiredOutcome": "maintain docs/reports/plan-3x-4x-charter-current-verdict.json and scripts/validate-four-plan-charter-current-verdict.ts as the charter-verdict authority"
     },
     {
       "id": "B4-backlog-disposition",
-      "scope": ["ATM bug backlog"],
+      "scope": [
+        "ATM bug backlog"
+      ],
       "status": "separated",
       "reason": "backlog census is machine-readable and valid; release-blocking-now is zero, but 133 deferred items still need task-card ownership or waiver before final releaseAuthorized=true",
       "requiredOutcome": "task-cardize or explicitly waive the 133 unowned deferred rows, then recompute backlog census and certificate"
     },
     {
       "id": "B5-release-certificate",
-      "scope": ["final certificate", "release closeback"],
+      "scope": [
+        "final certificate",
+        "release closeback"
+      ],
       "reason": "release surface is pushed and reachable, but certificate correctly blocks releaseAuthorized while objective and charter verdicts are not-complete",
       "requiredOutcome": "only recompute releaseAuthorized after B1-B3 are proven"
     }

@@ -7,13 +7,13 @@ const report = JSON.parse(readFileSync('docs/reports/plan-3x-fresh-command-repla
 assert.equal(report.schemaId, 'atm.plan3xFreshCommandReplayReceipts.v1');
 assert.equal(report.status, 'fresh-command-replay-partially-consumed');
 assert.equal(report.familyDisposition.proofFamilyId, 'fresh-command-replay-needed');
-assert.equal(report.familyDisposition.sourceRowCount, 28);
-assert.equal(report.familyDisposition.focusedCommandsExecuted, 18);
-assert.equal(report.familyDisposition.commandsGreen, 18);
-assert.equal(report.familyDisposition.rowsConsumedIntoSourceReplay, 22);
+assert.equal(report.familyDisposition.sourceRowCount, 27);
+assert.equal(report.familyDisposition.focusedCommandsExecuted, 19);
+assert.equal(report.familyDisposition.commandsGreen, 19);
+assert.equal(report.familyDisposition.rowsConsumedIntoSourceReplay, 23);
 assert.equal(report.familyDisposition.rowsCertifiedCompleteByTheseReceipts, 0);
-assert.equal(report.familyDisposition.remainingRowsInFamily, 28);
-assert.equal(report.commandRuns.length, 18);
+assert.equal(report.familyDisposition.remainingRowsInFamily, 27);
+assert.equal(report.commandRuns.length, 19);
 assert.ok(report.commandRuns.every((entry: any) => entry.exitCode === 0));
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
   'positive-row-receipts',

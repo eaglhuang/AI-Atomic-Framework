@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:318e59e8f2744b1938c37f828bc9f44aba1ffc5950fd86a73db4b031f8f4e268"
+      "digest": "sha256:72b87443b37bedd13f535ce6ba4451cbf06b6ed8672e99dd2596a0b91115a529"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:fb429147afecae08bde7a753c4638648343bfdd010dbc9a79fc554c59218cc10"
+      "digest": "sha256:0d7399ce8d816c0b8138eaa646d9e3eb5a0833f8acc61d5ac43cd079d918b957"
     }
   ],
   "totals": {
-    "freshCommandRows": 28,
+    "freshCommandRows": 27,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 22,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 23,
     "objectiveAlignedNegativeControlRowsConsumed": 8,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
-    "remainingUncoveredRows": 13,
-    "sourceRowsMutatedByThisReport": 22
+    "remainingUncoveredRows": 12,
+    "sourceRowsMutatedByThisReport": 23
   },
   "commandReceipts": [
     {
@@ -265,139 +265,212 @@
         "\"overridePresent\": false",
         "wait-does-not-green"
       ]
+    },
+    {
+      "id": "plan32-parallel-prepare-outside-queue",
+      "command": "node --strip-types scripts/validate-plan32-parallel-prepare-outside-queue.ts --json",
+      "exitCode": 0,
+      "verdict": "queue-residency-minimal",
+      "rowsCovered": [
+        "P32-OBJ-18"
+      ],
+      "stdoutAnchors": [
+        "atm.plan32ParallelPrepareOutsideQueueValidation.v1",
+        "\"queueResidencyMs\": 4500",
+        "critical-section-only"
+      ]
     }
   ],
   "positiveRows": [
     {
       "objectiveId": "P30-OBJ-02",
       "title": "Protected faults fail closed",
-      "receiptIds": ["plan30-protected-closure-fail-closed"],
+      "receiptIds": [
+        "plan30-protected-closure-fail-closed"
+      ],
       "sourceReplayAction": "recomputed row status because the current protected-closure validator proves source/frozen parity faults fail closed while all 420 cells stay command-backed"
     },
     {
       "objectiveId": "P31-OBJ-02",
       "title": "Shared pure verifier remains authoritative",
-      "receiptIds": ["plan31-four-plan-objectives"],
+      "receiptIds": [
+        "plan31-four-plan-objectives"
+      ],
       "sourceReplayAction": "recomputed row status because the current validator directly exercises the shared pure verifier for Plan 3.1 objective denominators"
     },
     {
       "objectiveId": "P30-OBJ-07",
       "title": "Continuation replay is command-backed",
-      "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
+      "receiptIds": [
+        "plan3-semantic-ready-to-close",
+        "broker-replay-ready-to-close"
+      ],
       "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P30-OBJ-08",
       "title": "Semantic union remains explicit",
-      "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
+      "receiptIds": [
+        "plan3-semantic-ready-to-close",
+        "broker-replay-ready-to-close"
+      ],
       "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P30-OBJ-12",
       "title": "Overlap/admission/starvation metrics are non-extrapolated",
-      "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
+      "receiptIds": [
+        "plan3-semantic-ready-to-close",
+        "broker-replay-ready-to-close"
+      ],
       "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P30-OBJ-13",
       "title": "A/B and B/A order effects are represented",
-      "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
+      "receiptIds": [
+        "plan3-semantic-ready-to-close",
+        "broker-replay-ready-to-close"
+      ],
       "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P31-OBJ-03",
       "title": "Fake-green rejection is explicit",
-      "receiptIds": ["atm3-final-closure-negative-controls"],
+      "receiptIds": [
+        "atm3-final-closure-negative-controls"
+      ],
       "sourceReplayAction": "recomputed row status because the objective itself is fail-closed rejection and the current negative fixture proves that behavior"
     },
     {
       "objectiveId": "P31-OBJ-07",
       "title": "Inconclusive evidence remains non-terminal",
-      "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
+      "receiptIds": [
+        "plan3-semantic-ready-to-close",
+        "broker-replay-ready-to-close"
+      ],
       "sourceReplayAction": "recomputed row status from current semantic closure receipts while preserving fail-closed non-terminal semantics for unrelated inconclusive evidence"
     },
     {
       "objectiveId": "P31-OBJ-09",
       "title": "Two-process overlap is command-backed",
-      "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
+      "receiptIds": [
+        "plan3-semantic-ready-to-close",
+        "broker-replay-ready-to-close"
+      ],
       "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P31-OBJ-13",
       "title": "AB/BA order effects are explicitly modeled",
-      "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
+      "receiptIds": [
+        "plan3-semantic-ready-to-close",
+        "broker-replay-ready-to-close"
+      ],
       "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P32-OBJ-01",
       "title": "Validator progress is row-addressable",
-      "receiptIds": ["plan32-final-closure-replay"],
+      "receiptIds": [
+        "plan32-final-closure-replay"
+      ],
       "sourceReplayAction": "recomputed row status because the current replay validator proves row-addressable Plan 3.2 objective coverage"
     },
     {
       "objectiveId": "P32-OBJ-02",
       "title": "Partial timeout remains non-terminal",
-      "receiptIds": ["plan32-timeout-nonterminal-fail-closed"],
+      "receiptIds": [
+        "plan32-timeout-nonterminal-fail-closed"
+      ],
       "sourceReplayAction": "recomputed row status because the current timeout fixture proves timed-out validator receipts remain not-complete and cannot green the row"
     },
     {
       "objectiveId": "P32-OBJ-05",
       "title": "Public attestation is not substituted for machine proof",
-      "receiptIds": ["plan32-attestation-boundary-fail-closed"],
+      "receiptIds": [
+        "plan32-attestation-boundary-fail-closed"
+      ],
       "sourceReplayAction": "recomputed row status because the current attestation-only fixture proves prose or public acknowledgement cannot substitute for machine evidence"
     },
     {
       "objectiveId": "P32-OBJ-11",
       "title": "HEAD CAS is observable",
-      "receiptIds": ["git-head-evidence-current-validator"],
+      "receiptIds": [
+        "git-head-evidence-current-validator"
+      ],
       "sourceReplayAction": "recomputed row status after binding the validator receipt to the source replay evidence tuple"
     },
     {
       "objectiveId": "P32-OBJ-12",
       "title": "Queue-only/no override path remains explicit",
-      "receiptIds": ["plan32-queue-only-no-override"],
+      "receiptIds": [
+        "plan32-queue-only-no-override"
+      ],
       "sourceReplayAction": "recomputed row status because the current queue-only fixture proves waiting for queue-head does not grant override authority or mark the row ready"
+    },
+    {
+      "objectiveId": "P32-OBJ-18",
+      "title": "Parallel prepare happens outside scarce queues",
+      "receiptIds": [
+        "plan32-parallel-prepare-outside-queue"
+      ],
+      "sourceReplayAction": "recomputed row status because the current queue-residency fixture proves parallel prepare and validation stay outside scarce queue while only the critical section holds the queue"
     },
     {
       "objectiveId": "P32-OBJ-19",
       "title": "Provenance mismatch fails closed",
-      "receiptIds": ["plan32-provenance-mismatch-fail-closed"],
+      "receiptIds": [
+        "plan32-provenance-mismatch-fail-closed"
+      ],
       "sourceReplayAction": "recomputed row status because the current provenance-mismatch validator proves mismatched git-head provenance fails closed"
     },
     {
       "objectiveId": "P32-OBJ-23",
       "title": "Unknown rows remain not-complete",
-      "receiptIds": ["plan32-unknown-evidence-nonterminal-fail-closed"],
+      "receiptIds": [
+        "plan32-unknown-evidence-nonterminal-fail-closed"
+      ],
       "sourceReplayAction": "recomputed row status because the current unknown-evidence fixture proves unrecognized evidence remains not-complete and cannot green the row"
     },
     {
       "objectiveId": "P32-OBJ-24",
       "title": "Stale rows remain not-complete",
-      "receiptIds": ["plan32-stale-evidence-nonterminal-fail-closed"],
+      "receiptIds": [
+        "plan32-stale-evidence-nonterminal-fail-closed"
+      ],
       "sourceReplayAction": "recomputed row status because the current stale-evidence fixture proves historical or stale references remain not-complete without fresh command receipts"
     },
     {
       "objectiveId": "P32-OBJ-26",
       "title": "Blocker text is machine-readable",
-      "receiptIds": ["plan32-machine-readable-blocker"],
+      "receiptIds": [
+        "plan32-machine-readable-blocker"
+      ],
       "sourceReplayAction": "recomputed row status because the current blocker fixture proves blocker code, next safe command, and non-terminal status are machine-readable"
     },
     {
       "objectiveId": "P32-OBJ-27",
       "title": "Dashboard can consume Plan 3.2 replay later",
-      "receiptIds": ["plan32-dashboard-consumption"],
+      "receiptIds": [
+        "plan32-dashboard-consumption"
+      ],
       "sourceReplayAction": "recomputed row status because the current dashboard validator proves Plan 3.2 replay rows and status counts are consumed through the dashboard engine while the whole dashboard remains not-ready"
     },
     {
       "objectiveId": "P32-OBJ-29",
       "title": "Plan 3.2 terminal verdict remains fail-closed",
-      "receiptIds": ["plan32-terminal-verdict-fail-closed"],
+      "receiptIds": [
+        "plan32-terminal-verdict-fail-closed"
+      ],
       "sourceReplayAction": "recomputed row status because the current terminal-verdict validator proves incomplete Plan 3.2 replay remains not-complete and fail-closed"
     },
     {
       "objectiveId": "P32-OBJ-22",
       "title": "Missing rows cannot pass",
-      "receiptIds": ["atm3-final-closure-negative-controls"],
+      "receiptIds": [
+        "atm3-final-closure-negative-controls"
+      ],
       "sourceReplayAction": "recomputed row status because the objective itself is missing-row rejection and the current negative fixture proves that behavior"
     }
   ],
@@ -405,14 +478,17 @@
     {
       "coverage": "blocked-doctor-drift",
       "rowCount": 2,
-      "rowRefs": ["P30-OBJ-10", "P31-OBJ-08"],
+      "rowRefs": [
+        "P30-OBJ-10",
+        "P31-OBJ-08"
+      ],
       "reason": "node atm.mjs doctor --json currently exits 1 due integration-adapter drift; these rows cannot be positive until the drift is fixed or a narrower row-specific validator replaces doctor."
     }
   ],
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Twenty-two rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Twenty-three rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

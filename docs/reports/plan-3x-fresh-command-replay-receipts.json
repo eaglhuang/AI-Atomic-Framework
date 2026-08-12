@@ -3,11 +3,11 @@
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:30:00.000Z",
   "status": "fresh-command-replay-partially-consumed",
-  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 22 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
+  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 23 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:318e59e8f2744b1938c37f828bc9f44aba1ffc5950fd86a73db4b031f8f4e268"
+      "digest": "sha256:72b87443b37bedd13f535ce6ba4451cbf06b6ed8672e99dd2596a0b91115a529"
     },
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
@@ -19,18 +19,18 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:7558cca47699ad58c095d6454468d366206dbd7c9a4619bad0876248f3cb1f7b"
+      "digest": "sha256:d7bbdad0b3ab330b3408d41532e1dd55f009537136daf5acee38026b72b92292"
     }
   ],
   "familyDisposition": {
     "proofFamilyId": "fresh-command-replay-needed",
-    "sourceRowCount": 28,
-    "focusedCommandsExecuted": 18,
-    "commandsGreen": 18,
-    "rowsConsumedIntoSourceReplay": 22,
+    "sourceRowCount": 27,
+    "focusedCommandsExecuted": 19,
+    "commandsGreen": 19,
+    "rowsConsumedIntoSourceReplay": 23,
     "rowsCertifiedCompleteByTheseReceipts": 0,
-    "remainingRowsInFamily": 28,
-    "reasonRowsRemainOpen": "Twenty-two current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
+    "remainingRowsInFamily": 27,
+    "reasonRowsRemainOpen": "Twenty-three current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
   },
   "commandRuns": [
     {
@@ -158,12 +158,19 @@
       "exitCode": 0,
       "stdoutPreview": "[validate-plan32-queue-only-no-override] ok verdict=wait-only diagnostics=queue-is-required,override-lease-absent,wait-does-not-green",
       "semanticBoundary": "objective-aligned queue-only no-override evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-parallel-prepare-outside-queue",
+      "command": "node --strip-types scripts/validate-plan32-parallel-prepare-outside-queue.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-parallel-prepare-outside-queue] ok queueResidencyMs=4500 diagnostics=prepare-outside-queue,validation-outside-queue,critical-section-only",
+      "semanticBoundary": "objective-aligned queue residency minimality evidence, not completion evidence for Plan 3.2"
     }
   ],
   "nextExecutionOrder": [
     {
       "id": "positive-row-receipts",
-      "whyFirst": "Replace historical-only or shape-only evidence for the remaining 28 fresh-command rows with command receipts that directly satisfy each row objective."
+      "whyFirst": "Replace historical-only or shape-only evidence for the remaining 27 fresh-command rows with command receipts that directly satisfy each row objective."
     },
     {
       "id": "source-replay-row-recompute",

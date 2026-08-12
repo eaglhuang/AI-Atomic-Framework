@@ -6,41 +6,655 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 12,
-    "not-complete": 17,
+    "verified": 13,
+    "not-complete": 16,
     "unknown": 0,
     "conflicting": 0
   },
   "nonClaim": "This replay proves the Plan 3.2 denominator and row-level evidence surface, but does not certify Plan 3.2 complete.",
   "rows": [
-    {"objectiveId":"P32-OBJ-01","title":"Validator progress is row-addressable","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["governance-optimization/tasks/ATM-GOV-0335-replay-and-certify-every-plan-3-2-objective.task.md"],"evidenceTuples":[{"kind":"current-row-addressability-validator","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-final-closure-replay","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-02","title":"Partial timeout remains non-terminal","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/timeout-nonterminal.json"],"evidenceTuples":[{"kind":"timeout-nonterminal-negative-control","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-timeout-nonterminal-fail-closed","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-03","title":"Freshness binding is explicit","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/history/evidence/ATM-GOV-0335.json"],"evidenceTuples":[{"kind":"freshness","source":".atm/history/evidence/ATM-GOV-0335.json","expectedTaskId":"ATM-GOV-0335"}],"blockers":["fresh command receipt exists only after this card lands"],"nextSafeCommand":"node atm.mjs evidence run --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --command \"npm run typecheck\" --runner-kind frozen-runner --json"},
-    {"objectiveId":"P32-OBJ-04","title":"Legal recovery lane is named","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md"],"evidenceTuples":[{"kind":"recovery-lane","source":".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md","expectedTaskId":"ATM-GOV-0335"}],"blockers":["emergency recovery remains anomaly evidence, not autonomous success"],"nextSafeCommand":"node atm.mjs git commit --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"},
-    {"objectiveId":"P32-OBJ-05","title":"Public attestation is not substituted for machine proof","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/attestation-only-nonterminal.json"],"evidenceTuples":[{"kind":"attestation-boundary-negative-control","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-attestation-boundary-fail-closed","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-06","title":"Target/planning close seam is visible","status":"not-complete","ownerTaskId":"ATM-GOV-0341","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/"],"evidenceTuples":[{"kind":"closeback","source":"C:/Users/User/3KLife","expectedTaskId":"ATM-GOV-0341"}],"blockers":["planning closeback is a successor task"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-07","title":"Runner saga is represented by digest evidence","status":"not-complete","ownerTaskId":"ATM-GOV-0336","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["release/atm-onefile/atm.mjs"],"evidenceTuples":[{"kind":"runner-saga","source":".atm/history/evidence/ATM-GOV-0336.runner-sync-receipt.json","expectedTaskId":"ATM-GOV-0336"}],"blockers":["runner saga is scheduled for Plan 4 foundation replay"],"nextSafeCommand":"ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"},
-    {"objectiveId":"P32-OBJ-08","title":"Sealed bundle is a tree subset","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["packages/cli/src/commands/git-governance/"],"evidenceTuples":[{"kind":"sealed-bundle","source":".atm/history/evidence/ATM-GOV-0335.bundle-manifest.json","expectedTaskId":"ATM-GOV-0335"}],"blockers":["bundle receipt will exist only after validation/commit"],"nextSafeCommand":"node atm.mjs git commit --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"},
-    {"objectiveId":"P32-OBJ-09","title":"Authorized shared delivery is separated from override","status":"not-complete","ownerTaskId":"ATM-GOV-0338","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["integrations/"],"evidenceTuples":[{"kind":"shared-delivery","source":".atm/history/evidence/ATM-GOV-0338.closure-packet.json","expectedTaskId":"ATM-GOV-0338"}],"blockers":["adapter parity/shared delivery has not yet been replayed"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0338 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-10","title":"Sealed apply is recoverable","status":"not-complete","ownerTaskId":"ATM-GOV-0336","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["packages/core/src/evidence/state-replay.ts"],"evidenceTuples":[{"kind":"sealed-apply","source":".atm/history/evidence/ATM-GOV-0336.closure-packet.json","expectedTaskId":"ATM-GOV-0336"}],"blockers":["Plan 4 foundation replay owns this proof"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0336 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-11","title":"HEAD CAS is observable","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/history/evidence/git-head.jsonl"],"evidenceTuples":[{"kind":"head-cas","source":"docs/reports/plan-3x-positive-current-receipts.json","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-12","title":"Queue-only/no override path remains explicit","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/queue-only-no-override.json"],"evidenceTuples":[{"kind":"queue-only-no-override","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-queue-only-no-override","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-13","title":"Foreign-work fail-close stays active","status":"not-complete","ownerTaskId":"TASK-ERR-0014","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["packages/cli/src/commands/git-governance/implementation/"],"evidenceTuples":[{"kind":"foreign-work","source":".atm/history/evidence/TASK-ERR-0014.json","expectedTaskId":"TASK-ERR-0014"}],"blockers":["foreign-work seam has its own task and cannot green this row"],"nextSafeCommand":"node atm.mjs tasks status --task TASK-ERR-0014 --json"},
-    {"objectiveId":"P32-OBJ-14","title":"Compose attribution is explicit","status":"not-complete","ownerTaskId":"ATM-GOV-0337","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["packages/core/src/maps/shadow-comparator.ts"],"evidenceTuples":[{"kind":"compose-attribution","source":".atm/history/evidence/ATM-GOV-0337.closure-packet.json","expectedTaskId":"ATM-GOV-0337"}],"blockers":["shadow comparison owns attribution proof"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0337 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-15","title":"Deferral order is deterministic","status":"not-complete","ownerTaskId":"ATM-GOV-0339","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["packages/core/src/broker/replay/"],"evidenceTuples":[{"kind":"deferral-order","source":".atm/history/evidence/ATM-GOV-0339.closure-packet.json","expectedTaskId":"ATM-GOV-0339"}],"blockers":["dual-captain dogfood has not yet produced paired evidence"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0339 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-16","title":"Batch split and handoff are not conflated","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/runtime/batches/"],"evidenceTuples":[{"kind":"batch-handoff","source":".atm/history/tasks/ATM-GOV-0335.json","expectedTaskId":"ATM-GOV-0335"}],"blockers":["current row records shape only; final close waits for batch checkpoint"],"nextSafeCommand":"node atm.mjs batch checkpoint --actor codex-gpt-5.4-mini --batch batch-2522d44aebb6 --json"},
-    {"objectiveId":"P32-OBJ-17","title":"Stale repair is owned by generic policy","status":"not-complete","ownerTaskId":"ATM-GOV-0340","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["docs/governance/atm-bug-and-optimization-backlog.md"],"evidenceTuples":[{"kind":"stale-repair","source":"docs/governance/atm-bug-and-optimization-backlog.md","expectedTaskId":"ATM-GOV-0340"}],"blockers":["backlog census will decide stale repair disposition"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-18","title":"Parallel prepare happens outside scarce queues","status":"not-complete","ownerTaskId":"ATM-GOV-0339","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["AtomicCharter"],"evidenceTuples":[{"kind":"parallel-prepare","source":"AtomicCharter","expectedTaskId":"ATM-GOV-0339"}],"blockers":["paired experiment has not yet proven queue residency minimality"],"nextSafeCommand":"node --strip-types scripts/run-real-parallel-dogfood.ts --help"},
-    {"objectiveId":"P32-OBJ-19","title":"Provenance mismatch fails closed","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/history/evidence/git-head.jsonl","tests/fixtures/plan3-fake-green/git-head-provenance-mismatch.json"],"evidenceTuples":[{"kind":"current-provenance-mismatch-negative-control","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-provenance-mismatch-fail-closed","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-20","title":"Stale-batch routing is generic","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/runtime/batches/"],"evidenceTuples":[{"kind":"stale-batch-routing","source":".atm/history/tasks/ATM-GOV-0335.json","expectedTaskId":"ATM-GOV-0335"}],"blockers":["routing is active but not terminal completion proof"],"nextSafeCommand":"node atm.mjs batch status --json"},
-    {"objectiveId":"P32-OBJ-21","title":"Generic Plan 4 fixture boundary is visible","status":"not-complete","ownerTaskId":"ATM-GOV-0336","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/governance-incidents/"],"evidenceTuples":[{"kind":"plan4-fixture","source":"tests/fixtures/governance-incidents/","expectedTaskId":"ATM-GOV-0336"}],"blockers":["Plan 4 fixture proof belongs to ATM-GOV-0336"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0336 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-22","title":"Missing rows cannot pass","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/plan32-incomplete-objective.json"],"evidenceTuples":[{"kind":"current-negative-control","source":"tests/fixtures/plan3-fake-green/plan32-incomplete-objective.json","receiptId":"atm3-final-closure-negative-controls","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-23","title":"Unknown rows remain not-complete","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/unknown-evidence-nonterminal.json"],"evidenceTuples":[{"kind":"unknown-evidence-nonterminal-negative-control","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-unknown-evidence-nonterminal-fail-closed","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-24","title":"Stale rows remain not-complete","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/stale-evidence-nonterminal.json"],"evidenceTuples":[{"kind":"stale-evidence-nonterminal-negative-control","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-stale-evidence-nonterminal-fail-closed","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-25","title":"Owning card is present for every row","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/history/tasks/ATM-GOV-0335.json"],"evidenceTuples":[{"kind":"row-owner","source":".atm/history/tasks/ATM-GOV-0335.json","expectedTaskId":"ATM-GOV-0335"}],"blockers":["ownership is recorded; completion is still pending"],"nextSafeCommand":"node atm.mjs tasks status --task ATM-GOV-0335 --json"},
-    {"objectiveId":"P32-OBJ-26","title":"Blocker text is machine-readable","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/machine-readable-blocker.json"],"evidenceTuples":[{"kind":"machine-readable-blocker","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-machine-readable-blocker","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-27","title":"Dashboard can consume Plan 3.2 replay later","status":"verified","ownerTaskId":"ATM-GOV-0332","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["packages/core/src/evidence/plan-closeout-dashboard.ts","scripts/validate-plan32-dashboard-consumption.ts"],"evidenceTuples":[{"kind":"dashboard-consumption","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-dashboard-consumption","expectedTaskId":"ATM-GOV-0332"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-28","title":"Final release provenance waits for terminal card","status":"not-complete","ownerTaskId":"ATM-GOV-0341","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/history/evidence/"],"evidenceTuples":[{"kind":"release-provenance","source":".atm/history/evidence/ATM-GOV-0341.closure-packet.json","expectedTaskId":"ATM-GOV-0341"}],"blockers":["final release and push provenance does not exist yet"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-29","title":"Plan 3.2 terminal verdict remains fail-closed","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["docs/reports/plan-3-2-objective-replay.json","scripts/validate-plan32-terminal-verdict-fail-closed.ts"],"evidenceTuples":[{"kind":"terminal-verdict-fail-closed","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-terminal-verdict-fail-closed","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]}
+    {
+      "objectiveId": "P32-OBJ-01",
+      "title": "Validator progress is row-addressable",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "governance-optimization/tasks/ATM-GOV-0335-replay-and-certify-every-plan-3-2-objective.task.md"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "current-row-addressability-validator",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-final-closure-replay",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-02",
+      "title": "Partial timeout remains non-terminal",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/timeout-nonterminal.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "timeout-nonterminal-negative-control",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-timeout-nonterminal-fail-closed",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-03",
+      "title": "Freshness binding is explicit",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        ".atm/history/evidence/ATM-GOV-0335.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "freshness",
+          "source": ".atm/history/evidence/ATM-GOV-0335.json",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": [
+        "fresh command receipt exists only after this card lands"
+      ],
+      "nextSafeCommand": "node atm.mjs evidence run --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --command \"npm run typecheck\" --runner-kind frozen-runner --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-04",
+      "title": "Legal recovery lane is named",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        ".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "recovery-lane",
+          "source": ".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": [
+        "emergency recovery remains anomaly evidence, not autonomous success"
+      ],
+      "nextSafeCommand": "node atm.mjs git commit --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-05",
+      "title": "Public attestation is not substituted for machine proof",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/attestation-only-nonterminal.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "attestation-boundary-negative-control",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-attestation-boundary-fail-closed",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-06",
+      "title": "Target/planning close seam is visible",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0341",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "closeback",
+          "source": "C:/Users/User/3KLife",
+          "expectedTaskId": "ATM-GOV-0341"
+        }
+      ],
+      "blockers": [
+        "planning closeback is a successor task"
+      ],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-07",
+      "title": "Runner saga is represented by digest evidence",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0336",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "release/atm-onefile/atm.mjs"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "runner-saga",
+          "source": ".atm/history/evidence/ATM-GOV-0336.runner-sync-receipt.json",
+          "expectedTaskId": "ATM-GOV-0336"
+        }
+      ],
+      "blockers": [
+        "runner saga is scheduled for Plan 4 foundation replay"
+      ],
+      "nextSafeCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+    },
+    {
+      "objectiveId": "P32-OBJ-08",
+      "title": "Sealed bundle is a tree subset",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "packages/cli/src/commands/git-governance/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "sealed-bundle",
+          "source": ".atm/history/evidence/ATM-GOV-0335.bundle-manifest.json",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": [
+        "bundle receipt will exist only after validation/commit"
+      ],
+      "nextSafeCommand": "node atm.mjs git commit --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-09",
+      "title": "Authorized shared delivery is separated from override",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0338",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "integrations/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "shared-delivery",
+          "source": ".atm/history/evidence/ATM-GOV-0338.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0338"
+        }
+      ],
+      "blockers": [
+        "adapter parity/shared delivery has not yet been replayed"
+      ],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0338 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-10",
+      "title": "Sealed apply is recoverable",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0336",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "packages/core/src/evidence/state-replay.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "sealed-apply",
+          "source": ".atm/history/evidence/ATM-GOV-0336.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0336"
+        }
+      ],
+      "blockers": [
+        "Plan 4 foundation replay owns this proof"
+      ],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0336 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-11",
+      "title": "HEAD CAS is observable",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        ".atm/history/evidence/git-head.jsonl"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "head-cas",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-12",
+      "title": "Queue-only/no override path remains explicit",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/queue-only-no-override.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "queue-only-no-override",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-queue-only-no-override",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-13",
+      "title": "Foreign-work fail-close stays active",
+      "status": "not-complete",
+      "ownerTaskId": "TASK-ERR-0014",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "packages/cli/src/commands/git-governance/implementation/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "foreign-work",
+          "source": ".atm/history/evidence/TASK-ERR-0014.json",
+          "expectedTaskId": "TASK-ERR-0014"
+        }
+      ],
+      "blockers": [
+        "foreign-work seam has its own task and cannot green this row"
+      ],
+      "nextSafeCommand": "node atm.mjs tasks status --task TASK-ERR-0014 --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-14",
+      "title": "Compose attribution is explicit",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0337",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "packages/core/src/maps/shadow-comparator.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "compose-attribution",
+          "source": ".atm/history/evidence/ATM-GOV-0337.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0337"
+        }
+      ],
+      "blockers": [
+        "shadow comparison owns attribution proof"
+      ],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0337 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-15",
+      "title": "Deferral order is deterministic",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0339",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "packages/core/src/broker/replay/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "deferral-order",
+          "source": ".atm/history/evidence/ATM-GOV-0339.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0339"
+        }
+      ],
+      "blockers": [
+        "dual-captain dogfood has not yet produced paired evidence"
+      ],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0339 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-16",
+      "title": "Batch split and handoff are not conflated",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        ".atm/runtime/batches/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "batch-handoff",
+          "source": ".atm/history/tasks/ATM-GOV-0335.json",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": [
+        "current row records shape only; final close waits for batch checkpoint"
+      ],
+      "nextSafeCommand": "node atm.mjs batch checkpoint --actor codex-gpt-5.4-mini --batch batch-2522d44aebb6 --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-17",
+      "title": "Stale repair is owned by generic policy",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0340",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "docs/governance/atm-bug-and-optimization-backlog.md"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "stale-repair",
+          "source": "docs/governance/atm-bug-and-optimization-backlog.md",
+          "expectedTaskId": "ATM-GOV-0340"
+        }
+      ],
+      "blockers": [
+        "backlog census will decide stale repair disposition"
+      ],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-18",
+      "title": "Parallel prepare happens outside scarce queues",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0339",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/parallel-prepare-outside-queue.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "parallel-prepare-outside-queue",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-parallel-prepare-outside-queue",
+          "expectedTaskId": "ATM-GOV-0339"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-19",
+      "title": "Provenance mismatch fails closed",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        ".atm/history/evidence/git-head.jsonl",
+        "tests/fixtures/plan3-fake-green/git-head-provenance-mismatch.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "current-provenance-mismatch-negative-control",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-provenance-mismatch-fail-closed",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-20",
+      "title": "Stale-batch routing is generic",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        ".atm/runtime/batches/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "stale-batch-routing",
+          "source": ".atm/history/tasks/ATM-GOV-0335.json",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": [
+        "routing is active but not terminal completion proof"
+      ],
+      "nextSafeCommand": "node atm.mjs batch status --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-21",
+      "title": "Generic Plan 4 fixture boundary is visible",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0336",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/governance-incidents/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "plan4-fixture",
+          "source": "tests/fixtures/governance-incidents/",
+          "expectedTaskId": "ATM-GOV-0336"
+        }
+      ],
+      "blockers": [
+        "Plan 4 fixture proof belongs to ATM-GOV-0336"
+      ],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0336 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-22",
+      "title": "Missing rows cannot pass",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/plan32-incomplete-objective.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "current-negative-control",
+          "source": "tests/fixtures/plan3-fake-green/plan32-incomplete-objective.json",
+          "receiptId": "atm3-final-closure-negative-controls",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-23",
+      "title": "Unknown rows remain not-complete",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/unknown-evidence-nonterminal.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "unknown-evidence-nonterminal-negative-control",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-unknown-evidence-nonterminal-fail-closed",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-24",
+      "title": "Stale rows remain not-complete",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/stale-evidence-nonterminal.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "stale-evidence-nonterminal-negative-control",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-stale-evidence-nonterminal-fail-closed",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-25",
+      "title": "Owning card is present for every row",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        ".atm/history/tasks/ATM-GOV-0335.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "row-owner",
+          "source": ".atm/history/tasks/ATM-GOV-0335.json",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": [
+        "ownership is recorded; completion is still pending"
+      ],
+      "nextSafeCommand": "node atm.mjs tasks status --task ATM-GOV-0335 --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-26",
+      "title": "Blocker text is machine-readable",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/machine-readable-blocker.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "machine-readable-blocker",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-machine-readable-blocker",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-27",
+      "title": "Dashboard can consume Plan 3.2 replay later",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0332",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "packages/core/src/evidence/plan-closeout-dashboard.ts",
+        "scripts/validate-plan32-dashboard-consumption.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "dashboard-consumption",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-dashboard-consumption",
+          "expectedTaskId": "ATM-GOV-0332"
+        }
+      ],
+      "blockers": []
+    },
+    {
+      "objectiveId": "P32-OBJ-28",
+      "title": "Final release provenance waits for terminal card",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0341",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        ".atm/history/evidence/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "release-provenance",
+          "source": ".atm/history/evidence/ATM-GOV-0341.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0341"
+        }
+      ],
+      "blockers": [
+        "final release and push provenance does not exist yet"
+      ],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P32-OBJ-29",
+      "title": "Plan 3.2 terminal verdict remains fail-closed",
+      "status": "verified",
+      "ownerTaskId": "ATM-GOV-0335",
+      "caseIds": [
+        "test_plan32_exact_29_objectives_0335"
+      ],
+      "sourceAnchors": [
+        "docs/reports/plan-3-2-objective-replay.json",
+        "scripts/validate-plan32-terminal-verdict-fail-closed.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "terminal-verdict-fail-closed",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-terminal-verdict-fail-closed",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
+      ],
+      "blockers": []
+    }
   ]
 }
