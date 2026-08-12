@@ -56,6 +56,10 @@
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
       "digest": "sha256:991fff85e018c6ab235207861728b8aa3cc07e9d2281e772ccf90de4a7fb9829"
+    },
+    {
+      "path": "docs/reports/plan-3x-positive-current-receipts.json",
+      "digest": "sha256:a9e84a5e61beaaf88b282a4ad99f26639fa76711164012ee1469e5eb6621b055"
     }
   ],
   "totals": {
@@ -73,6 +77,8 @@
     "plan3xCurrentRowProofFamilies": 4,
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
+    "plan3xPositiveReceiptRowsReadyForSourceRecompute": 8,
+    "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
     "backlogNeedsTaskCardBeforeFinalRelease": 133
   },
@@ -114,8 +120,8 @@
     {
       "id": "B1-current-row-proof",
       "scope": ["Plan 3.0", "Plan 3.1", "Plan 3.2"],
-      "status": "triaged",
-      "reason": "replay reports currently establish denominator and row evidence surfaces, and fresh replay validators now prove current execution while keeping every row not-complete",
+      "status": "partial-positive-receipts",
+      "reason": "replay reports establish denominator and row evidence surfaces; eight fresh-command rows now have positive current receipts ready for source replay recompute, while source rows remain not-complete",
       "requiredOutcome": "execute docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
     },
     {
