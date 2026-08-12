@@ -17,6 +17,28 @@ assert.equal(goodJson.planId, '3.0');
 assert.equal(goodJson.rowCount, 17);
 assert.equal(goodJson.notComplete, 17);
 
+const plan31 = spawnSync(process.execPath, [
+  '--strip-types',
+  'scripts/validate-atm-3-final-closure.ts',
+  '--mode',
+  'validate',
+  '--plan',
+  '3.1',
+  '--expect-rows',
+  '23',
+  '--input',
+  'docs/reports/plan-3-1-objective-replay.json',
+  '--json'
+], { encoding: 'utf8' });
+
+assert.equal(plan31.status, 0, plan31.stderr || plan31.stdout);
+const plan31Json = JSON.parse(plan31.stdout);
+assert.equal(plan31Json.schemaId, 'atm.planObjectiveReplayValidation.v1');
+assert.equal(plan31Json.ok, true);
+assert.equal(plan31Json.planId, '3.1');
+assert.equal(plan31Json.rowCount, 23);
+assert.equal(plan31Json.notComplete, 23);
+
 const fakeGreen = spawnSync(process.execPath, [
   '--strip-types',
   'scripts/validate-atm-3-final-closure.ts',
@@ -32,5 +54,25 @@ const fakeJson = JSON.parse(fakeGreen.stdout);
 assert.equal(fakeJson.ok, false);
 assert(fakeJson.findings.some((entry: string) => entry.includes('expected 17 objective rows')));
 assert(fakeJson.findings.some((entry: string) => entry.includes('complete verdict requires every row verified')));
+
+const fakePlan31 = spawnSync(process.execPath, [
+  '--strip-types',
+  'scripts/validate-atm-3-final-closure.ts',
+  '--mode',
+  'validate',
+  '--plan',
+  '3.1',
+  '--expect-rows',
+  '23',
+  '--input',
+  'tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json',
+  '--json'
+], { encoding: 'utf8' });
+
+assert.notEqual(fakePlan31.status, 0, 'Plan 3.1 fake-green fixture must fail closed');
+const fakePlan31Json = JSON.parse(fakePlan31.stdout);
+assert.equal(fakePlan31Json.ok, false);
+assert(fakePlan31Json.findings.some((entry: string) => entry.includes('expected 23 objective rows')));
+assert(fakePlan31Json.findings.some((entry: string) => entry.includes('complete verdict requires every row verified')));
 
 console.log('atm 3 final closure replay ok');

@@ -72,7 +72,7 @@ function main() {
   const verified = rows.filter((row) => row.status === 'verified').length;
   const notComplete = rows.filter((row) => row.status === 'not-complete').length;
   if (parsed.verdict === 'complete' && verified !== options.expectRows) findings.push('complete verdict requires every row verified');
-  if (parsed.verdict !== 'not-complete') findings.push('Plan 3.0 replay must remain not-complete until every row is verified');
+  if (parsed.verdict !== 'not-complete') findings.push(`Plan ${options.expectPlan} replay must remain not-complete until every row is verified`);
 
   const result = {
     schemaId: 'atm.planObjectiveReplayValidation.v1',

@@ -1,0 +1,17 @@
+{
+  "schemaId": "atm.planObjectiveReplay.v1",
+  "specVersion": "0.1.0",
+  "planId": "3.1",
+  "generatedAt": "2026-08-12T18:18:00.000Z",
+  "verdict": "complete",
+  "denominator": 23,
+  "rows": [
+    {
+      "objectiveId": "P31-OBJ-01",
+      "title": "Fake green with missing rows",
+      "status": "not-complete",
+      "evidenceTuples": [{"kind": "fake", "source": "tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json"}],
+      "nextSafeCommand": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.1 --expect-rows 23 --input docs/reports/plan-3-1-objective-replay.json"
+    }
+  ]
+}

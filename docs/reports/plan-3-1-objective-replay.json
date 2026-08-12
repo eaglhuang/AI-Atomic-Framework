@@ -1,0 +1,270 @@
+{
+  "schemaId": "atm.planObjectiveReplay.v1",
+  "specVersion": "0.1.0",
+  "planId": "3.1",
+  "generatedAt": "2026-08-12T18:18:00.000Z",
+  "verdict": "not-complete",
+  "denominator": 23,
+  "statusCounts": {
+    "verified": 0,
+    "not-complete": 23,
+    "unknown": 0,
+    "conflicting": 0
+  },
+  "nonClaim": "This replay proves the Plan 3.1 denominator and row-level evidence surface, but does not certify Plan 3.1 complete.",
+  "rows": [
+    {
+      "objectiveId": "P31-OBJ-01",
+      "title": "Exact missing-class evidence is command-backed",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0247",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["governance-optimization/tasks/ATM-GOV-0334-replay-and-certify-every-plan-3-1-objective.task.md"],
+      "evidenceTuples": [{"kind": "missing-class", "source": ".atm/history/evidence/ATM-GOV-0247.closure-packet.json", "expectedTaskId": "ATM-GOV-0247"}],
+      "blockers": ["historical evidence is referenced but not independently replayed as terminal proof"],
+      "nextSafeCommand": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.1 --expect-rows 23 --input docs/reports/plan-3-1-objective-replay.json"
+    },
+    {
+      "objectiveId": "P31-OBJ-02",
+      "title": "Shared pure verifier remains authoritative",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0251",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["scripts/validate-four-plan-objectives.ts"],
+      "evidenceTuples": [{"kind": "pure-verifier", "source": ".atm/history/evidence/ATM-GOV-0251.closure-packet.json", "expectedTaskId": "ATM-GOV-0251"}],
+      "blockers": ["shared verifier is available but row has not consumed a fresh closure receipt"],
+      "nextSafeCommand": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.1 --mode validate"
+    },
+    {
+      "objectiveId": "P31-OBJ-03",
+      "title": "Fake-green rejection is explicit",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0248",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json"],
+      "evidenceTuples": [{"kind": "negative-fixture", "source": "tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json", "expectedTaskId": "ATM-GOV-0334"}],
+      "blockers": ["negative fixture proves fail-closed shape, not objective completion"],
+      "nextSafeCommand": "node --strip-types tests/cli/atm-3-final-closure.test.ts"
+    },
+    {
+      "objectiveId": "P31-OBJ-04",
+      "title": "Machine authority is separated from prose authority",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0249",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": [".atm/history/tasks/", ".atm/history/evidence/"],
+      "evidenceTuples": [{"kind": "machine-authority", "source": ".atm/history/evidence/ATM-GOV-0249.closure-packet.json", "expectedTaskId": "ATM-GOV-0249"}],
+      "blockers": ["machine authority has not been freshly reconciled against all Plan 3.1 rows"],
+      "nextSafeCommand": "node atm.mjs tasks audit --tasks ATM-GOV-0249 --summary --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-05",
+      "title": "Realness rule rejects stale historical-only evidence",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0239",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["docs/reports/plan-3-1-objective-replay.json"],
+      "evidenceTuples": [{"kind": "realness", "source": ".atm/history/evidence/ATM-GOV-0239.closure-packet.json", "expectedTaskId": "ATM-GOV-0239"}],
+      "blockers": ["row is intentionally not-complete until a current command-backed receipt replaces historical-only reference"],
+      "nextSafeCommand": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.1 --expect-rows 23 --input docs/reports/plan-3-1-objective-replay.json"
+    },
+    {
+      "objectiveId": "P31-OBJ-06",
+      "title": "Two-key close is represented as a causal requirement",
+      "status": "not-complete",
+      "ownerTaskId": "TASK-ERR-0005",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["packages/cli/src/commands/taskflow/"],
+      "evidenceTuples": [{"kind": "two-key-close", "source": ".atm/history/evidence/TASK-ERR-0005.closure-packet.json", "expectedTaskId": "TASK-ERR-0005"}],
+      "blockers": ["two-key close is referenced but not re-executed in this replay row"],
+      "nextSafeCommand": "node atm.mjs taskflow close --task ATM-GOV-0334 --actor codex-gpt-5.4-mini --dry-run --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-07",
+      "title": "Inconclusive evidence remains non-terminal",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0240",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["scripts/diagnose-plan3-evidence-closure.ts"],
+      "evidenceTuples": [{"kind": "inconclusive", "source": ".atm/history/evidence/ATM-GOV-0240.closure-packet.json", "expectedTaskId": "ATM-GOV-0240"}],
+      "blockers": ["inconclusive rows must stay not-complete until replaced by verified receipts"],
+      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+    },
+    {
+      "objectiveId": "P31-OBJ-08",
+      "title": "Old/new frozen same-digest red-green is replayable",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0241",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["release/atm-onefile/atm.mjs", "scripts/run-sealed-runner-build.ts"],
+      "evidenceTuples": [{"kind": "frozen-digest", "source": ".atm/history/evidence/ATM-GOV-0241.closure-packet.json", "expectedTaskId": "ATM-GOV-0241"}],
+      "blockers": ["current frozen digest has not been attached to the row"],
+      "nextSafeCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+    },
+    {
+      "objectiveId": "P31-OBJ-09",
+      "title": "Two-process overlap is command-backed",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0252",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["packages/core/src/broker/"],
+      "evidenceTuples": [{"kind": "two-process-overlap", "source": ".atm/history/evidence/ATM-GOV-0252.closure-packet.json", "expectedTaskId": "ATM-GOV-0252"}],
+      "blockers": ["overlap proof is historical and not replayed in this row"],
+      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+    },
+    {
+      "objectiveId": "P31-OBJ-10",
+      "title": "Compose and steward responsibilities are separated",
+      "status": "not-complete",
+      "ownerTaskId": "TASK-ERR-0004",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["packages/cli/src/commands/broker/"],
+      "evidenceTuples": [{"kind": "compose-steward", "source": ".atm/history/evidence/TASK-ERR-0004.closure-packet.json", "expectedTaskId": "TASK-ERR-0004"}],
+      "blockers": ["compose/steward closure has not been freshly proven against current batch"],
+      "nextSafeCommand": "node atm.mjs batch status --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-11",
+      "title": "Conflict queue and wakeup receipts are observable",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0253",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": [".atm/runtime/broker/", ".atm/history/evidence/"],
+      "evidenceTuples": [{"kind": "queue-wakeup", "source": ".atm/history/evidence/ATM-GOV-0253.closure-packet.json", "expectedTaskId": "ATM-GOV-0253"}],
+      "blockers": ["queue/wakeup proof is not terminally consumed by this replay"],
+      "nextSafeCommand": "node atm.mjs broker status --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-12",
+      "title": "Full lifecycle receipts are command-backed",
+      "status": "not-complete",
+      "ownerTaskId": "TASK-ERR-0006",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": [".atm/history/task-events/", ".atm/history/evidence/"],
+      "evidenceTuples": [{"kind": "lifecycle-receipt", "source": ".atm/history/evidence/TASK-ERR-0006.closure-packet.json", "expectedTaskId": "TASK-ERR-0006"}],
+      "blockers": ["lifecycle receipts are not replayed end-to-end for Plan 3.1"],
+      "nextSafeCommand": "node atm.mjs tasks status --task ATM-GOV-0334 --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-13",
+      "title": "AB/BA order effects are explicitly modeled",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0254",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["artifacts/generated/atm-ab-v4/"],
+      "evidenceTuples": [{"kind": "order-effect", "source": ".atm/history/evidence/ATM-GOV-0254.closure-packet.json", "expectedTaskId": "ATM-GOV-0254"}],
+      "blockers": ["AB/BA replay is represented but not terminally certified"],
+      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+    },
+    {
+      "objectiveId": "P31-OBJ-14",
+      "title": "Sealed set correctness is independent of live index residue",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0250",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["packages/cli/src/commands/git-governance/"],
+      "evidenceTuples": [{"kind": "sealed-set", "source": ".atm/history/evidence/ATM-GOV-0250.closure-packet.json", "expectedTaskId": "ATM-GOV-0250"}],
+      "blockers": ["sealed-set proof is historical; current foreign staged residue must not be treated as pass/fail authority"],
+      "nextSafeCommand": "node atm.mjs git commit --task ATM-GOV-0334 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-15",
+      "title": "Correctness, performance, and cost are not conflated",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0246",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["docs/reports/plan-3-1-objective-replay.md"],
+      "evidenceTuples": [{"kind": "cost-correctness-boundary", "source": ".atm/history/evidence/ATM-GOV-0246.closure-packet.json", "expectedTaskId": "ATM-GOV-0246"}],
+      "blockers": ["cost/correctness boundary is stated but not independently replayed"],
+      "nextSafeCommand": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.1 --mode validate"
+    },
+    {
+      "objectiveId": "P31-OBJ-16",
+      "title": "Incident terminal disposition is explicit",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0237",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["docs/governance/atm-bug-and-optimization-backlog.md"],
+      "evidenceTuples": [{"kind": "incident-disposition", "source": ".atm/history/evidence/ATM-GOV-0237.closure-packet.json", "expectedTaskId": "ATM-GOV-0237"}],
+      "blockers": ["incident disposition is not yet reconciled with machine-readable backlog census"],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-17",
+      "title": "Rollback path is retained for every non-complete row",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0238",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["docs/reports/plan-3-1-objective-replay.json"],
+      "evidenceTuples": [{"kind": "rollback", "source": ".atm/history/evidence/ATM-GOV-0238.closure-packet.json", "expectedTaskId": "ATM-GOV-0238"}],
+      "blockers": ["rollback is row-local but not terminally exercised"],
+      "nextSafeCommand": "git revert --no-commit HEAD"
+    },
+    {
+      "objectiveId": "P31-OBJ-18",
+      "title": "Parity and breaker evidence carries digests",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0242",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["release/atm-onefile/atm.mjs", ".atm/history/evidence/"],
+      "evidenceTuples": [{"kind": "parity-breaker", "source": ".atm/history/evidence/ATM-GOV-0242.closure-packet.json", "expectedTaskId": "ATM-GOV-0242"}],
+      "blockers": ["digest evidence is not current terminal proof"],
+      "nextSafeCommand": "node atm.mjs doctor --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-19",
+      "title": "Runner-sync digest is visible to final certificate",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0243",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": [".atm/history/evidence/*.runner-sync-receipt.json"],
+      "evidenceTuples": [{"kind": "runner-sync", "source": ".atm/history/evidence/ATM-GOV-0243.runner-sync-receipt.json", "expectedTaskId": "ATM-GOV-0243"}],
+      "blockers": ["runner-sync digest is referenced but not consumed by terminal certificate"],
+      "nextSafeCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+    },
+    {
+      "objectiveId": "P31-OBJ-20",
+      "title": "Actor continuity is preserved across receipts",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0244",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": [".atm/history/task-events/", ".atm/history/tasks/"],
+      "evidenceTuples": [{"kind": "actor-continuity", "source": ".atm/history/evidence/ATM-GOV-0244.closure-packet.json", "expectedTaskId": "ATM-GOV-0244"}],
+      "blockers": ["actor continuity has not been machine-replayed across all Plan 3.1 rows"],
+      "nextSafeCommand": "node atm.mjs tasks audit --tasks ATM-GOV-0244 --summary --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-21",
+      "title": "Backlog inventory is machine-readable",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0340",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["docs/governance/atm-bug-and-optimization-backlog.items/"],
+      "evidenceTuples": [{"kind": "backlog-inventory", "source": "docs/governance/atm-bug-and-optimization-backlog.md", "expectedTaskId": "ATM-GOV-0340"}],
+      "blockers": ["backlog census is scheduled for ATM-GOV-0340 and must remain open here"],
+      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --auto-intent --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-22",
+      "title": "Autonomous zero-manual-command replay is separated from emergency approvals",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0245",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["AtomicCharter", "docs/reports/plan-3-1-objective-replay.md"],
+      "evidenceTuples": [{"kind": "autonomous-replay", "source": ".atm/history/evidence/ATM-GOV-0245.closure-packet.json", "expectedTaskId": "ATM-GOV-0245"}],
+      "blockers": ["emergency approval history cannot be treated as autonomous replay proof"],
+      "nextSafeCommand": "node atm.mjs next --json"
+    },
+    {
+      "objectiveId": "P31-OBJ-23",
+      "title": "Owning card remains explicit for every incomplete row",
+      "status": "not-complete",
+      "ownerTaskId": "ATM-GOV-0334",
+      "caseIds": ["test_plan31_exact_23_objectives_0334"],
+      "sourceAnchors": ["governance-optimization/tasks/ATM-GOV-0334-replay-and-certify-every-plan-3-1-objective.task.md"],
+      "evidenceTuples": [{"kind": "row-owner", "source": ".atm/history/tasks/ATM-GOV-0334.json", "expectedTaskId": "ATM-GOV-0334"}],
+      "blockers": ["Plan 3.1 terminal certificate must wait for successor cards and final closeback"],
+      "nextSafeCommand": "node atm.mjs batch checkpoint --actor codex-gpt-5.4-mini --batch batch-2522d44aebb6 --json"
+    }
+  ]
+}

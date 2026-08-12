@@ -1,0 +1,299 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0334",
+  "title": "Replay and certify every Plan 3.1 objective",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0333"
+  ],
+  "acceptance": [
+    "ACC-1: 23/23 rows 全具十項 evidence tuple，exact missing class、shared pure verifier、fake-green rejection、machine authority/realness/two-key close 與 inconclusive evidence 全部可重現。",
+    "ACC-2: old/new frozen same-digest red/green、two-process overlap、compose/steward、conflict queue/wakeup、full lifecycle receipts 全部 command-backed。",
+    "ACC-3: AB/BA 每方向至少三次；同一 sealed set 同時報 correctness/performance/cost；incident terminal disposition、rollback/parity/breaker、runner-sync digest、actor continuity 完整。",
+    "ACC-4: backlog inventory 與 autonomous zero-manual-command replay 完整；任一 row 不足即 Plan 3.1 NOT COMPLETE 並回傳 owning card。"
+  ],
+  "deliverables": [
+    "docs/reports/plan-3-1-objective-replay.json",
+    "docs/reports/plan-3-1-objective-replay.md",
+    "tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json"
+  ],
+  "scopePaths": [
+    "scripts/diagnose-plan3-evidence-closure.ts",
+    "scripts/validate-atm-3-final-closure.ts",
+    "tests/cli/atm-3-final-closure.test.ts",
+    "docs/reports/plan-3-1-objective-replay.json"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.1 --mode validate",
+    "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-failed-row-to-not-complete-and-retain-valid-observations",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.plan-objective-replay",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0334-replay-and-certify-every-plan-3-1-objective.task.md",
+    "sectionTitle": "ATM-GOV-0334",
+    "headingLine": 61,
+    "hash": "d0bd2dd2440e7303",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0334-replay-and-certify-every-plan-3-1-objective.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:d0bd2dd2440e7303aca8f4ff1464e8676c29812c9c1493e0c795a25b766d5257",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:24.998Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:24.998Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0333"
+    ],
+    "startConditions": [
+      "Plan 3.0 replay is 17/17 verified.",
+      "The authoritative Plan 3.1 denominator resolves to exactly 23 rows."
+    ],
+    "softRelations": [
+      "ATM-GOV-0335"
+    ],
+    "changedPublicSeams": [
+      "atm.planObjectiveReplay.v1"
+    ],
+    "causalImpactEdges": [
+      "plan31-causal-chain",
+      "plan31-objective-verdict",
+      "plan31-closeback"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-plan31-rows",
+      "corrected-receipts",
+      "dashboard"
+    ],
+    "validatorReferences": [
+      "validate-four-plan-objectives",
+      "validate-atm-3-final-closure"
+    ],
+    "phaseOwner": "closeout-wave-6-plan31"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_plan31_exact_23_objectives_0334",
+      "targetGroupId": null,
+      "semanticKey": "plan31_exact_23_objectives",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "plan31-causal-chain",
+        "plan31-objective-verdict",
+        "plan31-closeback"
+      ],
+      "expectedRedPredicate": "any of 23 rows missing stale historical-only or prose-only keeps Plan 3.1 not-complete",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.planObjectiveReplay.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_plan31_exact_23_objectives_0334"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_final_certification"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T18-14-38-975Z-renew-9ff37818eab2",
+  "lastTransitionAt": "2026-08-12T18:14:38.975Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T18:14:01.474Z",
+  "promotedAt": "2026-08-12T18:14:01.477Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-29e1de242cae",
+    "claimedAt": "2026-08-12T18:14:01.481Z",
+    "heartbeatAt": "2026-08-12T18:14:38.302Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0334.*",
+      ".atm/history/task-events/ATM-GOV-0334/**",
+      ".atm/history/tasks/ATM-GOV-0334.json",
+      "docs/reports/plan-3-1-objective-replay.json",
+      "docs/reports/plan-3-1-objective-replay.md",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "scripts/validate-atm-3-final-closure.ts",
+      "scripts/validate-four-plan-objectives.ts",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812164021-codex-gpt-5.4-mini-c263c3e976\""
+    }
+  },
+  "startedAt": "2026-08-12T18:14:01.481Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6b3976a54e0edb64",
+    "ticketDigest": "sha256:6b3976a54e0edb647782d86d15317de2c5f42f63542000aa1344fe82ea3c9436",
+    "taskId": "ATM-GOV-0334",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
+    "claimGeneration": "lease-29e1de242cae",
+    "issuedAt": "2026-08-12T18:14:38.302Z",
+    "expiresAt": "2026-08-12T18:44:38.302Z",
+    "scopeDigest": "sha256:75eb4535402c2e4a2192857cd094a8bf8797154458c156b8b01dccf0fcf613b1",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T18:14:38.302Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0334.*",
+          ".atm/history/task-events/ATM-GOV-0334/**",
+          ".atm/history/tasks/ATM-GOV-0334.json",
+          "docs/reports/plan-3-1-objective-replay.json",
+          "docs/reports/plan-3-1-objective-replay.md",
+          "scripts/diagnose-plan3-evidence-closure.ts",
+          "scripts/validate-atm-3-final-closure.ts",
+          "scripts/validate-four-plan-objectives.ts",
+          "tests/cli/atm-3-final-closure.test.ts",
+          "tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json"
+        ],
+        "digest": "sha256:f0d1dc12ee31646eebf99adc766e1afcce698202ffd3b2f30fa9332a93ebb8b7"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260812181401-codex-gpt-5.4-mini-ATM-GOV-0334-a221381569",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0334",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-ec28b86f7414de0a",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0334.*",
+      ".atm/history/task-events/ATM-GOV-0334/**",
+      ".atm/history/tasks/ATM-GOV-0334.json",
+      "docs/reports/plan-3-1-objective-replay.json",
+      "docs/reports/plan-3-1-objective-replay.md",
+      "scripts/diagnose-plan3-evidence-closure.ts",
+      "scripts/validate-atm-3-final-closure.ts",
+      "scripts/validate-four-plan-objectives.ts",
+      "tests/cli/atm-3-final-closure.test.ts",
+      "tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0334-replay-and-certify-every-plan-3-1-objective.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0334-replay-and-certify-every-plan-3-1-objective.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812164021-codex-gpt-5.4-mini-c263c3e976\""
+    },
+    "createdAt": "2026-08-12T18:14:05.726Z",
+    "status": "active"
+  }
+}
