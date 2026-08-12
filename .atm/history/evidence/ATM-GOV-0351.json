@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0351",
-  "updatedAt": "2026-08-12T07:36:54.432Z",
+  "updatedAt": "2026-08-12T07:49:54.733Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -812,6 +812,108 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:f68058989caabd93c69ed6aa5e7335a81511514c5ba5da9a1c0c2e0832730d3d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260812074136-codex-gpt-5.4-mini-ATM-GOV-0351-9be2392ce6",
+      "createdAt": "2026-08-12T07:49:54.733Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260812074136-codex-gpt-5.4-mini-ATM-GOV-0351-9be2392ce6",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-deferred-index-transaction",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/atm-evidence-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:bd2f4da12937c801247333ee02e9a7d8d37aa42a0157e3f58e55e9159c77ee5c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-12T07:49:43.567Z",
+            "finishedAt": "2026-08-12T07:49:54.732Z",
+            "durationMs": 11165,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "cacheKey": "sha256:bd02f0201684f4c8bed27baa8512e4b7695eb82514abcb133aa729a12287de3d",
+            "generatedAt": "2026-08-12T07:49:54.732Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:bd02f0201684f4c8bed27baa8512e4b7695eb82514abcb133aa729a12287de3d",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-12T07:49:54.732Z",
+              "observedAt": "2026-08-12T07:49:54.732Z",
+              "startedAt": "2026-08-12T07:49:43.567Z",
+              "finishedAt": "2026-08-12T07:49:54.732Z",
+              "durationMs": 11165,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:ba87b0dfb91ae72662af40b262c4616354cf05564948fec28ee9f5487d238ca3",
+              "outputDigest": "sha256:0af40a207ed085ab9c5aa7100e150eccfafefb40c37eef0a4be33da9aed42fd5",
+              "cache": {
+                "key": "sha256:bd02f0201684f4c8bed27baa8512e4b7695eb82514abcb133aa729a12287de3d",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7709f5011e1b0eee9e1275af412ebc875cfcd3c283d322ff1f926e1ced57c143",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0351",
-  "updatedAt": "2026-08-12T07:36:54.432Z",
+  "updatedAt": "2026-08-12T07:49:54.733Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
@@ -9,6 +9,7 @@
     "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
     "node --strip-types packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
     "node --strip-types packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
     "typecheck",
     "validate:cli",
     "validate:git-head-evidence"
@@ -139,6 +140,22 @@
       "startedAt": "2026-08-12T07:35:19.207Z",
       "finishedAt": "2026-08-12T07:36:54.431Z",
       "durationMs": 95224,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bd2f4da12937c801247333ee02e9a7d8d37aa42a0157e3f58e55e9159c77ee5c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts"
+      ],
+      "generatedAt": "2026-08-12T07:49:54.732Z",
+      "startedAt": "2026-08-12T07:49:43.567Z",
+      "finishedAt": "2026-08-12T07:49:54.732Z",
+      "durationMs": 11165,
       "runnerKind": "frozen-runner",
       "sourceCommit": null,
       "cached": false
