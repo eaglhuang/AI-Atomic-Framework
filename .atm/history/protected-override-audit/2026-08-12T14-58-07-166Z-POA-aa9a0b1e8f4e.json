@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-aa9a0b1e8f4e",
+  "recordedAt": "2026-08-12T14:58:07.166Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0331",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0331 --message \"refactor(git): extract cohesive commit execution atom map\n\nATM-Work-Admission: wat-9a52ac976c5cc6be sha256:9a52ac976c5cc6be44bd55d160bbd9e59f9902a7b2fd6bae069eabce689351de\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0331-ac3cb03b6d",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T14-58-07-165Z-EMG-ATM-GOV-0331-ac3cb03b6d.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

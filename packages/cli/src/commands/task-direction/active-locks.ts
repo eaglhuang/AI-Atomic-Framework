@@ -15,7 +15,12 @@ export function readActiveTaskDirectionLocks(cwd: string): readonly TaskDirectio
     try {
       const parsed = JSON.parse(readFileSync(path.join(lockRoot, entry), 'utf8')) as Record<string, unknown>;
       const lock = parsed.taskDirectionLock;
-      if (parsed.released !== true && parsed.status !== 'released' && isTaskDirectionLock(lock) && hasLiveMatchingTaskClaim(cwd, lock)) locks.push(lock);
+      if (
+        parsed.released !== true &&
+        parsed.status !== 'released' &&
+        isTaskDirectionLock(lock) &&
+        (hasLiveMatchingTaskClaim(cwd, lock) || isActiveEmbeddedDirectionLock(parsed, lock))
+      ) locks.push(lock);
     } catch { /* malformed runtime records are not active locks */ }
   }
   const sidecarRoot = path.join(cwd, '.atm', 'runtime', 'task-direction-locks');
@@ -50,4 +55,20 @@ function hasLiveMatchingTaskClaim(cwd: string, lock: TaskDirectionLock): boolean
     const claimLaneId = claim.laneSession?.laneSessionId;
     return !lockLaneId || !claimLaneId || lockLaneId === claimLaneId;
   } catch { return false; }
+}
+
+function isActiveEmbeddedDirectionLock(record: Record<string, unknown>, lock: TaskDirectionLock): boolean {
+  if (record.status !== 'active') return false;
+  const actorId = typeof record.actorId === 'string'
+    ? record.actorId
+    : typeof record.lockedBy === 'string'
+      ? record.lockedBy
+      : null;
+  if (actorId !== lock.actorId) return false;
+  const outerFiles = Array.isArray(record.files)
+    ? record.files.filter((entry): entry is string => typeof entry === 'string')
+    : [];
+  if (outerFiles.length === 0) return true;
+  const allowed = new Set(lock.allowedFiles.map((entry) => entry.replace(/\\/g, '/').toLowerCase()));
+  return outerFiles.every((entry) => allowed.has(entry.replace(/\\/g, '/').toLowerCase()));
 }

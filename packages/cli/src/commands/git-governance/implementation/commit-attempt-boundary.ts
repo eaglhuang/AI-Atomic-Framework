@@ -1,6 +1,6 @@
 import { consumeGitIndexOverrideLease, parkGitIndexLease, restoreGitIndexLease } from '../../git-index-ownership.ts';
 import { executeTaskScopedCommitTransaction } from '../task-scoped-commit-transaction.ts';
-import { executeHookBypassCommitBoundary } from './hook-bypass-commit-boundary.ts';
+import * as hookBypassCommitBoundary from './hook-bypass-commit-boundary.ts';
 import { writeGitCommitAttemptStatus } from './git-process-port.ts';
 import { recordGitIndexRestoreFailure, withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { resolveGovernedCommitSeal } from './sealed-commit-attribution.ts';
@@ -10,7 +10,7 @@ type LegacyValue = ReturnType<typeof JSON.parse>;
 export function executeCommitAttempt(input: LegacyValue): LegacyValue {
   let protectedOverrideAudit = input.protectedOverrideAudit;
   const runCommit = (env: LegacyValue) => {
-    const boundary = executeHookBypassCommitBoundary({
+    const boundary = hookBypassCommitBoundary.executeHookBypassCommitBoundary({
       hookBypassRequest: input.hookBypassRequest,
       cwd: input.options.cwd,
       gitArgs: input.args,

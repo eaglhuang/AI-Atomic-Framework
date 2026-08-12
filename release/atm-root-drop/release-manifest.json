@@ -5132,8 +5132,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 505,
-    "unchanged": 4592,
+    "copied": 405,
+    "unchanged": 4692,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -11626,5 +11626,35 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
+  },
+  "buildInputsTreeHash": "sha256:07577178b8ac50aa3c2177788ea05c9c5bcc6cf9e75ba538362f6779eef7ddfe",
+  "sealedSourceCommit": "2fa7d9b9011f8a6e252e981acf77e02e8d6cef44",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "missing-previous-sealed-source",
+  "incrementalPlanDigest": "sha256:fdc1736b938fc1eea522ca617dff638430bfdda57e909891b614ec847fa2e78c",
+  "tsBuildCacheDigest": "sha256:d931de1f82e6dd287230a88e5b09ff7eac534e805db676809e6048633779eabe",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "rootDropReleaseAssembly",
+    "dominantPhaseMs": 18383,
+    "totalElapsedMs": 46330,
+    "dominanceRatio": 0.3968,
+    "phaseMedianMs": 1655,
+    "phaseP95Ms": 18383,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
+  },
+  "phaseTimingsMs": {
+    "inputHashCalculation": 36,
+    "skipDecision": 7,
+    "worktreeSetup": 8347,
+    "typescriptBuild": 8232,
+    "rootDropReleaseAssembly": 18383,
+    "onefileReleaseAssembly": 1655,
+    "artifactSync": 4430,
+    "cleanup": 0,
+    "totalElapsed": 46330
   }
 }
