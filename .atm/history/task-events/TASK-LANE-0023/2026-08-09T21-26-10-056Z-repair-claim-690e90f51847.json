@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T21-26-10-056Z-repair-claim-690e90f51847",
+  "taskId": "TASK-LANE-0023",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809205007-codex-gpt-5.4-mini-TASK-LANE-0023-dd1954eb57",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0023.json",
+  "taskSha256": "sha256:63d6449196053629890d6c9251ae8dbb62097cdb44c890b7cb0e4afb79365fd1",
+  "createdAt": "2026-08-09T21:26:10.056Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-LANE-0023 --actor codex-gpt-5.4-mini --write --reason \"Repair expired lane-bound claim and dangling lock before committing the verified generic runner publication correction.\" --json"
+}

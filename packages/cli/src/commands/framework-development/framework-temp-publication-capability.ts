@@ -23,6 +23,8 @@ export interface FrameworkTempPublicationCapability {
 
 export interface FrameworkCommitAuthorityContext {
   readonly usesFrameworkClaimCommit: boolean;
+  /** A taskless framework commit is valid only when its current lane resolves one live temporary claim. */
+  readonly frameworkClaimRequired: boolean;
   readonly frameworkClaimFiles: readonly string[] | null;
   /** The exact live lock identity used by hook attribution; never reconstruct it from an actor id. */
   readonly frameworkClaimTaskId: string | null;
@@ -40,7 +42,8 @@ export function resolveFrameworkCommitAuthorityContext(input: {
     laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null,
   });
   return {
-    usesFrameworkClaimCommit: !input.taskExists || capability !== null,
+    usesFrameworkClaimCommit: capability !== null,
+    frameworkClaimRequired: !input.taskExists,
     frameworkClaimFiles: capability?.allowedFiles ?? null,
     frameworkClaimTaskId: capability?.taskId ?? null,
   };

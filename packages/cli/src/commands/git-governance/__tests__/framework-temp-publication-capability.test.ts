@@ -4,13 +4,16 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   frameworkTempPublicationCapabilityCovers,
+  resolveFrameworkCommitAuthorityContext,
   resolveFrameworkTempPublicationCapability,
 } from '../../framework-development/framework-temp-publication-capability.ts';
+import { assertFrameworkCommitClaimAuthority } from '../implementation/framework-commit-claim-guard.ts';
 import { evaluateTaskWorkAdmissionGate } from '../work-admission-check.ts';
 
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-framework-temp-publication-'));
 const taskId = 'ATM-FRAMEWORK-TEMP-publication';
-const now = '2026-08-09T14:53:00.000Z';
+const nowMs = Date.now();
+const now = new Date(nowMs).toISOString();
 mkdirSync(path.join(cwd, '.atm', 'runtime', 'locks'), { recursive: true });
 mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
 mkdirSync(path.join(cwd, '.atm', 'history', 'evidence'), { recursive: true });
@@ -18,7 +21,7 @@ mkdirSync(path.join(cwd, 'release', 'atm-root-drop'), { recursive: true });
 writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`), `${JSON.stringify({
   workItemId: taskId,
   actorId: 'publication-steward',
-  heartbeatAt: '2026-08-09T14:52:53.900Z',
+  heartbeatAt: new Date(nowMs - 1_000).toISOString(),
   ttlSeconds: 3600,
   laneSessionId: 'lane-publication',
   linkedTaskId: 'ATM-GOV-0342',
@@ -27,7 +30,7 @@ writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`),
 writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', 'ATM-FRAMEWORK-TEMP-other-live-claim.lock.json'), `${JSON.stringify({
   workItemId: 'ATM-FRAMEWORK-TEMP-other-live-claim',
   actorId: 'publication-steward',
-  heartbeatAt: '2026-08-09T14:52:54.000Z',
+  heartbeatAt: new Date(nowMs - 1_000).toISOString(),
   ttlSeconds: 3600,
   laneSessionId: 'lane-other',
   linkedTaskId: 'ATM-GOV-elsewhere',
@@ -87,6 +90,36 @@ assert.equal(frameworkTempPublicationCapabilityCovers(capability, [
   '.atm/history/evidence/ATM-GOV-0344.runner-sync-receipt.json',
 ]), true, 'queue/receipt-bound terminal continuation must be publishable without reopening its task');
 
+const unboundCommit = resolveFrameworkCommitAuthorityContext({
+  cwd,
+  taskId: null,
+  actorId: 'publication-steward',
+  taskExists: false,
+});
+assert.equal(unboundCommit.frameworkClaimRequired, true);
+assert.equal(unboundCommit.usesFrameworkClaimCommit, false, 'taskless commits must not fall back to every actor-owned staged file');
+assert.throws(
+  () => assertFrameworkCommitClaimAuthority({ actorId: 'publication-steward', laneSessionId: null, authority: unboundCommit }),
+  (error: unknown) => (error as { code?: string }).code === 'ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED',
+);
+
+const priorLaneSessionId = process.env.ATM_LANE_SESSION_ID;
+process.env.ATM_LANE_SESSION_ID = 'lane-publication';
+try {
+  const laneBoundCommit = resolveFrameworkCommitAuthorityContext({
+    cwd,
+    taskId: null,
+    actorId: 'publication-steward',
+    taskExists: false,
+  });
+  assert.equal(laneBoundCommit.usesFrameworkClaimCommit, true);
+  assert.deepEqual(laneBoundCommit.frameworkClaimFiles, capability?.allowedFiles, 'taskless commit scope is exactly the lane-bound capability allowlist');
+  assert.doesNotThrow(() => assertFrameworkCommitClaimAuthority({ actorId: 'publication-steward', laneSessionId: 'lane-publication', authority: laneBoundCommit }));
+} finally {
+  if (priorLaneSessionId === undefined) delete process.env.ATM_LANE_SESSION_ID;
+  else process.env.ATM_LANE_SESSION_ID = priorLaneSessionId;
+}
+
 assert.equal(resolveFrameworkTempPublicationCapability({
   cwd,
   taskId: null,
@@ -120,7 +153,7 @@ const expired = resolveFrameworkTempPublicationCapability({
   cwd,
   taskId,
   actorId: 'publication-steward',
-  now: Date.parse('2026-08-09T16:00:00.000Z'),
+  now: nowMs + 3_700_000,
 });
 assert.equal(expired, null);
 console.log('framework-temp-publication-capability: ok');

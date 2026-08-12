@@ -30,6 +30,7 @@ import { autoStageFrameworkClaimFiles, inspectFrameworkScopedUnstagedCommit, ins
 import { resolveFrameworkHookTaskId } from './framework-hook-identity.ts';
 import { executeGitCommit } from './commit-execution.ts';
 import { resolveFrameworkCommitAuthorityContext } from '../../framework-development/framework-temp-publication-capability.ts';
+import { assertFrameworkCommitClaimAuthority } from './framework-commit-claim-guard.ts';
 type LegacyValue = ReturnType<typeof JSON.parse>;
 export function runGitCommit(options: LegacyValue) {
   const resolvedActor = resolveActorId(
@@ -115,9 +116,11 @@ const taskDocument = options.taskId
     ? readTaskDocument(options.cwd, options.taskId)
     : null;
 
-const { usesFrameworkClaimCommit, frameworkClaimFiles, frameworkClaimTaskId } = resolveFrameworkCommitAuthorityContext({
+const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId } = resolveFrameworkCommitAuthorityContext({
   cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
 });
+
+assertFrameworkCommitClaimAuthority({ actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null, authority: { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId } });
 
 const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
 

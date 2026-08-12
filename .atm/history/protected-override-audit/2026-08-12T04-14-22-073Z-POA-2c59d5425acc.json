@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-2c59d5425acc",
+  "recordedAt": "2026-08-12T04:14:22.073Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-LANE-0023",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task TASK-LANE-0023 --message \"fix(git): isolate deferred framework commits\n\nATM-Work-Admission: wat-575a204466f8f3d9 sha256:575a204466f8f3d9b403f1d94587ae7519d3e0f97596749b652e8c9ac5a579be\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-LANE-0023-91c7b8b1f0",
+  "reason": "Bootstrap source-first commit after focused regression validation.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T04-14-22-071Z-EMG-TASK-LANE-0023-91c7b8b1f0.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
