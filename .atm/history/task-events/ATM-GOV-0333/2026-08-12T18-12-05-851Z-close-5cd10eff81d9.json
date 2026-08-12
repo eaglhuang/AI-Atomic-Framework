@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T18-12-05-851Z-close-5cd10eff81d9",
+  "taskId": "ATM-GOV-0333",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812180607-codex-gpt-5.4-mini-ATM-GOV-0333-432390c643",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0333.json",
+  "taskSha256": "sha256:aa90c3df2689ae6298aef8fbe711746505138c125f9a8413231879fd9e84b342",
+  "createdAt": "2026-08-12T18:12:05.851Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0333 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812180607-codex-gpt-5.4-mini-ATM-GOV-0333-432390c643",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0333.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:atm-3-final-closure",
+      "validate:cli",
+      "validate:four-plan-objectives",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T18:12:05.841Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0333.*",
+        ".atm/history/task-events/ATM-GOV-0333/**",
+        ".atm/history/tasks/ATM-GOV-0333.json",
+        "docs/reports/plan-3-0-objective-replay.json",
+        "docs/reports/plan-3-0-objective-replay.md",
+        "scripts/diagnose-plan3-evidence-closure.ts",
+        "scripts/validate-atm-3-final-closure.ts",
+        "scripts/validate-four-plan-objectives.ts",
+        "tests/cli/atm-3-final-closure.test.ts",
+        "tests/fixtures/plan3-fake-green/plan30-incomplete-objective.json"
+      ],
+      "criticalChangedFiles": [
+        "scripts/diagnose-plan3-evidence-closure.ts",
+        "scripts/validate-atm-3-final-closure.ts",
+        "scripts/validate-four-plan-objectives.ts",
+        "tests/cli/atm-3-final-closure.test.ts",
+        "tests/fixtures/plan3-fake-green/plan30-incomplete-objective.json"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
