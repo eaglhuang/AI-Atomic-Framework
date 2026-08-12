@@ -10,6 +10,8 @@ export * from './mutation-lineage.ts';
 export * from './obligation-inventory.ts';
 export * from './quality-gauntlet.ts';
 export * from './realness.ts';
+export * from './observed-source.ts';
+export * from './observed-source-adapters.ts';
 export * from './tdd-cycle.ts';
 export * from './validation-receipt.ts';
 export * from './validator-catalog-selection.ts';
