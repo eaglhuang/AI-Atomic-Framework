@@ -114,7 +114,9 @@ export function assertNoBrokerConflictBeforeHookBypass(options) {
     if (options.deferForeignStaged === true)
         return;
     const { cwd, taskId } = options;
-    const crossTaskBlock = detectCrossTaskMutation(cwd, taskId, "git commit --no-verify");
+    const crossTaskBlock = detectCrossTaskMutation(cwd, taskId, "git commit --no-verify", Array.isArray(options.candidateFiles) && options.candidateFiles.length > 0
+        ? options.candidateFiles
+        : undefined);
     if (!crossTaskBlock)
         return;
     recordIncidentFlag(cwd, crossTaskBlock);
@@ -155,5 +157,19 @@ export function assertNoBrokerConflictBeforeHookBypass(options) {
             brokerConflictOverridePermission: "backend.brokerConflictOverride",
             requiredCommand: 'node atm.mjs emergency approve --permission backend.brokerConflictOverride --actor <actor> --allowed-flag --broker-conflict-override --approval-text "<human approval sentence>" --reason "<why the recorded conflict resolution must override serialization>" --json',
         },
+    });
+}
+export function authorizeHookBypassAfterBrokerAdmission(options) {
+    assertNoBrokerConflictBeforeHookBypass(options);
+    return assertEmergencyApproval({
+        cwd: options.cwd,
+        surface: "git commit --no-verify",
+        permission: "backend.gitHookBypass",
+        taskId: options.taskId,
+        actorId: options.actorId,
+        emergencyApproval: options.emergencyApproval,
+        flags: ["--no-verify"],
+        reason: options.reason ?? "Governed git hook bypass for emergency recovery.",
+        command: options.command,
     });
 }

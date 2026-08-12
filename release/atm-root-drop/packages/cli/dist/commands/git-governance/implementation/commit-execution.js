@@ -12,6 +12,7 @@ import { withBranchCommitQueueLock } from './branch-commit-window.js';
 import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, readStagedFiles, recordGitIndexRestoreFailure, rollbackNewlyStagedLiveIndexResidue, withTaskScopedCommitIndex } from './git-index-transaction.js';
 import { resolveGovernedCommitSeal } from './sealed-commit-attribution.js';
 import { isHeadRaceCommitFailure, readHeadCommitSha } from './push-command.js';
+import { resolveTaskBoundCommitFiles } from './commit-bundle-selection.js';
 export function assertGovernedCommitPhysicalLineBudget(cwd, files, actorId, taskId) {
     const report = inspectTouchedPhysicalLineBudget(cwd, files, {
         taskId,
@@ -68,7 +69,7 @@ export function executeGitCommit(options, context) {
                 ATM_COMMIT_BROKER_CONFLICT_RESOLUTION: options.brokerConflictResolutionPath ?? "",
                 ATM_COMMIT_TRAILERS: trailers.join("\n"),
             });
-            const bundleFiles = options.taskId !== null && taskDocument && !bypassesActiveSession
+            const resolvedTaskBundle = options.taskId !== null && taskDocument
                 ? (taskScopedBundleReport ??
                     resolveTaskScopedCommitBundle({
                         cwd: options.cwd,
@@ -82,8 +83,14 @@ export function executeGitCommit(options, context) {
                         message: options.message,
                         actorId,
                         trailers,
-                    })).commitFiles
-                : frameworkClaimCommitFiles;
+                    }))
+                : null;
+            const bundleFiles = resolveTaskBoundCommitFiles({
+                taskId: options.taskId,
+                taskDocument,
+                taskScopedBundleReport: resolvedTaskBundle,
+                frameworkClaimCommitFiles,
+            });
             const autoStagedActorRegistryPath = options.taskId === null
                 ? stageTrackedActorRegistryIfNeeded(options.cwd)
                 : null;

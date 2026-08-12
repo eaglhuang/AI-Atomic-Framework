@@ -6,7 +6,7 @@ import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-s
 import { computeMissingValidatorReport, verifyTaskEvidence } from '../evidence.js';
 import { cleanupStaleTeamRunsForTerminalTasks } from '../team-runtime-cleanup.js';
 import { evaluateTeamRequiredCompletionGate } from '../team.js';
-import { assertRunnerFreshForWriteAction, createFrameworkModeStatus, inspectFrameworkCloseWorktree, registerCloseCommitWindow, requireTargetRepoClosureAuthority, } from '../framework-development.js';
+import { createFrameworkModeStatus, inspectFrameworkCloseWorktree, registerCloseCommitWindow, requireTargetRepoClosureAuthority, } from '../framework-development.js';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from '../emergency/gate.js';
 import { assertTaskCloseAllowedByDirection, advanceTaskQueueAfterClose } from '../task-direction.js';
 import { findActiveBatchRunForTask, readActiveBatchRun } from '../work-channels.js';
@@ -17,14 +17,15 @@ import { parseClaimRecord } from './task-ledger-readers.js';
 import { normalizeRelativePath, taskPathFor } from './task-file-io-helpers.js';
 import { evaluateFrameworkDeliveryWindow, readDeferredForeignStagedFilesForActiveCloseWindow } from './close-helpers/close-window-diagnostics.js';
 import { buildTaskFrameworkLockContext } from '../framework-development/framework-lock-context.js';
-import { extractTaskCloseDeclaredFiles, extractTaskDeliverableFiles, evaluateTaskDeliverableGate, existingTaskCloseArtifacts, stageTaskCloseArtifacts, taskDeliveryPrincipleText } from './close-helpers/close-artifact-staging.js';
+import { extractTaskCloseDeclaredFiles, extractTaskDeliverableFiles, evaluateTaskDeliverableGate, existingTaskCloseArtifacts, taskDeliveryPrincipleText } from './close-helpers/close-artifact-staging.js';
 import { createClosureTransitionMetadata } from './close-helpers/task-transition-writer.js';
-import { uniqueStrings, isCliErrorWithCode, recordStaleRunnerOverride, recordFailedEmergencyUseAttempt } from '../tasks.js';
+import { uniqueStrings, isCliErrorWithCode, recordFailedEmergencyUseAttempt } from '../tasks.js';
 import { parseCloseOptions } from './task-option-parsers.js';
 import { resolveCloseHistoricalContext } from './close-orchestrator/historical-context.js';
 import { prepareClosurePacket } from './close-orchestrator/closure-packet.js';
 import { makeTasksClosedResult } from './close-orchestrator/close-result.js';
 import { executeCloseWrites } from './close-orchestrator/close-write.js';
+import { authorizeCloseRunnerRecovery } from './close-orchestrator/runner-recovery.js';
 export async function runTasksClose(argv) {
     const options = parseCloseOptions(argv);
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -70,20 +71,7 @@ export async function runTasksClose(argv) {
                 }
             });
         }
-        const staleGate = assertRunnerFreshForWriteAction({
-            cwd: options.cwd,
-            action: 'tasks-close',
-            allowStaleRunner: options.allowStaleRunner
-        });
-        if (options.allowStaleRunner && staleGate.warning) {
-            await recordStaleRunnerOverride({
-                cwd: options.cwd,
-                taskId: options.taskId,
-                actorId,
-                action: 'tasks-close',
-                command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --allow-stale-runner --json`
-            });
-        }
+        emergencyUse = await authorizeCloseRunnerRecovery({ cwd: options.cwd, taskId: options.taskId, actorId, allowStaleRunner: options.allowStaleRunner, emergencyApproval: options.emergencyApproval, reason: options.reason });
         const currentClaim = parseClaimRecord(taskDocument.claim);
         const activeSession = resolveActorWorkSession(options.cwd, {
             actorId,
@@ -457,7 +445,6 @@ export async function runTasksClose(argv) {
             transitionPath,
             closurePacketPath
         ]);
-        stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
         if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
             const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
             await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));

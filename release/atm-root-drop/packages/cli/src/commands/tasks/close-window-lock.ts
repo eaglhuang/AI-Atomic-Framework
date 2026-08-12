@@ -134,8 +134,10 @@ function readCloseWindowStagedIndexLock(cwd: string): CloseWindowStagedIndexLock
 
 interface ForeignStagedIndexEntry {
   readonly path: string;
-  readonly mode: string;
-  readonly blobId: string;
+  /** Null represents an intentional staged deletion. */
+  readonly mode: string | null;
+  /** Null represents an intentional staged deletion. */
+  readonly blobId: string | null;
 }
 
 const INDEX_LOCK_RETRY_DELAYS_MS = [25, 50, 100, 200, 400, 800, 1600] as const;
@@ -196,25 +198,15 @@ function readStagedIndexEntries(cwd: string, files: readonly string[]): ForeignS
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
-  return output.split(/\r?\n/).flatMap((line) => {
+  const present = new Map(output.split(/\r?\n/).flatMap((line) => {
     const match = /^(\d+)\s+([0-9a-f]{40,})\s+\d+\t(.+)$/.exec(line.trim());
     return match ? [{ mode: match[1], blobId: match[2], path: normalizeRelativePath(match[3]) }] : [];
-  }).filter((entry) => entry.path);
+  }).filter((entry) => entry.path).map((entry) => [entry.path, entry] as const));
+  return requested.map((filePath) => present.get(filePath) ?? { path: filePath, mode: null, blobId: null });
 }
 
 function writeForeignStagedSnapshot(cwd: string, taskId: string, files: readonly string[]): { snapshotPath: string; entries: ForeignStagedIndexEntry[] } {
   const entries = readStagedIndexEntries(cwd, files);
-  if (entries.length !== uniqueSorted(files).length) {
-    throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Close window could not record every foreign staged index entry before deferral.', {
-      exitCode: 1,
-      details: {
-        recoveryState: 'snapshot-incomplete',
-        files: uniqueSorted(files),
-        entries,
-        remediation: 'Do not proceed with the close. Keep the foreign staged entries intact and retry only after the index can be read completely.'
-      }
-    });
-  }
   const snapshotPath = `.atm/runtime/snapshots/close-window-foreign-staged-${taskId}-${Date.now()}.json`;
   mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
   writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({
@@ -239,15 +231,19 @@ function restoreForeignStagedEntries(cwd: string, entries: readonly ForeignStage
     });
   }
   for (const entry of entries) {
+    const args = entry.mode === null || entry.blobId === null
+      ? ['update-index', '--force-remove', '--', entry.path]
+      : ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`];
     runGitIndexMutationWithRetry({
       cwd,
-      args: ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`],
+      args,
       operation: `restore foreign staged entry ${entry.path}`
     });
   }
   const restored = readStagedIndexEntries(cwd, entries.map((entry) => entry.path));
-  const expected = entries.map((entry) => `${entry.mode}:${entry.blobId}:${entry.path}`).sort();
-  const actual = restored.map((entry) => `${entry.mode}:${entry.blobId}:${entry.path}`).sort();
+  const describe = (entry: ForeignStagedIndexEntry) => `${entry.mode ?? 'deleted'}:${entry.blobId ?? 'deleted'}:${entry.path}`;
+  const expected = entries.map(describe).sort();
+  const actual = restored.map(describe).sort();
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
     throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Close window restored foreign staged entries but byte-identity verification failed.', {
       exitCode: 1,

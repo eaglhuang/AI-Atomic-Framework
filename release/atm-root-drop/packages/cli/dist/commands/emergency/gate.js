@@ -1,6 +1,6 @@
 import { CliError } from '../shared.js';
 import { isTaskflowOperatorLaneActive } from './context.js';
-import { consumeEmergencyLease } from './leases.js';
+import { assertEmergencyLeaseAvailable, consumeEmergencyLease } from './leases.js';
 import { recordProtectedOverrideAuthorization, recordProtectedOverrideCompletion } from './protected-override-audit.js';
 export function recordProtectedOverrideOutcome(input) {
     return recordProtectedOverrideCompletion({
@@ -33,7 +33,7 @@ export function assertEmergencyApproval(input) {
             }
         });
     }
-    const consumed = consumeEmergencyLease({
+    const leaseInput = {
         cwd: input.cwd,
         leaseId: input.emergencyApproval,
         permission: input.permission,
@@ -43,7 +43,11 @@ export function assertEmergencyApproval(input) {
         flags: input.flags ?? [],
         reason: input.reason ?? null,
         command: input.command ?? null
-    });
+    };
+    if (input.consume === false) {
+        return { lease: assertEmergencyLeaseAvailable(leaseInput), protectedOverrideAudit: null };
+    }
+    const consumed = consumeEmergencyLease(leaseInput);
     const protectedOverrideAudit = recordProtectedOverrideAuthorization({
         cwd: input.cwd,
         actorId: input.actorId ?? null,
@@ -62,4 +66,11 @@ export function assertEmergencyApproval(input) {
         ...consumed,
         protectedOverrideAudit
     };
+}
+/** A protected write surface cannot continue from a read-only lease check. */
+export function requireConsumedEmergencyApproval(approval) {
+    if (!approval || !approval.protectedOverrideAudit || !('usePath' in approval)) {
+        throw new CliError('ATM_EMERGENCY_CONSUMPTION_REQUIRED', 'Protected write requires a consumed emergency approval, not a read-only lease preflight.', { exitCode: 1 });
+    }
+    return approval;
 }

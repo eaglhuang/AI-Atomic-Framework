@@ -148,6 +148,7 @@ export function buildTaskflowClosePreflight(input: {
   taskDocument: Record<string, unknown>;
   previewCommitBundle: unknown;
   historicalDeliveryRefs: string[];
+  deferForeignStaged?: boolean;
   waiverOutOfScopeDelivery: boolean;
   waiverReason: string | null;
 }): HistoricalClosePreflightSummary {
@@ -158,6 +159,7 @@ export function buildTaskflowClosePreflight(input: {
     taskDocument: input.taskDocument,
     previewCommitBundle: input.previewCommitBundle as never,
     historicalDeliveryRefs: input.historicalDeliveryRefs,
+    deferForeignStaged: input.deferForeignStaged,
     waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
     waiverReason: input.waiverReason
   });
@@ -180,6 +182,7 @@ export function buildTaskflowClosePreflight(input: {
   }
   if (
     summary.unexpectedStagedTasks.length > 0
+    && !input.deferForeignStaged
     && !summary.blockers.some((entry) => entry.id === 'unexpectedStagedTasks')
   ) {
     const files = [...new Set(summary.unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles))];

@@ -1,0 +1,41 @@
+import { createATMVersionSummary } from '../atm-chart.ts';
+import { detectGovernanceRuntime } from '../governance-runtime.ts';
+export declare function checkOnboardingLifecycle(root: string, runtime: ReturnType<typeof detectGovernanceRuntime>): {
+    ok: boolean;
+    stage: string;
+    atmChartPath: string;
+    welcomeLineagePath: string;
+    atmChartFreshness: string;
+    welcomeRecorded: boolean;
+    recommendedAction: string;
+    defaultGuardsPath?: undefined;
+    recordedSourceGuardsSha256?: undefined;
+    currentSourceGuardsSha256?: undefined;
+    welcomeCount?: undefined;
+} | {
+    ok: boolean;
+    stage: string;
+    defaultGuardsPath: string;
+    atmChartPath: string;
+    welcomeLineagePath: string;
+    atmChartFreshness: string;
+    welcomeRecorded: boolean;
+    recommendedAction: string;
+    recordedSourceGuardsSha256?: undefined;
+    currentSourceGuardsSha256?: undefined;
+    welcomeCount?: undefined;
+} | {
+    ok: boolean;
+    stage: string;
+    defaultGuardsPath: string;
+    atmChartPath: string;
+    welcomeLineagePath: string;
+    atmChartFreshness: string;
+    recordedSourceGuardsSha256: {} | null;
+    currentSourceGuardsSha256: string;
+    welcomeRecorded: boolean;
+    welcomeCount: number;
+    recommendedAction: string;
+};
+export declare function createVersionSummaryMessages(versionSummary: ReturnType<typeof createATMVersionSummary>): import("../shared.ts").CommandMessage[];
+export declare function readATMChartFrontmatter(filePath: string): Record<string, unknown> | null;

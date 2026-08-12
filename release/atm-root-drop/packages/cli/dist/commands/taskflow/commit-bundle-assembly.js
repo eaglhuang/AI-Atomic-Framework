@@ -9,7 +9,7 @@ import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-deli
 import { loadTaskDocumentOrThrow } from '../tasks/public-surface.js';
 import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.js';
 import { validateStrictPathHeuristic } from '../tasks/task-import-validators.js';
-import { listOptionalEvidenceBundleGovernanceArtifacts } from './closeback-orchestration.js';
+import { listCurrentTaskCloseEvidenceFiles } from './current-task-close-evidence.js';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.js';
 import { listTaskOwnedProtectedOverrideAuditFiles, resolveActorGitIdentityForCommit } from '../git-governance.js';
 import { resolveCommitLaneSessionId } from '../git-governance/implementation.js';
@@ -51,7 +51,7 @@ function listExistingFilesRecursively(root, relativeDirectory) {
     return files;
 }
 function listCurrentTaskGovernanceFiles(root, taskId) {
-    const taskFiles = [`.atm/history/tasks/${taskId}.json`, `.atm/history/evidence/${taskId}.json`, `.atm/history/evidence/${taskId}.closure-packet.json`].filter((filePath) => existsSync(path.join(root, filePath)));
+    const taskFiles = [`.atm/history/tasks/${taskId}.json`].filter((filePath) => existsSync(path.join(root, filePath)));
     const taskEvents = listExistingFilesRecursively(root, `.atm/history/task-events/${taskId}`);
     const handoffHistory = listExistingFilesRecursively(root, `.atm/history/handoff/${taskId}`);
     return uniqueSorted([...taskFiles, ...taskEvents, ...handoffHistory]);
@@ -351,7 +351,7 @@ export function buildTaskflowCommitBundle(input) {
     }
     const targetDeliveryFiles = [];
     const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
-    const backendGovernanceFiles = [...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId), ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId), ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : []),
+    const backendGovernanceFiles = [...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId), ...listCurrentTaskCloseEvidenceFiles(targetRepoRoot, input.taskId), ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : []),
         ...listTaskOwnedProtectedOverrideAuditFiles(targetRepoRoot, input.taskId)];
     const targetGovernanceFiles = uniqueSorted([...(historicalBatchStageFile ? [historicalBatchStageFile] : []), ...backendGovernanceFiles, taskflowSealManifestPath(input.taskId)]);
     const excludedDirtyFiles = [];
@@ -540,16 +540,16 @@ export async function commitTaskflowDeliveryFiles(input) {
         return null;
     }
     const deliveryBundle = { repoRoot, stageFiles, commitMessage: `chore(taskflow): deliver ${input.taskId} source bundle`, commitCommand: commitCommandFor({ repoRoot, actorId: input.actorId, taskId: input.taskId, commitMessage: `chore(taskflow): deliver ${input.taskId} source bundle`, repoKind: 'target' }), commitSha: null, status: 'uncomputed' };
-    const preflight = verifyRepoIndexIsolation(deliveryBundle, 'pre-stage', true, input.taskId);
-    const staged = verifyRepoIndexIsolation(stageRepoBundle(preflight, input.taskId), 'post-stage', true, input.taskId);
-    if (staged.status !== 'staged') {
-        return null;
-    }
-    const indexLease = staged.indexIsolation?.indexLease ?? buildIndexIsolation(staged, readStagedFiles(repoRoot), input.taskId).indexLease;
+    // Delivery commits use an isolated temporary index below.  Foreign live-index
+    // entries are therefore neither inputs nor outputs of this transaction; require
+    // ownership evidence for parking/restoration, but never demand an empty shared
+    // index before constructing the private candidate.
+    const preflight = verifyRepoIndexIsolation(deliveryBundle, 'pre-stage', false, input.taskId);
+    const indexLease = preflight.indexIsolation?.indexLease ?? buildIndexIsolation(preflight, readStagedFiles(repoRoot), input.taskId).indexLease;
     const laneSessionId = resolveTaskflowCommitLaneSessionId({ repoRoot, actorId: input.actorId, taskId: input.taskId });
     commitRepoWithTaskScopedIndexLease({ repoRoot, taskId: input.taskId, leaseId: indexLease.leaseId, indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot, stageFiles, args: ['commit', '-m', appendSealTrailers(deliveryBundle.commitMessage, input.bundle.sealAndCommitReceipt, 'target', laneSessionId)], actorId: input.actorId, taskId: input.taskId, laneSessionId }) });
     const commitSha = tryGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
-    return { repoRoot, stageFiles: staged.stageFiles, commitMessage: deliveryBundle.commitMessage, commitSha, status: 'committed' };
+    return { repoRoot, stageFiles, commitMessage: deliveryBundle.commitMessage, commitSha, status: 'committed' };
 }
 export async function finalizeTaskflowCommitBundle(input) {
     assertCommitBundleReady(input.bundle);

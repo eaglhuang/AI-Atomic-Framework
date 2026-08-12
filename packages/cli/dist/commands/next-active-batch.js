@@ -1,3 +1,4 @@
+export const preservesExplicitTaskClaim = (explicitTaskIds) => (explicitTaskIds?.length ?? 0) > 0;
 export function decideActiveBatchClaimTask(input) {
     const activeBatch = input.activeBatch;
     const claimableTask = input.claimableTask;

@@ -65,6 +65,7 @@ export default defineCommandSpec({
         'node atm.mjs broker runner-sync supersede --task TASK-GOV-0100 --actor worker-1 --sealed-source-sha <sha> --surface release/atm-onefile/atm.mjs --json',
         'node atm.mjs broker runner-sync release --task TASK-GOV-0100 --steward-work-id runner-sync-1234abcd --receipt-ref .atm/history/evidence/TASK-GOV-0100.runner-sync-receipt.json --json',
         'node atm.mjs broker runner-sync reconcile-receipt --task TASK-GOV-0100 --actor worker-1 --receipt-ref .atm/history/evidence/TASK-GOV-0099.runner-sync-receipt.json --json',
+        'node atm.mjs broker runner-sync takeover-publication --task TASK-GOV-0100 --actor worker-1 --sealed-source-sha <sha> --surface full --json',
         'node atm.mjs broker projection enqueue --task TASK-GOV-0100 --actor worker-1 --projection-key atm.generated-projection.governance-backlog --source-item docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-YYYY-MM-DD-NNN.json --json',
         'node atm.mjs broker schedule enqueue --task TASK-GOV-0100 --wave wave-123 --surface-kind commit --surface-family cli --payload-digest sha256:abc --json',
         'node atm.mjs broker schedule plan --wave wave-123 --surface-kind commit --surface-family cli --expected-task TASK-GOV-0100 --expected-task TASK-GOV-0101 --json',

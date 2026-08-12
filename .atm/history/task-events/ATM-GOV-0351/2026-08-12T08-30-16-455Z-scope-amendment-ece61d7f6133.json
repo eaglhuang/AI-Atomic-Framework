@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T08-30-16-455Z-scope-amendment-ece61d7f6133",
+  "taskId": "ATM-GOV-0351",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0351.json",
+  "taskSha256": "sha256:3ecc868522b2339c9495e2b3fec4505b43a964b90a3d6dbde437bca78291c8a5",
+  "createdAt": "2026-08-12T08:30:16.455Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0351 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/hook/pre-commit/implementation.ts,packages/cli/src/commands/hook/pre-commit/framework-temp-claim-attribution.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

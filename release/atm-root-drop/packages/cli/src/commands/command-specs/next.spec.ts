@@ -14,6 +14,8 @@ export default defineCommandSpec({
     commonCwdOption,
     { flag: '--claim', summary: 'Start the selected fast/normal/batch route and create the required runtime state.' },
     { flag: '--actor', value: 'id', summary: 'Actor id used for next --claim (or set ATM_ACTOR_ID).' },
+    { flag: '--allow-stale-runner', summary: 'Allow a human-approved runner-recovery lease to perform only the claim lifecycle while frozen runner publication is unavailable.' },
+    { flag: '--emergency-approval', value: 'leaseId', summary: 'Emergency lease required with --allow-stale-runner for a recovery claim.' },
     { flag: '--auto-intent', summary: 'For next --claim task routes, auto-resolve write vs closeout-only from in-scope dirty files and whether deliverables already landed in HEAD.' },
     { flag: '--claim-intent', value: 'mode', summary: 'Override claim mode for next --claim: write or closeout-only/no-more-mutation.' },
     { flag: '--closeout-only', summary: 'Alias for --claim-intent closeout-only on next --claim.' },

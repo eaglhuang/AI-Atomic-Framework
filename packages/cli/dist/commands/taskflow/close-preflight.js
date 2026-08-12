@@ -117,6 +117,7 @@ export function buildTaskflowClosePreflight(input) {
         taskDocument: input.taskDocument,
         previewCommitBundle: input.previewCommitBundle,
         historicalDeliveryRefs: input.historicalDeliveryRefs,
+        deferForeignStaged: input.deferForeignStaged,
         waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
         waiverReason: input.waiverReason
     });
@@ -138,6 +139,7 @@ export function buildTaskflowClosePreflight(input) {
         };
     }
     if (summary.unexpectedStagedTasks.length > 0
+        && !input.deferForeignStaged
         && !summary.blockers.some((entry) => entry.id === 'unexpectedStagedTasks')) {
         const files = [...new Set(summary.unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles))];
         const taskIds = summary.unexpectedStagedTasks.map((entry) => entry.taskId);

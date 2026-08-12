@@ -8,7 +8,7 @@ import { describeActorResolution } from '../actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from '../actor-session.ts';
 import { tryBuildQuickfixClaimResult, buildNoClaimableTaskResult } from './claim-early-results.ts';
 import { cleanupPreviousBatchQueueLocks } from './claim-cleanup.ts';
-import { assertSourceFirstRunnerReadOnlyAction } from '../framework-development.ts';
+import { assertClaimRunnerWriteAuthority, assertRunnerRecoveryClaimPreflight } from './runner-recovery-claim-authorization.ts';
 import { inspectIntegrationBootstrap } from '../integration.ts';
 import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import { classifyTaskDelivery } from '../task-intent.ts';
@@ -29,8 +29,7 @@ import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessH
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
 import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts'; import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
-export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
-  assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
+export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly allowStaleRunner?: boolean; readonly emergencyApproval?: string | null; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   const claimStartedAt = Date.now();
   const claimLatencyPhases: Array<{ readonly phase: string; readonly durationMs: number }> = [];
   const claimIntent: NextClaimIntent = input.claimIntent ?? 'write';
@@ -248,7 +247,8 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   parallelAdvisory = parallelPreflight.parallelAdvisory;
   brokerQueueAdmission = parallelPreflight.brokerQueueAdmission;
   claimAllowedFiles = parallelPreflight.claimAllowedFiles;
-  const dirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: input.cwd, task: claimableTask, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, claimFiles: claimAllowedFiles });
+  const allowUnownedTaskScopedRecovery = assertRunnerRecoveryClaimPreflight({ cwd: input.cwd, actorId: input.actor ?? null, allowStaleRunner: Boolean(input.allowStaleRunner), emergencyApproval: input.emergencyApproval ?? null });
+  const dirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: input.cwd, task: claimableTask, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, claimFiles: claimAllowedFiles, allowUnownedTaskScopedRecovery });
   const planScopedPreflight = buildPlanScopedRoutingPreflight({ cwd: input.cwd, task: claimableTask, selectedTasks: importedTaskQueue.promptScope?.selectedTasks ?? [claimableTask], taskIntent: input.taskIntent, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, dirtyWipAdmission, command: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --task ${claimableTask.workItemId} --auto-intent --json` });
   const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
   const oversizedExtractionAdmission = assertClaimLineBudgetOrExtractionAdmission({ cwd: input.cwd, taskId: claimableTask.workItemId, taskPath: taskPathFor(input.cwd, claimableTask.workItemId), report: lineBudgetReport });
@@ -342,6 +342,12 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       actorId: resolvedActor.actorId
     });
   claimLatencyPhases.push({ phase: 'claim-preparation', durationMs: Date.now() - claimPreparationStartedAt });
+  assertClaimRunnerWriteAuthority({
+    cwd: input.cwd,
+    actorId: input.actor ?? null,
+    allowStaleRunner: Boolean(input.allowStaleRunner),
+    emergencyApproval: input.emergencyApproval ?? null
+  });
   const claimCommandStartedAt = Date.now();
   const claimResult = shouldReuseActiveClaim
     ? await runTasks([
@@ -585,15 +591,9 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       recommendedChannel: nextAction.recommendedChannel,
       taskIntent: input.taskIntent,
       importedTaskQueue: input.importedTaskQueue,
-      integrationBootstrap: input.integrationBootstrap,
-      runtimeAdapterReadiness: input.runtimeAdapterReadiness,
-    claimLatency: {
-      schemaId: 'atm.claimLatencyTelemetry.v1',
-      totalMs: Date.now() - claimStartedAt,
-      phases: claimLatencyPhases
-    },
-    planScopedPreflight,
-    dirtyWipAdmission,
+      integrationBootstrap: input.integrationBootstrap, runtimeAdapterReadiness: input.runtimeAdapterReadiness,
+    claimLatency: { schemaId: 'atm.claimLatencyTelemetry.v1', totalMs: Date.now() - claimStartedAt, phases: claimLatencyPhases },
+    planScopedPreflight, dirtyWipAdmission,
     ...(oversizedExtractionAdmission ? { oversizedExtractionAdmission } : {})
   }
   });

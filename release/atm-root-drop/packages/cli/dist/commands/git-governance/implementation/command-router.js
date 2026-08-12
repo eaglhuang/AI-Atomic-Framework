@@ -6,7 +6,7 @@ import { parseGitOptions } from './git-command-options.js';
 import { runGitLease } from './lease-command.js';
 import { runGitPostPushFailRecovery, runGitPush } from './push-command.js';
 import { runGitRecordCommit } from './record-commit-command.js';
-import { assertEmergencyApproval, recordProtectedOverrideOutcome } from '../../emergency/gate.js';
+import { assertEmergencyApproval, recordProtectedOverrideOutcome, requireConsumedEmergencyApproval } from '../../emergency/gate.js';
 import { GIT_INDEX_LOCK_RECOVERY_FLAG, recoverGitIndexLock } from './git-index-lock-recovery.js';
 export function normalizeCommitLaneSessionId(value) {
     return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -55,7 +55,7 @@ export async function runAtmGit(argv) {
     }
     if (options.action === 'recover-index-lock') {
         const command = `node atm.mjs git recover-index-lock --task ${quoteCliValue(options.taskId ?? '<task-id>')} --actor ${quoteCliValue(options.actorId ?? '<actor-id>')} ${GIT_INDEX_LOCK_RECOVERY_FLAG} --emergency-approval <lease-id> --reason "<human-approved reason>" --json`;
-        const approval = assertEmergencyApproval({
+        const approval = requireConsumedEmergencyApproval(assertEmergencyApproval({
             cwd: options.cwd,
             surface: 'git recover-index-lock',
             permission: 'backend.gitIndexLockRecovery',
@@ -65,7 +65,7 @@ export async function runAtmGit(argv) {
             flags: [GIT_INDEX_LOCK_RECOVERY_FLAG],
             reason: options.overrideReason,
             command,
-        });
+        }));
         try {
             const recovery = recoverGitIndexLock({
                 cwd: options.cwd,

@@ -147,42 +147,43 @@ export function getActiveTasks(cwd) {
     }
     return activeTasks;
 }
-export function detectCrossTaskMutation(cwd, currentTaskId, commandFamily) {
+export function detectCrossTaskMutation(cwd, currentTaskId, commandFamily, candidateFiles) {
     const normCurrentTaskId = currentTaskId?.trim().toUpperCase() ?? null;
     const activeTasks = getActiveTasks(cwd);
     const currentTask = normCurrentTaskId
         ? activeTasks.find((task) => task.taskId === normCurrentTaskId) ?? null
         : null;
     const includeUnstaged = shouldIncludeUnstaged(commandFamily);
-    let modifiedFiles = [];
-    try {
-        const gitExec = process.env.ATM_GIT_EXECUTABLE || 'git';
-        const nameStatusOutput = execFileSync(gitExec, ['-C', cwd, 'status', '--porcelain'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-        const mutationEntries = nameStatusOutput
-            .split('\n')
-            .map((line) => {
-            if (line.length < 4)
-                return '';
-            const stagedCode = line[0] ?? ' ';
-            const unstagedCode = line[1] ?? ' ';
-            const pathPart = line.slice(3).trim();
-            const renameMatch = pathPart.match(/^(.+) -> (.+)$/);
-            const file = renameMatch ? renameMatch[2] : pathPart;
-            return {
-                file: normalizeRelativePath(file),
-                staged: stagedCode !== ' ' && stagedCode !== '?',
-                unstaged: unstagedCode !== ' ' || stagedCode === '?'
-            };
-        })
-            .filter((entry) => typeof entry !== 'string' && Boolean(entry.file));
-        modifiedFiles = mutationEntries
-            .filter((entry) => entry.staged || (includeUnstaged && entry.unstaged))
-            .map((entry) => entry.file);
-    }
-    catch {
-        // Git not available or not a repo
-        return null;
-    }
+    let modifiedFiles = candidateFiles?.map(normalizeRelativePath).filter(Boolean) ?? [];
+    if (!candidateFiles)
+        try {
+            const gitExec = process.env.ATM_GIT_EXECUTABLE || 'git';
+            const nameStatusOutput = execFileSync(gitExec, ['-C', cwd, 'status', '--porcelain'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+            const mutationEntries = nameStatusOutput
+                .split('\n')
+                .map((line) => {
+                if (line.length < 4)
+                    return '';
+                const stagedCode = line[0] ?? ' ';
+                const unstagedCode = line[1] ?? ' ';
+                const pathPart = line.slice(3).trim();
+                const renameMatch = pathPart.match(/^(.+) -> (.+)$/);
+                const file = renameMatch ? renameMatch[2] : pathPart;
+                return {
+                    file: normalizeRelativePath(file),
+                    staged: stagedCode !== ' ' && stagedCode !== '?',
+                    unstaged: unstagedCode !== ' ' || stagedCode === '?'
+                };
+            })
+                .filter((entry) => typeof entry !== 'string' && Boolean(entry.file));
+            modifiedFiles = mutationEntries
+                .filter((entry) => entry.staged || (includeUnstaged && entry.unstaged))
+                .map((entry) => entry.file);
+        }
+        catch {
+            // Git not available or not a repo
+            return null;
+        }
     const conflicts = new Map();
     const addConflict = (conflict) => {
         const key = `${conflict.conflictTaskId}\0${conflict.surface}\0${conflict.owner}`;

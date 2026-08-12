@@ -15,7 +15,8 @@ export function inspectClaimDirtyWipAdmission(input) {
         .filter((file) => candidateFiles.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file)));
     const blockers = uniqueSorted(intersectingFiles).flatMap((file) => {
         const owner = findDirtyPathOwner(input.cwd, file);
-        if (isOwnedByRequestingClaim(owner, input.task.workItemId, input.actorId, input.laneSessionId))
+        if (isOwnedByRequestingClaim(owner, input.task.workItemId, input.actorId, input.laneSessionId)
+            || (!owner && input.allowUnownedTaskScopedRecovery === true))
             return [];
         return [{
                 file,

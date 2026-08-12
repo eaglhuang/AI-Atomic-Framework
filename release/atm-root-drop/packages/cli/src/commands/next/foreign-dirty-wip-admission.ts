@@ -42,6 +42,7 @@ export function inspectClaimDirtyWipAdmission(input: {
   readonly actorId: string;
   readonly laneSessionId?: string | null;
   readonly claimFiles: readonly string[];
+  readonly allowUnownedTaskScopedRecovery?: boolean;
 }): ClaimDirtyWipAdmission {
   const candidateFiles = uniqueSorted(input.claimFiles.map(normalizeWorkPath).filter(isCodeClaimPath));
   if (candidateFiles.length === 0) return clean(input, candidateFiles);
@@ -51,7 +52,8 @@ export function inspectClaimDirtyWipAdmission(input: {
     .filter((file) => candidateFiles.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file)));
   const blockers = uniqueSorted(intersectingFiles).flatMap((file): ClaimDirtyWipBlocker[] => {
     const owner = findDirtyPathOwner(input.cwd, file);
-    if (isOwnedByRequestingClaim(owner, input.task.workItemId, input.actorId, input.laneSessionId)) return [];
+    if (isOwnedByRequestingClaim(owner, input.task.workItemId, input.actorId, input.laneSessionId)
+      || (!owner && input.allowUnownedTaskScopedRecovery === true)) return [];
     return [{
       file,
       ownership: owner ? 'foreign' : 'unowned',
@@ -80,6 +82,7 @@ export function assertClaimDirtyWipAdmission(input: {
   readonly actorId: string;
   readonly laneSessionId?: string | null;
   readonly claimFiles: readonly string[];
+  readonly allowUnownedTaskScopedRecovery?: boolean;
 }): ClaimDirtyWipAdmission {
   const admission = inspectClaimDirtyWipAdmission(input);
   if (admission.ok) return admission;

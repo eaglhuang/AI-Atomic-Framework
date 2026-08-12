@@ -182,7 +182,7 @@ export function normalizeRunnerKind(value) {
     const normalized = String(value ?? '').trim().toLowerCase();
     if (normalized === 'dev' || normalized === 'source' || normalized === 'dev-source' || normalized === 'atm.dev.mjs')
         return 'dev-source';
-    if (normalized === 'frozen' || normalized === 'release' || normalized === 'stable' || normalized === 'atm.mjs')
+    if (normalized === 'frozen' || normalized === 'frozen-runner' || normalized === 'release' || normalized === 'stable' || normalized === 'atm.mjs')
         return 'frozen-runner';
     if (normalized === 'external' || normalized === 'host')
         return 'external';

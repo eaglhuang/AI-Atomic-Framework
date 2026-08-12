@@ -252,6 +252,16 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
   argv = claimIntentExtraction.argv;
   const claimIntent = claimIntentExtraction.claimIntent;
   const autoIntent = claimIntentExtraction.autoIntent;
+  const allowStaleRunner = argv.includes('--allow-stale-runner');
+  const emergencyApprovalIndex = argv.indexOf('--emergency-approval');
+  const emergencyApproval = emergencyApprovalIndex >= 0
+    ? argv[emergencyApprovalIndex + 1] ?? null
+    : null;
+  argv = argv.filter((_, index) =>
+    argv[index] !== '--allow-stale-runner'
+    && (emergencyApprovalIndex < 0
+      || (index !== emergencyApprovalIndex && index !== emergencyApprovalIndex + 1)),
+  );
   const outputFlagIndex = argv.indexOf('--output');
   if (outputFlagIndex !== -1) {
     const nextArg = argv[outputFlagIndex + 1];
@@ -318,6 +328,8 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
       autoIntent,
       forceClaim: Boolean(options.force),
       claimFiles: options.files,
+      allowStaleRunner,
+      emergencyApproval,
       taskIntent,
       importedTaskQueue,
       integrationBootstrap,

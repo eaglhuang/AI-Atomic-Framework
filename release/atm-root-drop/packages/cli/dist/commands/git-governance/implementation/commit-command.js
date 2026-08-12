@@ -3,10 +3,9 @@ import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.js';
 import { captureGitHeadEvidencePreparation } from './git-head-evidence-transaction.js';
 import { actorIdEnvVar, findActorByResolvedId, resolveActorId } from "../../actor-registry.js";
 import { recordOnlyClaimScopeExemptCovers, } from "../record-only-block-lifecycle-bridge.js";
-import { assertEmergencyApproval } from "../../emergency/gate.js";
 import { uniqueSorted, } from "../commit-scope-policy.js";
 import { CliError, makeResult, message, quoteCliValue } from "../../shared.js";
-import { assertNoBrokerConflictBeforeHookBypass } from './broker-hook-bypass-preflight.js';
+import { authorizeHookBypassAfterBrokerAdmission } from './broker-hook-bypass-preflight.js';
 import { buildCopyableGitCommitCommand, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles } from './git-index-transaction.js';
 import { assertNoStdinPathspecGitAddPreflight, gitCommitAttemptStatusRelativePath, resolveGitCommitTimeoutMs, writeGitCommitAttemptStatus } from './git-process-port.js';
 import { buildIdentitySetRequiredCommand, parseTaskClaim, readTaskDocument, requireExplicitGitActor, resolveGitGovernanceSession, resolveGitIdentityProfile } from './identity-check-command.js';
@@ -16,6 +15,7 @@ import { autoStageFrameworkClaimFiles, inspectFrameworkScopedUnstagedCommit, ins
 import { resolveFrameworkHookTaskId } from './framework-hook-identity.js';
 import { executeGitCommit } from './commit-execution.js';
 import { resolveFrameworkCommitAuthorityContext } from '../../framework-development/framework-temp-publication-capability.js';
+import { assertFrameworkCommitClaimAuthority } from './framework-commit-claim-guard.js';
 export function runGitCommit(options) {
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
     if (!resolvedActor) {
@@ -32,21 +32,6 @@ export function runGitCommit(options) {
     assertNoStdinPathspecGitAddPreflight(options.cwd);
     const commitCommand = `node atm.mjs git commit --actor ${actorId}${options.taskId ? ` --task ${options.taskId}` : ""} --message ${quoteCliValue(options.message)}${options.noVerify ? " --no-verify" : ""} --json`;
     let protectedOverrideAudit = null;
-    if (options.noVerify) {
-        protectedOverrideAudit = assertEmergencyApproval({
-            cwd: options.cwd,
-            surface: "git commit --no-verify",
-            permission: "backend.gitHookBypass",
-            taskId: options.taskId,
-            actorId,
-            emergencyApproval: options.emergencyApproval,
-            flags: ["--no-verify"],
-            reason: options.overrideReason ??
-                "Governed git hook bypass for emergency recovery.",
-            command: commitCommand,
-        });
-        assertNoBrokerConflictBeforeHookBypass({ cwd: options.cwd, taskId: options.taskId, actorId, deferForeignStaged: options.deferForeignStaged, brokerConflictOverrideApproval: options.brokerConflictOverrideApproval, brokerConflictResolutionPath: options.brokerConflictResolutionPath, reason: options.overrideReason, command: commitCommand });
-    }
     const actorRecord = findActorByResolvedId(options.cwd, resolvedActor);
     const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord, {
         explicitGitName: options.gitName,
@@ -66,9 +51,10 @@ export function runGitCommit(options) {
     const taskDocument = options.taskId
         ? readTaskDocument(options.cwd, options.taskId)
         : null;
-    const { usesFrameworkClaimCommit, frameworkClaimFiles, frameworkClaimTaskId } = resolveFrameworkCommitAuthorityContext({
+    const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId } = resolveFrameworkCommitAuthorityContext({
         cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
     });
+    assertFrameworkCommitClaimAuthority({ actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null, authority: { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId } });
     const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
     const stagedMirrorSync = options.taskId
         ? inspectMirrorSyncOnlyStagedArtifacts(options.cwd, options.taskId)
@@ -369,6 +355,24 @@ export function runGitCommit(options) {
         "--message",
         trailers.join("\n"),
     ];
+    // All rejectable checks use the sealed task candidate before consuming a
+    // one-time bypass lease.  The shared index is deliberately not an input here:
+    // its foreign residue is neither part of this commit nor authority to block it.
+    if (options.noVerify) {
+        const candidateFiles = taskScopedBundleReport?.commitFiles ?? frameworkClaimCommitFiles;
+        protectedOverrideAudit = authorizeHookBypassAfterBrokerAdmission({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            deferForeignStaged: options.deferForeignStaged,
+            candidateFiles,
+            brokerConflictOverrideApproval: options.brokerConflictOverrideApproval,
+            brokerConflictResolutionPath: options.brokerConflictResolutionPath,
+            reason: options.overrideReason,
+            command: commitCommand,
+            emergencyApproval: options.emergencyApproval,
+        });
+    }
     let protectedOverrideOutcome = null;
     const branchRef = readHeadBranchRef(options.cwd);
     const branchName = branchRef

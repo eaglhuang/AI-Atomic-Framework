@@ -4,14 +4,32 @@
 // metadata builder from the existing task-transition-helpers module so all
 // four close-transition symbols now live under close-helpers/.
 import path from 'node:path';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { closeSync, fsyncSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { CliError, parseJsonText } from '../../shared.js';
 import { appendTaskTransitionEvent, createTaskTransitionId } from '../../task-ledger.js';
 import { normalizeTaskDocumentId } from '../normalize-task-document-id-helper.js';
 import { taskIdsEqual } from '../task-import-validators.js';
 function writeTaskDocument(taskPath, document) {
-    mkdirSync(path.dirname(taskPath), { recursive: true });
-    writeFileSync(taskPath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+    const directory = path.dirname(taskPath);
+    const temporaryPath = path.join(directory, `.${path.basename(taskPath)}.${process.pid}.${Date.now()}.tmp`);
+    let descriptor = null;
+    try {
+        mkdirSync(directory, { recursive: true });
+        descriptor = openSync(temporaryPath, 'wx');
+        writeFileSync(descriptor, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+        fsyncSync(descriptor);
+        closeSync(descriptor);
+        descriptor = null;
+        renameSync(temporaryPath, taskPath);
+    }
+    catch (error) {
+        if (descriptor !== null)
+            closeSync(descriptor);
+        rmSync(temporaryPath, { force: true });
+        throw new CliError('ATM_TASK_LEDGER_WRITE_FAILED', `Task ledger write failed for ${taskPath}; the prior ledger state was retained.`, {
+            details: { taskPath, reason: error instanceof Error ? error.message : String(error) }
+        });
+    }
 }
 export { buildTaskTransitionCommand, createClosureTransitionMetadata } from '../task-transition-helpers.js';
 function verifyPersistedTaskDocument(input) {
@@ -56,27 +74,35 @@ export function writeTaskDocumentWithTransition(input) {
     input.taskDocument.lastTransitionId = transitionId;
     input.taskDocument.lastTransitionAt = createdAt;
     input.taskDocument.ledgerContractVersion = 'task-ledger/v1';
-    const transition = appendTaskTransitionEvent({
-        cwd: input.cwd,
-        taskId: input.taskId,
-        action: input.action,
-        actorId: input.actorId,
-        sessionId: input.sessionId ?? null,
-        fromStatus: input.previousStatus,
-        toStatus: nextStatus,
-        taskPath: input.taskPath,
-        taskDocument: input.taskDocument,
-        command: input.command ?? `node atm.mjs tasks ${input.action}`,
-        closureMetadata: input.closureMetadata ?? null,
-        createdAt,
-        transitionId
-    });
-    writeTaskDocument(input.taskPath, input.taskDocument);
-    verifyPersistedTaskDocument({
-        taskPath: input.taskPath,
-        taskId: input.taskId,
-        expectedStatus: nextStatus,
-        action: input.action
-    });
-    return transition.eventPath;
+    let transition = null;
+    try {
+        transition = appendTaskTransitionEvent({
+            cwd: input.cwd,
+            taskId: input.taskId,
+            action: input.action,
+            actorId: input.actorId,
+            sessionId: input.sessionId ?? null,
+            fromStatus: input.previousStatus,
+            toStatus: nextStatus,
+            taskPath: input.taskPath,
+            taskDocument: input.taskDocument,
+            command: input.command ?? `node atm.mjs tasks ${input.action}`,
+            closureMetadata: input.closureMetadata ?? null,
+            createdAt,
+            transitionId
+        });
+        writeTaskDocument(input.taskPath, input.taskDocument);
+        verifyPersistedTaskDocument({
+            taskPath: input.taskPath,
+            taskId: input.taskId,
+            expectedStatus: nextStatus,
+            action: input.action
+        });
+        return transition.eventPath;
+    }
+    catch (error) {
+        if (transition)
+            rmSync(path.resolve(input.cwd, transition.eventPath), { force: true });
+        throw error;
+    }
 }

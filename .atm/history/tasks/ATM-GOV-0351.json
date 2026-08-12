@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0351",
   "title": "make deferred foreign index commit failures transactionally reversible",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0344",
@@ -307,8 +307,8 @@
     "findings": []
   },
   "reopenedAt": "2026-08-12T07:41:15.141Z",
-  "lastTransitionId": "2026-08-12T08-00-58-179Z-scope-amendment-5315aa57b997",
-  "lastTransitionAt": "2026-08-12T08:00:58.179Z",
+  "lastTransitionId": "2026-08-12T08-36-18-798Z-close-65a775542e1a",
+  "lastTransitionAt": "2026-08-12T08:36:18.798Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T07:41:36.636Z",
@@ -317,7 +317,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-097337c8ee83",
     "claimedAt": "2026-08-12T07:41:36.646Z",
-    "heartbeatAt": "2026-08-12T07:41:36.646Z",
+    "heartbeatAt": "2026-08-12T08:36:18.795Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0351.*",
@@ -326,6 +326,8 @@
       "packages/cli/src/commands/command-specs/next.spec.ts",
       "packages/cli/src/commands/emergency/gate.ts",
       "packages/cli/src/commands/emergency/leases.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
       "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
@@ -335,6 +337,8 @@
       "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
       "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
       "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+      "packages/cli/src/commands/hook/pre-commit/framework-temp-claim-attribution.test.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/cli/src/commands/next.ts",
       "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
       "packages/cli/src/commands/next/claim-orchestration.ts",
@@ -349,34 +353,34 @@
       "packages/core/src/broker/cross-task-mutation-guard.ts",
       "tests/cli-fixtures/help-snapshots/next.json"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812074137-codex-gpt-5.4-mini-783ec8d57c",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812074137-codex-gpt-5.4-mini-783ec8d57c\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T07:41:36.646Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-9beb6acd8837956c",
-    "ticketDigest": "sha256:9beb6acd8837956c5555d85fc51a856c514b3f7779ad5b2709dc06816a563e73",
+    "ticketId": "wat-d980334436e0604d",
+    "ticketDigest": "sha256:d980334436e0604d4f0448d9a61cb71ef9d7b6a7df467a7ac9074e65eef49776",
     "taskId": "ATM-GOV-0351",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260812074137-codex-gpt-5.4-mini-783ec8d57c",
     "claimGeneration": "lease-097337c8ee83",
-    "issuedAt": "2026-08-12T07:41:36.646Z",
-    "expiresAt": "2026-08-12T08:11:36.646Z",
-    "scopeDigest": "sha256:b478aa7214c17b1ab93c021ac8fa6dcf86c9db15aa5b4038e2fbee0a5ea0dbd3",
+    "issuedAt": "2026-08-12T08:33:20.411Z",
+    "expiresAt": "2026-08-12T09:03:20.411Z",
+    "scopeDigest": "sha256:208ef79edd126edb0bff327868f8fa39227e73491726cd0b50b841a379a53633",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T07:41:36.646Z"
+      "selectedAt": "2026-08-12T08:33:20.411Z"
     },
     "grants": [
       {
@@ -389,6 +393,8 @@
           "packages/cli/src/commands/command-specs/next.spec.ts",
           "packages/cli/src/commands/emergency/gate.ts",
           "packages/cli/src/commands/emergency/leases.ts",
+          "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+          "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
           "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
           "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
@@ -398,16 +404,23 @@
           "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
           "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
           "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+          "packages/cli/src/commands/hook/pre-commit/framework-temp-claim-attribution.test.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
           "packages/cli/src/commands/next.ts",
           "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
           "packages/cli/src/commands/next/claim-orchestration.ts",
           "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
           "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
+          "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
+          "packages/cli/src/commands/taskflow/close-preflight.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
           "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
           "packages/core/src/broker/cross-task-mutation-guard.ts",
           "tests/cli-fixtures/help-snapshots/next.json"
         ],
-        "digest": "sha256:f66bb06ec4484676e632f05b762b2bbd580b8fd88ba84bb6846dadbc5cd721ab"
+        "digest": "sha256:ea1ab01298584a13a85a051bf295cb0e798c4c4b2f1481a89b71ad9173884a51"
       },
       {
         "kind": "lifecycle-operation",
@@ -458,6 +471,8 @@
       "packages/cli/src/commands/command-specs/next.spec.ts",
       "packages/cli/src/commands/emergency/gate.ts",
       "packages/cli/src/commands/emergency/leases.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
       "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
@@ -467,6 +482,8 @@
       "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
       "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
       "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+      "packages/cli/src/commands/hook/pre-commit/framework-temp-claim-attribution.test.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/cli/src/commands/next.ts",
       "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
       "packages/cli/src/commands/next/claim-orchestration.ts",
@@ -496,11 +513,15 @@
     "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260812074137-codex-gpt-5.4-mini-783ec8d57c",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812074137-codex-gpt-5.4-mini-783ec8d57c\""
     },
-    "createdAt": "2026-08-12T07:41:54.161Z",
+    "createdAt": "2026-08-12T08:30:10.817Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-12T08:36:18.795Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812074136-codex-gpt-5.4-mini-ATM-GOV-0351-9be2392ce6",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0351.closure-packet.json"
 }

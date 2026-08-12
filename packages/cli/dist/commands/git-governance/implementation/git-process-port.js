@@ -204,6 +204,37 @@ export function createSanitizedGitEnv(extra = {}) {
     if (!("GIT_INDEX_FILE" in extra)) {
         delete env.GIT_INDEX_FILE;
     }
+    return addTrustedGitHookRuntimePath(env);
+}
+/**
+ * Keeps Git hook interpreter discovery available after ATM has removed
+ * repository-selection variables. Git for Windows executes shebang hooks
+ * through `/usr/bin/env`; its `usr/bin` directory is therefore a runtime
+ * dependency of Git itself, not an inherited shell capability.
+ */
+export function addTrustedGitHookRuntimePath(env, options = {}) {
+    if ((options.platform ?? process.platform) !== "win32")
+        return env;
+    const gitExecutable = options.gitExecutable ?? resolveGitExecutable();
+    const pathExists = options.pathExists ?? existsSync;
+    const gitRoot = path.dirname(path.dirname(gitExecutable));
+    const hookRuntimePath = path.join(gitRoot, "usr", "bin");
+    if (!pathExists(path.join(hookRuntimePath, "sh.exe")))
+        return env;
+    const existingEntries = Object.entries(env)
+        .filter(([key]) => key.toLowerCase() === "path")
+        .flatMap(([, value]) => String(value ?? "").split(path.delimiter))
+        .filter(Boolean);
+    for (const key of Object.keys(env)) {
+        if (key.toLowerCase() === "path")
+            delete env[key];
+    }
+    if (!existingEntries.some((entry) => entry.toLowerCase() === hookRuntimePath.toLowerCase())) {
+        existingEntries.unshift(hookRuntimePath);
+    }
+    // Git for Windows' MSYS runtime reads the conventional uppercase spelling
+    // when resolving a shebang through /usr/bin/env.
+    env.PATH = existingEntries.join(path.delimiter);
     return env;
 }
 export function shouldStageGovernedGitHeadEvidenceBeforeCommit(stagedFiles) {

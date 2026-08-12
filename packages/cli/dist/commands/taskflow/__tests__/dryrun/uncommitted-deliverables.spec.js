@@ -76,14 +76,20 @@ async function makeUncommittedDeliverablesFixture(label, customTaskDoc) {
     execFileSync('git', ['commit', '-m', 'base planning'], { cwd: planningRepo, stdio: 'ignore' });
     const claim = await runNext(['--cwd', targetRepo, '--claim', '--actor', 'validator', '--task', fixtureTaskId]);
     assert.equal(claim.ok, true);
+    const laneSessionId = String(claim.evidence?.laneSession?.laneSessionId ?? '');
+    assert.ok(laneSessionId, 'claim must mint the fixture owner lane capability');
     return {
         targetRepo,
         planningRepo,
         taskId: fixtureTaskId,
         planPath,
         profilePath: path.join(planningRepo, 'taskflow.profile.json'),
-        baseCommitSha
+        baseCommitSha,
+        laneSessionId
     };
+}
+function useFixtureLane(fixture) {
+    process.env.ATM_LANE_SESSION_ID = fixture.laneSessionId;
 }
 // 1. Success case: uncommitted declared deliverables included in stageFiles
 const successDelFixture = await makeUncommittedDeliverablesFixture('success');
@@ -129,6 +135,7 @@ writeJson(path.join(writeDelFixture.targetRepo, '.atm/history/evidence', `${writ
     schemaId: 'atm.closurePacket.v1',
     taskId: writeDelFixture.taskId
 });
+useFixtureLane(writeDelFixture);
 const writeDelClose = await runTaskflow([
     'close',
     '--cwd', writeDelFixture.targetRepo,
@@ -170,6 +177,7 @@ writeJson(path.join(failClosedFixture.targetRepo, '.atm/history/evidence', `${fa
                 }]
         }]
 });
+useFixtureLane(failClosedFixture);
 const failClosedResult = await runTaskflow([
     'close',
     '--cwd', failClosedFixture.targetRepo,
@@ -246,6 +254,7 @@ writeJson(path.join(outOfScopeFixture.targetRepo, '.atm/history/evidence', `${ou
 let outOfScopeError = null;
 let outOfScopeResult = null;
 try {
+    useFixtureLane(outOfScopeFixture);
     outOfScopeResult = await runTaskflow([
         'close',
         '--cwd', outOfScopeFixture.targetRepo,
@@ -277,6 +286,7 @@ else {
         m.text.includes('delivery')));
 }
 // B. Close with --write and approved waiver should succeed
+useFixtureLane(outOfScopeFixture);
 const outOfScopeCloseWithWaiver = await runTaskflow([
     'close',
     '--cwd', outOfScopeFixture.targetRepo,
@@ -295,7 +305,8 @@ if (!outOfScopeCloseWithWaiver.ok) {
 assert.equal(outOfScopeCloseWithWaiver.ok, true);
 const preCloseForeignFixture = await makeDualRepoCloseFixture('precheck-foreign-staged');
 writeText(path.join(preCloseForeignFixture.targetRepo, '.atm/history/tasks/TASK-FOREIGN-0001.json'), '{"workItemId":"TASK-FOREIGN-0001"}\n');
-execFileSync('git', ['add', '.atm/history/tasks/TASK-FOREIGN-0001.json'], { cwd: preCloseForeignFixture.targetRepo, stdio: 'ignore' });
+writeText(path.join(preCloseForeignFixture.targetRepo, '.atm/history/evidence', `${preCloseForeignFixture.taskId}.runner-publication-takeover.json`), '{"schemaId":"atm.runnerPublicationTakeoverPlan.v1"}\n');
+execFileSync('git', ['add', '.atm/history/tasks/TASK-FOREIGN-0001.json', `.atm/history/evidence/${preCloseForeignFixture.taskId}.runner-publication-takeover.json`], { cwd: preCloseForeignFixture.targetRepo, stdio: 'ignore' });
 const preCloseForeign = await runTaskflow([
     'pre-close',
     '--cwd', preCloseForeignFixture.targetRepo,
@@ -307,10 +318,11 @@ const preCloseForeign = await runTaskflow([
 ]);
 assert.equal(preCloseForeign.command, 'taskflow pre-close');
 assert.equal(preCloseForeign.schemaId, 'atm.taskflowPreCloseResult.v1');
-assert.equal(preCloseForeign.ok, false, 'foreign staged governance must block pre-close');
-assert.ok(preCloseForeign.evidence.historicalClosePreflight.blockers.some((entry) => entry.id === 'unexpectedStagedTasks'));
-assert.deepEqual(preCloseForeign.evidence.historicalClosePreflight.unexpectedStagedTasks.map((entry) => entry.taskId), ['TASK-FOREIGN-0001']);
-assert.ok(preCloseForeign.evidence.historicalClosePreflight.writeRollbackSummary.operatorWarnings.some((entry) => entry.includes('silently unstage')));
+assert.equal(preCloseForeign.evidence.historicalClosePreflight.blockers.some((entry) => entry.id === 'unexpectedStagedTasks'), false);
+assert.equal(preCloseForeign.evidence.historicalClosePreflight.blockers.some((entry) => entry.id === 'unexpectedStagedNonBundleFiles'), false, 'released foreign governance residue must not become an index-isolation blocker');
+assert.ok(preCloseForeign.evidence.historicalClosePreflight.unexpectedNonBundleStaged
+    .flatMap((entry) => entry.parkableReleasedGovernanceFiles)
+    .includes('.atm/history/tasks/TASK-FOREIGN-0001.json'), 'pre-close must report the released governance residue that the close transaction will restore byte-identically');
 const preCloseNonBundleFixture = await makeDualRepoCloseFixture('precheck-nonbundle-staged');
 writeText(path.join(preCloseNonBundleFixture.targetRepo, 'packages/cli/src/commands/hook-hotfix.ts'), 'export const hotfix = true;\n');
 execFileSync('git', ['add', 'packages/cli/src/commands/hook-hotfix.ts'], { cwd: preCloseNonBundleFixture.targetRepo, stdio: 'ignore' });
@@ -327,6 +339,18 @@ assert.equal(preCloseNonBundle.ok, false, 'non-bundle staged source files must b
 assert.ok(preCloseNonBundle.evidence.historicalClosePreflight.blockers.some((entry) => entry.id === 'unexpectedStagedNonBundleFiles'));
 assert.ok(preCloseNonBundle.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_UNEXPECTED_STAGED_FILES'), 'dry-run writeReadinessHint must surface non-bundle staged blockers');
 assert.ok(preCloseNonBundle.evidence.historicalClosePreflight.unexpectedNonBundleStaged[0]?.restoreCommand?.includes('git lease stage-override'), 'non-bundle staged remediation must route through ATM stage-override lease, not raw git restore --staged');
+const preCloseDeferredNonBundle = await runTaskflow([
+    'pre-close',
+    '--cwd', preCloseNonBundleFixture.targetRepo,
+    '--profile', preCloseNonBundleFixture.profilePath,
+    '--task', preCloseNonBundleFixture.taskId,
+    '--actor', 'validator',
+    '--historical-delivery', preCloseNonBundleFixture.deliveryCommit,
+    '--defer-foreign-state',
+    '--json'
+]);
+assert.equal(preCloseDeferredNonBundle.evidence.historicalClosePreflight.blockers.some((entry) => entry.id === 'unexpectedStagedNonBundleFiles'), false, 'pre-close must share the deferred transaction contract used by close --write');
+assert.ok(preCloseDeferredNonBundle.evidence.historicalClosePreflight.unexpectedNonBundleStaged[0]?.stagedFiles.includes('packages/cli/src/commands/hook-hotfix.ts'), 'deferred staged files remain visible as diagnostic evidence rather than being silently ignored');
 const preCloseMixed = await runTaskflow([
     'pre-close',
     '--cwd', outOfScopeFixture.targetRepo,

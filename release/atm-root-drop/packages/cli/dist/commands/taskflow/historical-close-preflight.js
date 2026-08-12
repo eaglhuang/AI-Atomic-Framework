@@ -13,6 +13,7 @@ import { inspectHistoricalDelivery } from '../tasks/historical-delivery.js';
 import { buildSharedDeliveryWaiverCommand } from './write-readiness.js';
 import { isPathAllowedByScope } from '../work-channels.js';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.js';
+import { isCurrentTaskCloseEvidenceFile } from './current-task-close-evidence.js';
 function uniqueStrings(values) {
     return [...new Set(values.map((entry) => entry.trim()).filter(Boolean))];
 }
@@ -34,14 +35,7 @@ function extractGovernanceTaskId(filePath) {
 function isSameTaskAdvisoryStagedFile(taskId, filePath) {
     const normalizedTaskId = normalizeTaskId(taskId);
     const normalized = normalizeRelativePath(filePath).toLowerCase();
-    const bundleManifest = `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json`.toLowerCase();
-    const closurePacket = `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`.toLowerCase();
-    const runnerPublicationTakeover = `.atm/history/evidence/${normalizedTaskId}.runner-publication-takeover.json`.toLowerCase();
-    const runnerSyncReceipt = `.atm/history/evidence/${normalizedTaskId}.runner-sync-receipt.json`.toLowerCase();
-    if (normalized === bundleManifest
-        || normalized === closurePacket
-        || normalized === runnerPublicationTakeover
-        || normalized === runnerSyncReceipt) {
+    if (isCurrentTaskCloseEvidenceFile(normalizedTaskId, normalized)) {
         return true;
     }
     const foreignSnapshotPattern = new RegExp(`^\\.atm/runtime/snapshots/(?:close-window-)?foreign-staged-${normalizedTaskId.toLowerCase()}-\\d+\\.json$`);
@@ -417,7 +411,11 @@ export function buildHistoricalClosePreflight(input) {
     const operationalBlockers = [
         buildScopeDirtyBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
         buildIncorrectPlanningMirrorBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
-        buildUnexpectedNonBundleStagedBlocker(unexpectedNonBundleStaged),
+        // `taskflow close --defer-foreign-state` is an explicit request for the
+        // close transaction's park/temporary-index/restore boundary.  Preserve
+        // the report for diagnostics, but do not reject that very transaction as
+        // though it would use the shared index.
+        input.deferForeignStaged ? null : buildUnexpectedNonBundleStagedBlocker(unexpectedNonBundleStaged),
         buildMixedDeliveryBlocker({
             taskId: input.taskId,
             actorId: input.actorId,
