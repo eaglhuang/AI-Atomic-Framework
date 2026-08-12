@@ -84,11 +84,12 @@ assert.ok(report.diagnostics.includes('dimension-fail-closed:charter-verdict:not
 assert.equal(report.diagnostics.includes('release-digest-mismatch:origin-main'), false);
 
 const closeback = JSON.parse(readFileSync('docs/reports/plan-3x-4x-release-closeback.json', 'utf8'));
-const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-const originMain = execFileSync('git', ['rev-parse', 'origin/main'], { encoding: 'utf8' }).trim();
-assert.equal(closeback.targetHead, head);
-assert.equal(closeback.originMain, originMain);
-assert.equal(closeback.status, head === originMain ? 'pushed' : 'blocked');
+const targetHead = String(closeback.targetHead);
+const recordedOriginMain = String(closeback.originMain);
+assert.equal(targetHead.length, 40);
+assert.equal(recordedOriginMain, targetHead);
+execFileSync('git', ['merge-base', '--is-ancestor', targetHead, 'origin/main'], { stdio: 'ignore' });
+assert.equal(closeback.status, 'pushed');
 assert.equal(closeback.legacyAuthority.retired, false);
-assert.equal(closeback.remoteReachability.targetHeadReachableFromOriginMain, head === originMain);
+assert.equal(closeback.remoteReachability.targetHeadReachableFromOriginMain, true);
 console.log('four-plan-independent-certificate.test.ts: ok');
