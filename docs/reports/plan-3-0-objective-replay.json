@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 17,
   "statusCounts": {
-    "verified": 4,
-    "not-complete": 13,
+    "verified": 5,
+    "not-complete": 12,
     "unknown": 0,
     "conflicting": 0
   },
@@ -27,13 +27,12 @@
     {
       "objectiveId": "P30-OBJ-02",
       "title": "Protected faults fail closed",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0300",
       "caseIds": ["test_plan30_exact_17_objectives_0333"],
       "sourceAnchors": ["packages/cli/src/commands/tasks/close-orchestrator.ts"],
-      "evidenceTuples": [{"kind": "protected-state", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300"}],
-      "blockers": ["protected fault replay is referenced but not re-executed as final objective proof"],
-      "nextSafeCommand": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate"
+      "evidenceTuples": [{"kind": "current-protected-fail-closed", "source": "docs/reports/plan-3x-positive-current-receipts.json", "receiptId": "plan30-protected-closure-fail-closed", "expectedTaskId": "ATM-GOV-0300"}],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-03",
