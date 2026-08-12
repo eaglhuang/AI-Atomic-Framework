@@ -31,3 +31,19 @@ export function resolveRunnerPublicationCloseHandoff(input: {
     reason: null
   };
 }
+
+/**
+ * Authorizes a close commit only when its framework-critical outputs are the
+ * exact task-owned inventory sealed by the runner-publication receipt.
+ */
+export function authorizesRunnerPublicationCloseCommit(input: {
+  readonly taskId: string;
+  readonly receipt: Record<string, unknown> | null;
+  readonly criticalChangedFiles: readonly string[];
+}): boolean {
+  const handoff = resolveRunnerPublicationCloseHandoff({ taskId: input.taskId, receipt: input.receipt });
+  if (!handoff.ok) return false;
+  const ownedFiles = new Set(handoff.stageFiles);
+  return input.criticalChangedFiles.length > 0
+    && input.criticalChangedFiles.every((file) => ownedFiles.has(file));
+}

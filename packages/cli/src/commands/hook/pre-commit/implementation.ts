@@ -64,6 +64,7 @@ import {
 } from '../commit-range-guard.ts';
 import { buildBrokerResolutionDependencyDeferral, checkStageTimeCrossFileConsistency } from './cross-file-consistency.ts';
 import { buildCommitTaskFrameworkLockContext } from './framework-lock-context.ts';
+import { authorizesRunnerPublicationCloseCommit } from '../../framework-development/runner-publication-close-handoff.ts';
 import { buildPreCommitBlockingFindings, buildPreCommitFailureEnvelope, isPreCommitBaselineFinding, isPreCommitEnvironmentFinding, selectActionableResidueFindings, summarizePreCommitFailureEnvelope } from './failure-envelope.ts';
 import { inspectTaskCardStatusChanges, readStagedChangedLineCount, readStagedFiles, scanEncoding, shouldWriteGitHeadEvidenceForStagedCommit, writeStagedGitHeadEvidence } from './input-state.ts';
 import {
@@ -191,7 +192,8 @@ export function authorizeBlockLifecycleRecordBridge(
 export function runPreCommitHook(cwd: string) {
   const root = path.resolve(cwd);
   const committingTaskIdForHook = typeof process.env.ATM_COMMIT_TASK_ID === 'string' ? process.env.ATM_COMMIT_TASK_ID.trim() : null;
-  const crossTaskBlock = detectCrossTaskMutation(root, committingTaskIdForHook, 'pre-commit');
+  const scopedIndexActive = typeof process.env.GIT_INDEX_FILE === 'string' && process.env.GIT_INDEX_FILE.trim().length > 0;
+  const crossTaskBlock = detectCrossTaskMutation(root, committingTaskIdForHook, 'pre-commit', scopedIndexActive ? readStagedFiles(root) : undefined);
   const hasTaskHistoryCrossTaskBlock = crossTaskBlock?.conflicts.some((entry) => entry.surface === 'task-history') ?? false;
   if (crossTaskBlock && hasTaskHistoryCrossTaskBlock && !isResolutionAuthorizedCurrentTask(root, committingTaskIdForHook, crossTaskBlock.conflictTaskId) && !authorizeBlockLifecycleRecordBridge(root, crossTaskBlock).authorized) {
     recordIncidentFlag(root, crossTaskBlock);
@@ -205,7 +207,6 @@ export function runPreCommitHook(cwd: string) {
       }
     });
   }
-  const scopedIndexActive = typeof process.env.GIT_INDEX_FILE === 'string' && process.env.GIT_INDEX_FILE.trim().length > 0;
   const commitIndexFinalized = process.env.ATM_COMMIT_INDEX_FINALIZED === '1';
   const residueCandidates = resolvePreCommitResidueCandidates(root, scopedIndexActive);
   const residueTaskId = resolveResidueTaskId(root);
@@ -303,9 +304,22 @@ export function runPreCommitHook(cwd: string) {
     && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles));
   const directionLockCoversFrameworkCriticalFiles = frameworkStatus.criticalChangedFiles.length > 0
     && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, directionLockAllowedFiles));
+  const runnerPublicationReceiptPath = committingTaskIdForHook
+    ? path.join(root, '.atm', 'history', 'evidence', `${committingTaskIdForHook}.runner-sync-receipt.json`)
+    : null;
+  const runnerPublicationReceipt = runnerPublicationReceiptPath && existsSync(runnerPublicationReceiptPath)
+    ? readJsonText(readFileSync(runnerPublicationReceiptPath, 'utf8'))
+    : null;
+  const runnerPublicationCoversFrameworkCriticalFiles = committingTaskIdForHook
+    ? authorizesRunnerPublicationCloseCommit({
+      taskId: committingTaskIdForHook,
+      receipt: runnerPublicationReceipt,
+      criticalChangedFiles: frameworkStatus.criticalChangedFiles
+    })
+    : false;
   const rawBlockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => {
     if (entry === 'git-head-evidence-missing') return false;
-    if (entry === 'active-framework-claim-required' && (checkpointCoversFrameworkCriticalFiles || directionLockCoversFrameworkCriticalFiles)) return false;
+    if (entry === 'active-framework-claim-required' && (checkpointCoversFrameworkCriticalFiles || directionLockCoversFrameworkCriticalFiles || runnerPublicationCoversFrameworkCriticalFiles)) return false;
     if (entry === 'closure-authority-belongs-to-target-repo' && allowAdopterInfrastructureSync) return false;
     return true;
   });

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { evaluateRunnerPublicationContinuation } from './runner-publication-lifecycle.ts';
-import { resolveRunnerPublicationCloseHandoff } from './runner-publication-close-handoff.ts';
+import { authorizesRunnerPublicationCloseCommit, resolveRunnerPublicationCloseHandoff } from './runner-publication-close-handoff.ts';
 import { deriveRunnerBuildOutputInventory } from '../../../../core/src/broker/runner-build-output-inventory.ts';
 
 const valid = evaluateRunnerPublicationContinuation({
@@ -43,5 +43,35 @@ const alteredInventory = evaluateRunnerPublicationContinuation({
 });
 assert.equal(alteredInventory.allowed, false);
 assert.equal(alteredInventory.code, 'ATM_RUNNER_PUBLICATION_CONTINUATION_MISMATCH');
+
+const outputInventory = deriveRunnerBuildOutputInventory({
+  sealedSourceSha: 'a'.repeat(40),
+  observedPaths: ['packages/cli/dist/atm.js', 'release/atm-onefile/atm.mjs'],
+  currentTaskId: 'ATM-GOV-0344',
+  ownership: [
+    { path: 'packages/cli/dist/atm.js', ownerTaskId: 'ATM-GOV-0344' },
+    { path: 'release/atm-onefile/atm.mjs', ownerTaskId: 'ATM-GOV-0344' }
+  ]
+});
+const receipt = {
+  schemaId: 'atm.runnerSyncReceipt.v1',
+  taskId: 'ATM-GOV-0344',
+  outputInventory
+};
+assert.equal(authorizesRunnerPublicationCloseCommit({
+  taskId: 'ATM-GOV-0344',
+  receipt,
+  criticalChangedFiles: ['packages/cli/dist/atm.js', 'release/atm-onefile/atm.mjs']
+}), true);
+assert.equal(authorizesRunnerPublicationCloseCommit({
+  taskId: 'ATM-GOV-0344',
+  receipt,
+  criticalChangedFiles: ['packages/cli/dist/atm.js', 'release/foreign.mjs']
+}), false);
+assert.equal(authorizesRunnerPublicationCloseCommit({
+  taskId: 'ATM-GOV-OTHER',
+  receipt,
+  criticalChangedFiles: ['packages/cli/dist/atm.js']
+}), false);
 
 console.log('[runner-publication-lifecycle] continuation contract assertions passed.');
