@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T19-39-37-349Z-close-5ee45a17ec8c",
+  "taskId": "ATM-GOV-0341",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812191912-codex-gpt-5.4-mini-ATM-GOV-0341-3292dc777f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0341.json",
+  "taskSha256": "sha256:699e93d9f84fd4953a36762c62fc99a1939a805b7961f928a8f8de0905194b42",
+  "createdAt": "2026-08-12T19:39:37.349Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812191912-codex-gpt-5.4-mini-ATM-GOV-0341-3292dc777f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0341.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "four-plan-independent-certificate",
+      "lint:touched",
+      "typecheck",
+      "validate-backlog-census",
+      "validate-four-plan-objectives",
+      "validate-runner-reproducibility",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:module-boundaries"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T19:39:37.337Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0341.*",
+        ".atm/history/task-events/ATM-GOV-0341/**",
+        ".atm/history/tasks/ATM-GOV-0341.json",
+        "docs/reports/plan-3x-4x-independent-certificate.json",
+        "docs/reports/plan-3x-4x-release-closeback.json",
+        "packages/core/src/evidence/four-plan-independent-certificate.ts",
+        "packages/core/src/evidence/oracle-adjudication.ts",
+        "packages/core/src/evidence/quality-authority.ts",
+        "packages/core/src/evidence/quality-vector.ts",
+        "schemas/evidence/four-plan-independent-certificate.schema.json",
+        "scripts/validate-backlog-census.ts",
+        "scripts/validate-four-plan-objectives.ts",
+        "scripts/validate-runner-reproducibility.ts",
+        "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+        "tests/cli/four-plan-independent-certificate.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/four-plan-independent-certificate.ts",
+        "packages/core/src/evidence/oracle-adjudication.ts",
+        "packages/core/src/evidence/quality-authority.ts",
+        "packages/core/src/evidence/quality-vector.ts",
+        "schemas/evidence/four-plan-independent-certificate.schema.json",
+        "scripts/validate-backlog-census.ts",
+        "scripts/validate-four-plan-objectives.ts",
+        "scripts/validate-runner-reproducibility.ts",
+        "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+        "tests/cli/four-plan-independent-certificate.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
