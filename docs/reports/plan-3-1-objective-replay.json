@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 23,
   "statusCounts": {
-    "verified": 14,
-    "not-complete": 9,
+    "verified": 18,
+    "not-complete": 5,
     "unknown": 0,
     "conflicting": 0
   },
@@ -168,26 +168,24 @@
     {
       "objectiveId": "P31-OBJ-08",
       "title": "Old/new frozen same-digest red-green is replayable",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0241",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "release/atm-onefile/atm.mjs",
-        "scripts/run-sealed-runner-build.ts"
+        "tests/fixtures/plan3-fake-green/plan31-parity-cost-digest-boundaries.json",
+        "scripts/validate-plan31-parity-cost-digest-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "frozen-digest",
-          "source": ".atm/history/evidence/ATM-GOV-0241.closure-packet.json",
+          "kind": "plan31-parity-cost-digest-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-parity-cost-digest-boundaries",
           "expectedTaskId": "ATM-GOV-0241"
         }
       ],
-      "blockers": [
-        "current frozen digest has not been attached to the row"
-      ],
-      "nextSafeCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-09",
@@ -321,25 +319,24 @@
     {
       "objectiveId": "P31-OBJ-15",
       "title": "Correctness, performance, and cost are not conflated",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0246",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "docs/reports/plan-3-1-objective-replay.md"
+        "tests/fixtures/plan3-fake-green/plan31-parity-cost-digest-boundaries.json",
+        "scripts/validate-plan31-parity-cost-digest-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "cost-correctness-boundary",
-          "source": ".atm/history/evidence/ATM-GOV-0246.closure-packet.json",
+          "kind": "plan31-parity-cost-digest-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-parity-cost-digest-boundaries",
           "expectedTaskId": "ATM-GOV-0246"
         }
       ],
-      "blockers": [
-        "cost/correctness boundary is stated but not independently replayed"
-      ],
-      "nextSafeCommand": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.1 --mode validate"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-16",
@@ -389,49 +386,46 @@
     {
       "objectiveId": "P31-OBJ-18",
       "title": "Parity and breaker evidence carries digests",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0242",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "release/atm-onefile/atm.mjs",
-        ".atm/history/evidence/"
+        "tests/fixtures/plan3-fake-green/plan31-parity-cost-digest-boundaries.json",
+        "scripts/validate-plan31-parity-cost-digest-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "parity-breaker",
-          "source": ".atm/history/evidence/ATM-GOV-0242.closure-packet.json",
+          "kind": "plan31-parity-cost-digest-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-parity-cost-digest-boundaries",
           "expectedTaskId": "ATM-GOV-0242"
         }
       ],
-      "blockers": [
-        "digest evidence is not current terminal proof"
-      ],
-      "nextSafeCommand": "node atm.mjs doctor --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-19",
       "title": "Runner-sync digest is visible to final certificate",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0243",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        ".atm/history/evidence/*.runner-sync-receipt.json"
+        "tests/fixtures/plan3-fake-green/plan31-parity-cost-digest-boundaries.json",
+        "scripts/validate-plan31-parity-cost-digest-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "runner-sync",
-          "source": ".atm/history/evidence/ATM-GOV-0243.runner-sync-receipt.json",
+          "kind": "plan31-parity-cost-digest-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-parity-cost-digest-boundaries",
           "expectedTaskId": "ATM-GOV-0243"
         }
       ],
-      "blockers": [
-        "runner-sync digest is referenced but not consumed by terminal certificate"
-      ],
-      "nextSafeCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-20",

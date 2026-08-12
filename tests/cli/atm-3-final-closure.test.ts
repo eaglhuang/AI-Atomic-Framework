@@ -38,8 +38,8 @@ assert.equal(plan31Json.schemaId, 'atm.planObjectiveReplayValidation.v1');
 assert.equal(plan31Json.ok, true);
 assert.equal(plan31Json.planId, '3.1');
 assert.equal(plan31Json.rowCount, 23);
-assert.equal(plan31Json.verified, 14);
-assert.equal(plan31Json.notComplete, 9);
+assert.equal(plan31Json.verified, 18);
+assert.equal(plan31Json.notComplete, 5);
 
 const fakeGreen = spawnSync(process.execPath, [
   '--strip-types',

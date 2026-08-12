@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:93d1ac52afd0c2f24207393676511f851a54de6feac1071919ad67cc5ce729fe"
+      "digest": "sha256:138f5c2bc6fb01dda77e954b456c541e3fe45bbddc744ee02e1f91b0ce795204"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:b47996718bbc565daccf0f3bfeb00f28d9c879799d5bff7827a38481357e5f8a"
+      "digest": "sha256:579410e8b2ef778cb923f7729d44eb055fc6f20b5f9ccfbd41185844059c6f61"
     }
   ],
   "totals": {
-    "freshCommandRows": 4,
+    "freshCommandRows": 0,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 46,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 50,
     "objectiveAlignedNegativeControlRowsConsumed": 8,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
     "remainingUncoveredRows": 0,
-    "sourceRowsMutatedByThisReport": 46
+    "sourceRowsMutatedByThisReport": 50
   },
   "commandReceipts": [
     {
@@ -424,6 +424,23 @@
         "sealed-set-live-index-separated",
         "actor-continuity-replayable"
       ]
+    },
+    {
+      "id": "plan31-parity-cost-digest-boundaries",
+      "command": "node --strip-types scripts/validate-plan31-parity-cost-digest-boundaries.ts --json",
+      "exitCode": 0,
+      "verdict": "plan31-parity-cost-digest-boundaries-proven",
+      "rowsCovered": [
+        "P31-OBJ-08",
+        "P31-OBJ-15",
+        "P31-OBJ-18",
+        "P31-OBJ-19"
+      ],
+      "stdoutAnchors": [
+        "atm.plan31ParityCostDigestBoundariesValidation.v1",
+        "cost-correctness-separated",
+        "runner-sync-digest-visible"
+      ]
     }
   ],
   "positiveRows": [
@@ -801,6 +818,38 @@
         "plan31-lifecycle-concurrency-boundaries"
       ],
       "sourceReplayAction": "recomputed row status because the current Plan 3.1 lifecycle/concurrency validator proves causal close, queue wakeup, lifecycle receipt, sealed-set, rollback, and actor continuity boundaries"
+    },
+    {
+      "objectiveId": "P31-OBJ-08",
+      "title": "Old/new frozen same-digest red-green is replayable",
+      "receiptIds": [
+        "plan31-parity-cost-digest-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 parity/cost/digest validator proves replayable digests, cost-correctness separation, and final-certificate-visible runner sync digest"
+    },
+    {
+      "objectiveId": "P31-OBJ-15",
+      "title": "Correctness, performance, and cost are not conflated",
+      "receiptIds": [
+        "plan31-parity-cost-digest-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 parity/cost/digest validator proves replayable digests, cost-correctness separation, and final-certificate-visible runner sync digest"
+    },
+    {
+      "objectiveId": "P31-OBJ-18",
+      "title": "Parity and breaker evidence carries digests",
+      "receiptIds": [
+        "plan31-parity-cost-digest-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 parity/cost/digest validator proves replayable digests, cost-correctness separation, and final-certificate-visible runner sync digest"
+    },
+    {
+      "objectiveId": "P31-OBJ-19",
+      "title": "Runner-sync digest is visible to final certificate",
+      "receiptIds": [
+        "plan31-parity-cost-digest-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 parity/cost/digest validator proves replayable digests, cost-correctness separation, and final-certificate-visible runner sync digest"
     }
   ],
   "blockedPositiveRows": [
@@ -817,7 +866,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Forty-six rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Fifty rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

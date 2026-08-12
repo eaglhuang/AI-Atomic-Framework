@@ -13,7 +13,7 @@
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
-      "digest": "sha256:e607713e4ba3667679f92fc965b430865b59083f5723f3c6a05c73e3927e2780",
+      "digest": "sha256:361c4d3e445d5cfb76215bf3f859ac891c9708451ebace9c1b26d8448a3170f7",
       "planId": "3.1",
       "expectedRows": 23
     },
@@ -27,8 +27,8 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsVerified": 46,
-    "sourceRowsNotComplete": 23,
+    "sourceRowsVerified": 50,
+    "sourceRowsNotComplete": 19,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
     "proofFamilies": 5
@@ -37,7 +37,7 @@
     {
       "id": "verified-current-receipt",
       "status": "verified",
-      "rowCount": 46,
+      "rowCount": 50,
       "meaning": "The row now has a current command-backed receipt or objective-aligned negative-control receipt replayed into the source objective report.",
       "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
       "rowRefs": [
@@ -86,21 +86,20 @@
         "P31-OBJ-12",
         "P31-OBJ-14",
         "P31-OBJ-17",
-        "P31-OBJ-20"
-      ]
-    },
-    {
-      "id": "fresh-command-replay-needed",
-      "status": "not-complete",
-      "rowCount": 4,
-      "meaning": "The row references historical, stale, descriptive, or shape-only evidence and needs a fresh command-backed receipt before it can become verified.",
-      "nextExecutionRule": "Run the row's nextSafeCommand or the shared validator named by the row, record command output/digest, then recompute the source replay row.",
-      "rowRefs": [
+        "P31-OBJ-20",
         "P31-OBJ-08",
         "P31-OBJ-15",
         "P31-OBJ-18",
         "P31-OBJ-19"
       ]
+    },
+    {
+      "id": "fresh-command-replay-needed",
+      "status": "not-complete",
+      "rowCount": 0,
+      "meaning": "The row references historical, stale, descriptive, or shape-only evidence and needs a fresh command-backed receipt before it can become verified.",
+      "nextExecutionRule": "Run the row's nextSafeCommand or the shared validator named by the row, record command output/digest, then recompute the source replay row.",
+      "rowRefs": []
     },
     {
       "id": "governed-state-replay-needed",
@@ -165,11 +164,11 @@
     {
       "planId": "3.1",
       "rows": 23,
-      "verifiedRows": 14,
-      "notCompleteRows": 9,
+      "verifiedRows": 18,
+      "notCompleteRows": 5,
       "proofFamilyCounts": {
-        "verified-current-receipt": 14,
-        "fresh-command-replay-needed": 4,
+        "verified-current-receipt": 18,
+        "fresh-command-replay-needed": 0,
         "governed-state-replay-needed": 5,
         "runner-release-parity-needed": 0,
         "negative-control-only": 0
