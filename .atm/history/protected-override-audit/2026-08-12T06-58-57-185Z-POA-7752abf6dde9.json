@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-7752abf6dde9",
+  "recordedAt": "2026-08-12T06:58:57.185Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0351",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0351 --message \"fix(git): preserve task candidate across WIP session bypass\n\nATM-Work-Admission: wat-57bc3fca80e7467e sha256:57bc3fca80e7467eae339d9791ee5e82b2c6e91ecce0b8ffde9546f3bddd7f22\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-2f65de6ea2",
+  "reason": "Frozen hook bootstrap circularity",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T06-58-57-184Z-EMG-GLOBAL-2f65de6ea2.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

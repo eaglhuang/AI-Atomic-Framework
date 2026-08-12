@@ -1,0 +1,498 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0351",
+  "title": "make deferred foreign index commit failures transactionally reversible",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0344",
+    "ATM-GOV-0348"
+  ],
+  "acceptance": [
+    "ACC-1: A failure injected after deferred-index work begins and before a commit completes leaves HEAD, every pre-existing staged entry (path/mode/blob), and unrelated worktree bytes identical to the captured baseline.",
+    "ACC-2: The transaction has one owner with explicit success and failure completion results; all throw/return paths finalize through it rather than relying on callers to repair shared index state.",
+    "ACC-3: Failure recovery is idempotent and fail-closed: if exact restore cannot be proven, later shared-index writes are blocked with a durable, executable recovery result instead of silently continuing.",
+    "ACC-4: A successful task-scoped commit excludes and preserves multiple generated foreign entries without a fixed task ID, path list, or entry count.",
+    "ACC-5: Focused red/green evidence binds the same case, digest, public seam, and baseline/candidate lineage. Broad CLI validation is phase advisory, not a substitute for the focused proof.",
+    "ACC-6: A runner-recovery claim validates all read-only eligibility and broker admission before consuming its one-time emergency lease; a rejected claim consumes none, while the first actual lifecycle write consumes exactly one. This rule is permission-generic and must not depend on a task ID.",
+    "ACC-7: An explicit, valid-but-unconsumed recovery lease may admit only unowned dirty code paths already wholly declared by that same task; foreign ownership remains blocked. Lease validation is read-only and the lease is still consumed only immediately before the first lifecycle write.",
+    "ACC-8: A hook-bypass commit resolves its exact sealed candidate and passes Team Broker ownership admission before consuming a one-time bypass lease. Foreign shared-index residue outside that candidate is preserved and cannot force a broker override; a candidate that actually overlaps foreign scope remains blocked."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.test.ts",
+    "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.test.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
+    "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+    "packages/cli/src/commands/emergency/gate.ts",
+    "packages/cli/src/commands/emergency/leases.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+    "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+    "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+    "packages/core/src/broker/cross-task-mutation-guard.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+    "packages/cli/src/commands/command-specs/next.spec.ts",
+    "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.test.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "npm run typecheck",
+    "node --strip-types packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the transaction owner and its focused fixtures together; no raw index reset or manual .atm mutation is a recovery path.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-deferred-index-transaction",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-evidence-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.git-deferred-index-transaction",
+        "pattern": "Transaction Script",
+        "source": "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.test.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
+        "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+        "packages/cli/src/commands/emergency/gate.ts",
+        "packages/cli/src/commands/emergency/leases.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+        "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+        "atomic_workbench/maps/atm-evidence-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "Start by adding the focused failure fixture against the current path. Extract\nthe state capture, ownership, finalize, and exact-restore responsibilities into\n`deferred-index-transaction.ts`; keep `commit-bundle-resolution.ts` a policy\nplanner and `commit-execution.ts` a caller. Do not use an alternate worktree,\nraw Git reset, manually edited ATM runtime state, or an emergency lease as the\nimplementation mechanism. Emergency authority may only unblock a subsequent\ntask-scoped delivery after this generic repair is green.\n\nThe same transaction rule applies to runner-recovery claims: validation and\nbroker admission are read-only preparation, while consuming a one-time\nemergency approval is an irreversible state transition. Keep the public CLI\nflag as a narrow bootstrap bridge, but consume its lease immediately before the\nfirst lifecycle write—not merely because a request was parsed. Do not encode a\nspecific task, actor, lane, or incident into the rule.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-08-12T06:13:37.597Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"governance-optimization/tasks/ATM-GOV-0351-make-deferred-foreign-index-commit-failures-transactionally-reversible.task.md\",\"contentDigest\":\"sha256:d0ad990dd6b7f723f5fec7ef1ad7c781c7a60f9f1dc18df7dce38f89001e600d\"} -->",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0351-make-deferred-foreign-index-commit-failures-transactionally-reversible.task.md",
+    "sectionTitle": "ATM-GOV-0351",
+    "headingLine": 133,
+    "hash": "9065157cdfb5c184",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0351-make-deferred-foreign-index-commit-failures-transactionally-reversible.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:9065157cdfb5c184afce7f1d7debb157e7e4597bdecf54932c4f40c7d33e48e7",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-12T06:43:51.573Z"
+    }
+  },
+  "importedAt": "2026-08-12T06:43:51.573Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0344",
+      "ATM-GOV-0348"
+    ],
+    "startConditions": [
+      "A reproducible governed commit failure has left a changed shared index after defer-foreign-staged resolution."
+    ],
+    "softRelations": [
+      "ATM-GOV-0349",
+      "ATM-GOV-0350",
+      "TASK-ERR-0014"
+    ],
+    "changedPublicSeams": [
+      "atm.gitDeferredIndexTransaction.v1"
+    ],
+    "causalImpactEdges": [
+      "deferred-foreign-state",
+      "failed-commit-index-rollback",
+      "protected-governance-rollback",
+      "runner-recovery-claim-bootstrap",
+      "emergency-lease-atomicity"
+    ],
+    "parallelFrontierInputs": [
+      "canonical-worktree",
+      "sealed-candidate-index",
+      "broker-ticket",
+      "exact-index-entry-baseline"
+    ],
+    "validatorReferences": [
+      "git-index-deferred-transaction-atomicity",
+      "validate-cli"
+    ],
+    "phaseOwner": "wave-3-validator-and-lifecycle-recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_deferred_index_failure_restores_exact_prestate_0351",
+      "targetGroupId": "null",
+      "semanticKey": "deferred_index_failure_restores_exact_prestate",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "deferred-foreign-state",
+        "failed-commit-index-rollback",
+        "protected-governance-rollback"
+      ],
+      "expectedRedPredicate": "a post-mutation resolver or commit failure leaves any pre-existing index entry changed, deleted, added, or reordered",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.gitDeferredIndexTransaction.v1",
+      "resourceKey": "git-index"
+    },
+    {
+      "caseId": "test_deferred_index_success_preserves_foreign_entries_0351",
+      "targetGroupId": "null",
+      "semanticKey": "deferred_index_success_preserves_foreign_entries",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "deferred-foreign-state"
+      ],
+      "expectedRedPredicate": "a successful task-scoped commit leaks, removes, or changes a foreign staged mode/blob/path entry",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.gitDeferredIndexTransaction.v1",
+      "resourceKey": "git-index"
+    },
+    {
+      "caseId": "test_runner_recovery_claim_consumes_lease_after_admission_0351",
+      "targetGroupId": "null",
+      "semanticKey": "runner_recovery_claim_consumes_lease_after_admission",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "runner-recovery-claim-bootstrap",
+        "emergency-lease-atomicity"
+      ],
+      "expectedRedPredicate": "a broker or readiness rejection consumes a runner-recovery emergency lease before a claim lifecycle write begins",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.gitDeferredIndexTransaction.v1",
+      "resourceKey": "emergency-lease"
+    },
+    {
+      "caseId": "test_runner_recovery_reclaims_unowned_task_scoped_wip_0351",
+      "targetGroupId": "null",
+      "semanticKey": "runner_recovery_reclaims_unowned_task_scoped_wip",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-6",
+        "ACC-7"
+      ],
+      "coversImpactEdges": [
+        "runner-recovery-claim-bootstrap",
+        "emergency-lease-atomicity"
+      ],
+      "expectedRedPredicate": "valid recovery authorization cannot reclaim wholly task-scoped unowned WIP, or it admits a foreign-owned dirty path",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.gitDeferredIndexTransaction.v1",
+      "resourceKey": "claim-dirty-wip-admission"
+    },
+    {
+      "caseId": "test_hook_bypass_preflight_uses_sealed_candidate_before_lease_0351",
+      "targetGroupId": "null",
+      "semanticKey": "hook_bypass_preflight_uses_sealed_candidate_before_lease",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-5",
+        "ACC-8"
+      ],
+      "coversImpactEdges": [
+        "emergency-lease-atomicity"
+      ],
+      "expectedRedPredicate": "an unrelated shared-index entry blocks or consumes a hook-bypass lease before the task-scoped sealed candidate has passed broker admission",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.gitDeferredIndexTransaction.v1",
+      "resourceKey": "broker-candidate-admission"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_deferred_index_failure_restores_exact_prestate_0351",
+    "test_deferred_index_success_preserves_foreign_entries_0351",
+    "test_runner_recovery_claim_consumes_lease_after_admission_0351",
+    "test_runner_recovery_reclaims_unowned_task_scoped_wip_0351",
+    "test_hook_bypass_preflight_uses_sealed_candidate_before_lease_0351"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [
+    "legacy_cmd_validate_cli"
+  ],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T06-59-30-613Z-scope-amendment-128b7e9bede6",
+  "lastTransitionAt": "2026-08-12T06:59:30.613Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T06:53:19.128Z",
+  "promotedAt": "2026-08-12T06:53:19.132Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-36c199c00013",
+    "claimedAt": "2026-08-12T06:53:19.138Z",
+    "heartbeatAt": "2026-08-12T06:53:19.138Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0351.*",
+      ".atm/history/task-events/ATM-GOV-0351/**",
+      ".atm/history/tasks/ATM-GOV-0351.json",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/emergency/gate.ts",
+      "packages/cli/src/commands/emergency/leases.ts",
+      "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+      "packages/cli/src/commands/git-governance/implementation/command-router.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-selection.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
+      "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260812065319-codex-gpt-5.4-mini-ef346e9b2b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812065319-codex-gpt-5.4-mini-ef346e9b2b\""
+    }
+  },
+  "startedAt": "2026-08-12T06:53:19.138Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-57bc3fca80e7467e",
+    "ticketDigest": "sha256:57bc3fca80e7467eae339d9791ee5e82b2c6e91ecce0b8ffde9546f3bddd7f22",
+    "taskId": "ATM-GOV-0351",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812065319-codex-gpt-5.4-mini-ef346e9b2b",
+    "claimGeneration": "lease-36c199c00013",
+    "issuedAt": "2026-08-12T06:53:19.138Z",
+    "expiresAt": "2026-08-12T07:23:19.138Z",
+    "scopeDigest": "sha256:2710e83e48565f1db3ee595eac1d115b562f17310da230d8eaa15037856e1e07",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T06:53:19.138Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0351.*",
+          ".atm/history/task-events/ATM-GOV-0351/**",
+          ".atm/history/tasks/ATM-GOV-0351.json",
+          "packages/cli/src/commands/command-specs/next.spec.ts",
+          "packages/cli/src/commands/emergency/gate.ts",
+          "packages/cli/src/commands/emergency/leases.ts",
+          "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+          "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/next.ts",
+          "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+          "packages/cli/src/commands/next/claim-orchestration.ts",
+          "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+          "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
+          "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+          "packages/core/src/broker/cross-task-mutation-guard.ts"
+        ],
+        "digest": "sha256:12ceb5572537ebc92344e7b34d3b105851aa1280179430c43dc78e93dd96c090"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260812065319-codex-gpt-5.4-mini-ATM-GOV-0351-3f761032b4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0351",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0351.*",
+      ".atm/history/task-events/ATM-GOV-0351/**",
+      ".atm/history/tasks/ATM-GOV-0351.json",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/emergency/gate.ts",
+      "packages/cli/src/commands/emergency/leases.ts",
+      "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+      "packages/cli/src/commands/git-governance/implementation/command-router.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-selection.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/deferred-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.test.ts",
+      "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/runner-recovery-claim-lease.test.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0351-make-deferred-foreign-index-commit-failures-transactionally-reversible.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0351-make-deferred-foreign-index-commit-failures-transactionally-reversible.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "6f24be5a37d61592f92f04f4b17057b1921c4a408d470a5e715d8c0786ab80c2",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812065319-codex-gpt-5.4-mini-ef346e9b2b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812065319-codex-gpt-5.4-mini-ef346e9b2b\""
+    },
+    "createdAt": "2026-08-12T06:53:38.505Z",
+    "status": "active"
+  }
+}

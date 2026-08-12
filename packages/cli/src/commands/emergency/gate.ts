@@ -1,6 +1,6 @@
 import { CliError } from '../shared.ts';
 import { isTaskflowOperatorLaneActive } from './context.ts';
-import { consumeEmergencyLease } from './leases.ts';
+import { assertEmergencyLeaseAvailable, consumeEmergencyLease } from './leases.ts';
 import {
   recordProtectedOverrideAuthorization,
   recordProtectedOverrideCompletion,
@@ -19,6 +19,7 @@ export interface EmergencyGateInput {
   readonly reason?: string | null;
   readonly command?: string | null;
   readonly allowTaskflowOperatorLane?: boolean;
+  readonly consume?: boolean;
 }
 
 export function recordProtectedOverrideOutcome(input: {
@@ -75,7 +76,7 @@ export function assertEmergencyApproval(input: EmergencyGateInput) {
       }
     );
   }
-  const consumed = consumeEmergencyLease({
+  const leaseInput = {
     cwd: input.cwd,
     leaseId: input.emergencyApproval,
     permission: input.permission,
@@ -85,7 +86,11 @@ export function assertEmergencyApproval(input: EmergencyGateInput) {
     flags: input.flags ?? [],
     reason: input.reason ?? null,
     command: input.command ?? null
-  });
+  };
+  if (input.consume === false) {
+    return { lease: assertEmergencyLeaseAvailable(leaseInput), protectedOverrideAudit: null };
+  }
+  const consumed = consumeEmergencyLease(leaseInput);
   const protectedOverrideAudit = recordProtectedOverrideAuthorization({
     cwd: input.cwd,
     actorId: input.actorId ?? null,
@@ -104,4 +109,18 @@ export function assertEmergencyApproval(input: EmergencyGateInput) {
     ...consumed,
     protectedOverrideAudit
   };
+}
+
+/** A protected write surface cannot continue from a read-only lease check. */
+export function requireConsumedEmergencyApproval(
+  approval: ReturnType<typeof assertEmergencyApproval>,
+) {
+  if (!approval || !approval.protectedOverrideAudit || !('usePath' in approval)) {
+    throw new CliError(
+      'ATM_EMERGENCY_CONSUMPTION_REQUIRED',
+      'Protected write requires a consumed emergency approval, not a read-only lease preflight.',
+      { exitCode: 1 },
+    );
+  }
+  return approval;
 }

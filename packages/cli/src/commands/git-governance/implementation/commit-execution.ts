@@ -53,6 +53,7 @@ import { withBranchCommitQueueLock } from './branch-commit-window.ts';
 import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles, recordGitIndexRestoreFailure, rollbackNewlyStagedLiveIndexResidue, withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { resolveGovernedCommitSeal } from './sealed-commit-attribution.ts';
 import { isHeadRaceCommitFailure, readHeadBranchRef, readHeadCommitSha } from './push-command.ts';
+import { resolveTaskBoundCommitFiles } from './commit-bundle-selection.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
@@ -123,8 +124,8 @@ try {
             options.brokerConflictResolutionPath ?? "",
           ATM_COMMIT_TRAILERS: trailers.join("\n"),
         });
-        const bundleFiles =
-          options.taskId !== null && taskDocument && !bypassesActiveSession
+        const resolvedTaskBundle =
+          options.taskId !== null && taskDocument
             ? (taskScopedBundleReport ??
                 resolveTaskScopedCommitBundle({
                   cwd: options.cwd,
@@ -139,8 +140,14 @@ try {
                   message: options.message,
                   actorId,
                   trailers,
-                })).commitFiles
-            : frameworkClaimCommitFiles;
+                }))
+            : null;
+        const bundleFiles = resolveTaskBoundCommitFiles({
+          taskId: options.taskId,
+          taskDocument,
+          taskScopedBundleReport: resolvedTaskBundle,
+          frameworkClaimCommitFiles,
+        });
         const autoStagedActorRegistryPath =
           options.taskId === null
             ? stageTrackedActorRegistryIfNeeded(options.cwd)

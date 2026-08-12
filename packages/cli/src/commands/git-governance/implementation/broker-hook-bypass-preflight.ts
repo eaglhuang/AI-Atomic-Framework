@@ -171,6 +171,9 @@ export function assertNoBrokerConflictBeforeHookBypass(options: LegacyValue) {
     cwd,
     taskId,
     "git commit --no-verify",
+    Array.isArray(options.candidateFiles) && options.candidateFiles.length > 0
+      ? options.candidateFiles
+      : undefined,
   );
   if (!crossTaskBlock) return;
   recordIncidentFlag(cwd, crossTaskBlock);
@@ -220,4 +223,20 @@ export function assertNoBrokerConflictBeforeHookBypass(options: LegacyValue) {
       },
     },
   );
+}
+
+export function authorizeHookBypassAfterBrokerAdmission(options: LegacyValue) {
+  assertNoBrokerConflictBeforeHookBypass(options);
+  return assertEmergencyApproval({
+    cwd: options.cwd,
+    surface: "git commit --no-verify",
+    permission: "backend.gitHookBypass",
+    taskId: options.taskId,
+    actorId: options.actorId,
+    emergencyApproval: options.emergencyApproval,
+    flags: ["--no-verify"],
+    reason:
+      options.reason ?? "Governed git hook bypass for emergency recovery.",
+    command: options.command,
+  });
 }

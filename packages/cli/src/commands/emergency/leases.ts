@@ -168,6 +168,39 @@ export function consumeEmergencyLease(input: {
   readonly touchedFiles?: readonly string[];
   readonly result?: 'authorized' | 'succeeded' | 'failed';
 }): { lease: EmergencyMaintenanceLease; use: EmergencyMaintenanceUse; leasePath: string; usePath: string } {
+  const lease = assertEmergencyLeaseAvailable(input);
+  const updated: EmergencyMaintenanceLease = {
+    ...lease,
+    usedCount: lease.usedCount + 1
+  };
+  const usedAt = new Date().toISOString();
+  const use: EmergencyMaintenanceUse = {
+    schemaId: 'atm.emergencyMaintenanceUse.v1',
+    leaseId: lease.leaseId,
+    taskId: input.taskId,
+    actorId: input.actorId,
+    permission: input.permission,
+    surface: input.surface,
+    usedAt,
+    reason: input.reason,
+    command: input.command,
+    result: input.result ?? 'authorized',
+    before: input.before ?? { leaseStatus: lease.status, usedCount: lease.usedCount },
+    after: input.after ?? { leaseStatus: updated.status, usedCount: updated.usedCount },
+    touchedFiles: [...new Set((input.touchedFiles ?? []).map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean))].sort()
+  };
+  const usePath = path.join(usesDir(input.cwd), `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
+  return { lease: updated, use, leasePath: writeJson(leasePath(input.cwd, lease.leaseId), updated), usePath: writeJson(usePath, use) };
+}
+
+export function assertEmergencyLeaseAvailable(input: {
+  readonly cwd: string;
+  readonly leaseId: string;
+  readonly permission: EmergencyPermissionId;
+  readonly taskId: string | null;
+  readonly actorId: string | null;
+  readonly flags: readonly string[];
+}): EmergencyMaintenanceLease {
   const lease = readEmergencyLease(input.cwd, input.leaseId);
   if (lease.status !== 'active') {
     throw new CliError('ATM_EMERGENCY_APPROVAL_REVOKED', `Emergency approval lease is not active: ${lease.leaseId}`, { exitCode: 1, details: { leaseId: lease.leaseId, status: lease.status } });
@@ -193,39 +226,7 @@ export function consumeEmergencyLease(input: {
   if (disallowedFlag) {
     throw new CliError('ATM_EMERGENCY_FLAG_NOT_APPROVED', `Emergency approval ${lease.leaseId} does not allow ${disallowedFlag}.`, { exitCode: 1, details: { leaseId: lease.leaseId, disallowedFlag, allowedFlags: approvedFlags } });
   }
-  const updated: EmergencyMaintenanceLease = {
-    ...lease,
-    usedCount: lease.usedCount + 1
-  };
-  const usedAt = new Date().toISOString();
-  const use: EmergencyMaintenanceUse = {
-    schemaId: 'atm.emergencyMaintenanceUse.v1',
-    leaseId: lease.leaseId,
-    taskId: input.taskId,
-    actorId: input.actorId,
-    permission: input.permission,
-    surface: input.surface,
-    usedAt,
-    reason: input.reason,
-    command: input.command,
-    result: input.result ?? 'authorized',
-    before: input.before ?? {
-      leaseStatus: lease.status,
-      usedCount: lease.usedCount
-    },
-    after: input.after ?? {
-      leaseStatus: updated.status,
-      usedCount: updated.usedCount
-    },
-    touchedFiles: [...new Set((input.touchedFiles ?? []).map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean))].sort()
-  };
-  const usePath = path.join(usesDir(input.cwd), `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
-  return {
-    lease: updated,
-    use,
-    leasePath: writeJson(leasePath(input.cwd, lease.leaseId), updated),
-    usePath: writeJson(usePath, use)
-  };
+  return lease;
 }
 
 function normalizeEmergencyFlags(flags: readonly string[]): string[] {

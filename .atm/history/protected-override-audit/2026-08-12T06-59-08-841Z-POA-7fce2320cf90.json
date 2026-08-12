@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-7fce2320cf90",
+  "recordedAt": "2026-08-12T06:59:08.841Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0351",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0351 --message \"fix(git): preserve task candidate across WIP session bypass\n\nATM-Work-Admission: wat-57bc3fca80e7467e sha256:57bc3fca80e7467eae339d9791ee5e82b2c6e91ecce0b8ffde9546f3bddd7f22\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-2f65de6ea2",
+  "reason": "Frozen hook bootstrap circularity",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "failed",
+  "failureCode": "ATM_GIT_COMMIT_FAILED",
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T06-58-57-184Z-EMG-GLOBAL-2f65de6ea2.json",
+  "parentEventId": "POA-7752abf6dde9",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Git commit failed after an authorized hook bypass; fix the commit error and retry without --no-verify when hooks can pass.",
+    "suggestedCommand": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0351 --message \"fix(git): preserve task candidate across WIP session bypass\n\nATM-Work-Admission: wat-57bc3fca80e7467e sha256:57bc3fca80e7467eae339d9791ee5e82b2c6e91ecce0b8ffde9546f3bddd7f22\" --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

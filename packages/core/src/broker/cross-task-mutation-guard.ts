@@ -181,7 +181,8 @@ export function getActiveTasks(cwd: string): readonly ActiveTaskInfo[] {
 export function detectCrossTaskMutation(
   cwd: string,
   currentTaskId: string | null,
-  commandFamily: string
+  commandFamily: string,
+  candidateFiles?: readonly string[]
 ): CrossTaskMutationBlock | null {
   const normCurrentTaskId = currentTaskId?.trim().toUpperCase() ?? null;
   const activeTasks = getActiveTasks(cwd);
@@ -190,8 +191,8 @@ export function detectCrossTaskMutation(
     : null;
   
   const includeUnstaged = shouldIncludeUnstaged(commandFamily);
-  let modifiedFiles: string[] = [];
-  try {
+  let modifiedFiles: string[] = candidateFiles?.map(normalizeRelativePath).filter(Boolean) ?? [];
+  if (!candidateFiles) try {
     const gitExec = process.env.ATM_GIT_EXECUTABLE || 'git';
     const nameStatusOutput = execFileSync(
       gitExec,

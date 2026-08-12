@@ -23,7 +23,7 @@ import { runGitLease } from './lease-command.ts';
 import { runGitPostPushFailRecovery, runGitPush } from './push-command.ts';
 
 import { runGitRecordCommit } from './record-commit-command.ts';
-import { assertEmergencyApproval, recordProtectedOverrideOutcome } from '../../emergency/gate.ts';
+import { assertEmergencyApproval, recordProtectedOverrideOutcome, requireConsumedEmergencyApproval } from '../../emergency/gate.ts';
 import { GIT_INDEX_LOCK_RECOVERY_FLAG, recoverGitIndexLock } from './git-index-lock-recovery.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
@@ -81,7 +81,7 @@ export async function runAtmGit(argv: LegacyValue) {
   }
   if (options.action === 'recover-index-lock') {
     const command = `node atm.mjs git recover-index-lock --task ${quoteCliValue(options.taskId ?? '<task-id>')} --actor ${quoteCliValue(options.actorId ?? '<actor-id>')} ${GIT_INDEX_LOCK_RECOVERY_FLAG} --emergency-approval <lease-id> --reason "<human-approved reason>" --json`;
-    const approval = assertEmergencyApproval({
+    const approval = requireConsumedEmergencyApproval(assertEmergencyApproval({
       cwd: options.cwd,
       surface: 'git recover-index-lock',
       permission: 'backend.gitIndexLockRecovery',
@@ -91,7 +91,7 @@ export async function runAtmGit(argv: LegacyValue) {
       flags: [GIT_INDEX_LOCK_RECOVERY_FLAG],
       reason: options.overrideReason,
       command,
-    });
+    }));
     try {
       const recovery = recoverGitIndexLock({
         cwd: options.cwd,
