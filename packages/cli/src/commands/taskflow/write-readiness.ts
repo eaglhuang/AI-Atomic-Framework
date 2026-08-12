@@ -18,6 +18,7 @@ import { evaluateTaskflowBrokerConflictGate, type TaskflowBrokerConflictGate } f
 import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { quoteCliValue } from '../shared.ts';
 import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.ts';
+import { inspectCloseWindowStagedIndexAdmission } from '../tasks/close-window-lock.ts';
 
 export interface TaskflowCloseKnownBlocker {
   readonly code: string;
@@ -168,11 +169,14 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
   declaredFiles: readonly string[];
   closebackPlan: TaskflowClosebackPlan;
   previewCommitBundle: {
+    targetRepo?: { stageFiles: readonly string[] };
     targetDeliveryFiles: readonly string[];
+    targetGovernanceFiles?: readonly string[];
   };
   historicalDeliveryRefs: readonly string[];
   waiverOutOfScopeDelivery?: boolean;
   waiverReason?: string | null;
+  deferForeignStaged?: boolean;
   planningAuthorityDeliveryGate: {
     required: boolean;
     ok: boolean;
@@ -205,6 +209,24 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
     // target ticket fail scope coverage.
     files: input.previewCommitBundle.targetDeliveryFiles,
     producingAtmCommand: 'node atm.mjs taskflow close --write --json'
+  });
+  const expectedCloseWindowStageFiles = [
+    ...(input.previewCommitBundle.targetRepo?.stageFiles ?? []),
+    ...input.previewCommitBundle.targetDeliveryFiles,
+    ...(input.previewCommitBundle.targetGovernanceFiles ?? [])
+  ];
+  const closeWindowAdmission = inspectCloseWindowStagedIndexAdmission({ cwd: input.cwd, taskId: input.taskId,
+    expectedStageFiles: expectedCloseWindowStageFiles,
+    // CLI adapter fallback keeps legacy callers compatible until the compact
+    // taskflow orchestrator is reformatted; explicit library callers remain pure.
+    deferForeignStaged: input.deferForeignStaged ?? (process.argv.includes('--defer-foreign-staged') || process.argv.includes('--defer-foreign-state')) });
+  if (!closeWindowAdmission.ok) blockers.push({
+    code: closeWindowAdmission.blockedCode ?? 'ATM_CLOSE_WINDOW_STAGED_INDEX_BLOCKED',
+    summary: closeWindowAdmission.blockedSummary ?? 'Close window staged-index admission is blocked.',
+    requiredCommand: closeWindowAdmission.blockedCode === 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS'
+      ? `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --defer-foreign-staged --write --json`
+      : closeWindowAdmission.lock?.taskId ? `node atm.mjs tasks status --task ${closeWindowAdmission.lock.taskId} --json` : null,
+    files: closeWindowAdmission.unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles)
   });
 
   if (!workAdmission.decision.ok) {
