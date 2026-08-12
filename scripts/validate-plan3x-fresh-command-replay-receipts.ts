@@ -45,7 +45,7 @@ function main() {
 
   if (report.schemaId !== 'atm.plan3xFreshCommandReplayReceipts.v1') findings.push('schemaId mismatch');
   if (report.status !== 'fresh-command-replay-partially-consumed') findings.push('status must be fresh-command-replay-partially-consumed');
-  if (report.nonClaim !== 'These receipts prove that focused Plan 3.x validators execute against current files and that 16 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.') {
+  if (report.nonClaim !== 'These receipts prove that focused Plan 3.x validators execute against current files and that 17 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.') {
     findings.push('nonClaim missing or weakened');
   }
   for (const source of report.sourceReports ?? []) {
@@ -61,12 +61,12 @@ function main() {
   const freshFamily = (proofMap.proofFamilies ?? []).find((entry: any) => entry.id === 'fresh-command-replay-needed');
   if (!freshFamily) findings.push('fresh-command proof family missing from proof map');
   if (report.familyDisposition?.sourceRowCount !== freshFamily?.rowCount) findings.push('familyDisposition.sourceRowCount mismatch');
-  if (report.familyDisposition?.rowsConsumedIntoSourceReplay !== 16) findings.push('rowsConsumedIntoSourceReplay mismatch');
+  if (report.familyDisposition?.rowsConsumedIntoSourceReplay !== 17) findings.push('rowsConsumedIntoSourceReplay mismatch');
   if (report.familyDisposition?.rowsCertifiedCompleteByTheseReceipts !== 0) findings.push('receipts must not certify rows complete');
   if (report.familyDisposition?.remainingRowsInFamily !== freshFamily?.rowCount) findings.push('remainingRowsInFamily mismatch');
 
   const commandRuns = Array.isArray(report.commandRuns) ? report.commandRuns : [];
-  if (commandRuns.length !== 12) findings.push(`commandRuns count mismatch: expected 12, observed ${commandRuns.length}`);
+  if (commandRuns.length !== 13) findings.push(`commandRuns count mismatch: expected 13, observed ${commandRuns.length}`);
   for (const run of commandRuns) {
     if (run.exitCode !== 0) findings.push(`command did not exit 0: ${run.id}`);
     if (!String(run.semanticBoundary ?? '').match(/not completion|not-complete|not positive completion|still need/i)) {
@@ -82,7 +82,7 @@ function main() {
     if (replay.verdict !== 'not-complete') findings.push(`source replay must remain not-complete: ${replay.planId}`);
     verifiedRows += Number(replay.statusCounts?.verified ?? 0);
   }
-  if (verifiedRows !== 16) findings.push(`source replay verified count mismatch: expected 16, observed ${verifiedRows}`);
+  if (verifiedRows !== 17) findings.push(`source replay verified count mismatch: expected 17, observed ${verifiedRows}`);
 
   const ok = findings.length === 0;
   const output = {

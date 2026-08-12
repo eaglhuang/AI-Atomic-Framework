@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:2aaef57ace410d0682058127e7c4c474adc5ca1a28e845774a96b9b99d2ba4c3"
+      "digest": "sha256:d863fc454d0fa7c859a347cf2c07de9d1231051383a941f64442a0dbf790d0d4"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:48c6cfdad41f7c587fd7210107b62367efed46b18ff80e090f129afc30ab8761"
+      "digest": "sha256:189bcb8dd104e909f94f524b578af009fae554c01c2efdd135dc646c9b6d5e7b"
     }
   ],
   "totals": {
-    "freshCommandRows": 32,
+    "freshCommandRows": 31,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 16,
-    "objectiveAlignedNegativeControlRowsConsumed": 5,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 17,
+    "objectiveAlignedNegativeControlRowsConsumed": 6,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
-    "remainingUncoveredRows": 19,
-    "sourceRowsMutatedByThisReport": 16
+    "remainingUncoveredRows": 18,
+    "sourceRowsMutatedByThisReport": 17
   },
   "commandReceipts": [
     {
@@ -181,6 +181,20 @@
         "\"failClosed\": true",
         "prose-must-not-green"
       ]
+    },
+    {
+      "id": "plan32-unknown-evidence-nonterminal-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-unknown-evidence-nonterminal.ts --json",
+      "exitCode": 0,
+      "verdict": "unknown-evidence-nonterminal-fail-closed",
+      "rowsCovered": [
+        "P32-OBJ-23"
+      ],
+      "stdoutAnchors": [
+        "atm.plan32UnknownEvidenceNonterminalValidation.v1",
+        "\"failClosed\": true",
+        "unknown-must-not-green"
+      ]
     }
   ],
   "positiveRows": [
@@ -275,6 +289,12 @@
       "sourceReplayAction": "recomputed row status because the current provenance-mismatch validator proves mismatched git-head provenance fails closed"
     },
     {
+      "objectiveId": "P32-OBJ-23",
+      "title": "Unknown rows remain not-complete",
+      "receiptIds": ["plan32-unknown-evidence-nonterminal-fail-closed"],
+      "sourceReplayAction": "recomputed row status because the current unknown-evidence fixture proves unrecognized evidence remains not-complete and cannot green the row"
+    },
+    {
       "objectiveId": "P32-OBJ-22",
       "title": "Missing rows cannot pass",
       "receiptIds": ["atm3-final-closure-negative-controls"],
@@ -292,7 +312,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Sixteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Seventeen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",
