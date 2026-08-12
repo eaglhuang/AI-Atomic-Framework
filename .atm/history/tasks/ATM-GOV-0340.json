@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0340",
   "title": "Rebuild backlog census and close every open-like disposition",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0339"
@@ -177,8 +177,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T19-11-45-116Z-scope-amendment-fae4c62660cd",
-  "lastTransitionAt": "2026-08-12T19:11:45.116Z",
+  "lastTransitionId": "2026-08-12T19-18-28-418Z-lock-cleanup-db0aaedd9648",
+  "lastTransitionAt": "2026-08-12T19:18:28.418Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T19:11:21.551Z",
@@ -187,7 +187,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-a1b263954618",
     "claimedAt": "2026-08-12T19:11:21.560Z",
-    "heartbeatAt": "2026-08-12T19:11:21.560Z",
+    "heartbeatAt": "2026-08-12T19:18:28.231Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0340.*",
@@ -201,14 +201,14 @@
       "scripts/validate-governance-projections.ts",
       "tests/cli/backlog-census-authority.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812185740-codex-gpt-5.4-mini-538d26f40a",
       "status": "active",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812185740-codex-gpt-5.4-mini-538d26f40a\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T19:11:21.560Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -318,6 +318,13 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812185740-codex-gpt-5.4-mini-538d26f40a\""
     },
     "createdAt": "2026-08-12T19:11:26.457Z",
-    "status": "active"
-  }
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T19:18:28.415Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-12T19:18:28.231Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812191121-codex-gpt-5.4-mini-ATM-GOV-0340-3f4ab85fac",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0340.closure-packet.json"
 }

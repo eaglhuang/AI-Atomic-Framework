@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T19-18-28-233Z-close-ae3916504eb2",
+  "taskId": "ATM-GOV-0340",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812191121-codex-gpt-5.4-mini-ATM-GOV-0340-3f4ab85fac",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0340.json",
+  "taskSha256": "sha256:11d463ed35c374c1835d54e8cff8be1cf9e2733689f4313a1950c3e222711639",
+  "createdAt": "2026-08-12T19:18:28.233Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812191121-codex-gpt-5.4-mini-ATM-GOV-0340-3f4ab85fac",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0340.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/backlog-census-authority.test.ts",
+      "typecheck",
+      "validate:backlog-census",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T19:18:28.223Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0340.*",
+        ".atm/history/task-events/ATM-GOV-0340/**",
+        ".atm/history/tasks/ATM-GOV-0340.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+        "schemas/skills/incident-learning-candidate.schema.json",
+        "scripts/validate-backlog-census.ts",
+        "scripts/validate-governance-projections.ts",
+        "tests/cli/backlog-census-authority.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "schemas/skills/incident-learning-candidate.schema.json",
+        "scripts/validate-backlog-census.ts",
+        "scripts/validate-governance-projections.ts",
+        "tests/cli/backlog-census-authority.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
