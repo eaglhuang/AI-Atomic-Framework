@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T10-06-55-057Z-close-29e5f713cc67",
+  "taskId": "ATM-GOV-0307",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812094009-codex-gpt-5.4-mini-ATM-GOV-0307-7204cb83e9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0307.json",
+  "taskSha256": "sha256:4d05905c98233479c7ad88e8777cc8656d4dd38ba7398b463c2b7da442fe0814",
+  "createdAt": "2026-08-12T10:06:55.057Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0307 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812094009-codex-gpt-5.4-mini-ATM-GOV-0307-7204cb83e9",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-incident-corpus.test.ts",
+      "node --strip-types tests/cli/plan4-state-replay.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T10:06:55.041Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0307.*",
+        ".atm/history/task-events/ATM-GOV-0307/**",
+        ".atm/history/tasks/ATM-GOV-0307.json",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/state-replay.ts",
+        "schemas/evidence/state-replay.schema.json",
+        "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+        "tests/cli/plan4-incident-corpus.test.ts",
+        "tests/cli/plan4-state-replay.test.ts",
+        "tests/fixtures/governance-incidents/active-batch-router/**",
+        "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+        "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+        "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+        "tests/fixtures/governance-incidents/sealed-deletion-tombstone/**",
+        "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+        "tests/fixtures/governance-incidents/stale-mixed-batch/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/evidence/state-replay.ts",
+        "schemas/evidence/state-replay.schema.json",
+        "tests/catalog/groups/test_group_plan4_incident_replay.shard.json",
+        "tests/cli/plan4-incident-corpus.test.ts",
+        "tests/cli/plan4-state-replay.test.ts",
+        "tests/fixtures/governance-incidents/active-batch-router/**",
+        "tests/fixtures/governance-incidents/close-deferral-derived-manifest/**",
+        "tests/fixtures/governance-incidents/import-frontmatter-fidelity/**",
+        "tests/fixtures/governance-incidents/runner-sync-protected-state/**",
+        "tests/fixtures/governance-incidents/sealed-deletion-tombstone/**",
+        "tests/fixtures/governance-incidents/shared-index-commit-attribution/**",
+        "tests/fixtures/governance-incidents/stale-mixed-batch/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-c32008325f5c",
+  "recordedAt": "2026-08-12T10:03:49.826Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0307",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0307 --message \"feat(evidence): replay sealed incident corpus\n\nATM-Work-Admission: wat-a10af814eeed9a80 sha256:a10af814eeed9a802c2925dc1a4b98100111552e479dfbc21ba37c9e3152a4c4\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-8ffa2d5bc6",
+  "reason": "ATM_RUNNER_STALE_WRITE_REFUSED checkpoint/bootstrap circularity; see ATM-BUG-2026-07-14-183",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T10-03-49-825Z-EMG-GLOBAL-8ffa2d5bc6.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
