@@ -199,8 +199,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-11T23-30-46-090Z-scope-amendment-5e707558d142",
-  "lastTransitionAt": "2026-08-11T23:30:46.090Z",
+  "lastTransitionId": "2026-08-12T00-02-40-504Z-renew-a600c150062e",
+  "lastTransitionAt": "2026-08-12T00:02:40.504Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-11T17:52:13.830Z",
@@ -209,8 +209,8 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-5791eae59642",
     "claimedAt": "2026-08-11T17:52:13.839Z",
-    "heartbeatAt": "2026-08-11T23:25:48.780Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-08-12T00:02:39.106Z",
+    "ttlSeconds": 3600,
     "files": [
       ".atm/history/evidence/ATM-GOV-0345.*",
       ".atm/history/task-events/ATM-GOV-0345/**",
@@ -251,26 +251,27 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-85f1536fae1ef57a",
-    "ticketDigest": "sha256:85f1536fae1ef57a6eee4ed3de009911d342e648371921f659eb181b19383d7c",
+    "ticketId": "wat-0fc4e68d686d78c7",
+    "ticketDigest": "sha256:0fc4e68d686d78c76e7a96d3c77d45347d64179df09f19d0291042772905cb44",
     "taskId": "ATM-GOV-0345",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
     "claimGeneration": "lease-5791eae59642",
-    "issuedAt": "2026-08-11T23:25:48.780Z",
-    "expiresAt": "2026-08-11T23:55:48.780Z",
-    "scopeDigest": "sha256:9bcb89001675b96a68ea7150c11a2794bf3dcd82ab26f5f24b00086fc162312b",
+    "issuedAt": "2026-08-12T00:02:39.106Z",
+    "expiresAt": "2026-08-12T01:02:39.106Z",
+    "scopeDigest": "sha256:5976d9c4fcc54eb0bd3224636af2e2cb9381bf1d5d4eaf06463ad95d287dcac8",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-11T23:25:48.780Z"
+      "selectedAt": "2026-08-12T00:02:39.106Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0345.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0345/**",
           ".atm/history/tasks/ATM-GOV-0345.json",
           "packages/cli/src/commands/__tests__/task-direction-queue.test.ts",
@@ -283,8 +284,11 @@
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
           "packages/cli/src/commands/task-direction.ts",
           "packages/cli/src/commands/task-direction/active-locks.ts",
+          "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
           "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
           "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
           "packages/cli/src/commands/tasks/close-orchestrator.ts",
           "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
           "scripts/__tests__/sealed-runner-publication.test.ts",
@@ -293,7 +297,7 @@
           "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
           "tests/cli/runner-sync-build-script-admission.test.ts"
         ],
-        "digest": "sha256:60626a00b7269f4dd1530b331dff00025bc47ed482697f4d8d4d04b63e185c57"
+        "digest": "sha256:3681c66d78c456383eaef25fffc6120b8aebdddaff9e046291e0bf22b653d6c3"
       },
       {
         "kind": "lifecycle-operation",

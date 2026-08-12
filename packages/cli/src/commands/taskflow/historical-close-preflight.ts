@@ -118,7 +118,14 @@ function isSameTaskAdvisoryStagedFile(taskId: string, filePath: string): boolean
   const normalized = normalizeRelativePath(filePath).toLowerCase();
   const bundleManifest = `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json`.toLowerCase();
   const closurePacket = `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`.toLowerCase();
-  if (normalized === bundleManifest || normalized === closurePacket) {
+  const runnerPublicationTakeover = `.atm/history/evidence/${normalizedTaskId}.runner-publication-takeover.json`.toLowerCase();
+  const runnerSyncReceipt = `.atm/history/evidence/${normalizedTaskId}.runner-sync-receipt.json`.toLowerCase();
+  if (
+    normalized === bundleManifest
+    || normalized === closurePacket
+    || normalized === runnerPublicationTakeover
+    || normalized === runnerSyncReceipt
+  ) {
     return true;
   }
   const foreignSnapshotPattern = new RegExp(`^\\.atm/runtime/snapshots/(?:close-window-)?foreign-staged-${normalizedTaskId.toLowerCase()}-\\d+\\.json$`);

@@ -335,7 +335,11 @@ assert.equal(outOfScopeCloseWithWaiver.ok, true);
 
 const preCloseForeignFixture = await makeDualRepoCloseFixture('precheck-foreign-staged');
 writeText(path.join(preCloseForeignFixture.targetRepo, '.atm/history/tasks/TASK-FOREIGN-0001.json'), '{"workItemId":"TASK-FOREIGN-0001"}\n');
-execFileSync('git', ['add', '.atm/history/tasks/TASK-FOREIGN-0001.json'], { cwd: preCloseForeignFixture.targetRepo, stdio: 'ignore' });
+writeText(
+  path.join(preCloseForeignFixture.targetRepo, '.atm/history/evidence', `${preCloseForeignFixture.taskId}.runner-publication-takeover.json`),
+  '{"schemaId":"atm.runnerPublicationTakeoverPlan.v1"}\n'
+);
+execFileSync('git', ['add', '.atm/history/tasks/TASK-FOREIGN-0001.json', `.atm/history/evidence/${preCloseForeignFixture.taskId}.runner-publication-takeover.json`], { cwd: preCloseForeignFixture.targetRepo, stdio: 'ignore' });
 const preCloseForeign = await runTaskflow([
   'pre-close',
   '--cwd', preCloseForeignFixture.targetRepo,
