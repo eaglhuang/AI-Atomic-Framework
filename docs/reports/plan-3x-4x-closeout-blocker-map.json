@@ -15,7 +15,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:8f3646e5ec0db88df8860668ff7753e94bb9c6776f7f2368168012aa428e2ab2"
+      "digest": "sha256:7558cca47699ad58c095d6454468d366206dbd7c9a4619bad0876248f3cb1f7b"
     },
     {
       "path": "docs/reports/plan-4-foundation-replay.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:89646da56b899bd61e61c6479e08565fc31e7ed71d5d4fa6f5aaa4910119bd0f"
+      "digest": "sha256:318e59e8f2744b1938c37f828bc9f44aba1ffc5950fd86a73db4b031f8f4e268"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:e5eba1b477142c7bc631d57e3cad6bdceb6872615d68370e26dd5136239277b5"
+      "digest": "sha256:fb429147afecae08bde7a753c4638648343bfdd010dbc9a79fc554c59218cc10"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
@@ -59,12 +59,12 @@
     },
     {
       "path": "docs/reports/plan-3x-positive-current-receipts.json",
-      "digest": "sha256:77a66ae30b1b993e8fb91afd6bb5b7dd3fa11f535b1df8ba0d2e2bb2447ed7bb"
+      "digest": "sha256:bcc9f85b0d6227e0366f8e6fd1162542fcc6105d8080666c0d0d73d5a352a9ca"
     }
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 65,
+    "unresolvedObjectiveRows": 64,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -78,7 +78,7 @@
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
     "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
-    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 21,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 22,
     "plan3xObjectiveAlignedNegativeControlRowsConsumed": 8,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
@@ -105,9 +105,9 @@
       "planId": "3.2",
       "source": "docs/reports/plan-3-2-objective-replay.json",
       "objectiveRows": 29,
-      "verifiedRows": 11,
-      "unresolvedRows": 18,
-      "primaryBlocker": "HEAD CAS, row-addressability, timeout non-terminal behavior, stale-evidence rejection, terminal verdict fail-closed behavior, public-attestation boundary, unknown-evidence rejection, machine-readable blocker structure, dashboard consumption, provenance mismatch rejection, and missing-row rejection have current evidence consumed into source replay; remaining shared closure controls, sealed bundle, and provenance rows are represented but not terminally consumed"
+      "verifiedRows": 12,
+      "unresolvedRows": 17,
+      "primaryBlocker": "HEAD CAS, row-addressability, queue-only/no-override behavior, timeout non-terminal behavior, stale-evidence rejection, terminal verdict fail-closed behavior, public-attestation boundary, unknown-evidence rejection, machine-readable blocker structure, dashboard consumption, provenance mismatch rejection, and missing-row rejection have current evidence consumed into source replay; remaining shared closure controls, sealed bundle, and provenance rows are represented but not terminally consumed"
     },
     {
       "planId": "4.0",
@@ -123,7 +123,7 @@
       "id": "B1-current-row-proof",
       "scope": ["Plan 3.0", "Plan 3.1", "Plan 3.2"],
       "status": "partial-source-recomputed",
-      "reason": "replay reports establish denominator and row evidence surfaces; twenty-one Plan 3.x rows now have current objective-aligned receipts consumed into source replay, while the aggregate source replay verdict remains not-complete",
+      "reason": "replay reports establish denominator and row evidence surfaces; twenty-two Plan 3.x rows now have current objective-aligned receipts consumed into source replay, while the aggregate source replay verdict remains not-complete",
       "requiredOutcome": "continue executing docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
     },
     {

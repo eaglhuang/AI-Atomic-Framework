@@ -97,8 +97,8 @@ assert.equal(plan32Json.schemaId, 'atm.planObjectiveReplayValidation.v1');
 assert.equal(plan32Json.ok, true);
 assert.equal(plan32Json.planId, '3.2');
 assert.equal(plan32Json.rowCount, 29);
-assert.equal(plan32Json.verified, 11);
-assert.equal(plan32Json.notComplete, 18);
+assert.equal(plan32Json.verified, 12);
+assert.equal(plan32Json.notComplete, 17);
 
 const fakePlan32 = spawnSync(process.execPath, [
   '--strip-types',

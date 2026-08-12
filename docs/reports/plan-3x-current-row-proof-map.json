@@ -19,7 +19,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:8f3646e5ec0db88df8860668ff7753e94bb9c6776f7f2368168012aa428e2ab2",
+      "digest": "sha256:7558cca47699ad58c095d6454468d366206dbd7c9a4619bad0876248f3cb1f7b",
       "planId": "3.2",
       "expectedRows": 29
     }
@@ -27,8 +27,8 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsVerified": 21,
-    "sourceRowsNotComplete": 48,
+    "sourceRowsVerified": 22,
+    "sourceRowsNotComplete": 47,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
     "proofFamilies": 5
@@ -37,7 +37,7 @@
     {
       "id": "verified-current-receipt",
       "status": "verified",
-      "rowCount": 21,
+      "rowCount": 22,
       "meaning": "The row now has a current command-backed receipt or objective-aligned negative-control receipt replayed into the source objective report.",
       "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
       "rowRefs": [
@@ -55,6 +55,7 @@
         "P32-OBJ-02",
         "P32-OBJ-05",
         "P32-OBJ-11",
+        "P32-OBJ-12",
         "P32-OBJ-19",
         "P32-OBJ-23",
         "P32-OBJ-24",
@@ -104,7 +105,7 @@
     {
       "id": "governed-state-replay-needed",
       "status": "not-complete",
-      "rowCount": 18,
+      "rowCount": 17,
       "meaning": "The row depends on current ATM state, taskflow, closeback, backlog, broker, or lane facts rather than a standalone source validator.",
       "nextExecutionRule": "Use the row's ATM read/claim/closeback command only inside the relevant current task scope; do not infer completion from stale task status.",
       "rowRefs": [
@@ -117,7 +118,6 @@
         "P31-OBJ-23",
         "P32-OBJ-06",
         "P32-OBJ-10",
-        "P32-OBJ-12",
         "P32-OBJ-13",
         "P32-OBJ-14",
         "P32-OBJ-15",
@@ -178,12 +178,12 @@
     {
       "planId": "3.2",
       "rows": 29,
-      "verifiedRows": 11,
-      "notCompleteRows": 18,
+      "verifiedRows": 12,
+      "notCompleteRows": 17,
       "proofFamilyCounts": {
-        "verified-current-receipt": 11,
+        "verified-current-receipt": 12,
         "fresh-command-replay-needed": 5,
-        "governed-state-replay-needed": 11,
+        "governed-state-replay-needed": 10,
         "runner-release-parity-needed": 2,
         "negative-control-only": 0
       }
