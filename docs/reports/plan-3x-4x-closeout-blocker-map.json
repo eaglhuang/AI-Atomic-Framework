@@ -7,7 +7,7 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
-      "digest": "sha256:2a878d7b2023da4782b5d878dc10fe6fe1a3031e70dd4fbcfd0b3fd021218b8e"
+      "digest": "sha256:68d8d8e0c67cef993cf8d3355cbd8fa680756fdeec1ac0a53ff053fdce887023"
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:5247f1cc226bcc77e62483000c1c50e2f0d2b1e40631fecf9e00a1fc7cc04583"
+      "digest": "sha256:4c3d97770f428c4f114675946811e775bf967433a8d25d7a7680fa0170ce6e0b"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:21baba5e111df20c1bb2babe5ba78d10231cb5e612e61b6329d376b817be2042"
+      "digest": "sha256:566e74092a333d4a63e48dddaa14a98adfbfec63d95976d59287da68c4a96b7d"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
@@ -59,12 +59,12 @@
     },
     {
       "path": "docs/reports/plan-3x-positive-current-receipts.json",
-      "digest": "sha256:09a967aa26cb7dd8021dd1e6ffc63547b81001517b2f5b57e5c03fbcb5909e40"
+      "digest": "sha256:a11b0a473ac5f0a5cb362a677411a07a726d768990e54ae7d47c60bcc7df2f77"
     }
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 55,
+    "unresolvedObjectiveRows": 52,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -78,7 +78,7 @@
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
     "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
-    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 31,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 34,
     "plan3xObjectiveAlignedNegativeControlRowsConsumed": 8,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
@@ -89,9 +89,9 @@
       "planId": "3.0",
       "source": "docs/reports/plan-3-0-objective-replay.json",
       "objectiveRows": 17,
-      "verifiedRows": 9,
-      "unresolvedRows": 8,
-      "primaryBlocker": "8 Plan 3.0 rows still require fresh command or governed-state receipts; closure evidence boundaries now have focused current receipts"
+      "verifiedRows": 12,
+      "unresolvedRows": 5,
+      "primaryBlocker": "5 Plan 3.0 rows still require parity, policy, or governed-state receipts; operational safety rows now have focused current receipts"
     },
     {
       "planId": "3.1",

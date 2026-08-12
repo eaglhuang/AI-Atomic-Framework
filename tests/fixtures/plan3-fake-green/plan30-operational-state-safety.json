@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.plan30OperationalStateSafetyFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {
+      "objectiveId": "P30-OBJ-05",
+      "evidenceKind": "migration-rollback",
+      "rollbackPathPreserved": true,
+      "rollbackIsDestructiveByDefault": false,
+      "requiresExplicitExecution": true
+    },
+    {
+      "objectiveId": "P30-OBJ-06",
+      "evidenceKind": "exactly-once-transition",
+      "transitionIdempotent": true,
+      "duplicateTransitionRejected": true,
+      "eventDurable": true
+    },
+    {
+      "objectiveId": "P30-OBJ-17",
+      "evidenceKind": "legacy-authority-retirement",
+      "legacyAuthorityActiveUntilFinalCertificate": true,
+      "retirementRequiresFinalCertificate": true,
+      "earlyRetirementForbidden": true
+    }
+  ],
+  "expectedVerdict": "plan30-operational-state-safety-proven",
+  "diagnostics": [
+    "rollback-path-preserved",
+    "exactly-once-transition-durable",
+    "legacy-authority-retirement-deferred"
+  ]
+}

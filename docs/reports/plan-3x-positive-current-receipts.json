@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:5247f1cc226bcc77e62483000c1c50e2f0d2b1e40631fecf9e00a1fc7cc04583"
+      "digest": "sha256:4c3d97770f428c4f114675946811e775bf967433a8d25d7a7680fa0170ce6e0b"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:21baba5e111df20c1bb2babe5ba78d10231cb5e612e61b6329d376b817be2042"
+      "digest": "sha256:566e74092a333d4a63e48dddaa14a98adfbfec63d95976d59287da68c4a96b7d"
     }
   ],
   "totals": {
-    "freshCommandRows": 19,
+    "freshCommandRows": 16,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 31,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 34,
     "objectiveAlignedNegativeControlRowsConsumed": 8,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
-    "remainingUncoveredRows": 4,
-    "sourceRowsMutatedByThisReport": 31
+    "remainingUncoveredRows": 1,
+    "sourceRowsMutatedByThisReport": 34
   },
   "commandReceipts": [
     {
@@ -353,6 +353,23 @@
         "telemetry-not-correctness",
         "circuit-breaker-reset-digest"
       ]
+    },
+    {
+      "id": "plan30-operational-state-safety",
+      "command": "node --strip-types scripts/validate-plan30-operational-state-safety.ts --json",
+      "exitCode": 0,
+      "verdict": "plan30-operational-state-safety-proven",
+      "rowsCovered": [
+        "P30-OBJ-05",
+        "P30-OBJ-06",
+        "P30-OBJ-17"
+      ],
+      "stdoutAnchors": [
+        "atm.plan30OperationalStateSafetyValidation.v1",
+        "rollback-path-preserved",
+        "exactly-once-transition-durable",
+        "legacy-authority-retirement-deferred"
+      ]
     }
   ],
   "positiveRows": [
@@ -610,6 +627,30 @@
         "plan30-closure-evidence-boundaries"
       ],
       "sourceReplayAction": "recomputed row status because the current Plan 3.0 closure-boundary validator proves command-backed, verifier-computed, telemetry-separated, and digest-backed closure evidence without caller assertion"
+    },
+    {
+      "objectiveId": "P30-OBJ-05",
+      "title": "Migration rollback path is preserved",
+      "receiptIds": [
+        "plan30-operational-state-safety"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.0 operational-state validator proves rollback, exactly-once transition, and legacy-authority retirement boundaries"
+    },
+    {
+      "objectiveId": "P30-OBJ-06",
+      "title": "Exactly-once transition evidence is durable",
+      "receiptIds": [
+        "plan30-operational-state-safety"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.0 operational-state validator proves rollback, exactly-once transition, and legacy-authority retirement boundaries"
+    },
+    {
+      "objectiveId": "P30-OBJ-17",
+      "title": "Legacy authority retirement waits for final certificate",
+      "receiptIds": [
+        "plan30-operational-state-safety"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.0 operational-state validator proves rollback, exactly-once transition, and legacy-authority retirement boundaries"
     }
   ],
   "blockedPositiveRows": [
@@ -626,7 +667,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Thirty-one rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Thirty-four rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

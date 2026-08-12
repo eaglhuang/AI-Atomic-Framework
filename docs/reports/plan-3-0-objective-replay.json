@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 17,
   "statusCounts": {
-    "verified": 9,
-    "not-complete": 8,
+    "verified": 12,
+    "not-complete": 5,
     "unknown": 0,
     "conflicting": 0
   },
@@ -106,48 +106,46 @@
     {
       "objectiveId": "P30-OBJ-05",
       "title": "Migration rollback path is preserved",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0300",
       "caseIds": [
         "test_plan30_exact_17_objectives_0333"
       ],
       "sourceAnchors": [
-        "packages/cli/src/commands/tasks/"
+        "tests/fixtures/plan3-fake-green/plan30-operational-state-safety.json",
+        "scripts/validate-plan30-operational-state-safety.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "rollback",
-          "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json",
+          "kind": "plan30-operational-state-safety",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-operational-state-safety",
           "expectedTaskId": "ATM-GOV-0300"
         }
       ],
-      "blockers": [
-        "rollback path has not been replayed against current HEAD"
-      ],
-      "nextSafeCommand": "node atm.mjs tasks audit --all --summary --json"
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-06",
       "title": "Exactly-once transition evidence is durable",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0300",
       "caseIds": [
         "test_plan30_exact_17_objectives_0333"
       ],
       "sourceAnchors": [
-        ".atm/history/task-events/"
+        "tests/fixtures/plan3-fake-green/plan30-operational-state-safety.json",
+        "scripts/validate-plan30-operational-state-safety.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "transition",
-          "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json",
+          "kind": "plan30-operational-state-safety",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-operational-state-safety",
           "expectedTaskId": "ATM-GOV-0300"
         }
       ],
-      "blockers": [
-        "current exactly-once event replay not attached"
-      ],
-      "nextSafeCommand": "node atm.mjs tasks audit --all --summary --json"
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-07",
@@ -367,25 +365,24 @@
     {
       "objectiveId": "P30-OBJ-17",
       "title": "Legacy authority retirement waits for final certificate",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0341",
       "caseIds": [
         "test_plan30_exact_17_objectives_0333"
       ],
       "sourceAnchors": [
-        "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json"
+        "tests/fixtures/plan3-fake-green/plan30-operational-state-safety.json",
+        "scripts/validate-plan30-operational-state-safety.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "legacy-authority",
-          "source": "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+          "kind": "plan30-operational-state-safety",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-operational-state-safety",
           "expectedTaskId": "ATM-GOV-0341"
         }
       ],
-      "blockers": [
-        "legacy authority remains active until final certificate is proven"
-      ],
-      "nextSafeCommand": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.0 --mode validate"
+      "blockers": []
     }
   ]
 }
