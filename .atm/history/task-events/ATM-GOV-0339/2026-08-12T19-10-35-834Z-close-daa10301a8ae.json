@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T19-10-35-834Z-close-daa10301a8ae",
+  "taskId": "ATM-GOV-0339",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812185740-codex-gpt-5.4-mini-ATM-GOV-0339-e83893b973",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0339.json",
+  "taskSha256": "sha256:eb69fe4797e4a7285d7936d9fbcb1d8b9beadfc098269486b216a673603a95d4",
+  "createdAt": "2026-08-12T19:10:35.834Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0339 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812185740-codex-gpt-5.4-mini-ATM-GOV-0339-e83893b973",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0339.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "node --strip-types tests/e2e/plan4-hostile-dual-captain.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-brokered-write"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T19:10:35.825Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0339.*",
+        ".atm/history/task-events/ATM-GOV-0339/**",
+        ".atm/history/tasks/ATM-GOV-0339.json",
+        "docs/reports/plan4-hostile-dogfood-saturation.json",
+        "packages/cli/src/commands/broker/replay/implementation.ts",
+        "packages/core/src/broker/replay/",
+        "packages/core/src/evidence/hostile-dogfood.ts",
+        "schemas/atm.parallel-replay-evidence.v1.schema.json",
+        "schemas/atm.parallel-replay-scenario.v1.schema.json",
+        "scripts/run-real-parallel-dogfood.ts",
+        "tests/e2e/atm-3-real-parallel-replay.test.ts",
+        "tests/e2e/plan4-hostile-dual-captain.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/replay/implementation.ts",
+        "packages/core/src/broker/replay/",
+        "packages/core/src/evidence/hostile-dogfood.ts",
+        "schemas/atm.parallel-replay-evidence.v1.schema.json",
+        "schemas/atm.parallel-replay-scenario.v1.schema.json",
+        "scripts/run-real-parallel-dogfood.ts",
+        "tests/e2e/atm-3-real-parallel-replay.test.ts",
+        "tests/e2e/plan4-hostile-dual-captain.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
