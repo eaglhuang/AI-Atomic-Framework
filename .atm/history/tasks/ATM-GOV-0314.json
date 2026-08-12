@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0314",
   "title": "Plan 4.0 selected-versus-full shadow comparison and escaped-defect adjudication",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0294",
@@ -187,8 +187,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T11-00-00-234Z-renew-bd10dce94a3b",
-  "lastTransitionAt": "2026-08-12T11:00:00.234Z",
+  "lastTransitionId": "2026-08-12T11-03-01-991Z-close-185d586ce59c",
+  "lastTransitionAt": "2026-08-12T11:03:01.991Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T10:26:36.191Z",
@@ -197,7 +197,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-f836ebe5f5ed",
     "claimedAt": "2026-08-12T10:26:36.205Z",
-    "heartbeatAt": "2026-08-12T10:59:58.508Z",
+    "heartbeatAt": "2026-08-12T11:03:01.989Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0314.*",
@@ -211,13 +211,14 @@
       "tests/cli/batch-deliver-and-close-forwarding.test.ts",
       "tests/cli/plan4-shadow-comparison.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812102637-codex-gpt-5.4-mini-68074efbfd\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T10:26:36.205Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -331,5 +332,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-12T11:03:01.989Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812102636-codex-gpt-5.4-mini-ATM-GOV-0314-a7e3fee824",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0314.closure-packet.json"
 }

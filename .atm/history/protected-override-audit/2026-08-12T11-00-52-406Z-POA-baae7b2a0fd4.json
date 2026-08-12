@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-baae7b2a0fd4",
+  "recordedAt": "2026-08-12T11:00:52.406Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0314",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0314 --message \"fix(tasks): forward protected close approval\n\nATM-Work-Admission: wat-c8872c390978ec03 sha256:c8872c390978ec03b97da7bc6b147779a91e473840a1b346cba2e4463dfdc2a2\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0314-566e2c3d47",
+  "reason": "Bootstrap circularity repair validated by focused tests, typecheck, and validate:cli.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T11-00-36-482Z-EMG-ATM-GOV-0314-566e2c3d47.json",
+  "parentEventId": "POA-94c346340297",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
