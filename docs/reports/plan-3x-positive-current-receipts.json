@@ -3,25 +3,26 @@
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:55:00.000Z",
   "status": "positive-current-receipts-consumed",
-  "nonClaim": "This report identifies Plan 3.x rows whose current positive receipts were consumed into source replay; it does not certify any plan complete while aggregate source replay verdicts remain not-complete.",
+  "nonClaim": "This report identifies Plan 3.x rows whose current objective-aligned receipts were consumed into source replay; it does not certify any plan complete while aggregate source replay verdicts remain not-complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:fb0269a631d16b47ebf64489fb83e9c8a507e063e3d94be04fd2aaff53f11072"
+      "digest": "sha256:46a4863144158f51b633b82069f1f70d70619e7b673920751a166fde9b364a4b"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:f10f91944fe8eef7fb9348d1f14188267de6d4e78c23155390d2250a155aafd9"
+      "digest": "sha256:21a15acaaac1b1c59c1f7f06623a8de2ea16db2aa6695f0fe407c9f3237c9fff"
     }
   ],
   "totals": {
     "freshCommandRows": 37,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 8,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 10,
+    "objectiveAlignedNegativeControlRowsConsumed": 2,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
     "remainingUncoveredRows": 22,
-    "sourceRowsMutatedByThisReport": 8
+    "sourceRowsMutatedByThisReport": 10
   },
   "commandReceipts": [
     {
@@ -81,6 +82,21 @@
         "git-head-evidence:validate",
         "doctor git evidence states verified"
       ]
+    },
+    {
+      "id": "atm3-final-closure-negative-controls",
+      "command": "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "exitCode": 0,
+      "verdict": "objective-aligned-negative-controls-green",
+      "rowsCovered": [
+        "P31-OBJ-03",
+        "P32-OBJ-22"
+      ],
+      "stdoutAnchors": [
+        "fake-green fixture must fail closed",
+        "Plan 3.2 fake-green fixture must fail closed",
+        "atm 3 final closure replay ok"
+      ]
     }
   ],
   "positiveRows": [
@@ -109,6 +125,12 @@
       "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
+      "objectiveId": "P31-OBJ-03",
+      "title": "Fake-green rejection is explicit",
+      "receiptIds": ["atm3-final-closure-negative-controls"],
+      "sourceReplayAction": "recomputed row status because the objective itself is fail-closed rejection and the current negative fixture proves that behavior"
+    },
+    {
       "objectiveId": "P31-OBJ-07",
       "title": "Inconclusive evidence remains non-terminal",
       "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
@@ -131,6 +153,12 @@
       "title": "HEAD CAS is observable",
       "receiptIds": ["git-head-evidence-current-validator"],
       "sourceReplayAction": "recomputed row status after binding the validator receipt to the source replay evidence tuple"
+    },
+    {
+      "objectiveId": "P32-OBJ-22",
+      "title": "Missing rows cannot pass",
+      "receiptIds": ["atm3-final-closure-negative-controls"],
+      "sourceReplayAction": "recomputed row status because the objective itself is missing-row rejection and the current negative fixture proves that behavior"
     }
   ],
   "blockedPositiveRows": [
@@ -144,7 +172,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Eight rows now have current positive receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Ten rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

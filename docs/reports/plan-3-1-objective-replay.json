@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 23,
   "statusCounts": {
-    "verified": 3,
-    "not-complete": 20,
+    "verified": 4,
+    "not-complete": 19,
     "unknown": 0,
     "conflicting": 0
   },
@@ -38,13 +38,12 @@
     {
       "objectiveId": "P31-OBJ-03",
       "title": "Fake-green rejection is explicit",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0248",
       "caseIds": ["test_plan31_exact_23_objectives_0334"],
       "sourceAnchors": ["tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json"],
-      "evidenceTuples": [{"kind": "negative-fixture", "source": "tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json", "expectedTaskId": "ATM-GOV-0334"}],
-      "blockers": ["negative fixture proves fail-closed shape, not objective completion"],
-      "nextSafeCommand": "node --strip-types tests/cli/atm-3-final-closure.test.ts"
+      "evidenceTuples": [{"kind": "current-negative-control", "source": "tests/fixtures/plan3-fake-green/plan31-incomplete-objective.json", "receiptId": "atm3-final-closure-negative-controls", "expectedTaskId": "ATM-GOV-0334"}],
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-04",

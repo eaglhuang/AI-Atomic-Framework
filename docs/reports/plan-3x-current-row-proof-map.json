@@ -13,13 +13,13 @@
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
-      "digest": "sha256:1563471ad3daa1685fd480ee1c5550e4fac1a6b3866039e2fcaac966358c2b89",
+      "digest": "sha256:02f6d563779d7fd87cf9e18666df1b32b4a805985609026bebd7ca787ad90a29",
       "planId": "3.1",
       "expectedRows": 23
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:0964043d1efc8c140f1b7995877016b07fe46a0c4af5764b29e02cff256ed034",
+      "digest": "sha256:777be15c62875c9f47874ecd2bfece06382eb8de9f0c08f6a4fb0479bc7c91ab",
       "planId": "3.2",
       "expectedRows": 29
     }
@@ -27,8 +27,8 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsVerified": 8,
-    "sourceRowsNotComplete": 61,
+    "sourceRowsVerified": 10,
+    "sourceRowsNotComplete": 59,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
     "proofFamilies": 5
@@ -37,8 +37,8 @@
     {
       "id": "verified-current-receipt",
       "status": "verified",
-      "rowCount": 8,
-      "meaning": "The row now has a current command-backed receipt replayed into the source objective report.",
+      "rowCount": 10,
+      "meaning": "The row now has a current command-backed receipt or objective-aligned negative-control receipt replayed into the source objective report.",
       "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
       "rowRefs": [
         "P30-OBJ-07",
@@ -48,7 +48,9 @@
         "P31-OBJ-07",
         "P31-OBJ-09",
         "P31-OBJ-13",
-        "P32-OBJ-11"
+        "P31-OBJ-03",
+        "P32-OBJ-11",
+        "P32-OBJ-22"
       ]
     },
     {
@@ -139,13 +141,11 @@
     {
       "id": "negative-control-only",
       "status": "not-complete",
-      "rowCount": 3,
+      "rowCount": 1,
       "meaning": "The row currently proves fail-closed behavior or a negative fixture. That is necessary guard evidence, but not positive completion evidence.",
       "nextExecutionRule": "Keep the negative test, then add a separate positive current receipt before allowing the source row to become verified.",
       "rowRefs": [
-        "P31-OBJ-03",
-        "P32-OBJ-19",
-        "P32-OBJ-22"
+        "P32-OBJ-19"
       ]
     }
   ],
@@ -166,27 +166,27 @@
     {
       "planId": "3.1",
       "rows": 23,
-      "verifiedRows": 3,
-      "notCompleteRows": 20,
+      "verifiedRows": 4,
+      "notCompleteRows": 19,
       "proofFamilyCounts": {
-        "verified-current-receipt": 3,
+        "verified-current-receipt": 4,
         "fresh-command-replay-needed": 14,
         "governed-state-replay-needed": 5,
         "runner-release-parity-needed": 0,
-        "negative-control-only": 1
+        "negative-control-only": 0
       }
     },
     {
       "planId": "3.2",
       "rows": 29,
-      "verifiedRows": 1,
-      "notCompleteRows": 28,
+      "verifiedRows": 2,
+      "notCompleteRows": 27,
       "proofFamilyCounts": {
-        "verified-current-receipt": 1,
+        "verified-current-receipt": 2,
         "fresh-command-replay-needed": 12,
         "governed-state-replay-needed": 12,
         "runner-release-parity-needed": 2,
-        "negative-control-only": 2
+        "negative-control-only": 1
       }
     }
   ],
