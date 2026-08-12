@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:1eb2a824d27e357d14a6bef5da0c72bdf6e9bd26d1006337f4ba9f2a41cf12e5"
+      "digest": "sha256:2aaef57ace410d0682058127e7c4c474adc5ca1a28e845774a96b9b99d2ba4c3"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:f5e5efe4075f6a488b9524fe55022df0fcc0b5da732b2bf4606b1176830a58a2"
+      "digest": "sha256:48c6cfdad41f7c587fd7210107b62367efed46b18ff80e090f129afc30ab8761"
     }
   ],
   "totals": {
-    "freshCommandRows": 33,
+    "freshCommandRows": 32,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 15,
-    "objectiveAlignedNegativeControlRowsConsumed": 4,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 16,
+    "objectiveAlignedNegativeControlRowsConsumed": 5,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
-    "remainingUncoveredRows": 20,
-    "sourceRowsMutatedByThisReport": 15
+    "remainingUncoveredRows": 19,
+    "sourceRowsMutatedByThisReport": 16
   },
   "commandReceipts": [
     {
@@ -167,6 +167,20 @@
         "\"failClosed\": true",
         "timeout-must-not-green"
       ]
+    },
+    {
+      "id": "plan32-attestation-boundary-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-attestation-boundary.ts --json",
+      "exitCode": 0,
+      "verdict": "attestation-boundary-fail-closed",
+      "rowsCovered": [
+        "P32-OBJ-05"
+      ],
+      "stdoutAnchors": [
+        "atm.plan32AttestationBoundaryValidation.v1",
+        "\"failClosed\": true",
+        "prose-must-not-green"
+      ]
     }
   ],
   "positiveRows": [
@@ -243,6 +257,12 @@
       "sourceReplayAction": "recomputed row status because the current timeout fixture proves timed-out validator receipts remain not-complete and cannot green the row"
     },
     {
+      "objectiveId": "P32-OBJ-05",
+      "title": "Public attestation is not substituted for machine proof",
+      "receiptIds": ["plan32-attestation-boundary-fail-closed"],
+      "sourceReplayAction": "recomputed row status because the current attestation-only fixture proves prose or public acknowledgement cannot substitute for machine evidence"
+    },
+    {
       "objectiveId": "P32-OBJ-11",
       "title": "HEAD CAS is observable",
       "receiptIds": ["git-head-evidence-current-validator"],
@@ -272,7 +292,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Fifteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Sixteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",
