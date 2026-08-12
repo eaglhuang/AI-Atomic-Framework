@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0351",
-  "updatedAt": "2026-08-12T07:10:44.640Z",
+  "updatedAt": "2026-08-12T07:15:00.996Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -98,6 +98,108 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:83af316d6198247aa7371fb73a1b233b30f10d0e5156f154cd06f36fde45cbbb",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260812065319-codex-gpt-5.4-mini-ATM-GOV-0351-3f761032b4",
+      "createdAt": "2026-08-12T07:15:00.996Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260812065319-codex-gpt-5.4-mini-ATM-GOV-0351-3f761032b4",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-deferred-index-transaction",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/atm-evidence-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:25e3da538fdaffe304f4e06e47a1287f3136103ca879f6ec4e8a890ed170d688",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-12T07:14:44.318Z",
+            "finishedAt": "2026-08-12T07:15:00.995Z",
+            "durationMs": 16677,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "cacheKey": "sha256:77c9717ac04f83751512076855fcdb25ae5ccc002a0688f881d919185cb007a6",
+            "generatedAt": "2026-08-12T07:15:00.995Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:77c9717ac04f83751512076855fcdb25ae5ccc002a0688f881d919185cb007a6",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-12T07:15:00.995Z",
+              "observedAt": "2026-08-12T07:15:00.995Z",
+              "startedAt": "2026-08-12T07:14:44.318Z",
+              "finishedAt": "2026-08-12T07:15:00.995Z",
+              "durationMs": 16677,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:d8440e2b2eb2e225394b056b7dbe5358d7571771d073a6629f9d89f492089286",
+              "outputDigest": "sha256:4d51d021b35646bec178fc7b2091f65861e740f82015c5b910b47358628ee384",
+              "cache": {
+                "key": "sha256:77c9717ac04f83751512076855fcdb25ae5ccc002a0688f881d919185cb007a6",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0d0f57bc1b7782abea72107eee66dcc35d9dc0b86c03037fcbadef7ff887125c",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

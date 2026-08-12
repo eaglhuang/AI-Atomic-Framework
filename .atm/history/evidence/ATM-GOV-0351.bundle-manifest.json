@@ -1,10 +1,11 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0351",
-  "updatedAt": "2026-08-12T07:10:44.640Z",
+  "updatedAt": "2026-08-12T07:15:00.996Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
-    "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts"
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -20,6 +21,22 @@
       "startedAt": "2026-08-12T07:10:43.760Z",
       "finishedAt": "2026-08-12T07:10:44.639Z",
       "durationMs": 879,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:25e3da538fdaffe304f4e06e47a1287f3136103ca879f6ec4e8a890ed170d688",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts"
+      ],
+      "generatedAt": "2026-08-12T07:15:00.995Z",
+      "startedAt": "2026-08-12T07:14:44.318Z",
+      "finishedAt": "2026-08-12T07:15:00.995Z",
+      "durationMs": 16677,
       "runnerKind": "frozen-runner",
       "sourceCommit": null,
       "cached": false
