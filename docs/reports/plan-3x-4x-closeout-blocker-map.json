@@ -1,0 +1,150 @@
+{
+  "schemaId": "atm.fourPlanCloseoutBlockerMap.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-13T00:00:00.000Z",
+  "status": "actionable-not-complete",
+  "nonClaim": "This map is an execution dashboard, not a completion certificate.",
+  "sourceReports": [
+    {
+      "path": "docs/reports/plan-3-0-objective-replay.json",
+      "digest": "sha256:e080a41f0f68672e83725d19286c064ac707a5208330433dae5c4d1ad0817f00"
+    },
+    {
+      "path": "docs/reports/plan-3-1-objective-replay.json",
+      "digest": "sha256:6212686585e15b2dc98d845f7637d461730e5e52666b3a6b2f038ccbe6953b8c"
+    },
+    {
+      "path": "docs/reports/plan-3-2-objective-replay.json",
+      "digest": "sha256:54f1ea49a99988b17082eab303833c8d0662fdb4acdd7adca4a9d37e1feb72b7"
+    },
+    {
+      "path": "docs/reports/plan-4-foundation-replay.json",
+      "digest": "sha256:ae7df4f3c4466eae24f63b6eb4d4b6efb3f26386c37ef4e0f2ddb3aea5159c48"
+    },
+    {
+      "path": "docs/reports/plan4-real-shadow-comparison.json",
+      "digest": "sha256:26a9074b8d5a8680f92ef7f284d2fbf7edd47490ec23fb58aac1c66be0cd5280"
+    },
+    {
+      "path": "docs/reports/plan4-six-editor-adapter-parity.json",
+      "digest": "sha256:b70410de1ac69a13a186d5d9dc8203d2bd7f78fdbeb61c66dbffcd3fe9086f47"
+    },
+    {
+      "path": "docs/reports/plan4-hostile-dogfood-saturation.json",
+      "digest": "sha256:216e9dbb835198890ced00bd9cb0838ada447408e5bd95a92a8faf01024cdd84"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+      "digest": "sha256:a2074fc99dbc7ff8faf9ae3670839f73058cf4103082034dd2f1ff6331170906"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-independent-certificate.json",
+      "digest": "sha256:29a53e96d11904615cdd45042d98f253aab9da71c02859b5de93d2835cd8c9db"
+    }
+  ],
+  "totals": {
+    "objectiveRows": 86,
+    "unresolvedObjectiveRows": 86,
+    "plansWithExactDenominator": 4,
+    "backlogTotal": 391,
+    "backlogTerminal": 219,
+    "backlogOwnedOpen": 2,
+    "backlogDeferred": 170,
+    "certificateDimensionsProven": 4,
+    "certificateDimensionsNotComplete": 2
+  },
+  "planSummaries": [
+    {
+      "planId": "3.0",
+      "source": "docs/reports/plan-3-0-objective-replay.json",
+      "objectiveRows": 17,
+      "verifiedRows": 0,
+      "unresolvedRows": 17,
+      "primaryBlocker": "current objective rows need fresh command-backed replay instead of historical closure-packet references"
+    },
+    {
+      "planId": "3.1",
+      "source": "docs/reports/plan-3-1-objective-replay.json",
+      "objectiveRows": 23,
+      "verifiedRows": 0,
+      "unresolvedRows": 23,
+      "primaryBlocker": "current objective rows need fresh receipts and negative controls that prove completion, not only fail-closed behavior"
+    },
+    {
+      "planId": "3.2",
+      "source": "docs/reports/plan-3-2-objective-replay.json",
+      "objectiveRows": 29,
+      "verifiedRows": 0,
+      "unresolvedRows": 29,
+      "primaryBlocker": "shared closure controls, HEAD CAS, sealed bundle, and provenance rows are represented but not terminally consumed"
+    },
+    {
+      "planId": "4.0",
+      "source": "docs/reports/plan-4-foundation-replay.json",
+      "objectiveRows": 17,
+      "verifiedRows": 0,
+      "unresolvedRows": 17,
+      "primaryBlocker": "foundation evidence is proven, but successor wave evidence has not closed every Plan 4 objective anchor"
+    }
+  ],
+  "blockerClasses": [
+    {
+      "id": "B1-current-row-proof",
+      "scope": ["Plan 3.0", "Plan 3.1", "Plan 3.2"],
+      "reason": "replay reports currently establish denominator and row evidence surfaces, but keep every row not-complete",
+      "requiredOutcome": "replace historical-only references with fresh command receipts per row class, then recompute objective verdict"
+    },
+    {
+      "id": "B2-plan4-successor-wave",
+      "scope": ["Plan 4.0"],
+      "reason": "foundation, shadow comparison, adapter parity, hostile dogfood, and backlog census reports exist, but objective anchors still wait for successor-wave closure",
+      "requiredOutcome": "map successor reports onto each Plan 4 objective anchor and leave any unsupported anchor not-complete"
+    },
+    {
+      "id": "B3-charter-verdict",
+      "scope": ["AtomicCharter", "deep-module", "first-principles"],
+      "reason": "independent certificate still references the legacy objective evidence matrix for charter verdict",
+      "requiredOutcome": "derive charter verdict from current source reports and explicit violations/non-violations rather than from prose authority"
+    },
+    {
+      "id": "B4-backlog-disposition",
+      "scope": ["ATM bug backlog"],
+      "reason": "backlog census is machine-readable and valid, but 170 deferred items remain non-terminal and two are owned-open",
+      "requiredOutcome": "keep deferred backlog out of release completion claims or close/task-card the subset that is release-blocking"
+    },
+    {
+      "id": "B5-release-certificate",
+      "scope": ["final certificate", "release closeback"],
+      "reason": "release surface is pushed and reachable, but certificate correctly blocks releaseAuthorized while objective and charter verdicts are not-complete",
+      "requiredOutcome": "only recompute releaseAuthorized after B1-B3 are proven"
+    }
+  ],
+  "nextExecutionOrder": [
+    {
+      "id": "B3-charter-verdict",
+      "whyFirst": "smallest high-leverage gap: current reports can be checked against charter principles without replaying all 86 rows"
+    },
+    {
+      "id": "B2-plan4-successor-wave",
+      "whySecond": "successor reports already exist and can likely close or precisely leave open each Plan 4 anchor"
+    },
+    {
+      "id": "B1-current-row-proof",
+      "whyThird": "largest work item; execute by row classes and focused validators, not one long full-suite run"
+    },
+    {
+      "id": "B4-backlog-disposition",
+      "whyFourth": "release-blocking subset should be separated from non-blocking deferred backlog"
+    },
+    {
+      "id": "B5-release-certificate",
+      "whyLast": "certificate must stay fail-closed until upstream dimensions are proven"
+    }
+  ],
+  "principlesApplied": [
+    "first-principles: completion requires current evidence, not historical prose or task status alone",
+    "deep-module: blocker classes expose stable seams instead of spreading one-off row logic through certificate code",
+    "queue-minimization: long replay preparation stays outside scarce commit/runner queues; only final bottleneck writes serialize",
+    "false-green prevention: not-complete remains a valid, useful, machine-checked output"
+  ]
+}
