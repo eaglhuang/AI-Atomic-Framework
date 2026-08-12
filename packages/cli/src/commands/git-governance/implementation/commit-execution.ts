@@ -8,17 +8,17 @@ import {
   createSanitizedGitEnv,
   gitCommitAttemptStatusRelativePath,
   readGitCommitAttemptStatus,
-  resolveGitCommitTimeoutMs,
   resolveGitExecutable,
+  resolveGitCommitTimeoutMs,
   shouldStageGovernedGitHeadEvidenceBeforeCommit,
   stageTrackedActorRegistryIfNeeded,
   writeGitCommitAttemptStatus,
 } from './git-process-port.ts';
-import { execFileSync } from "node:child_process";
 import {
   assertEmergencyApproval,
   recordProtectedOverrideOutcome,
 } from "../../emergency/gate.ts";
+import { executeHookBypassCommitBoundary } from "./hook-bypass-commit-boundary.ts";
 import { buildProtectedOverrideRepairCandidate } from "../../emergency/protected-override-audit.ts";
 import {
   ATM_INDEX_FOREIGN_ACTIVE_STAGED,
@@ -75,7 +75,7 @@ export function assertGovernedCommitPhysicalLineBudget(cwd: LegacyValue, files: 
 }
 
 export function executeGitCommit(options: LegacyValue, context: LegacyValue) {
-let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers } = context;
+let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers } = context;
 try {
     withBranchCommitQueueLock(
       {
@@ -189,14 +189,17 @@ try {
             },
           );
         }
-        const runCommit = (env: LegacyValue) =>
-          execFileSync(resolveGitExecutable(), args, {
+        const runCommit = (env: LegacyValue) => {
+          const boundary = executeHookBypassCommitBoundary({
+            hookBypassRequest,
             cwd: options.cwd,
-            encoding: "utf8",
-            stdio: ["ignore", "pipe", "pipe"],
+            gitArgs: args,
             env,
-            timeout: commitTimeoutMs,
+            timeoutMs: commitTimeoutMs,
           });
+          protectedOverrideAudit = boundary.protectedOverrideAudit;
+          return boundary.value;
+        };
         writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
           schemaId: "atm.gitCommitAttemptStatus.v1",
           actorId,

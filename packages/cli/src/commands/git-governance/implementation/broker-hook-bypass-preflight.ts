@@ -237,7 +237,51 @@ export function assertNoBrokerConflictBeforeHookBypass(options: LegacyValue) {
   );
 }
 
-export function authorizeHookBypassAfterBrokerAdmission(options: LegacyValue) {
+/**
+ * Prove that a bypass lease is eligible without consuming its one-use capability.
+ *
+ * This deliberately stays outside the branch commit queue: candidate and broker
+ * rejection are retryable preparation failures, not protected writes.
+ */
+export function preflightHookBypassEligibility(options: LegacyValue) {
+  assertNoBrokerConflictBeforeHookBypass(options);
+  return assertEmergencyApproval({
+    cwd: options.cwd,
+    surface: "git commit --no-verify",
+    permission: "backend.gitHookBypass",
+    taskId: options.taskId,
+    actorId: options.actorId,
+    emergencyApproval: options.emergencyApproval,
+    flags: ["--no-verify"],
+    reason:
+      options.reason ?? "Governed git hook bypass for emergency recovery.",
+    command: options.command,
+    consume: false,
+  });
+}
+
+/** Build the immutable request consumed only by the protected write boundary. */
+export function prepareHookBypassRequest(options: LegacyValue) {
+  preflightHookBypassEligibility(options);
+  return {
+    cwd: options.cwd,
+    taskId: options.taskId,
+    actorId: options.actorId,
+    deferForeignStaged: options.deferForeignStaged,
+    candidateFiles: options.candidateFiles,
+    brokerConflictOverrideApproval: options.brokerConflictOverrideApproval,
+    brokerConflictResolutionPath: options.brokerConflictResolutionPath,
+    reason: options.reason,
+    command: options.command,
+    emergencyApproval: options.emergencyApproval,
+  };
+}
+
+/**
+ * Consume the bypass capability only at the protected-write boundary. Callers
+ * must invoke this after branch-queue admission and immediately before Git.
+ */
+export function consumeHookBypassAtProtectedWrite(options: LegacyValue) {
   assertNoBrokerConflictBeforeHookBypass(options);
   return assertEmergencyApproval({
     cwd: options.cwd,

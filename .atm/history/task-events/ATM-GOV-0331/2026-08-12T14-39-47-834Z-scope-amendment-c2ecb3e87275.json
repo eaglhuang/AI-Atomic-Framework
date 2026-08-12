@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T14-39-47-834Z-scope-amendment-c2ecb3e87275",
+  "taskId": "ATM-GOV-0331",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0331.json",
+  "taskSha256": "sha256:2de66c1e815e935b62df9fa1df1497af5f4f940434af0e56d1cd3bd4fd95b148",
+  "createdAt": "2026-08-12T14:39:47.834Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0331 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.test.ts,packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts,packages/cli/src/commands/git-governance/implementation/commit-command.ts,packages/cli/src/commands/git-governance/implementation/commit-execution.ts,packages/cli/src/commands/git-governance/implementation/hook-bypass-commit-boundary.ts\" --reason \"Commit the already-validated generic hook-bypass consumption boundary whose generated outputs block sealed runner publication.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Commit the already-validated generic hook-bypass consumption boundary whose generated outputs block sealed runner publication."
+  }
+}
