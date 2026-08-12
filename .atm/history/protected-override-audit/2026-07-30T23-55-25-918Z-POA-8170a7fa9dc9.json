@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-8170a7fa9dc9",
+  "recordedAt": "2026-07-30T23:55:25.918Z",
+  "actorId": "codex-skl-captain",
+  "taskId": "ATM-GOV-0273",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0273 --actor codex-skl-captain --status done --json",
+  "flags": [
+    "--historical-delivery",
+    "--waiver-out-of-scope-delivery"
+  ],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-ATM-GOV-0273-19ad60a98b",
+  "reason": "ATM-GOV-0273 is a retroactive closeback for the shared close-saga delivery; matched 0273 deliverables are in 84a57b9e6 while sibling closeback schema/parity files belong to co-delivered boundary tasks.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.close"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-30T23-55-25-917Z-EMG-ATM-GOV-0273-19ad60a98b.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

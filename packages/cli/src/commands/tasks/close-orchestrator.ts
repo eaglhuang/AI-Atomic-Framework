@@ -51,7 +51,6 @@ import { resolveCloseHistoricalContext } from './close-orchestrator/historical-c
 import { prepareClosurePacket } from './close-orchestrator/closure-packet.ts';
 import { makeTasksClosedResult } from './close-orchestrator/close-result.ts';
 import { executeCloseWrites } from './close-orchestrator/close-write.ts';
-import { authorizeCloseRunnerRecovery } from './close-orchestrator/runner-recovery.ts';
 export async function runTasksClose(argv: string[]) {
   const options = parseCloseOptions(argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -105,7 +104,20 @@ export async function runTasksClose(argv: string[]) {
         }
       });
     }
-    emergencyUse = await authorizeCloseRunnerRecovery({ cwd: options.cwd, taskId: options.taskId, actorId, allowStaleRunner: options.allowStaleRunner, emergencyApproval: options.emergencyApproval, reason: options.reason });
+    const staleGate = assertRunnerFreshForWriteAction({
+      cwd: options.cwd,
+      action: 'tasks-close',
+      allowStaleRunner: options.allowStaleRunner
+    });
+    if (options.allowStaleRunner && staleGate.warning) {
+      await recordStaleRunnerOverride({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        actorId,
+        action: 'tasks-close',
+        command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --allow-stale-runner --json`
+      });
+    }
   const currentClaim = parseClaimRecord(taskDocument.claim);
   const activeSession = resolveActorWorkSession(options.cwd, {
     actorId,
