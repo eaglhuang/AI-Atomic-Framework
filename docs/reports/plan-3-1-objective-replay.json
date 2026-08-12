@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 23,
   "statusCounts": {
-    "verified": 4,
-    "not-complete": 19,
+    "verified": 5,
+    "not-complete": 18,
     "unknown": 0,
     "conflicting": 0
   },
@@ -27,13 +27,12 @@
     {
       "objectiveId": "P31-OBJ-02",
       "title": "Shared pure verifier remains authoritative",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0251",
       "caseIds": ["test_plan31_exact_23_objectives_0334"],
       "sourceAnchors": ["scripts/validate-four-plan-objectives.ts"],
-      "evidenceTuples": [{"kind": "pure-verifier", "source": ".atm/history/evidence/ATM-GOV-0251.closure-packet.json", "expectedTaskId": "ATM-GOV-0251"}],
-      "blockers": ["shared verifier is available but row has not consumed a fresh closure receipt"],
-      "nextSafeCommand": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.1 --mode validate"
+      "evidenceTuples": [{"kind": "current-shared-pure-verifier", "source": "docs/reports/plan-3x-positive-current-receipts.json", "receiptId": "plan31-four-plan-objectives", "expectedTaskId": "ATM-GOV-0251"}],
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-03",

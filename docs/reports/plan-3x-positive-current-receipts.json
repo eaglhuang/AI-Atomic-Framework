@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:46a4863144158f51b633b82069f1f70d70619e7b673920751a166fde9b364a4b"
+      "digest": "sha256:3993e4065b0ac4662e4b95b64884dbb3473bf7be4a0452175c315694978a359b"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:21a15acaaac1b1c59c1f7f06623a8de2ea16db2aa6695f0fe407c9f3237c9fff"
+      "digest": "sha256:be5ccd74e193fec5f58cef83a16112113e8c9c0b16efd5a6f66680f979cfc217"
     }
   ],
   "totals": {
-    "freshCommandRows": 37,
+    "freshCommandRows": 35,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 10,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 12,
     "objectiveAlignedNegativeControlRowsConsumed": 2,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
     "remainingUncoveredRows": 22,
-    "sourceRowsMutatedByThisReport": 10
+    "sourceRowsMutatedByThisReport": 12
   },
   "commandReceipts": [
     {
@@ -97,9 +97,43 @@
         "Plan 3.2 fake-green fixture must fail closed",
         "atm 3 final closure replay ok"
       ]
+    },
+    {
+      "id": "plan31-four-plan-objectives",
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.1 --mode validate",
+      "exitCode": 0,
+      "verdict": "shared-pure-verifier-green",
+      "rowsCovered": [
+        "P31-OBJ-02"
+      ],
+      "stdoutAnchors": [
+        "validate-four-plan-objectives",
+        "Plan 3.1",
+        "digest=sha256:972d5ea61b851a84d575fc50ffd201123b6ab76791628a43e1f1eae52aa2fe68"
+      ]
+    },
+    {
+      "id": "plan32-final-closure-replay",
+      "command": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.2 --expect-rows 29 --input docs/reports/plan-3-2-objective-replay.json",
+      "exitCode": 0,
+      "verdict": "row-addressability-validator-green",
+      "rowsCovered": [
+        "P32-OBJ-01"
+      ],
+      "stdoutAnchors": [
+        "atm.planObjectiveReplayValidation.v1",
+        "\"planId\": \"3.2\"",
+        "\"rowCount\": 29"
+      ]
     }
   ],
   "positiveRows": [
+    {
+      "objectiveId": "P31-OBJ-02",
+      "title": "Shared pure verifier remains authoritative",
+      "receiptIds": ["plan31-four-plan-objectives"],
+      "sourceReplayAction": "recomputed row status because the current validator directly exercises the shared pure verifier for Plan 3.1 objective denominators"
+    },
     {
       "objectiveId": "P30-OBJ-07",
       "title": "Continuation replay is command-backed",
@@ -149,6 +183,12 @@
       "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
+      "objectiveId": "P32-OBJ-01",
+      "title": "Validator progress is row-addressable",
+      "receiptIds": ["plan32-final-closure-replay"],
+      "sourceReplayAction": "recomputed row status because the current replay validator proves row-addressable Plan 3.2 objective coverage"
+    },
+    {
       "objectiveId": "P32-OBJ-11",
       "title": "HEAD CAS is observable",
       "receiptIds": ["git-head-evidence-current-validator"],
@@ -172,7 +212,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Ten rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Twelve rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

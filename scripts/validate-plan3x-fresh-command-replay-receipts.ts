@@ -45,7 +45,7 @@ function main() {
 
   if (report.schemaId !== 'atm.plan3xFreshCommandReplayReceipts.v1') findings.push('schemaId mismatch');
   if (report.status !== 'fresh-command-replay-partially-consumed') findings.push('status must be fresh-command-replay-partially-consumed');
-  if (report.nonClaim !== 'These receipts prove that focused Plan 3.x validators execute against current files and that 10 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.') {
+  if (report.nonClaim !== 'These receipts prove that focused Plan 3.x validators execute against current files and that 12 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.') {
     findings.push('nonClaim missing or weakened');
   }
   for (const source of report.sourceReports ?? []) {
@@ -61,7 +61,7 @@ function main() {
   const freshFamily = (proofMap.proofFamilies ?? []).find((entry: any) => entry.id === 'fresh-command-replay-needed');
   if (!freshFamily) findings.push('fresh-command proof family missing from proof map');
   if (report.familyDisposition?.sourceRowCount !== freshFamily?.rowCount) findings.push('familyDisposition.sourceRowCount mismatch');
-  if (report.familyDisposition?.rowsConsumedIntoSourceReplay !== 10) findings.push('rowsConsumedIntoSourceReplay mismatch');
+  if (report.familyDisposition?.rowsConsumedIntoSourceReplay !== 12) findings.push('rowsConsumedIntoSourceReplay mismatch');
   if (report.familyDisposition?.rowsCertifiedCompleteByTheseReceipts !== 0) findings.push('receipts must not certify rows complete');
   if (report.familyDisposition?.remainingRowsInFamily !== freshFamily?.rowCount) findings.push('remainingRowsInFamily mismatch');
 
@@ -82,7 +82,7 @@ function main() {
     if (replay.verdict !== 'not-complete') findings.push(`source replay must remain not-complete: ${replay.planId}`);
     verifiedRows += Number(replay.statusCounts?.verified ?? 0);
   }
-  if (verifiedRows !== 10) findings.push(`source replay verified count mismatch: expected 10, observed ${verifiedRows}`);
+  if (verifiedRows !== 12) findings.push(`source replay verified count mismatch: expected 12, observed ${verifiedRows}`);
 
   const ok = findings.length === 0;
   const output = {
