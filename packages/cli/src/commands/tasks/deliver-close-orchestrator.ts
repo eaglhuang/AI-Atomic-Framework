@@ -160,6 +160,9 @@ export async function runTasksDeliverAndClose(argv: string[], dependencies: Deli
   if (options.reason) {
     closeArgv.push('--reason', options.reason);
   }
+  if (options.emergencyApproval) {
+    closeArgv.push('--emergency-approval', options.emergencyApproval);
+  }
   const closeResult = await dependencies.runTasks(closeArgv);
   if (!closeResult.ok) {
     return makeResult({

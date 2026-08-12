@@ -22,11 +22,14 @@ function lineCount(text: string): number {
 const facade = read('packages/cli/src/commands/tasks.ts');
 const legacyImplementation = read('packages/cli/src/commands/tasks/legacy/implementation.ts');
 const orchestrator = read('packages/cli/src/commands/tasks/deliver-close-orchestrator.ts');
+const parser = read('packages/cli/src/commands/tasks/task-option-parsers/close-delivery-options.ts');
 
 assert(orchestrator.includes('export async function runTasksDeliverAndClose'), 'deliver-and-close runner must live in deliver-close-orchestrator');
 assert(orchestrator.includes('DeliverAndCloseDependencies'), 'deliver-and-close must keep recursive runTasks dependency injected');
 assert(orchestrator.includes('ATM_BATCH_CHECKPOINT_REQUIRED'), 'deliver-and-close orchestrator must own batch checkpoint gate');
 assert(orchestrator.includes("'--auto-stage'"), 'deliver-and-close must delegate complete task bundle staging, including task events, to governed git commit');
+assert(orchestrator.includes("closeArgv.push('--emergency-approval', options.emergencyApproval)"), 'deliver-and-close must forward protected close approval to its close backend');
+assert(parser.includes("arg === '--emergency-approval'"), 'deliver-and-close option parser must accept protected close approval');
 assert(!orchestrator.includes("execFileSync('git', ['-C', options.cwd, 'add'"), 'deliver-and-close must not maintain a second partial raw-git staging path');
 assert(facade.includes('runTasks,'), 'public tasks facade must continue to export the task command entrypoint');
 assert(legacyImplementation.includes("import { runTasksDeliverAndClose as delegatedRunTasksDeliverAndClose } from '../deliver-close-orchestrator.ts';"), 'active task dispatcher must import the delegated deliver-and-close orchestrator');

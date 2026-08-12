@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-8d6a025de5a7",
+  "recordedAt": "2026-08-12T10:55:20.220Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0314",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0314 --message \"fix(batch): forward protected close approval\n\nATM-Work-Admission: wat-914e775db616816f sha256:914e775db616816fd62dc3a1b1c1a3f6d379e61b6626b8b221b0ead859d897ca\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0314-fd4cd30fce",
+  "reason": "Bootstrap circularity repair validated by focused test, typecheck, and validate:cli.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T10-55-20-219Z-EMG-ATM-GOV-0314-fd4cd30fce.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
