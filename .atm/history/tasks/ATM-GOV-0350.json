@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0350",
   "title": "Unify current-task close evidence bundle classification",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -149,8 +149,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T10-19-58-109Z-renew-f765bcbd4559",
-  "lastTransitionAt": "2026-08-12T10:19:58.109Z",
+  "lastTransitionId": "2026-08-12T10-25-07-340Z-close-95287bf4d4ba",
+  "lastTransitionAt": "2026-08-12T10:25:07.340Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T06:00:22.407Z",
@@ -159,7 +159,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-ac389a77ebe0",
     "claimedAt": "2026-08-12T06:00:22.415Z",
-    "heartbeatAt": "2026-08-12T10:19:57.434Z",
+    "heartbeatAt": "2026-08-12T10:25:07.336Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0350.json",
@@ -168,13 +168,14 @@
       "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
       "packages/cli/src/commands/taskflow/historical-close-preflight.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812060023-codex-gpt-5.4-mini-234a40e7e1",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812060023-codex-gpt-5.4-mini-234a40e7e1\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T06:00:22.415Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -274,5 +275,9 @@
     },
     "createdAt": "2026-08-12T06:00:37.426Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-12T10:25:07.337Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812060022-codex-gpt-5.4-mini-ATM-GOV-0350-8739c17c52",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0350.closure-packet.json"
 }

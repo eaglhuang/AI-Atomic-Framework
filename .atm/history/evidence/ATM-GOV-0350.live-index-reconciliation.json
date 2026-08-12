@@ -1,13 +1,29 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [],
-  "retainedPaths": [],
+  "reconciledPaths": [
+    ".atm/history/evidence/ATM-GOV-0350.bundle-manifest.json",
+    ".atm/history/evidence/ATM-GOV-0350.json",
+    ".atm/history/evidence/ATM-GOV-0350.live-index-reconciliation.json",
+    ".atm/history/protected-override-audit/2026-08-12T06-08-23-752Z-POA-4bf00cae3269.json",
+    ".atm/history/protected-override-audit/2026-08-12T06-09-27-518Z-POA-aa326ce9388c.json",
+    ".atm/history/task-events/ATM-GOV-0350/2026-08-12T05-59-32-879Z-import-594ddc4e4c4c.json",
+    ".atm/history/task-events/ATM-GOV-0350/2026-08-12T06-00-22-407Z-reserve-452226e23331.json",
+    ".atm/history/task-events/ATM-GOV-0350/2026-08-12T06-00-22-411Z-promote-0969b343f0c5.json",
+    ".atm/history/task-events/ATM-GOV-0350/2026-08-12T06-00-37-427Z-claim-d45efc01aca8.json",
+    ".atm/history/task-events/ATM-GOV-0350/2026-08-12T10-19-58-109Z-renew-f765bcbd4559.json",
+    ".atm/history/tasks/ATM-GOV-0350.json",
+    "packages/cli/src/commands/taskflow/__tests__/current-task-close-evidence.spec.ts",
+    "packages/cli/src/commands/taskflow/current-task-close-evidence.ts"
+  ],
+  "retainedPaths": [
+    {
+      "path": ".atm/history/evidence/git-head.jsonl",
+      "reason": "worktree-diverged"
+    }
+  ],
   "clean": false,
-  "failure": {
-    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
-    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,52974b8d5715bf5dec6539411b71aa4bf21632f4,.atm/history/evidence/ATM-GOV-0350.bundle-manifest.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
-  },
+  "failure": null,
   "taskId": "ATM-GOV-0350",
-  "createdAt": "2026-08-12T06:08:59.966Z"
+  "createdAt": "2026-08-12T10:23:45.797Z"
 }
