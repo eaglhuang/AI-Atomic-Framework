@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.fourPlanIndependentCertificate.v1",
+  "specVersion": "0.1.0",
+  "certificateId": "ATM-GOV-0341-independent-four-plan-certificate",
+  "generatedAt": "2026-08-12T19:20:00.000Z",
+  "writerRole": "certificate-writer",
+  "reviewers": [
+    {
+      "reviewerId": "atm-validator-recompute",
+      "roles": [
+        "independent-reviewer"
+      ],
+      "outputPath": "docs/reports/plan-3x-4x-release-closeback.json",
+      "digest": "sha256:c4ea5ab2d33b382cc3200943ab9376d5d7cfaa5a117b7d2c77bcf2d3f358a2c5"
+    },
+    {
+      "reviewerId": "codex-independent-recompute",
+      "roles": [
+        "independent-reviewer"
+      ],
+      "outputPath": "docs/reports/plan-3x-4x-independent-certificate.json",
+      "digest": "sha256:f725aa89a3299806dcc44f4daa5952c88a07bec92fa08070a9f7149ec480abf7"
+    }
+  ],
+  "minimumIndependentReviewers": 2,
+  "forbiddenReviewerRoles": [
+    "certificate-writer",
+    "closure-actor",
+    "evidence-producer",
+    "fixture-generator",
+    "implementer",
+    "override-approver"
+  ],
+  "dimensions": [
+    {
+      "dimensionId": "card-state-verdict",
+      "status": "proven",
+      "digest": "sha256:6685c920ac3b3eb3aeade44a70d38edcb0322f64b0f29c1a24c73d9869031a58",
+      "evidenceRefs": [
+        ".atm/history/tasks/ATM-GOV-0340.json",
+        ".atm/history/tasks/ATM-GOV-0341.json"
+      ],
+      "reviewerRole": null
+    },
+    {
+      "dimensionId": "charter-verdict",
+      "status": "not-complete",
+      "digest": "sha256:46563f7387cdb3279e85ab2f4c24a6101817d6a5edc9038b260165eb448efff7",
+      "evidenceRefs": [
+        "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md"
+      ],
+      "reviewerRole": null
+    },
+    {
+      "dimensionId": "freshness-verdict",
+      "status": "stale",
+      "digest": "sha256:73d80eb1401c5569670bb4356140e8ec1ca26549d4daae0ebc90f484fe05681a",
+      "evidenceRefs": [
+        "release/atm-onefile/release-manifest.json",
+        "scripts/validate-runner-reproducibility.ts"
+      ],
+      "reviewerRole": null
+    },
+    {
+      "dimensionId": "incident-verdict",
+      "status": "proven",
+      "digest": "sha256:a2074fc99dbc7ff8faf9ae3670839f73058cf4103082034dd2f1ff6331170906",
+      "evidenceRefs": [
+        "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+        "scripts/validate-backlog-census.ts"
+      ],
+      "reviewerRole": null
+    },
+    {
+      "dimensionId": "objective-verdict",
+      "status": "not-complete",
+      "digest": "sha256:b0012575923294b8017967f2d43cef38460cc056844fff645a2cf9908bb9807d",
+      "evidenceRefs": [
+        "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+        "scripts/validate-four-plan-objectives.ts"
+      ],
+      "reviewerRole": null
+    },
+    {
+      "dimensionId": "release-verdict",
+      "status": "not-complete",
+      "digest": "sha256:c4ea5ab2d33b382cc3200943ab9376d5d7cfaa5a117b7d2c77bcf2d3f358a2c5",
+      "evidenceRefs": [
+        "docs/reports/plan-3x-4x-release-closeback.json"
+      ],
+      "reviewerRole": null
+    }
+  ],
+  "releaseSurfaces": [
+    {
+      "surfaceId": "frozen-runner",
+      "expectedDigest": "sha256:034c412e78ee512d6fa40a432da102676f3c2db300d8b0cdad9c85402b983921",
+      "observedDigest": "sha256:034c412e78ee512d6fa40a432da102676f3c2db300d8b0cdad9c85402b983921",
+      "reachable": true
+    },
+    {
+      "surfaceId": "origin-main",
+      "expectedDigest": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "observedDigest": "0d50ba508a866d92fc4e26501a060ac539024140",
+      "reachable": true
+    },
+    {
+      "surfaceId": "root-drop",
+      "expectedDigest": "sha256:9ae304e366cd24c3c0f2a877a746ca01d1d1504a16dc282405d1f27bdc24bebb",
+      "observedDigest": "sha256:9ae304e366cd24c3c0f2a877a746ca01d1d1504a16dc282405d1f27bdc24bebb",
+      "reachable": true
+    },
+    {
+      "surfaceId": "target-head",
+      "expectedDigest": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "observedDigest": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "reachable": true
+    }
+  ],
+  "mutationControls": [
+    "digest-parity-before-release",
+    "fail-closed-on-not-complete",
+    "independent-reviewer-role-separation",
+    "no-legacy-retirement-with-stale-or-unpushed-surface"
+  ],
+  "status": "stale",
+  "overallVerdict": "not-complete",
+  "diagnostics": [
+    "dimension-fail-closed:charter-verdict:not-complete",
+    "dimension-fail-closed:freshness-verdict:stale",
+    "dimension-fail-closed:objective-verdict:not-complete",
+    "dimension-fail-closed:release-verdict:not-complete",
+    "release-digest-mismatch:origin-main"
+  ],
+  "nonClaims": [
+    "does-not-authorize-release:origin-main",
+    "does-not-claim-complete:charter-verdict",
+    "does-not-claim-complete:freshness-verdict",
+    "does-not-claim-complete:objective-verdict",
+    "does-not-claim-complete:release-verdict"
+  ],
+  "releaseAuthorized": false,
+  "provenance": {
+    "taskId": "ATM-GOV-0341",
+    "head": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+    "originMain": "0d50ba508a866d92fc4e26501a060ac539024140"
+  },
+  "certificateDigest": "sha256:d4bb1e5a9b10200911d7b621c97cd512dadc99790e3059c765b45ede02266b08"
+}

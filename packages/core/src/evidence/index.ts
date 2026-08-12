@@ -45,3 +45,4 @@ export * from './state-replay.ts';
 export * from './shadow-comparison.ts';
 export * from './adapter-parity.ts';
 export * from './hostile-dogfood.ts';
+export * from './four-plan-independent-certificate.ts';

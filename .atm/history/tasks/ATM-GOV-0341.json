@@ -1,0 +1,374 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0341",
+  "title": "Produce independent four-plan certification and governed release",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0340"
+  ],
+  "acceptance": [
+    "ACC-1: certificate writer、fixture generator、implementer、evidence producer、closure actor、reviewer 角色分離；reviewer output path 與 compiler output path 分離。",
+    "ACC-2: 分別輸出 objective、card-state、incident/backlog、freshness、charter、release verdict；任何 unresolved/unknown/unavailable/stale/override/no-verify/unauthorized 為 NOT COMPLETE。",
+    "ACC-3: reviewer 只讀 raw digests，不讀 writer overall verdict；獨立重算 byte-stable，mutation controls 可使每個子維度單獨翻紅。",
+    "ACC-4: focused、typecheck、lint、test、test-facade、module-boundaries、quick、standard、full、catalog、neutrality、release parity、frozen smoke 全綠且無 timeout/orphan。",
+    "ACC-5: source/frozen/root-drop/onefile digest parity；target/planning commits remote-reachable；closeback 綁定兩邊 SHA。所有條件通過後才可退休 legacy authority。"
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/four-plan-independent-certificate.ts",
+    "schemas/evidence/four-plan-independent-certificate.schema.json",
+    "tests/cli/four-plan-independent-certificate.test.ts",
+    "docs/reports/plan-3x-4x-independent-certificate.json",
+    "docs/reports/plan-3x-4x-release-closeback.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/quality-authority.ts",
+    "packages/core/src/evidence/quality-vector.ts",
+    "packages/core/src/evidence/oracle-adjudication.ts",
+    "scripts/validate-four-plan-objectives.ts",
+    "scripts/validate-backlog-census.ts",
+    "scripts/validate-runner-reproducibility.ts",
+    "tests/catalog/groups/test_group_plan4_final_certification.shard.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
+    "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate",
+    "node --strip-types scripts/validate-backlog-census.ts --mode validate",
+    "npm run typecheck",
+    "npm run lint",
+    "npm test",
+    "npm run validate:test-facade",
+    "npm run validate:module-boundaries",
+    "npm run validate:standard",
+    "npm run validate:full"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "independently-recomputed-command-backed",
+  "rollbackStrategy": "keep-legacy-authority-and-emit-blocked-certificate",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.independent-certification",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-evidence-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/evidence/quality-authority.ts",
+        "packages/core/src/evidence/quality-vector.ts",
+        "packages/core/src/evidence/oracle-adjudication.ts",
+        "scripts/validate-four-plan-objectives.ts",
+        "scripts/validate-backlog-census.ts",
+        "scripts/validate-runner-reproducibility.ts",
+        "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+        "packages/core/src/evidence/four-plan-independent-certificate.ts",
+        "schemas/evidence/four-plan-independent-certificate.schema.json",
+        "tests/cli/four-plan-independent-certificate.test.ts",
+        "docs/reports/plan-3x-4x-independent-certificate.json",
+        "docs/reports/plan-3x-4x-release-closeback.json",
+        "atomic_workbench/maps/atm-evidence-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0341-produce-independent-four-plan-certification-and-governed-release.task.md",
+    "sectionTitle": "ATM-GOV-0341",
+    "headingLine": 90,
+    "hash": "c9840676d431b3e9",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0341-produce-independent-four-plan-certification-and-governed-release.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:c9840676d431b3e995dbf962238b81d8a8cfb7e00c094e1f7b7c8af9eadbecad",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:52.955Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:52.955Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0340"
+    ],
+    "startConditions": [
+      "Plan objective counts are exactly 17/17 23/23 29/29 and 17/17 verified.",
+      "Backlog unclassified and open-like counts are both zero.",
+      "No unresolved timeout override no-verify unauthorized receipt or rescue-root ambiguity remains."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "atm.fourPlanIndependentCertificate.v1"
+    ],
+    "causalImpactEdges": [
+      "objective-verdict",
+      "card-state-verdict",
+      "incident-verdict",
+      "freshness-verdict",
+      "charter-verdict",
+      "release-verdict"
+    ],
+    "parallelFrontierInputs": [
+      "planning-matrix",
+      "target-receipts",
+      "backlog-census",
+      "dashboards",
+      "runner-provenance"
+    ],
+    "validatorReferences": [
+      "validate-four-plan-objectives",
+      "validate-backlog-census",
+      "validate-full",
+      "validate-charter",
+      "validate-runner-reproducibility"
+    ],
+    "phaseOwner": "closeout-wave-10"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_independent_certificate_fail_closed_dimensions_0341",
+      "targetGroupId": null,
+      "semanticKey": "independent_certificate_fail_closed_dimensions",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "objective-verdict",
+        "card-state-verdict",
+        "incident-verdict",
+        "freshness-verdict",
+        "charter-verdict"
+      ],
+      "expectedRedPredicate": "any unknown stale unavailable override or self-issued evidence keeps overall not-complete",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.fourPlanIndependentCertificate.v1",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_release_closeback_digest_parity_0341",
+      "targetGroupId": null,
+      "semanticKey": "release_closeback_digest_parity",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "release-verdict"
+      ],
+      "expectedRedPredicate": "source frozen root-drop onefile remote or planning target digest mismatch blocks release",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.fourPlanIndependentCertificate.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_independent_certificate_fail_closed_dimensions_0341",
+    "test_release_closeback_digest_parity_0341"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_final_certification"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T19-19-58-236Z-scope-amendment-e00e2c61fa31",
+  "lastTransitionAt": "2026-08-12T19:19:58.236Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T19:19:11.996Z",
+  "promotedAt": "2026-08-12T19:19:12.000Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-e545cc9e29a2",
+    "claimedAt": "2026-08-12T19:19:12.004Z",
+    "heartbeatAt": "2026-08-12T19:19:12.004Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0341.*",
+      ".atm/history/task-events/ATM-GOV-0341/**",
+      ".atm/history/tasks/ATM-GOV-0341.json",
+      "docs/reports/plan-3x-4x-independent-certificate.json",
+      "docs/reports/plan-3x-4x-release-closeback.json",
+      "packages/core/src/evidence/four-plan-independent-certificate.ts",
+      "packages/core/src/evidence/oracle-adjudication.ts",
+      "packages/core/src/evidence/quality-authority.ts",
+      "packages/core/src/evidence/quality-vector.ts",
+      "schemas/evidence/four-plan-independent-certificate.schema.json",
+      "scripts/validate-backlog-census.ts",
+      "scripts/validate-four-plan-objectives.ts",
+      "scripts/validate-runner-reproducibility.ts",
+      "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+      "tests/cli/four-plan-independent-certificate.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260812191912-codex-gpt-5.4-mini-6f2f9b9022",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812191912-codex-gpt-5.4-mini-6f2f9b9022\""
+    }
+  },
+  "startedAt": "2026-08-12T19:19:12.004Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-92e78ea046241c7a",
+    "ticketDigest": "sha256:92e78ea046241c7a9ea1aef808556c5a6ef9bb8d4837242b06398a7299cdf6de",
+    "taskId": "ATM-GOV-0341",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812191912-codex-gpt-5.4-mini-6f2f9b9022",
+    "claimGeneration": "lease-e545cc9e29a2",
+    "issuedAt": "2026-08-12T19:19:12.004Z",
+    "expiresAt": "2026-08-12T19:49:12.004Z",
+    "scopeDigest": "sha256:c201c349e77b2f771f6e8a3aba29cee42ff5eb491ede9a43f67ed8b9c1e473db",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T19:19:12.004Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0341.*",
+          ".atm/history/task-events/ATM-GOV-0341/**",
+          ".atm/history/tasks/ATM-GOV-0341.json",
+          "packages/core/src/evidence/oracle-adjudication.ts",
+          "packages/core/src/evidence/quality-authority.ts",
+          "packages/core/src/evidence/quality-vector.ts",
+          "scripts/validate-backlog-census.ts",
+          "scripts/validate-four-plan-objectives.ts",
+          "scripts/validate-runner-reproducibility.ts",
+          "tests/catalog/groups/test_group_plan4_final_certification.shard.json"
+        ],
+        "digest": "sha256:4057648379aa5337e88e1007d90a81df25226f883dc51e0c6b0e8a8991de510b"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260812191912-codex-gpt-5.4-mini-ATM-GOV-0341-3292dc777f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0341",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-ba39367cbc803138",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0341.*",
+      ".atm/history/task-events/ATM-GOV-0341/**",
+      ".atm/history/tasks/ATM-GOV-0341.json",
+      "docs/reports/plan-3x-4x-independent-certificate.json",
+      "docs/reports/plan-3x-4x-release-closeback.json",
+      "packages/core/src/evidence/four-plan-independent-certificate.ts",
+      "packages/core/src/evidence/oracle-adjudication.ts",
+      "packages/core/src/evidence/quality-authority.ts",
+      "packages/core/src/evidence/quality-vector.ts",
+      "schemas/evidence/four-plan-independent-certificate.schema.json",
+      "scripts/validate-backlog-census.ts",
+      "scripts/validate-four-plan-objectives.ts",
+      "scripts/validate-runner-reproducibility.ts",
+      "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+      "tests/cli/four-plan-independent-certificate.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0341-produce-independent-four-plan-certification-and-governed-release.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0341-produce-independent-four-plan-certification-and-governed-release.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812191912-codex-gpt-5.4-mini-6f2f9b9022",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812191912-codex-gpt-5.4-mini-6f2f9b9022\""
+    },
+    "createdAt": "2026-08-12T19:19:16.461Z",
+    "status": "active"
+  }
+}

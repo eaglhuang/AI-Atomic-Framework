@@ -1,0 +1,131 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0341",
+  "updatedAt": "2026-08-12T19:29:28.415Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "four-plan-independent-certificate",
+    "lint:touched",
+    "typecheck",
+    "validate-backlog-census",
+    "validate-four-plan-objectives",
+    "validate-runner-reproducibility",
+    "validate:module-boundaries"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9f64bd493e4d989e3db0664624125c0cd1d2f8297121e727678135e14bdb032f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "four-plan-independent-certificate"
+      ],
+      "generatedAt": "2026-08-12T19:28:23.489Z",
+      "startedAt": "2026-08-12T19:28:22.768Z",
+      "finishedAt": "2026-08-12T19:28:23.489Z",
+      "durationMs": 721,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4e1694d54ce63eb4d94756c4162819ece05387cc18bb5de0c74fd2d0cf05f3a2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate-four-plan-objectives"
+      ],
+      "generatedAt": "2026-08-12T19:28:34.169Z",
+      "startedAt": "2026-08-12T19:28:33.531Z",
+      "finishedAt": "2026-08-12T19:28:34.169Z",
+      "durationMs": 638,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-backlog-census.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:275e8c55c21ae59e9a4f92898280c852b1be3ceaa231b3462a1031b084c5f235",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate-backlog-census"
+      ],
+      "generatedAt": "2026-08-12T19:28:37.002Z",
+      "startedAt": "2026-08-12T19:28:36.324Z",
+      "finishedAt": "2026-08-12T19:28:37.002Z",
+      "durationMs": 678,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-runner-reproducibility.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0ab8aba5585b7a61eed2876061c79fcfeb24e45c019d26d8b4fe09c110e86d95",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate-runner-reproducibility"
+      ],
+      "generatedAt": "2026-08-12T19:29:09.012Z",
+      "startedAt": "2026-08-12T19:28:39.059Z",
+      "finishedAt": "2026-08-12T19:29:09.012Z",
+      "durationMs": 29953,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-12T19:29:20.191Z",
+      "startedAt": "2026-08-12T19:29:11.109Z",
+      "finishedAt": "2026-08-12T19:29:20.191Z",
+      "durationMs": 9082,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:module-boundaries",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a2dbc9928e612b3a64801c6f65ec874048278a5bddb1bb45b5dc1773a699596b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:module-boundaries"
+      ],
+      "generatedAt": "2026-08-12T19:29:23.788Z",
+      "startedAt": "2026-08-12T19:29:22.362Z",
+      "finishedAt": "2026-08-12T19:29:23.788Z",
+      "durationMs": 1426,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "cached": false
+    },
+    {
+      "command": "npx eslint packages/core/src/evidence/four-plan-independent-certificate.ts tests/cli/four-plan-independent-certificate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint:touched"
+      ],
+      "generatedAt": "2026-08-12T19:29:28.413Z",
+      "startedAt": "2026-08-12T19:29:25.920Z",
+      "finishedAt": "2026-08-12T19:29:28.413Z",
+      "durationMs": 2493,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f90f1a8f4a69624eaa7e5894ac37d968075ddd38",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

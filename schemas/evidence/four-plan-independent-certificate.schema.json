@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.fourPlanIndependentCertificate.v1",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "certificateId",
+    "generatedAt",
+    "writerRole",
+    "reviewers",
+    "minimumIndependentReviewers",
+    "forbiddenReviewerRoles",
+    "dimensions",
+    "releaseSurfaces",
+    "mutationControls",
+    "status",
+    "overallVerdict",
+    "diagnostics",
+    "nonClaims",
+    "releaseAuthorized",
+    "provenance",
+    "certificateDigest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.fourPlanIndependentCertificate.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "certificateId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "writerRole": { "type": "string", "minLength": 1 },
+    "reviewers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reviewerId", "roles", "outputPath", "digest"],
+        "properties": {
+          "reviewerId": { "type": "string" },
+          "roles": { "type": "array", "items": { "type": "string" } },
+          "outputPath": { "type": "string" },
+          "digest": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "minimumIndependentReviewers": { "type": "integer", "minimum": 0 },
+    "forbiddenReviewerRoles": { "type": "array", "items": { "type": "string" } },
+    "dimensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["dimensionId", "status", "digest", "evidenceRefs", "reviewerRole"],
+        "properties": {
+          "dimensionId": { "type": "string" },
+          "status": { "enum": ["proven", "not-complete", "unknown", "unavailable", "stale", "override", "unauthorized", "conflicting"] },
+          "digest": { "type": "string" },
+          "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+          "reviewerRole": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "releaseSurfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["surfaceId", "expectedDigest", "observedDigest", "reachable"],
+        "properties": {
+          "surfaceId": { "type": "string" },
+          "expectedDigest": { "type": "string" },
+          "observedDigest": { "type": "string" },
+          "reachable": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "mutationControls": { "type": "array", "items": { "type": "string" } },
+    "status": { "enum": ["proven", "blocked", "stale", "contradictory"] },
+    "overallVerdict": { "enum": ["complete", "not-complete"] },
+    "diagnostics": { "type": "array", "items": { "type": "string" } },
+    "nonClaims": { "type": "array", "items": { "type": "string" } },
+    "releaseAuthorized": { "type": "boolean" },
+    "provenance": { "type": "object" },
+    "certificateDigest": { "type": "string", "pattern": "^sha256:" }
+  },
+  "additionalProperties": false
+}
