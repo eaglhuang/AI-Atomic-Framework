@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0330",
   "title": "Replace caller-supplied evidence with observed source adapters",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0326",
@@ -195,40 +195,34 @@
     "findings": []
   },
   "reopenedAt": "2026-08-11T17:02:53.664Z",
-  "lastTransitionId": "2026-08-12T03-05-51-329Z-scope-amendment-3fd947966bde",
-  "lastTransitionAt": "2026-08-12T03:05:51.329Z",
+  "lastTransitionId": "2026-08-12T09-48-54-029Z-close-8376b8ae7b33",
+  "lastTransitionAt": "2026-08-12T09:48:54.029Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T03:00:19.704Z",
   "promotedAt": "2026-08-12T03:00:19.710Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-d5c08dfa3ffa",
-    "claimedAt": "2026-08-12T03:00:19.716Z",
-    "heartbeatAt": "2026-08-12T03:00:19.716Z",
+    "leaseId": "lease-fa4e8188a994",
+    "claimedAt": "2026-08-12T09:44:41.712Z",
+    "heartbeatAt": "2026-08-12T09:48:54.026Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/ATM-GOV-0330.*",
-      ".atm/history/task-events/ATM-GOV-0330/**",
       ".atm/history/tasks/ATM-GOV-0330.json",
-      "docs/reports/observed-evidence-source-deep-module-review.json",
       "packages/core/src/evidence/evidence-freshness-certificate.ts",
-      "packages/core/src/evidence/observed-source-adapters.ts",
-      "packages/core/src/evidence/observed-source.ts",
       "packages/core/src/evidence/realness.ts",
       "packages/core/src/evidence/validation-receipt.ts",
       "packages/core/src/telemetry/observation.ts",
       "schemas/evidence/",
       "tests/core/"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
+      "laneSessionId": "lane-20260812094441-codex-gpt-5.4-mini-4464526d83",
       "status": "adopted",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
-    }
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812094441-codex-gpt-5.4-mini-4464526d83\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T03:00:19.716Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -298,49 +292,56 @@
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
   },
-  "startedBySessionId": "session-20260812030019-codex-gpt-5.4-mini-ATM-GOV-0330-0b768b18ea",
+  "startedBySessionId": "session-20260812094441-codex-gpt-5.4-mini-ATM-GOV-0330-9c5966a0a7",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0330",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
+    "dirtyPaths": [
+      ".atm/history/evidence/ATM-GOV-0330.live-index-reconciliation.json",
+      ".atm/history/tasks/ATM-GOV-0330.json"
+    ],
+    "retainedAt": "2026-08-12T09:44:25.452Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-gpt-5.4-mini",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0330",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-a9e891ce6ca0c90c",
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0330.*",
       ".atm/history/task-events/ATM-GOV-0330/**",
       ".atm/history/tasks/ATM-GOV-0330.json",
-      "docs/reports/observed-evidence-source-deep-module-review.json",
       "packages/core/src/evidence/evidence-freshness-certificate.ts",
-      "packages/core/src/evidence/observed-source-adapters.ts",
-      "packages/core/src/evidence/observed-source.ts",
       "packages/core/src/evidence/realness.ts",
       "packages/core/src/evidence/validation-receipt.ts",
       "packages/core/src/telemetry/observation.ts",
       "schemas/evidence/",
       "tests/core/"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0330-replace-caller-supplied-evidence-with-observed-source-adapters.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0330-replace-caller-supplied-evidence-with-observed-source-adapters.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "9c34232dbf9ba1ce43d35d7fa0d1a5f059e4352b7e0d529595b68aa01f72c69d",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": null,
+    "sessionId": "session-20260812094441-codex-gpt-5.4-mini-ATM-GOV-0330-9c5966a0a7",
     "laneSession": {
-      "laneSessionId": "lane-20260811175214-codex-gpt-5.4-mini-599fb35ead",
-      "status": "adopted",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811175214-codex-gpt-5.4-mini-599fb35ead\""
+      "laneSessionId": "lane-20260812094441-codex-gpt-5.4-mini-4464526d83",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812094441-codex-gpt-5.4-mini-4464526d83\""
     },
-    "createdAt": "2026-08-12T03:00:44.371Z",
+    "createdAt": "2026-08-12T09:44:44.832Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-12T09:48:54.026Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812094441-codex-gpt-5.4-mini-ATM-GOV-0330-9c5966a0a7",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0330.closure-packet.json"
 }
