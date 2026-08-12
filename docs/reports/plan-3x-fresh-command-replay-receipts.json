@@ -3,11 +3,11 @@
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:30:00.000Z",
   "status": "fresh-command-replay-partially-consumed",
-  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 24 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
+  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 25 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:717d359b8bad3728fc1e88b7783bf3a8acdd6226fe1c09c89607fc469e36223a"
+      "digest": "sha256:aa44ada48b5bf96d394fb7f36d767add9e15f9b950fb5f41b8cb390ada0cd8d0"
     },
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
@@ -19,18 +19,18 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:3c6806716b4e4314800391f4bc63f8db51ebdffa06150f36062119a1f6c9a3b3"
+      "digest": "sha256:a4238f964eb253a90832ea19bf6b7c55a4602bbba4732fddd14c971ec4803045"
     }
   ],
   "familyDisposition": {
     "proofFamilyId": "fresh-command-replay-needed",
-    "sourceRowCount": 26,
-    "focusedCommandsExecuted": 20,
-    "commandsGreen": 20,
-    "rowsConsumedIntoSourceReplay": 24,
+    "sourceRowCount": 25,
+    "focusedCommandsExecuted": 21,
+    "commandsGreen": 21,
+    "rowsConsumedIntoSourceReplay": 25,
     "rowsCertifiedCompleteByTheseReceipts": 0,
-    "remainingRowsInFamily": 26,
-    "reasonRowsRemainOpen": "Twenty-four current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
+    "remainingRowsInFamily": 25,
+    "reasonRowsRemainOpen": "Twenty-five current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
   },
   "commandRuns": [
     {
@@ -172,12 +172,19 @@
       "exitCode": 0,
       "stdoutPreview": "[validate-plan32-legal-recovery-lane] ok lane=atm-git-pathspec-emergency-commit diagnostics=lane-named,authority-preconditions-before-use,emergency-not-success-metric,exact-keep-list-required,post-commit-and-backlog-required",
       "semanticBoundary": "objective-aligned legal recovery lane evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-sealed-bundle-tree-subset",
+      "command": "node --strip-types scripts/validate-plan32-sealed-bundle-tree-subset.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-sealed-bundle-tree-subset] ok sealed=2 candidate=3 diagnostics=sealed-paths-subset-of-candidate-tree,foreign-live-surface-excluded,empty-missing-from-candidate",
+      "semanticBoundary": "objective-aligned sealed bundle tree subset evidence, not completion evidence for Plan 3.2"
     }
   ],
   "nextExecutionOrder": [
     {
       "id": "positive-row-receipts",
-      "whyFirst": "Replace historical-only or shape-only evidence for the remaining 26 fresh-command rows with command receipts that directly satisfy each row objective."
+      "whyFirst": "Replace historical-only or shape-only evidence for the remaining 25 fresh-command rows with command receipts that directly satisfy each row objective."
     },
     {
       "id": "source-replay-row-recompute",

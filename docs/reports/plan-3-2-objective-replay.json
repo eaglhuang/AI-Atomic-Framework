@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 14,
-    "not-complete": 15,
+    "verified": 15,
+    "not-complete": 14,
     "unknown": 0,
     "conflicting": 0
   },
@@ -170,25 +170,24 @@
     {
       "objectiveId": "P32-OBJ-08",
       "title": "Sealed bundle is a tree subset",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0335",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "packages/cli/src/commands/git-governance/"
+        "tests/fixtures/plan3-fake-green/sealed-bundle-tree-subset.json",
+        "scripts/validate-plan32-sealed-bundle-tree-subset.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "sealed-bundle",
-          "source": ".atm/history/evidence/ATM-GOV-0335.bundle-manifest.json",
+          "kind": "sealed-bundle-tree-subset",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-sealed-bundle-tree-subset",
           "expectedTaskId": "ATM-GOV-0335"
         }
       ],
-      "blockers": [
-        "bundle receipt will exist only after validation/commit"
-      ],
-      "nextSafeCommand": "node atm.mjs git commit --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-09",
