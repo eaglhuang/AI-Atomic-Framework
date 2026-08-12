@@ -391,7 +391,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   const closeoutOnlyMutationFiles =
     claimIntent === "closeout-only"
       ? uniqueSorted(
-          commitFiles.filter((filePath: LegacyValue) => {
+          [...commitFiles, ...unstagedDirtyFiles, ...inScopeStagedFiles].filter((filePath: LegacyValue) => {
             const normalized = normalizeRelativePath(filePath);
             if (!normalized || normalized.startsWith(".atm/")) return false;
             if (planningPath && normalized === planningPath) return false;
@@ -434,10 +434,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   } else if (manualReviewResidue.length > 0) {
     blockedCode = "ATM_GIT_COMMIT_GENERATED_RESIDUE_MANUAL_REVIEW";
     blockedSummary = `Generated-looking residue needs manual review before commit: ${manualReviewResidue.map((entry: LegacyValue) => entry.path).join(", ")}`;
-  } else if (
-    taskClaim?.state === "active" &&
-    closeoutOnlyMutationFiles.length > 0
-  ) {
+  } else if (claimIntent === "closeout-only" && closeoutOnlyMutationFiles.length > 0) {
     blockedCode = "ATM_GIT_COMMIT_CLOSEOUT_ONLY_MUTATION";
     blockedSummary = `Task ${input.taskId} holds a closeout-only claim but the commit bundle contains source mutations: ${closeoutOnlyMutationFiles.join(", ")}. Re-claim with --claim-intent write before committing new source changes.`;
   }
