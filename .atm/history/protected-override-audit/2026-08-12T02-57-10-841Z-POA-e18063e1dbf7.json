@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-e18063e1dbf7",
+  "recordedAt": "2026-08-12T02:57:10.841Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0291",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0291 --message \"feat(evidence): enforce dependency graph interface bypass gate\n\nATM-Work-Admission: wat-58eb80d9f907cde9 sha256:58eb80d9f907cde90bcee81e73239021d04d9c32e560d3a0f3bb11134aab036a\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0291-16e3e6b8ee",
+  "reason": "One-time bootstrap circularity bypass; verified scope and validators, frozen build and batch checkpoint follow.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T02-57-10-839Z-EMG-ATM-GOV-0291-16e3e6b8ee.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

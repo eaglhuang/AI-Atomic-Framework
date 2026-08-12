@@ -1,1 +1,15 @@
-import assert from'node:assert/strict';import{compileDependencyGraphBypassGate,validateDependencyGraphBypassGate}from'../../packages/core/src/evidence/dependency-graph-bypass-gate.ts';const a={authorityId:'g',digest:'sha256:g',sealed:true as const};const r=compileDependencyGraphBypassGate({runId:'r',authority:a,observedAuthorityDigest:a.digest,nodes:['a','b'],edges:[['a','b']]});assert.equal(r.status,'proven');assert.equal(validateDependencyGraphBypassGate(r).ok,true);console.log('plan4 dependency graph bypass gate: ok');
+import assert from 'node:assert/strict';
+import { compileDependencyGraphBypassGate, replayDependencyGraphBypassGate, validateDependencyGraphBypassGate } from '../../packages/core/src/evidence/dependency-graph-bypass-gate.ts';
+
+const authority = { authorityId: 'dependency-graph-fixture', digest: 'sha256:graph', sealed: true as const };
+const result = compileDependencyGraphBypassGate({
+  runId: 'dependency-graph-success', authority, observedAuthorityDigest: authority.digest,
+  nodes: ['caller', 'public-api', 'service'],
+  edges: [['caller', 'public-api'], ['public-api', 'service']],
+  publicInterfaces: ['public-api']
+});
+
+assert.equal(result.status, 'proven');
+assert.deepEqual(replayDependencyGraphBypassGate(result), result);
+assert.equal(validateDependencyGraphBypassGate(result).ok, true);
+console.log('plan4 dependency graph bypass gate: ok');
