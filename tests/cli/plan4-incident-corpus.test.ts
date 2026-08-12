@@ -1,2 +1,28 @@
-import assert from 'node:assert/strict'; import { replayState } from '../../packages/core/src/evidence/state-replay.ts';
-const families = ['shared-index-commit-attribution','close-deferral-derived-manifest','active-batch-router','import-frontmatter-fidelity','runner-sync-protected-state','stale-mixed-batch']; const observations = families.map((family, index) => ({ incidentId: `dogfood-${index}`, family, sourceCommit: `sha256:c${index}`, runnerDigest: `sha256:r${index}`, treeDigest: `sha256:t${index}`, provenanceDigest: `sha256:p${index}`, fixtureDigest: `sha256:f${index}`, observedSourceCommit: `sha256:c${index}`, observedRunnerDigest: `sha256:r${index}`, observedTreeDigest: `sha256:t${index}`, observedProvenanceDigest: `sha256:p${index}`, observedFixtureDigest: `sha256:f${index}`, realDogfood: true, historical: index === 0, supported: true })); const result = replayState({ authorityDigest: 'sha256:authority', observations, requiredFamilies: families }); assert.equal(result.status, 'proven'); assert.deepEqual(result.verdicts.map((x) => x.family), families); assert.deepEqual(result.historicalIncidentIds, ['dogfood-0']); const missing = replayState({ authorityDigest: 'sha256:authority', observations: observations.slice(0, 2), requiredFamilies: families }); assert.equal(missing.status, 'blocked'); assert.ok(missing.verdicts.some((x) => x.diagnostics.includes('required-family-missing'))); assert.deepEqual(missing.historicalIncidentIds, ['dogfood-0']); console.log('plan4 incident corpus: ok');
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { replayState, sealReplayObservation, replayDogfoodSignals, type ReplayDogfoodSignal } from '../../packages/core/src/evidence/state-replay.ts';
+
+const fixtureRoot = join(process.cwd(), 'tests', 'fixtures', 'governance-incidents');
+const fixtures = readdirSync(fixtureRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => {
+  const value = JSON.parse(readFileSync(join(fixtureRoot, entry.name, 'incident.json'), 'utf8')) as { semanticFamily: string };
+  return value.semanticFamily;
+}).sort();
+const expectedFamilies = ['active-batch-router', 'close-deferral-derived-manifest', 'import-frontmatter-fidelity', 'runner-sync-protected-state', 'sealed-deletion-tombstone', 'shared-index-commit-attribution', 'stale-mixed-batch'];
+assert.deepEqual(fixtures, expectedFamilies, 'every sealed incident fixture is present and catalogued by semantic family');
+const digest = (seed: string) => `sha256:${createHash('sha256').update(seed).digest('hex')}`;
+const signalFor = (family: string): ReplayDogfoodSignal | undefined => family === 'shared-index-commit-attribution' ? 'cross-lane-shared-index' : family === 'close-deferral-derived-manifest' ? 'close-deferral' : family === 'active-batch-router' ? 'active-batch-routing' : undefined;
+const observations = fixtures.map((family, index) => {
+  const binding = { sourceCommit: digest(`source-${index}`), runnerDigest: digest(`runner-${index}`), treeDigest: digest(`tree-${index}`), provenanceDigest: digest(`provenance-${index}`), fixtureDigest: digest(`fixture-${index}`), repairDigest: digest(`repair-${index}`) };
+  const signal = signalFor(family);
+  const input = { incidentId: `incident-${index}`, family, historical: true, supported: true, expected: binding, observed: binding, dogfoodWitness: signal ? { signal, laneIds: ['lane-left', 'lane-right'], eventDigest: digest(`event-${index}`) } : undefined };
+  return { ...input, sealDigest: sealReplayObservation(input) };
+});
+const result = replayState({ authorityDigest: digest('authority'), observations, requiredFamilies: expectedFamilies, requiredDogfoodSignals: replayDogfoodSignals });
+assert.equal(result.status, 'proven'); assert.deepEqual(result.observedDogfoodSignals, [...replayDogfoodSignals].sort());
+const fixtureOnly = replayState({ authorityDigest: digest('authority'), observations: observations.map((item) => ({ ...item, dogfoodWitness: undefined, sealDigest: sealReplayObservation({ ...item, dogfoodWitness: undefined }) })), requiredFamilies: expectedFamilies, requiredDogfoodSignals: replayDogfoodSignals });
+assert.equal(fixtureOnly.status, 'blocked'); assert.ok(fixtureOnly.diagnostics.some((entry) => entry.startsWith('required-dogfood-signal-missing:')));
+const missing = replayState({ authorityDigest: digest('authority'), observations: observations.slice(0, -1), requiredFamilies: expectedFamilies });
+assert.equal(missing.status, 'blocked'); assert.ok(missing.verdicts.some((entry) => entry.diagnostics.includes('required-family-missing')));
+console.log('plan4 incident corpus: ok');

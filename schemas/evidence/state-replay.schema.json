@@ -1,1 +1,22 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://ai-atomic-framework.dev/schemas/evidence/state-replay.schema.json","title":"ATM State Replay Result","type":"object","required":["schemaId","status","verdicts","nonClaims","historicalIncidentIds","resultDigest"],"additionalProperties":false,"properties":{"schemaId":{"const":"atm.stateReplay.v1"},"status":{"enum":["proven","blocked"]},"verdicts":{"type":"array"},"nonClaims":{"type":"array","items":{"type":"string"}},"historicalIncidentIds":{"type":"array","items":{"type":"string"}},"resultDigest":{"type":"string","pattern":"^sha256:"}}}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.dev/schemas/evidence/state-replay.schema.json",
+  "title": "ATM State Replay Result",
+  "type": "object",
+  "required": ["schemaId", "specVersion", "authorityDigest", "status", "verdicts", "requiredFamilies", "requiredDogfoodSignals", "observedDogfoodSignals", "nonClaims", "historicalIncidentIds", "diagnostics", "resultDigest"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaId": { "const": "atm.stateReplay.v1" },
+    "specVersion": { "const": "0.2.0" },
+    "authorityDigest": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+    "status": { "enum": ["proven", "blocked"] },
+    "verdicts": { "type": "array", "items": { "type": "object", "required": ["incidentId", "family", "verdict", "diagnostics"], "additionalProperties": false, "properties": { "incidentId": { "type": "string", "minLength": 1 }, "family": { "type": "string", "minLength": 1 }, "verdict": { "enum": ["repaired", "regressed", "stale", "forged", "missing", "unsupported"] }, "diagnostics": { "type": "array", "items": { "type": "string" }, "uniqueItems": true } } } },
+    "requiredFamilies": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "requiredDogfoodSignals": { "type": "array", "items": { "enum": ["cross-lane-shared-index", "close-deferral", "active-batch-routing"] }, "uniqueItems": true },
+    "observedDogfoodSignals": { "type": "array", "items": { "enum": ["cross-lane-shared-index", "close-deferral", "active-batch-routing"] }, "uniqueItems": true },
+    "nonClaims": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "historicalIncidentIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "diagnostics": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "resultDigest": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" }
+  }
+}

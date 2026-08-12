@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-47a8a5539c43",
+  "recordedAt": "2026-08-09T16:08:20.003Z",
+  "actorId": null,
+  "taskId": "ATM-GOV-0307",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\governance-optimization\\tasks\\ATM-GOV-0307-state-replay-and-known-incident-corpus-closure.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-ATM-GOV-0307-e73e77c51d",
+  "reason": "Force import would overwrite closed target-authority task history.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T16-08-20-001Z-EMG-ATM-GOV-0307-e73e77c51d.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
