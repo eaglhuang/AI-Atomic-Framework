@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:4d490533373b47fde591347092e725f267214387c8818a4726a204ea44daf86b"
+      "digest": "sha256:a9ad9e3381b331896628950786ab83c02af3c1f8b97754e3beda804f859351f0"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:fe0d08055bdc3e25f3afeff94d3e1c93ae4ceac03b3af2272b899e770f6be2ae"
+      "digest": "sha256:44b4bda87458cdc940c5c0f79d0d6cf452fdbbc2de95d3563747628b5587a3c0"
     }
   ],
   "totals": {
-    "freshCommandRows": 30,
+    "freshCommandRows": 29,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 18,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 19,
     "objectiveAlignedNegativeControlRowsConsumed": 6,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
-    "remainingUncoveredRows": 17,
-    "sourceRowsMutatedByThisReport": 18
+    "remainingUncoveredRows": 16,
+    "sourceRowsMutatedByThisReport": 19
   },
   "commandReceipts": [
     {
@@ -209,6 +209,20 @@
         "\"status\": \"not-complete\"",
         "next-safe-command-present"
       ]
+    },
+    {
+      "id": "plan32-dashboard-consumption",
+      "command": "node --strip-types scripts/validate-plan32-dashboard-consumption.ts --json",
+      "exitCode": 0,
+      "verdict": "dashboard-consumes-plan32-replay",
+      "rowsCovered": [
+        "P32-OBJ-27"
+      ],
+      "stdoutAnchors": [
+        "atm.plan32DashboardConsumptionValidation.v1",
+        "\"wholeDashboardReady\": false",
+        "sha256:3ef96ec583ebcae01041afd04f85ea2b0801abe845f1956a2e74ff3d61a662cb"
+      ]
     }
   ],
   "positiveRows": [
@@ -315,6 +329,12 @@
       "sourceReplayAction": "recomputed row status because the current blocker fixture proves blocker code, next safe command, and non-terminal status are machine-readable"
     },
     {
+      "objectiveId": "P32-OBJ-27",
+      "title": "Dashboard can consume Plan 3.2 replay later",
+      "receiptIds": ["plan32-dashboard-consumption"],
+      "sourceReplayAction": "recomputed row status because the current dashboard validator proves Plan 3.2 replay rows and status counts are consumed through the dashboard engine while the whole dashboard remains not-ready"
+    },
+    {
       "objectiveId": "P32-OBJ-22",
       "title": "Missing rows cannot pass",
       "receiptIds": ["atm3-final-closure-negative-controls"],
@@ -332,7 +352,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Eighteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Nineteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",
