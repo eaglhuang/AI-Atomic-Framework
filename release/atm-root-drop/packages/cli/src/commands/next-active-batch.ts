@@ -5,6 +5,8 @@ export interface NextBatchTaskRef {
   readonly workItemId: string;
 }
 
+export const preservesExplicitTaskClaim = (explicitTaskIds: readonly string[] | null | undefined): boolean => (explicitTaskIds?.length ?? 0) > 0;
+
 export interface ActiveBatchClaimDecisionTaskMissing {
   readonly kind: 'queue-head-missing';
   readonly batchId: string;

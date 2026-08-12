@@ -4,11 +4,6 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
-  assertRunnerSyncAdmission,
-  inspectRunnerSyncAdmission,
-  type RunnerSyncAdmissionReport
-} from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
-import {
   buildRunnerSyncReleaseCommand,
   buildRunnerSyncBuildObservation,
   buildRunnerSyncReceipt,
@@ -28,9 +23,11 @@ import {
   type RunnerSyncReceipt,
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
-import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
-import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
+import { scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
+import { resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
+import { isSealedBuildOutputPath } from './sealed-build-output-ownership.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
@@ -43,7 +40,6 @@ export {
   type RunnerIncrementalBuildPlan,
   type RunnerSyncReceipt
 } from './runner-sync-incremental-build.ts';
-
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const invokedAsCli = process.argv[1] !== undefined
   && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
@@ -114,25 +110,9 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     : process.env.AGENT_IDENTITY?.trim()
       ? 'AGENT_IDENTITY'
       : 'fallback';
+  const publicationTaskId = process.env.ATM_RUNNER_PUBLICATION_TASK?.trim() || null;
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
-
-  const admission = inspectRunnerSyncAdmission({
-    cwd: repoRoot,
-    stewardActorId: actorId,
-    sealedSourceSha
-  });
-  assertRunnerSyncAdmission(admission);
-  const currentTaskId = admission.queueHeadOwnership.waitingTasks[0] ?? null;
-  const currentTask = currentTaskId
-    ? getActiveTasks(repoRoot).find((entry) => entry.taskId === currentTaskId.toUpperCase())
-    : null;
-  const beforeBuildSnapshot = captureRunnerBuildOutputSnapshot({
-    cwd: repoRoot,
-    buildTarget,
-    currentTaskId,
-    currentTaskAllowedFiles: currentTask?.allowedFiles
-  });
 
   const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
   const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({
@@ -141,6 +121,13 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     buildInputsTreeHash
   }));
   if (cacheDecision.decision === 'cacheHitSkip') {
+    const publication = resolveSealedRunnerPublication({
+      cwd: repoRoot,
+      stewardActorId: actorId,
+      sealedSourceSha,
+      buildTarget,
+      publicationTaskId
+    });
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     const dominantPhaseSummary = summarizeDominantPhase(timings);
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
@@ -170,11 +157,11 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     }));
     const receiptRef = writeRunnerSyncReceipt({
       cwd: repoRoot,
-      admission,
+      admission: publication.admission,
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null, beforeBuildSnapshot }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: publication.currentTaskId, beforeBuildSnapshot: publication.beforeBuildSnapshot, includeDirtyPublicationMembers: true }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
@@ -185,7 +172,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       timings,
       dominantPhaseSummary
     });
-    releaseRunnerSyncSteward({ cwd: repoRoot, admission, receiptRef });
+    releaseRunnerSyncSteward({ cwd: repoRoot, admission: publication.admission, receiptRef });
     console.log(`[sealed-runner-build] cacheHitSkip ${buildTarget} from ${sealedSourceSha}`);
     return;
   }
@@ -216,7 +203,34 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     }
     runTimedInnerBuild(worktreeRoot, buildTarget, timings, buildDecision === 'incrementalBuild' ? incrementalPlan : null);
     tsBuildCache = persistTsBuildCache({ cwd: repoRoot, worktreeRoot, summary: tsBuildCache });
-    timePhase(timings, 'artifactSyncMs', () => syncGeneratedArtifacts(worktreeRoot, repoRoot, buildTarget, beforeBuildSnapshot.preexistingDirtyPaths));
+    // The detached worktree build is intentionally queue-free.  The queue is a
+    // publication mutex, not a build reservation: only acquire/revalidate it
+    // after the candidate is complete and immediately before root mutation.
+    const publication = resolveSealedRunnerPublication({
+      cwd: repoRoot,
+      stewardActorId: actorId,
+      sealedSourceSha,
+      buildTarget,
+      publicationTaskId
+    });
+    const artifactSync = timePhase(
+      timings,
+      'artifactSyncMs',
+      () => syncGeneratedArtifacts(
+        worktreeRoot,
+        repoRoot,
+        buildTarget,
+        publication.beforeBuildSnapshot.preexistingDirtyPaths.filter((entry) =>
+          !publication.takeoverPaths.includes(entry)
+          && !isSealedBuildOutputPath(entry, buildTarget),
+        ),
+      ),
+    );
+    if (artifactSync.preservedPaths.length > 0) {
+      throw new Error(
+        `Runner publication incomplete: preserved foreign generated outputs were not replaced by sealed build ${sealedSourceSha}: ${artifactSync.preservedPaths.join(', ')}`,
+      );
+    }
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeBuildMetadataToReleaseManifests({
       cwd: repoRoot,
@@ -228,7 +242,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       runtimeTelemetryRef: null,
       tsBuildCache,
       timings,
-      preservePaths: beforeBuildSnapshot.preexistingDirtyPaths
+      preservePaths: publication.beforeBuildSnapshot.preexistingDirtyPaths
     });
     const dominantPhaseSummary = summarizeDominantPhase(timings);
     const runtimeTelemetryRef = writeRunnerBuildRuntimeTelemetry({
@@ -246,11 +260,11 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     });
     const receiptRef = writeRunnerSyncReceipt({
       cwd: repoRoot,
-      admission,
+      admission: publication.admission,
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: admission.queueHeadOwnership.waitingTasks[0] ?? null, beforeBuildSnapshot }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: publication.currentTaskId, beforeBuildSnapshot: publication.beforeBuildSnapshot, includeDirtyPublicationMembers: true }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision,
@@ -261,7 +275,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       timings,
       dominantPhaseSummary
     });
-    releaseRunnerSyncSteward({ cwd: repoRoot, admission, receiptRef });
+    releaseRunnerSyncSteward({ cwd: repoRoot, admission: publication.admission, receiptRef });
     console.log(`[sealed-runner-build] ${buildDecision} ${buildTarget} from ${sealedSourceSha}`);
   } finally {
     // CRITICAL: unlink the node_modules junction BEFORE git worktree remove.
@@ -458,7 +472,7 @@ function releaseRunnerSyncSteward(input: {
 }
 
 export function shouldAutoReleaseRunnerSyncSteward(env: NodeJS.ProcessEnv = process.env): boolean {
-  return env.ATM_RUNNER_SYNC_AUTO_RELEASE === '1';
+  return env.ATM_RUNNER_SYNC_AUTO_RELEASE !== '0';
 }
 
 export function unlinkWorktreeNodeModulesLink(worktreeRoot: string): void {
@@ -499,7 +513,7 @@ function runInnerBuild(buildTarget: BuildTarget): void {
   }
 }
 
-export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget, preservePaths: readonly string[] = []): void {
+export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, buildTarget: BuildTarget, preservePaths: readonly string[] = []): { readonly preservedPaths: readonly string[] } {
   // Preserve only paths explicitly classified by the pre-build snapshot.
   // Admission decides whether that foreign WIP may coexist with this build;
   // synchronisation must never silently overwrite it. Unlisted generated
@@ -519,8 +533,8 @@ export function syncGeneratedArtifacts(sourceRoot: string, targetRoot: string, b
   if (buildTarget === 'full' || buildTarget === 'onefile') {
     syncDirectoryHashChanged(path.join(sourceRoot, 'release', 'atm-onefile'), path.join(targetRoot, 'release', 'atm-onefile'), { preserveRelativePaths: preservedUnder('release/atm-onefile') });
   }
+  return { preservedPaths: [...preservePaths].sort((left, right) => left.localeCompare(right)) };
 }
-
 
 export function hydratePackageDistFromCurrentRootDrop(input: { readonly cwd: string; readonly worktreeRoot: string; }): void {
   const currentRootDropPackages = path.join(input.cwd, 'release', 'atm-root-drop', 'packages');

@@ -11,12 +11,69 @@ import { CliError, relativePathFrom, resolveValue } from '../shared.ts';
 import { findActiveTaskQueue, writeTaskDirectionLock, type TaskDirectionLock } from '../task-direction.ts';
 import type { LaneSessionResolution } from '../lane-session/resolve.ts';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.ts';
-import { createClaimRecord } from './task-ledger-readers.ts';
+import { createClaimRecord, isClaimExpired } from './task-ledger-readers.ts';
 import { readLatestGitHeadReceiptTaskId } from '../git-head-evidence.ts';
 
 interface ClaimLifecyclePhase {
   readonly phase: string;
   readonly durationMs: number;
+}
+
+export type RenewalDirectionLockRecovery = Readonly<{
+  status: 'not-needed' | 'restored';
+  directionLock: TaskDirectionLock | null;
+}>;
+
+/**
+ * Restores only a released runtime direction lock that still belongs to a
+ * live renewal.  The caller has already verified actor/lane ownership; this
+ * boundary additionally refuses expired or non-active claims.
+ */
+export function restoreReleasedDirectionLockForRenewal(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly claim: TaskClaimRecord;
+  readonly taskDocument: Record<string, unknown>;
+  readonly nowIso: string;
+}): RenewalDirectionLockRecovery {
+  if (input.claim.state !== 'active' || isClaimExpired(input.claim, input.nowIso)) {
+    return { status: 'not-needed', directionLock: null };
+  }
+  const lockPath = path.join(input.cwd, '.atm', 'runtime', 'locks', `${input.taskId}.lock.json`);
+  if (!existsSync(lockPath)) return { status: 'not-needed', directionLock: null };
+  let outerLock: Record<string, unknown>;
+  try {
+    outerLock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+  } catch {
+    return { status: 'not-needed', directionLock: null };
+  }
+  if (outerLock.released !== true && outerLock.status !== 'released') {
+    return { status: 'not-needed', directionLock: null };
+  }
+  const priorDirectionLock = outerLock.taskDirectionLock;
+  if (!priorDirectionLock || typeof priorDirectionLock !== 'object' || Array.isArray(priorDirectionLock)) {
+    return { status: 'not-needed', directionLock: null };
+  }
+  const prior = priorDirectionLock as Record<string, unknown>;
+  const allowedFiles = Array.from(new Set([
+    ...input.claim.files,
+    ...(Array.isArray(prior.allowedFiles) ? prior.allowedFiles.filter((value): value is string => typeof value === 'string') : [])
+  ]));
+  const directionLock = writeTaskDirectionLock({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    actorId: input.actorId,
+    queue: findActiveTaskQueue(input.cwd, undefined, { taskId: input.taskId }),
+    allowedFiles,
+    planningReadOnlyPaths: Array.isArray(prior.planningReadOnlyPaths) ? prior.planningReadOnlyPaths.filter((value): value is string => typeof value === 'string') : [],
+    planningMirrorPaths: Array.isArray(prior.planningMirrorPaths) ? prior.planningMirrorPaths.filter((value): value is string => typeof value === 'string') : [],
+    allowPlanningMirror: prior.allowPlanningMirror === true,
+    prompt: input.taskId,
+    sessionId: typeof input.taskDocument.startedBySessionId === 'string' ? input.taskDocument.startedBySessionId : null
+  });
+  input.taskDocument.taskDirectionLock = directionLock;
+  return { status: 'restored', directionLock };
 }
 
 export async function completeTaskClaimWithWorkAdmission(input: {

@@ -2,6 +2,7 @@ import {
   advanceTaskQueueHead,
   createOrRefreshTaskQueue,
   findActiveTaskQueue,
+  readActiveTaskDirectionLocks,
   type TaskDirectionTask
 } from '../task-direction.ts';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
@@ -139,5 +140,36 @@ const unfinishedQueue = createOrRefreshTaskQueue({
 });
 const advancedToBlocked = advanceTaskQueueHead(unfinishedBlockedRepo, 'TASK-BLOCKED-0001', { batchId: unfinishedQueue.batchId });
 assert(advancedToBlocked?.currentIndex === 1, 'queue advance must not skip genuinely unfinished blocked tasks');
+
+const leaseRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-task-direction-lease-'));
+const leaseTaskId = 'TASK-LEASE-0001';
+mkdirSync(path.join(leaseRepo, '.atm', 'history', 'tasks'), { recursive: true });
+mkdirSync(path.join(leaseRepo, '.atm', 'runtime', 'locks'), { recursive: true });
+const liveLock = {
+  schemaId: 'atm.taskDirectionLock.v1', specVersion: '0.1.0', taskId: leaseTaskId,
+  batchId: null, scopeKey: null, queueId: null, queueIndex: null,
+  allowedFiles: ['src/shared.ts'], planningReadOnlyPaths: [], planningMirrorPaths: [],
+  allowPlanningMirror: false, promptHash: null, actorId: 'worker', sessionId: null,
+  laneSession: { laneSessionId: 'lane-live', status: 'active', source: 'minted', exportHint: 'fixture' },
+  createdAt: new Date().toISOString(), status: 'active'
+};
+writeFileSync(path.join(leaseRepo, '.atm', 'runtime', 'locks', `${leaseTaskId}.lock.json`), `${JSON.stringify({ taskDirectionLock: liveLock })}\n`);
+writeFileSync(path.join(leaseRepo, '.atm', 'history', 'tasks', `${leaseTaskId}.json`), `${JSON.stringify({
+  workItemId: leaseTaskId,
+  claim: { actorId: 'worker', leaseId: 'lease-stale', claimedAt: '2026-01-01T00:00:00.000Z', heartbeatAt: '2026-01-01T00:00:00.000Z', ttlSeconds: 1, files: ['src/shared.ts'], state: 'active', laneSession: liveLock.laneSession }
+})}\n`);
+assert(readActiveTaskDirectionLocks(leaseRepo).length === 0, 'expired claim locks must not be treated as active shared writers');
+writeFileSync(path.join(leaseRepo, '.atm', 'history', 'tasks', `${leaseTaskId}.json`), `${JSON.stringify({
+  workItemId: leaseTaskId,
+  claim: { actorId: 'worker', leaseId: 'lease-live', claimedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 3600, files: ['src/shared.ts'], state: 'active', laneSession: liveLock.laneSession }
+})}\n`);
+assert(readActiveTaskDirectionLocks(leaseRepo).length === 1, 'a live matching claim must retain its direction lock');
+writeFileSync(path.join(leaseRepo, '.atm', 'history', 'tasks', `${leaseTaskId}.json`), `${JSON.stringify({
+  workItemId: leaseTaskId,
+  taskDirectionLock: liveLock,
+  claim: { actorId: 'worker', leaseId: 'lease-live', claimedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 3600, files: ['src/shared.ts'], state: 'active', laneSession: liveLock.laneSession }
+})}\n`);
+writeFileSync(path.join(leaseRepo, '.atm', 'runtime', 'locks', `${leaseTaskId}.lock.json`), `${JSON.stringify({ schemaId: 'atm.governanceScopeLock', workItemId: leaseTaskId, status: 'released', released: true })}\n`);
+assert(readActiveTaskDirectionLocks(leaseRepo).length === 1, 'a live ledger direction lock must survive a replaced runtime projection');
 
 console.log('[task-direction-queue.test] ok');

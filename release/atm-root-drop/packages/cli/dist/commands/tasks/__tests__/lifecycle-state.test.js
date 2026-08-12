@@ -1,9 +1,10 @@
 import { evaluateTaskClaimAdmission, evaluateTaskDoneCloseAdmission, evaluateTaskPromotionAdmission, evaluateTaskResetAdmission } from '../lifecycle-state.js';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { writeTaskDirectionLock } from '../../task-direction.js';
 import { parseClaimRecord } from '../task-ledger-readers.js';
+import { restoreReleasedDirectionLockForRenewal } from '../claim-work-admission.js';
 function fail(message) {
     console.error(`[lifecycle-state.test] ${message}`);
     process.exitCode = 1;
@@ -148,4 +149,32 @@ writeTaskDirectionLock({
 });
 const sidecar = JSON.parse(readFileSync(path.join(repo, '.atm/runtime/task-direction-locks/TASK-LIFE.json'), 'utf8'));
 assert(sidecar.laneSession?.laneSessionId === laneSession.laneSessionId, 'direction lock must stamp lane session metadata');
+const releasedLockPath = path.join(repo, '.atm/runtime/locks/TASK-LIFE-RENEW.lock.json');
+mkdirSync(path.dirname(releasedLockPath), { recursive: true });
+writeFileSync(releasedLockPath, JSON.stringify({
+    status: 'released',
+    released: true,
+    taskDirectionLock: {
+        schemaId: 'atm.taskDirectionLock.v1',
+        taskId: 'TASK-LIFE-RENEW',
+        allowedFiles: ['packages/cli/src/commands/task-direction.ts'],
+        planningReadOnlyPaths: [],
+        planningMirrorPaths: [],
+        allowPlanningMirror: false
+    }
+}), 'utf8');
+const renewalClaim = parseClaimRecord({
+    actorId: 'captain', leaseId: 'lease-renew', claimedAt: '2026-08-11T00:00:00.000Z', heartbeatAt: '2026-08-11T00:00:00.000Z', ttlSeconds: 1800,
+    files: ['packages/cli/src/commands/task-direction.ts'], state: 'active', laneSession
+});
+assert(renewalClaim, 'renewal fixture claim must parse');
+if (!renewalClaim)
+    fail('renewal fixture claim must parse');
+const restored = restoreReleasedDirectionLockForRenewal({ cwd: repo, taskId: 'TASK-LIFE-RENEW', actorId: 'captain', claim: renewalClaim, taskDocument: {}, nowIso: '2026-08-11T00:10:00.000Z' });
+assert(restored.status === 'restored', 'a live matching renewal must restore an explicitly released direction lock');
+const restoredOuterLock = JSON.parse(readFileSync(releasedLockPath, 'utf8'));
+assert(restoredOuterLock.status === 'active' && restoredOuterLock.released !== true, 'restored lock must become active without retaining release state');
+writeFileSync(releasedLockPath, JSON.stringify({ status: 'released', released: true, taskDirectionLock: restoredOuterLock.taskDirectionLock }), 'utf8');
+const expiredRecovery = restoreReleasedDirectionLockForRenewal({ cwd: repo, taskId: 'TASK-LIFE-RENEW', actorId: 'captain', claim: renewalClaim, taskDocument: {}, nowIso: '2026-08-11T01:00:01.000Z' });
+assert(expiredRecovery.status === 'not-needed', 'an expired claim must not recreate a released direction lock');
 console.log('[lifecycle-state.test] ok');

@@ -269,8 +269,9 @@ try {
   assert(probe.hostWorkflow === 'file-publish', 'project probe must report file-publish host workflow');
 
   const guards = readJson(path.join(hostRepo, '.atm', 'runtime', 'default-guards.json'));
-  assert(Array.isArray(guards.guards) && guards.guards.length === 6, 'default guards must contain 6 starter guards');
+  assert(Array.isArray(guards.guards) && guards.guards.length === 7, 'default guards must contain 7 starter guards');
   assert(guards.guards.some((guard: any) => guard.id === 'protect-context-budget'), 'default guards must include protect-context-budget');
+  assert(guards.guards.some((guard: any) => guard.id === 'minimum-queue-residency'), 'default guards must include minimum-queue-residency');
   assert(guards.guards.some((guard: any) => guard.id === 'framework-work-tracking-stays-downstream'), 'default guards must include framework-work-tracking-stays-downstream');
   assert(guards.guards.some((guard: any) => guard.id === 'public-framework-docs-remain-english-only'), 'default guards must include public-framework-docs-remain-english-only');
 

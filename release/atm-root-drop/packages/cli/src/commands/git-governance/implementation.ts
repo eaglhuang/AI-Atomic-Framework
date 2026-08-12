@@ -6,5 +6,6 @@ export { resolveCommitLaneSessionId, runAtmGit } from './implementation/command-
 export { resolveTaskScopedCommitBundle } from './implementation/commit-bundle-resolution.ts';
 export { captureGitHeadEvidencePreparation, reconcileResolvedCrossTaskMutationIncident, rollbackFailedGitHeadEvidencePreparation } from './implementation/git-head-evidence-transaction.ts';
 export { listTaskOwnedProtectedOverrideAuditFiles } from './implementation/git-index-transaction.ts';
+export { inspectGitIndexLock, recoverGitIndexLock } from './implementation/git-index-lock-recovery.ts';
 export { resolveGitExecutable } from './implementation/git-process-port.ts';
 export { evaluateGitGovernanceCheck, resolveActorGitIdentityForCommit } from './implementation/identity-check-command.ts';

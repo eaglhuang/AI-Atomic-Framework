@@ -1,5 +1,4 @@
 import { reconcileResolvedCrossTaskMutationIncident } from './git-head-evidence-transaction.ts';
-import { execFileSync } from "node:child_process";
 
 import {
   appendFileSync,
@@ -49,7 +48,8 @@ import { laneSessionIdFromRecord } from './command-router.ts';
 
 import { inspectCloseCommitWindowStagedArtifacts } from './git-index-transaction.ts';
 
-import { createSanitizedGitEnv, inspectStdinPathspecGitAddProcesses, readGitCommitAttemptStatus } from './git-process-port.ts';
+import { inspectStdinPathspecGitAddProcesses, readGitCommitAttemptStatus } from './git-process-port.ts';
+import { readGitConfig, writeGitConfig } from './git-config-port.ts';
 
 import { readHeadCommitMessage } from './push-command.ts';
 
@@ -259,6 +259,15 @@ export function runGitPrepare(options: LegacyValue) {
       "ATM_GIT_PREPARE_IDENTITY_MISSING",
       "git prepare requires git name/email from actor registry, repo default identity, or explicit --name/--email.",
       { exitCode: 2, details: { actorId } },
+    );
+  }
+  writeGitConfig(options.cwd, "user.name", nextName);
+  writeGitConfig(options.cwd, "user.email", nextEmail);
+  if (readGitConfig(options.cwd, "user.name") !== nextName || readGitConfig(options.cwd, "user.email") !== nextEmail) {
+    throw new CliError(
+      "ATM_GIT_PREPARE_IDENTITY_WRITE_FAILED",
+      "git prepare could not verify the local Git identity after writing it.",
+      { exitCode: 1, details: { actorId, gitName: nextName, gitEmail: nextEmail } },
     );
   }
   const identityPath =
@@ -547,28 +556,7 @@ export function resolveGitGovernanceSession(cwd: LegacyValue, input: LegacyValue
   });
 }
 
-export function readGitConfig(cwd: LegacyValue, key: LegacyValue) {
-  try {
-    const value = execFileSync("git", ["config", "--local", "--get", key], {
-      cwd,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-      env: createSanitizedGitEnv(),
-    }).trim();
-    return value || null;
-  } catch {
-    return null;
-  }
-}
-
-export function writeGitConfig(cwd: LegacyValue, key: LegacyValue, value: LegacyValue) {
-  execFileSync("git", ["config", "--local", key, value], {
-    cwd,
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-    env: createSanitizedGitEnv(),
-  });
-}
+export { readGitConfig, writeGitConfig } from './git-config-port.ts';
 
 export function parseTrailers(commitMessage: LegacyValue) {
   if (!commitMessage) {

@@ -266,21 +266,14 @@ export function runRequiredFrameworkValidators(cwd: string, requiredGates: reado
   return commands.map((command) => runShellCommandForReport(cwd, command));
 }
 
-export function triageForeignTaskflowValidatorRuns(input: {
+export function triageForeignValidatorRuns(input: {
   cwd: string;
   stagedFiles: readonly string[];
   activeDirectionLocks: ReturnType<typeof readActiveTaskDirectionLocks>;
+  committingTaskId?: string | null;
   failedRuns: readonly CommandRunReport[];
 }): ValidatorRunTriage {
-  const taskflowPath = 'packages/cli/src/commands/taskflow.ts';
   if (input.failedRuns.length === 0) {
-    return { blockingRuns: input.failedRuns, advisoryFindings: [] };
-  }
-  if (input.stagedFiles.includes(taskflowPath)) {
-    return { blockingRuns: input.failedRuns, advisoryFindings: [] };
-  }
-  const owningLocks = input.activeDirectionLocks.filter((lock) => isPathAllowedByTaskDirection(taskflowPath, lock.allowedFiles));
-  if (owningLocks.length === 0) {
     return { blockingRuns: input.failedRuns, advisoryFindings: [] };
   }
 
@@ -288,23 +281,25 @@ export function triageForeignTaskflowValidatorRuns(input: {
   const advisoryFindings: PreCommitAdvisoryFinding[] = [];
   for (const run of input.failedRuns) {
     const preview = `${run.stdoutPreview}\n${run.stderrPreview}`;
-    const mentionsForeignTaskflow = preview.includes(taskflowPath)
-      || preview.includes('buildTaskflowCloseWriteReadinessHint')
-      || preview.includes('Identifier \'buildTaskflowCloseWriteReadinessHint\' has already been declared')
-      || preview.includes('Cannot find name \'Taskflow')
-      || preview.includes('Cannot find name \'buildHistoricalClosePreflight\'');
+    const foreignSurface = findForeignInFlightCommandSurface({
+      preview,
+      stagedFiles: input.stagedFiles,
+      activeDirectionLocks: input.activeDirectionLocks,
+      committingTaskId: input.committingTaskId
+    });
     const isFrameworkSurface = run.command === 'npm run typecheck' || run.command === 'npm run validate:cli';
-    if (isFrameworkSurface && mentionsForeignTaskflow) {
+    if (isFrameworkSurface && foreignSurface) {
       advisoryFindings.push({
-        code: 'ATM_HOOK_FOREIGN_TASKFLOW_WIP_ADVISORY',
+        code: 'ATM_HOOK_FOREIGN_COMMAND_SURFACE_WIP_ADVISORY',
         source: 'framework-validator',
-        detail: `${run.command} failed against foreign in-flight taskflow.ts source owned by active direction lock(s): ${owningLocks.map((lock) => lock.taskId).join(', ')}. This commit does not stage taskflow.ts, so the failure is advisory for this lane.`,
+        detail: `${run.command} failed against foreign in-flight ${foreignSurface.commandName} command surface owned by active direction lock(s): ${foreignSurface.owningLocks.map((lock) => lock.taskId).join(', ')}. This commit does not stage that surface, so the failure is advisory for this lane.`,
         scope: 'tree-wide',
         classification: 'tree-wide-advisory',
         data: {
           command: run.command,
-          foreignTaskflowPath: taskflowPath,
-          owningTaskIds: owningLocks.map((lock) => lock.taskId),
+          foreignCommand: foreignSurface.commandName,
+          foreignSurfacePaths: foreignSurface.surfacePaths,
+          owningTaskIds: foreignSurface.owningLocks.map((lock) => lock.taskId),
           stdoutSha256: run.stdoutSha256,
           stderrSha256: run.stderrSha256
         }
@@ -314,6 +309,40 @@ export function triageForeignTaskflowValidatorRuns(input: {
     blockingRuns.push(run);
   }
   return { blockingRuns, advisoryFindings };
+}
+
+// Compatibility export for callers that adopted the original narrow name.
+export const triageForeignTaskflowValidatorRuns = triageForeignValidatorRuns;
+
+function findForeignInFlightCommandSurface(input: {
+  preview: string;
+  stagedFiles: readonly string[];
+  activeDirectionLocks: ReturnType<typeof readActiveTaskDirectionLocks>;
+  committingTaskId?: string | null;
+}): { readonly commandName: string; readonly surfacePaths: readonly string[]; readonly owningLocks: readonly ReturnType<typeof readActiveTaskDirectionLocks>[number][] } | null {
+  const taskflowPath = 'packages/cli/src/commands/taskflow.ts';
+  const taskflowFailure = input.preview.includes(taskflowPath)
+    || input.preview.includes('buildTaskflowCloseWriteReadinessHint')
+    || input.preview.includes('Identifier \'buildTaskflowCloseWriteReadinessHint\' has already been declared')
+    || input.preview.includes('Cannot find name \'Taskflow')
+    || input.preview.includes('Cannot find name \'buildHistoricalClosePreflight\'');
+  const helpSnapshotMatch = input.preview.match(/^([a-z0-9][a-z0-9-]*) --help usage snapshot must match fixture$/im);
+  const commandName = taskflowFailure ? 'taskflow' : helpSnapshotMatch?.[1] ?? null;
+  if (!commandName) return null;
+
+  const surfacePaths = commandName === 'taskflow'
+    ? [taskflowPath]
+    : [
+      `packages/cli/src/commands/${commandName}.ts`,
+      `packages/cli/src/commands/${commandName}/`,
+      `packages/cli/src/commands/command-specs/${commandName}.spec.ts`
+    ];
+  if (input.stagedFiles.some((file) => surfacePaths.some((surface) => file === surface || file.startsWith(surface)))) return null;
+  const committingTaskId = input.committingTaskId?.trim().toUpperCase();
+  const owningLocks = input.activeDirectionLocks.filter((lock) => lock.taskId !== committingTaskId && surfacePaths.some((surface) =>
+    lock.allowedFiles.some((allowed) => allowed === surface || allowed.startsWith(surface) || isPathAllowedByTaskDirection(surface, lock.allowedFiles))
+  ));
+  return owningLocks.length > 0 ? { commandName, surfacePaths, owningLocks } : null;
 }
 
 export function runCommandForReport(cwd: string, command: string, args: readonly string[]): CommandRunReport {

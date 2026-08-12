@@ -88,7 +88,7 @@ const defaultIgnoredDirs = new Set(['.git', 'node_modules', 'dist', 'build', 're
 const markdownCompletionPatterns = [/^\s*status:\s*\*\*(?:all\s+)?completed\*\*\s*$/im, /^\s*ALL\s+COMPLETED\s*$/m, /^\s*(?:progress|status|completion):\s*16\s*\/\s*16\s*$/im, /^\s*(?:progress|status|completion):\s*100%\s*\(?\s*completed\s*\)?\s*$/im];
 const markdownCompletionReportNamePatterns = [/(?:^|[-_.])closeout[-_.]?report\.md$/i, /(?:^|[-_.])completion[-_.]?report\.md$/i];
 export function runFrameworkMode(argv) { const options = parseFrameworkModeArgs(argv); if (options.action === 'claim') {
-    return runFrameworkTempClaim(options.cwd, options.actor, options.files, options.reason, undefined, options.laneSessionId);
+    return runFrameworkTempClaim(options.cwd, options.actor, options.files, options.reason, options.taskId, options.laneSessionId);
 } if (options.action === 'release') {
     return runFrameworkTempRelease(options.cwd, options.actor, options.laneSessionId);
 } const report = createFrameworkModeStatus({ cwd: options.cwd, files: options.files, targetRepo: options.targetRepo }); return makeResult({ ok: true, command: 'framework-mode', cwd: options.cwd, messages: [message('info', 'ATM_FRAMEWORK_MODE_STATUS', `Framework development mode is ${report.mode}.`, { mode: report.mode, repoRole: report.repoRole, criticalChangedFileCount: report.criticalChangedFiles.length, closureAuthority: report.closureAuthority })], evidence: { action: options.action, report } }); }
@@ -96,7 +96,7 @@ export async function runFrameworkTempClaim(cwd, actor, files, reason, linkedTas
     throw new CliError('ATM_ACTOR_ID_MISSING', 'framework-mode claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
 } const scopedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean)); if (scopedFiles.length === 0) {
     throw new CliError('ATM_CLI_USAGE', 'framework-mode claim requires --files <csv> for the intended framework edit scope.', { exitCode: 2 });
-} const root = path.resolve(cwd); assertFrameworkGitWorktreeReady(root); const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, linkedTaskId); const currentLaneSessionId = resolveFrameworkLaneSessionId(laneSessionId); const staleLock = classifyFrameworkStaleLock(root, actorId, { currentTaskId, laneSessionId: currentLaneSessionId }); if (staleLock) {
+} const root = path.resolve(cwd); assertFrameworkGitWorktreeReady(root); const currentLaneSessionId = resolveFrameworkLaneSessionId(laneSessionId); const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, linkedTaskId, currentLaneSessionId); const staleLock = classifyFrameworkStaleLock(root, actorId, { currentTaskId, laneSessionId: currentLaneSessionId }); if (staleLock) {
     if (canAutoReconcileCompletedSelfTempLock(staleLock, actorId)) {
         return await runFrameworkTempClaimWithAutoReconcile({ root, actorId, scopedFiles, reason, currentTaskId, staleLock, laneSessionId: currentLaneSessionId });
     }
@@ -146,7 +146,14 @@ export async function runFrameworkTempRelease(cwd, actor, laneSessionId) { const
 export function buildFrameworkTempClaimCommand(files = [], reason = null, actorId = null, laneSessionId = null) { const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean)); const filesValue = normalizedFiles.length > 0 ? normalizedFiles.join(',') : '<files>'; const reasonValue = reason?.trim() || 'temporary framework maintenance'; const actorValue = actorId?.trim() || '<id>'; const laneValue = normalizeOptionalString(laneSessionId); const laneFlag = laneValue ? ` --lane-session ${quoteCliValue(laneValue)}` : ''; return `node atm.mjs framework-mode claim --actor ${actorValue === '<id>' ? actorValue : quoteCliValue(actorValue)}${laneFlag} --files ${quoteCliValue(filesValue)} --reason ${quoteCliValue(reasonValue)} --json`; }
 export function classifyFrameworkStaleLock(cwd, actorId, options = {}) { const root = path.resolve(cwd); const laneSessionId = resolveFrameworkLaneSessionId(options.laneSessionId); const lockId = frameworkTempTaskId(actorId, laneSessionId); const lockPath = path.join(root, '.atm', 'runtime', 'locks', `${lockId}.lock.json`); const document = readJsonIfExists(lockPath); if (!document)
     return null; if (document.released === true)
-    return null; const lockedAt = normalizeOptionalString(document.lockedAt ?? null); const explicitLinkedTaskId = normalizeOptionalString(document.linkedTaskId ?? null); const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, options.currentTaskId ?? null); const releaseCommand = buildFrameworkStaleReleaseCommand(actorId, laneSessionId); const lockActorId = normalizeOptionalString(document.actorId ?? document.lockedBy); const lockWorkItemId = normalizeOptionalString(document.workItemId ?? null); if (!explicitLinkedTaskId && !currentTaskId && lockActorId === actorId && lockWorkItemId === lockId && isRuntimeLockActive(lockPath)) {
+    return null; const lockedAt = normalizeOptionalString(document.lockedAt ?? null); const explicitLinkedTaskId = normalizeOptionalString(document.linkedTaskId ?? null); const currentTaskId = (() => { try {
+    return resolveCurrentFrameworkTaskId(root, actorId, options.currentTaskId ?? null, laneSessionId);
+}
+catch (error) {
+    if (error instanceof CliError && error.code === 'ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_AMBIGUOUS' && !normalizeOptionalString(options.currentTaskId))
+        return null;
+    throw error;
+} })(); const releaseCommand = buildFrameworkStaleReleaseCommand(actorId, laneSessionId); const lockActorId = normalizeOptionalString(document.actorId ?? document.lockedBy); const lockWorkItemId = normalizeOptionalString(document.workItemId ?? null); if (!explicitLinkedTaskId && !currentTaskId && lockActorId === actorId && lockWorkItemId === lockId && isRuntimeLockActive(lockPath)) {
     return null;
 } const linkedTaskId = explicitLinkedTaskId ?? inferLinkedTaskIdFromActorSessions(root, actorId, lockedAt); const documentLaneSessionId = normalizeOptionalString(document.laneSessionId ?? null) ?? laneSessionId; const base = { lockTaskId: lockId, lockPath: relativePathFrom(root, lockPath), actorId, laneSessionId: documentLaneSessionId, lockedAt, linkedTaskId, currentTaskId }; if (linkedTaskId && currentTaskId && linkedTaskId === currentTaskId) {
     return null;
@@ -172,7 +179,7 @@ export function isFrameworkStaleLockReleasable(staleLock) { return staleLock.kin
 function writeFrameworkLockAutoReconcileEvidence(root, input) { const auditPath = path.join(root, '.atm', 'runtime', 'framework-lock-auto-reconcile.jsonl'); const record = { schemaId: 'atm.frameworkLockAutoReconcile.v1', ...input, auditPath: relativePathFrom(root, auditPath) }; mkdirSync(path.dirname(auditPath), { recursive: true }); appendFileSync(auditPath, `${JSON.stringify(record)}\n`, 'utf8'); return record; }
 export function runFrameworkDevelopmentGuard(cwd, files = [], targetRepo = null) { const report = createFrameworkModeStatus({ cwd, files, targetRepo }); const ok = report.blockers.length === 0; return makeResult({ ok, command: 'guard', cwd, messages: [ok ? message('info', 'ATM_GUARD_FRAMEWORK_DEVELOPMENT_OK', 'Framework development guard passed.', { mode: report.mode, criticalChangedFileCount: report.criticalChangedFiles.length }) : message('error', 'ATM_GUARD_FRAMEWORK_DEVELOPMENT_FAILED', 'Framework development guard found blocking issues.', { mode: report.mode, blockers: report.blockers })], evidence: { guard: 'framework-development', report, ...(report.staleLocks.length > 0 ? { staleLocks: report.staleLocks } : {}) } }); }
 export function runFrameworkDevelopmentValidation(cwd, files = [], targetRepo = null) { const report = createFrameworkModeStatus({ cwd, files, targetRepo }); const taskAudit = auditTasks(cwd); const ok = report.blockers.length === 0 && taskAudit.ok; return makeResult({ ok, command: 'validate', cwd, messages: [ok ? message('info', 'ATM_VALIDATE_FRAMEWORK_DEVELOPMENT_OK', 'Framework development validation passed.', { mode: report.mode, criticalChangedFileCount: report.criticalChangedFiles.length }) : message('error', 'ATM_VALIDATE_FRAMEWORK_DEVELOPMENT_FAILED', 'Framework development validation failed.', { mode: report.mode, blockers: report.blockers, taskAuditFindings: taskAudit.findings.length })], evidence: { validation: 'framework-development', report, taskAudit } }); }
-export function createFrameworkModeStatus(input) { const cwd = path.resolve(input.cwd); const generatedAt = new Date().toISOString(); const repoIdentity = detectFrameworkRepoIdentity(cwd); const gitWorktreeReadiness = inspectGitWorktreeReadiness(cwd); const declaredFiles = (input.files ?? []).map((entry) => normalizeRelativePath(entry)).filter(Boolean); const changedFiles = declaredFiles.length > 0 ? uniqueSorted(declaredFiles) : readChangedFiles(cwd); const adopterInfrastructureSyncOnly = !repoIdentity.isFrameworkRepo && isAdopterInfrastructureSyncCommit(changedFiles); const inferredTarget = input.targetRepo || adopterInfrastructureSyncOnly ? null : inferFrameworkTargetRepoFromTasks(cwd); const targetRepo = input.targetRepo ? resolveTargetRepoReference(cwd, input.targetRepo) : inferredTarget?.targetRepo ?? null; const targetRepoIdentity = targetRepo ? detectFrameworkRepoIdentity(targetRepo) : null; const taskLedger = readTaskLedgerPolicy(cwd); const criticalChangedFiles = repoIdentity.isFrameworkRepo ? changedFiles.filter(isAtmCriticalNonDocSurface) : []; const docsOnlyChangedFiles = repoIdentity.isFrameworkRepo ? changedFiles.filter((entry) => !isAtmCriticalNonDocSurface(entry)) : []; const activeLocks = readActiveLockPaths(cwd); const staleLocks = classifyCurrentFrameworkStaleLocks(cwd); const pinnedRunner = inspectPinnedRunner(cwd); const requiredGates = buildRequiredGates(criticalChangedFiles); let mode = 'inactive'; let closureAuthority = 'none'; const blockers = []; const warnings = []; if (adopterInfrastructureSyncOnly) {
+export function createFrameworkModeStatus(input) { const cwd = path.resolve(input.cwd); const generatedAt = new Date().toISOString(); const repoIdentity = detectFrameworkRepoIdentity(cwd); const gitWorktreeReadiness = inspectGitWorktreeReadiness(cwd); const declaredFiles = (input.files ?? []).map((entry) => normalizeRelativePath(entry)).filter(Boolean); const changedFiles = declaredFiles.length > 0 ? uniqueSorted(declaredFiles) : readChangedFiles(cwd); const adopterInfrastructureSyncOnly = !repoIdentity.isFrameworkRepo && isAdopterInfrastructureSyncCommit(changedFiles); const inferredTarget = input.targetRepo || adopterInfrastructureSyncOnly ? null : inferFrameworkTargetRepoFromTasks(cwd); const targetRepo = input.targetRepo ? resolveTargetRepoReference(cwd, input.targetRepo) : inferredTarget?.targetRepo ?? null; const targetRepoIdentity = targetRepo ? detectFrameworkRepoIdentity(targetRepo) : null; const taskLedger = readTaskLedgerPolicy(cwd); const criticalChangedFiles = repoIdentity.isFrameworkRepo ? changedFiles.filter(isAtmCriticalNonDocSurface) : []; const docsOnlyChangedFiles = repoIdentity.isFrameworkRepo ? changedFiles.filter((entry) => !isAtmCriticalNonDocSurface(entry)) : []; const activeLocks = readActiveLockPaths(cwd, input.taskId ?? null); const staleLocks = classifyCurrentFrameworkStaleLocks(cwd, { taskId: input.taskId ?? null, actorId: input.actorId ?? null }); const pinnedRunner = inspectPinnedRunner(cwd); const requiredGates = buildRequiredGates(criticalChangedFiles); let mode = 'inactive'; let closureAuthority = 'none'; const blockers = []; const warnings = []; if (adopterInfrastructureSyncOnly) {
     mode = 'inactive';
     closureAuthority = 'none';
     warnings.push('adopter-infrastructure-sync');
@@ -746,7 +753,7 @@ export function requireTargetRepoClosureAuthority(input) { if (input.status !== 
     return null; const closureAuthority = normalizeClosureAuthority(input.taskDocument.closure_authority ?? input.taskDocument.closureAuthority); const targetRepo = normalizeOptionalString(input.taskDocument.target_repo ?? input.taskDocument.targetRepo ?? input.taskDocument.upstream_repo ?? input.taskDocument.upstreamRepo); if (closureAuthority !== 'target_repo' || !targetRepo)
     return null; if (matchesCurrentRepoIdentity(input.cwd, targetRepo))
     return null; throw new CliError('ATM_TASK_CLOSE_TARGET_REPO_REQUIRED', `Task ${input.taskId} must be closed by its target repo, not the planning repo.`, { details: { taskId: input.taskId, targetRepo, closureAuthority } }); }
-function parseFrameworkModeArgs(argv) { const state = { cwd: process.cwd(), action: null, files: [], targetRepo: null, actor: null, reason: null, laneSessionId: null }; for (let index = 0; index < argv.length; index += 1) {
+function parseFrameworkModeArgs(argv) { const state = { cwd: process.cwd(), action: null, files: [], targetRepo: null, actor: null, taskId: null, reason: null, laneSessionId: null }; for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--cwd' || arg === '--repo') {
         state.cwd = requireValue(argv, index, arg);
@@ -765,6 +772,11 @@ function parseFrameworkModeArgs(argv) { const state = { cwd: process.cwd(), acti
     }
     if (arg === '--actor') {
         state.actor = requireValue(argv, index, '--actor');
+        index += 1;
+        continue;
+    }
+    if (arg === '--task') {
+        state.taskId = requireValue(argv, index, '--task');
         index += 1;
         continue;
     }
@@ -793,12 +805,12 @@ function parseFrameworkModeArgs(argv) { const state = { cwd: process.cwd(), acti
     state.action = arg;
 } if (!state.action) {
     throw new CliError('ATM_CLI_USAGE', 'framework-mode requires an action: status | claim | release.', { exitCode: 2 });
-} return { cwd: path.resolve(state.cwd), action: state.action, files: state.files, targetRepo: state.targetRepo, actor: state.actor, reason: state.reason, laneSessionId: state.laneSessionId }; }
+} return { cwd: path.resolve(state.cwd), action: state.action, files: state.files, targetRepo: state.targetRepo, actor: state.actor, taskId: state.taskId, reason: state.reason, laneSessionId: state.laneSessionId }; }
 function readChangedFiles(cwd) { const changed = [...runGitLines(cwd, ['diff', '--name-only']), ...runGitLines(cwd, ['diff', '--cached', '--name-only']), ...runGitLines(cwd, ['ls-files', '--others', '--exclude-standard'])]; return uniqueSorted(changed.map(normalizeRelativePath).filter(Boolean)); }
 function runGitLines(cwd, args) { const result = spawnSync('git', args, { cwd, encoding: 'utf8' }); if (result.error || result.status !== 0)
     return []; return String(result.stdout || '').split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean); }
-function readActiveLockPaths(cwd) { const lockDir = path.join(cwd, '.atm', 'runtime', 'locks'); if (!existsSync(lockDir))
-    return []; return readdirSync(lockDir).filter((entry) => entry.endsWith('.lock.json')).filter((entry) => isRuntimeLockActive(path.join(lockDir, entry))).map((entry) => normalizeRelativePath(path.join('.atm', 'runtime', 'locks', entry))).sort((left, right) => left.localeCompare(right)); }
+function readActiveLockPaths(cwd, taskId = null) { const lockDir = path.join(cwd, '.atm', 'runtime', 'locks'); if (!existsSync(lockDir))
+    return []; return readdirSync(lockDir).filter((entry) => entry.endsWith('.lock.json')).filter((entry) => !taskId || entry === `${taskId}.lock.json`).filter((entry) => isRuntimeLockActive(path.join(lockDir, entry))).map((entry) => normalizeRelativePath(path.join('.atm', 'runtime', 'locks', entry))).sort((left, right) => left.localeCompare(right)); }
 function isRuntimeLockActive(lockPath) { const document = readJsonIfExists(lockPath); if (!document)
     return false; if (document.released === true)
     return false; const status = normalizeOptionalString(document.status)?.toLowerCase(); if (status && status !== 'active')
@@ -891,7 +903,7 @@ function isPlanningOnlyAuthorityTask(root, document) { const explicitPlanningOnl
     return true; const closureAuthorityRaw = String(document.closure_authority ?? document.closureAuthority ?? '').trim().toLowerCase().replace(/-/g, '_'); if (closureAuthorityRaw === 'planning_repo')
     return true; const targetRepo = normalizeOptionalString(document.target_repo ?? document.targetRepo ?? document.upstream_repo ?? document.upstreamRepo); const planningRepo = normalizeOptionalString(document.planning_repo ?? document.planningRepo); return Boolean(planningRepo && targetRepo && !matchesCurrentRepoIdentity(root, targetRepo) && closureAuthorityRaw !== 'target_repo'); }
 function normalizeStatus(value) { return String(value ?? '').trim().toLowerCase().replace(/-/g, '_'); }
-function classifyCurrentFrameworkStaleLocks(cwd) { const root = path.resolve(cwd); const locks = readActiveTaskDirectionLocks(root); const seenActors = new Set(); const output = []; for (const lock of locks) {
+function classifyCurrentFrameworkStaleLocks(cwd, context = {}) { const root = path.resolve(cwd); const taskId = normalizeOptionalString(context.taskId); const actorId = normalizeOptionalString(context.actorId); const locks = readActiveTaskDirectionLocks(root).filter((lock) => (!taskId || lock.taskId === taskId) && (!actorId || lock.actorId === actorId)); const seenActors = new Set(); const output = []; for (const lock of locks) {
     if (seenActors.has(lock.actorId))
         continue;
     seenActors.add(lock.actorId);
@@ -899,8 +911,14 @@ function classifyCurrentFrameworkStaleLocks(cwd) { const root = path.resolve(cwd
     if (stale)
         output.push(stale);
 } return output; }
-function resolveCurrentFrameworkTaskId(cwd, actorId, explicitTaskId) { const explicit = normalizeOptionalString(explicitTaskId); if (explicit)
-    return explicit; const actorKey = actorId.toLowerCase(); const locks = readActiveTaskDirectionLocks(cwd).filter((lock) => lock.actorId.toLowerCase() === actorKey).sort((left, right) => right.createdAt.localeCompare(left.createdAt)); return locks[0]?.taskId ?? null; }
+function resolveCurrentFrameworkTaskId(cwd, actorId, explicitTaskId, laneSessionId) { const explicit = normalizeOptionalString(explicitTaskId); const actorKey = actorId.toLowerCase(); const lane = normalizeOptionalString(laneSessionId); const actorLocks = readActiveTaskDirectionLocks(cwd).filter((lock) => lock.actorId.toLowerCase() === actorKey); const candidateLocks = lane ? actorLocks.filter((lock) => lock.laneSession?.laneSessionId === lane) : actorLocks; if (explicit) {
+    const matchingLock = candidateLocks.find((lock) => lock.taskId === explicit);
+    if (matchingLock)
+        return matchingLock.taskId;
+    throw new CliError('ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_INVALID', 'Framework temporary claim cannot bind ' + explicit + ': no active direction lock proves actor ' + actorId + (lane ? ' owns it in lane ' + lane : ' owns it') + '.', { exitCode: 1, details: { actorId, taskId: explicit, laneSessionId: lane, candidateTaskIds: candidateLocks.map((lock) => lock.taskId) } });
+} if (candidateLocks.length === 1)
+    return candidateLocks[0]?.taskId ?? null; if (candidateLocks.length === 0)
+    return null; throw new CliError('ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_AMBIGUOUS', 'Framework temporary claim found multiple active task directions for actor ' + actorId + (lane ? ' in lane ' + lane : '') + '; pass --task with one proved active task instead of choosing by recency.', { exitCode: 1, details: { actorId, laneSessionId: lane, candidateTaskIds: candidateLocks.map((lock) => lock.taskId).sort() } }); }
 function inferLinkedTaskIdFromActorSessions(cwd, actorId, lockedAt) { const actorKey = actorId.toLowerCase(); const lockedAtMs = lockedAt ? Date.parse(lockedAt) : Number.NaN; const sessions = listActorWorkSessions(cwd).filter((session) => session.actorId.toLowerCase() === actorKey).filter((session) => { if (!Number.isFinite(lockedAtMs))
     return true; const createdMs = Date.parse(session.createdAt); return Number.isFinite(createdMs) && createdMs <= lockedAtMs; }).sort((left, right) => { const leftTime = Date.parse(left.updatedAt ?? left.createdAt); const rightTime = Date.parse(right.updatedAt ?? right.createdAt); return rightTime - leftTime; }); return sessions[0]?.taskId ?? null; }
 function readTaskStatusFromLedger(cwd, taskId) { const taskLedger = readTaskLedgerPolicy(cwd); const taskPath = path.join(cwd, taskLedger.taskRoot, `${taskId}.json`); const document = readJsonIfExists(taskPath); if (!document)

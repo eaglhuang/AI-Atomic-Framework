@@ -10,6 +10,8 @@ export * from './mutation-lineage.js';
 export * from './obligation-inventory.js';
 export * from './quality-gauntlet.js';
 export * from './realness.js';
+export * from './observed-source.js';
+export * from './observed-source-adapters.js';
 export * from './tdd-cycle.js';
 export * from './validation-receipt.js';
 export * from './validator-catalog-selection.js';

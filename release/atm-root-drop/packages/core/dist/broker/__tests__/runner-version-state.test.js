@@ -1,7 +1,7 @@
 // TASK-MAO-0017: tests for the runner version stream state machine.
 import assert from 'node:assert/strict';
 import { createRunnerVersionStream, transitionRunnerVersion, acquireRunnerVersionLease } from '../runner-version-state.js';
-import { classifyRunnerAffectingPaths, isRunnerGeneratedOutputPath } from '../runner-version-contract.js';
+import { classifyRunnerAffectingPaths, filterRunnerInputTreeListing, isRunnerGeneratedOutputPath } from '../runner-version-contract.js';
 function testInitialStateIsInDev() {
     const s = createRunnerVersionStream('runner-v0.x');
     assert.equal(s.state, 'in-dev');
@@ -48,6 +48,7 @@ function testGeneratedRunnerOutputsDoNotInvalidateTheirOwnSeal() {
     ]);
     assert.deepEqual(classification.runnerAffecting, ['packages/cli/src/commands/taskflow/implementation.ts']);
     assert.deepEqual(classification.nonRunnerAffecting, ['packages/cli/dist/commands/taskflow/implementation.js']);
+    assert.equal(filterRunnerInputTreeListing('100644 blob a\tpackages/core/dist/x.js\0' + '100644 blob b\tpackages/core/src/x.ts\0'), '100644 blob b\tpackages/core/src/x.ts\0');
 }
 testInitialStateIsInDev();
 testHappyPathLifecycle();

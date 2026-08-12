@@ -1,22 +1,24 @@
 {
-  "schemaId": "atm.testCatalogGroupShard.v1",
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
   "groupId": "test_group_editor_skill_overlay",
-  "title": "Editor-global skill overlay and external skill federation",
-  "taskIds": ["TASK-SKL-0032"],
-  "requiredTestCaseIds": [
-    "test_task_skl_0032_global_federation_43bfb7c2",
-    "test_task_skl_0032_overlay_collision_f9f565a0"
-  ],
+  "theme": "Editor-global skill overlay and external skill federation",
+  "resourceKey": "editor-skill-overlay",
+  "maintainers": ["atm-integrations"],
   "cases": [
     {
       "caseId": "test_task_skl_0032_global_federation_43bfb7c2",
+      "semanticKey": "global_federation",
       "command": "node --strip-types tests/cli/editor-global-skill-federation.test.ts",
-      "covers": ["external source provenance", "ATM namespace collision", "duplicate external priority"]
+      "responsibility": "task-required",
+      "coversAcceptance": ["external source provenance", "ATM namespace collision", "duplicate external priority"]
     },
     {
       "caseId": "test_task_skl_0032_overlay_collision_f9f565a0",
+      "semanticKey": "overlay_collision",
       "command": "node --strip-types tests/cli/editor-global-overlay-collision.test.ts",
-      "covers": ["editor-global manifest separation", "unmanaged file preservation", "hash-bound apply"]
+      "responsibility": "task-required",
+      "coversAcceptance": ["editor-global manifest separation", "unmanaged file preservation", "hash-bound apply"]
     }
   ]
 }

@@ -4,8 +4,9 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, w
 import os from 'node:os';
 import path from 'node:path';
 import { CliError } from '../../shared.js';
-import { acquireCloseWindowStagedIndexLock, assertCloseWindowStagingAllowed, inspectForeignStagedTasksForCloseWindow, readCloseWindowStagedIndexLockReport, releaseCloseWindowStagedIndexLock } from '../../tasks/close-window-lock.js';
+import { acquireCloseWindowStagedIndexLock, assertCloseWindowStagingAllowed, inspectForeignStagedTasksForCloseWindow, readCloseWindowStagedIndexLockReport, releaseCloseWindowStagedIndexLock, runGitIndexMutationWithRetry } from '../../tasks/close-window-lock.js';
 import { buildCloseWriteRollbackSnapshot, rollbackCloseWriteTransaction } from '../close-orchestration.js';
+import { chunkGitPathspecs } from '../commit-bundle-assembly.js';
 function writeJson(filePath, value) {
     mkdirSync(path.dirname(filePath), { recursive: true });
     writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
@@ -30,6 +31,11 @@ function stageGovernanceFile(repoRoot, taskId, suffix = 'json') {
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-close-window-lock-'));
 const repoRoot = path.join(tempRoot, 'target');
 try {
+    const longPathspecs = Array.from({ length: 200 }, (_, index) => `release/atm-root-drop/${String(index).padStart(4, '0')}/${'nested-path/'.repeat(20)}generated-file.ts`);
+    const pathspecChunks = chunkGitPathspecs(longPathspecs);
+    assert.ok(pathspecChunks.length > 1, 'large release bundles must be split before reaching the host argv ceiling');
+    assert.deepEqual(pathspecChunks.flat(), longPathspecs, 'chunking must preserve every path exactly once and in order');
+    assert.ok(pathspecChunks.every((chunk) => Buffer.byteLength(chunk.join('\0'), 'utf8') < 8_000), 'each pathspec chunk must stay inside the conservative argv budget');
     initGitRepo(repoRoot);
     writeJson(path.join(repoRoot, '.atm/config.json'), {
         schemaVersion: 'atm.config.v0.1',
@@ -39,10 +45,42 @@ try {
     });
     execFileSync('git', ['add', '.'], { cwd: repoRoot, stdio: 'ignore' });
     execFileSync('git', ['commit', '-m', 'bootstrap'], { cwd: repoRoot, stdio: 'ignore' });
+    let transientIndexLockAttempts = 0;
+    runGitIndexMutationWithRetry({
+        cwd: repoRoot,
+        args: ['update-index', '--add'],
+        operation: 'fixture transient index mutation',
+        run: () => {
+            transientIndexLockAttempts += 1;
+            if (transientIndexLockAttempts === 1) {
+                throw new Error("fatal: Unable to create 'fixture/.git/index.lock': File exists.");
+            }
+        }
+    });
+    assert.equal(transientIndexLockAttempts, 2, 'a short-lived index lock must retry the same mutation once');
     const taskId = 'TASK-CLOSE-WINDOW-0001';
     const foreignTaskId = 'TASK-FOREIGN-0002';
     const expectedStageFile = stageGovernanceFile(repoRoot, taskId);
     const foreignStageFile = stageGovernanceFile(repoRoot, foreignTaskId);
+    // Index ownership deliberately trusts a direction lock only when it has a
+    // matching live claim.  Model a real foreign writer rather than a stale
+    // lock-file residue, which must remain non-authoritative.
+    writeJson(path.join(repoRoot, foreignStageFile), {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: foreignTaskId,
+        title: `${foreignTaskId} fixture`,
+        status: 'running',
+        claim: {
+            actorId: 'foreign-agent',
+            leaseId: 'lease-foreign-live',
+            claimedAt: new Date().toISOString(),
+            heartbeatAt: new Date().toISOString(),
+            ttlSeconds: 3600,
+            files: [foreignStageFile],
+            state: 'active'
+        }
+    });
+    execFileSync('git', ['add', foreignStageFile], { cwd: repoRoot, stdio: 'ignore' });
     writeJson(path.join(repoRoot, '.atm/runtime/locks', `${foreignTaskId}.lock.json`), {
         schemaId: 'atm.governanceScopeLock',
         workItemId: foreignTaskId,

@@ -32,6 +32,7 @@ export function parseGitOptions(argv) {
         timeoutMs: null,
         paths: [],
         ttlSeconds: null,
+        forceIndexLockRecovery: false,
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -156,6 +157,10 @@ export function parseGitOptions(argv) {
             options.dryRun = true;
             continue;
         }
+        if (arg === "--force-index-lock-recovery") {
+            options.forceIndexLockRecovery = true;
+            continue;
+        }
         if (arg === "--steward-plan") {
             options.stewardPlan = true;
             continue;
@@ -204,8 +209,9 @@ export function parseGitOptions(argv) {
             arg !== "commit" &&
             arg !== "record-commit" &&
             arg !== "commit-status" &&
+            arg !== "recover-index-lock" &&
             arg !== "lease") {
-            throw new CliError("ATM_CLI_USAGE", "git supports: prepare, admit, push, recover-push-fail, check, commit, record-commit, commit-status, lease", { exitCode: 2 });
+            throw new CliError("ATM_CLI_USAGE", "git supports: prepare, admit, push, recover-push-fail, recover-index-lock, check, commit, record-commit, commit-status, lease", { exitCode: 2 });
         }
         options.action = arg;
     }

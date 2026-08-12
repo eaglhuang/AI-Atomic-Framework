@@ -12,7 +12,7 @@ import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../.
 import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, writeTaskDirectionLock } from '../task-direction.js';
 import { inspectBatchRunConsistency, readActiveBatchRun, writeBatchRun } from '../work-channels.js';
 import { buildTeamKnowledgeSummary } from '../team-knowledge.js';
-import { decideActiveBatchClaimTask } from '../next-active-batch.js';
+import { decideActiveBatchClaimTask, preservesExplicitTaskClaim } from '../next-active-batch.js';
 import { runClaimParallelPreflight } from './claim-parallel-preflight.js';
 import { buildPlanScopedRoutingPreflight } from './plan-scoped-preflight.js';
 import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.js';
@@ -154,7 +154,7 @@ export async function claimNextImportedTask(input) {
     }
     if (activeBatchAtClaimStart?.status === 'active' && claimableTask) {
         const batchPromptQueue = inspectImportedTaskQueue(input.cwd, createDeterministicTaskIntent(activeBatchAtClaimStart.sourcePrompt), claimIntent);
-        const activeBatchClaimDecision = decideActiveBatchClaimTask({
+        const activeBatchClaimDecision = preservesExplicitTaskClaim(input.taskIntent?.explicitTaskIds) ? null : decideActiveBatchClaimTask({
             activeBatch: activeBatchAtClaimStart,
             activeQueue: promptScopeRuntime?.queue
                 ?? activeQueueForIntent

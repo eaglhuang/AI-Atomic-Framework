@@ -2,9 +2,9 @@ import { defineCommandSpec } from '../shared.js';
 import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption, } from './_common.js';
 export default defineCommandSpec({
     name: 'git',
-    summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts with a fresh admission rerun, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt plus live branch queue and stuck stdin pathspec staging diagnostics, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
+    summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts or a human-confirmed stale index lock, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt plus live branch queue and stuck stdin pathspec staging diagnostics, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
     positional: [
-        { name: 'action', summary: 'prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status | attest', required: true }
+        { name: 'action', summary: 'prepare | admit | push | recover-push-fail | recover-index-lock | check | commit | record-commit | commit-status | attest', required: true }
     ],
     options: [
         commonCwdOption,
@@ -29,6 +29,7 @@ export default defineCommandSpec({
         { flag: '--no-verify', summary: 'Emergency-only pass-through to git commit; requires --emergency-approval with backend.gitHookBypass permission and cannot override Team Broker conflicts by itself.' },
         { flag: '--wip', summary: 'For git commit: commit staged files with non-delivery ATM-WIP trailers and bypass full repository-wide typecheck.' },
         { flag: '--emergency-approval', value: 'leaseId', summary: 'Required when --no-verify is used; must authorize backend.gitHookBypass.' },
+        { flag: '--force-index-lock-recovery', summary: 'For git recover-index-lock: confirms the human has verified no active Git writer; requires backend.gitIndexLockRecovery approval.' },
         { flag: '--broker-conflict-override', value: 'leaseId', summary: 'High-authority override for Team Broker cross-task conflicts; must authorize backend.brokerConflictOverride and be paired with --broker-conflict-resolution.' },
         { flag: '--broker-conflict-resolution', value: 'path', summary: 'Paper-style Team Broker conflict-resolution artifact proving conflict task id, shared paths, resolution order, and validator plan.' },
         { flag: '--reason', value: 'text', summary: 'Human-readable reason for the governed hook bypass when using --no-verify.' },
@@ -58,6 +59,7 @@ export default defineCommandSpec({
         'node atm.mjs git admit --actor codex-main --branch main --remote origin --steward-plan --json',
         'node atm.mjs git admit --actor codex-main --branch main --remote origin --apply-to-working-tree --json',
         'node atm.mjs git recover-push-fail --actor codex-main --branch main --remote origin --json',
+        'node atm.mjs git recover-index-lock --task ATM-GOV-0105 --actor codex-main --force-index-lock-recovery --emergency-approval <lease-id> --reason "human-confirmed stale lock" --json',
         'node atm.mjs git check --task ATM-GOV-0105 --actor codex-main --json',
         'node atm.mjs git check --actor codex-main --json',
         'node atm.mjs git commit --actor codex-main --task TASK-AAO-0036 --message "atm: sync TASK-AAO-0036 ledger mirror" --json',

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -104,6 +104,7 @@ try {
   const receipt = buildRunnerSyncReceipt(receiptInput);
   assert.equal(receipt.schemaId, 'atm.runnerSyncReceipt.v1');
   assert.equal(receipt.taskId, 'ATM-GOV-0256');
+  assert.equal(receipt.publicationDisposition, 'published', 'a successful sealed build must publish an explicit terminal disposition for the release gate');
   assert.deepEqual(receipt.linkedTaskIds, ['ATM-GOV-0256'], 'receipt must preserve the durable delivery-task continuation independently from the steward work item');
   assert.equal(receipt.stewardWorkId, 'runner-sync-fixture');
   assert.match(receipt.autoReleaseCommand, /^node atm\.mjs broker runner-sync release --task "ATM-GOV-0256" --steward-work-id "runner-sync-fixture" --receipt-ref ".*" --json$/);
@@ -125,6 +126,7 @@ try {
   const onDisk = JSON.parse(readFileSync(path.join(repo, expectedReceiptRef), 'utf8'));
   assert.equal(onDisk.schemaId, 'atm.runnerSyncReceipt.v1');
   assert.equal(onDisk.buildDecision, 'cacheHitSkip');
+  assert.equal(onDisk.publicationDisposition, 'published');
 
   // 3. Re-publishing (e.g. a subsequent no-op revalidation) overwrites the same
   // governed file in place instead of accumulating a second disposition.
@@ -134,6 +136,39 @@ try {
   assert.deepEqual(entriesAfterRepublish, ['ATM-GOV-0256.runner-sync-receipt.json'], 'republication must stay a single governed file, not accumulate residue');
   const onDiskAfterRepublish = JSON.parse(readFileSync(path.join(repo, expectedReceiptRef), 'utf8'));
   assert.equal(onDiskAfterRepublish.decisionReason, 'revalidated no-op');
+
+  const tempTaskId = 'ATM-FRAMEWORK-TEMP-captain-a';
+  const linkedDeliveryTaskId = 'ATM-GOV-0257';
+  const temporaryAdmission = fixtureAdmission({
+    runnerSyncSteward: {
+      ...admission.runnerSyncSteward,
+      stewardWorkId: 'runner-sync-fixture',
+      queuePosition: 1,
+      suggestedNextAction: 'run runner sync',
+      requestedSurfaces: ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'],
+      waitingTasks: [tempTaskId, linkedDeliveryTaskId],
+      requests: [
+        { taskId: tempTaskId, actorId: 'release-steward', requestedSurfaces: ['release/atm-onefile/atm.mjs'] },
+        { taskId: linkedDeliveryTaskId, actorId: 'release-steward', requestedSurfaces: ['release/atm-root-drop'] }
+      ]
+    },
+    queueHeadOwnership: {
+      ...admission.queueHeadOwnership,
+      waitingTasks: [tempTaskId, linkedDeliveryTaskId]
+    }
+  });
+  const lockPath = path.join(repo, '.atm', 'runtime', 'locks', `${tempTaskId}.lock.json`);
+  mkdirSync(path.dirname(lockPath), { recursive: true });
+  writeFileSync(lockPath, `${JSON.stringify({ workItemId: tempTaskId, linkedTaskId: linkedDeliveryTaskId })}\n`, 'utf8');
+  const linkedReceiptRef = writeRunnerSyncReceipt({ ...receiptInput, admission: temporaryAdmission });
+  assert.equal(linkedReceiptRef, `.atm/history/evidence/${linkedDeliveryTaskId}.runner-sync-receipt.json`, 'a temporary queue head must publish through its single durable delivery link');
+  const linkedReceipt = JSON.parse(readFileSync(path.join(repo, linkedReceiptRef), 'utf8'));
+  assert.equal(linkedReceipt.taskId, linkedDeliveryTaskId, 'the receipt file remains owned by the durable delivery task');
+  assert.equal(
+    linkedReceipt.autoReleaseCommand,
+    buildRunnerSyncReleaseCommand({ taskId: tempTaskId, stewardWorkId: 'runner-sync-fixture', receiptRef: linkedReceiptRef }),
+    'the release command must name the actual queue member while referencing the durable receipt path'
+  );
 
   console.log('[runner-sync-post-close-receipt-publication.test] ok');
 } finally {

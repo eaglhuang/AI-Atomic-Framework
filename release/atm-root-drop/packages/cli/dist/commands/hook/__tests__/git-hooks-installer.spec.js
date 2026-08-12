@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -14,6 +14,8 @@ try {
     spawnSync('git', ['init'], { cwd: tempRoot, encoding: 'utf8' });
     const firstInstall = installGitHooks(tempRoot, { frameworkRequired: true });
     assert.equal(firstInstall.ok, true);
+    const generatedPreCommit = readFileSync(path.join(tempRoot, '.atm', 'git-hooks', 'pre-commit'), 'utf8');
+    assert.match(generatedPreCommit, /^#!\/bin\/sh\n/, 'generated hooks use Git Bash-compatible direct shell resolution');
     const afterFirst = inspectGitHooks(tempRoot, { frameworkRequired: true });
     assert.equal(afterFirst.installedHookFiles.every((entry) => entry.present), true);
     const secondInstall = installGitHooks(tempRoot, { frameworkRequired: true });

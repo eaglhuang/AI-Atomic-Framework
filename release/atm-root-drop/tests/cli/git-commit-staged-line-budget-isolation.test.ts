@@ -55,6 +55,25 @@ const largeBase = Array.from({ length: 700 }, (_, index) => `export const line${
 {
   const repo = initRepo();
   try {
+    writeTracked(repo, 'packages/cli/src/unstaged-large.ts', largeBase);
+    writeFileSync(path.join(repo, 'packages/cli/src/unstaged-large.ts'), largeBase.replace('export const line0 = 0;', 'export const line0 = 1000;'), 'utf8');
+
+    const report = inspectTouchedPhysicalLineBudget(repo, ['packages/cli/src/unstaged-large.ts'], {
+      taskId: 'TASK-CANDIDATE',
+      actorId: 'codex',
+      gate: 'git-commit'
+    });
+
+    assert(report.ok, 'small unstaged auto-stage candidate must not fail merely because its baseline source exceeds 600 lines');
+    assert(report.topFile?.lines === 2, `expected unstaged candidate line count 2, got ${report.topFile?.lines}`);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+}
+
+{
+  const repo = initRepo();
+  try {
     writeTracked(repo, 'packages/cli/src/small.ts', 'export const base = 1;\n');
     writeFileSync(path.join(repo, 'packages/cli/src/small.ts'), Array.from({ length: 650 }, (_, index) => `export const next${index} = ${index};`).join('\n') + '\n', 'utf8');
     execFileSync('git', ['add', 'packages/cli/src/small.ts'], { cwd: repo, stdio: 'ignore' });

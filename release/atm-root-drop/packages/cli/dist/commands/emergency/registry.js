@@ -140,6 +140,20 @@ export const emergencyPermissionRegistry = Object.freeze([
         validatorTags: ['emergency-broker-conflict-override', 'team-broker-resolution']
     },
     {
+        id: 'backend.gitIndexLockRecovery',
+        summary: 'Remove a stale Git index lock after an explicit human quiescence confirmation.',
+        protectedSurfaces: ['git recover-index-lock --force-index-lock-recovery'],
+        normalLane: 'wait for the active Git writer to finish',
+        riskTier: 'high',
+        defaultTtlMinutes: 10,
+        defaultMaxUses: 1,
+        requiresTaskId: true,
+        requiresActor: true,
+        requiresHumanApprovalText: true,
+        auditRequired: true,
+        validatorTags: ['emergency-git-index-lock-recovery']
+    },
+    {
         id: 'backend.gitHookBypass',
         summary: 'Governed git hook bypass recovery; does not override Team Broker cross-task mutation blocks.',
         protectedSurfaces: ['git recovery flags except broker-conflict ownership overrides'],

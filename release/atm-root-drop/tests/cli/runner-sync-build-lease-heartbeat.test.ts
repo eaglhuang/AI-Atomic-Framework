@@ -19,7 +19,6 @@ import {
 } from '../../packages/core/src/broker/runner-sync-session.ts';
 import {
   computeAggregateInputTreeHash,
-  RUNNER_SYNC_ERROR_CODES,
   RUNNER_INPUT_GRAPH_SCHEMA,
   type RunnerInputGraph,
   type RunnerInputGraphNode
@@ -55,7 +54,7 @@ const buildResult: BuildResult = {
   } as RunnerInputGraph
 };
 
-assert.equal(shouldAutoReleaseRunnerSyncSteward({}), false);
+assert.equal(shouldAutoReleaseRunnerSyncSteward({}), true);
 assert.equal(shouldAutoReleaseRunnerSyncSteward({ ATM_RUNNER_SYNC_AUTO_RELEASE: '0' }), false);
 assert.equal(shouldAutoReleaseRunnerSyncSteward({ ATM_RUNNER_SYNC_AUTO_RELEASE: '1' }), true);
 
@@ -66,22 +65,22 @@ const started = startRunnerSyncSession(
 );
 assert.equal(started.allowed, true);
 assert.equal(started.state.schemaId, RUNNER_SYNC_SESSION_STATE_SCHEMA);
-assert.equal(started.state.phase, 'building');
+assert.equal(started.state.phase, 'prepared');
 assert.deepEqual([...started.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
-assert.ok(started.state.buildLease);
+assert.equal(started.state.buildLease, null);
 
 // 2. Lease renewal within TTL extends the lease.
 const renewed = renewRunnerSyncSession(started.state, fixedPorts('2026-07-27T08:30:00.000Z'));
 assert.equal(renewed.allowed, true);
-assert.equal(renewed.action, 'renew-lease');
-assert.ok(renewed.state.buildLease && renewed.state.buildLease.expiresAt > started.state.buildLease!.expiresAt);
+assert.equal(renewed.action, 'wait');
+assert.equal(renewed.state.buildLease, null);
 
 // 3. Lease expired → ATM_RUNNER_SYNC_STEWARD_LEASE_EXPIRED with resume path, no drop.
 const expired = renewRunnerSyncSession(started.state, fixedPorts('2026-07-27T10:00:00.000Z'));
-assert.equal(expired.allowed, false);
-assert.equal(expired.errorCode, RUNNER_SYNC_ERROR_CODES.stewardLeaseExpired);
-assert.equal(expired.action, 'resume-build');
-assert.ok(expired.recoveryCommand && expired.recoveryCommand.includes('resume'));
+assert.equal(expired.allowed, true);
+assert.equal(expired.errorCode, null);
+assert.equal(expired.action, 'wait');
+assert.equal(expired.state.buildLease, null);
 // The manifest (member attribution) survives an expired lease.
 assert.deepEqual([...expired.state.groupManifest.memberTaskIds], ['ATM-GOV-0240', 'ATM-GOV-0248', 'TASK-SKL-0029']);
 
@@ -243,6 +242,78 @@ assert.equal(finalized.childReceipts.length, 3);
     receiptDigest: null
   }), /ATM_RUNNER_SYNC_COALESCED_ATTRIBUTION_MISSING/);
   assert.equal(queued.queue.groups.length, 1, 'release validation failure must not clear the queue fixture');
+
+  const tempTaskId = 'ATM-FRAMEWORK-TEMP-captain';
+  const durableTaskId = 'TASK-ERR-0013';
+  const delegatedQueue = enqueueRunnerSyncStewardRequest(null, {
+    taskId: tempTaskId,
+    actorId: 'captain',
+    sealedSourceSha: SEAL,
+    requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+    createdAt: '2026-07-27T08:03:00.000Z',
+    heartbeatAt: '2026-07-27T08:03:00.000Z'
+  }).queue;
+  const delegatedGroup = delegatedQueue.groups[0]!;
+  const delegatedAdmission = {
+    ...admission,
+    runnerSyncSteward: {
+      ...admission.runnerSyncSteward,
+      stewardWorkId: delegatedGroup.stewardWorkId,
+      requestedSurfaces: delegatedGroup.requestedSurfaces,
+      waitingTasks: delegatedGroup.waitingTasks,
+      requests: delegatedGroup.requests
+    },
+    queueHeadOwnership: {
+      ...admission.queueHeadOwnership,
+      stewardWorkId: delegatedGroup.stewardWorkId,
+      waitingTasks: delegatedGroup.waitingTasks
+    }
+  };
+  const delegatedReceipt = buildRunnerSyncReceipt({
+    admission: delegatedAdmission,
+    actorId: 'captain',
+    sealedSourceSha: SEAL,
+    linkedTaskIds: [durableTaskId],
+    receiptTaskId: durableTaskId,
+    buildTarget: 'full',
+    buildInputsTreeHash: INPUT_DIGEST,
+    buildDecision: 'built',
+    decisionReason: 'delegated fixture',
+    timings: {
+      startedAt: 0,
+      inputHashCalculationMs: 1,
+      skipDecisionMs: 1,
+      worktreeSetupMs: 1,
+      typescriptBuildMs: 1,
+      rootDropAssemblyMs: 1,
+      onefileAssemblyMs: 1,
+      artifactSyncMs: 1,
+      cleanupMs: 1,
+      totalElapsedMs: 8
+    },
+    publishedAt: '2026-07-27T08:04:00.000Z'
+  });
+  assert.equal(delegatedReceipt.taskId, durableTaskId);
+  assert.deepEqual([...delegatedReceipt.memberTaskIds], [tempTaskId]);
+  assert.deepEqual([...delegatedReceipt.linkedTaskIds], [durableTaskId]);
+  const delegatedReceiptRef = writeTempReceipt(receiptRepo, delegatedReceipt);
+  assert.doesNotThrow(() => validateRunnerSyncReleaseReceipt({
+    cwd: receiptRepo,
+    queue: delegatedQueue,
+    taskId: tempTaskId,
+    stewardWorkId: delegatedGroup.stewardWorkId,
+    receiptRef: delegatedReceiptRef,
+    receiptDigest: null
+  }), 'an explicitly linked durable receipt owner must be releasable by its actual temporary queue member');
+  assert.throws(() => validateRunnerSyncReleaseReceipt({
+    cwd: receiptRepo,
+    queue: delegatedQueue,
+    taskId: tempTaskId,
+    stewardWorkId: delegatedGroup.stewardWorkId,
+    receiptRef: writeTempReceipt(receiptRepo, { ...delegatedReceipt, linkedTaskIds: [] }),
+    receiptDigest: null
+  }), /ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_INVALID.*taskId/,
+  'delegated receipt attribution must fail closed when the durable link is absent');
 
   assert.throws(() => validateRunnerSyncReleaseReceipt({
     cwd: receiptRepo,

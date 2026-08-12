@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildResidueReconcileReport } from '../../residue.js';
 import { runNext } from '../../next.js';
 import { runTaskflow } from '../../taskflow.js';
+import { runTasksClose } from '../../tasks/close-orchestrator.js';
 function writeJson(filePath, value) {
     mkdirSync(path.dirname(filePath), { recursive: true });
     writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
@@ -50,6 +51,26 @@ function terminateProcessTree(child) {
     catch {
         child.kill('SIGKILL');
     }
+}
+/**
+ * Windows reports the process as exited before every descendant has released
+ * its working-directory handle.  Teardown is not an assertion waiver: it has
+ * a short, bounded barrier and rethrows the last filesystem error if the
+ * process tree has not actually quiesced.
+ */
+async function removeFixtureWithRetry(target) {
+    let lastError = null;
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+        try {
+            rmSync(target, { recursive: true, force: true, maxRetries: 0 });
+            return;
+        }
+        catch (error) {
+            lastError = error;
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+    }
+    throw lastError;
 }
 async function makeKillAfterTargetCommitFixture() {
     const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-close-crash-kill-after-target-'));
@@ -190,6 +211,49 @@ assert.match(residueSource, /RESIDUE_REMOVE_MAX_ATTEMPTS\s*=\s*3/);
 assert.match(residueSource, /EPERM/);
 assert.match(residueSource, /EBUSY/);
 assert.match(residueSource, /ENOTEMPTY/);
+const stageFailureFixture = await makeKillAfterTargetCommitFixture();
+try {
+    const taskPath = path.join(stageFailureFixture.targetRepo, '.atm/history/tasks', `${stageFailureFixture.taskId}.json`);
+    const eventDir = path.join(stageFailureFixture.targetRepo, '.atm/history/task-events', stageFailureFixture.taskId);
+    const indexLockPath = path.join(stageFailureFixture.targetRepo, '.git/index.lock');
+    const cachedBefore = git(stageFailureFixture.targetRepo, ['diff', '--cached', '--name-only']);
+    const priorLaneSessionId = process.env.ATM_LANE_SESSION_ID;
+    process.env.ATM_LANE_SESSION_ID = stageFailureFixture.laneSessionId;
+    writeText(indexLockPath, '');
+    try {
+        await runTasksClose([
+            '--cwd', stageFailureFixture.targetRepo,
+            '--task', stageFailureFixture.taskId,
+            '--actor', 'validator',
+            '--status', 'done',
+            '--json'
+        ]);
+        assert.fail('a close artifact staging failure must fail the entire close transaction');
+    }
+    catch (error) {
+        assert.equal(error.code, 'ATM_TASK_CLOSE_TRANSACTION_FAILED');
+    }
+    finally {
+        if (priorLaneSessionId === undefined)
+            delete process.env.ATM_LANE_SESSION_ID;
+        else
+            process.env.ATM_LANE_SESSION_ID = priorLaneSessionId;
+        if (existsSync(indexLockPath))
+            unlinkSync(indexLockPath);
+    }
+    const taskAfterFailure = JSON.parse(readFileSync(taskPath, 'utf8'));
+    assert.equal(taskAfterFailure.status, 'running', 'staging failure must restore the pre-close ledger status');
+    assert.equal(taskAfterFailure.claim?.state, 'active', 'staging failure must not release the active claim');
+    assert.equal(existsSync(path.join(stageFailureFixture.targetRepo, '.atm/history/evidence', `${stageFailureFixture.taskId}.closure-packet.json`)), false);
+    const closeEvents = existsSync(eventDir)
+        ? readdirSync(eventDir).filter((entry) => readFileSync(path.join(eventDir, entry), 'utf8').includes('"action": "close"'))
+        : [];
+    assert.deepEqual(closeEvents, [], 'staging failure must remove the uncommitted close transition event');
+    assert.equal(git(stageFailureFixture.targetRepo, ['diff', '--cached', '--name-only']), cachedBefore, 'staging failure must not alter the live index');
+}
+finally {
+    await removeFixtureWithRetry(stageFailureFixture.tempRoot);
+}
 const killFixture = await makeKillAfterTargetCommitFixture();
 try {
     const markerPath = path.join(killFixture.tempRoot, 'planning-hook-entered.txt');
@@ -264,6 +328,6 @@ try {
     assert.match(git(killFixture.planningRepo, ['show', `HEAD:${planningCardRelativePath}`]), /status:\s*done/, 'taskflow close can converge the dirty planning closeback without changing the target deliverable');
 }
 finally {
-    rmSync(killFixture.tempRoot, { recursive: true, force: true });
+    await removeFixtureWithRetry(killFixture.tempRoot);
 }
 console.log('[taskflow-close-crash-matrix] ok');

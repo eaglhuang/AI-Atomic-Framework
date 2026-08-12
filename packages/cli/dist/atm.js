@@ -252,7 +252,9 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
     catch (error) {
         const cliError = error instanceof CliError
             ? error
-            : new CliError('ATM_CLI_UNHANDLED', error instanceof Error ? error.message : String(error));
+            : new CliError('ATM_CLI_UNHANDLED', error instanceof Error ? error.message : String(error), {
+                details: { stack: error instanceof Error ? error.stack ?? null : null }
+            });
         const result = enrichCommandResult(makeResult({
             ok: false,
             command: commandName,

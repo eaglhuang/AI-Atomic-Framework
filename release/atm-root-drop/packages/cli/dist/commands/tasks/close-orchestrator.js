@@ -17,7 +17,7 @@ import { parseClaimRecord } from './task-ledger-readers.js';
 import { normalizeRelativePath, taskPathFor } from './task-file-io-helpers.js';
 import { evaluateFrameworkDeliveryWindow, readDeferredForeignStagedFilesForActiveCloseWindow } from './close-helpers/close-window-diagnostics.js';
 import { buildTaskFrameworkLockContext } from '../framework-development/framework-lock-context.js';
-import { extractTaskCloseDeclaredFiles, extractTaskDeliverableFiles, evaluateTaskDeliverableGate, existingTaskCloseArtifacts, stageTaskCloseArtifacts, taskDeliveryPrincipleText } from './close-helpers/close-artifact-staging.js';
+import { extractTaskCloseDeclaredFiles, extractTaskDeliverableFiles, evaluateTaskDeliverableGate, existingTaskCloseArtifacts, taskDeliveryPrincipleText } from './close-helpers/close-artifact-staging.js';
 import { createClosureTransitionMetadata } from './close-helpers/task-transition-writer.js';
 import { uniqueStrings, isCliErrorWithCode, recordStaleRunnerOverride, recordFailedEmergencyUseAttempt } from '../tasks.js';
 import { parseCloseOptions } from './task-option-parsers.js';
@@ -457,7 +457,6 @@ export async function runTasksClose(argv) {
             transitionPath,
             closurePacketPath
         ]);
-        stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
         if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
             const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
             await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));

@@ -35,12 +35,13 @@ export function classifyProtectedGovernanceStatePath(filePath: string): Pick<Pro
   return null;
 }
 
-function listDiffNames(cwd: string, args: readonly string[]): string[] {
+function listDiffNames(cwd: string, args: readonly string[], env?: NodeJS.ProcessEnv): string[] {
   try {
     return execFileSync('git', [...args, '-z'], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env
     }).split('\0').map(normalizeRelativePath).filter(Boolean);
   } catch {
     return [];
@@ -50,13 +51,26 @@ function listDiffNames(cwd: string, args: readonly string[]): string[] {
 export function inspectProtectedGovernanceStateDestructiveChanges(input: {
   readonly cwd: string;
   readonly taskId: string;
+  /** Optional isolated candidate index used by a sealed commit transaction. */
+  readonly env?: NodeJS.ProcessEnv;
+  /**
+   * A commit resolver may share an index with unrelated retained residue.
+   * In that case only deletions that will enter this commit are writes by the
+   * current transaction; every other deletion remains visible but is not a
+   * reason to reject a path-bounded delivery.
+   */
+  readonly commitFiles?: readonly string[];
 }): ProtectedGovernanceStateReport {
+  const commitFileSet = input.commitFiles
+    ? new Set(input.commitFiles.map(normalizeRelativePath))
+    : null;
   const deleted = new Set([
-    ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D']),
-    ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'])
+    ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D'], input.env),
+    ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'], input.env)
   ]);
   const violations: ProtectedGovernanceStateViolation[] = [];
   for (const filePath of [...deleted].sort()) {
+    if (commitFileSet && !commitFileSet.has(normalizeRelativePath(filePath))) continue;
     const classification = classifyProtectedGovernanceStatePath(filePath);
     if (!classification) continue;
     violations.push({

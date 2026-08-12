@@ -40,6 +40,14 @@ try {
     assert.equal(normalized[0]?.startedAt, '2026-07-20T00:00:00.000Z');
     assert.equal(normalized[0]?.finishedAt, '2026-07-20T00:00:01.234Z');
     assert.equal(normalized[0]?.durationMs, 1234);
+    const frozenNormalized = normalizeEvidenceCommandRuns({
+        cwd: process.cwd(),
+        inlineRun: null,
+        fileRuns,
+        runnerKind: 'frozen-runner',
+        sourceCommit: null
+    });
+    assert.equal(frozenNormalized[0]?.runnerKind, 'frozen-runner');
 }
 finally {
     rmSync(temp, { recursive: true, force: true });

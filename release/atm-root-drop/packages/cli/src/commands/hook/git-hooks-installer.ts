@@ -108,7 +108,7 @@ export function createGitHookScript(hookName: 'pre-commit' | 'pre-push', repoIde
   const command = `node atm.mjs hook ${action} --json`;
   if (!repoIdentity.isFrameworkRepo) {
     return [
-      '#!/usr/bin/env sh',
+      '#!/bin/sh',
       'set -eu',
       `# ${hookMarker}`,
       '',
@@ -120,7 +120,7 @@ export function createGitHookScript(hookName: 'pre-commit' | 'pre-push', repoIde
     ].join('\n');
   }
   return [
-    '#!/usr/bin/env sh',
+    '#!/bin/sh',
     'set -eu',
     `# ${hookMarker}`,
     '',

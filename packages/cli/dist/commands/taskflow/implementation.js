@@ -20,9 +20,10 @@ import { resolveTaskflowDeclaredFiles } from './task-scope.js';
 import { deriveAtmScopeClass } from '../../../../core/dist/broker/atm-core-scope.js';
 import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, readStagedFiles, restoreDeferredGovernanceDirtyFiles } from './commit-bundle-assembly.js';
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js';
+import { resolveRunnerPublicationCloseHandoff } from '../framework-development/runner-publication-close-handoff.js';
 import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../../core/dist/team-runtime/handoff-ledger.js';
 import { clearBrokerRuntimeStateForTask } from '../../../../core/dist/broker/lifecycle.js';
-import { classifyRunnerAffectingPaths } from '../../../../core/dist/broker/runner-version-contract.js';
+import { classifyRunnerAffectingPaths, filterRunnerInputTreeListing, RUNNER_INPUT_TREE_PATHS } from '../../../../core/dist/broker/runner-version-contract.js';
 function buildTasksNewCommand(input) {
     const parts = ['node atm.mjs tasks new'];
     if (input.template) {
@@ -223,7 +224,7 @@ function buildTaskflowRunnerGateDecision(filePaths) { const scopeClass = deriveA
 function buildRunnerSyncEnqueueCommand(input) { const sealedSource = input.sealedSourceSha ?? '<sealed-source-sha>'; const surfaces = runnerSyncSurfaces.map((surface) => `--surface ${quoteCliValue(surface)}`).join(' '); return `node atm.mjs broker runner-sync enqueue --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --sealed-source-sha ${quoteCliValue(sealedSource)} ${surfaces} --json`; }
 function buildRunnerSyncTaskflowCloseCommand(input) { return `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --write --json`; }
 function buildTaskflowStaleRunnerBlocker(input) { const sealedSourceSha = readCurrentGitHead(input.cwd); const enqueueCommand = buildRunnerSyncEnqueueCommand({ taskId: input.taskId, actorId: input.actorId, sealedSourceSha }); const buildCommand = 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build'; const closeCommand = buildRunnerSyncTaskflowCloseCommand({ taskId: input.taskId, actorId: input.actorId }); const admission = inspectRunnerSyncAdmission({ cwd: input.cwd, stewardActorId: input.actorId || '<actor>', sealedSourceSha, dirtyFiles: [] }); const ownership = admission.queueHeadOwnership; const actionChain = ownership.ok ? [buildCommand, closeCommand] : ownership.cleanupCommand ? [ownership.cleanupCommand, enqueueCommand] : ownership.queuePosition && ownership.queuePosition > 1 ? [`node atm.mjs broker runner-sync status --task ${input.taskId} --json`, buildCommand, closeCommand] : [enqueueCommand, buildCommand, closeCommand]; const queueStatus = ownership.queuePosition === null ? 'not enqueued' : `queued at position ${ownership.queuePosition}`; const requiredCommand = actionChain[0] ?? enqueueCommand; const summary = ownership.ok ? 'The frozen runner is stale and this task owns the active runner-sync queue head; run the runner-sync build, then retry taskflow close.' : ownership.cleanupCommand ? `The frozen runner is stale, but the runner-sync queue head is orphaned (${ownership.queueHeadHealth}); cleanup is required before enqueue/build/close.` : ownership.queuePosition && ownership.queuePosition > 1 ? `The frozen runner is stale and this task is ${queueStatus}; wait for the queue head before build. queueHeadHealth=${ownership.queueHeadHealth}.` : 'The frozen runner is stale and this task is not enqueued in runner-sync; enqueue before build so closeback can proceed without mutating the runner-sync queue silently.'; return { code: 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER', summary, requiredCommand, runnerSyncAdmission: admission, runnerSyncActionChain: actionChain, queuePosition: ownership.queuePosition, queueHeadHealth: ownership.queueHeadHealth, ...(input.runnerGateDecision ? { runnerGateDecision: input.runnerGateDecision.runnerGateDecision, runnerGateIntersectingFiles: input.runnerGateDecision.runnerGateIntersectingFiles, sharedSurface: input.runnerGateDecision.sharedSurface, scopeClass: input.runnerGateDecision.scopeClass } : {}) }; }
-const runnerGateBuildInputTreePaths = ['packages', 'scripts', 'templates', 'schemas', 'atomic_workbench', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json'];
+const runnerGateBuildInputTreePaths = RUNNER_INPUT_TREE_PATHS;
 function readJsonRecordIfExists(filePath) { if (!existsSync(filePath))
     return null; try {
     const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
@@ -247,7 +248,7 @@ catch {
 } }
 function computeRunnerInputTreeHash(cwd, commitSha = 'HEAD') { try {
     const output = execFileSync('git', ['ls-tree', '-r', '-z', commitSha, '--', ...runnerGateBuildInputTreePaths], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
-    return `sha256:${createHash('sha256').update(output).digest('hex')}`;
+    return `sha256:${createHash('sha256').update(filterRunnerInputTreeListing(output.toString('utf8'))).digest('hex')}`;
 }
 catch {
     return null;
@@ -290,11 +291,14 @@ function inspectRunnerReceiptPublicationClosure(input) {
     const resolvedReceipt = resolveTaskRunnerReceipt(input.cwd, input.taskId);
     const receiptRef = resolvedReceipt.receiptRef;
     const currentHead = readCurrentGitHead(input.cwd);
-    const missing = (reason, extra) => ({ schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'missing', receiptRef, sealedSourceSha: null, currentHead, receiptRunnerInputTreeHash: null, currentRunnerInputTreeHash: null, headDeltaPaths: [], runnerAffectingDeltaPaths: [], nonRunnerAffectingDeltaPaths: [], reason, ...extra });
-    const rebuild = (reason, extra) => ({ schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'rebuild-required', receiptRef, sealedSourceSha: null, currentHead, receiptRunnerInputTreeHash: null, currentRunnerInputTreeHash: null, headDeltaPaths: [], runnerAffectingDeltaPaths: [], nonRunnerAffectingDeltaPaths: [], reason, ...extra });
+    const missing = (reason, extra) => ({ schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'missing', receiptRef, sealedSourceSha: null, currentHead, receiptRunnerInputTreeHash: null, currentRunnerInputTreeHash: null, publicationFiles: [], headDeltaPaths: [], runnerAffectingDeltaPaths: [], nonRunnerAffectingDeltaPaths: [], reason, ...extra });
+    const rebuild = (reason, extra) => ({ schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'rebuild-required', receiptRef, sealedSourceSha: null, currentHead, receiptRunnerInputTreeHash: null, currentRunnerInputTreeHash: null, publicationFiles: [], headDeltaPaths: [], runnerAffectingDeltaPaths: [], nonRunnerAffectingDeltaPaths: [], reason, ...extra });
     const receipt = resolvedReceipt.receipt;
     if (!receipt)
         return missing('No durable runner-sync receipt exists for this task.');
+    const publicationHandoff = resolveRunnerPublicationCloseHandoff({ taskId: input.taskId, receipt });
+    if (!publicationHandoff.ok)
+        return rebuild(publicationHandoff.reason ?? 'Runner publication handoff cannot be verified.');
     const sealedSourceSha = typeof receipt.sealedSourceSha === 'string' && receipt.sealedSourceSha.trim() ? receipt.sealedSourceSha.trim() : null;
     const receiptRunnerInputTreeHash = typeof receipt.runnerInputTreeHash === 'string' && receipt.runnerInputTreeHash.trim() ? receipt.runnerInputTreeHash.trim() : null;
     const graph = objectRecord(receipt.runnerInputGraph);
@@ -318,13 +322,12 @@ function inspectRunnerReceiptPublicationClosure(input) {
     const currentRunnerInputTreeHash = computeRunnerInputTreeHash(input.cwd, 'HEAD');
     if (!currentRunnerInputTreeHash || currentRunnerInputTreeHash !== receiptRunnerInputTreeHash)
         return rebuild('Current runner input tree hash does not match the durable receipt.', { sealedSourceSha, receiptRunnerInputTreeHash, currentRunnerInputTreeHash, headDeltaPaths, runnerAffectingDeltaPaths: classified.runnerAffecting, nonRunnerAffectingDeltaPaths: classified.nonRunnerAffecting });
-    return { schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'accepted', receiptRef, sealedSourceSha, currentHead, receiptRunnerInputTreeHash, currentRunnerInputTreeHash, headDeltaPaths, runnerAffectingDeltaPaths: classified.runnerAffecting, nonRunnerAffectingDeltaPaths: classified.nonRunnerAffecting, reason: sealedSourceSha === currentHead ? 'Receipt is sealed to current HEAD and runner input hash matches.' : 'Receipt sealed source is a HEAD ancestor; only non-runner-affecting lifecycle/evidence delta occurred and runner input hash still matches.' };
+    return { schemaId: 'atm.taskflowRunnerReceiptPublicationClosure.v1', status: 'accepted', receiptRef, sealedSourceSha, currentHead, receiptRunnerInputTreeHash, currentRunnerInputTreeHash, publicationFiles: publicationHandoff.stageFiles, headDeltaPaths, runnerAffectingDeltaPaths: classified.runnerAffecting, nonRunnerAffectingDeltaPaths: classified.nonRunnerAffecting, reason: sealedSourceSha === currentHead ? 'Receipt is sealed to current HEAD and runner input hash matches.' : 'Receipt sealed source is a HEAD ancestor; only non-runner-affecting lifecycle/evidence delta occurred and runner input hash still matches.' };
 }
 function isTaskScopedLifecycleEvidencePath(taskId, filePath) { const normalized = filePath.replace(/\\/g, '/'); return normalized === `.atm/history/tasks/${taskId}.json` || normalized.startsWith(`.atm/history/task-events/${taskId}/`) || normalized.startsWith(`.atm/history/evidence/${taskId}.`); }
 function isTaskScopedGeneratedDocumentationPath(filePath) { const normalized = filePath.replace(/\\/g, '/'); return normalized === 'docs/ERROR_CODES.md' || normalized === 'docs/governance/error-code-registry.json'; }
 function isReceiptClosureDirtyFileAllowed(input) { if (input.closure.status !== 'accepted')
-    return false; const normalized = input.filePath.replace(/\\/g, '/'); const classification = classifyRunnerAffectingPaths([normalized]); if (classification.runnerAffecting.length > 0)
-    return false; return normalized === input.closure.receiptRef || isTaskScopedLifecycleEvidencePath(input.taskId, normalized) || isTaskScopedGeneratedDocumentationPath(normalized); }
+    return false; const normalized = input.filePath.replace(/\\/g, '/'); return input.closure.publicationFiles.includes(normalized) || normalized === input.closure.receiptRef || isTaskScopedLifecycleEvidencePath(input.taskId, normalized) || isTaskScopedGeneratedDocumentationPath(normalized); }
 function applyRunnerReceiptPublicationClosureDirtyException(input) { const dirtyGuard = input.preflight.dirtyGuard; if (input.closure.status !== 'accepted' || dirtyGuard.blockingTrackedDirtyFiles.length === 0)
     return input.preflight; const allowedDirtyFiles = dirtyGuard.blockingTrackedDirtyFiles.filter((filePath) => isReceiptClosureDirtyFileAllowed({ taskId: input.taskId, filePath, closure: input.closure })); if (allowedDirtyFiles.length !== dirtyGuard.blockingTrackedDirtyFiles.length)
     return input.preflight; const allowed = new Set(allowedDirtyFiles); const adjustedDirtyGuard = { ...dirtyGuard, ok: true, reason: 'no-blocking-dirty-files', blockingTrackedDirtyFiles: [], scopeTrackedDirtyFiles: dirtyGuard.scopeTrackedDirtyFiles.filter((filePath) => !allowed.has(filePath)), governanceTrackedDirtyFiles: dirtyGuard.governanceTrackedDirtyFiles.filter((filePath) => !allowed.has(filePath)), advisoryTrackedDirtyFiles: uniqueSorted([...dirtyGuard.advisoryTrackedDirtyFiles, ...allowedDirtyFiles]) }; const keepBlocker = (entry) => entry.id !== 'scopeTrackedDirtyFiles' || adjustedDirtyGuard.scopeTrackedDirtyFiles.length > 0; const blockers = input.preflight.blockers.filter(keepBlocker); const operationalBlockers = input.preflight.operationalBlockers.filter(keepBlocker); return { ...input.preflight, ok: blockers.length === 0 && adjustedDirtyGuard.ok, blockers, operationalBlockers, scopeTrackedDirtyFiles: adjustedDirtyGuard.scopeTrackedDirtyFiles, dirtyGuard: adjustedDirtyGuard }; }

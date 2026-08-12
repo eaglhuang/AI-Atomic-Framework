@@ -57,6 +57,13 @@ export function isRunnerGeneratedOutputPath(path) {
     const normalized = normalizePath(path);
     return /^packages\/[^/]+\/dist\//.test(normalized);
 }
+/** Normalize `git ls-tree -z` output before it becomes a sealed-input digest. */
+export function filterRunnerInputTreeListing(listing) {
+    return listing.split('\0').filter((entry) => {
+        const tab = entry.indexOf('\t');
+        return tab < 0 || !isRunnerGeneratedOutputPath(entry.slice(tab + 1));
+    }).join('\0');
+}
 /** Prefixes / exact files that map a repo path to a runner input segment. */
 const SEGMENT_PREFIXES = [
     { segment: 'packages', test: (p) => p.startsWith('packages/') },

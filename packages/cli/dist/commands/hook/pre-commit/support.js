@@ -263,7 +263,7 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
                 continue;
             const lock = readJsonFile(path.join(lockRoot, entry));
             const declaredFiles = Array.isArray(lock?.files) ? lock.files.map(normalizeRelativePath) : [];
-            if (lock?.workItemId === taskId && declaredFiles.includes(file) && lock?.actorId === evidence?.actorId) {
+            if (lock?.workItemId === taskId && normalizeRelativePath(file) === `.atm/history/evidence/${taskId}.runner-sync-receipt.json` && lock?.actorId === evidence?.actorId) {
                 const context = contexts.get(taskId) ?? { ledger: false, event: false };
                 context.event = true;
                 contexts.set(taskId, context);

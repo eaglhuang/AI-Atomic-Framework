@@ -26,7 +26,7 @@ const REQUEST: PublicationRequest = {
 
 function snapshot(over: Partial<PublicationSnapshot> = {}): PublicationSnapshot {
   return {
-    phase: 'reservation',
+    phase: 'prepared',
     sealedSourceSha: REQUEST.sealedSourceSha,
     generation: 3,
     runnerBuildDigest: null,
@@ -40,13 +40,18 @@ function snapshot(over: Partial<PublicationSnapshot> = {}): PublicationSnapshot 
 }
 
 // 1. Reservation without queue-head ownership fails closed with the steward code.
-const noReservation = publishSealedRunner(REQUEST, snapshot({ queueHeadOwned: false }));
-assert.equal(noReservation.allowed, false);
-assert.equal(noReservation.errorCode, 'ATM_RUNNER_SYNC_STEWARD_REQUIRED');
-assert.ok(noReservation.recoveryCommand?.includes('runner-sync enqueue'));
+const privatePreparation = publishSealedRunner(REQUEST, snapshot({ queueHeadOwned: false }));
+assert.equal(privatePreparation.allowed, true);
+assert.equal(privatePreparation.action, 'build');
+
+const noPublicationReservation = publishSealedRunner(REQUEST, snapshot({ phase: 'publication-ready', queueHeadOwned: false }));
+assert.equal(noPublicationReservation.allowed, false);
+assert.equal(noPublicationReservation.errorCode, 'ATM_RUNNER_SYNC_STEWARD_REQUIRED');
+assert.ok(noPublicationReservation.recoveryCommand?.includes('runner-sync enqueue'));
 
 // 2. Full phase walk drives one governed transition per call to the terminal phase.
 const expectedActionByPhase: Record<PublicationPhase, string> = {
+  'prepared': 'build',
   'reservation': 'build',
   'build-ready': 'build',
   'built-sealed': 'seal',
@@ -54,9 +59,9 @@ const expectedActionByPhase: Record<PublicationPhase, string> = {
   'published': 'archive-receipt',
   'receipt-archived': 'complete'
 };
-let phase: PublicationPhase = 'reservation';
+let phase: PublicationPhase = 'prepared';
 const walk: PublicationPhase[] = [phase];
-for (let i = 0; i < 6 && phase !== 'receipt-archived'; i += 1) {
+for (let i = 0; i < 7 && phase !== 'receipt-archived'; i += 1) {
   const decision = publishSealedRunner(REQUEST, snapshot({ phase, generation: 3 }));
   assert.equal(decision.allowed, true, `${phase} must advance`);
   assert.equal(decision.action, expectedActionByPhase[phase], `${phase} action`);
@@ -65,7 +70,7 @@ for (let i = 0; i < 6 && phase !== 'receipt-archived'; i += 1) {
   phase = next;
   walk.push(phase);
 }
-assert.deepEqual(walk, ['reservation', 'build-ready', 'built-sealed', 'publication-ready', 'published', 'receipt-archived']);
+assert.deepEqual(walk, ['prepared', 'reservation', 'build-ready', 'built-sealed', 'publication-ready', 'published', 'receipt-archived']);
 
 // 3. Published phase yields a canonical receipt binding every required field.
 const atPublished = publishSealedRunner(REQUEST, snapshot({

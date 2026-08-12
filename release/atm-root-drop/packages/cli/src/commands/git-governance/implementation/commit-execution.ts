@@ -118,6 +118,7 @@ try {
           ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? "",
           ATM_COMMIT_SESSION_ID: session?.sessionId ?? "",
           ATM_COMMIT_LANE_SESSION_ID: laneSessionId ?? "",
+          ATM_COMMIT_INDEX_FINALIZED: "1",
           ATM_COMMIT_BROKER_CONFLICT_RESOLUTION:
             options.brokerConflictResolutionPath ?? "",
           ATM_COMMIT_TRAILERS: trailers.join("\n"),

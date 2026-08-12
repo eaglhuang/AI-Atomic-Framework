@@ -10,7 +10,7 @@ import { supersedeRunnerSyncReservation } from './runner-sync-supersession.js';
 import { cleanupGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../../core/dist/broker/generated-projection-steward.js';
 import { readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward } from './persistence.js';
 import { appendLaneSessionEvent } from '../lane-session/events.js';
-import { inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.js';
+import { authorizeRunnerPublicationTakeover, evaluateRunnerPublicationContinuation, inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.js';
 export function handleBrokerStewardQueues(options, context) {
     const runnerSyncQueuePath = context.runnerSyncQueuePath;
     const projectionStewardPath = context.projectionStewardPath;
@@ -191,7 +191,32 @@ export function handleBrokerStewardQueues(options, context) {
                 throw toRunnerSyncQueueCliError(error);
             }
         }
-        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, supersede, status, cleanup, release, reconcile-receipt', { exitCode: 2 });
+        if (options.runnerSyncAction === 'takeover-publication') {
+            if (!options.task || !options.actorId || !options.sealedSourceSha || options.surfaces.length !== 1) {
+                throw new CliError('ATM_CLI_USAGE', 'broker runner-sync takeover-publication requires --task, --actor, --sealed-source-sha, and exactly one --surface <full|packages|root-drop|onefile>.', { exitCode: 2 });
+            }
+            assertRunnerSyncRecoveryAuthority(options.cwd, options.task, options.actorId);
+            const buildTarget = options.surfaces[0];
+            if (!['full', 'packages', 'root-drop', 'onefile'].includes(buildTarget)) {
+                throw new CliError('ATM_CLI_USAGE', 'takeover-publication surface must be one of: full, packages, root-drop, onefile.', { exitCode: 2 });
+            }
+            const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
+            const sealedSourceSha = resolveFullGitCommitSha(options.cwd, options.sealedSourceSha);
+            const head = queue.groups[0];
+            if (!head || head.sealedSourceSha !== sealedSourceSha || !head.waitingTasks.includes(options.task)) {
+                throw new CliError('ATM_RUNNER_PUBLICATION_PENDING', 'Publication takeover requires the active queue-head task and its exact sealed source SHA.', { exitCode: 1 });
+            }
+            const task = JSON.parse(readFileSync(path.join(options.cwd, '.atm', 'history', 'tasks', `${options.task}.json`), 'utf8'));
+            const plan = authorizeRunnerPublicationTakeover({ cwd: options.cwd, taskId: options.task, sealedSourceSha, buildTarget: buildTarget, currentTaskAllowedFiles: task.allowedFiles ?? [] });
+            return makeResult({
+                ok: true,
+                command: 'broker',
+                cwd: options.cwd,
+                messages: [message('info', 'ATM_BROKER_RUNNER_PUBLICATION_TAKEOVER_AUTHORIZED', `Authorized ${plan.entries.length} exact generated publication member(s) for the queue-head sealed build.`, { planDigest: plan.digest })],
+                evidence: { plan, receiptPath: `.atm/history/evidence/${options.task}.runner-publication-takeover.json` }
+            });
+        }
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, supersede, status, cleanup, release, reconcile-receipt, takeover-publication', { exitCode: 2 });
     }
     if (options.action === 'projection') {
         if (options.projectionAction === 'enqueue') {
@@ -392,7 +417,7 @@ export function validateRunnerSyncReleaseReceipt(input) {
     const expectedSurfaces = normalizeReceiptStringArray(group.requestedSurfaces);
     const mismatches = [
         receipt.schemaId === 'atm.runnerSyncReceipt.v1' ? null : 'schemaId',
-        receipt.taskId === input.taskId ? null : 'taskId',
+        receiptRepresentsRunnerSyncQueueTask(receipt, input.taskId) ? null : 'taskId',
         receipt.actorId === ownerRequest.actorId ? null : 'actorId',
         receipt.stewardWorkId === input.stewardWorkId ? null : 'stewardWorkId',
         receipt.sealedSourceSha === group.sealedSourceSha ? null : 'sealedSourceSha',
@@ -407,11 +432,35 @@ export function validateRunnerSyncReleaseReceipt(input) {
     if (!publication.ok && publication.code) {
         throw new Error(`${publication.code}: receipt ${receiptRef} cannot release ${input.stewardWorkId} while its sealed output inventory is ${publication.report.disposition}. inventoryDigest=${publication.report.inventoryDigest}.`);
     }
+    const continuation = evaluateRunnerPublicationContinuation({
+        taskId: input.taskId,
+        queueMemberTaskIds: group.waitingTasks,
+        stewardWorkId: input.stewardWorkId,
+        queueHeadStewardWorkId: group.queuePosition === 1 ? group.stewardWorkId : '',
+        sealedSourceSha: group.sealedSourceSha,
+        receiptSealedSourceSha: String(receipt.sealedSourceSha ?? ''),
+        receiptDigest: digest,
+        inventoryDigest: publication.report.inventoryDigest,
+        receiptInventoryDigest: String(receipt.outputInventory?.digest ?? ''),
+    });
+    if (!continuation.allowed) {
+        throw new Error(`${continuation.code}: ${continuation.reason}`);
+    }
     validateRunnerSyncReleaseFinalizableReceipt({ receipt, group, stewardWorkId: input.stewardWorkId });
     return {
         receiptRef: receiptRef.replace(/\\/g, '/'),
         receiptDigest: digest
     };
+}
+function receiptRepresentsRunnerSyncQueueTask(receipt, queueTaskId) {
+    const receiptTaskId = typeof receipt.taskId === 'string' ? receipt.taskId.trim() : '';
+    if (!receiptTaskId)
+        return false;
+    if (receiptTaskId === queueTaskId)
+        return true;
+    const memberTaskIds = normalizeReceiptStringArray(receipt.memberTaskIds);
+    const linkedTaskIds = normalizeReceiptStringArray(receipt.linkedTaskIds);
+    return memberTaskIds.includes(queueTaskId) && linkedTaskIds.includes(receiptTaskId);
 }
 function validateRunnerSyncReleaseFinalizableReceipt(input) {
     const receipt = input.receipt;

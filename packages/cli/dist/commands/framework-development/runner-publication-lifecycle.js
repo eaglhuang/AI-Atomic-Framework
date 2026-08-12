@@ -2,8 +2,19 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { deriveRunnerBuildOutputInventory, evaluateRunnerPublicationDisposition, validateRunnerBuildOutputInventory } from '../../../../core/dist/broker/runner-build-output-inventory.js';
+import { buildRunnerPublicationReceipt } from './runner-publication-receipt.js';
+import { captureRunnerBuildOutputSnapshot, deriveRunnerBuildOutputInventory, evaluateRunnerPublicationDisposition, planRunnerPublicationTakeover, validateRunnerBuildOutputInventory } from '../../../../core/dist/broker/runner-build-output-inventory.js';
+export function authorizeRunnerPublicationTakeover(input) {
+    const snapshot = captureRunnerBuildOutputSnapshot({ cwd: input.cwd, buildTarget: input.buildTarget, currentTaskId: input.taskId, currentTaskAllowedFiles: input.currentTaskAllowedFiles });
+    const plan = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot });
+    if (plan.entries.length === 0)
+        throw new Error('ATM_RUNNER_PUBLICATION_PENDING: takeover requires at least one pre-existing generated publication member.');
+    const receiptPath = path.join(input.cwd, '.atm', 'history', 'evidence', `${input.taskId}.runner-publication-takeover.json`);
+    writeFileSync(receiptPath, `${JSON.stringify(plan, null, 2)}\n`, 'utf8');
+    return plan;
+}
 const PHASE_ORDER = [
+    'prepared',
     'reservation',
     'build-ready',
     'built-sealed',
@@ -11,30 +22,48 @@ const PHASE_ORDER = [
     'published',
     'receipt-archived'
 ];
-function fingerprint(value, kind) {
-    if (typeof value !== 'string' || value.trim().length === 0)
-        return null;
-    return `${kind}fp:${createHash('sha256').update(`${kind}\n${value}`).digest('hex').slice(0, 16)}`;
+/**
+ * Validates the durable continuation authority for publishing a receipt after
+ * its source task has closed.  The authority is the sealed queue/receipt
+ * tuple, never a reopened task, actor override, or task-id exception.
+ */
+export function evaluateRunnerPublicationContinuation(input) {
+    const mismatches = [
+        input.queueMemberTaskIds.includes(input.taskId) ? null : 'queue-member-task',
+        input.stewardWorkId === input.queueHeadStewardWorkId ? null : 'queue-head-work',
+        input.sealedSourceSha === input.receiptSealedSourceSha ? null : 'sealed-source',
+        input.inventoryDigest === input.receiptInventoryDigest ? null : 'output-inventory',
+        /^sha256:[a-f0-9]{64}$/i.test(input.receiptDigest) ? null : 'receipt-digest',
+    ].filter((entry) => entry !== null);
+    return mismatches.length === 0
+        ? {
+            schemaId: 'atm.runnerPublicationContinuationDecision.v1',
+            allowed: true,
+            code: null,
+            reason: 'Queue-head, sealed source, receipt digest, and output inventory form one durable publication continuation.',
+        }
+        : {
+            schemaId: 'atm.runnerPublicationContinuationDecision.v1',
+            allowed: false,
+            code: 'ATM_RUNNER_PUBLICATION_CONTINUATION_MISMATCH',
+            reason: `Publication continuation facts do not match: ${mismatches.join(', ')}.`,
+        };
 }
 function buildReceipt(request, snapshot, disposition, now) {
-    const surfaces = [...new Set(request.surfaces.map((s) => s.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-    const core = {
-        schemaId: 'atm.sealedRunnerPublicationReceipt.v1',
+    return buildRunnerPublicationReceipt({
         taskId: request.authority.taskId,
-        laneFingerprint: fingerprint(request.authority.laneSessionId, 'lane'),
+        laneSessionId: request.authority.laneSessionId,
         stewardActorId: request.authority.stewardActorId,
         sealedSourceSha: request.sealedSourceSha,
         generation: snapshot.generation,
         runnerBuildDigest: snapshot.runnerBuildDigest,
         manifestDigest: snapshot.manifestDigest,
-        surfaces,
+        surfaces: request.surfaces,
         publicationCommitSha: snapshot.publicationCommitSha,
         remoteVisibility: request.remoteVisibility,
         receiptDisposition: disposition,
         issuedAt: now
-    };
-    const receiptDigest = `sha256:${createHash('sha256').update(JSON.stringify(core)).digest('hex')}`;
-    return { ...core, receiptDigest };
+    });
 }
 /**
  * Advance (or report) the sealed runner publication lifecycle by exactly one
@@ -70,21 +99,22 @@ export function publishSealedRunner(request, snapshot) {
     }
     const enqueueRecovery = `node atm.mjs broker runner-sync enqueue --task ${request.authority.taskId} --actor ${request.authority.stewardActorId} --sealed-source-sha ${request.sealedSourceSha} --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json`;
     switch (snapshot.phase) {
+        case 'prepared':
+            return decide('build', 'prepared', true, 'Private candidate preparation holds no shared queue reservation; build and seal outside the publication mutex.');
         case 'reservation': {
-            // Queue-head ownership is mandatory before any build/publish.
-            if (!snapshot.queueHeadOwned) {
-                return decide('reserve', 'reservation', false, 'Runner-sync steward queue-head reservation is required before build or publication.', {
-                    errorCode: 'ATM_RUNNER_SYNC_STEWARD_REQUIRED',
-                    recoveryCommand: enqueueRecovery
-                });
-            }
-            return decide('build', 'reservation', true, 'Reservation held; proceed to the sealed build from committed source.');
+            return decide('build', 'reservation', true, 'Legacy reservation state is treated as queue-free candidate preparation; build and seal before requesting publication.');
         }
         case 'build-ready':
             return decide('build', 'build-ready', true, 'Build the runner from the sealed source; frozen bootstrap validates against the newly built runner, not the stale one.');
         case 'built-sealed':
             return decide('seal', 'built-sealed', true, 'Runner built and sealed; compute build/manifest digests and prepare publication.');
         case 'publication-ready':
+            if (!snapshot.queueHeadOwned) {
+                return decide('reserve', 'publication-ready', false, 'Queue-head ownership is required only for the final shared publication mutation.', {
+                    errorCode: 'ATM_RUNNER_SYNC_STEWARD_REQUIRED',
+                    recoveryCommand: enqueueRecovery
+                });
+            }
             return decide('publish', 'publication-ready', true, 'Publish the sealed runner + generated manifest onto the declared surfaces.');
         case 'published':
             return decide('archive-receipt', 'published', true, 'Publication landed; archive the canonical receipt as the governed terminal phase.', {
@@ -115,8 +145,13 @@ export function inspectRunnerPublicationDisposition(cwd, receiptRef) {
     const dirtyPaths = readDirtyPaths(cwd);
     const receipts = readRunnerReceipts(cwd);
     const requested = receiptRef ? normalizeReceiptRef(receiptRef) : null;
+    // A release transition is explicitly receipt-addressed.  Do not silently
+    // fall back to directory discovery when its caller supplied one: test,
+    // recovery, and alternate evidence roots are all legitimate as long as the
+    // reference is repository-local and the receipt validates.  Discovery is a
+    // convenience only for callers that did not name a receipt.
     const selected = (requested
-        ? receipts.find((candidate) => candidate.path === requested)
+        ? readRunnerReceiptAtPath(cwd, requested)
         : null) ?? receipts.find((candidate) => {
         const members = new Set(candidate.inventory.entries.map((entry) => entry.path));
         return dirtyPaths.some((entry) => members.has(entry));
@@ -140,6 +175,26 @@ export function inspectRunnerPublicationDisposition(cwd, receiptRef) {
         sealedSourceSha: selected?.inventory.sealedSourceSha ?? null,
         report
     };
+}
+function readRunnerReceiptAtPath(cwd, receiptRef) {
+    const absolute = path.resolve(cwd, receiptRef);
+    if (!absolute.startsWith(path.resolve(cwd) + path.sep) || !existsSync(absolute))
+        return null;
+    try {
+        const document = JSON.parse(readFileSync(absolute, 'utf8'));
+        const validated = validateRunnerBuildOutputInventory(document.outputInventory);
+        if (!validated.ok || !validated.inventory)
+            return null;
+        const disposition = document.publicationDisposition;
+        return {
+            path: receiptRef,
+            inventory: validated.inventory,
+            terminalDisposition: disposition === 'published' || disposition === 'recovery-retained' ? disposition : null
+        };
+    }
+    catch {
+        return null;
+    }
 }
 /**
  * The sole controlled terminal route for one stale runner-sync receipt. It is

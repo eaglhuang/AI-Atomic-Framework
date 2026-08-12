@@ -1,11 +1,13 @@
 import { evaluateGitGovernanceCheck, runGitCommitStatus, runGitPrepare, } from './identity-check-command.js';
-import { makeResult, message, } from "../../shared.js";
+import { CliError, makeResult, message, quoteCliValue, relativePathFrom, } from "../../shared.js";
 import { runGitAdmission } from './admission-command.js';
 import { runGitCommit } from './commit-command.js';
 import { parseGitOptions } from './git-command-options.js';
 import { runGitLease } from './lease-command.js';
 import { runGitPostPushFailRecovery, runGitPush } from './push-command.js';
 import { runGitRecordCommit } from './record-commit-command.js';
+import { assertEmergencyApproval, recordProtectedOverrideOutcome } from '../../emergency/gate.js';
+import { GIT_INDEX_LOCK_RECOVERY_FLAG, recoverGitIndexLock } from './git-index-lock-recovery.js';
 export function normalizeCommitLaneSessionId(value) {
     return typeof value === "string" && value.trim() ? value.trim() : null;
 }
@@ -50,6 +52,74 @@ export async function runAtmGit(argv) {
     }
     if (options.action === "commit-status") {
         return runGitCommitStatus(options);
+    }
+    if (options.action === 'recover-index-lock') {
+        const command = `node atm.mjs git recover-index-lock --task ${quoteCliValue(options.taskId ?? '<task-id>')} --actor ${quoteCliValue(options.actorId ?? '<actor-id>')} ${GIT_INDEX_LOCK_RECOVERY_FLAG} --emergency-approval <lease-id> --reason "<human-approved reason>" --json`;
+        const approval = assertEmergencyApproval({
+            cwd: options.cwd,
+            surface: 'git recover-index-lock',
+            permission: 'backend.gitIndexLockRecovery',
+            taskId: options.taskId,
+            actorId: options.actorId,
+            emergencyApproval: options.emergencyApproval,
+            flags: [GIT_INDEX_LOCK_RECOVERY_FLAG],
+            reason: options.overrideReason,
+            command,
+        });
+        try {
+            const recovery = recoverGitIndexLock({
+                cwd: options.cwd,
+                force: options.forceIndexLockRecovery,
+                dryRun: options.dryRun,
+            });
+            if (approval) {
+                recordProtectedOverrideOutcome({
+                    cwd: options.cwd,
+                    parentEventId: approval.protectedOverrideAudit.event.eventId,
+                    actorId: options.actorId,
+                    taskId: options.taskId,
+                    surface: 'git recover-index-lock',
+                    command,
+                    flags: [GIT_INDEX_LOCK_RECOVERY_FLAG],
+                    permission: 'backend.gitIndexLockRecovery',
+                    leaseId: options.emergencyApproval,
+                    reason: options.overrideReason,
+                    skippedChecks: ['active-git-writer-liveness-is-human-confirmed'],
+                    touchedFiles: recovery.action === 'removed' ? [relativePathFrom(options.cwd, recovery.before.lockPath)] : [],
+                    outcome: 'succeeded',
+                    emergencyUsePath: approval.usePath,
+                });
+            }
+            return makeResult({
+                ok: true,
+                command: 'git',
+                cwd: options.cwd,
+                messages: [message('info', 'ATM_GIT_INDEX_LOCK_RECOVERY_READY', `Git index lock recovery ${recovery.action}.`, { recovery })],
+                evidence: { action: 'recover-index-lock', recovery, emergencyUse: approval ?? null },
+            });
+        }
+        catch (error) {
+            if (approval) {
+                recordProtectedOverrideOutcome({
+                    cwd: options.cwd,
+                    parentEventId: approval.protectedOverrideAudit.event.eventId,
+                    actorId: options.actorId,
+                    taskId: options.taskId,
+                    surface: 'git recover-index-lock',
+                    command,
+                    flags: [GIT_INDEX_LOCK_RECOVERY_FLAG],
+                    permission: 'backend.gitIndexLockRecovery',
+                    leaseId: options.emergencyApproval,
+                    reason: options.overrideReason,
+                    skippedChecks: ['active-git-writer-liveness-is-human-confirmed'],
+                    touchedFiles: [],
+                    outcome: 'failed',
+                    failureCode: error instanceof CliError ? error.code : 'ATM_GIT_INDEX_LOCK_PRESENT',
+                    emergencyUsePath: approval.usePath,
+                });
+            }
+            throw error;
+        }
     }
     const check = evaluateGitGovernanceCheck({
         cwd: options.cwd,

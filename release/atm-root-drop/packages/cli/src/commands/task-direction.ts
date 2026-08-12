@@ -1,11 +1,11 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, relativePathFrom } from './shared.ts';
+import { readActiveTaskDirectionLocks } from './task-direction/active-locks.ts';
 import { isExternalPlanningStoredPath, normalizeStoredPlanningPathForIdentity, resolveStoredPlanningPath } from './planning-repo-root.ts';
 import { isPathAllowedByScope } from './work-channels.ts';
 import {
   buildQueueId,
-  dedupeDirectionLocks,
   derivePlanningMirrorGuardPaths,
   deriveQueueScopeKey,
   isExternalPlanningPath,
@@ -486,34 +486,7 @@ function computeAllowedFilesDrift(canonical: readonly string[], source: readonly
   return { missingFromSource, extraInSource };
 }
 
-export function readActiveTaskDirectionLocks(cwd: string): readonly TaskDirectionLock[] {
-  const locks: TaskDirectionLock[] = [];
-  const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
-  if (existsSync(lockRoot)) {
-    for (const entry of readdirSync(lockRoot).filter((item) => item.endsWith('.json'))) {
-      try {
-        const parsed = JSON.parse(readFileSync(path.join(lockRoot, entry), 'utf8')) as Record<string, unknown>;
-        const released = parsed.released === true || parsed.status === 'released';
-        const embedded = parsed.taskDirectionLock;
-        if (!released && isTaskDirectionLock(embedded)) locks.push(embedded);
-      } catch {
-        // Ignore malformed runtime files; task audit owns persistent task validation.
-      }
-    }
-  }
-  const sidecarRoot = path.join(cwd, '.atm', 'runtime', 'task-direction-locks');
-  if (existsSync(sidecarRoot)) {
-    for (const entry of readdirSync(sidecarRoot).filter((item) => item.endsWith('.json'))) {
-      try {
-        const parsed = JSON.parse(readFileSync(path.join(sidecarRoot, entry), 'utf8'));
-        if (isTaskDirectionLock(parsed)) locks.push(parsed);
-      } catch {
-        // Ignore malformed runtime files.
-      }
-    }
-  }
-  return dedupeDirectionLocks(locks);
-}
+export { readActiveTaskDirectionLocks };
 
 export function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, actorId: string, options: {
   readonly allowHistoricalCloseback?: boolean;

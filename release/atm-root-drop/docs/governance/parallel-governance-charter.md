@@ -42,6 +42,21 @@ failures, unsupported adapters, and fairness bounds. A safe same-file compose
 is allowed to have zero queue residency; path-only serialization is not evidence
 of successful parallel governance.
 
+## Minimum Queue Residency
+
+Queueing is a scarce-resource boundary, not a model for owning work. For every
+queue, first remove, compose, defer, or privatize everything that does not need
+the same shared resource at the same instant. The remaining queue interval must
+be the smallest observable interval that preserves the shared transition's
+safety.
+
+Admission therefore accepts only a ready candidate bound to current state;
+completion or invalidation returns capacity immediately. A queue must not carry
+planning, computation, validation, staging, polling, or long-lived reservation.
+Broker tickets, locks, leases, publication flows, and commits are mechanisms
+that must implement this principle rather than exceptions to it. This
+operationalizes `INV-ATM-011`.
+
 The only execution-substrate exceptions are `emergency-anomaly-recovery`,
 `historical-read-only-discrimination`, and `non-development-sealed-packaging`.
 Each requires a named receipt, is fail-closed for unknown reasons, and cannot

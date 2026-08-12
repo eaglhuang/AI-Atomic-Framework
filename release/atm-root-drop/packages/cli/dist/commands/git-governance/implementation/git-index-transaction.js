@@ -11,6 +11,7 @@ import { ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit } from './git-he
 import { parseTaskClaim, readTaskDocument } from './identity-check-command.js';
 import { isIgnorableCommitStagingSideEffect, isTaskOwnedProtectedOverrideAuditPath } from './task-scope-staging.js';
 import { runWithSealedTaskScopedCommitIndex } from './sealed-commit-attribution.js';
+import { recordLiveIndexReconciliation } from './live-index-reconciliation.js';
 export function inspectCloseCommitWindowStagedArtifacts(cwd, taskId) {
     const stagedFiles = readStagedFiles(cwd);
     if (stagedFiles.length === 0) {
@@ -65,6 +66,24 @@ export function readStagedFiles(cwd) {
             "--name-only",
             "--diff-filter=ACMRT",
         ])
+            .split(/\r?\n/)
+            .map(normalizeRelativePath)
+            .filter(Boolean)
+            .sort((left, right) => left.localeCompare(right));
+    }
+    catch {
+        return [];
+    }
+}
+/**
+ * Read tracked worktree changes independently of staged state. A path may be
+ * both staged and unstaged (`MM`); callers that implement auto-stage must keep
+ * that path in the worktree overlay instead of treating the staged entry as
+ * authoritative.
+ */
+export function readUnstagedFiles(cwd) {
+    try {
+        return runGitCommand(cwd, ["diff", "--name-only", "--diff-filter=ACMRTD"])
             .split(/\r?\n/)
             .map(normalizeRelativePath)
             .filter(Boolean)
@@ -356,10 +375,16 @@ export function recordGitIndexRestoreFailure(cwd, input) {
  * before `run` may create a commit. An empty bundle is not a licence to commit
  * the live shared index, and neither is an absent one: the caller passes the
  * seal source it decided on, and an unnamed source fails closed.
+ *
+ * The commit result is returned alongside the live-index reconciliation rather
+ * than in place of it. Reconciliation is the postcondition that decides whether
+ * the shared index is actually clean afterwards, so a caller that only ever
+ * sees the commit result cannot tell a clean index from one holding retained
+ * paths it does not own.
  */
 export function withTaskScopedCommitIndex(cwd, files, actorId, taskId, run, sealSource) {
     const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
-    return runWithSealedTaskScopedCommitIndex({
+    const outcome = runWithSealedTaskScopedCommitIndex({
         cwd,
         paths: normalizedFiles,
         provenance: "task-scope",
@@ -373,7 +398,13 @@ export function withTaskScopedCommitIndex(cwd, files, actorId, taskId, run, seal
             return staged?.evidencePath ? [staged.evidencePath] : [];
         },
         run,
-    }).result;
+    });
+    const liveIndexReconciliation = outcome.liveIndexReconciliation;
+    return {
+        result: outcome.result,
+        liveIndexReconciliation,
+        liveIndexReconciliationRecordPath: recordLiveIndexReconciliation(cwd, taskId, liveIndexReconciliation),
+    };
 }
 export function stageTaskScopedBundleFiles(cwd, files, env) {
     const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));

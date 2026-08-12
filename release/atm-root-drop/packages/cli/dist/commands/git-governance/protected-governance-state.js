@@ -16,12 +16,13 @@ export function classifyProtectedGovernanceStatePath(filePath) {
         return { pathClass: 'task-evidence', ownerTaskId: match[1]?.toUpperCase() ?? null };
     return null;
 }
-function listDiffNames(cwd, args) {
+function listDiffNames(cwd, args, env) {
     try {
         return execFileSync('git', [...args, '-z'], {
             cwd,
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'pipe']
+            stdio: ['ignore', 'pipe', 'pipe'],
+            env
         }).split('\0').map(normalizeRelativePath).filter(Boolean);
     }
     catch {
@@ -29,12 +30,17 @@ function listDiffNames(cwd, args) {
     }
 }
 export function inspectProtectedGovernanceStateDestructiveChanges(input) {
+    const commitFileSet = input.commitFiles
+        ? new Set(input.commitFiles.map(normalizeRelativePath))
+        : null;
     const deleted = new Set([
-        ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D']),
-        ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'])
+        ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D'], input.env),
+        ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'], input.env)
     ]);
     const violations = [];
     for (const filePath of [...deleted].sort()) {
+        if (commitFileSet && !commitFileSet.has(normalizeRelativePath(filePath)))
+            continue;
         const classification = classifyProtectedGovernanceStatePath(filePath);
         if (!classification)
             continue;

@@ -21,9 +21,8 @@ import {
 } from '../packages/core/src/broker/runner-version-contract.ts';
 import type { BuildDecision, BuildTarget, SealedBuildTimings } from './run-sealed-runner-build.ts';
 import { buildRunnerSyncBuildObservation, summarizeDominantPhase } from './runner-sync-observability.ts';
-import { buildRunnerSyncReleaseCommand, resolveTemporaryStewardLinks, uniqueReceiptTaskIds } from './runner-sync-receipt-continuation.ts';
+import { buildRunnerSyncReleaseCommand, resolveRunnerSyncReceiptOwnerTaskId, resolveTemporaryStewardLinks, uniqueReceiptTaskIds } from './runner-sync-receipt-continuation.ts';
 export { buildRunnerSyncBuildObservation, persistTsBuildCache, prepareTsBuildCache, summarizeDominantPhase, writeRunnerBuildRuntimeTelemetry } from './runner-sync-observability.ts';
-
 const releaseManifestPaths = [
   path.join('release', 'atm-root-drop', 'release-manifest.json'),
   path.join('release', 'atm-onefile', 'release-manifest.json')
@@ -111,6 +110,7 @@ export type RunnerSyncReceipt = {
   readonly schemaId: 'atm.runnerSyncReceipt.v1';
   readonly specVersion: '0.1.0';
   readonly taskId: string;
+  readonly publicationDisposition: 'published';
   readonly actorId: string;
   readonly actorIdentity: {
     readonly actorId: string;
@@ -248,7 +248,6 @@ export function planRunnerIncrementalBuild(input: {
   };
 }
 
-
 export function writeJsonWithRetry(input: {
   readonly filePath: string;
   readonly value: unknown;
@@ -287,12 +286,14 @@ export function buildRunnerSyncReceipt(input: {
   readonly tsBuildCache?: TsBuildCacheSummary | null;
   readonly brokerTicket?: RunnerSyncBuildObservation['brokerTicket'];
   readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
+  readonly receiptTaskId?: string | null;
   readonly timings: SealedBuildTimings;
   readonly publishedAt?: string;
 }): RunnerSyncReceipt {
-  const taskId = input.admission.queueHeadOwnership.waitingTasks[0] ?? '';
+  const queueTaskId = input.admission.queueHeadOwnership.waitingTasks[0] || '';
+  const taskId = input.receiptTaskId?.trim() || queueTaskId;
   const stewardWorkId = input.admission.queueHeadOwnership.stewardWorkId ?? '';
-  if (!taskId || !stewardWorkId) {
+  if (!queueTaskId || !taskId || !stewardWorkId) {
     throw new Error('ATM_RUNNER_SYNC_RECEIPT_INVALID: queue-head task and steward work id are required to publish a runner-sync receipt.');
   }
   const brokerTicket = input.brokerTicket ?? normalizeBrokerTicket(input.admission);
@@ -315,6 +316,7 @@ export function buildRunnerSyncReceipt(input: {
     schemaId: 'atm.runnerSyncReceipt.v1',
     specVersion: '0.1.0',
     taskId,
+    publicationDisposition: 'published',
     actorId: input.actorId,
     actorIdentity: {
       actorId: input.actorId,
@@ -370,7 +372,7 @@ export function buildRunnerSyncReceipt(input: {
       maxAttempts: 4
     },
     autoReleaseCommand: buildRunnerSyncReleaseCommand({
-      taskId,
+      taskId: queueTaskId,
       stewardWorkId,
       receiptRef: path.join('.atm', 'history', 'evidence', `${taskId}.runner-sync-receipt.json`).replace(/\\/g, '/')
     }),
@@ -486,12 +488,14 @@ export function writeRunnerSyncReceipt(input: {
   readonly dominantPhaseSummary?: RunnerSyncDominantPhaseSummary;
   readonly timings: SealedBuildTimings;
 }): string {
+  const linkedTaskIds = uniqueReceiptTaskIds([
+    ...(input.linkedTaskIds ?? []),
+    ...resolveTemporaryStewardLinks(input.cwd, input.admission.queueHeadOwnership.waitingTasks)
+  ]);
   const receipt = buildRunnerSyncReceipt({
     ...input,
-    linkedTaskIds: uniqueReceiptTaskIds([
-      ...(input.linkedTaskIds ?? []),
-      ...resolveTemporaryStewardLinks(input.cwd, input.admission.queueHeadOwnership.waitingTasks)
-    ])
+    linkedTaskIds,
+    receiptTaskId: resolveRunnerSyncReceiptOwnerTaskId(input.cwd, input.admission.queueHeadOwnership.waitingTasks)
   });
   const relative = path.join('.atm', 'history', 'evidence', `${receipt.taskId}.runner-sync-receipt.json`);
   const absolute = path.join(input.cwd, relative);

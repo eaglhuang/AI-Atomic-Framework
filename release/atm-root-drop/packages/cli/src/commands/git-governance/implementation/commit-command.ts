@@ -9,10 +9,7 @@ import {
   RECORD_COMMIT_BLOCK_BRIDGE_AUTH_DIR,
   RECORD_COMMIT_BLOCK_BRIDGE_DEFAULT_TTL_MS,
 } from "../record-only-block-lifecycle-bridge.ts";
-import {
-  assertEmergencyApproval,
-  recordProtectedOverrideOutcome,
-} from "../../emergency/gate.ts";
+import { assertEmergencyApproval, recordProtectedOverrideOutcome } from "../../emergency/gate.ts";
 import {
   extractGovernanceTaskIdFromPath,
   inspectTouchedPhysicalLineBudget,
@@ -22,13 +19,7 @@ import {
   pathMatchesTaskScope,
   uniqueSorted,
 } from "../commit-scope-policy.ts";
-import {
-  CliError,
-  makeResult,
-  message,
-  quoteCliValue,
-  relativePathFrom,
-} from "../../shared.ts";
+import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from "../../shared.ts";
 import { assertNoBrokerConflictBeforeHookBypass } from './broker-hook-bypass-preflight.ts';
 import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles, recordGitIndexRestoreFailure, rollbackNewlyStagedLiveIndexResidue, withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { assertNoStdinPathspecGitAddPreflight, createSanitizedGitEnv, gitCommitAttemptStatusRelativePath, readGitCommitAttemptStatus, resolveGitCommitTimeoutMs, shouldStageGovernedGitHeadEvidenceBeforeCommit, stageTrackedActorRegistryIfNeeded, writeGitCommitAttemptStatus } from './git-process-port.ts';
@@ -286,11 +277,16 @@ if (options.taskId && taskDocument && !bypassesActiveSession) {
         },
       );
     }
-    const stagedBundleInspection = inspectTaskScopedStagedGovernanceBundle(
-      options.cwd,
-      options.taskId,
-      taskDocument,
-    );
+    // `--auto-stage` assembles and verifies the bundle in a sealed candidate
+    // index. Re-staging it in the shared index is redundant and lets foreign
+    // lanes contend on bytes this commit will never consume.
+    const stagedBundleInspection = options.autoStage
+      ? { ok: true, code: '', summary: '', warnings: [], details: {} }
+      : inspectTaskScopedStagedGovernanceBundle(
+        options.cwd,
+        options.taskId,
+        taskDocument,
+      );
     if (!stagedBundleInspection.ok) {
       cleanupDeferredForeignStagedSnapshot(
         options.cwd,
@@ -312,11 +308,13 @@ if (options.taskId && taskDocument && !bypassesActiveSession) {
         },
       );
     }
-    const stagingInspection = inspectTaskScopedUnstagedCommit(
-      options.cwd,
-      options.taskId,
-      taskDocument,
-    );
+    const stagingInspection = options.autoStage
+      ? null
+      : inspectTaskScopedUnstagedCommit(
+        options.cwd,
+        options.taskId,
+        taskDocument,
+      );
     if (stagingInspection?.kind === "staging-required") {
       cleanupDeferredForeignStagedSnapshot(
         options.cwd,

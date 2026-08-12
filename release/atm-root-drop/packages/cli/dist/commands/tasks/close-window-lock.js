@@ -93,6 +93,48 @@ function readCloseWindowStagedIndexLock(cwd) {
         return null;
     }
 }
+const INDEX_LOCK_RETRY_DELAYS_MS = [25, 50, 100, 200, 400, 800, 1600];
+function isGitIndexLockContention(error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return /(?:index\.lock|unable to create .*\.git[\\/]index\.lock)/i.test(message);
+}
+function waitForIndexLockRetry(delayMs) {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delayMs);
+}
+/**
+ * Runs one index mutation through a deliberately bounded retry window.
+ * A close window never steals a live Git lock: it merely tolerates the short
+ * hand-off interval after a child commit/hook releases the shared index.
+ */
+export function runGitIndexMutationWithRetry(input) {
+    for (let attempt = 0;; attempt += 1) {
+        try {
+            (input.run ?? (() => execFileSync(resolveGitExecutable(), input.args, {
+                cwd: input.cwd,
+                stdio: ['ignore', 'pipe', 'pipe']
+            })))();
+            return;
+        }
+        catch (error) {
+            const delayMs = INDEX_LOCK_RETRY_DELAYS_MS[attempt];
+            if (!isGitIndexLockContention(error) || delayMs === undefined) {
+                if (isGitIndexLockContention(error)) {
+                    throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', `Close window could not ${input.operation} because Git's shared index remained busy.`, {
+                        exitCode: 1,
+                        details: {
+                            recoveryState: 'index-lock-timeout',
+                            operation: input.operation,
+                            attempts: attempt + 1,
+                            remediation: 'Keep the close-window record and durable restore identity intact. Wait for the active Git operation to finish, then retry the governed close or rollback path.'
+                        }
+                    });
+                }
+                throw error;
+            }
+            waitForIndexLockRetry(delayMs);
+        }
+    }
+}
 function readStagedIndexEntries(cwd, files) {
     const requested = uniqueSorted(files);
     if (requested.length === 0)
@@ -143,7 +185,11 @@ function restoreForeignStagedEntries(cwd, entries, recoveryReference) {
         });
     }
     for (const entry of entries) {
-        execFileSync(resolveGitExecutable(), ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+        runGitIndexMutationWithRetry({
+            cwd,
+            args: ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`],
+            operation: `restore foreign staged entry ${entry.path}`
+        });
     }
     const restored = readStagedIndexEntries(cwd, entries.map((entry) => entry.path));
     const expected = entries.map((entry) => `${entry.mode}:${entry.blobId}:${entry.path}`).sort();
@@ -166,9 +212,10 @@ function deferForeignStagedFiles(cwd, taskId, files) {
     if (normalizedFiles.length === 0)
         return null;
     const snapshot = writeForeignStagedSnapshot(cwd, taskId, normalizedFiles);
-    execFileSync(resolveGitExecutable(), ['restore', '--staged', '--', ...files], {
+    runGitIndexMutationWithRetry({
         cwd,
-        stdio: ['ignore', 'pipe', 'pipe']
+        args: ['restore', '--staged', '--', ...files],
+        operation: 'defer foreign staged entries'
     });
     return snapshot;
 }
@@ -207,8 +254,6 @@ export function acquireCloseWindowStagedIndexLock(input) {
     });
     const expectedStageFiles = new Set(uniqueSorted(input.expectedStageFiles));
     const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expectedStageFiles.has(filePath));
-    let foreignStagedSnapshotPath = null;
-    let foreignStagedEntries = [];
     if (unexpectedStagedFiles.length > 0 && !input.deferForeignStaged) {
         return {
             schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
@@ -223,12 +268,9 @@ export function acquireCloseWindowStagedIndexLock(input) {
                 : 'Close window blocked by staged entries outside the governed bundle; defer explicitly or reconcile the index before closing.'
         };
     }
-    if (unexpectedStagedFiles.length > 0 && input.deferForeignStaged) {
-        const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles);
-        foreignStagedSnapshotPath = deferred?.snapshotPath ?? null;
-        foreignStagedEntries = deferred?.entries ?? [];
-    }
-    const record = {
+    // Publish the coordination lease before touching Git's shared index.  The
+    // former order parked foreign entries first, leaving an index-lock race.
+    let record = {
         schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
         specVersion: '0.1.0',
         taskId: normalizeTaskId(input.taskId),
@@ -236,21 +278,36 @@ export function acquireCloseWindowStagedIndexLock(input) {
         acquiredAt: new Date().toISOString(),
         status: 'active',
         expectedStageFiles: uniqueSorted(input.expectedStageFiles),
-        foreignStagedSnapshotPath,
-        foreignStagedEntries,
+        foreignStagedSnapshotPath: null,
+        foreignStagedEntries: [],
         unexpectedStagedTasks,
         releasedAt: null,
         releaseOutcome: null
     };
     mkdirSync(path.dirname(lockPath), { recursive: true });
     writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+    try {
+        if (unexpectedStagedFiles.length > 0 && input.deferForeignStaged) {
+            const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles);
+            record = {
+                ...record,
+                foreignStagedSnapshotPath: deferred?.snapshotPath ?? null,
+                foreignStagedEntries: deferred?.entries ?? []
+            };
+            writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+        }
+    }
+    catch (error) {
+        unlinkSync(lockPath);
+        throw error;
+    }
     return {
         schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
         ok: true,
         lockPath: relativePathFrom(input.cwd, lockPath),
         lock: record,
         unexpectedStagedTasks,
-        foreignStagedSnapshotPath,
+        foreignStagedSnapshotPath: record.foreignStagedSnapshotPath,
         blockedCode: null,
         blockedSummary: null
     };

@@ -3,6 +3,8 @@ import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { executeTaskCloseTransaction, writeClosurePacket } from '../../framework-development.js';
 import { buildTaskTransitionCommand, createClosureTransitionMetadata, writeTaskDocumentWithTransition } from '../close-helpers/task-transition-writer.js';
+import { existingTaskCloseArtifacts, stageTaskCloseArtifacts } from '../close-helpers/close-artifact-staging.js';
+import { relativePathFrom } from '../../shared.js';
 function normalizeRel(filePath) {
     return filePath.replace(/\\/g, '/');
 }
@@ -167,6 +169,27 @@ export async function executeCloseWrites(input) {
                     : null,
                 command: closeTransitionCommand
             });
+            const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
+                relativePathFrom(options.cwd, input.taskPath),
+                `.atm/history/evidence/${options.taskId}.json`,
+                transitionPath,
+                closurePacketPath
+            ]);
+            try {
+                stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
+            }
+            catch (error) {
+                // The transaction cannot learn the transition path until runWrites returns.
+                // Remove artifacts produced by this callback before rethrowing so its outer
+                // ledger rollback restores the pre-close state as one atomic operation.
+                const transitionAbsolute = path.resolve(options.cwd, transitionPath);
+                if (existsSync(transitionAbsolute))
+                    unlinkSync(transitionAbsolute);
+                if (input.createdClosurePacketAbsolute && existsSync(input.createdClosurePacketAbsolute)) {
+                    unlinkSync(input.createdClosurePacketAbsolute);
+                }
+                throw error;
+            }
             return { transitionPath, closurePacketPath, abandonResidueDispositionPath };
         }
     });

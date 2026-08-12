@@ -12,9 +12,9 @@ import {
  * (ATM-GOV-0266 Phase A deep module).
  *
  * Deletion test: without this module, coalesced-group attribution, per-member
- * child receipts, the durable `queued -> building -> built-provisional ->
+ * child receipts, the durable `prepared -> built-provisional ->
  * publication-ready -> published` (with `reconciled`/`abandoned` recovery)
- * state machine, build-lease heartbeat, and seal
+ * state machine, legacy build-lease recovery, and seal
  * revalidation must reappear scattered across `runner-sync-steward-queue.ts`
  * (coalescing), `runner-sync-incremental-build.ts` (single-task receipt), and
  * `runner-publication-lifecycle.ts` (single-task phase machine) — exactly the
@@ -36,11 +36,16 @@ export const RUNNER_SYNC_CHILD_RECEIPT_SCHEMA = 'atm.runnerSyncChildReceipt.v1' 
  * until the session is released (`published`) or reconciled. No transition erases
  * group state before release/reconcile.
  *
- *   queued -> building -> built-provisional -> publication-ready -> published
- *                                    \                                  |
- *                                     -> abandoned (seal drift)     reconciled (recovered)
+ *   prepared -> built-provisional -> publication-ready -> published
+ *                   \                                  |
+ *                    -> abandoned (seal drift)     reconciled (recovered)
+ *
+ * `prepared` deliberately holds no shared queue/build lease. It represents
+ * private compilation and staging; only the later publication transaction may
+ * acquire a shared lease.
  */
 export type RunnerSyncSessionPhase =
+  | 'prepared'
   | 'queued'
   | 'building'
   | 'built-provisional'
@@ -119,6 +124,7 @@ export interface RunnerSyncSessionState {
 }
 
 export type SessionAction =
+  | 'prepare'
   | 'build'
   | 'renew-lease'
   | 'publish-receipts'
@@ -163,9 +169,10 @@ export interface SealObservation {
 const DEFAULT_BUILD_LEASE_TTL_SECONDS = 3600;
 
 /**
- * Start a runner-sync session from a coalesced enqueue. Builds the group
- * manifest with full member attribution and enters `building` with a fresh
- * build lease. Fails closed if no members are declared.
+ * Start a runner-sync session from a coalesced candidate. Builds the group
+ * manifest with full member attribution and enters `prepared` without a shared
+ * lease. Private build work must not reserve the publication queue. Fails
+ * closed if no members are declared.
  */
 export function startRunnerSyncSession(
   request: StartSessionRequest,
@@ -178,7 +185,7 @@ export function startRunnerSyncSession(
     return decide('wait', false, RUNNER_SYNC_ERROR_CODES.coalescedAttributionMissing, {
       schemaId: RUNNER_SYNC_SESSION_STATE_SCHEMA,
       specVersion: '0.1.0',
-      phase: 'queued',
+      phase: 'prepared',
       stewardWorkId: request.stewardWorkId,
       sealedSourceSha: request.sealedSourceSha,
       groupManifest: emptyManifest,
@@ -189,21 +196,20 @@ export function startRunnerSyncSession(
     }, [], null, 'A runner-sync session requires at least one attributable coalesced member.');
   }
   const manifest = buildManifest(request.stewardWorkId, request.sealedSourceSha, members, request.sharedSealedInputDigest, null, now);
-  const ttl = request.buildLeaseTtlSeconds && request.buildLeaseTtlSeconds > 0 ? Math.trunc(request.buildLeaseTtlSeconds) : DEFAULT_BUILD_LEASE_TTL_SECONDS;
   const state: RunnerSyncSessionState = {
     schemaId: RUNNER_SYNC_SESSION_STATE_SCHEMA,
     specVersion: '0.1.0',
-    phase: 'building',
+    phase: 'prepared',
     stewardWorkId: request.stewardWorkId,
     sealedSourceSha: request.sealedSourceSha,
     groupManifest: manifest,
-    buildLease: newLease(now, ttl),
+    buildLease: null,
     childReceipts: [],
     inputGraph: null,
     updatedAt: now
   };
   return decide('build', true, null, state, [], null,
-    `Session started for ${manifest.memberTaskIds.length} coalesced member(s); run one build for ${request.sealedSourceSha} then record it.`);
+    `Session prepared for ${manifest.memberTaskIds.length} coalesced member(s); run private build/staging for ${request.sealedSourceSha} before requesting publication.`);
 }
 
 /**
@@ -216,8 +222,11 @@ export function renewRunnerSyncSession(
   ports: SessionPorts
 ): RunnerSyncSessionDecision {
   const now = ports.now();
+  if (session.phase === 'prepared') {
+    return decide('wait', true, null, touch(session, now), [], null, 'Prepared private work holds no shared lease and needs no heartbeat.');
+  }
   if (session.phase !== 'building') {
-    return decide('wait', false, null, touch(session, now), [], null, `Lease renewal only applies while building; session is ${session.phase}.`);
+    return decide('wait', false, null, touch(session, now), [], null, `Lease renewal only applies to legacy building sessions; session is ${session.phase}.`);
   }
   if (!session.buildLease) {
     return decide('resume-build', false, RUNNER_SYNC_ERROR_CODES.resumeRequired, touch(session, now), [], resumeCommand(session),
@@ -245,8 +254,8 @@ export function recordRunnerSyncBuild(
   ports: SessionPorts
 ): RunnerSyncSessionDecision {
   const now = ports.now();
-  if (session.phase !== 'building') {
-    return decide('wait', false, null, touch(session, now), [], null, `A build can only be recorded while building; session is ${session.phase}.`);
+  if (session.phase !== 'prepared' && session.phase !== 'building') {
+    return decide('wait', false, null, touch(session, now), [], null, `A build can only be recorded from prepared private work or a legacy building session; session is ${session.phase}.`);
   }
   if (session.groupManifest.members.length === 0) {
     return decide('wait', false, RUNNER_SYNC_ERROR_CODES.coalescedAttributionMissing, touch(session, now), [], null,
@@ -358,6 +367,9 @@ export function reconcileRunnerSyncSession(
 ): RunnerSyncSessionDecision {
   const now = ports.now();
   switch (session.phase) {
+    case 'prepared':
+      return decide('build', true, null, touch(session, now), [], null,
+        'Session is prepared with no shared lease; private build/staging may continue without queue residency.');
     case 'queued':
       return decide('build', true, null, touch(session, now), [], null, 'Session reconciled in queued state; start the build.');
     case 'building': {

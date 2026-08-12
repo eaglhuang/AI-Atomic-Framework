@@ -2,33 +2,36 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { buildRunnerPublicationReceipt } from './runner-publication-receipt.ts';
 import {
+  captureRunnerBuildOutputSnapshot,
   deriveRunnerBuildOutputInventory,
   evaluateRunnerPublicationDisposition,
+  planRunnerPublicationTakeover,
   validateRunnerBuildOutputInventory,
   type RunnerBuildOutputInventory,
+  type RunnerBuildOutputTarget,
+  type RunnerPublicationTakeoverPlan,
   type RunnerPublicationDispositionReport
 } from '../../../../core/src/broker/runner-build-output-inventory.ts';
 
+export function authorizeRunnerPublicationTakeover(input: { readonly cwd: string; readonly taskId: string; readonly sealedSourceSha: string; readonly buildTarget: RunnerBuildOutputTarget; readonly currentTaskAllowedFiles: readonly string[] }): RunnerPublicationTakeoverPlan {
+  const snapshot = captureRunnerBuildOutputSnapshot({ cwd: input.cwd, buildTarget: input.buildTarget, currentTaskId: input.taskId, currentTaskAllowedFiles: input.currentTaskAllowedFiles });
+  const plan = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot });
+  if (plan.entries.length === 0) throw new Error('ATM_RUNNER_PUBLICATION_PENDING: takeover requires at least one pre-existing generated publication member.');
+  const receiptPath = path.join(input.cwd, '.atm', 'history', 'evidence', `${input.taskId}.runner-publication-takeover.json`);
+  writeFileSync(receiptPath, `${JSON.stringify(plan, null, 2)}\n`, 'utf8');
+  return plan;
+}
+
 /**
- * Sealed runner publication lifecycle.
- *
- * `publishSealedRunner` owns the durable state machine
- *   reservation -> build-ready -> built-sealed -> publication-ready
- *   -> published -> receipt-archived
- * and returns one canonical publication receipt. Taskflow close and internal
- * release consume the same lifecycle, so a successful normal task never needs a
- * later framework-temp hygiene conversation, native pathspec, manual receipt
- * archival, or manual release-artifact commit.
- *
- * Receipt archival is a governed terminal phase, not untracked advisory
- * residue. Repeated publication/reconcile calls are idempotent and never
- * publish the same generation twice. The module is pure: the caller supplies
- * the current lifecycle snapshot and executes the returned next action through
- * ports.
+ * Pure lifecycle for a sealed runner: private prepare/build/seal, then a
+ * queue-head-gated shared publication, receipt archival, and idempotent retry.
  */
 
 export type PublicationPhase =
+  | 'prepared'
+  /** Legacy persisted spelling. It has the same queue-free build semantics as prepared. */
   | 'reservation'
   | 'build-ready'
   | 'built-sealed'
@@ -37,6 +40,7 @@ export type PublicationPhase =
   | 'receipt-archived';
 
 const PHASE_ORDER: readonly PublicationPhase[] = [
+  'prepared',
   'reservation',
   'build-ready',
   'built-sealed',
@@ -64,19 +68,13 @@ export interface PublicationAuthority {
 export interface PublicationSnapshot {
   readonly phase: PublicationPhase;
   readonly sealedSourceSha: string | null;
-  /** Generation of the authority window this publication is bound to. */
   readonly generation: number;
-  /** Digest of the built+sealed runner, once built. */
   readonly runnerBuildDigest: string | null;
-  /** Generated release manifest digest, once built. */
   readonly manifestDigest: string | null;
-  /** Publication commit sha, once published. */
   readonly publicationCommitSha: string | null;
-  /** Generations already published (idempotency ledger). */
   readonly publishedGenerations: readonly number[];
-  /** Path of an already-archived receipt for this generation, if any. */
   readonly archivedReceiptPath: string | null;
-  /** Queue-head ownership for the sealed source (gate before build/publish). */
+  /** Queue-head ownership for the sealed source (gate only before publication). */
   readonly queueHeadOwned: boolean;
 }
 
@@ -179,6 +177,7 @@ export interface RunnerPublicationInspection {
   readonly report: RunnerPublicationDispositionReport;
 }
 
+
 export interface RunnerPublicationReceiptReconciliation {
   readonly schemaId: 'atm.runnerPublicationReceiptReconciliation.v1';
   readonly taskId: string;
@@ -200,30 +199,21 @@ interface RunnerPublicationRecoveryLedger {
   readonly records: readonly RunnerPublicationReceiptReconciliation[];
 }
 
-function fingerprint(value: string | null | undefined, kind: string): string | null {
-  if (typeof value !== 'string' || value.trim().length === 0) return null;
-  return `${kind}fp:${createHash('sha256').update(`${kind}\n${value}`).digest('hex').slice(0, 16)}`;
-}
-
 function buildReceipt(request: PublicationRequest, snapshot: PublicationSnapshot, disposition: 'archived' | 'pending', now: string): PublicationReceipt {
-  const surfaces = [...new Set(request.surfaces.map((s) => s.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-  const core = {
-    schemaId: 'atm.sealedRunnerPublicationReceipt.v1' as const,
+  return buildRunnerPublicationReceipt({
     taskId: request.authority.taskId,
-    laneFingerprint: fingerprint(request.authority.laneSessionId, 'lane'),
+    laneSessionId: request.authority.laneSessionId,
     stewardActorId: request.authority.stewardActorId,
     sealedSourceSha: request.sealedSourceSha,
     generation: snapshot.generation,
     runnerBuildDigest: snapshot.runnerBuildDigest,
     manifestDigest: snapshot.manifestDigest,
-    surfaces,
+    surfaces: request.surfaces,
     publicationCommitSha: snapshot.publicationCommitSha,
     remoteVisibility: request.remoteVisibility,
     receiptDisposition: disposition,
     issuedAt: now
-  };
-  const receiptDigest = `sha256:${createHash('sha256').update(JSON.stringify(core)).digest('hex')}`;
-  return { ...core, receiptDigest };
+  });
 }
 
 /**
@@ -272,21 +262,22 @@ export function publishSealedRunner(
   const enqueueRecovery = `node atm.mjs broker runner-sync enqueue --task ${request.authority.taskId} --actor ${request.authority.stewardActorId} --sealed-source-sha ${request.sealedSourceSha} --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json`;
 
   switch (snapshot.phase) {
+    case 'prepared':
+      return decide('build', 'prepared', true, 'Private candidate preparation holds no shared queue reservation; build and seal outside the publication mutex.');
     case 'reservation': {
-      // Queue-head ownership is mandatory before any build/publish.
-      if (!snapshot.queueHeadOwned) {
-        return decide('reserve', 'reservation', false, 'Runner-sync steward queue-head reservation is required before build or publication.', {
-          errorCode: 'ATM_RUNNER_SYNC_STEWARD_REQUIRED',
-          recoveryCommand: enqueueRecovery
-        });
-      }
-      return decide('build', 'reservation', true, 'Reservation held; proceed to the sealed build from committed source.');
+      return decide('build', 'reservation', true, 'Legacy reservation state is treated as queue-free candidate preparation; build and seal before requesting publication.');
     }
     case 'build-ready':
       return decide('build', 'build-ready', true, 'Build the runner from the sealed source; frozen bootstrap validates against the newly built runner, not the stale one.');
     case 'built-sealed':
       return decide('seal', 'built-sealed', true, 'Runner built and sealed; compute build/manifest digests and prepare publication.');
     case 'publication-ready':
+      if (!snapshot.queueHeadOwned) {
+        return decide('reserve', 'publication-ready', false, 'Queue-head ownership is required only for the final shared publication mutation.', {
+          errorCode: 'ATM_RUNNER_SYNC_STEWARD_REQUIRED',
+          recoveryCommand: enqueueRecovery
+        });
+      }
       return decide('publish', 'publication-ready', true, 'Publish the sealed runner + generated manifest onto the declared surfaces.');
     case 'published':
       return decide('archive-receipt', 'published', true, 'Publication landed; archive the canonical receipt as the governed terminal phase.', {
@@ -319,8 +310,13 @@ export function inspectRunnerPublicationDisposition(cwd: string, receiptRef?: st
   const dirtyPaths = readDirtyPaths(cwd);
   const receipts = readRunnerReceipts(cwd);
   const requested = receiptRef ? normalizeReceiptRef(receiptRef) : null;
+  // A release transition is explicitly receipt-addressed.  Do not silently
+  // fall back to directory discovery when its caller supplied one: test,
+  // recovery, and alternate evidence roots are all legitimate as long as the
+  // reference is repository-local and the receipt validates.  Discovery is a
+  // convenience only for callers that did not name a receipt.
   const selected = (requested
-    ? receipts.find((candidate) => candidate.path === requested)
+    ? readRunnerReceiptAtPath(cwd, requested)
     : null) ?? receipts.find((candidate) => {
     const members = new Set(candidate.inventory.entries.map((entry) => entry.path));
     return dirtyPaths.some((entry) => members.has(entry));
@@ -344,6 +340,28 @@ export function inspectRunnerPublicationDisposition(cwd: string, receiptRef?: st
     sealedSourceSha: selected?.inventory.sealedSourceSha ?? null,
     report
   };
+}
+
+function readRunnerReceiptAtPath(cwd: string, receiptRef: string): {
+  readonly path: string;
+  readonly inventory: RunnerBuildOutputInventory;
+  readonly terminalDisposition: 'published' | 'recovery-retained' | null;
+} | null {
+  const absolute = path.resolve(cwd, receiptRef);
+  if (!absolute.startsWith(path.resolve(cwd) + path.sep) || !existsSync(absolute)) return null;
+  try {
+    const document = JSON.parse(readFileSync(absolute, 'utf8')) as Record<string, unknown>;
+    const validated = validateRunnerBuildOutputInventory(document.outputInventory);
+    if (!validated.ok || !validated.inventory) return null;
+    const disposition = document.publicationDisposition;
+    return {
+      path: receiptRef,
+      inventory: validated.inventory,
+      terminalDisposition: disposition === 'published' || disposition === 'recovery-retained' ? disposition : null
+    };
+  } catch {
+    return null;
+  }
 }
 
 /**

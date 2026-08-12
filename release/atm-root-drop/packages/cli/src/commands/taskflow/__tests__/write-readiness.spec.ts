@@ -107,6 +107,56 @@ const hint = buildTaskflowCloseWriteReadinessHint({
 assert.equal(hint.brokerConflictGate.verdict, 'noConflict');
 assert.ok(hint.blockers.every((entry) => entry.code !== 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'));
 
+// A close can declare planning/read-only authority paths in addition to files
+// that the target repository will write.  The target work ticket covers only
+// the latter; planning authority is checked by the independent closeback
+// gate.  Passing the combined declaration set to work admission used to turn
+// a valid target ticket into a scope violation.
+writeJson(path.join(repo, '.atm/history/tasks/TASK-WRITE-0003.json'), {
+  status: 'done',
+  scopePaths: ['src/app.ts'],
+  claim: {
+    state: 'active',
+    actorId: 'validator',
+    leaseId: 'lease-3',
+    ttlSeconds: 3600
+  }
+});
+const planningReadOnlyHint = buildTaskflowCloseWriteReadinessHint({
+  cwd: repo,
+  taskId: 'TASK-WRITE-0003',
+  actorId: 'validator',
+  taskDocument: {
+    status: 'done',
+    claim: {
+      state: 'active',
+      actorId: 'validator',
+      leaseId: 'lease-3'
+    }
+  },
+  declaredFiles: ['src/app.ts', 'C:/planning/docs/tasks/TASK-WRITE-0003.task.md'],
+  closebackPlan: {
+    writerBoundary: { planningMirrorPath: null },
+    closebackPathResolution: null,
+    historicalDeliveryGate: { required: false }
+  } as any,
+  previewCommitBundle: {
+    targetDeliveryFiles: ['src/app.ts']
+  },
+  historicalDeliveryRefs: [],
+  planningAuthorityDeliveryGate: {
+    required: false,
+    ok: false,
+    repoRoot: null,
+    matchedFiles: [],
+    reason: null
+  }
+});
+assert.ok(
+  planningReadOnlyHint.blockers.every((entry) => entry.code !== 'ATM_WRITE_TICKET_SCOPE_VIOLATION'),
+  'target work admission must evaluate the target delivery set, not read-only planning declarations'
+);
+
 // ATM-BUG-2026-07-07-050: a stale/unresolvable closeback planning path (route
 // 'missing' or 'ambiguous') used to only fail at `--write` time via
 // assertClosebackPlanningPathReady(), while dry-run's write-readiness hint had

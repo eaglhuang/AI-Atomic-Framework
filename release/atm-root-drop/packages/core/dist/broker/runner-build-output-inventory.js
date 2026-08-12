@@ -29,6 +29,9 @@ export function deriveRunnerBuildOutputInventory(input) {
  */
 export function scanSealedRunnerBuildOutputInventory(input) {
     const outputPaths = changedPathsSinceSnapshot(input.cwd, input.buildTarget, input.beforeBuildSnapshot);
+    if (input.includeDirtyPublicationMembers) {
+        outputPaths.push(...listDirtyPaths(input.cwd).filter(isRunnerPublicationArtifactPath));
+    }
     if (input.taskId)
         outputPaths.push(`.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`);
     return deriveRunnerBuildOutputInventory({
@@ -48,6 +51,51 @@ export function captureRunnerBuildOutputSnapshot(input) {
         .filter((entry) => Object.hasOwn(members, entry))
         .filter((entry) => !hasCanonicalScope || !pathMatchesScope(entry, allowedFiles));
     return { schemaId: 'atm.runnerBuildOutputSnapshot.v1', buildTarget: input.buildTarget, members, preexistingDirtyPaths };
+}
+/** Create the immutable payload a broker must persist before a takeover. */
+export function planRunnerPublicationTakeover(input) {
+    const entries = uniquePaths(input.snapshot.preexistingDirtyPaths)
+        .map((entry) => ({ path: entry, observedDigest: input.snapshot.members[entry] ?? 'missing' }));
+    if (entries.some((entry) => !isRunnerPublicationArtifactPath(entry.path) || entry.observedDigest === 'missing')) {
+        throw new Error('Runner publication takeover can only name pre-existing generated publication members with an observed digest.');
+    }
+    const sealedSourceSha = input.sealedSourceSha.trim();
+    const snapshotDigest = digestSnapshot(input.snapshot);
+    return {
+        schemaId: 'atm.runnerPublicationTakeoverPlan.v1',
+        sealedSourceSha,
+        snapshotDigest,
+        entries,
+        digest: digestTakeoverPlan({ sealedSourceSha, snapshotDigest, entries })
+    };
+}
+/** Reject stale, broadened, or hand-edited takeovers before any bytes move. */
+export function validateRunnerPublicationTakeoverPlan(input) {
+    if (!input.plan || typeof input.plan !== 'object' || Array.isArray(input.plan))
+        return { ok: false, plan: null, reason: 'plan must be an object' };
+    const raw = input.plan;
+    if (raw.schemaId !== 'atm.runnerPublicationTakeoverPlan.v1' || !Array.isArray(raw.entries))
+        return { ok: false, plan: null, reason: 'plan schema or entries are invalid' };
+    const sealedSourceSha = typeof raw.sealedSourceSha === 'string' ? raw.sealedSourceSha.trim() : '';
+    const snapshotDigest = typeof raw.snapshotDigest === 'string' ? raw.snapshotDigest.trim() : '';
+    const entries = raw.entries.map((entry) => {
+        const value = entry && typeof entry === 'object' && !Array.isArray(entry) ? entry : {};
+        return { path: typeof value.path === 'string' ? normalizePath(value.path) : '', observedDigest: typeof value.observedDigest === 'string' ? value.observedDigest : '' };
+    });
+    if (!sealedSourceSha || !snapshotDigest || entries.some((entry) => !entry.path || !entry.observedDigest) || JSON.stringify(entries) !== JSON.stringify([...entries].sort((a, b) => a.path.localeCompare(b.path)))) {
+        return { ok: false, plan: null, reason: 'plan entries must be complete, unique, and sorted' };
+    }
+    const plan = { schemaId: 'atm.runnerPublicationTakeoverPlan.v1', sealedSourceSha, snapshotDigest, entries, digest: typeof raw.digest === 'string' ? raw.digest.trim() : '' };
+    if (plan.digest !== digestTakeoverPlan(plan))
+        return { ok: false, plan: null, reason: 'plan digest is invalid' };
+    if (plan.sealedSourceSha !== input.sealedSourceSha.trim())
+        return { ok: false, plan: null, reason: 'plan sealed source does not match this build' };
+    if (plan.snapshotDigest !== digestSnapshot(input.snapshot))
+        return { ok: false, plan: null, reason: 'plan snapshot does not match current pre-build bytes' };
+    const expected = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot: input.snapshot });
+    if (plan.digest !== expected.digest)
+        return { ok: false, plan: null, reason: 'plan does not cover exactly the current pre-existing publication members' };
+    return { ok: true, plan, reason: null };
 }
 export function buildRunnerBuildOutputInventory(input) {
     const ownershipByPath = new Map((input.ownership ?? []).map((entry) => [normalizePath(entry.path), entry]));
@@ -91,9 +139,13 @@ export function evaluateRunnerPublicationDisposition(input) {
     const terminalDisposition = input.terminalDisposition ?? null;
     const disposition = terminalDisposition === 'recovery-retained'
         ? 'recovery-retained'
-        : dirtyInventoryPaths.length > 0
-            ? 'publication-pending'
-            : 'published';
+        : terminalDisposition === 'published' && extraOutputPaths.length === 0
+            ? 'published'
+            : extraOutputPaths.length > 0
+                ? 'inventory-incomplete'
+                : dirtyInventoryPaths.length > 0
+                    ? 'publication-pending'
+                    : 'published';
     return {
         schemaId: 'atm.runnerPublicationDisposition.v1',
         disposition,
@@ -214,6 +266,17 @@ export function validateRunnerBuildOutputInventory(value) {
 function digestInventory(sealedSourceSha, entries) {
     const payload = JSON.stringify({ sealedSourceSha, entries });
     return `sha256:${createHash('sha256').update(payload).digest('hex')}`;
+}
+function digestSnapshot(snapshot) {
+    return `sha256:${createHash('sha256').update(JSON.stringify({ buildTarget: snapshot.buildTarget, members: snapshot.members, preexistingDirtyPaths: uniquePaths(snapshot.preexistingDirtyPaths) })).digest('hex')}`;
+}
+function digestTakeoverPlan(plan) {
+    const payload = {
+        sealedSourceSha: plan.sealedSourceSha,
+        snapshotDigest: plan.snapshotDigest,
+        entries: plan.entries
+    };
+    return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
 }
 function uniquePaths(paths) {
     return [...new Set(paths.map(normalizePath).filter(Boolean))].sort();

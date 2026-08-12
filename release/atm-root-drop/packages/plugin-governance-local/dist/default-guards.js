@@ -16,6 +16,10 @@ export const defaultGuardCatalog = Object.freeze([
         summary: 'When estimated context load exceeds the repository policy, summarize or offload before continuing.'
     },
     {
+        id: 'minimum-queue-residency',
+        summary: 'Treat queueing as a scarce-resource boundary: keep only the irreducible shared interval queued, move separable work outside it, and release capacity immediately on completion or invalidation.'
+    },
+    {
         id: 'framework-work-tracking-stays-downstream',
         summary: 'Do not create or keep coordinating implementation task cards or project planning queues inside the framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.'
     },

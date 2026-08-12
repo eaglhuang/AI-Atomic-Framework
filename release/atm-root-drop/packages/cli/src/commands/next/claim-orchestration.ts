@@ -15,7 +15,7 @@ import { classifyTaskDelivery } from '../task-intent.ts';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../../core/src/broker/lifecycle.ts';
 import { abandonTaskQueue, buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, readActiveTaskDirectionLocks, type TaskQueueRecord, writeTaskDirectionLock } from '../task-direction.ts';
 import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, repairBatchRunFromQueue, writeBatchRun, writeQuickfixLock } from '../work-channels.ts';
-import { buildTeamKnowledgeSummary } from '../team-knowledge.ts'; import { decideActiveBatchClaimTask } from '../next-active-batch.ts';
+import { buildTeamKnowledgeSummary } from '../team-knowledge.ts'; import { decideActiveBatchClaimTask, preservesExplicitTaskClaim } from '../next-active-batch.ts';
 import { runClaimParallelPreflight } from './claim-parallel-preflight.ts'; import { buildPlanScopedRoutingPreflight } from './plan-scoped-preflight.ts';
 import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.ts'; import { CliError, makeResult, message, parseJsonText } from '../shared.ts';
 import { prepareImportedTaskForClaim, registerPreClaimBrokerTransaction } from './claim-helpers.ts';
@@ -151,7 +151,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   }
   if (activeBatchAtClaimStart?.status === 'active' && claimableTask) {
     const batchPromptQueue = inspectImportedTaskQueue(input.cwd, createDeterministicTaskIntent(activeBatchAtClaimStart.sourcePrompt), claimIntent);
-    const activeBatchClaimDecision = decideActiveBatchClaimTask({
+    const activeBatchClaimDecision = preservesExplicitTaskClaim(input.taskIntent?.explicitTaskIds) ? null : decideActiveBatchClaimTask({
       activeBatch: activeBatchAtClaimStart,
       activeQueue: promptScopeRuntime?.queue
         ?? activeQueueForIntent

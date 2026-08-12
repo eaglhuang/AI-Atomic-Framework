@@ -13,7 +13,7 @@ import { taskPathFor } from './task-file-io-helpers.js';
 import { parseClaimRecord, createClaimRecord, isClaimExpired } from './task-ledger-readers.js';
 import { parseClaimLifecycleOptions } from './task-option-parsers.js';
 import { resolveTaskClaimIntent } from './claim-intent.js';
-import { completeTaskClaimWithWorkAdmission, resealWorkAdmissionTicketForRenewal } from './claim-work-admission.js';
+import { completeTaskClaimWithWorkAdmission, resealWorkAdmissionTicketForRenewal, restoreReleasedDirectionLockForRenewal } from './claim-work-admission.js';
 import { writeTakeoverEvidence } from './takeover-evidence.js';
 import { assertPlanningSourceSealValid } from './import-task.js';
 import { resolveLaneSession } from '../lane-session/resolve.js';
@@ -260,6 +260,14 @@ export async function runTasksClaimLifecycle(action, argv) {
             claim: renewed,
             nowIso
         });
+        const directionLockRecovery = restoreReleasedDirectionLockForRenewal({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            claim: renewed,
+            taskDocument,
+            nowIso
+        });
         const sessionRecord = updateActorWorkSessionState({
             cwd: options.cwd,
             actorId,
@@ -296,6 +304,7 @@ export async function runTasksClaimLifecycle(action, argv) {
                 actorId,
                 claim: renewed,
                 workAdmissionTicket,
+                directionLockRecovery,
                 transitionPath,
                 sessionId: sessionRecord?.session.sessionId ?? null,
                 session: sessionRecord?.session ?? null

@@ -1,19 +1,23 @@
 {
-  "schemaId": "atm.testCatalogGroupShard.v1",
+  "schemaId": "atm.testCaseGroup.v1",
   "specVersion": "0.1.0",
   "groupId": "test_group_diagnostic_loop",
-  "title": "Diagnostic feedback loop and causal repair receipt",
+  "theme": "Diagnostic feedback loop and causal repair receipt",
+  "resourceKey": "diagnostic-loop",
+  "maintainers": ["atm-diagnostics"],
   "cases": [
     {
       "caseId": "test_task_skl_0033_diagnostic_loop_4cc1c8b1",
       "semanticKey": "diagnostic_loop_reproducer_fail_closed",
       "command": "node --strip-types tests/cli/diagnostic-feedback-loop.test.ts",
+      "responsibility": "task-required",
       "coversAcceptance": ["ACC-1", "ACC-2", "ACC-3", "ACC-5", "ACC-6", "ACC-7"]
     },
     {
       "caseId": "test_task_skl_0033_causal_repair_receipt_01c82ab4",
       "semanticKey": "causal_repair_receipt_core_contract",
       "command": "node --strip-types tests/core/causal-repair-receipt.test.ts",
+      "responsibility": "task-required",
       "coversAcceptance": ["ACC-1", "ACC-2", "ACC-3", "ACC-4"]
     }
   ]

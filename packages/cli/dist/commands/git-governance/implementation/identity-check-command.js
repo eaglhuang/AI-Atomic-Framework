@@ -1,5 +1,4 @@
 import { reconcileResolvedCrossTaskMutationIncident } from './git-head-evidence-transaction.js';
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, } from "node:fs";
 import path from "node:path";
 import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor, } from "../../actor-registry.js";
@@ -9,7 +8,8 @@ import { CliError, makeResult, message, quoteCliValue, relativePathFrom, } from 
 import { inspectCurrentBranchCommitQueueStatus } from './branch-commit-window.js';
 import { laneSessionIdFromRecord } from './command-router.js';
 import { inspectCloseCommitWindowStagedArtifacts } from './git-index-transaction.js';
-import { createSanitizedGitEnv, inspectStdinPathspecGitAddProcesses, readGitCommitAttemptStatus } from './git-process-port.js';
+import { inspectStdinPathspecGitAddProcesses, readGitCommitAttemptStatus } from './git-process-port.js';
+import { readGitConfig, writeGitConfig } from './git-config-port.js';
 import { readHeadCommitMessage } from './push-command.js';
 import { inspectHistoricalLedgerRestoreStagedArtifacts, inspectMirrorSyncOnlyStagedArtifacts } from './record-bundle-inspection.js';
 export function resolveActorGitIdentityForCommit(cwd, actorId) {
@@ -165,6 +165,11 @@ export function runGitPrepare(options) {
     const nextEmail = profile.gitEmail;
     if (!nextName || !nextEmail) {
         throw new CliError("ATM_GIT_PREPARE_IDENTITY_MISSING", "git prepare requires git name/email from actor registry, repo default identity, or explicit --name/--email.", { exitCode: 2, details: { actorId } });
+    }
+    writeGitConfig(options.cwd, "user.name", nextName);
+    writeGitConfig(options.cwd, "user.email", nextEmail);
+    if (readGitConfig(options.cwd, "user.name") !== nextName || readGitConfig(options.cwd, "user.email") !== nextEmail) {
+        throw new CliError("ATM_GIT_PREPARE_IDENTITY_WRITE_FAILED", "git prepare could not verify the local Git identity after writing it.", { exitCode: 1, details: { actorId, gitName: nextName, gitEmail: nextEmail } });
     }
     const identityPath = options.gitName !== null && options.gitEmail !== null
         ? writePreparedRuntimeIdentity(options.cwd, actorId, nextName, nextEmail, actorRecord)
@@ -368,28 +373,7 @@ export function resolveGitGovernanceSession(cwd, input) {
         includeNonActive: true,
     });
 }
-export function readGitConfig(cwd, key) {
-    try {
-        const value = execFileSync("git", ["config", "--local", "--get", key], {
-            cwd,
-            encoding: "utf8",
-            stdio: ["ignore", "pipe", "ignore"],
-            env: createSanitizedGitEnv(),
-        }).trim();
-        return value || null;
-    }
-    catch {
-        return null;
-    }
-}
-export function writeGitConfig(cwd, key, value) {
-    execFileSync("git", ["config", "--local", key, value], {
-        cwd,
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-        env: createSanitizedGitEnv(),
-    });
-}
+export { readGitConfig, writeGitConfig } from './git-config-port.js';
 export function parseTrailers(commitMessage) {
     if (!commitMessage) {
         return {};

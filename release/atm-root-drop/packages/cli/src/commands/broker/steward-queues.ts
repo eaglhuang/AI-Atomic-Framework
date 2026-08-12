@@ -35,7 +35,7 @@ import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleas
 import { loadComposeProposals, relativeStorePath, resolveBrokerRunEvidenceDir, normalizeEvidencePath } from './parser.ts';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
 import { appendLaneSessionEvent } from '../lane-session/events.ts';
-import { evaluateRunnerPublicationContinuation, inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.ts';
+import { authorizeRunnerPublicationTakeover, evaluateRunnerPublicationContinuation, inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.ts';
 
 
 export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context: BrokerCommandContext) {
@@ -229,7 +229,33 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
       }
     }
 
-    throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, supersede, status, cleanup, release, reconcile-receipt', { exitCode: 2 });
+    if (options.runnerSyncAction === 'takeover-publication') {
+      if (!options.task || !options.actorId || !options.sealedSourceSha || options.surfaces.length !== 1) {
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync takeover-publication requires --task, --actor, --sealed-source-sha, and exactly one --surface <full|packages|root-drop|onefile>.', { exitCode: 2 });
+      }
+      assertRunnerSyncRecoveryAuthority(options.cwd, options.task, options.actorId);
+      const buildTarget = options.surfaces[0];
+      if (!['full', 'packages', 'root-drop', 'onefile'].includes(buildTarget)) {
+        throw new CliError('ATM_CLI_USAGE', 'takeover-publication surface must be one of: full, packages, root-drop, onefile.', { exitCode: 2 });
+      }
+      const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
+      const sealedSourceSha = resolveFullGitCommitSha(options.cwd, options.sealedSourceSha);
+      const head = queue.groups[0];
+      if (!head || head.sealedSourceSha !== sealedSourceSha || !head.waitingTasks.includes(options.task)) {
+        throw new CliError('ATM_RUNNER_PUBLICATION_PENDING', 'Publication takeover requires the active queue-head task and its exact sealed source SHA.', { exitCode: 1 });
+      }
+      const task = JSON.parse(readFileSync(path.join(options.cwd, '.atm', 'history', 'tasks', `${options.task}.json`), 'utf8')) as { allowedFiles?: string[] };
+      const plan = authorizeRunnerPublicationTakeover({ cwd: options.cwd, taskId: options.task, sealedSourceSha, buildTarget: buildTarget as 'full' | 'packages' | 'root-drop' | 'onefile', currentTaskAllowedFiles: task.allowedFiles ?? [] });
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [message('info', 'ATM_BROKER_RUNNER_PUBLICATION_TAKEOVER_AUTHORIZED', `Authorized ${plan.entries.length} exact generated publication member(s) for the queue-head sealed build.`, { planDigest: plan.digest })],
+        evidence: { plan, receiptPath: `.atm/history/evidence/${options.task}.runner-publication-takeover.json` }
+      });
+    }
+
+    throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, supersede, status, cleanup, release, reconcile-receipt, takeover-publication', { exitCode: 2 });
   }
 
   if (options.action === 'projection') {
@@ -444,7 +470,7 @@ export function validateRunnerSyncReleaseReceipt(input: {
   const expectedSurfaces = normalizeReceiptStringArray(group.requestedSurfaces);
   const mismatches = [
     receipt.schemaId === 'atm.runnerSyncReceipt.v1' ? null : 'schemaId',
-    receipt.taskId === input.taskId ? null : 'taskId',
+    receiptRepresentsRunnerSyncQueueTask(receipt, input.taskId) ? null : 'taskId',
     receipt.actorId === ownerRequest.actorId ? null : 'actorId',
     receipt.stewardWorkId === input.stewardWorkId ? null : 'stewardWorkId',
     receipt.sealedSourceSha === group.sealedSourceSha ? null : 'sealedSourceSha',
@@ -478,6 +504,16 @@ export function validateRunnerSyncReleaseReceipt(input: {
     receiptRef: receiptRef.replace(/\\/g, '/'),
     receiptDigest: digest
   };
+}
+
+function receiptRepresentsRunnerSyncQueueTask(receipt: Record<string, unknown>, queueTaskId: string): boolean {
+  const receiptTaskId = typeof receipt.taskId === 'string' ? receipt.taskId.trim() : '';
+  if (!receiptTaskId) return false;
+  if (receiptTaskId === queueTaskId) return true;
+
+  const memberTaskIds = normalizeReceiptStringArray(receipt.memberTaskIds);
+  const linkedTaskIds = normalizeReceiptStringArray(receipt.linkedTaskIds);
+  return memberTaskIds.includes(queueTaskId) && linkedTaskIds.includes(receiptTaskId);
 }
 
 function validateRunnerSyncReleaseFinalizableReceipt(input: {

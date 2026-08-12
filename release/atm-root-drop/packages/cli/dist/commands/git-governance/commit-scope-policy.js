@@ -91,7 +91,11 @@ function countHeadPhysicalLines(cwd, file) {
 }
 function countStagedDiffPhysicalLines(cwd, file) {
     try {
-        const output = execFileSync('git', ['diff', '--cached', '--numstat', '--', file], {
+        // Commit admission runs before the task-scoped index transaction stages an
+        // auto-stage candidate. Compare HEAD with the complete candidate tree so
+        // the oversized-baseline exception has identical semantics for staged and
+        // unstaged task-scoped files.
+        const output = execFileSync('git', ['diff', '--numstat', 'HEAD', '--', file], {
             cwd,
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'ignore']

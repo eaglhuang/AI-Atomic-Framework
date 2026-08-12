@@ -3,9 +3,9 @@ import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.js';
 import { captureGitHeadEvidencePreparation } from './git-head-evidence-transaction.js';
 import { actorIdEnvVar, findActorByResolvedId, resolveActorId } from "../../actor-registry.js";
 import { recordOnlyClaimScopeExemptCovers, } from "../record-only-block-lifecycle-bridge.js";
-import { assertEmergencyApproval, } from "../../emergency/gate.js";
+import { assertEmergencyApproval } from "../../emergency/gate.js";
 import { uniqueSorted, } from "../commit-scope-policy.js";
-import { CliError, makeResult, message, quoteCliValue, } from "../../shared.js";
+import { CliError, makeResult, message, quoteCliValue } from "../../shared.js";
 import { assertNoBrokerConflictBeforeHookBypass } from './broker-hook-bypass-preflight.js';
 import { buildCopyableGitCommitCommand, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles } from './git-index-transaction.js';
 import { assertNoStdinPathspecGitAddPreflight, gitCommitAttemptStatusRelativePath, resolveGitCommitTimeoutMs, writeGitCommitAttemptStatus } from './git-process-port.js';
@@ -191,7 +191,12 @@ export function runGitCommit(options) {
                 },
             });
         }
-        const stagedBundleInspection = inspectTaskScopedStagedGovernanceBundle(options.cwd, options.taskId, taskDocument);
+        // `--auto-stage` assembles and verifies the bundle in a sealed candidate
+        // index. Re-staging it in the shared index is redundant and lets foreign
+        // lanes contend on bytes this commit will never consume.
+        const stagedBundleInspection = options.autoStage
+            ? { ok: true, code: '', summary: '', warnings: [], details: {} }
+            : inspectTaskScopedStagedGovernanceBundle(options.cwd, options.taskId, taskDocument);
         if (!stagedBundleInspection.ok) {
             cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
             throw new CliError(stagedBundleInspection.code, stagedBundleInspection.summary, {
@@ -206,7 +211,9 @@ export function runGitCommit(options) {
                 },
             });
         }
-        const stagingInspection = inspectTaskScopedUnstagedCommit(options.cwd, options.taskId, taskDocument);
+        const stagingInspection = options.autoStage
+            ? null
+            : inspectTaskScopedUnstagedCommit(options.cwd, options.taskId, taskDocument);
         if (stagingInspection?.kind === "staging-required") {
             cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
             throw new CliError("ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED", `git commit for ${options.taskId} requires staged task-scoped files before the wrapper can create a governed commit.`, {
