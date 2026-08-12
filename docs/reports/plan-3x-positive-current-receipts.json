@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:72b87443b37bedd13f535ce6ba4451cbf06b6ed8672e99dd2596a0b91115a529"
+      "digest": "sha256:717d359b8bad3728fc1e88b7783bf3a8acdd6226fe1c09c89607fc469e36223a"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:0d7399ce8d816c0b8138eaa646d9e3eb5a0833f8acc61d5ac43cd079d918b957"
+      "digest": "sha256:06fbcaf70697757b8ebbe2039f55c6b22c4ada1807ab4dc433315f8f3525fa62"
     }
   ],
   "totals": {
-    "freshCommandRows": 27,
+    "freshCommandRows": 26,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 23,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 24,
     "objectiveAlignedNegativeControlRowsConsumed": 8,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
-    "remainingUncoveredRows": 12,
-    "sourceRowsMutatedByThisReport": 23
+    "remainingUncoveredRows": 11,
+    "sourceRowsMutatedByThisReport": 24
   },
   "commandReceipts": [
     {
@@ -279,6 +279,20 @@
         "\"queueResidencyMs\": 4500",
         "critical-section-only"
       ]
+    },
+    {
+      "id": "plan32-legal-recovery-lane",
+      "command": "node --strip-types scripts/validate-plan32-legal-recovery-lane.ts --json",
+      "exitCode": 0,
+      "verdict": "legal-recovery-lane-named",
+      "rowsCovered": [
+        "P32-OBJ-04"
+      ],
+      "stdoutAnchors": [
+        "atm.plan32LegalRecoveryLaneValidation.v1",
+        "atm-git-pathspec-emergency-commit",
+        "emergency-not-success-metric"
+      ]
     }
   ],
   "positiveRows": [
@@ -386,6 +400,14 @@
       "sourceReplayAction": "recomputed row status because the current timeout fixture proves timed-out validator receipts remain not-complete and cannot green the row"
     },
     {
+      "objectiveId": "P32-OBJ-04",
+      "title": "Legal recovery lane is named",
+      "receiptIds": [
+        "plan32-legal-recovery-lane"
+      ],
+      "sourceReplayAction": "recomputed row status because the current recovery-lane validator proves the legal emergency lane is named, authority-bounded, exact-keep-list scoped, and excluded from autonomous success metrics"
+    },
+    {
       "objectiveId": "P32-OBJ-05",
       "title": "Public attestation is not substituted for machine proof",
       "receiptIds": [
@@ -488,7 +510,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Twenty-three rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Twenty-four rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

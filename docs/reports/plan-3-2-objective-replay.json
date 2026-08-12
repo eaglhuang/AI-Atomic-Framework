@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 13,
-    "not-complete": 16,
+    "verified": 14,
+    "not-complete": 15,
     "unknown": 0,
     "conflicting": 0
   },
@@ -81,25 +81,24 @@
     {
       "objectiveId": "P32-OBJ-04",
       "title": "Legal recovery lane is named",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0335",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        ".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md"
+        ".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md",
+        "scripts/validate-plan32-legal-recovery-lane.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "recovery-lane",
-          "source": ".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md",
+          "kind": "legal-recovery-lane",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-legal-recovery-lane",
           "expectedTaskId": "ATM-GOV-0335"
         }
       ],
-      "blockers": [
-        "emergency recovery remains anomaly evidence, not autonomous success"
-      ],
-      "nextSafeCommand": "node atm.mjs git commit --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-05",
