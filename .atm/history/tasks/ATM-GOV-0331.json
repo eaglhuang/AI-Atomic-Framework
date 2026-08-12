@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0331",
   "title": "Wire deep evidence modules into production callers and remove shallow shells",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0330"
@@ -189,22 +189,22 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T17-40-55-920Z-scope-amendment-bb52ed875f3f",
-  "lastTransitionAt": "2026-08-12T17:40:55.920Z",
+  "lastTransitionId": "2026-08-12T17-50-30-266Z-close-85a6f8de51db",
+  "lastTransitionAt": "2026-08-12T17:50:30.266Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T16:40:21.766Z",
   "promotedAt": "2026-08-12T16:40:21.771Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-668b06a75523",
-    "claimedAt": "2026-08-12T16:40:21.776Z",
-    "heartbeatAt": "2026-08-12T17:40:24.230Z",
+    "leaseId": "lease-7fd69ff0e264",
+    "claimedAt": "2026-08-12T17:50:03.902Z",
+    "heartbeatAt": "2026-08-12T17:50:30.265Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/tasks/ATM-GOV-0331.json",
       ".atm/history/evidence/ATM-GOV-0331.*",
       ".atm/history/task-events/ATM-GOV-0331/**",
-      ".atm/history/tasks/ATM-GOV-0331.json",
       "docs/reports/evidence-shell-deletion-receipt.json",
       "packages/cli/dist/atm.js",
       "packages/cli/src/commands/evidence.ts",
@@ -234,34 +234,34 @@
       "templates/skills/atm-atom-map-refactor.skill.md",
       "tests/cli/observed-evidence-production-callers.test.ts"
     ],
-    "state": "active",
-    "reason": "closed",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
-      "status": "active",
-      "source": "minted",
+      "status": "adopted",
+      "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812164021-codex-gpt-5.4-mini-c263c3e976\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T13:17:02.350Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-bac7121672db2db3",
-    "ticketDigest": "sha256:bac7121672db2db3d7bda6d172c0efb0989f1545a251cbc8ff2817dc18415f3a",
+    "ticketId": "wat-a58e9165c5768f65",
+    "ticketDigest": "sha256:a58e9165c5768f65d1b775b8d6874f7eb561062005669e2a1d400d5053689569",
     "taskId": "ATM-GOV-0331",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
     "claimGeneration": "lease-668b06a75523",
-    "issuedAt": "2026-08-12T17:40:24.230Z",
-    "expiresAt": "2026-08-12T18:10:24.230Z",
-    "scopeDigest": "sha256:d7acb475d48762f4cbcf38907020245db81a11bb2fea105940bb2a9b0a8bcc7a",
+    "issuedAt": "2026-08-12T17:49:14.891Z",
+    "expiresAt": "2026-08-12T18:19:14.891Z",
+    "scopeDigest": "sha256:6acdba41f6f97d091caf35b2d20210d02fda0b56b38e43b3bde538cbeb1aa1cf",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T17:40:24.230Z"
+      "selectedAt": "2026-08-12T17:49:14.891Z"
     },
     "grants": [
       {
@@ -285,6 +285,7 @@
           "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
           "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
           "packages/cli/src/commands/git-governance/implementation/hook-bypass-commit-boundary.ts",
+          "packages/cli/src/commands/task-direction/active-locks.ts",
           "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
           "packages/cli/src/commands/taskflow/close-orchestration.ts",
           "packages/cli/src/commands/taskflow/close-preflight.ts",
@@ -298,7 +299,7 @@
           "templates/skills/atm-atom-map-refactor.skill.md",
           "tests/cli/observed-evidence-production-callers.test.ts"
         ],
-        "digest": "sha256:97cd8f4445e43abe79c3fa8f9f7ec5a39e097302f8f4d9458798e9acf1fe669e"
+        "digest": "sha256:b0cf2ee77745e686095a010bfda4369c594d321176455db9e3bc74831c5fe0d4"
       },
       {
         "kind": "lifecycle-operation",
@@ -333,15 +334,15 @@
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   },
-  "startedBySessionId": "session-20260812164021-codex-gpt-5.4-mini-ATM-GOV-0331-63016edd8a",
+  "startedBySessionId": "session-20260812175003-codex-gpt-5.4-mini-ATM-GOV-0331-2ec284157f",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0331",
     "batchId": "batch-2522d44aebb6",
     "scopeKey": "tasks-832d0e940d20",
-    "queueId": "queue-0f1c793686bffbe8",
-    "queueIndex": 0,
+    "queueId": "queue-9efd7bc4d1e64bd7",
+    "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0331.*",
       ".atm/history/task-events/ATM-GOV-0331/**",
@@ -375,25 +376,24 @@
       "templates/skills/atm-atom-map-refactor.skill.md",
       "tests/cli/observed-evidence-production-callers.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0331-wire-deep-evidence-modules-into-production-callers-and-remove-shallow-shells.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0331-wire-deep-evidence-modules-into-production-callers-and-remove-shallow-shells.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "4487006f351180d2e13ae2deb836853cc52851165347671933ca5205fb60cf39",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260812164021-codex-gpt-5.4-mini-ATM-GOV-0331-63016edd8a",
-    "createdAt": "2026-08-12T17:40:24.647Z",
+    "sessionId": "session-20260812175003-codex-gpt-5.4-mini-ATM-GOV-0331-2ec284157f",
+    "laneSession": {
+      "laneSessionId": "lane-20260812164021-codex-gpt-5.4-mini-c263c3e976",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812164021-codex-gpt-5.4-mini-c263c3e976\""
+    },
+    "createdAt": "2026-08-12T17:50:08.413Z",
     "status": "active"
   },
   "resetReason": "Source commits landed; clear stale publication ownership without touching WIP bytes",
-  "closedAt": "2026-08-12T17:39:47.038Z",
+  "closedAt": "2026-08-12T17:50:30.265Z",
   "closedByActor": "codex-gpt-5.4-mini",
-  "closedBySessionId": "session-20260812164021-codex-gpt-5.4-mini-ATM-GOV-0331-63016edd8a",
+  "closedBySessionId": "session-20260812175003-codex-gpt-5.4-mini-ATM-GOV-0331-2ec284157f",
   "closurePacket": ".atm/history/evidence/ATM-GOV-0331.closure-packet.json"
 }
