@@ -6,7 +6,7 @@ const ALLOWED_FLAGS_MAP = {
     spec: ['--spec', '--validate'],
     verify: ['--spec', '--self', '--neutrality', '--agents-md', '--guards', '--evidence'],
     'self-host-alpha': ['--verify', '--agent'],
-    next: ['--spec', '--claim', '--tasks', '--actor', '--prompt', '--intent', '--task'],
+    next: ['--spec', '--claim', '--tasks', '--actor', '--prompt', '--planning-root', '--intent', '--task'],
     batch: ['--batch', '--scope', '--compact', '--hold', '--actor', '--reason', '--task'],
     quickfix: ['--actor', '--prompt', '--files', '--reason'],
     init: ['--spec', '--dry-run', '--adopt', '--integration', '--task'],
@@ -67,6 +67,7 @@ export function parseOptions(argv, commandName) {
         edgeContracts: false,
         agent: undefined,
         prompt: undefined,
+        planningRoot: undefined,
         intent: undefined,
         files: [],
         reason: undefined,
@@ -255,6 +256,14 @@ export function parseOptions(argv, commandName) {
                 throw createUsageError(commandName, `${commandName} does not support option --prompt`, { invalidFlags: ['--prompt'] });
             }
             options.prompt = requireOptionValue(argv, index, '--prompt', commandName);
+            index += 1;
+            continue;
+        }
+        if (arg === '--planning-root') {
+            if (commandName !== 'next') {
+                throw createUsageError(commandName, `${commandName} does not support option --planning-root`, { invalidFlags: ['--planning-root'] });
+            }
+            options.planningRoot = requireOptionValue(argv, index, '--planning-root', commandName);
             index += 1;
             continue;
         }

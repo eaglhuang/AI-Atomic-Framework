@@ -2,6 +2,11 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import {
+  observeCommandRunRecords,
+  observeProcessExecution,
+  type ObservedProcessExecution
+} from '../observed-source-loader.ts';
+import {
   evaluateTddPhaseReceipt,
   type TddFailureClass,
   type TddPhase,
@@ -51,7 +56,15 @@ export interface EvidenceTddRunOptions {
 export function runEvidenceRun(argv: string[]) {
   const { baseArgv, tdd } = splitTddRunArgv(argv);
   if (!tdd) {
-    return runEvidenceRunBase(baseArgv);
+    const result = runEvidenceRunBase(baseArgv);
+    const commandRuns = readCommandRuns(result.evidence?.bundleManifest);
+    return {
+      ...result,
+      evidence: {
+        ...result.evidence,
+        observedCommandOutcomes: observeCommandRunRecords(commandRuns)
+      }
+    };
   }
 
   const common = readCommonRunOptions(baseArgv);
@@ -72,6 +85,13 @@ export function runEvidenceRun(argv: string[]) {
   const finishedAtMs = Date.now();
   const exitCode = result.status ?? (result.error ? 1 : 0);
   const commandOk = exitCode === 0 && !result.error;
+  const observedCommandOutcome = observeEvidenceRunProcess({
+    command: common.command,
+    exitCode,
+    stdout: result.stdout ?? '',
+    stderr: result.stderr ?? '',
+    processError: result.error?.message ?? null
+  });
 
   const receipt = evaluateTddPhaseReceipt({
     phase: tdd.phase,
@@ -150,7 +170,8 @@ export function runEvidenceRun(argv: string[]) {
       durationMs: Math.max(0, finishedAtMs - startedAtMs),
       stdoutSha256: hashString(result.stdout ?? ''),
       stderrSha256: hashString(result.stderr ?? '')
-    }
+    },
+    observedCommandOutcome
   };
 
   return makeResult({
@@ -167,6 +188,29 @@ export function runEvidenceRun(argv: string[]) {
     ],
     evidence,
     cwd: common.cwd
+  });
+}
+
+/**
+ * Production boundary for evidence-run observations.  The command result is
+ * read from the spawned process; callers cannot supply an outcome flag or a
+ * digest that bypasses the observed-source contract.
+ */
+export function observeEvidenceRunProcess(input: ObservedProcessExecution) {
+  return observeProcessExecution(input);
+}
+
+function readCommandRuns(value: unknown): Array<{ command: string; exitCode: number; stdoutSha256: string; stderrSha256: string }> {
+  if (!value || typeof value !== 'object' || !Array.isArray((value as { commandRuns?: unknown }).commandRuns)) return [];
+  return (value as { commandRuns: unknown[] }).commandRuns.flatMap((entry) => {
+    if (!entry || typeof entry !== 'object') return [];
+    const run = entry as Record<string, unknown>;
+    return typeof run.command === 'string'
+      && typeof run.exitCode === 'number'
+      && typeof run.stdoutSha256 === 'string'
+      && typeof run.stderrSha256 === 'string'
+      ? [{ command: run.command, exitCode: run.exitCode, stdoutSha256: run.stdoutSha256, stderrSha256: run.stderrSha256 }]
+      : [];
   });
 }
 

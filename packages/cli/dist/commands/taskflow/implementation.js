@@ -5,7 +5,7 @@ import path from 'node:path';
 import { getCommandSpec } from '../command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from '../tasks/public-surface.js';
 import { authorizeLaneCapability } from '../lane-session/capability-authority.js';
-import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, resolveClosebackPlanningPath, resolveCloseWriteSupport, capturePlanningCardSnapshot, applyPlanningCardCloseback, resolvePlanningRosterPaths } from './closeback-orchestration.js';
+import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, inspectObservedTaskEvidence, resolveClosebackPlanningPath, resolveCloseWriteSupport, capturePlanningCardSnapshot, applyPlanningCardCloseback, resolvePlanningRosterPaths } from './closeback-orchestration.js';
 import { buildAutoEvidencePlan, executeAutoEvidencePlan } from '../evidence.js';
 import { mapAutoEvidenceCommand } from './auto-evidence-mapper.js';
 import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, relativePathFrom } from '../shared.js';
@@ -419,6 +419,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline' ? closebackPlan.writerBoundary.rosterIndexPath : null, historicalDeliveryRefs, historicalBatchRef, planningAuthorityDeliveryOk: planningAuthorityDeliveryGate.ok });
     const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
     const declaredFiles = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
+    const observedTaskEvidence = inspectObservedTaskEvidence(cwd, taskId);
     const rawHistoricalClosePreflight = buildTaskflowClosePreflight({ cwd, taskId, actorId: actorId || '<actor>', taskDocument, previewCommitBundle, historicalDeliveryRefs, deferForeignStaged, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason });
     let writeReadinessHint = buildTaskflowCloseWriteReadinessHint({ cwd, taskId, actorId, taskDocument, declaredFiles, closebackPlan, previewCommitBundle,
         historicalDeliveryRefs, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason, planningAuthorityDeliveryGate });
@@ -441,7 +442,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     if (surface === 'pre-close') {
         return { ...makeResult({ ok: historicalClosePreflight.ok && !preCloseWriteBlocked, command: 'taskflow pre-close', cwd, mode: 'pre-close', messages: [
                     message(preCloseMessageLevel, preCloseMessageCode, preCloseMessageText, { taskId, blockerCount: historicalClosePreflight.blockers.length, writeReadinessBlockerCount: writeReadinessHint.blockers.length, runnerGateDecision: runnerGateEvidence.runnerGateDecision })
-                ], evidence: { historicalClosePreflight, writeReadinessHint, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, runnerReceiptPublicationClosure, closebackPlan, governedCommitBundle: previewCommitBundle, residueDiagnosis: enrichedDiagnosis, closebackPathResolution,
+                ], evidence: { historicalClosePreflight, writeReadinessHint, observedTaskEvidence, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, runnerReceiptPublicationClosure, closebackPlan, governedCommitBundle: previewCommitBundle, residueDiagnosis: enrichedDiagnosis, closebackPathResolution,
                     ...(autoEvidencePlan ? { autoEvidencePlan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowPreCloseResult.v1', writeEnabled: false, historicalClosePreflight };
     }
     const writeSupport = resolveCloseWriteSupport({ writeRequested, closeMode: closebackPlan.closeMode, actorSupplied: actorId.length > 0, taskIdSupplied: taskId.length > 0,

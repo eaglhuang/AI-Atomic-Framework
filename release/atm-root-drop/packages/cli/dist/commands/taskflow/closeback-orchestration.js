@@ -5,7 +5,7 @@ import { buildPlanningMirrorClosebackExpectation, classifyPlanningMirrorPreEdit 
 import { appendTaskTransitionEvent, createTaskTransitionId } from '../task-ledger.js';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { CliError } from '../shared.js';
-export { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, listOptionalEvidenceBundleGovernanceArtifacts, resolveCloseWriteSupport, resolveClosebackPlanningPath } from './close-orchestration.js';
+export { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, inspectObservedTaskEvidence, listOptionalEvidenceBundleGovernanceArtifacts, resolveCloseWriteSupport, resolveClosebackPlanningPath } from './close-orchestration.js';
 function tryGitScalar(cwd, args) {
     try {
         return execFileSync('git', [...args], {

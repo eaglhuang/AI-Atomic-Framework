@@ -47,23 +47,34 @@ export function readBrokerConflictResolutionArtifact(input) {
             },
         });
     }
-    const artifactConflictTaskId = String(artifact.conflictTaskId ?? "")
-        .trim()
-        .toUpperCase();
+    const artifactConflictTaskIds = Array.isArray(artifact.conflictingTaskIds)
+        ? artifact.conflictingTaskIds
+        : [artifact.conflictTaskId];
+    const artifactConflictTaskId = artifactConflictTaskIds
+        .map((entry) => String(entry ?? "").trim().toUpperCase())
+        .includes(String(input.conflictTaskId).trim().toUpperCase())
+        ? String(input.conflictTaskId).trim().toUpperCase()
+        : "";
     const artifactConflictFiles = Array.isArray(artifact.conflictFiles)
         ? artifact.conflictFiles
-            .map((entry) => String(entry).replace(/\\/g, "/"))
-            .filter(Boolean)
-            .sort()
-        : [];
+        : Array.isArray(artifact.sharedPaths)
+            ? artifact.sharedPaths
+            : [];
+    const normalizedArtifactConflictFiles = artifactConflictFiles
+        .map((entry) => String(entry).replace(/\\/g, "/"))
+        .filter(Boolean)
+        .sort();
     const expectedFiles = [...input.conflictFiles]
         .map((entry) => String(entry).replace(/\\/g, "/"))
         .sort();
     const resolutionOrder = Array.isArray(artifact.resolutionOrder)
         ? artifact.resolutionOrder
-            .map((entry) => String(entry).trim())
-            .filter(Boolean)
-        : [];
+        : Array.isArray(artifact.releaseOrder)
+            ? artifact.releaseOrder
+            : [];
+    const normalizedResolutionOrder = resolutionOrder
+        .map((entry) => String(entry).trim())
+        .filter(Boolean);
     const validatorPlan = Array.isArray(artifact.validatorPlan)
         ? artifact.validatorPlan
             .map((entry) => String(entry).trim())
@@ -74,8 +85,8 @@ export function readBrokerConflictResolutionArtifact(input) {
     const violationStatus = String(artifact.violationStatus ?? "").trim();
     if (artifact.schemaId !== "atm.brokerConflictResolution.v1" ||
         artifactConflictTaskId !== input.conflictTaskId ||
-        JSON.stringify(artifactConflictFiles) !== JSON.stringify(expectedFiles) ||
-        resolutionOrder.length < 2 ||
+        JSON.stringify(normalizedArtifactConflictFiles) !== JSON.stringify(expectedFiles) ||
+        normalizedResolutionOrder.length < 2 ||
         validatorPlan.length === 0 ||
         ![
             "serial-release",
@@ -159,7 +170,48 @@ export function assertNoBrokerConflictBeforeHookBypass(options) {
         },
     });
 }
-export function authorizeHookBypassAfterBrokerAdmission(options) {
+/**
+ * Prove that a bypass lease is eligible without consuming its one-use capability.
+ *
+ * This deliberately stays outside the branch commit queue: candidate and broker
+ * rejection are retryable preparation failures, not protected writes.
+ */
+export function preflightHookBypassEligibility(options) {
+    assertNoBrokerConflictBeforeHookBypass(options);
+    return assertEmergencyApproval({
+        cwd: options.cwd,
+        surface: "git commit --no-verify",
+        permission: "backend.gitHookBypass",
+        taskId: options.taskId,
+        actorId: options.actorId,
+        emergencyApproval: options.emergencyApproval,
+        flags: ["--no-verify"],
+        reason: options.reason ?? "Governed git hook bypass for emergency recovery.",
+        command: options.command,
+        consume: false,
+    });
+}
+/** Build the immutable request consumed only by the protected write boundary. */
+export function prepareHookBypassRequest(options) {
+    preflightHookBypassEligibility(options);
+    return {
+        cwd: options.cwd,
+        taskId: options.taskId,
+        actorId: options.actorId,
+        deferForeignStaged: options.deferForeignStaged,
+        candidateFiles: options.candidateFiles,
+        brokerConflictOverrideApproval: options.brokerConflictOverrideApproval,
+        brokerConflictResolutionPath: options.brokerConflictResolutionPath,
+        reason: options.reason,
+        command: options.command,
+        emergencyApproval: options.emergencyApproval,
+    };
+}
+/**
+ * Consume the bypass capability only at the protected-write boundary. Callers
+ * must invoke this after branch-queue admission and immediately before Git.
+ */
+export function consumeHookBypassAtProtectedWrite(options) {
     assertNoBrokerConflictBeforeHookBypass(options);
     return assertEmergencyApproval({
         cwd: options.cwd,

@@ -16,11 +16,18 @@ import { findActiveTaskQueueForIntent } from './runtime.js';
 import { dedupeTasks, isActiveClaimedTask, isHandoffPrompt, isTaskIdMentioned, resolvePromptScopedTaskRoute } from './matching.js';
 import { finalizeImportedTaskSummary, extractDeclaredTaskPathsFromDocument, extractLinkedSourceTaskArtifactPaths, extractTaskArtifactPathsFromMarkdown } from './artifact-scope.js';
 import { findNearbyPlanPaths, listPromptScopedExternalTaskCardFiles, listTaskCardFiles } from './task-card-discovery.js';
-export function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
+export function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write', explicitPlanningRoot = null) {
     const profile = createNextProfiler('ATM_NEXT_QUEUE_PROFILE');
-    const planningRootResolution = resolveCandidatePlanningRoots(cwd, {
-        configuredRoots: readConfiguredPlanningRoots(cwd)
-    });
+    const planningRootResolution = explicitPlanningRoot
+        ? {
+            roots: [path.isAbsolute(explicitPlanningRoot) ? path.resolve(explicitPlanningRoot) : path.resolve(cwd, explicitPlanningRoot)],
+            excludedDerivativeRoots: [],
+            ambiguousSiblingGroups: [],
+            warnings: []
+        }
+        : resolveCandidatePlanningRoots(cwd, {
+            configuredRoots: readConfiguredPlanningRoots(cwd)
+        });
     profile.mark('resolve-planning-roots');
     const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
     const jsonTasks = existsSync(taskStorePath) ? readdirSync(taskStorePath)

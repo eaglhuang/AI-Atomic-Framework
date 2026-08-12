@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
+import { observeCommandRunRecords, observeProcessExecution } from '../observed-source-loader.js';
 import { evaluateTddPhaseReceipt } from '../../../../../core/dist/evidence/tdd-cycle.js';
 import { evaluateValidationContract } from '../../../../../core/dist/evidence/validation-contract.js';
 import { CliError, makeResult, message } from '../../shared.js';
@@ -22,7 +23,15 @@ const TDD_FLAG_KEYS = new Set([
 export function runEvidenceRun(argv) {
     const { baseArgv, tdd } = splitTddRunArgv(argv);
     if (!tdd) {
-        return runEvidenceRunBase(baseArgv);
+        const result = runEvidenceRunBase(baseArgv);
+        const commandRuns = readCommandRuns(result.evidence?.bundleManifest);
+        return {
+            ...result,
+            evidence: {
+                ...result.evidence,
+                observedCommandOutcomes: observeCommandRunRecords(commandRuns)
+            }
+        };
     }
     const common = readCommonRunOptions(baseArgv);
     const shell = process.platform === 'win32' ? 'powershell.exe' : '/bin/sh';
@@ -42,6 +51,13 @@ export function runEvidenceRun(argv) {
     const finishedAtMs = Date.now();
     const exitCode = result.status ?? (result.error ? 1 : 0);
     const commandOk = exitCode === 0 && !result.error;
+    const observedCommandOutcome = observeEvidenceRunProcess({
+        command: common.command,
+        exitCode,
+        stdout: result.stdout ?? '',
+        stderr: result.stderr ?? '',
+        processError: result.error?.message ?? null
+    });
     const receipt = evaluateTddPhaseReceipt({
         phase: tdd.phase,
         binding: {
@@ -118,7 +134,8 @@ export function runEvidenceRun(argv) {
             durationMs: Math.max(0, finishedAtMs - startedAtMs),
             stdoutSha256: hashString(result.stdout ?? ''),
             stderrSha256: hashString(result.stderr ?? '')
-        }
+        },
+        observedCommandOutcome
     };
     return makeResult({
         ok: true,
@@ -129,6 +146,29 @@ export function runEvidenceRun(argv) {
         ],
         evidence,
         cwd: common.cwd
+    });
+}
+/**
+ * Production boundary for evidence-run observations.  The command result is
+ * read from the spawned process; callers cannot supply an outcome flag or a
+ * digest that bypasses the observed-source contract.
+ */
+export function observeEvidenceRunProcess(input) {
+    return observeProcessExecution(input);
+}
+function readCommandRuns(value) {
+    if (!value || typeof value !== 'object' || !Array.isArray(value.commandRuns))
+        return [];
+    return value.commandRuns.flatMap((entry) => {
+        if (!entry || typeof entry !== 'object')
+            return [];
+        const run = entry;
+        return typeof run.command === 'string'
+            && typeof run.exitCode === 'number'
+            && typeof run.stdoutSha256 === 'string'
+            && typeof run.stderrSha256 === 'string'
+            ? [{ command: run.command, exitCode: run.exitCode, stdoutSha256: run.stdoutSha256, stderrSha256: run.stderrSha256 }]
+            : [];
     });
 }
 export { runEvidenceRun as run };

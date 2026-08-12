@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'integration',
   summary: 'List, install, verify, remove, or run ATM agent integration adapters and hooks.',
   positional: [
-    { name: 'action', summary: 'list | add | verify | remove | hook | hooks', required: false },
+    { name: 'action', summary: 'list | add | verify | parity | remove | hook | hooks', required: false },
     { name: 'adapter-id', summary: 'Adapter id for add/verify/remove or hook event/action.', required: false },
     { name: 'hook-adapter-id', summary: 'Adapter id for hooks install/verify/uninstall, including git-pre-push.', required: false }
   ],
@@ -36,6 +36,7 @@ export default defineCommandSpec({
     'node atm.mjs integration add codex --json',
     'node atm.mjs integration add antigravity --json',
     'node atm.mjs integration verify claude-code --json',
+    'node atm.mjs integration parity --json',
     'node atm.mjs integration remove claude-code --json',
     'node atm.mjs integration hook pre-agent --editor copilot --json',
     'node atm.mjs integration hook pre-tool --editor claude-code --files packages/core/src/index.ts --json',

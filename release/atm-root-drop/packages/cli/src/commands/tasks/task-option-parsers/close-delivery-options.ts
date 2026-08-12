@@ -87,6 +87,7 @@ export function parseDeliverAndCloseOptions(argv: string[]) {
     deliveryCommit: null as string | null,
     message: null as string | null,
     reason: null as string | null,
+    emergencyApproval: null as string | null,
     dryRun: false,
     fromBatchCheckpoint: false,
     batchId: null as string | null
@@ -120,6 +121,11 @@ export function parseDeliverAndCloseOptions(argv: string[]) {
     }
     if (arg === '--reason') {
       options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--emergency-approval') {
+      options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
       index += 1;
       continue;
     }

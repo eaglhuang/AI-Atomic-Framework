@@ -209,7 +209,8 @@ function buildIgnoredArtifactForceAddHints(cwd) {
         reason: 'This path is currently hidden by .gitignore; use force-add only if it is the intended deliverable for the selected route.'
     }));
 }
-export function buildNonPlaybookRouteHints(cwd, prompt) {
+export function buildNonPlaybookRouteHints(cwd, prompt, options = {}) {
+    const includeWorktreeDetails = options.includeWorktreeDetails !== false;
     return {
         playbookState: 'absent',
         structuredOutputHint: {
@@ -218,7 +219,22 @@ export function buildNonPlaybookRouteHints(cwd, prompt) {
             treatCliJsonAs: 'structured-tool-guidance',
             followNextActionField: 'evidence.nextAction.command'
         },
-        ignoredArtifactForceAddHints: buildIgnoredArtifactForceAddHints(cwd),
-        promptWorktreeHint: buildPromptWorktreeHint(cwd, prompt)
+        ignoredArtifactForceAddHints: includeWorktreeDetails ? buildIgnoredArtifactForceAddHints(cwd) : [],
+        promptWorktreeHint: includeWorktreeDetails
+            ? buildPromptWorktreeHint(cwd, prompt)
+            : {
+                schemaId: 'atm.promptWorktreeHint.v1',
+                status: 'deferred',
+                promptPathHints: extractPathLikeStringsFromText(prompt),
+                promptMatchedFiles: [],
+                atmManagedFiles: [],
+                generatedArtifactFiles: [],
+                releaseMirrorFiles: [],
+                unrelatedTrackedFiles: [],
+                unrelatedUntrackedFiles: [],
+                ignoredArtifactCount: 0,
+                note: 'Unscoped guidance defers live-worktree enumeration; task-scoped next performs exact admission when work is selected.',
+                diagnosticCommand: 'node atm.mjs next --prompt "<task-or-path-scoped prompt>" --json'
+            }
     };
 }

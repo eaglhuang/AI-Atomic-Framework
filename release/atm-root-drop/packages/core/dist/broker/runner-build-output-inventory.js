@@ -34,11 +34,21 @@ export function scanSealedRunnerBuildOutputInventory(input) {
     }
     if (input.taskId)
         outputPaths.push(`.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`);
+    const preexistingDirtyPaths = new Set(input.beforeBuildSnapshot.preexistingDirtyPaths.map(normalizePath));
+    const takeoverPaths = new Set((input.takeoverPaths ?? []).map(normalizePath));
     return deriveRunnerBuildOutputInventory({
         sealedSourceSha: input.sealedSourceSha,
         observedPaths: outputPaths,
         currentTaskId: input.taskId,
-        ownership: outputPaths.map((entry) => ({ path: entry, ownerTaskId: input.taskId }))
+        // A queue-head build may observe pre-existing generated WIP, but it cannot
+        // convert that observation into ownership unless the publication boundary
+        // has supplied an exact digest-bound takeover for that same path.
+        ownership: outputPaths.map((entry) => ({
+            path: entry,
+            ownerTaskId: preexistingDirtyPaths.has(normalizePath(entry)) && !takeoverPaths.has(normalizePath(entry))
+                ? null
+                : input.taskId
+        }))
     });
 }
 /** Capture byte identities before a sealed build mutates its output surfaces. */

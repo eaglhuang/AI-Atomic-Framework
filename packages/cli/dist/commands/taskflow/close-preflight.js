@@ -312,6 +312,8 @@ export function buildPlanningDeliveryRequiredCommand(taskId, actorId) {
 // remain non-blocking. The contract digest it seals here is the same digest the
 // evidence run, close packet, and pre-push guard thread through the lifecycle.
 export function resolveClosePreflightValidationContract(task, changeSet, catalog, evidence = {}) {
+    // observedOutcome receipts are interpreted by the shared deep evaluator;
+    // pre-close cannot reclassify a caller-declared status as fresh.
     return evaluateValidationContract(task, changeSet, catalog, evidence);
 }
 /**

@@ -12,6 +12,7 @@ export {
   buildCloseWriteRollbackSnapshot,
   buildTaskflowCloseDiagnostics,
   executeCloseWriteCommitPhase,
+  inspectObservedTaskEvidence,
   listOptionalEvidenceBundleGovernanceArtifacts,
   resolveCloseWriteSupport,
   resolveClosebackPlanningPath,

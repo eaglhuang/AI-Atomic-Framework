@@ -11,6 +11,11 @@
 // evidence. The decentralized shard machinery it can consume lives in
 // packages/core/src/evidence/test-case-catalog.ts.
 
+import {
+  OBSERVATION_SNAPSHOT_SCHEMA_ID,
+  type ObservedEvidenceSnapshot
+} from './observed-source.ts';
+
 export const VALIDATION_CONTRACT_EVALUATION_SCHEMA_ID = 'atm.validationContractEvaluation.v1' as const;
 
 export type ValidationRiskTier = 'low' | 'medium' | 'high';
@@ -60,10 +65,21 @@ export interface ValidationContractCatalog {
 
 export interface ValidationContractEvidenceReceipt {
   readonly caseId: string;
+  /**
+   * Legacy, caller-declared outcome.  New producers must instead provide an
+   * observedOutcome.  When observedOutcome exists this field is deliberately
+   * ignored by the freshness evaluator.
+   */
   readonly status?: string | null;
   readonly gitHead?: string | null;
   readonly observedAt?: string | null;
   readonly freshUntil?: string | null;
+  /**
+   * Process fact collected through the observed-evidence port.  This is a
+   * deep boundary: the evaluator derives pass/fail from its exitCode and
+   * refuses malformed, unavailable, or conflicting observations.
+   */
+  readonly observedOutcome?: ObservedEvidenceSnapshot | null;
 }
 
 export interface ValidationContractEvidence {
@@ -411,7 +427,18 @@ function computeFreshnessInputs(
       continue;
     }
     const receiptHead = receipt.gitHead ?? null;
-    if (String(receipt.status ?? '').toLowerCase() === 'failed') {
+    const observedOutcome = evaluateObservedOutcome(receipt.observedOutcome);
+    if (observedOutcome.kind === 'missing') {
+      inputs.push({ caseId: selection.caseId, status: 'missing', reason: observedOutcome.reason, receiptGitHead: receiptHead });
+      continue;
+    }
+    if (observedOutcome.kind === 'failed') {
+      inputs.push({ caseId: selection.caseId, status: 'failed', reason: observedOutcome.reason, receiptGitHead: receiptHead });
+      continue;
+    }
+    // A legacy receipt has no observedOutcome and remains readable during the
+    // migration.  An adopted observedOutcome never trusts this caller claim.
+    if (observedOutcome.kind === 'legacy' && String(receipt.status ?? '').toLowerCase() === 'failed') {
       inputs.push({ caseId: selection.caseId, status: 'failed', reason: 'receipt records a failed result', receiptGitHead: receiptHead });
       continue;
     }
@@ -423,9 +450,39 @@ function computeFreshnessInputs(
       inputs.push({ caseId: selection.caseId, status: 'stale', reason: `receipt freshness expired at ${receipt.freshUntil}`, receiptGitHead: receiptHead });
       continue;
     }
-    inputs.push({ caseId: selection.caseId, status: 'fresh', reason: 'receipt passed and within freshness bounds', receiptGitHead: receiptHead });
+    inputs.push({
+      caseId: selection.caseId,
+      status: 'fresh',
+      reason: observedOutcome.kind === 'observed'
+        ? 'observed process exited successfully and receipt is within freshness bounds'
+        : 'legacy receipt passed and is within freshness bounds',
+      receiptGitHead: receiptHead
+    });
   }
   return inputs;
+}
+
+type ObservedOutcomeDecision =
+  | { readonly kind: 'legacy' }
+  | { readonly kind: 'observed' }
+  | { readonly kind: 'missing'; readonly reason: string }
+  | { readonly kind: 'failed'; readonly reason: string };
+
+function evaluateObservedOutcome(value: ObservedEvidenceSnapshot | null | undefined): ObservedOutcomeDecision {
+  if (value === undefined || value === null) return { kind: 'legacy' };
+  if (value.schemaId !== OBSERVATION_SNAPSHOT_SCHEMA_ID || value.status !== 'observed') {
+    return { kind: 'missing', reason: 'observed validation outcome is unavailable or conflicting' };
+  }
+  if (value.sourceIds.length === 0 || !/^sha256:[a-f0-9]{64}$/i.test(value.valueDigest ?? '')) {
+    return { kind: 'missing', reason: 'observed validation outcome lacks a source or digest' };
+  }
+  const execution = value.value;
+  if (!execution || typeof execution !== 'object' || Array.isArray(execution) || typeof (execution as { exitCode?: unknown }).exitCode !== 'number') {
+    return { kind: 'missing', reason: 'observed validation outcome lacks a process exit code' };
+  }
+  return (execution as { exitCode: number }).exitCode === 0
+    ? { kind: 'observed' }
+    : { kind: 'failed', reason: `observed process exited with code ${(execution as { exitCode: number }).exitCode}` };
 }
 
 function groupPhaseOwners(

@@ -7,6 +7,7 @@ import { evaluateTaskflowBrokerConflictGate } from './broker-gate.js';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { quoteCliValue } from '../shared.js';
 import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.js';
+import { inspectCloseWindowStagedIndexAdmission } from '../tasks/close-window-lock.js';
 // TASK-SKL-0029 — write-readiness lifecycle adapter.
 //
 // Write-readiness must not recompute a task's required-case set or freshness; it
@@ -119,6 +120,25 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
         files: input.previewCommitBundle.targetDeliveryFiles,
         producingAtmCommand: 'node atm.mjs taskflow close --write --json'
     });
+    const expectedCloseWindowStageFiles = [
+        ...(input.previewCommitBundle.targetRepo?.stageFiles ?? []),
+        ...input.previewCommitBundle.targetDeliveryFiles,
+        ...(input.previewCommitBundle.targetGovernanceFiles ?? [])
+    ];
+    const closeWindowAdmission = inspectCloseWindowStagedIndexAdmission({ cwd: input.cwd, taskId: input.taskId,
+        expectedStageFiles: expectedCloseWindowStageFiles,
+        // CLI adapter fallback keeps legacy callers compatible until the compact
+        // taskflow orchestrator is reformatted; explicit library callers remain pure.
+        deferForeignStaged: input.deferForeignStaged ?? (process.argv.includes('--defer-foreign-staged') || process.argv.includes('--defer-foreign-state')) });
+    if (!closeWindowAdmission.ok)
+        blockers.push({
+            code: closeWindowAdmission.blockedCode ?? 'ATM_CLOSE_WINDOW_STAGED_INDEX_BLOCKED',
+            summary: closeWindowAdmission.blockedSummary ?? 'Close window staged-index admission is blocked.',
+            requiredCommand: closeWindowAdmission.blockedCode === 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS'
+                ? `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --defer-foreign-staged --write --json`
+                : closeWindowAdmission.lock?.taskId ? `node atm.mjs tasks status --task ${closeWindowAdmission.lock.taskId} --json` : null,
+            files: closeWindowAdmission.unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles)
+        });
     if (!workAdmission.decision.ok) {
         blockers.push({
             code: workAdmission.decision.code,

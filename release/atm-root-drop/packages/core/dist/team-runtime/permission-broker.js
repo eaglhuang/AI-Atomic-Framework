@@ -115,6 +115,7 @@ export function createBrokerConflictResolutionArtifact(input) {
         decisionReason: input.decisionReason.trim(),
         violationStatus,
         releaseOrder,
+        validatorPlan: [`node atm.mjs evidence verify --task ${primaryTaskId} --gate commit --json`],
         currentAllowedTaskId,
         blockedTaskIds,
         artifactType: 'atm.brokerConflictResolution.v1',

@@ -27,7 +27,6 @@ import { scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broke
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 import { resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
-import { isSealedBuildOutputPath } from './sealed-build-output-ownership.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
@@ -161,7 +160,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: publication.currentTaskId, beforeBuildSnapshot: publication.beforeBuildSnapshot, includeDirtyPublicationMembers: true }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: publication.currentTaskId, beforeBuildSnapshot: publication.beforeBuildSnapshot, includeDirtyPublicationMembers: true, takeoverPaths: publication.takeoverPaths }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
@@ -220,10 +219,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
         worktreeRoot,
         repoRoot,
         buildTarget,
-        publication.beforeBuildSnapshot.preexistingDirtyPaths.filter((entry) =>
-          !publication.takeoverPaths.includes(entry)
-          && !isSealedBuildOutputPath(entry, buildTarget),
-        ),
+        publication.beforeBuildSnapshot.preexistingDirtyPaths.filter((entry) => !publication.takeoverPaths.includes(entry)),
       ),
     );
     if (artifactSync.preservedPaths.length > 0) {
@@ -264,7 +260,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       actorId,
       actorIdentitySource,
       sealedSourceSha,
-      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: publication.currentTaskId, beforeBuildSnapshot: publication.beforeBuildSnapshot, includeDirtyPublicationMembers: true }),
+      outputInventory: scanSealedRunnerBuildOutputInventory({ cwd: repoRoot, buildTarget, sealedSourceSha, taskId: publication.currentTaskId, beforeBuildSnapshot: publication.beforeBuildSnapshot, includeDirtyPublicationMembers: true, takeoverPaths: publication.takeoverPaths }),
       buildTarget,
       buildInputsTreeHash,
       buildDecision,

@@ -1,6 +1,4 @@
-import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.ts';
 import {
-  ensureGovernedGitHeadEvidenceStagedForCommit,
   rollbackFailedGitHeadEvidencePreparation,
 } from './git-head-evidence-transaction.ts';
 import {
@@ -8,13 +6,10 @@ import {
   createSanitizedGitEnv,
   gitCommitAttemptStatusRelativePath,
   readGitCommitAttemptStatus,
-  resolveGitCommitTimeoutMs,
   resolveGitExecutable,
-  shouldStageGovernedGitHeadEvidenceBeforeCommit,
-  stageTrackedActorRegistryIfNeeded,
+  resolveGitCommitTimeoutMs,
   writeGitCommitAttemptStatus,
 } from './git-process-port.ts';
-import { execFileSync } from "node:child_process";
 import {
   assertEmergencyApproval,
   recordProtectedOverrideOutcome,
@@ -24,18 +19,13 @@ import {
   ATM_INDEX_FOREIGN_ACTIVE_STAGED,
   authorizeGitIndexOverrideLease,
   buildForeignActiveStagedDiagnostic,
-  consumeGitIndexOverrideLease,
   inspectGitIndexOwnership,
-  parkGitIndexLease,
-  restoreGitIndexLease,
 } from "../../git-index-ownership.ts";
 import {
-  executeTaskScopedCommitTransaction,
   TaskScopedCommitTransactionError,
 } from "../task-scoped-commit-transaction.ts";
 import {
   extractGovernanceTaskIdFromPath,
-  inspectTouchedPhysicalLineBudget,
   isProtectedStagedGovernanceOwnershipPath,
   normalizeRelativePath,
   normalizeTaskClaimIntent,
@@ -50,32 +40,17 @@ import {
   relativePathFrom,
 } from "../../shared.ts";
 import { withBranchCommitQueueLock } from './branch-commit-window.ts';
-import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles, recordGitIndexRestoreFailure, rollbackNewlyStagedLiveIndexResidue, withTaskScopedCommitIndex } from './git-index-transaction.ts';
-import { resolveGovernedCommitSeal } from './sealed-commit-attribution.ts';
+import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, rollbackNewlyStagedLiveIndexResidue } from './git-index-transaction.ts';
 import { isHeadRaceCommitFailure, readHeadBranchRef, readHeadCommitSha } from './push-command.ts';
-import { resolveTaskBoundCommitFiles } from './commit-bundle-selection.ts';
+import { prepareCommitCandidate, assertGovernedCommitPhysicalLineBudget } from './commit-candidate-preparation.ts';
+import { executeCommitAttempt } from './commit-attempt-boundary.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
-export function assertGovernedCommitPhysicalLineBudget(cwd: LegacyValue, files: LegacyValue, actorId: LegacyValue, taskId: LegacyValue) {
-  const report = inspectTouchedPhysicalLineBudget(cwd, files, {
-    taskId,
-    actorId,
-    gate: "git-commit",
-  });
-  if (report.ok) return;
-  throw new CliError(
-    "ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED",
-    `Governed commit blocked because touched source files exceed the physical line budget (${report.maxLines}).`,
-    {
-      exitCode: 1,
-      details: report,
-    },
-  );
-}
+export { assertGovernedCommitPhysicalLineBudget };
 
 export function executeGitCommit(options: LegacyValue, context: LegacyValue) {
-let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers } = context;
+let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers } = context;
 try {
     withBranchCommitQueueLock(
       {
@@ -124,157 +99,35 @@ try {
             options.brokerConflictResolutionPath ?? "",
           ATM_COMMIT_TRAILERS: trailers.join("\n"),
         });
-        const resolvedTaskBundle =
-          options.taskId !== null && taskDocument
-            ? (taskScopedBundleReport ??
-                resolveTaskScopedCommitBundle({
-                  cwd: options.cwd,
-                  taskId: options.taskId,
-                  taskDocument,
-                  apply: false,
-                  autoStage: options.autoStage,
-                  deferForeignStaged: options.deferForeignStaged,
-                  stageOverrideLease: options.stageOverrideLease,
-                  brokerConflictResolutionPath:
-                    options.brokerConflictResolutionPath,
-                  message: options.message,
-                  actorId,
-                  trailers,
-                }))
-            : null;
-        const bundleFiles = resolveTaskBoundCommitFiles({
-          taskId: options.taskId,
+        const candidate = prepareCommitCandidate({
+          options,
           taskDocument,
-          taskScopedBundleReport: resolvedTaskBundle,
+          taskScopedBundleReport,
           frameworkClaimCommitFiles,
-        });
-        const autoStagedActorRegistryPath =
-          options.taskId === null
-            ? stageTrackedActorRegistryIfNeeded(options.cwd)
-            : null;
-        const scopedCommitFiles =
-          bundleFiles.length > 0 ? bundleFiles : frameworkClaimCommitFiles;
-        const preStagedEvidence =
-          !options.noVerify && scopedCommitFiles.length === 0
-            ? ensureGovernedGitHeadEvidenceStagedForCommit(options.cwd, actorId)
-            : null;
-        const stagedCommitSurface =
-          scopedCommitFiles.length > 0
-            ? scopedCommitFiles
-            : readStagedFiles(options.cwd);
-        assertGovernedCommitPhysicalLineBudget(
-          options.cwd,
-          stagedCommitSurface,
           actorId,
+          trailers,
           hookTaskId,
-        );
-        if (
-          !options.noVerify &&
-          scopedCommitFiles.length === 0 &&
-          shouldStageGovernedGitHeadEvidenceBeforeCommit(stagedCommitSurface) &&
-          !preStagedEvidence
-        ) {
-          throw new CliError(
-            "ATM_GIT_COMMIT_GIT_HEAD_PREPARE_FAILED",
-            "ATM could not pre-stage git-head evidence for this governed commit.",
-            {
-              exitCode: 1,
-              details: {
-                actorId,
-                taskId: options.taskId,
-                stagedCommitSurface,
-                autoStagedActorRegistryPath,
-                autoStagedFrameworkPaths,
-              },
-            },
-          );
-        }
-        const runCommit = (env: LegacyValue) =>
-          execFileSync(resolveGitExecutable(), args, {
-            cwd: options.cwd,
-            encoding: "utf8",
-            stdio: ["ignore", "pipe", "pipe"],
-            env,
-            timeout: commitTimeoutMs,
-          });
-        writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
-          schemaId: "atm.gitCommitAttemptStatus.v1",
+          autoStagedFrameworkPaths,
+        });
+        protectedOverrideAudit = executeCommitAttempt({
+          options,
           actorId,
-          taskId: options.taskId,
-          sessionId: session?.sessionId ?? null,
+          args,
+          commitEnv,
+          commitTimeoutMs,
+          hookBypassRequest,
+          protectedOverrideAudit,
+          commitAttemptStatusPath,
+          commitAttemptStartedAt,
+          session,
           laneSessionId,
-          status: "in-progress",
-          phase: "running-git-commit",
-          startedAt: commitAttemptStartedAt,
-          updatedAt: new Date().toISOString(),
-          commitSha: null,
           headShaBeforeCommit,
-          headShaAfterAttempt: null,
-          headAdvancedDuringAttempt: null,
-          timeoutMs: commitTimeoutMs,
-          errorCode: null,
-          errorSummary: null,
           statusCommand,
           retryCommand,
-          copyableCommitCommand: rawCopyableCommitCommand,
-          liveIndexResidueRollback: [],
+          rawCopyableCommitCommand,
+          taskScopedBundleReport,
+          ...candidate,
         });
-        // Every governed commit goes through a sealed candidate index, and both
-        // branches seal explicitly: the admitted task-scope bundle is reused as
-        // resolved, and a commit that only has a pre-staged index seals that
-        // index under its own provenance. Neither branch reaches assembly
-        // without a named seal, so there is no live-index fallback left.
-        const commitScopedBundle = () =>
-          withTaskScopedCommitIndex(
-            options.cwd,
-            scopedCommitFiles.length > 0 ? scopedCommitFiles : stagedCommitSurface,
-            actorId,
-            options.taskId,
-            (scopedEnv: LegacyValue) => runCommit({ ...commitEnv, ...scopedEnv }),
-            resolveGovernedCommitSeal({
-              cwd: options.cwd,
-              admittedBundle:
-                scopedCommitFiles.length > 0
-                  ? (taskScopedBundleReport?.sealedBundle ?? null)
-                  : null,
-              paths: stagedCommitSurface,
-              provenance: "pre-staged-index",
-            }),
-          );
-        const indexLeaseAuthorization = taskScopedBundleReport?.indexLeaseAuthorization;
-        if (indexLeaseAuthorization?.ok) {
-          executeTaskScopedCommitTransaction(
-            {
-              taskId: options.taskId,
-              leaseId: indexLeaseAuthorization.lease.leaseId,
-              foreignEntries: indexLeaseAuthorization.plan.parkEntries.map(
-                (entry: LegacyValue) => ({
-                  path: entry.path,
-                  mode: String(entry.stagedMode ?? ""),
-                  blobId: String(entry.stagedBlobId ?? ""),
-                }),
-              ),
-            },
-            {
-              park: () => {
-                parkGitIndexLease(options.cwd, indexLeaseAuthorization.plan);
-              },
-              commitCurrentTaskBundle: commitScopedBundle,
-              restore: () => {
-                restoreGitIndexLease(options.cwd, indexLeaseAuthorization.plan);
-              },
-              recordRestoreFailure: (failure: LegacyValue) => {
-                recordGitIndexRestoreFailure(options.cwd, failure);
-              },
-            },
-          );
-          consumeGitIndexOverrideLease(
-            options.cwd,
-            indexLeaseAuthorization.lease,
-          );
-        } else {
-          commitScopedBundle();
-        }
       },
     );
   } catch (error) {

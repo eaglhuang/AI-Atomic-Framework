@@ -35,6 +35,8 @@ import { evaluateValidationContract } from '../../../../core/dist/evidence/valid
 // A missing required contract fails closed (no cases) rather than mapping the
 // full repository suite.
 export function resolveAutoEvidenceValidationContract(task, changeSet, catalog, evidence = {}) {
+    // observedOutcome receipts are interpreted by the shared deep evaluator;
+    // this adapter never promotes a caller-declared status itself.
     return evaluateValidationContract(task, changeSet, catalog, evidence);
 }
 /**

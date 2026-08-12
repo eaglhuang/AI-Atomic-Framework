@@ -76,6 +76,7 @@ export type BrokerConflictResolutionArtifact = BrokerConflictResolutionAuthority
   readonly decisionReason: string;
   readonly violationStatus: BrokerConflictViolationStatus;
   readonly releaseOrder: readonly string[];
+  readonly validatorPlan: readonly string[];
   readonly currentAllowedTaskId: string | null;
   readonly blockedTaskIds: readonly string[];
   readonly artifactType: 'atm.brokerConflictResolution.v1';
@@ -251,6 +252,7 @@ export function createBrokerConflictResolutionArtifact(input: {
     decisionReason: input.decisionReason.trim(),
     violationStatus,
     releaseOrder,
+    validatorPlan: [`node atm.mjs evidence verify --task ${primaryTaskId} --gate commit --json`],
     currentAllowedTaskId,
     blockedTaskIds,
     artifactType: 'atm.brokerConflictResolution.v1',

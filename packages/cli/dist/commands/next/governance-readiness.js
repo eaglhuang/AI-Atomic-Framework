@@ -13,7 +13,13 @@ export function buildGovernanceReadinessHintContract(input) {
         ...(input.ownFiles ?? []),
         ...(input.taskId ? input.readTaskWorkFiles(input.cwd, input.taskId) : [])
     ]);
-    const activeWorkSummary = input.buildActiveWorkSummary(input.cwd, input.actorId, ownFiles);
+    const activeWorkSummary = input.channel === null
+        ? {
+            schemaId: 'atm.activeWorkSummary.v1',
+            status: 'deferred',
+            reason: 'Unscoped guidance does not enumerate active work; exact admission runs after a task, path, or queue scope is selected.'
+        }
+        : input.buildActiveWorkSummary(input.cwd, input.actorId, ownFiles);
     const earlyPreparation = [
         'Read evidence.nextAction.playbook before editing, closing, or committing.',
         'Resolve explicit actor identity before claim, commit, or report.',

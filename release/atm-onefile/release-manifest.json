@@ -2,11 +2,11 @@
   "schemaVersion": "atm.onefileRelease.v0.2",
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "entrypoint": "atm.mjs",
-  "payloadSha256": "746ada61f0fa8face61887217c5558c95c6640410249f22940cdbe20a714961a",
-  "payloadInputManifestHash": "sha256:17911d4f8d369a90886e30c629c7132fc8e7eedb918586ec9e3ccc7cbda40ab4",
+  "payloadSha256": "1d9babf2c64752f06cdfde8e1a7ba895254773f702aadbdafe9d09469d78c1e6",
+  "payloadInputManifestHash": "sha256:e675469f1a4f8c76e55e5dc51290d7f0798e9239e1ab3576e4acd1f28c4dcf21",
   "payloadReuse": false,
   "sourceRoot": "release/atm-root-drop",
-  "fileCount": 2153,
+  "fileCount": 1804,
   "generatedFiles": [
     "release/atm-onefile/README.onefile.md",
     "release/atm-onefile/atm.mjs",
@@ -24,35 +24,5 @@
     "contractSurface": "release-manifest.json",
     "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
     "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
-  },
-  "buildInputsTreeHash": "sha256:7f070e845945c057856be588bf27e693d7809834173f412e0084f51885fd9b33",
-  "sealedSourceCommit": "c23c0dbced685ab65deb21c92c47403cddd6060a",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:3b9c54a07348e9ce901a91b4a276fe76cbb47086f360bc29c69b6d71e8a816de",
-  "tsBuildCacheDigest": "sha256:7ddf21c36f99e6bb84c92ea38d6c238f154c89c12332eed9e83e5c771880e021",
-  "rawTelemetryPolicy": "gitignored-runtime-only",
-  "dominantPhaseSummary": {
-    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 20881,
-    "totalElapsedMs": 71499,
-    "dominanceRatio": 0.292,
-    "phaseMedianMs": 3137,
-    "phaseP95Ms": 20881,
-    "measuredPhaseCount": 8,
-    "optimizationVerdict": "inconclusive",
-    "basis": "single-run"
-  },
-  "phaseTimingsMs": {
-    "inputHashCalculation": 48,
-    "skipDecision": 50,
-    "worktreeSetup": 11300,
-    "typescriptBuild": 20740,
-    "rootDropReleaseAssembly": 20881,
-    "onefileReleaseAssembly": 3137,
-    "artifactSync": 7269,
-    "cleanup": 0,
-    "totalElapsed": 71499
   }
 }

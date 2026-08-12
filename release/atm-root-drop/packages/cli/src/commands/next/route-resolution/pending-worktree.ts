@@ -296,7 +296,12 @@ function buildIgnoredArtifactForceAddHints(cwd: string) {
   }));
 }
 
-export function buildNonPlaybookRouteHints(cwd: string, prompt: string) {
+export function buildNonPlaybookRouteHints(
+  cwd: string,
+  prompt: string,
+  options: { readonly includeWorktreeDetails?: boolean } = {}
+) {
+  const includeWorktreeDetails = options.includeWorktreeDetails !== false;
   return {
     playbookState: 'absent' as const,
     structuredOutputHint: {
@@ -305,7 +310,22 @@ export function buildNonPlaybookRouteHints(cwd: string, prompt: string) {
       treatCliJsonAs: 'structured-tool-guidance' as const,
       followNextActionField: 'evidence.nextAction.command' as const
     },
-    ignoredArtifactForceAddHints: buildIgnoredArtifactForceAddHints(cwd),
-    promptWorktreeHint: buildPromptWorktreeHint(cwd, prompt)
+    ignoredArtifactForceAddHints: includeWorktreeDetails ? buildIgnoredArtifactForceAddHints(cwd) : [],
+    promptWorktreeHint: includeWorktreeDetails
+      ? buildPromptWorktreeHint(cwd, prompt)
+      : {
+          schemaId: 'atm.promptWorktreeHint.v1' as const,
+          status: 'deferred' as const,
+          promptPathHints: extractPathLikeStringsFromText(prompt),
+          promptMatchedFiles: [],
+          atmManagedFiles: [],
+          generatedArtifactFiles: [],
+          releaseMirrorFiles: [],
+          unrelatedTrackedFiles: [],
+          unrelatedUntrackedFiles: [],
+          ignoredArtifactCount: 0,
+          note: 'Unscoped guidance defers live-worktree enumeration; task-scoped next performs exact admission when work is selected.',
+          diagnosticCommand: 'node atm.mjs next --prompt "<task-or-path-scoped prompt>" --json'
+        }
   };
 }

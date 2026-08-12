@@ -52,12 +52,11 @@ export function createGeminiSourceFiles(repositoryRoot = process.cwd()): readonl
 
 export function createAntigravitySourceFiles(repositoryRoot = process.cwd()): readonly IntegrationSourceFile[] {
   const skillFiles = compileSkillTemplatesForAdapter('codex', undefined, { repositoryRoot })
-    .map((sourceFile) => ({
-      relativePath: `.agents/skills/${sourceFile.relativePath}`,
-      content: sourceFile.content,
-      fileFormat: sourceFile.fileFormat,
-      source: sourceFile.source
+    .map(({ relativePath, ...sourceFile }) => ({
+      ...sourceFile,
+      relativePath: `.agents/skills/${relativePath}`
     } satisfies IntegrationSourceFile));
+  const sourceProvenance = skillFiles.find((sourceFile) => sourceFile.sourceCatalogDigest && sourceFile.installProfileId);
   const charter = renderCharterInvariantsBlock(repositoryRoot);
   const geminiRoot = [
     '# ATM Antigravity Onboarding',
@@ -109,7 +108,9 @@ export function createAntigravitySourceFiles(repositoryRoot = process.cwd()): re
       relativePath: 'GEMINI.md',
       content: `${geminiRoot}\n`,
       fileFormat: 'markdown',
-      source: 'generated'
+      source: 'generated',
+      sourceCatalogDigest: sourceProvenance?.sourceCatalogDigest,
+      installProfileId: sourceProvenance?.installProfileId
     },
     ...skillFiles
   ];

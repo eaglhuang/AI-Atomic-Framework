@@ -94,9 +94,6 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
                 }
             });
         }
-        if (modifiedUnstaged.length > 0) {
-            execFileSync('git', ['-C', options.cwd, 'add', '--', ...modifiedUnstaged], { stdio: 'ignore' });
-        }
         const deliveryMessage = options.message ?? `feat: deliver ${options.taskId}`;
         const previousBatchDeliverAndClose = process.env.ATM_BATCH_DELIVER_AND_CLOSE;
         process.env.ATM_BATCH_DELIVER_AND_CLOSE = '1';
@@ -108,6 +105,7 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
                 '--actor', actorId,
                 '--task', options.taskId,
                 '--message', deliveryMessage,
+                '--auto-stage',
                 '--json'
             ]);
         }
@@ -156,6 +154,9 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
     if (options.reason) {
         closeArgv.push('--reason', options.reason);
     }
+    if (options.emergencyApproval) {
+        closeArgv.push('--emergency-approval', options.emergencyApproval);
+    }
     const closeResult = await dependencies.runTasks(closeArgv);
     if (!closeResult.ok) {
         return makeResult({
@@ -197,9 +198,6 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
         governanceFiles.push(closeEvidence.transitionPath);
     }
     const validGovernanceFiles = uniqueStrings(governanceFiles.filter(Boolean));
-    if (validGovernanceFiles.length > 0) {
-        execFileSync('git', ['-C', options.cwd, 'add', '--', ...validGovernanceFiles], { stdio: ['ignore', 'ignore', 'ignore'] });
-    }
     const closureMessage = `chore(${options.taskId}): governance close task with delivery evidence`;
     const closureResult = await runAtmGit([
         'commit',
@@ -207,6 +205,7 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
         '--actor', actorId,
         '--task', options.taskId,
         '--message', closureMessage,
+        '--auto-stage',
         '--json'
     ]);
     const closureCommitSha = closureResult.ok

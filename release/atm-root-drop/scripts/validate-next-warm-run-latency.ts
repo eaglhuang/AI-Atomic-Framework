@@ -29,9 +29,12 @@ import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { buildOnefileRelease } from './build-onefile-release.ts';
 import { createTempWorkspace } from './temp-root.ts';
+import { createNextWarmLatencyWorkload } from './lib/next-warm-latency-workload.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const jsonOutput = process.argv.includes('--json');
+const planningRoot = path.resolve(repoRoot, '..', '3KLife', 'docs', 'ai_atomic_framework');
+const workload = createNextWarmLatencyWorkload(planningRoot);
 
 const budget = {
   // Acceptance bar from ATM-BUG-2026-07-07-048 / OPT-13:
@@ -55,6 +58,7 @@ type TimedRun = {
 
 const tempRoot = createTempWorkspace('atm-next-warm-run-latency-');
 try {
+  buildCurrentPackageDist();
   const rootDrop = buildRootDropRelease({
     repositoryRoot: repoRoot,
     releaseRoot: path.join(tempRoot, 'release', 'atm-root-drop')
@@ -69,19 +73,19 @@ try {
   // Prime the onefile extraction cache; these runs are intentionally excluded
   // from the warm-run sample set (they pay one-time decompression cost).
   for (let primeIndex = 0; primeIndex < budget.cachePrimeCount; primeIndex += 1) {
-    runTimed(release.outputFilePath, ['next', '--json'], cacheRoot);
+    runTimed(release.outputFilePath, workload.args, cacheRoot);
   }
 
   const samples: number[] = [];
   for (let index = 0; index < budget.sampleCount; index += 1) {
-    const run = runTimed(release.outputFilePath, ['next', '--json'], cacheRoot);
+    const run = runTimed(release.outputFilePath, workload.args, cacheRoot);
     if (run.exitCode !== 0) {
       throw new Error(`warm-run sample ${index + 1} exited ${run.exitCode}: ${run.stderr.slice(0, 2000)}`);
     }
     samples.push(run.elapsedMs);
   }
 
-  const profiledRun = runTimed(release.outputFilePath, ['next', '--json'], cacheRoot, { ATM_NEXT_PROFILE: '1' });
+  const profiledRun = runTimed(release.outputFilePath, workload.args, cacheRoot, { ATM_NEXT_PROFILE: '1' });
   const cliLogicMs = extractCliLogicMsFromProfileOutput(profiledRun.stderr);
 
   const sorted = [...samples].sort((left, right) => left - right);
@@ -110,6 +114,7 @@ try {
     budget,
     measuredArtifact: path.relative(repoRoot, release.outputFilePath).replace(/\\/g, '/'),
     measuredAgainstRepo: repoRoot,
+    workload,
     platform: process.platform,
     samples: sorted.map((value) => Number(value.toFixed(2))),
     p50Ms: Number(p50.toFixed(2)),
@@ -135,7 +140,18 @@ function readBudgetNumber(name: string, defaultValue: number): number {
   return Math.floor(parsed);
 }
 
-function runTimed(entrypointPath: string, args: string[], cacheRoot: string, extraEnv: Record<string, string> = {}): TimedRun {
+function buildCurrentPackageDist(): void {
+  const result = spawnSync(process.execPath, ['--strip-types', path.join(repoRoot, 'scripts', 'build-package-dist.ts')], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if ((result.status ?? 1) !== 0) {
+    throw new Error(`failed to compile current package source before latency measurement: ${(result.stderr ?? '').slice(0, 2000)}`);
+  }
+}
+
+function runTimed(entrypointPath: string, args: readonly string[], cacheRoot: string, extraEnv: Record<string, string> = {}): TimedRun {
   const startedAt = process.hrtime.bigint();
   const result = spawnSync(process.execPath, [entrypointPath, ...args], {
     cwd: repoRoot,

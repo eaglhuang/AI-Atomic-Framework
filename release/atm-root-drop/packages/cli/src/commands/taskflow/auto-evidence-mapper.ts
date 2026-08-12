@@ -53,6 +53,8 @@ export function resolveAutoEvidenceValidationContract(
   catalog: ValidationContractCatalog,
   evidence: ValidationContractEvidence = {}
 ): ValidationContractEvaluation {
+  // observedOutcome receipts are interpreted by the shared deep evaluator;
+  // this adapter never promotes a caller-declared status itself.
   return evaluateValidationContract(task, changeSet, catalog, evidence);
 }
 

@@ -56,6 +56,11 @@
                         "summary":  "Scope next-action routing to the current user prompt before falling back to global state."
                     },
                     {
+                        "flag":  "--planning-root",
+                        "value":  "path",
+                        "summary":  "Use one explicit planning authority root and bypass ambiguous sibling discovery for this route."
+                    },
+                    {
                         "flag":  "--task",
                         "value":  "id",
                         "summary":  "Route directly to one task id without writing a shared task-intent file."
@@ -97,6 +102,7 @@
                      "node atm.mjs next --json",
                      "node atm.mjs next --json --output",
                      "node atm.mjs next --prompt \"implement TASK-ABC-0001\" --json",
+                     "node atm.mjs next --prompt \"implement TASK-ABC-0001\" --planning-root C:/planning/docs/ai_atomic_framework --json",
                      "node atm.mjs next --task TASK-ABC-0001 --json",
                      "node atm.mjs next --prompt \"quick fix tsconfig.json typo\" --json",
                      "node atm.mjs next --prompt \"complete all task cards in PlanAlpha\" --json",

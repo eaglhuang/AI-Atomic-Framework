@@ -5,6 +5,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { deriveRunnerBuildOutputInventory } from '../../packages/core/src/broker/runner-build-output-inventory.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const cliEntrypoint = path.join(root, 'packages/cli/src/atm.ts');
@@ -17,6 +18,7 @@ function writeJson(filePath: string, value: unknown): void {
 }
 
 function writeTask(taskId: string, status = 'running', files: readonly string[] = ['packages/cli/src/commands/taskflow/implementation.ts']): void {
+  const claimedAt = new Date().toISOString();
   const cardPath = `docs/tasks/${taskId}.task.md`;
   mkdirSync(path.join(repo, 'docs/tasks'), { recursive: true });
   writeFileSync(path.join(repo, cardPath), [
@@ -41,7 +43,9 @@ function writeTask(taskId: string, status = 'running', files: readonly string[] 
     claim: {
       actorId: 'lane-captain',
       leaseId: 'lease-1',
-      claimedAt: '2026-07-16T00:00:00.000Z',
+      claimedAt,
+      heartbeatAt: claimedAt,
+      ttlSeconds: 3600,
       state: 'active',
       files
     }
@@ -137,6 +141,12 @@ function computeBuildInputsTreeHash(commitSha = 'HEAD'): string {
 function writeRunnerSyncReceipt(taskId: string, sealedSourceSha: string, runnerInputTreeHash: string, options: { complete?: boolean; staleChild?: boolean } = {}): string {
   const receiptRef = `.atm/history/evidence/${taskId}.runner-sync-receipt.json`;
   const complete = options.complete !== false;
+  const outputInventory = deriveRunnerBuildOutputInventory({
+    sealedSourceSha,
+    observedPaths: [receiptRef],
+    currentTaskId: taskId,
+    ownership: [{ path: receiptRef, ownerTaskId: taskId }]
+  });
   writeJson(path.join(repo, receiptRef), {
     schemaId: 'atm.runnerSyncReceipt.v1',
     taskId,
@@ -155,6 +165,7 @@ function writeRunnerSyncReceipt(taskId: string, sealedSourceSha: string, runnerI
     lifecycle: {
       finalizable: true
     },
+    outputInventory,
     runnerInputTreeHash,
     runnerInputGraph: {
       schemaId: 'atm.runnerInputGraph.v1',

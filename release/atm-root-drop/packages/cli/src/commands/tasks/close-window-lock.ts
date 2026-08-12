@@ -5,6 +5,7 @@ import { normalizeTaskId } from './task-import-validators.ts';
 import { normalizeRelativePath } from './task-file-io-helpers.ts';
 import { CliError, quoteCliValue, relativePathFrom } from '../shared.ts';
 import { inspectGitIndexOwnership } from '../git-index-ownership.ts';
+import { evaluateCloseWindowStagedIndexAdmission } from './close-window-staged-index-admission.ts';
 
 export const CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID = 'atm.closeWindowStagedIndexLock.v1';
 
@@ -281,6 +282,23 @@ function cleanupForeignStagedSnapshot(cwd: string, snapshotPath: string | null) 
   }
 }
 
+export function inspectCloseWindowStagedIndexAdmission(input: {
+  cwd: string;
+  taskId: string;
+  expectedStageFiles: readonly string[];
+  deferForeignStaged?: boolean;
+}): CloseWindowStagedIndexLockReport {
+  const existing = readCloseWindowStagedIndexLock(input.cwd);
+  const unexpectedStagedTasks = inspectForeignStagedTasksForCloseWindow(input);
+  const expected = new Set(uniqueSorted(input.expectedStageFiles));
+  const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expected.has(filePath));
+  const decision = evaluateCloseWindowStagedIndexAdmission({ taskId: normalizeTaskId(input.taskId), activeLockTaskId: existing?.status === 'active' ? existing.taskId : null,
+    unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true });
+  return { schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID, ok: decision.ok,
+    lockPath: relativePathFrom(input.cwd, closeWindowStagedIndexLockPath(input.cwd)), lock: existing, unexpectedStagedTasks,
+    foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null, blockedCode: decision.blockedCode, blockedSummary: decision.blockedSummary };
+}
+
 export function acquireCloseWindowStagedIndexLock(input: {
   cwd: string;
   taskId: string;
@@ -290,19 +308,6 @@ export function acquireCloseWindowStagedIndexLock(input: {
 }): CloseWindowStagedIndexLockReport {
   const lockPath = closeWindowStagedIndexLockPath(input.cwd);
   const existing = readCloseWindowStagedIndexLock(input.cwd);
-  if (existing?.status === 'active' && existing.taskId !== normalizeTaskId(input.taskId)) {
-    return {
-      schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
-      ok: false,
-      lockPath: relativePathFrom(input.cwd, lockPath),
-      lock: existing,
-      unexpectedStagedTasks: existing.unexpectedStagedTasks,
-      foreignStagedSnapshotPath: existing.foreignStagedSnapshotPath,
-      blockedCode: 'ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED',
-      blockedSummary: `Close window staged-index lock is already held by ${existing.taskId}; wait for release or inspect tasks status before staging.`
-    };
-  }
-
   const unexpectedStagedTasks = inspectForeignStagedTasksForCloseWindow({
     cwd: input.cwd,
     taskId: input.taskId,
@@ -310,18 +315,18 @@ export function acquireCloseWindowStagedIndexLock(input: {
   });
   const expectedStageFiles = new Set(uniqueSorted(input.expectedStageFiles));
   const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expectedStageFiles.has(filePath));
-  if (unexpectedStagedFiles.length > 0 && !input.deferForeignStaged) {
+  const admission = evaluateCloseWindowStagedIndexAdmission({ taskId: normalizeTaskId(input.taskId), activeLockTaskId: existing?.status === 'active' ? existing.taskId : null,
+    unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true });
+  if (!admission.ok) {
     return {
       schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
       ok: false,
       lockPath: relativePathFrom(input.cwd, lockPath),
       lock: existing,
       unexpectedStagedTasks,
-      foreignStagedSnapshotPath: null,
-      blockedCode: 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS',
-      blockedSummary: unexpectedStagedTasks.length > 0
-        ? `Close window blocked by foreign staged tasks (${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}); defer explicitly or wait for the other agent to commit.`
-        : 'Close window blocked by staged entries outside the governed bundle; defer explicitly or reconcile the index before closing.'
+      foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null,
+      blockedCode: admission.blockedCode,
+      blockedSummary: admission.blockedSummary
     };
   }
   // Publish the coordination lease before touching Git's shared index.  The

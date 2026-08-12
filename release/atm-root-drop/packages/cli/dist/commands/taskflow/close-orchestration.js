@@ -10,6 +10,7 @@ import { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestPathForTask, 
 import { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory } from '../tasks/historical-delivery.js';
 import { resolveStoredPlanningPath } from '../planning-repo-root.js';
 import { assertPlanningSourceSealValid } from '../tasks/import-task.js';
+import { observeCommandRunRecords } from '../evidence/observed-source-loader.js';
 import { executeTaskCloseSaga } from './cross-authority-closeback.js';
 function buildTasksCloseCommand(input) {
     const parts = ['node atm.mjs tasks close', `--task ${input.taskId}`, `--actor ${input.actorId}`, '--status done', '--json'];
@@ -116,6 +117,7 @@ export function buildClosebackPlan(input) {
             followUpSteps.push('roster-closeback-follow-up-command');
         }
     }
+    const observedEvidence = input.cwd ? inspectObservedTaskEvidence(input.cwd, input.taskId) : undefined;
     const authorityReconciliation = input.cwd && input.taskDocument ? buildAuthorityReconciliation({ cwd: input.cwd, taskId: input.taskId, actorId: input.actorId, taskDocument: input.taskDocument, planningMirrorPath, targetFiles: input.targetFiles ?? [], planningFiles: input.planningFiles ?? (planningMirrorPath ? [planningMirrorPath] : []) }) : undefined;
     const historicalDeliveryRequired = closeMode === 'historical-delivery-close'
         || (closeMode === 'normal-close' && input.diagnosis.triangulation.liveLedger.status !== 'done');
@@ -500,6 +502,10 @@ export function buildCloseCompletionChecklist(input) {
 }
 export { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestRelativePath, evidenceBundleManifestPathForTask, readEvidenceBundleManifest };
 export { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory };
+export function inspectObservedTaskEvidence(cwd, taskId) { const manifest = readEvidenceBundleManifest(cwd, taskId); if (!manifest)
+    return { status: 'missing', commandRunCount: 0, digest: null }; const runs = manifest.commandRuns.flatMap((entry) => { const run = entry; return typeof run.command === 'string' && typeof run.exitCode === 'number' && typeof run.stdoutSha256 === 'string' && typeof run.stderrSha256 === 'string' ? [{ command: run.command, exitCode: run.exitCode, stdoutSha256: run.stdoutSha256, stderrSha256: run.stderrSha256 }] : []; }); if (runs.length !== manifest.commandRuns.length)
+    return { status: 'invalid', commandRunCount: runs.length, digest: null }; const observations = observeCommandRunRecords(runs); if (observations.some((entry) => entry.status !== 'observed' || entry.valueDigest === null))
+    return { status: 'invalid', commandRunCount: runs.length, digest: null }; return { status: 'observed', commandRunCount: runs.length, digest: `sha256:${createHash('sha256').update(JSON.stringify(observations.map((entry) => ({ sourceIds: entry.sourceIds, valueDigest: entry.valueDigest })))).digest('hex')}` }; }
 export function listOptionalEvidenceBundleGovernanceArtifacts(cwd, taskId) { const relativePath = evidenceBundleManifestRelativePath(taskId); return existsSync(path.join(cwd, relativePath)) ? [relativePath] : []; }
 export { getValidatorScope } from '../validate.js';
 export { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers } from './historical-close-preflight.js';

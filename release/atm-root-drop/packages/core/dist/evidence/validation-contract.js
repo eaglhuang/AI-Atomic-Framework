@@ -10,6 +10,7 @@
 // defaulting to a full run. It never executes commands and never mutates
 // evidence. The decentralized shard machinery it can consume lives in
 // packages/core/src/evidence/test-case-catalog.ts.
+import { OBSERVATION_SNAPSHOT_SCHEMA_ID } from './observed-source.js';
 export const VALIDATION_CONTRACT_EVALUATION_SCHEMA_ID = 'atm.validationContractEvaluation.v1';
 const BROAD_SUITE_PATTERN = /^(npm run )?(typecheck|lint|validate:cli|validate:schemas|test|validate:all)\b|\.static\.all\b|\btier[:=]full\b|^(language|integration)\.[a-z0-9_.-]+\.(all|full)$/;
 function isBroadSuiteRef(value, broadSuite) {
@@ -258,7 +259,18 @@ function computeFreshnessInputs(selections, evidence) {
             continue;
         }
         const receiptHead = receipt.gitHead ?? null;
-        if (String(receipt.status ?? '').toLowerCase() === 'failed') {
+        const observedOutcome = evaluateObservedOutcome(receipt.observedOutcome);
+        if (observedOutcome.kind === 'missing') {
+            inputs.push({ caseId: selection.caseId, status: 'missing', reason: observedOutcome.reason, receiptGitHead: receiptHead });
+            continue;
+        }
+        if (observedOutcome.kind === 'failed') {
+            inputs.push({ caseId: selection.caseId, status: 'failed', reason: observedOutcome.reason, receiptGitHead: receiptHead });
+            continue;
+        }
+        // A legacy receipt has no observedOutcome and remains readable during the
+        // migration.  An adopted observedOutcome never trusts this caller claim.
+        if (observedOutcome.kind === 'legacy' && String(receipt.status ?? '').toLowerCase() === 'failed') {
             inputs.push({ caseId: selection.caseId, status: 'failed', reason: 'receipt records a failed result', receiptGitHead: receiptHead });
             continue;
         }
@@ -270,9 +282,33 @@ function computeFreshnessInputs(selections, evidence) {
             inputs.push({ caseId: selection.caseId, status: 'stale', reason: `receipt freshness expired at ${receipt.freshUntil}`, receiptGitHead: receiptHead });
             continue;
         }
-        inputs.push({ caseId: selection.caseId, status: 'fresh', reason: 'receipt passed and within freshness bounds', receiptGitHead: receiptHead });
+        inputs.push({
+            caseId: selection.caseId,
+            status: 'fresh',
+            reason: observedOutcome.kind === 'observed'
+                ? 'observed process exited successfully and receipt is within freshness bounds'
+                : 'legacy receipt passed and is within freshness bounds',
+            receiptGitHead: receiptHead
+        });
     }
     return inputs;
+}
+function evaluateObservedOutcome(value) {
+    if (value === undefined || value === null)
+        return { kind: 'legacy' };
+    if (value.schemaId !== OBSERVATION_SNAPSHOT_SCHEMA_ID || value.status !== 'observed') {
+        return { kind: 'missing', reason: 'observed validation outcome is unavailable or conflicting' };
+    }
+    if (value.sourceIds.length === 0 || !/^sha256:[a-f0-9]{64}$/i.test(value.valueDigest ?? '')) {
+        return { kind: 'missing', reason: 'observed validation outcome lacks a source or digest' };
+    }
+    const execution = value.value;
+    if (!execution || typeof execution !== 'object' || Array.isArray(execution) || typeof execution.exitCode !== 'number') {
+        return { kind: 'missing', reason: 'observed validation outcome lacks a process exit code' };
+    }
+    return execution.exitCode === 0
+        ? { kind: 'observed' }
+        : { kind: 'failed', reason: `observed process exited with code ${execution.exitCode}` };
 }
 function groupPhaseOwners(phaseSuite) {
     const byPhase = new Map();

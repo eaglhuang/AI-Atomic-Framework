@@ -5,7 +5,7 @@ import { actorIdEnvVar, findActorByResolvedId, resolveActorId } from "../../acto
 import { recordOnlyClaimScopeExemptCovers, } from "../record-only-block-lifecycle-bridge.js";
 import { uniqueSorted, } from "../commit-scope-policy.js";
 import { CliError, makeResult, message, quoteCliValue } from "../../shared.js";
-import { authorizeHookBypassAfterBrokerAdmission } from './broker-hook-bypass-preflight.js';
+import { prepareHookBypassRequest } from './broker-hook-bypass-preflight.js';
 import { buildCopyableGitCommitCommand, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, readStagedFiles } from './git-index-transaction.js';
 import { assertNoStdinPathspecGitAddPreflight, gitCommitAttemptStatusRelativePath, resolveGitCommitTimeoutMs, writeGitCommitAttemptStatus } from './git-process-port.js';
 import { buildIdentitySetRequiredCommand, parseTaskClaim, readTaskDocument, requireExplicitGitActor, resolveGitGovernanceSession, resolveGitIdentityProfile } from './identity-check-command.js';
@@ -358,21 +358,17 @@ export function runGitCommit(options) {
     // All rejectable checks use the sealed task candidate before consuming a
     // one-time bypass lease.  The shared index is deliberately not an input here:
     // its foreign residue is neither part of this commit nor authority to block it.
-    if (options.noVerify) {
-        const candidateFiles = taskScopedBundleReport?.commitFiles ?? frameworkClaimCommitFiles;
-        protectedOverrideAudit = authorizeHookBypassAfterBrokerAdmission({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            actorId,
-            deferForeignStaged: options.deferForeignStaged,
-            candidateFiles,
+    const candidateFiles = taskScopedBundleReport?.commitFiles ?? frameworkClaimCommitFiles;
+    const hookBypassRequest = options.noVerify
+        ? prepareHookBypassRequest({
+            cwd: options.cwd, taskId: options.taskId, actorId,
+            deferForeignStaged: options.deferForeignStaged, candidateFiles,
             brokerConflictOverrideApproval: options.brokerConflictOverrideApproval,
             brokerConflictResolutionPath: options.brokerConflictResolutionPath,
-            reason: options.overrideReason,
-            command: commitCommand,
+            reason: options.overrideReason, command: commitCommand,
             emergencyApproval: options.emergencyApproval,
-        });
-    }
+        })
+        : null;
     let protectedOverrideOutcome = null;
     const branchRef = readHeadBranchRef(options.cwd);
     const branchName = branchRef
@@ -406,5 +402,5 @@ export function runGitCommit(options) {
         copyableCommitCommand: rawCopyableCommitCommand,
         liveIndexResidueRollback: [],
     });
-    return executeGitCommit(options, { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
+    return executeGitCommit(options, { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
 }

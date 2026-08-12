@@ -16,12 +16,19 @@ function lineCount(text) {
     return text.split(/\r?\n/).length;
 }
 const facade = read('packages/cli/src/commands/tasks.ts');
+const legacyImplementation = read('packages/cli/src/commands/tasks/legacy/implementation.ts');
 const orchestrator = read('packages/cli/src/commands/tasks/deliver-close-orchestrator.ts');
+const parser = read('packages/cli/src/commands/tasks/task-option-parsers/close-delivery-options.ts');
 assert(orchestrator.includes('export async function runTasksDeliverAndClose'), 'deliver-and-close runner must live in deliver-close-orchestrator');
 assert(orchestrator.includes('DeliverAndCloseDependencies'), 'deliver-and-close must keep recursive runTasks dependency injected');
 assert(orchestrator.includes('ATM_BATCH_CHECKPOINT_REQUIRED'), 'deliver-and-close orchestrator must own batch checkpoint gate');
-assert(facade.includes("import { runTasksDeliverAndClose as delegatedRunTasksDeliverAndClose } from './tasks/deliver-close-orchestrator.js';"), 'tasks facade must import delegated deliver-and-close orchestrator');
-assert(facade.includes('return delegatedRunTasksDeliverAndClose(argv, { runTasks });'), 'tasks facade must inject runTasks into deliver-and-close');
+assert(orchestrator.includes("'--auto-stage'"), 'deliver-and-close must delegate complete task bundle staging, including task events, to governed git commit');
+assert(orchestrator.includes("closeArgv.push('--emergency-approval', options.emergencyApproval)"), 'deliver-and-close must forward protected close approval to its close backend');
+assert(parser.includes("arg === '--emergency-approval'"), 'deliver-and-close option parser must accept protected close approval');
+assert(!orchestrator.includes("execFileSync('git', ['-C', options.cwd, 'add'"), 'deliver-and-close must not maintain a second partial raw-git staging path');
+assert(facade.includes('runTasks,'), 'public tasks facade must continue to export the task command entrypoint');
+assert(legacyImplementation.includes("import { runTasksDeliverAndClose as delegatedRunTasksDeliverAndClose } from '../deliver-close-orchestrator.js';"), 'active task dispatcher must import the delegated deliver-and-close orchestrator');
+assert(legacyImplementation.includes('return delegatedRunTasksDeliverAndClose(argv, { runTasks });'), 'active task dispatcher must inject runTasks into deliver-and-close');
 assert(!facade.includes('ATM_DELIVER_AND_CLOSE_DELIVERY_COMMIT_FAILED'), 'tasks facade must not retain deliver-and-close delivery commit body');
 assert(lineCount(orchestrator) <= 600, 'deliver-close-orchestrator.ts must stay at or below 600 lines');
 console.log('[deliver-close-orchestrator.spec] ok');

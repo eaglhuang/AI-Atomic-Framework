@@ -86,7 +86,21 @@ async function runNextRoute(argv) {
         explicitTaskIds
     });
     profile.mark('resolve-task-intent');
-    const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent, claimIntent ?? 'write');
+    if (taskIntent && taskIntent.taskScopeMentioned === false) {
+        const unscopedGuidance = buildPromptGuidanceNextResult({
+            cwd: options.cwd,
+            actor: options.agent,
+            taskIntent,
+            integrationBootstrap,
+            runtimeAdapterReadiness
+        });
+        if (unscopedGuidance) {
+            profile.mark('build-unscoped-prompt-guidance-result');
+            profile.flush('unscoped-prompt-guidance-result');
+            return withRunnerMode(unscopedGuidance, options.cwd);
+        }
+    }
+    const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent, claimIntent ?? 'write', typeof options.planningRoot === 'string' ? options.planningRoot : null);
     profile.mark('inspect-imported-task-queue');
     const scopedTargetRepo = importedTaskQueue.promptScope?.targetRepo ?? null;
     const earlyFrameworkStatus = shouldInspectCrossRepoFrameworkStatus(options.cwd, scopedTargetRepo)

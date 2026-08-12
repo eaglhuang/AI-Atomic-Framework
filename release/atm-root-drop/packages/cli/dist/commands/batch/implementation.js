@@ -7,8 +7,11 @@ import { createAtomicWaveCheckpointReceipt, evaluateAtomicWaveCheckpoint } from 
 import { appendPlanBatchRunEvent, startPlanBatchRun } from '../../../../core/dist/batch/plan-run-journal.js';
 import { runBatchExecutePlan } from './plan-executor.js';
 import { buildBatchCheckpointRunnerRecoveryArgs, categorizeCheckpointCloseFailure } from './runner-recovery-forwarding.js';
+import { decideCheckpointContinuation } from './checkpoint-commit-window-policy.js';
+import { buildBatchDeliverAndCloseArgs, parseBatchDeliverAndCloseExtras, stripBatchDeliverAndCloseExtras } from './deliver-and-close-forwarding.js';
 import { CliError, makeResult, message, parseOptions } from '../shared.js';
 import { resolveActorId } from '../actor-registry.js';
+import { withTaskflowOperatorLane } from '../emergency/context.js';
 import { runNext } from '../next.js';
 import { runTasks } from '../tasks.js';
 import { abandonTaskQueue, advanceTaskQueueHead, findActiveTaskQueue, partitionTaskScope, restoreTaskQueueHead } from '../task-direction.js';
@@ -102,7 +105,7 @@ export async function runBatch(argv) {
             });
         }
         const capturedHeadBeforeClose = readGitHead(options.cwd);
-        const closeResult = await runTasks(['close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), ...(batchHistoricalDeliveryWaiver?.enabled ? ['--waiver-out-of-scope-delivery', '--reason', batchHistoricalDeliveryWaiver.reason] : []), ...buildBatchCheckpointRunnerRecoveryArgs(batchEmergencyApproval), '--json']);
+        const closeResult = await withTaskflowOperatorLane(() => runTasks(['close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), ...(batchHistoricalDeliveryWaiver?.enabled ? ['--waiver-out-of-scope-delivery', '--reason', batchHistoricalDeliveryWaiver.reason] : []), ...buildBatchCheckpointRunnerRecoveryArgs(batchEmergencyApproval), '--json']));
         if (!closeResult.ok) {
             const closeCategory = categorizeCheckpointCloseFailure(closeResult, currentTaskId, resolvedActor.actorId, options.cwd);
             return makeResult({ ok: false, command: 'batch', cwd: options.cwd, messages: [message('error', 'ATM_BATCH_CHECKPOINT_CLOSE_FAILED', closeCategory.tldr ?? `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, { batchId: active.batchId, closedTaskId: currentTaskId,
@@ -119,10 +122,10 @@ export async function runBatch(argv) {
         }
         const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
         const nextTaskId = queue?.taskIds[queue.currentIndex] ?? null;
-        const updated = updateBatchRun(options.cwd, active, { currentIndex: queue?.currentIndex ?? active.currentIndex, currentTaskId: nextTaskId, pendingCommitTaskId: currentTaskId, status: queue?.status === 'completed' || !nextTaskId ? 'completed' : 'active', hold: holdNextClaim && nextTaskId ? { schemaId: 'atm.batchHold.v1', status: 'held', afterTaskId: currentTaskId, currentTaskId: nextTaskId,
+        const continuation = decideCheckpointContinuation({ closedTaskId: currentTaskId, nextTaskId });
+        const updated = updateBatchRun(options.cwd, active, { currentIndex: queue?.currentIndex ?? active.currentIndex, currentTaskId: nextTaskId, pendingCommitTaskId: continuation.pendingCommitTaskId, status: queue?.status === 'completed' || !nextTaskId ? 'completed' : 'active', hold: nextTaskId ? { schemaId: 'atm.batchHold.v1', status: 'held', afterTaskId: currentTaskId, currentTaskId: nextTaskId,
                 heldByActor: resolvedActor.actorId, heldAt: new Date().toISOString(), resumeCommand: `node atm.mjs batch resume --actor ${resolvedActor.actorId} --batch ${active.batchId} --json` }
                 : null });
-        const nextClaim = updated.status === 'active' && !holdNextClaim ? await runNext(['--cwd', options.cwd, '--claim', '--actor', resolvedActor.actorId, '--prompt', active.sourcePrompt, '--json']) : null;
         if (updated.status === 'completed') {
             releaseBatchRun(options.cwd, updated, 'completed');
         }
@@ -130,18 +133,16 @@ export async function runBatch(argv) {
         const currentIndex = updated.currentIndex ?? 0;
         const remainingTasks = updated.status === 'completed' ? 0 : Math.max(0, totalTasks - currentIndex);
         const isBatchComplete = updated.status === 'completed';
-        const isPartialOk = !isBatchComplete && !holdNextClaim;
+        const isPartialOk = false;
         const primaryCode = isPartialOk ? 'ATM_BATCH_CHECKPOINT_PARTIAL_OK' : 'ATM_BATCH_CHECKPOINT_OK';
-        const primaryText = isBatchComplete ? 'Batch checkpoint closed the final task and completed the batch run.' : holdNextClaim ? 'Batch checkpoint closed the current task and held before claiming the next queue head.' : `Batch checkpoint closed task ${currentTaskId}; ${remainingTasks} task(s) remain — batch is NOT yet complete.`;
+        const primaryText = isBatchComplete ? 'Batch checkpoint closed the final task and completed the batch run.' : 'Batch checkpoint closed the current task and opened a mandatory commit window before claiming the next queue head.';
         return makeResult({ ok: true, command: 'batch', cwd: options.cwd,
-            messages: [message('info', primaryCode, primaryText, { batchId: updated.batchId, closedTaskId: currentTaskId, nextTaskId: updated.currentTaskId, held: holdNextClaim, category: isBatchComplete ? 'batch-complete' : holdNextClaim ? 'held' : 'partial-ok', remainingTasks, totalTasks, batchComplete: isBatchComplete,
+            messages: [message('info', primaryCode, primaryText, { batchId: updated.batchId, closedTaskId: currentTaskId, nextTaskId: updated.currentTaskId, held: Boolean(nextTaskId), category: isBatchComplete ? 'batch-complete' : 'pending-commit', remainingTasks, totalTasks, batchComplete: isBatchComplete,
                     deliveryPrinciple: 'Batch speed comes from automated queue bookkeeping, not relaxed delivery. Each task still needs real non-.atm deliverables before checkpoint can close it.',
-                    commitInstruction: `Checkpoint succeeded. Stage .atm/history/tasks/${currentTaskId}.json and .atm/history/task-events/${currentTaskId}/, then create one commit that contains the already staged deliverables, evidence, task file, and task events.`, continueInstruction: isBatchComplete ? 'Batch is complete after this checkpoint commit.' : holdNextClaim
-                        ? `Commit the closed task first, then resume with node atm.mjs batch resume --actor <id> --batch ${updated.batchId} --json or node atm.mjs next --claim --actor <id> --prompt "${updated.sourcePrompt}" --json.` : `This is a batch run. Do not switch to per-task normal flow. After this checkpoint commit, continue with ${updated.currentTaskId} using --batch ${updated.batchId}.`, requiredCommand: isPartialOk
-                        ? `node atm.mjs batch checkpoint --actor <id> --batch ${updated.batchId} --json` : null }), ...(isBatchComplete || holdNextClaim ? [] : [message('warning', 'ATM_BATCH_CONTEXT_ACTIVE', 'This is a batch run. Do not switch to per-task normal flow.', { batchId: updated.batchId, currentTaskId: updated.currentTaskId, requiredCommand: `node atm.mjs batch checkpoint --actor <id> --batch ${updated.batchId} --json` })])],
-            evidence: { action: 'checkpoint', actorId: resolvedActor.actorId, closedTaskId: currentTaskId, held: holdNextClaim, historicalDeliveryRefs: batchHistoricalDeliveryRefs, historicalBatchRefs: batchHistoricalBatchRefs, closeHeadCapture: { schemaId: 'atm.batchCheckpointHeadCapture.v1', taskId: currentTaskId, batchId: active.batchId, headBeforeClose: capturedHeadBeforeClose, headAfterClose: readGitHead(options.cwd) },
+                    commitInstruction: `Checkpoint succeeded. Stage .atm/history/tasks/${currentTaskId}.json and .atm/history/task-events/${currentTaskId}/, then create one commit that contains the already staged deliverables, evidence, task file, and task events.`, continueInstruction: isBatchComplete ? 'Batch is complete after this checkpoint commit.' : `Commit the closed task first, then resume with node atm.mjs batch resume --actor <id> --batch ${updated.batchId} --json.`, requiredCommand: null })],
+            evidence: { action: 'checkpoint', actorId: resolvedActor.actorId, closedTaskId: currentTaskId, held: Boolean(nextTaskId), continuation, historicalDeliveryRefs: batchHistoricalDeliveryRefs, historicalBatchRefs: batchHistoricalBatchRefs, closeHeadCapture: { schemaId: 'atm.batchCheckpointHeadCapture.v1', taskId: currentTaskId, batchId: active.batchId, headBeforeClose: capturedHeadBeforeClose, headAfterClose: readGitHead(options.cwd) },
                 commitInstruction: { timing: 'single-commit-after-checkpoint', beforeCheckpoint: ['<stage deliverables>', `.atm/history/evidence/${currentTaskId}.json`], files: ['<deliverables>', `.atm/history/tasks/${currentTaskId}.json`, `.atm/history/evidence/${currentTaskId}.json`, `.atm/history/task-events/${currentTaskId}/`] }, closeResult: closeResult.evidence,
-                cleanupResult: cleanupResult?.evidence ?? null, batchRun: updated, nextClaim: nextClaim?.evidence ?? null }
+                cleanupResult: cleanupResult?.evidence ?? null, batchRun: updated, nextClaim: null }
         });
     }
     if (action === 'deliver-and-close') {
@@ -162,16 +163,7 @@ export async function runBatch(argv) {
             const completed = releaseBatchRun(options.cwd, active, 'completed');
             return makeResult({ ok: true, command: 'batch', cwd: options.cwd, messages: [message('info', 'ATM_BATCH_COMPLETED', 'Batch run is already completed.', { batchId: completed.batchId, scopeKey: completed.scopeKey })], evidence: { action: 'deliver-and-close', batchRun: completed } });
         }
-        const deliverAndCloseArgv = ['deliver-and-close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--from-batch-checkpoint', '--batch', active.batchId, '--json'];
-        if (batchDeliverAndCloseExtras?.deliveryCommit) {
-            deliverAndCloseArgv.push('--delivery-commit', batchDeliverAndCloseExtras.deliveryCommit);
-        }
-        if (batchDeliverAndCloseExtras?.deliveryMessage) {
-            deliverAndCloseArgv.push('--message', batchDeliverAndCloseExtras.deliveryMessage);
-        }
-        if (batchDeliverAndCloseExtras?.reason) {
-            deliverAndCloseArgv.push('--reason', batchDeliverAndCloseExtras.reason);
-        }
+        const deliverAndCloseArgv = buildBatchDeliverAndCloseArgs(options.cwd, currentTaskId, resolvedActor.actorId, active.batchId, batchDeliverAndCloseExtras);
         const deliverResult = await runTasks(deliverAndCloseArgv);
         if (!deliverResult.ok) {
             const deliverEvidence = deliverResult.evidence;
@@ -286,7 +278,12 @@ export async function runBatch(argv) {
             });
         }
         const repaired = consistency.ok ? active : repairBatchRunFromQueue(options.cwd, active, queue);
-        const resumed = action === 'resume' && repaired.hold ? updateBatchRun(options.cwd, repaired, { hold: null }) : repaired;
+        const pendingCommitWindow = action === 'resume' ? buildPendingCheckpointCommitWindow(options.cwd, repaired, queue) : null;
+        const continuation = decideCheckpointContinuation({ closedTaskId: null, nextTaskId: repaired.currentTaskId ?? null, pendingWindowTaskId: pendingCommitWindow?.taskId ?? null });
+        if (action === 'resume' && !continuation.mayClaimNext) {
+            throw new CliError('ATM_BATCH_PENDING_COMMIT_REQUIRED', continuation.reason, { exitCode: 1, details: { batchId: repaired.batchId, pendingCommitTaskId: continuation.pendingCommitTaskId, commitCommand: pendingCommitWindow?.commitCommand ?? null, statusCommand: `node atm.mjs batch current --batch ${repaired.batchId} --compact --json` } });
+        }
+        const resumed = action === 'resume' && repaired.hold ? updateBatchRun(options.cwd, repaired, { hold: null, pendingCommitTaskId: null }) : repaired;
         const nextClaim = action === 'resume' && resumed.currentTaskId ? await runNext(['--cwd', options.cwd, '--claim', '--actor', resolvedActor.actorId, '--prompt', resumed.sourcePrompt, '--json']) : null;
         return makeResult({ ok: true, command: 'batch', cwd: options.cwd, messages: [consistency.ok ? message('info', 'ATM_BATCH_REPAIR_NOT_NEEDED', 'Batch runtime is already consistent.', { batchId: active.batchId,
                     currentTaskId: active.currentTaskId, held: Boolean(active.hold) })
@@ -423,30 +420,6 @@ function parseBatchEmergencyApproval(argv) {
     }
     return null;
 }
-function parseBatchDeliverAndCloseExtras(argv) {
-    let deliveryCommit = null;
-    let deliveryMessage = null;
-    let reason = null;
-    for (let index = 0; index < argv.length; index += 1) {
-        const arg = argv[index];
-        if ((arg === '--delivery-commit' || arg === '--historical-delivery') && index + 1 < argv.length) {
-            deliveryCommit = argv[index + 1];
-            index += 1;
-            continue;
-        }
-        if (arg === '--message' && index + 1 < argv.length) {
-            deliveryMessage = argv[index + 1];
-            index += 1;
-            continue;
-        }
-        if (arg === '--reason' && index + 1 < argv.length) {
-            reason = argv[index + 1];
-            index += 1;
-            continue;
-        }
-    }
-    return { deliveryCommit, deliveryMessage, reason };
-}
 function parseBatchCheckpointReadinessArgs(argv) {
     let waveId = null;
     let manifestDigest = null;
@@ -517,18 +490,6 @@ function writeCheckpointReceipt(cwd, outPath, value) {
     mkdirSync(path.dirname(absolute), { recursive: true });
     writeFileSync(absolute, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
     return path.relative(cwd, absolute).replace(/\\/g, '/');
-}
-function stripBatchDeliverAndCloseExtras(argv) {
-    const stripped = [];
-    for (let index = 0; index < argv.length; index += 1) {
-        const arg = argv[index];
-        if ((arg === '--delivery-commit' || arg === '--historical-delivery' || arg === '--message' || arg === '--reason') && index + 1 < argv.length) {
-            index += 1;
-            continue;
-        }
-        stripped.push(arg);
-    }
-    return stripped;
 }
 function parseBatchHistoricalDeliveryRefs(argv) {
     const refs = [];

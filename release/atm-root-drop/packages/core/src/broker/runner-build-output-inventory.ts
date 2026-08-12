@@ -121,17 +121,32 @@ export function scanSealedRunnerBuildOutputInventory(input: {
   readonly beforeBuildSnapshot: RunnerBuildOutputSnapshot;
   /** A queue-head sealed build owns the publication roots it has admitted. */
   readonly includeDirtyPublicationMembers?: boolean;
+  /**
+   * Pre-existing output bytes become current-task owned only after the
+   * publication boundary has validated an exact digest-bound takeover plan.
+   */
+  readonly takeoverPaths?: readonly string[];
 }): RunnerBuildOutputInventory {
   const outputPaths = changedPathsSinceSnapshot(input.cwd, input.buildTarget, input.beforeBuildSnapshot);
   if (input.includeDirtyPublicationMembers) {
     outputPaths.push(...listDirtyPaths(input.cwd).filter(isRunnerPublicationArtifactPath));
   }
   if (input.taskId) outputPaths.push(`.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`);
+  const preexistingDirtyPaths = new Set(input.beforeBuildSnapshot.preexistingDirtyPaths.map(normalizePath));
+  const takeoverPaths = new Set((input.takeoverPaths ?? []).map(normalizePath));
   return deriveRunnerBuildOutputInventory({
     sealedSourceSha: input.sealedSourceSha,
     observedPaths: outputPaths,
     currentTaskId: input.taskId,
-    ownership: outputPaths.map((entry) => ({ path: entry, ownerTaskId: input.taskId }))
+    // A queue-head build may observe pre-existing generated WIP, but it cannot
+    // convert that observation into ownership unless the publication boundary
+    // has supplied an exact digest-bound takeover for that same path.
+    ownership: outputPaths.map((entry) => ({
+      path: entry,
+      ownerTaskId: preexistingDirtyPaths.has(normalizePath(entry)) && !takeoverPaths.has(normalizePath(entry))
+        ? null
+        : input.taskId
+    }))
   });
 }
 
