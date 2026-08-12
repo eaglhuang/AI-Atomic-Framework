@@ -8,12 +8,12 @@ assert.equal(report.schemaId, 'atm.plan3xPositiveCurrentReceipts.v1');
 assert.equal(report.status, 'positive-current-receipts-consumed');
 assert.equal(report.totals.freshCommandRows, 28);
 assert.equal(report.totals.positiveReceiptRowsReadyForSourceRecompute, 0);
-assert.equal(report.totals.positiveReceiptRowsConsumedIntoSourceReplay, 20);
-assert.equal(report.totals.objectiveAlignedNegativeControlRowsConsumed, 7);
+assert.equal(report.totals.positiveReceiptRowsConsumedIntoSourceReplay, 21);
+assert.equal(report.totals.objectiveAlignedNegativeControlRowsConsumed, 8);
 assert.equal(report.totals.blockedByDoctorIntegrationDrift, 2);
-assert.equal(report.totals.sourceRowsMutatedByThisReport, 20);
-assert.equal(report.positiveRows.length, 20);
-assert.equal(new Set(report.positiveRows.map((entry: any) => entry.objectiveId)).size, 20);
+assert.equal(report.totals.sourceRowsMutatedByThisReport, 21);
+assert.equal(report.positiveRows.length, 21);
+assert.equal(new Set(report.positiveRows.map((entry: any) => entry.objectiveId)).size, 21);
 assert.deepEqual(report.blockedPositiveRows[0].rowRefs, ['P30-OBJ-10', 'P31-OBJ-08']);
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
   'preserve-consumed-positive-rows',

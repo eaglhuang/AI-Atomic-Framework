@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 10,
-    "not-complete": 19,
+    "verified": 11,
+    "not-complete": 18,
     "unknown": 0,
     "conflicting": 0
   },
@@ -41,6 +41,6 @@
     {"objectiveId":"P32-OBJ-26","title":"Blocker text is machine-readable","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/machine-readable-blocker.json"],"evidenceTuples":[{"kind":"machine-readable-blocker","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-machine-readable-blocker","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
     {"objectiveId":"P32-OBJ-27","title":"Dashboard can consume Plan 3.2 replay later","status":"verified","ownerTaskId":"ATM-GOV-0332","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["packages/core/src/evidence/plan-closeout-dashboard.ts","scripts/validate-plan32-dashboard-consumption.ts"],"evidenceTuples":[{"kind":"dashboard-consumption","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-dashboard-consumption","expectedTaskId":"ATM-GOV-0332"}],"blockers":[]},
     {"objectiveId":"P32-OBJ-28","title":"Final release provenance waits for terminal card","status":"not-complete","ownerTaskId":"ATM-GOV-0341","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/history/evidence/"],"evidenceTuples":[{"kind":"release-provenance","source":".atm/history/evidence/ATM-GOV-0341.closure-packet.json","expectedTaskId":"ATM-GOV-0341"}],"blockers":["final release and push provenance does not exist yet"],"nextSafeCommand":"node atm.mjs next --claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --auto-intent --json"},
-    {"objectiveId":"P32-OBJ-29","title":"Plan 3.2 terminal verdict remains fail-closed","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["docs/reports/plan-3-2-objective-replay.json"],"evidenceTuples":[{"kind":"terminal-verdict","source":"docs/reports/plan-3-2-objective-replay.json","expectedTaskId":"ATM-GOV-0335"}],"blockers":["not all 29 rows are verified; verdict must remain not-complete"],"nextSafeCommand":"node atm.mjs batch checkpoint --actor codex-gpt-5.4-mini --batch batch-2522d44aebb6 --json"}
+    {"objectiveId":"P32-OBJ-29","title":"Plan 3.2 terminal verdict remains fail-closed","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["docs/reports/plan-3-2-objective-replay.json","scripts/validate-plan32-terminal-verdict-fail-closed.ts"],"evidenceTuples":[{"kind":"terminal-verdict-fail-closed","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-terminal-verdict-fail-closed","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]}
   ]
 }

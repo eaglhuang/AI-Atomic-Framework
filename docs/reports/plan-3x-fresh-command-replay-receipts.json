@@ -3,11 +3,11 @@
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:30:00.000Z",
   "status": "fresh-command-replay-partially-consumed",
-  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 20 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
+  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 21 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:f07e2aa1c59f80bf3508b26aa1000cd956c9ad83d5576b09128eeb6dad9912b8"
+      "digest": "sha256:89646da56b899bd61e61c6479e08565fc31e7ed71d5d4fa6f5aaa4910119bd0f"
     },
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
@@ -19,18 +19,18 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:1c2b85c1430a75068e81e19d5569d934aa9056468d7b639fe4246481f9ce484f"
+      "digest": "sha256:8f3646e5ec0db88df8860668ff7753e94bb9c6776f7f2368168012aa428e2ab2"
     }
   ],
   "familyDisposition": {
     "proofFamilyId": "fresh-command-replay-needed",
     "sourceRowCount": 28,
-    "focusedCommandsExecuted": 16,
-    "commandsGreen": 16,
-    "rowsConsumedIntoSourceReplay": 20,
+    "focusedCommandsExecuted": 17,
+    "commandsGreen": 17,
+    "rowsConsumedIntoSourceReplay": 21,
     "rowsCertifiedCompleteByTheseReceipts": 0,
     "remainingRowsInFamily": 28,
-    "reasonRowsRemainOpen": "Twenty current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
+    "reasonRowsRemainOpen": "Twenty-one current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
   },
   "commandRuns": [
     {
@@ -144,6 +144,13 @@
       "exitCode": 0,
       "stdoutPreview": "[validate-plan32-stale-evidence-nonterminal] ok verdict=not-complete diagnostics=stale-evidence-is-nonterminal,stale-reference-must-not-green",
       "semanticBoundary": "objective-aligned stale evidence non-terminal evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-terminal-verdict-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-terminal-verdict-fail-closed.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-terminal-verdict-fail-closed] ok verified=11/29 verdict=not-complete",
+      "semanticBoundary": "objective-aligned terminal verdict fail-closed evidence, not completion evidence for Plan 3.2"
     }
   ],
   "nextExecutionOrder": [
