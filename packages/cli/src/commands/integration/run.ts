@@ -8,6 +8,7 @@ import { createIntegrationListResult } from './list.ts';
 import { installIntegrationAdapter } from './install.ts';
 import { asOptionalString, createIntegrationAdapter, createIntegrationContext, describeAdapter, manifestPathForIntegration, requireAdapterId } from './adapters.ts';
 import { readIntegrationManifest, verifyInstalledManifest } from './health.ts';
+import { collectAdapterParity } from './adapter-parity.ts';
 
 async function loadIntegrationHooks() {
   return import('../integration-hooks.ts');
@@ -113,6 +114,19 @@ export async function runIntegration(argv: string[]) {
     return createIntegrationListResult(cwd);
   }
 
+  if (action === 'parity') {
+    const receipt = await collectAdapterParity(cwd);
+    return makeResult({
+      ok: receipt.status === 'proven',
+      command: 'integration',
+      cwd,
+      messages: [receipt.status === 'proven'
+        ? message('info', 'ATM_INTEGRATION_PARITY_PROVEN', 'All six editor projections match the current sealed source snapshot.', receipt)
+        : message('error', 'ATM_INTEGRATION_PARITY_BLOCKED', 'At least one editor projection is stale, degraded, or lacks smoke proof.', receipt)],
+      evidence: { action, receipt }
+    });
+  }
+
   if (action === 'add') {
     const report = await installIntegrationAdapter(cwd, requireAdapterId(adapterId, action), {
       actor: asOptionalString(parsed.options.actor),
@@ -202,7 +216,7 @@ export async function runIntegration(argv: string[]) {
   throw new CliError('ATM_CLI_USAGE', `integration does not support action ${action}`, {
     exitCode: 2,
     details: {
-      supportedActions: ['list', 'add', 'verify', 'remove', 'hook', 'hooks']
+      supportedActions: ['list', 'add', 'verify', 'parity', 'remove', 'hook', 'hooks']
     }
   });
 }
