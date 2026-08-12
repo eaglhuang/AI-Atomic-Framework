@@ -80,7 +80,7 @@ assert.equal(validateFourPlanIndependentCertificate(report).diagnostics.includes
 assert.equal(report.overallVerdict, 'not-complete');
 assert.equal(report.releaseAuthorized, false);
 assert.ok(report.diagnostics.includes('dimension-fail-closed:objective-verdict:not-complete'));
-assert.ok(report.diagnostics.includes('dimension-fail-closed:charter-verdict:not-complete'));
+assert.equal(report.diagnostics.includes('dimension-fail-closed:charter-verdict:not-complete'), false);
 assert.equal(report.diagnostics.includes('release-digest-mismatch:origin-main'), false);
 
 const closeback = JSON.parse(readFileSync('docs/reports/plan-3x-4x-release-closeback.json', 'utf8'));

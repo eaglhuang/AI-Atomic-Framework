@@ -39,7 +39,7 @@
     },
     {
       "path": "docs/reports/plan-3x-4x-independent-certificate.json",
-      "digest": "sha256:29a53e96d11904615cdd45042d98f253aab9da71c02859b5de93d2835cd8c9db"
+      "digest": "sha256:495dd976b68bc1863dcdad9dd98fcc3ab171426ea2e57a2db5f3da805f5c7a4e"
     }
   ],
   "totals": {
@@ -50,8 +50,8 @@
     "backlogTerminal": 219,
     "backlogOwnedOpen": 2,
     "backlogDeferred": 170,
-    "certificateDimensionsProven": 4,
-    "certificateDimensionsNotComplete": 2
+    "certificateDimensionsProven": 5,
+    "certificateDimensionsNotComplete": 1
   },
   "planSummaries": [
     {
@@ -103,8 +103,9 @@
     {
       "id": "B3-charter-verdict",
       "scope": ["AtomicCharter", "deep-module", "first-principles"],
-      "reason": "independent certificate still references the legacy objective evidence matrix for charter verdict",
-      "requiredOutcome": "derive charter verdict from current source reports and explicit violations/non-violations rather than from prose authority"
+      "status": "resolved",
+      "reason": "independent certificate now references the current charter verdict report instead of the legacy objective evidence matrix",
+      "requiredOutcome": "maintain docs/reports/plan-3x-4x-charter-current-verdict.json and scripts/validate-four-plan-charter-current-verdict.ts as the charter-verdict authority"
     },
     {
       "id": "B4-backlog-disposition",
@@ -121,24 +122,20 @@
   ],
   "nextExecutionOrder": [
     {
-      "id": "B3-charter-verdict",
-      "whyFirst": "smallest high-leverage gap: current reports can be checked against charter principles without replaying all 86 rows"
-    },
-    {
       "id": "B2-plan4-successor-wave",
-      "whySecond": "successor reports already exist and can likely close or precisely leave open each Plan 4 anchor"
+      "whyFirst": "successor reports already exist and can likely close or precisely leave open each Plan 4 anchor"
     },
     {
       "id": "B1-current-row-proof",
-      "whyThird": "largest work item; execute by row classes and focused validators, not one long full-suite run"
+      "whySecond": "largest work item; execute by row classes and focused validators, not one long full-suite run"
     },
     {
       "id": "B4-backlog-disposition",
-      "whyFourth": "release-blocking subset should be separated from non-blocking deferred backlog"
+      "whyThird": "release-blocking subset should be separated from non-blocking deferred backlog"
     },
     {
       "id": "B5-release-certificate",
-      "whyLast": "certificate must stay fail-closed until upstream dimensions are proven"
+      "whyFourth": "certificate must stay fail-closed until upstream dimensions are proven"
     }
   ],
   "principlesApplied": [
