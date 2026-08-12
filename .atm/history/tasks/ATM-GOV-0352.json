@@ -1,0 +1,353 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0352",
+  "title": "Disclose close-window staged-index blockers at taskflow close dry-run",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 With staged entries outside the governed close bundle and no deferral flag, `taskflow close --dry-run` reports a blocker carrying `ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS`, the offending paths, and the deferral `requiredCommand` — the same verdict `--write` would reach.",
+    "ACC-2 An active close-window staged-index lock held by another task is likewise disclosed at dry-run as `ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED`.",
+    "ACC-3 When the index is clean, or when the deferral flag is supplied, dry-run adds no close-window blocker and the previous preview outcome is unchanged.",
+    "ACC-4 Dry-run performs no mutation: index entries, the lock file, and any foreign staged snapshot are byte-identical before and after a disclosing dry-run.",
+    "ACC-5 `acquireCloseWindowStagedIndexLock` keeps refusing exactly as it does today. Disclosure must not become permission; both paths read one predicate, and the write path remains authoritative."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts",
+    "packages/cli/src/commands/tasks/close-window-lock.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/taskflow/__tests__/dryrun/close-window-staged-index-disclosure.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts",
+    "packages/cli/src/commands/tasks/close-window-lock.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/taskflow/__tests__/dryrun/close-window-staged-index-disclosure.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/dryrun/close-window-staged-index-disclosure.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/git-governance/**"
+  ],
+  "nonGoals": [
+    "Making dry-run mutate anything. Disclosure must stay a pure read of index and lock state.",
+    "Weakening or removing the acquire-time refusal. The write path stays the authority; dry-run only stops hiding what it will decide.",
+    "Turning the disclosure into a guarantee. Index state can change between preview and write, and the blocker is advisory in exactly that window."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the shared admission predicate together with both consumers. The write path must stay fail-closed and authoritative; never resolve a regression here by relaxing the acquire-time refusal.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-close-write-readiness",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.close-window-staged-index-admission",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/tasks/close-window-lock.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts",
+        "packages/cli/src/commands/tasks/close-window-lock.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/taskflow/__tests__/dryrun/close-window-staged-index-disclosure.spec.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "Extract the decision, not the effect. `acquireCloseWindowStagedIndexLock`\ncurrently interleaves a pure verdict (existing lock, unexpected staged files,\ndeferral) with side effects (writing the lock record, deferring foreign staged\nentries). Lift only the verdict into\n`close-window-staged-index-admission.ts` as a Policy Object returning a small\nresult contract, then have the acquire path consume it and write-readiness\nconsume it too. Two call sites, one predicate — a second copy of this rule in\nthe readiness layer would drift back apart within a wave.\n\nPreview and write observe the index at different instants, and in write mode\nthe delivery commit happens after the lock is taken. Perfect equality is not\nachievable and must not be claimed; the contract is that dry-run discloses the\nverdict for the state it observed. State that boundary in the hint text rather\nthan implying a guarantee.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-08-12T12:23:39.210Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"governance-optimization/tasks/ATM-GOV-0352-disclose-close-window-staged-index-blockers-at-taskflow-close-dry-run.task.md\",\"contentDigest\":\"sha256:6df2e0b4d170d0d7fdfbff90f26143bb328b249c8ba66984c441ac25ba1f94d5\"} -->",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0352-disclose-close-window-staged-index-blockers-at-taskflow-close-dry-run.task.md",
+    "sectionTitle": "ATM-GOV-0352",
+    "headingLine": 116,
+    "hash": "be5c0c7314d915ec",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0352-disclose-close-window-staged-index-blockers-at-taskflow-close-dry-run.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:be5c0c7314d915ec595a77eeb5b06804f74e82fa748a91493feba0113251e1f6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-12T12:28:33.916Z"
+    }
+  },
+  "importedAt": "2026-08-12T12:28:33.916Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A governed close runs while paths outside the task's own close bundle sit in the shared index."
+    ],
+    "softRelations": [
+      "TASK-CID-0080",
+      "ATM-GOV-0344",
+      "ATM-GOV-0348",
+      "ATM-GOV-0350",
+      "ATM-GOV-0351"
+    ],
+    "changedPublicSeams": [
+      "atm.closeWindowStagedIndexAdmission.v1"
+    ],
+    "causalImpactEdges": [
+      "close-window-staged-index-state-to-write-readiness-disclosure",
+      "undisclosed-blocker-to-partially-applied-close-attempt"
+    ],
+    "parallelFrontierInputs": [
+      "canonical-git-index",
+      "close-window-staged-index-lock",
+      "taskflow-preview-commit-bundle"
+    ],
+    "validatorReferences": [
+      "test_atm_gov_0352_close_window_dryrun_disclosure"
+    ],
+    "phaseOwner": "wave-3-validator-and-lifecycle-recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0352_close_window_dryrun_disclosure",
+      "targetGroupId": "null",
+      "semanticKey": "close_window_staged_index_blockers_are_disclosed_before_write",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "close-window-staged-index-state-to-write-readiness-disclosure",
+        "undisclosed-blocker-to-partially-applied-close-attempt"
+      ],
+      "expectedRedPredicate": "taskflow close --dry-run reports zero blockers for an index state whose --write attempt is refused with ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS",
+      "contributionResourceKey": "taskflow-close-window-dryrun-disclosure",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.closeWindowStagedIndexAdmission.v1",
+      "resourceKey": "taskflow-close-window-dryrun-disclosure"
+    },
+    {
+      "caseId": "test_atm_gov_0352_dryrun_disclosure_is_non_mutating",
+      "targetGroupId": "null",
+      "semanticKey": "close_window_disclosure_never_touches_index_lock_or_snapshot",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "close-window-staged-index-state-to-write-readiness-disclosure"
+      ],
+      "expectedRedPredicate": "the close-window verdict is only reachable through the acquiring path, so evaluating it writes a lock record and can defer foreign staged entries",
+      "contributionResourceKey": "taskflow-close-window-dryrun-purity",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.closeWindowStagedIndexAdmission.v1",
+      "resourceKey": "taskflow-close-window-dryrun-purity"
+    },
+    {
+      "caseId": "test_atm_gov_0352_acquire_refusal_parity",
+      "targetGroupId": "null",
+      "semanticKey": "acquire_time_refusal_survives_the_shared_predicate",
+      "coversAcceptance": [
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "undisclosed-blocker-to-partially-applied-close-attempt"
+      ],
+      "expectedRedPredicate": "the acquire path owns its own inline verdict, so nothing proves disclosure and refusal read the same rule",
+      "contributionResourceKey": "taskflow-close-window-acquire-parity",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.closeWindowStagedIndexAdmission.v1",
+      "resourceKey": "taskflow-close-window-acquire-parity"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0352_close_window_dryrun_disclosure",
+    "test_atm_gov_0352_dryrun_disclosure_is_non_mutating",
+    "test_atm_gov_0352_acquire_refusal_parity"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck",
+    "validate:cli"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T14-52-41-994Z-claim-fddcc0559cde",
+  "lastTransitionAt": "2026-08-12T14:52:41.994Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-08-12T14:16:27.695Z",
+  "promotedAt": "2026-08-12T14:16:27.702Z",
+  "claim": {
+    "actorId": "claude-008-gov-0352",
+    "leaseId": "lease-2fbd366f57be",
+    "claimedAt": "2026-08-12T14:52:37.291Z",
+    "heartbeatAt": "2026-08-12T14:52:37.291Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0352.json"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260812145158-claude-008-gov-0352-11bd77514e",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812145158-claude-008-gov-0352-11bd77514e\""
+    }
+  },
+  "startedAt": "2026-08-12T13:39:44.009Z",
+  "startedByActor": "claude-008-gov-0352",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-1dd49eaa019d9b4e",
+    "ticketDigest": "sha256:1dd49eaa019d9b4e73e92260e81b171a89b9d3290c0fb7070f35b04d285a680d",
+    "taskId": "ATM-GOV-0352",
+    "origin": "claim",
+    "actorId": "claude-008-gov-0352",
+    "laneSessionId": "lane-20260812145158-claude-008-gov-0352-11bd77514e",
+    "claimGeneration": "lease-2fbd366f57be",
+    "issuedAt": "2026-08-12T14:52:37.291Z",
+    "expiresAt": "2026-08-12T15:22:37.291Z",
+    "scopeDigest": "sha256:2d659e7b37c09953cc1bdf07cdc024aebd8406346007f62a0070e84356517bbf",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T14:52:37.291Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0352.*",
+          ".atm/history/task-events/ATM-GOV-0352/**",
+          ".atm/history/tasks/ATM-GOV-0352.json",
+          "packages/cli/src/commands/taskflow/__tests__/dryrun/close-window-staged-index-disclosure.spec.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
+          "packages/cli/src/commands/taskflow/write-readiness.ts",
+          "packages/cli/src/commands/tasks/close-window-lock.ts",
+          "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts"
+        ],
+        "digest": "sha256:5e840c3cad9d97b51d5e8725ae3fb2409e7b051762a01a840f1e5cd86c06350b"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260812145237-claude-008-gov-0352-ATM-GOV-0352-5ff144fdf4",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0352",
+    "actorId": "claude-008-gov-0352",
+    "laneSessionId": "lane-20260812141612-claude-008-gov-0352-3087c7a68c",
+    "dirtyPaths": [
+      ".atm/history/tasks/ATM-GOV-0352.json"
+    ],
+    "retainedAt": "2026-08-12T14:49:46.441Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "claude-008-gov-0352",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0352",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-0f1c793686bffbe8",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0352.*",
+      ".atm/history/task-events/ATM-GOV-0352/**",
+      ".atm/history/tasks/ATM-GOV-0352.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "8bde7a2e295a0a3520ce008385bcc44e8230328b03618c9af990058aef75e558",
+    "actorId": "claude-008-gov-0352",
+    "sessionId": "session-20260812145237-claude-008-gov-0352-ATM-GOV-0352-5ff144fdf4",
+    "laneSession": {
+      "laneSessionId": "lane-20260812145158-claude-008-gov-0352-11bd77514e",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812145158-claude-008-gov-0352-11bd77514e\""
+    },
+    "createdAt": "2026-08-12T14:52:41.993Z",
+    "status": "active"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T14-49-47-092Z-repair-claim-a6834693a97e",
+  "taskId": "ATM-GOV-0352",
+  "action": "repair-claim",
+  "actorId": "claude-008-gov-0352",
+  "sessionId": "session-20260812141627-claude-008-gov-0352-ATM-GOV-0352-4d0a319cff",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0352.json",
+  "taskSha256": "sha256:339fa20fd7526bfc3b1f1bddeffd0ffe256223eea5a407a4db10756f3153ea0e",
+  "createdAt": "2026-08-12T14:49:47.092Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0352 --actor claude-008-gov-0352 --write --reason \"Captain-authorized forced release: commit-session claim cannot be released because the only offered routes mutate an active peer lane's uncommitted source\" --json"
+}
