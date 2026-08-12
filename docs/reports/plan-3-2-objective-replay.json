@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 15,
-    "not-complete": 14,
+    "verified": 16,
+    "not-complete": 13,
     "unknown": 0,
     "conflicting": 0
   },
@@ -192,25 +192,24 @@
     {
       "objectiveId": "P32-OBJ-09",
       "title": "Authorized shared delivery is separated from override",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0338",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "integrations/"
+        "tests/fixtures/plan3-fake-green/shared-delivery-no-override.json",
+        "scripts/validate-plan32-shared-delivery-no-override.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "shared-delivery",
-          "source": ".atm/history/evidence/ATM-GOV-0338.closure-packet.json",
+          "kind": "shared-delivery-no-override",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-shared-delivery-no-override",
           "expectedTaskId": "ATM-GOV-0338"
         }
       ],
-      "blockers": [
-        "adapter parity/shared delivery has not yet been replayed"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0338 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-10",

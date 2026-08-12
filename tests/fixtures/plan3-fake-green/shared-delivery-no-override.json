@@ -1,0 +1,22 @@
+{
+  "schemaId": "atm.plan3SharedDeliveryNoOverrideFixture.v1",
+  "specVersion": "0.1.0",
+  "sharedDelivery": {
+    "authorized": true,
+    "deliveryMode": "steward-composed",
+    "memberAttributionRequired": true,
+    "scope": ["integrations/codex", "integrations/claude-code"]
+  },
+  "override": {
+    "leasePresent": false,
+    "emergencyBypass": false,
+    "manualForeignBytesAllowed": false
+  },
+  "expectedVerdict": "shared-delivery-separated-from-override",
+  "diagnostics": [
+    "shared-delivery-authorized",
+    "member-attribution-required",
+    "override-lease-absent",
+    "manual-foreign-bytes-forbidden"
+  ]
+}
