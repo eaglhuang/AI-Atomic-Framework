@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-0b31bad32a01",
+  "recordedAt": "2026-08-12T02:15:10.745Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/taskflow/commit-bundle-assembly.ts --reason \"Restore the active ledger-backed task direction lock projection without widening scope; required for the official framework temporary-claim recovery path.\" --emergency-approval EMG-ATM-GOV-0345-b8aba13574 --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0345-b8aba13574",
+  "reason": "Restore the active ledger-backed task direction lock projection without widening scope; required for the official framework temporary-claim recovery path.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T02-15-10-743Z-EMG-ATM-GOV-0345-b8aba13574.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

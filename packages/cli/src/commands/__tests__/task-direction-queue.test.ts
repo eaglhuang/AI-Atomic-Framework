@@ -164,5 +164,12 @@ writeFileSync(path.join(leaseRepo, '.atm', 'history', 'tasks', `${leaseTaskId}.j
   claim: { actorId: 'worker', leaseId: 'lease-live', claimedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 3600, files: ['src/shared.ts'], state: 'active', laneSession: liveLock.laneSession }
 })}\n`);
 assert(readActiveTaskDirectionLocks(leaseRepo).length === 1, 'a live matching claim must retain its direction lock');
+writeFileSync(path.join(leaseRepo, '.atm', 'history', 'tasks', `${leaseTaskId}.json`), `${JSON.stringify({
+  workItemId: leaseTaskId,
+  taskDirectionLock: liveLock,
+  claim: { actorId: 'worker', leaseId: 'lease-live', claimedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 3600, files: ['src/shared.ts'], state: 'active', laneSession: liveLock.laneSession }
+})}\n`);
+writeFileSync(path.join(leaseRepo, '.atm', 'runtime', 'locks', `${leaseTaskId}.lock.json`), `${JSON.stringify({ schemaId: 'atm.governanceScopeLock', workItemId: leaseTaskId, status: 'released', released: true })}\n`);
+assert(readActiveTaskDirectionLocks(leaseRepo).length === 1, 'a live ledger direction lock must survive a replaced runtime projection');
 
 console.log('[task-direction-queue.test] ok');

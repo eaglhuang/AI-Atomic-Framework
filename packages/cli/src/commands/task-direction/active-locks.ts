@@ -25,6 +25,18 @@ export function readActiveTaskDirectionLocks(cwd: string): readonly TaskDirectio
       if (isTaskDirectionLock(lock) && hasLiveMatchingTaskClaim(cwd, lock)) locks.push(lock);
     } catch { /* malformed runtime records are not active locks */ }
   }
+  // Runtime lock files are projections, not a second source of authority. A
+  // generic scope lock may legitimately replace a projection; retain the
+  // durable direction lock whenever its ledger claim is still live.
+  const taskRoot = path.join(cwd, '.atm', 'history', 'tasks');
+  if (existsSync(taskRoot)) for (const entry of readdirSync(taskRoot).filter((item) => item.endsWith('.json'))) {
+    try {
+      const task = JSON.parse(readFileSync(path.join(taskRoot, entry), 'utf8')) as { taskDirectionLock?: unknown };
+      if (isTaskDirectionLock(task.taskDirectionLock) && hasLiveMatchingTaskClaim(cwd, task.taskDirectionLock)) {
+        locks.push(task.taskDirectionLock);
+      }
+    } catch { /* malformed ledger records are never active locks */ }
+  }
   return dedupeDirectionLocks(locks);
 }
 
