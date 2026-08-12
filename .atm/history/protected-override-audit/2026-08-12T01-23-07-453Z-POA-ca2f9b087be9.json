@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-ca2f9b087be9",
+  "recordedAt": "2026-08-12T01:23:07.453Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0345 --message \"fix(taskflow): retry close-window index restore\n\nATM-Work-Admission: wat-32800a6f39608440 sha256:32800a6f3960844014394bf037bfea7695eb63989a00aa9899878e2acd0f6a90\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0345-b31f3ed7ad",
+  "reason": "Bounded repair after repeated transient index-lock handoff; focused tests and typecheck passed.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T01-23-07-452Z-EMG-ATM-GOV-0345-b31f3ed7ad.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

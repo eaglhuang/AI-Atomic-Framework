@@ -138,6 +138,56 @@ interface ForeignStagedIndexEntry {
   readonly blobId: string;
 }
 
+const INDEX_LOCK_RETRY_DELAYS_MS = [25, 50, 100, 200, 400, 800, 1600] as const;
+
+function isGitIndexLockContention(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /(?:index\.lock|unable to create .*\.git[\\/]index\.lock)/i.test(message);
+}
+
+function waitForIndexLockRetry(delayMs: number): void {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delayMs);
+}
+
+/**
+ * Runs one index mutation through a deliberately bounded retry window.
+ * A close window never steals a live Git lock: it merely tolerates the short
+ * hand-off interval after a child commit/hook releases the shared index.
+ */
+export function runGitIndexMutationWithRetry(input: {
+  readonly cwd: string;
+  readonly args: readonly string[];
+  readonly operation: string;
+  readonly run?: () => void;
+}): void {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      (input.run ?? (() => execFileSync(resolveGitExecutable(), input.args, {
+        cwd: input.cwd,
+        stdio: ['ignore', 'pipe', 'pipe']
+      })))();
+      return;
+    } catch (error) {
+      const delayMs = INDEX_LOCK_RETRY_DELAYS_MS[attempt];
+      if (!isGitIndexLockContention(error) || delayMs === undefined) {
+        if (isGitIndexLockContention(error)) {
+          throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', `Close window could not ${input.operation} because Git's shared index remained busy.`, {
+            exitCode: 1,
+            details: {
+              recoveryState: 'index-lock-timeout',
+              operation: input.operation,
+              attempts: attempt + 1,
+              remediation: 'Keep the close-window record and durable restore identity intact. Wait for the active Git operation to finish, then retry the governed close or rollback path.'
+            }
+          });
+        }
+        throw error;
+      }
+      waitForIndexLockRetry(delayMs);
+    }
+  }
+}
+
 function readStagedIndexEntries(cwd: string, files: readonly string[]): ForeignStagedIndexEntry[] {
   const requested = uniqueSorted(files);
   if (requested.length === 0) return [];
@@ -189,7 +239,11 @@ function restoreForeignStagedEntries(cwd: string, entries: readonly ForeignStage
     });
   }
   for (const entry of entries) {
-    execFileSync(resolveGitExecutable(), ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    runGitIndexMutationWithRetry({
+      cwd,
+      args: ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`],
+      operation: `restore foreign staged entry ${entry.path}`
+    });
   }
   const restored = readStagedIndexEntries(cwd, entries.map((entry) => entry.path));
   const expected = entries.map((entry) => `${entry.mode}:${entry.blobId}:${entry.path}`).sort();
@@ -212,9 +266,10 @@ function deferForeignStagedFiles(cwd: string, taskId: string, files: readonly st
   const normalizedFiles = uniqueSorted(files);
   if (normalizedFiles.length === 0) return null;
   const snapshot = writeForeignStagedSnapshot(cwd, taskId, normalizedFiles);
-  execFileSync(resolveGitExecutable(), ['restore', '--staged', '--', ...files], {
+  runGitIndexMutationWithRetry({
     cwd,
-    stdio: ['ignore', 'pipe', 'pipe']
+    args: ['restore', '--staged', '--', ...files],
+    operation: 'defer foreign staged entries'
   });
   return snapshot;
 }

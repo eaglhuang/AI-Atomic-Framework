@@ -9,7 +9,8 @@ import {
   assertCloseWindowStagingAllowed,
   inspectForeignStagedTasksForCloseWindow,
   readCloseWindowStagedIndexLockReport,
-  releaseCloseWindowStagedIndexLock
+  releaseCloseWindowStagedIndexLock,
+  runGitIndexMutationWithRetry
 } from '../../tasks/close-window-lock.ts';
 import {
   buildCloseWriteRollbackSnapshot,
@@ -53,6 +54,20 @@ try {
   });
   execFileSync('git', ['add', '.'], { cwd: repoRoot, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'bootstrap'], { cwd: repoRoot, stdio: 'ignore' });
+
+  let transientIndexLockAttempts = 0;
+  runGitIndexMutationWithRetry({
+    cwd: repoRoot,
+    args: ['update-index', '--add'],
+    operation: 'fixture transient index mutation',
+    run: () => {
+      transientIndexLockAttempts += 1;
+      if (transientIndexLockAttempts === 1) {
+        throw new Error("fatal: Unable to create 'fixture/.git/index.lock': File exists.");
+      }
+    }
+  });
+  assert.equal(transientIndexLockAttempts, 2, 'a short-lived index lock must retry the same mutation once');
 
   const taskId = 'TASK-CLOSE-WINDOW-0001';
   const foreignTaskId = 'TASK-FOREIGN-0002';
