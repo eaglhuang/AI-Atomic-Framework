@@ -101,9 +101,6 @@ export async function runTasksDeliverAndClose(argv: string[], dependencies: Deli
         }
       });
     }
-    if (modifiedUnstaged.length > 0) {
-      execFileSync('git', ['-C', options.cwd, 'add', '--', ...modifiedUnstaged], { stdio: 'ignore' });
-    }
     const deliveryMessage = options.message ?? `feat: deliver ${options.taskId}`;
     const previousBatchDeliverAndClose = process.env.ATM_BATCH_DELIVER_AND_CLOSE;
     process.env.ATM_BATCH_DELIVER_AND_CLOSE = '1';
@@ -115,6 +112,7 @@ export async function runTasksDeliverAndClose(argv: string[], dependencies: Deli
         '--actor', actorId,
         '--task', options.taskId,
         '--message', deliveryMessage,
+        '--auto-stage',
         '--json'
       ]);
     } finally {
@@ -203,9 +201,6 @@ export async function runTasksDeliverAndClose(argv: string[], dependencies: Deli
     governanceFiles.push(closeEvidence.transitionPath);
   }
   const validGovernanceFiles = uniqueStrings(governanceFiles.filter(Boolean));
-  if (validGovernanceFiles.length > 0) {
-    execFileSync('git', ['-C', options.cwd, 'add', '--', ...validGovernanceFiles], { stdio: ['ignore', 'ignore', 'ignore'] });
-  }
   const closureMessage = `chore(${options.taskId}): governance close task with delivery evidence`;
   const closureResult = await runAtmGit([
     'commit',
@@ -213,6 +208,7 @@ export async function runTasksDeliverAndClose(argv: string[], dependencies: Deli
     '--actor', actorId,
     '--task', options.taskId,
     '--message', closureMessage,
+    '--auto-stage',
     '--json'
   ]);
   const closureCommitSha = closureResult.ok

@@ -92,23 +92,35 @@ export function readBrokerConflictResolutionArtifact(input: LegacyValue) {
       },
     );
   }
-  const artifactConflictTaskId = String(artifact.conflictTaskId ?? "")
-    .trim()
-    .toUpperCase();
+  const artifactConflictTaskIds = Array.isArray(artifact.conflictingTaskIds)
+    ? artifact.conflictingTaskIds
+    : [artifact.conflictTaskId];
+  const artifactConflictTaskId = artifactConflictTaskIds
+    .map((entry: LegacyValue) => String(entry ?? "").trim().toUpperCase())
+    .includes(String(input.conflictTaskId).trim().toUpperCase())
+    ? String(input.conflictTaskId).trim().toUpperCase()
+    : "";
   const artifactConflictFiles = Array.isArray(artifact.conflictFiles)
     ? artifact.conflictFiles
+    : Array.isArray(artifact.sharedPaths)
+      ? artifact.sharedPaths
+      : [];
+  const normalizedArtifactConflictFiles = artifactConflictFiles
         .map((entry: LegacyValue) => String(entry).replace(/\\/g, "/"))
         .filter(Boolean)
-        .sort()
-    : [];
+        .sort();
   const expectedFiles = [...input.conflictFiles]
     .map((entry: LegacyValue) => String(entry).replace(/\\/g, "/"))
     .sort();
   const resolutionOrder = Array.isArray(artifact.resolutionOrder)
     ? artifact.resolutionOrder
+    : Array.isArray(artifact.releaseOrder)
+      ? artifact.releaseOrder
+      : [];
+  const normalizedResolutionOrder = resolutionOrder
         .map((entry: LegacyValue) => String(entry).trim())
         .filter(Boolean)
-    : [];
+    ;
   const validatorPlan = Array.isArray(artifact.validatorPlan)
     ? artifact.validatorPlan
         .map((entry: LegacyValue) => String(entry).trim())
@@ -120,8 +132,8 @@ export function readBrokerConflictResolutionArtifact(input: LegacyValue) {
   if (
     artifact.schemaId !== "atm.brokerConflictResolution.v1" ||
     artifactConflictTaskId !== input.conflictTaskId ||
-    JSON.stringify(artifactConflictFiles) !== JSON.stringify(expectedFiles) ||
-    resolutionOrder.length < 2 ||
+    JSON.stringify(normalizedArtifactConflictFiles) !== JSON.stringify(expectedFiles) ||
+    normalizedResolutionOrder.length < 2 ||
     validatorPlan.length === 0 ||
     ![
       "serial-release",
