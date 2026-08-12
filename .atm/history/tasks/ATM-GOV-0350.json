@@ -1,0 +1,279 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0350",
+  "title": "Unify current-task close evidence bundle classification",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: One shared classifier returns current-task generated close evidence from its task identity and supported evidence schema/filename contract; both bundle assembly and pre-close consume that result.",
+    "ACC-2: A current-task live-index reconciliation receipt is included in the governed bundle and is not reported as unexpected staged residue on a subsequent pre-close.",
+    "ACC-3: A foreign task's evidence and an unknown/malformed current-task artifact are not silently admitted; existing foreign ownership isolation and fail-closed behavior remain intact.",
+    "ACC-4: Repeating pre-close without external changes is idempotent: it neither creates an endless evidence-only delivery-commit loop nor widens the bundle beyond current-task governance evidence."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+    "packages/cli/src/commands/taskflow/__tests__/current-task-close-evidence.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+    "packages/cli/src/commands/taskflow/__tests__/current-task-close-evidence.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/current-task-close-evidence.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target-repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the shared evidence classifier and its callers; foreign evidence remains fail-closed throughout.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-current-close-evidence",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.taskflow-current-close-evidence",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+        "packages/cli/src/commands/taskflow/__tests__/current-task-close-evidence.spec.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "- Extract `current-task-close-evidence.ts` as the Result Contract Object. It\n  owns recognition and returns normalized relative paths; `commit-bundle-assembly`\n  assembles and `historical-close-preflight` consumes it.\n- Include only artifacts that are both task-identified and explicitly defined\n  by the shared supported contract. Do not accept an arbitrary\n  `.atm/history/evidence/<task>.*` glob.\n- This is a private computation and must not introduce broker queueing,\n  runner-sync, global scans, or a second lifecycle/evidence registry.\n- Run the focused test first, then typecheck. Do not use a full repository\n  validator as the task-required oracle.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-08-12T05:58:02.572Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"governance-optimization/tasks/ATM-GOV-0350-unify-current-task-close-evidence-bundle-classification.task.md\",\"contentDigest\":\"sha256:c9aafea7aaf59ef227aeb4b07ba376d4a3a4022e4c990831b2568b666407a5c0\"} -->",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0350-unify-current-task-close-evidence-bundle-classification.task.md",
+    "sectionTitle": "ATM-GOV-0350",
+    "headingLine": 69,
+    "hash": "05a7279f8ae0399d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0350-unify-current-task-close-evidence-bundle-classification.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:05a7279f8ae0399dbdab83e2dea9ac10652ef28cff559fcbfe78188d815652ae",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-12T05:59:32.663Z"
+    }
+  },
+  "importedAt": "2026-08-12T05:59:32.663Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [
+      "current-task-generated-evidence-to-close-bundle",
+      "current-task-generated-evidence-to-preclose-isolation"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "test_atm_gov_0350_current_task_evidence_bundle_5d13c97a"
+    ],
+    "phaseOwner": "Wave 3 recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0350_current_task_evidence_bundle_5d13c97a",
+      "targetGroupId": "null",
+      "semanticKey": "current_task_close_evidence_bundle",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "current-task-generated-evidence-to-close-bundle",
+        "current-task-generated-evidence-to-preclose-isolation"
+      ],
+      "expectedRedPredicate": "a task-owned generated reconciliation receipt is excluded from the close bundle or is reported as an unexpected staged file",
+      "contributionResourceKey": "taskflow-current-evidence-classification",
+      "responsibility": "task-required",
+      "dependencyEdge": "current-task-generated-evidence-to-close-bundle",
+      "contractEdge": "atm.taskflow.currentTaskCloseEvidence",
+      "resourceKey": "taskflow-current-evidence-classification"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0350_current_task_evidence_bundle_5d13c97a"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T06-00-37-427Z-claim-d45efc01aca8",
+  "lastTransitionAt": "2026-08-12T06:00:37.427Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T06:00:22.407Z",
+  "promotedAt": "2026-08-12T06:00:22.411Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-ac389a77ebe0",
+    "claimedAt": "2026-08-12T06:00:22.415Z",
+    "heartbeatAt": "2026-08-12T06:00:22.415Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0350.json",
+      "packages/cli/src/commands/taskflow/__tests__/current-task-close-evidence.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260812060023-codex-gpt-5.4-mini-234a40e7e1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812060023-codex-gpt-5.4-mini-234a40e7e1\""
+    }
+  },
+  "startedAt": "2026-08-12T06:00:22.415Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-a32bc4d49eb39929",
+    "ticketDigest": "sha256:a32bc4d49eb39929c06d0341ea229a381f1e5d83bc9d933a8f460c1cc24d62f8",
+    "taskId": "ATM-GOV-0350",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812060023-codex-gpt-5.4-mini-234a40e7e1",
+    "claimGeneration": "lease-ac389a77ebe0",
+    "issuedAt": "2026-08-12T06:00:22.415Z",
+    "expiresAt": "2026-08-12T06:30:22.415Z",
+    "scopeDigest": "sha256:1fae4afb32ed5bf1ed0828c944456400c1590c90faceff25c18d6e77d8a49148",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T06:00:22.415Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0350.*",
+          ".atm/history/task-events/ATM-GOV-0350/**",
+          ".atm/history/tasks/ATM-GOV-0350.json",
+          "packages/cli/src/commands/taskflow/__tests__/current-task-close-evidence.spec.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+          "packages/cli/src/commands/taskflow/historical-close-preflight.ts"
+        ],
+        "digest": "sha256:9005ecaeee3d6f2186477b55fcbea8087bdc2832c4981f26e88f164eba3e1774"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260812060022-codex-gpt-5.4-mini-ATM-GOV-0350-8739c17c52",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0350",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-6366b590fc4097aa",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0350.*",
+      ".atm/history/task-events/ATM-GOV-0350/**",
+      ".atm/history/tasks/ATM-GOV-0350.json",
+      "packages/cli/src/commands/taskflow/__tests__/current-task-close-evidence.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "cee206a0c5fe3be7c3e68aab6e0aed4f4c82f6d5919951092617768177bbd25c",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260812060022-codex-gpt-5.4-mini-ATM-GOV-0350-8739c17c52",
+    "laneSession": {
+      "laneSessionId": "lane-20260812060023-codex-gpt-5.4-mini-234a40e7e1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812060023-codex-gpt-5.4-mini-234a40e7e1\""
+    },
+    "createdAt": "2026-08-12T06:00:37.426Z",
+    "status": "active"
+  }
+}
