@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 23,
   "statusCounts": {
-    "verified": 0,
-    "not-complete": 23,
+    "verified": 3,
+    "not-complete": 20,
     "unknown": 0,
     "conflicting": 0
   },
@@ -82,13 +82,12 @@
     {
       "objectiveId": "P31-OBJ-07",
       "title": "Inconclusive evidence remains non-terminal",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0240",
       "caseIds": ["test_plan31_exact_23_objectives_0334"],
       "sourceAnchors": ["scripts/diagnose-plan3-evidence-closure.ts"],
-      "evidenceTuples": [{"kind": "inconclusive", "source": ".atm/history/evidence/ATM-GOV-0240.closure-packet.json", "expectedTaskId": "ATM-GOV-0240"}],
-      "blockers": ["inconclusive rows must stay not-complete until replaced by verified receipts"],
-      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+      "evidenceTuples": [{"kind": "inconclusive", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0240"}],
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-08",
@@ -104,13 +103,12 @@
     {
       "objectiveId": "P31-OBJ-09",
       "title": "Two-process overlap is command-backed",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0252",
       "caseIds": ["test_plan31_exact_23_objectives_0334"],
       "sourceAnchors": ["packages/core/src/broker/"],
-      "evidenceTuples": [{"kind": "two-process-overlap", "source": ".atm/history/evidence/ATM-GOV-0252.closure-packet.json", "expectedTaskId": "ATM-GOV-0252"}],
-      "blockers": ["overlap proof is historical and not replayed in this row"],
-      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+      "evidenceTuples": [{"kind": "two-process-overlap", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0252"}],
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-10",
@@ -148,13 +146,12 @@
     {
       "objectiveId": "P31-OBJ-13",
       "title": "AB/BA order effects are explicitly modeled",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0254",
       "caseIds": ["test_plan31_exact_23_objectives_0334"],
       "sourceAnchors": ["artifacts/generated/atm-ab-v4/"],
-      "evidenceTuples": [{"kind": "order-effect", "source": ".atm/history/evidence/ATM-GOV-0254.closure-packet.json", "expectedTaskId": "ATM-GOV-0254"}],
-      "blockers": ["AB/BA replay is represented but not terminally certified"],
-      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+      "evidenceTuples": [{"kind": "order-effect", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0254"}],
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-14",

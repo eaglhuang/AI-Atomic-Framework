@@ -2,25 +2,26 @@
   "schemaId": "atm.plan3xPositiveCurrentReceipts.v1",
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:55:00.000Z",
-  "status": "positive-current-receipts-partial",
-  "nonClaim": "This report identifies Plan 3.x rows with current positive receipts ready for source replay recompute; it does not mutate the source replay row status.",
+  "status": "positive-current-receipts-consumed",
+  "nonClaim": "This report identifies Plan 3.x rows whose current positive receipts were consumed into source replay; it does not certify any plan complete while aggregate source replay verdicts remain not-complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:ec981ed479f426f22a9c3f1cf667e249c5ca1424cbc3740cb035dca6b1438600"
+      "digest": "sha256:fb0269a631d16b47ebf64489fb83e9c8a507e063e3d94be04fd2aaff53f11072"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:f049b078a679b66fd9f03103096381fb38a9249d146deace87a9a026b2355ead"
+      "digest": "sha256:f10f91944fe8eef7fb9348d1f14188267de6d4e78c23155390d2250a155aafd9"
     }
   ],
   "totals": {
-    "freshCommandRows": 45,
-    "positiveReceiptRowsReadyForSourceRecompute": 8,
+    "freshCommandRows": 37,
+    "positiveReceiptRowsReadyForSourceRecompute": 0,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 8,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
     "remainingUncoveredRows": 22,
-    "sourceRowsMutatedByThisReport": 0
+    "sourceRowsMutatedByThisReport": 8
   },
   "commandReceipts": [
     {
@@ -87,49 +88,49 @@
       "objectiveId": "P30-OBJ-07",
       "title": "Continuation replay is command-backed",
       "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
-      "nextSourceReplayAction": "recompute row status from current semantic closure receipts"
+      "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P30-OBJ-08",
       "title": "Semantic union remains explicit",
       "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
-      "nextSourceReplayAction": "recompute row status from current semantic closure receipts"
+      "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P30-OBJ-12",
       "title": "Overlap/admission/starvation metrics are non-extrapolated",
       "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
-      "nextSourceReplayAction": "recompute row status from current semantic closure receipts"
+      "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P30-OBJ-13",
       "title": "A/B and B/A order effects are represented",
       "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
-      "nextSourceReplayAction": "recompute row status from current semantic closure receipts"
+      "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P31-OBJ-07",
       "title": "Inconclusive evidence remains non-terminal",
       "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
-      "nextSourceReplayAction": "recompute row status from current semantic closure receipts while preserving fail-closed non-terminal semantics for unrelated inconclusive evidence"
+      "sourceReplayAction": "recomputed row status from current semantic closure receipts while preserving fail-closed non-terminal semantics for unrelated inconclusive evidence"
     },
     {
       "objectiveId": "P31-OBJ-09",
       "title": "Two-process overlap is command-backed",
       "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
-      "nextSourceReplayAction": "recompute row status from current semantic closure receipts"
+      "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P31-OBJ-13",
       "title": "AB/BA order effects are explicitly modeled",
       "receiptIds": ["plan3-semantic-ready-to-close", "broker-replay-ready-to-close"],
-      "nextSourceReplayAction": "recompute row status from current semantic closure receipts"
+      "sourceReplayAction": "recomputed row status from current semantic closure receipts"
     },
     {
       "objectiveId": "P32-OBJ-11",
       "title": "HEAD CAS is observable",
       "receiptIds": ["git-head-evidence-current-validator"],
-      "nextSourceReplayAction": "recompute row status only after binding the validator receipt to the source replay evidence tuple"
+      "sourceReplayAction": "recomputed row status after binding the validator receipt to the source replay evidence tuple"
     }
   ],
   "blockedPositiveRows": [
@@ -142,8 +143,8 @@
   ],
   "nextExecutionOrder": [
     {
-      "id": "source-replay-recompute-eight-positive-rows",
-      "whyFirst": "Eight rows now have current positive receipts and can be recomputed without waiting for the rest of the 45-row family."
+      "id": "preserve-consumed-positive-rows",
+      "whyFirst": "Eight rows now have current positive receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

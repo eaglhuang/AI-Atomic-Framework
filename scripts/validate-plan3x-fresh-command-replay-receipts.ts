@@ -44,8 +44,8 @@ function main() {
   const findings: string[] = [];
 
   if (report.schemaId !== 'atm.plan3xFreshCommandReplayReceipts.v1') findings.push('schemaId mismatch');
-  if (report.status !== 'fresh-command-replay-observed-not-terminal') findings.push('status must be fresh-command-replay-observed-not-terminal');
-  if (report.nonClaim !== 'These receipts prove that the focused Plan 3.x replay validators execute against current files; they do not certify any objective row complete while source replay verdicts remain not-complete.') {
+  if (report.status !== 'fresh-command-replay-partially-consumed') findings.push('status must be fresh-command-replay-partially-consumed');
+  if (report.nonClaim !== 'These receipts prove that focused Plan 3.x validators execute against current files and that 8 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.') {
     findings.push('nonClaim missing or weakened');
   }
   for (const source of report.sourceReports ?? []) {
@@ -61,6 +61,7 @@ function main() {
   const freshFamily = (proofMap.proofFamilies ?? []).find((entry: any) => entry.id === 'fresh-command-replay-needed');
   if (!freshFamily) findings.push('fresh-command proof family missing from proof map');
   if (report.familyDisposition?.sourceRowCount !== freshFamily?.rowCount) findings.push('familyDisposition.sourceRowCount mismatch');
+  if (report.familyDisposition?.rowsConsumedIntoSourceReplay !== 8) findings.push('rowsConsumedIntoSourceReplay mismatch');
   if (report.familyDisposition?.rowsCertifiedCompleteByTheseReceipts !== 0) findings.push('receipts must not certify rows complete');
   if (report.familyDisposition?.remainingRowsInFamily !== freshFamily?.rowCount) findings.push('remainingRowsInFamily mismatch');
 
@@ -76,10 +77,12 @@ function main() {
   const plan30 = readJson('docs/reports/plan-3-0-objective-replay.json');
   const plan31 = readJson('docs/reports/plan-3-1-objective-replay.json');
   const plan32 = readJson('docs/reports/plan-3-2-objective-replay.json');
+  let verifiedRows = 0;
   for (const replay of [plan30, plan31, plan32]) {
     if (replay.verdict !== 'not-complete') findings.push(`source replay must remain not-complete: ${replay.planId}`);
-    if (replay.statusCounts?.verified !== 0) findings.push(`source replay verified count must remain zero: ${replay.planId}`);
+    verifiedRows += Number(replay.statusCounts?.verified ?? 0);
   }
+  if (verifiedRows !== 8) findings.push(`source replay verified count mismatch: expected 8, observed ${verifiedRows}`);
 
   const ok = findings.length === 0;
   const output = {

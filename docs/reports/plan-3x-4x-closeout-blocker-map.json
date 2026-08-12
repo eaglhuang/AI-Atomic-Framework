@@ -7,15 +7,15 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
-      "digest": "sha256:e080a41f0f68672e83725d19286c064ac707a5208330433dae5c4d1ad0817f00"
+      "digest": "sha256:e6f107bd3633d5ec6588cc328f8c0f461dc4e646bacc9669e05d7ce4ecdd5de8"
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
-      "digest": "sha256:6212686585e15b2dc98d845f7637d461730e5e52666b3a6b2f038ccbe6953b8c"
+      "digest": "sha256:1563471ad3daa1685fd480ee1c5550e4fac1a6b3866039e2fcaac966358c2b89"
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:54f1ea49a99988b17082eab303833c8d0662fdb4acdd7adca4a9d37e1feb72b7"
+      "digest": "sha256:0964043d1efc8c140f1b7995877016b07fe46a0c4af5764b29e02cff256ed034"
     },
     {
       "path": "docs/reports/plan-4-foundation-replay.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:ec981ed479f426f22a9c3f1cf667e249c5ca1424cbc3740cb035dca6b1438600"
+      "digest": "sha256:fb0269a631d16b47ebf64489fb83e9c8a507e063e3d94be04fd2aaff53f11072"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:f049b078a679b66fd9f03103096381fb38a9249d146deace87a9a026b2355ead"
+      "digest": "sha256:f10f91944fe8eef7fb9348d1f14188267de6d4e78c23155390d2250a155aafd9"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
@@ -59,12 +59,12 @@
     },
     {
       "path": "docs/reports/plan-3x-positive-current-receipts.json",
-      "digest": "sha256:a9e84a5e61beaaf88b282a4ad99f26639fa76711164012ee1469e5eb6621b055"
+      "digest": "sha256:df0c6e82ac83bf747017b1bbbe46cf4a0b2f5acd61353e471b40cd5e0043b401"
     }
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 86,
+    "unresolvedObjectiveRows": 78,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -74,10 +74,11 @@
     "certificateDimensionsNotComplete": 1,
     "plan4SuccessorMappedAnchors": 17,
     "plan3xCurrentRowProofMappedRows": 69,
-    "plan3xCurrentRowProofFamilies": 4,
+    "plan3xCurrentRowProofFamilies": 5,
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
-    "plan3xPositiveReceiptRowsReadyForSourceRecompute": 8,
+    "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 8,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
     "backlogNeedsTaskCardBeforeFinalRelease": 133
@@ -87,25 +88,25 @@
       "planId": "3.0",
       "source": "docs/reports/plan-3-0-objective-replay.json",
       "objectiveRows": 17,
-      "verifiedRows": 0,
-      "unresolvedRows": 17,
-      "primaryBlocker": "current objective rows need fresh command-backed replay instead of historical closure-packet references"
+      "verifiedRows": 4,
+      "unresolvedRows": 13,
+      "primaryBlocker": "four rows now have current positive receipts consumed into source replay; remaining rows need fresh command-backed replay instead of historical closure-packet references"
     },
     {
       "planId": "3.1",
       "source": "docs/reports/plan-3-1-objective-replay.json",
       "objectiveRows": 23,
-      "verifiedRows": 0,
-      "unresolvedRows": 23,
-      "primaryBlocker": "current objective rows need fresh receipts and negative controls that prove completion, not only fail-closed behavior"
+      "verifiedRows": 3,
+      "unresolvedRows": 20,
+      "primaryBlocker": "three rows now have current positive receipts consumed into source replay; remaining rows need fresh receipts and negative controls that prove completion, not only fail-closed behavior"
     },
     {
       "planId": "3.2",
       "source": "docs/reports/plan-3-2-objective-replay.json",
       "objectiveRows": 29,
-      "verifiedRows": 0,
-      "unresolvedRows": 29,
-      "primaryBlocker": "shared closure controls, HEAD CAS, sealed bundle, and provenance rows are represented but not terminally consumed"
+      "verifiedRows": 1,
+      "unresolvedRows": 28,
+      "primaryBlocker": "HEAD CAS has current validator evidence consumed into source replay; remaining shared closure controls, sealed bundle, and provenance rows are represented but not terminally consumed"
     },
     {
       "planId": "4.0",
@@ -120,9 +121,9 @@
     {
       "id": "B1-current-row-proof",
       "scope": ["Plan 3.0", "Plan 3.1", "Plan 3.2"],
-      "status": "partial-positive-receipts",
-      "reason": "replay reports establish denominator and row evidence surfaces; eight fresh-command rows now have positive current receipts ready for source replay recompute, while source rows remain not-complete",
-      "requiredOutcome": "execute docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
+      "status": "partial-source-recomputed",
+      "reason": "replay reports establish denominator and row evidence surfaces; eight fresh-command rows now have positive current receipts consumed into source replay, while the aggregate source replay verdict remains not-complete",
+      "requiredOutcome": "continue executing docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
     },
     {
       "id": "B2-plan4-successor-wave",

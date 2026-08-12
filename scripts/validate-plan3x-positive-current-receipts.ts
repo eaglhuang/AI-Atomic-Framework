@@ -32,8 +32,8 @@ function main() {
   const findings: string[] = [];
 
   if (report.schemaId !== 'atm.plan3xPositiveCurrentReceipts.v1') findings.push('schemaId mismatch');
-  if (report.status !== 'positive-current-receipts-partial') findings.push('status mismatch');
-  if (report.nonClaim !== 'This report identifies Plan 3.x rows with current positive receipts ready for source replay recompute; it does not mutate the source replay row status.') {
+  if (report.status !== 'positive-current-receipts-consumed') findings.push('status mismatch');
+  if (report.nonClaim !== 'This report identifies Plan 3.x rows whose current positive receipts were consumed into source replay; it does not certify any plan complete while aggregate source replay verdicts remain not-complete.') {
     findings.push('nonClaim missing or weakened');
   }
   for (const source of report.sourceReports ?? []) {
@@ -42,17 +42,19 @@ function main() {
 
   const proofMap = readJson('docs/reports/plan-3x-current-row-proof-map.json');
   const freshFamily = (proofMap.proofFamilies ?? []).find((entry: any) => entry.id === 'fresh-command-replay-needed');
-  const freshRefs = new Set((freshFamily?.rowRefs ?? []).map(String));
+  const verifiedFamily = (proofMap.proofFamilies ?? []).find((entry: any) => entry.id === 'verified-current-receipt');
+  const verifiedRefs = new Set((verifiedFamily?.rowRefs ?? []).map(String));
   const positiveRows = Array.isArray(report.positiveRows) ? report.positiveRows : [];
   const positiveRefs = positiveRows.map((row: any) => String(row.objectiveId));
   if (positiveRefs.length !== 8) findings.push(`positive row count mismatch: expected 8, observed ${positiveRefs.length}`);
   if (new Set(positiveRefs).size !== positiveRefs.length) findings.push('duplicate positive rows');
   for (const rowRef of positiveRefs) {
-    if (!freshRefs.has(rowRef)) findings.push(`positive row is not in fresh-command family: ${rowRef}`);
+    if (!verifiedRefs.has(rowRef)) findings.push(`positive row was not consumed into verified-current-receipt family: ${rowRef}`);
   }
   if (report.totals?.freshCommandRows !== freshFamily?.rowCount) findings.push('freshCommandRows mismatch');
-  if (report.totals?.positiveReceiptRowsReadyForSourceRecompute !== positiveRefs.length) findings.push('positiveReceiptRowsReadyForSourceRecompute mismatch');
-  if (report.totals?.sourceRowsMutatedByThisReport !== 0) findings.push('report must not mutate source rows');
+  if (report.totals?.positiveReceiptRowsReadyForSourceRecompute !== 0) findings.push('positiveReceiptRowsReadyForSourceRecompute must be zero after consumption');
+  if (report.totals?.positiveReceiptRowsConsumedIntoSourceReplay !== positiveRefs.length) findings.push('positiveReceiptRowsConsumedIntoSourceReplay mismatch');
+  if (report.totals?.sourceRowsMutatedByThisReport !== positiveRefs.length) findings.push('sourceRowsMutatedByThisReport mismatch');
 
   const commandRuns = Array.isArray(report.commandReceipts) ? report.commandReceipts : [];
   for (const receipt of commandRuns) {

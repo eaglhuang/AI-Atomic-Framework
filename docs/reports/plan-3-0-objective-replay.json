@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 17,
   "statusCounts": {
-    "verified": 0,
-    "not-complete": 17,
+    "verified": 4,
+    "not-complete": 13,
     "unknown": 0,
     "conflicting": 0
   },
@@ -82,24 +82,22 @@
     {
       "objectiveId": "P30-OBJ-07",
       "title": "Continuation replay is command-backed",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
       "caseIds": ["test_plan30_exact_17_objectives_0333"],
       "sourceAnchors": ["scripts/diagnose-plan3-evidence-closure.ts"],
-      "evidenceTuples": [{"kind": "continuation-replay", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307"}],
-      "blockers": ["continuation replay is not independently frozen in this row"],
-      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+      "evidenceTuples": [{"kind": "continuation-replay", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0307"}],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-08",
       "title": "Semantic union remains explicit",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
       "caseIds": ["test_plan30_exact_17_objectives_0333"],
       "sourceAnchors": ["packages/cli/src/commands/broker/replay/closure-policy.ts"],
-      "evidenceTuples": [{"kind": "semantic-closure", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307"}],
-      "blockers": ["semantic union currently reports remain-open under final replay"],
-      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+      "evidenceTuples": [{"kind": "semantic-closure", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0307"}],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-09",
@@ -137,24 +135,22 @@
     {
       "objectiveId": "P30-OBJ-12",
       "title": "Overlap/admission/starvation metrics are non-extrapolated",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
       "caseIds": ["test_plan30_exact_17_objectives_0333"],
       "sourceAnchors": ["packages/core/src/broker/replay/"],
-      "evidenceTuples": [{"kind": "parallel-replay", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307"}],
-      "blockers": ["n=2 non-extrapolation disclosure is present but not final certification"],
-      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+      "evidenceTuples": [{"kind": "parallel-replay", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0307"}],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-13",
       "title": "A/B and B/A order effects are represented",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
       "caseIds": ["test_plan30_exact_17_objectives_0333"],
       "sourceAnchors": ["artifacts/generated/atm-ab-v4/summary.json"],
-      "evidenceTuples": [{"kind": "paired-ab", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307"}],
-      "blockers": ["paired AB evidence shape is not enough to close"],
-      "nextSafeCommand": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --json --allow-inconclusive"
+      "evidenceTuples": [{"kind": "paired-ab", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0307"}],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-14",

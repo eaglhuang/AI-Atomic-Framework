@@ -12,6 +12,7 @@ const expectedPlanRows = new Map([
   ['3.2', 29]
 ]);
 const familyIds = [
+  'verified-current-receipt',
   'fresh-command-replay-needed',
   'governed-state-replay-needed',
   'runner-release-parity-needed',
@@ -50,6 +51,8 @@ function sha256File(relativePath: string): string {
 
 function flattenSourceRows(report: any) {
   const rowRefs: string[] = [];
+  let verifiedRows = 0;
+  let notCompleteRows = 0;
   for (const source of report.sourceReports ?? []) {
     const sourcePath = String(source.path ?? '');
     const sourceReport = readJson(sourcePath);
@@ -60,11 +63,14 @@ function flattenSourceRows(report: any) {
     if (sourceReport.planId !== source.planId) throw new Error(`source planId mismatch: ${sourcePath}`);
     if (sourceReport.denominator !== expectedRows) throw new Error(`denominator mismatch: ${sourcePath}`);
     if (sourceReport.verdict !== 'not-complete') throw new Error(`source verdict must remain not-complete: ${sourcePath}`);
-    if (sourceReport.statusCounts?.verified !== 0) throw new Error(`source verified rows must remain zero in this triage layer: ${sourcePath}`);
-    if (sourceReport.statusCounts?.['not-complete'] !== expectedRows) throw new Error(`source not-complete rows mismatch: ${sourcePath}`);
+    const sourceVerified = Number(sourceReport.statusCounts?.verified ?? 0);
+    const sourceNotComplete = Number(sourceReport.statusCounts?.['not-complete'] ?? 0);
+    if (sourceVerified + sourceNotComplete !== expectedRows) throw new Error(`source status counts mismatch: ${sourcePath}`);
+    verifiedRows += sourceVerified;
+    notCompleteRows += sourceNotComplete;
     for (const row of sourceReport.rows ?? []) rowRefs.push(String(row.objectiveId));
   }
-  return rowRefs;
+  return { rowRefs, verifiedRows, notCompleteRows };
 }
 
 function main() {
@@ -74,14 +80,19 @@ function main() {
   const findings: string[] = [];
 
   if (report.schemaId !== 'atm.plan3xCurrentRowProofMap.v1') findings.push('schemaId mismatch');
-  if (report.status !== 'current-row-proof-triaged') findings.push('status must be current-row-proof-triaged');
-  if (report.nonClaim !== 'This map classifies every Plan 3.x objective row into the next proof family; it does not certify any Plan 3.x row complete.') {
+  if (report.status !== 'current-row-proof-partially-verified') findings.push('status must be current-row-proof-partially-verified');
+  if (report.nonClaim !== 'This map classifies every Plan 3.x objective row into its current proof family; verified rows are backed by current receipts, but this map does not certify any plan complete.') {
     findings.push('nonClaim missing or weakened');
   }
 
   let sourceRows: string[] = [];
+  let sourceVerifiedRows = 0;
+  let sourceNotCompleteRows = 0;
   try {
-    sourceRows = flattenSourceRows(report);
+    const flattened = flattenSourceRows(report);
+    sourceRows = flattened.rowRefs;
+    sourceVerifiedRows = flattened.verifiedRows;
+    sourceNotCompleteRows = flattened.notCompleteRows;
   } catch (error) {
     findings.push(error instanceof Error ? error.message : String(error));
   }
@@ -94,7 +105,8 @@ function main() {
   for (const family of report.proofFamilies ?? []) {
     const id = String(family.id ?? '');
     if (!familyIds.includes(id)) findings.push(`unknown proof family: ${id}`);
-    if (family.status !== 'not-complete') findings.push(`family status must remain not-complete: ${id}`);
+    const expectedStatus = id === 'verified-current-receipt' ? 'verified' : 'not-complete';
+    if (family.status !== expectedStatus) findings.push(`family status mismatch for ${id}: expected ${expectedStatus}`);
     const refs = Array.isArray(family.rowRefs) ? family.rowRefs.map(String) : [];
     if (family.rowCount !== refs.length) findings.push(`rowCount mismatch for family ${id}`);
     familyCountById.set(id, refs.length);
@@ -115,7 +127,8 @@ function main() {
 
   if (report.totals?.plans !== 3) findings.push('totals.plans mismatch');
   if (report.totals?.objectiveRows !== 69) findings.push('totals.objectiveRows mismatch');
-  if (report.totals?.sourceRowsNotComplete !== 69) findings.push('totals.sourceRowsNotComplete mismatch');
+  if (report.totals?.sourceRowsVerified !== sourceVerifiedRows) findings.push('totals.sourceRowsVerified mismatch');
+  if (report.totals?.sourceRowsNotComplete !== sourceNotCompleteRows) findings.push('totals.sourceRowsNotComplete mismatch');
   if (report.totals?.rowsMappedToProofFamily !== 69) findings.push('totals.rowsMappedToProofFamily mismatch');
   if (report.totals?.rowsCertifiedCompleteByThisMap !== 0) findings.push('this map must not certify rows complete');
   if (report.totals?.proofFamilies !== familyIds.length) findings.push('totals.proofFamilies mismatch');
@@ -126,7 +139,9 @@ function main() {
     const expectedRows = expectedPlanRows.get(String(plan.planId));
     if (expectedRows === undefined) findings.push(`unexpected plan summary: ${plan.planId}`);
     if (plan.rows !== expectedRows) findings.push(`plan summary rows mismatch: ${plan.planId}`);
-    if (plan.notCompleteRows !== expectedRows) findings.push(`plan summary notCompleteRows mismatch: ${plan.planId}`);
+    if (Number(plan.verifiedRows ?? 0) + Number(plan.notCompleteRows ?? 0) !== expectedRows) {
+      findings.push(`plan summary status total mismatch: ${plan.planId}`);
+    }
   }
 
   const orderedFamilies = (report.nextExecutionOrder ?? []).map((entry: any) => String(entry.id));

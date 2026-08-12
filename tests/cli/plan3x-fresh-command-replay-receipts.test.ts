@@ -5,13 +5,14 @@ import { readFileSync } from 'node:fs';
 const report = JSON.parse(readFileSync('docs/reports/plan-3x-fresh-command-replay-receipts.json', 'utf8'));
 
 assert.equal(report.schemaId, 'atm.plan3xFreshCommandReplayReceipts.v1');
-assert.equal(report.status, 'fresh-command-replay-observed-not-terminal');
+assert.equal(report.status, 'fresh-command-replay-partially-consumed');
 assert.equal(report.familyDisposition.proofFamilyId, 'fresh-command-replay-needed');
-assert.equal(report.familyDisposition.sourceRowCount, 45);
+assert.equal(report.familyDisposition.sourceRowCount, 37);
 assert.equal(report.familyDisposition.focusedCommandsExecuted, 8);
 assert.equal(report.familyDisposition.commandsGreen, 8);
+assert.equal(report.familyDisposition.rowsConsumedIntoSourceReplay, 8);
 assert.equal(report.familyDisposition.rowsCertifiedCompleteByTheseReceipts, 0);
-assert.equal(report.familyDisposition.remainingRowsInFamily, 45);
+assert.equal(report.familyDisposition.remainingRowsInFamily, 37);
 assert.equal(report.commandRuns.length, 8);
 assert.ok(report.commandRuns.every((entry: any) => entry.exitCode === 0));
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [

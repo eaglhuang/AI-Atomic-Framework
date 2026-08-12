@@ -2,34 +2,35 @@
   "schemaId": "atm.plan3xFreshCommandReplayReceipts.v1",
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:30:00.000Z",
-  "status": "fresh-command-replay-observed-not-terminal",
-  "nonClaim": "These receipts prove that the focused Plan 3.x replay validators execute against current files; they do not certify any objective row complete while source replay verdicts remain not-complete.",
+  "status": "fresh-command-replay-partially-consumed",
+  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 8 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:ec981ed479f426f22a9c3f1cf667e249c5ca1424cbc3740cb035dca6b1438600"
+      "digest": "sha256:fb0269a631d16b47ebf64489fb83e9c8a507e063e3d94be04fd2aaff53f11072"
     },
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
-      "digest": "sha256:e080a41f0f68672e83725d19286c064ac707a5208330433dae5c4d1ad0817f00"
+      "digest": "sha256:e6f107bd3633d5ec6588cc328f8c0f461dc4e646bacc9669e05d7ce4ecdd5de8"
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
-      "digest": "sha256:6212686585e15b2dc98d845f7637d461730e5e52666b3a6b2f038ccbe6953b8c"
+      "digest": "sha256:1563471ad3daa1685fd480ee1c5550e4fac1a6b3866039e2fcaac966358c2b89"
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:54f1ea49a99988b17082eab303833c8d0662fdb4acdd7adca4a9d37e1feb72b7"
+      "digest": "sha256:0964043d1efc8c140f1b7995877016b07fe46a0c4af5764b29e02cff256ed034"
     }
   ],
   "familyDisposition": {
     "proofFamilyId": "fresh-command-replay-needed",
-    "sourceRowCount": 45,
+    "sourceRowCount": 37,
     "focusedCommandsExecuted": 8,
     "commandsGreen": 8,
+    "rowsConsumedIntoSourceReplay": 8,
     "rowsCertifiedCompleteByTheseReceipts": 0,
-    "remainingRowsInFamily": 45,
-    "reasonRowsRemainOpen": "The focused validators prove denominator, replay shape, and fail-closed behavior. Positive per-row receipts still need to replace historical-only or descriptive evidence before row status can become verified."
+    "remainingRowsInFamily": 37,
+    "reasonRowsRemainOpen": "Eight positive current receipts were consumed into source replay. The remaining fresh-command rows still need positive per-row receipts before their row status can become verified."
   },
   "commandRuns": [
     {
@@ -92,7 +93,7 @@
   "nextExecutionOrder": [
     {
       "id": "positive-row-receipts",
-      "whyFirst": "Replace historical-only or shape-only evidence for the 45 fresh-command rows with command receipts that directly satisfy each row objective."
+      "whyFirst": "Replace historical-only or shape-only evidence for the remaining 37 fresh-command rows with command receipts that directly satisfy each row objective."
     },
     {
       "id": "source-replay-row-recompute",

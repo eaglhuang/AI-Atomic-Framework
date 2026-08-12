@@ -2,24 +2,24 @@
   "schemaId": "atm.plan3xCurrentRowProofMap.v1",
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:15:00.000Z",
-  "status": "current-row-proof-triaged",
-  "nonClaim": "This map classifies every Plan 3.x objective row into the next proof family; it does not certify any Plan 3.x row complete.",
+  "status": "current-row-proof-partially-verified",
+  "nonClaim": "This map classifies every Plan 3.x objective row into its current proof family; verified rows are backed by current receipts, but this map does not certify any plan complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
-      "digest": "sha256:e080a41f0f68672e83725d19286c064ac707a5208330433dae5c4d1ad0817f00",
+      "digest": "sha256:e6f107bd3633d5ec6588cc328f8c0f461dc4e646bacc9669e05d7ce4ecdd5de8",
       "planId": "3.0",
       "expectedRows": 17
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
-      "digest": "sha256:6212686585e15b2dc98d845f7637d461730e5e52666b3a6b2f038ccbe6953b8c",
+      "digest": "sha256:1563471ad3daa1685fd480ee1c5550e4fac1a6b3866039e2fcaac966358c2b89",
       "planId": "3.1",
       "expectedRows": 23
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:54f1ea49a99988b17082eab303833c8d0662fdb4acdd7adca4a9d37e1feb72b7",
+      "digest": "sha256:0964043d1efc8c140f1b7995877016b07fe46a0c4af5764b29e02cff256ed034",
       "planId": "3.2",
       "expectedRows": 29
     }
@@ -27,16 +27,34 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsNotComplete": 69,
+    "sourceRowsVerified": 8,
+    "sourceRowsNotComplete": 61,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
-    "proofFamilies": 4
+    "proofFamilies": 5
   },
   "proofFamilies": [
     {
+      "id": "verified-current-receipt",
+      "status": "verified",
+      "rowCount": 8,
+      "meaning": "The row now has a current command-backed receipt replayed into the source objective report.",
+      "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
+      "rowRefs": [
+        "P30-OBJ-07",
+        "P30-OBJ-08",
+        "P30-OBJ-12",
+        "P30-OBJ-13",
+        "P31-OBJ-07",
+        "P31-OBJ-09",
+        "P31-OBJ-13",
+        "P32-OBJ-11"
+      ]
+    },
+    {
       "id": "fresh-command-replay-needed",
       "status": "not-complete",
-      "rowCount": 45,
+      "rowCount": 37,
       "meaning": "The row references historical, stale, descriptive, or shape-only evidence and needs a fresh command-backed receipt before it can become verified.",
       "nextExecutionRule": "Run the row's nextSafeCommand or the shared validator named by the row, record command output/digest, then recompute the source replay row.",
       "rowRefs": [
@@ -46,25 +64,18 @@
         "P30-OBJ-04",
         "P30-OBJ-05",
         "P30-OBJ-06",
-        "P30-OBJ-07",
-        "P30-OBJ-08",
         "P30-OBJ-09",
         "P30-OBJ-10",
         "P30-OBJ-11",
-        "P30-OBJ-12",
-        "P30-OBJ-13",
         "P30-OBJ-14",
         "P30-OBJ-17",
         "P31-OBJ-01",
         "P31-OBJ-02",
         "P31-OBJ-05",
         "P31-OBJ-06",
-        "P31-OBJ-07",
         "P31-OBJ-08",
-        "P31-OBJ-09",
         "P31-OBJ-11",
         "P31-OBJ-12",
-        "P31-OBJ-13",
         "P31-OBJ-14",
         "P31-OBJ-15",
         "P31-OBJ-17",
@@ -78,7 +89,6 @@
         "P32-OBJ-05",
         "P32-OBJ-08",
         "P32-OBJ-09",
-        "P32-OBJ-11",
         "P32-OBJ-16",
         "P32-OBJ-18",
         "P32-OBJ-23",
@@ -143,9 +153,11 @@
     {
       "planId": "3.0",
       "rows": 17,
-      "notCompleteRows": 17,
+      "verifiedRows": 4,
+      "notCompleteRows": 13,
       "proofFamilyCounts": {
-        "fresh-command-replay-needed": 15,
+        "verified-current-receipt": 4,
+        "fresh-command-replay-needed": 11,
         "governed-state-replay-needed": 2,
         "runner-release-parity-needed": 0,
         "negative-control-only": 0
@@ -154,9 +166,11 @@
     {
       "planId": "3.1",
       "rows": 23,
-      "notCompleteRows": 23,
+      "verifiedRows": 3,
+      "notCompleteRows": 20,
       "proofFamilyCounts": {
-        "fresh-command-replay-needed": 17,
+        "verified-current-receipt": 3,
+        "fresh-command-replay-needed": 14,
         "governed-state-replay-needed": 5,
         "runner-release-parity-needed": 0,
         "negative-control-only": 1
@@ -165,9 +179,11 @@
     {
       "planId": "3.2",
       "rows": 29,
-      "notCompleteRows": 29,
+      "verifiedRows": 1,
+      "notCompleteRows": 28,
       "proofFamilyCounts": {
-        "fresh-command-replay-needed": 13,
+        "verified-current-receipt": 1,
+        "fresh-command-replay-needed": 12,
         "governed-state-replay-needed": 12,
         "runner-release-parity-needed": 2,
         "negative-control-only": 2
@@ -176,16 +192,20 @@
   ],
   "nextExecutionOrder": [
     {
+      "id": "verified-current-receipt",
+      "whyFirst": "already backed by current receipts; preserve these rows and avoid re-spending long validation time unless the evidence changes"
+    },
+    {
       "id": "fresh-command-replay-needed",
-      "whyFirst": "largest family; most rows can be advanced with focused validators instead of long full-suite runs"
+      "whySecond": "largest remaining family; most rows can be advanced with focused validators instead of long full-suite runs"
     },
     {
       "id": "governed-state-replay-needed",
-      "whySecond": "requires current ATM state reads and closeback facts after standalone evidence is reduced"
+      "whyThird": "requires current ATM state reads and closeback facts after standalone evidence is reduced"
     },
     {
       "id": "runner-release-parity-needed",
-      "whyThird": "only two rows require scarce build/publication bottlenecks; keep that queue residency minimal"
+      "whyFourth": "only two rows require scarce build/publication bottlenecks; keep that queue residency minimal"
     },
     {
       "id": "negative-control-only",
