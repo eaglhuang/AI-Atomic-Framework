@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-f7fcf37a0cd3",
+  "recordedAt": "2026-08-12T13:45:06.389Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0331",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0331 --message \"feat(evidence): wire observed outcomes into taskflow pre-close\n\nATM-Work-Admission: wat-2a38403ef12f3cca sha256:2a38403ef12f3cca437de95ab2aabc6ca1017320202759833e99ab38d7153880\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0331-56d08579f6",
+  "reason": "Frozen hook cannot validate the source that must be sealed before runner sync; approved task-scoped bootstrap savepoint.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T13-45-06-387Z-EMG-ATM-GOV-0331-56d08579f6.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T14-30-24-391Z-scope-amendment-cfc3b9cb6347",
+  "taskId": "ATM-GOV-0331",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0331.json",
+  "taskSha256": "sha256:262d9d9b14ded0595a8ce67fed847fad0eab4116d8317021632d3c0660b45a17",
+  "createdAt": "2026-08-12T14:30:24.391Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0331 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts,packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts\" --reason \"Owner-approved generalized sealed candidate authority repair required to unblock concurrent ATM-GOV-0352 closeout.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Owner-approved generalized sealed candidate authority repair required to unblock concurrent ATM-GOV-0352 closeout."
+  }
+}

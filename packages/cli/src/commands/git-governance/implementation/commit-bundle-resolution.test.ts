@@ -141,4 +141,39 @@ const sealedDelivery = mmBundle.sealedBundle.entries.find((entry: { path: string
 assert.ok(mmBundle.stageFiles.includes('src/delivery.ts'), 'MM path must remain in auto-stage worktree overlay');
 assert.equal(sealedDelivery?.blobId, worktreeDeliveryBlob, 'sealed candidate must use worktree bytes for MM path');
 assert.notEqual(sealedDelivery?.blobId, stagedDeliveryBlob, 'older staged blob must not override worktree bytes');
+
+// Declared task scope is a planning envelope, not current byte ownership. A
+// narrowed active claim must keep another lane's dirty source out of this
+// task's sealed candidate even when the card still declares that source path.
+writeFileSync(path.join(cwd, 'src', 'declared-but-unclaimed.ts'), 'export const owner = "other-lane";\n');
+const narrowedTask = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-CURRENT.json'), 'utf8'));
+narrowedTask.scopePaths.push('src/declared-but-unclaimed.ts');
+narrowedTask.claim.files = [
+  '.atm/history/evidence/TASK-CURRENT.*',
+  '.atm/history/task-events/TASK-CURRENT/**',
+  '.atm/history/tasks/TASK-CURRENT.json',
+];
+narrowedTask.workAdmissionTicket = {
+  schemaId: 'atm.workAdmissionTicket.v1',
+  taskId: 'TASK-CURRENT',
+  actorId: 'test-actor',
+  claimGeneration: 'lease-current',
+  grants: [{ kind: 'file-write', values: narrowedTask.claim.files }],
+};
+const narrowedBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: 'TASK-CURRENT',
+  actorId: 'test-actor',
+  taskDocument: narrowedTask,
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.ok(!narrowedBundle.stageFiles.includes('src/declared-but-unclaimed.ts'));
+assert.ok(!narrowedBundle.commitFiles.includes('src/declared-but-unclaimed.ts'));
+assert.ok(narrowedBundle.skippedExternalDirtyFiles.includes('src/declared-but-unclaimed.ts'));
 console.log('commit-bundle-resolution: foreign released residue preserved');

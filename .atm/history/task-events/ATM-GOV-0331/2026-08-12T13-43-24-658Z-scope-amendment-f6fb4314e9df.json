@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T13-43-24-658Z-scope-amendment-f6fb4314e9df",
+  "taskId": "ATM-GOV-0331",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0331.json",
+  "taskSha256": "sha256:88790c42a4086ddc7dcc90ec30e0c47bec7d4fcdbcef36b7f7bf6f21cd42da5c",
+  "createdAt": "2026-08-12T13:43:24.658Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0331 --actor codex-gpt-5.4-mini --add tests/cli/observed-evidence-production-callers.test.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -377,6 +377,8 @@ export function resolveClosePreflightValidationContract(
   catalog: ValidationContractCatalog,
   evidence: ValidationContractEvidence = {}
 ): ValidationContractEvaluation {
+  // observedOutcome receipts are interpreted by the shared deep evaluator;
+  // pre-close cannot reclassify a caller-declared status as fresh.
   return evaluateValidationContract(task, changeSet, catalog, evidence);
 }
 

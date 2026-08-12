@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T14-34-42-321Z-scope-amendment-97e2952dc2e8",
+  "taskId": "ATM-GOV-0331",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0331.json",
+  "taskSha256": "sha256:ac94d68345fb9c8945f56dd431b1eee8a61af24b7e0b696137a6c0f4ff1c49a6",
+  "createdAt": "2026-08-12T14:34:42.321Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0331 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.test.ts --reason \"Focused contract test for the extracted commit-candidate authority Policy Object atom.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Focused contract test for the extracted commit-candidate authority Policy Object atom."
+  }
+}

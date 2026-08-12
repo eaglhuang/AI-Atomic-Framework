@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0331",
+  "title": "Wire deep evidence modules into production callers and remove shallow shells",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0330"
+  ],
+  "acceptance": [
+    "ACC-1: evidence run、auto-evidence、pre-close、close、replay 都消費同一 observed-source contract/digest，不各自重算 freshness。",
+    "ACC-2: 舊 caller-supplied outcome 形式先相容讀取、停止新寫入、完成 migration，最後 old-form usage query 為零。",
+    "ACC-3: production negative tests 覆蓋 forged realness、stale source、missing adapter、digest mismatch、rollback/retry。",
+    "ACC-4: zero-caller/private-fixture-only shells 被刪除或正式標記 follow-up；刪除後 catalog、public interface、module-boundary 全綠。",
+    "ACC-5: deletion receipt 證明刪除 deep module 會使預期 production callers 失敗，證明模組具有實際深度與 leverage。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/evidence/observed-source-loader.ts",
+    "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/core/src/broker/replay/lifecycle-receipt-observability.ts",
+    "tests/cli/observed-evidence-production-callers.test.ts",
+    "docs/reports/evidence-shell-deletion-receipt.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/evidence/",
+    "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/core/src/broker/replay/",
+    "packages/core/src/evidence/"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/observed-evidence-production-callers.test.ts",
+    "npm run validate:governance-commands",
+    "npm run validate:taskflow-close-atomicity",
+    "npm run validate:module-boundaries"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "switch-production-callers-to-last-known-good-interface-and-retain-observations",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-integration",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-cli-command-router-map.json",
+      "atomic_workbench/maps/atm-evidence-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0331-wire-deep-evidence-modules-into-production-callers-and-remove-shallow-shells.task.md",
+    "sectionTitle": "ATM-GOV-0331",
+    "headingLine": 76,
+    "hash": "3699ca7b2e980564",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0331-wire-deep-evidence-modules-into-production-callers-and-remove-shallow-shells.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:3699ca7b2e9805642ba12859b1414abeddf5496f4bbcc202c5bbd98f3e42b769",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:14.362Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:14.362Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0330"
+    ],
+    "startConditions": [
+      "Observed evidence interface and two adapters are green.",
+      "Production caller inventory is sealed and zero-caller candidates are named."
+    ],
+    "softRelations": [
+      "ATM-GOV-0332"
+    ],
+    "changedPublicSeams": [
+      "atm.evidenceRun.v1",
+      "atm.taskCloseEvidence.v1",
+      "atm.runnerReplayEvidence.v1"
+    ],
+    "causalImpactEdges": [
+      "evidence-command",
+      "pre-close-gate",
+      "close-orchestration",
+      "runner-replay",
+      "shell-deletion"
+    ],
+    "parallelFrontierInputs": [
+      "evidence-cli",
+      "taskflow-close",
+      "broker-replay"
+    ],
+    "validatorReferences": [
+      "validate-governance-commands",
+      "validate-taskflow-close-atomicity",
+      "validate-state-replay",
+      "validate-module-boundaries"
+    ],
+    "phaseOwner": "correction-wave-4-integration"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_observed_evidence_production_callers_0331",
+      "targetGroupId": null,
+      "semanticKey": "observed_evidence_production_callers",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "evidence-command",
+        "pre-close-gate",
+        "close-orchestration",
+        "runner-replay"
+      ],
+      "expectedRedPredicate": "production close or replay cannot accept caller-authored outcome fields",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.taskCloseEvidence.v1",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_shallow_evidence_shell_deletion_0331",
+      "targetGroupId": null,
+      "semanticKey": "shallow_evidence_shell_deletion",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "shell-deletion"
+      ],
+      "expectedRedPredicate": "deleting the deep module breaks all intended callers while deleted shallow shells have zero callers",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.evidenceRun.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_observed_evidence_production_callers_0331",
+    "test_shallow_evidence_shell_deletion_0331"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_incident_replay"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T14-35-55-667Z-renew-9efa833541ca",
+  "lastTransitionAt": "2026-08-12T14:35:55.667Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T13:17:02.341Z",
+  "promotedAt": "2026-08-12T13:17:02.345Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-17885398937c",
+    "claimedAt": "2026-08-12T13:17:02.350Z",
+    "heartbeatAt": "2026-08-12T14:35:55.207Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0331.*",
+      ".atm/history/task-events/ATM-GOV-0331/**",
+      ".atm/history/tasks/ATM-GOV-0331.json",
+      "docs/reports/evidence-shell-deletion-receipt.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/evidence/",
+      "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/core/src/broker/replay/",
+      "packages/core/src/evidence/",
+      "tests/cli/observed-evidence-production-callers.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812102637-codex-gpt-5.4-mini-68074efbfd\""
+    }
+  },
+  "startedAt": "2026-08-12T13:17:02.350Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-41877f3ee3467125",
+    "ticketDigest": "sha256:41877f3ee3467125e98dfd7d17884f268a78d36096f2440b89ce48d642bfbdeb",
+    "taskId": "ATM-GOV-0331",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
+    "claimGeneration": "lease-17885398937c",
+    "issuedAt": "2026-08-12T14:35:55.207Z",
+    "expiresAt": "2026-08-12T15:05:55.207Z",
+    "scopeDigest": "sha256:4685e41a507eba7583e15d9fe5d734a84f918bc455bf9a2a207913b7d61390f4",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T14:35:55.207Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0331.*",
+          ".atm/history/task-events/ATM-GOV-0331/**",
+          ".atm/history/tasks/ATM-GOV-0331.json",
+          "docs/reports/evidence-shell-deletion-receipt.json",
+          "packages/cli/src/commands/evidence.ts",
+          "packages/cli/src/commands/evidence/",
+          "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/taskflow/close-preflight.ts",
+          "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
+          "packages/core/src/broker/replay/",
+          "packages/core/src/evidence/",
+          "tests/cli/observed-evidence-production-callers.test.ts"
+        ],
+        "digest": "sha256:f4ce11722268910f86b449fb495500ef28b657d03f4181f3f211b7fbaab2b520"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260812131702-codex-gpt-5.4-mini-ATM-GOV-0331-ec843e3043",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0331",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-0f1c793686bffbe8",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0331.*",
+      ".atm/history/task-events/ATM-GOV-0331/**",
+      ".atm/history/tasks/ATM-GOV-0331.json",
+      "docs/reports/evidence-shell-deletion-receipt.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/evidence/",
+      "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/core/src/broker/replay/",
+      "packages/core/src/evidence/",
+      "tests/cli/observed-evidence-production-callers.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0331-wire-deep-evidence-modules-into-production-callers-and-remove-shallow-shells.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0331-wire-deep-evidence-modules-into-production-callers-and-remove-shallow-shells.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812102637-codex-gpt-5.4-mini-68074efbfd\""
+    },
+    "createdAt": "2026-08-12T13:17:06.726Z",
+    "status": "active"
+  }
+}
