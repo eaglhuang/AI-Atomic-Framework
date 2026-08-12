@@ -8,12 +8,12 @@ assert.equal(report.schemaId, 'atm.plan3xFreshCommandReplayReceipts.v1');
 assert.equal(report.status, 'fresh-command-replay-partially-consumed');
 assert.equal(report.familyDisposition.proofFamilyId, 'fresh-command-replay-needed');
 assert.equal(report.familyDisposition.sourceRowCount, 0);
-assert.equal(report.familyDisposition.focusedCommandsExecuted, 31);
-assert.equal(report.familyDisposition.commandsGreen, 31);
-assert.equal(report.familyDisposition.rowsConsumedIntoSourceReplay, 65);
+assert.equal(report.familyDisposition.focusedCommandsExecuted, 32);
+assert.equal(report.familyDisposition.commandsGreen, 32);
+assert.equal(report.familyDisposition.rowsConsumedIntoSourceReplay, 69);
 assert.equal(report.familyDisposition.rowsCertifiedCompleteByTheseReceipts, 0);
 assert.equal(report.familyDisposition.remainingRowsInFamily, 0);
-assert.equal(report.commandRuns.length, 31);
+assert.equal(report.commandRuns.length, 32);
 assert.ok(report.commandRuns.every((entry: any) => entry.exitCode === 0));
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
   'positive-row-receipts',

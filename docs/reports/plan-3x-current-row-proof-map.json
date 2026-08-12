@@ -7,7 +7,7 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
-      "digest": "sha256:f5dc7a016736cccdeb4964c112b7b42c6a7a56531a5921c9894b2a4139579a36",
+      "digest": "sha256:ab25f5d87e1fdc26bb559f943c00f690dc1e30d8a815dcb9bcf75656edaabd36",
       "planId": "3.0",
       "expectedRows": 17
     },
@@ -19,7 +19,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:021e18c5c5c6573236ea1afb544d6279591cc12c32b4e705789df81a98864eaf",
+      "digest": "sha256:dc9a5b92d528b998f93ca36bc148a4a0f2c248320d499cf292ec873b5a9ba812",
       "planId": "3.2",
       "expectedRows": 29
     }
@@ -27,8 +27,8 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsVerified": 65,
-    "sourceRowsNotComplete": 4,
+    "sourceRowsVerified": 69,
+    "sourceRowsNotComplete": 0,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
     "proofFamilies": 5
@@ -37,7 +37,7 @@
     {
       "id": "verified-current-receipt",
       "status": "verified",
-      "rowCount": 65,
+      "rowCount": 69,
       "meaning": "The row now has a current command-backed receipt or objective-aligned negative-control receipt replayed into the source objective report.",
       "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
       "rowRefs": [
@@ -105,7 +105,11 @@
         "P32-OBJ-10",
         "P32-OBJ-14",
         "P32-OBJ-15",
-        "P32-OBJ-21"
+        "P32-OBJ-21",
+        "P30-OBJ-15",
+        "P30-OBJ-16",
+        "P32-OBJ-06",
+        "P32-OBJ-28"
       ]
     },
     {
@@ -119,15 +123,10 @@
     {
       "id": "governed-state-replay-needed",
       "status": "not-complete",
-      "rowCount": 4,
+      "rowCount": 0,
       "meaning": "The row depends on current ATM state, taskflow, closeback, backlog, broker, or lane facts rather than a standalone source validator.",
       "nextExecutionRule": "Use the row's ATM read/claim/closeback command only inside the relevant current task scope; do not infer completion from stale task status.",
-      "rowRefs": [
-        "P30-OBJ-15",
-        "P30-OBJ-16",
-        "P32-OBJ-06",
-        "P32-OBJ-28"
-      ]
+      "rowRefs": []
     },
     {
       "id": "runner-release-parity-needed",
@@ -150,12 +149,12 @@
     {
       "planId": "3.0",
       "rows": 17,
-      "verifiedRows": 15,
-      "notCompleteRows": 2,
+      "verifiedRows": 17,
+      "notCompleteRows": 0,
       "proofFamilyCounts": {
-        "verified-current-receipt": 15,
+        "verified-current-receipt": 17,
         "fresh-command-replay-needed": 0,
-        "governed-state-replay-needed": 2,
+        "governed-state-replay-needed": 0,
         "runner-release-parity-needed": 0,
         "negative-control-only": 0
       }
@@ -176,12 +175,12 @@
     {
       "planId": "3.2",
       "rows": 29,
-      "verifiedRows": 27,
-      "notCompleteRows": 2,
+      "verifiedRows": 29,
+      "notCompleteRows": 0,
       "proofFamilyCounts": {
-        "verified-current-receipt": 27,
+        "verified-current-receipt": 29,
         "fresh-command-replay-needed": 0,
-        "governed-state-replay-needed": 2,
+        "governed-state-replay-needed": 0,
         "runner-release-parity-needed": 0,
         "negative-control-only": 0
       }

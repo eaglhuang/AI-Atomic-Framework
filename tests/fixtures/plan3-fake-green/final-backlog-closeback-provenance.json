@@ -1,0 +1,37 @@
+{
+  "schemaId": "atm.finalBacklogClosebackProvenanceFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {
+      "objectiveId": "P30-OBJ-15",
+      "backlogCensusMachineReadable": true,
+      "openItemRuleMachineCheckable": true,
+      "proseBacklogMayGreen": false
+    },
+    {
+      "objectiveId": "P30-OBJ-16",
+      "targetPlanningClosebackShaExplicit": true,
+      "terminalReleasePushProvenanceRequired": true,
+      "scheduledClosebackMayGreen": false
+    },
+    {
+      "objectiveId": "P32-OBJ-06",
+      "targetPlanningCloseSeamVisible": true,
+      "closebackSuccessRequiresShaProvenance": true,
+      "successorTaskTextMayGreen": false
+    },
+    {
+      "objectiveId": "P32-OBJ-28",
+      "finalReleaseProvenanceRequired": true,
+      "pushShaRequired": true,
+      "receiptTextMaySubstituteSha": false
+    }
+  ],
+  "expectedVerdict": "final-backlog-closeback-provenance-boundaries-proven",
+  "diagnostics": [
+    "backlog-census-machine-readable",
+    "closeback-sha-explicit",
+    "close-seam-visible",
+    "final-release-push-sha-required"
+  ]
+}

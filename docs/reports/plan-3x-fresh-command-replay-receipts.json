@@ -3,15 +3,15 @@
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:30:00.000Z",
   "status": "fresh-command-replay-partially-consumed",
-  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 65 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
+  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 69 rows were consumed into source replay; they do not certify the full runbook complete until Plan 4, backlog, closeout, and full validation evidence are audited.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:03457e9e3c4dc9642a53a7d6f665c3a72cc9e5003fea466246fbe5cea3670e3a"
+      "digest": "sha256:6612b4bf3748f822178c72c1dca87eca32ffa8a3fe8993c196338b88ae96e13f"
     },
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
-      "digest": "sha256:f5dc7a016736cccdeb4964c112b7b42c6a7a56531a5921c9894b2a4139579a36"
+      "digest": "sha256:ab25f5d87e1fdc26bb559f943c00f690dc1e30d8a815dcb9bcf75656edaabd36"
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
@@ -19,18 +19,18 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:021e18c5c5c6573236ea1afb544d6279591cc12c32b4e705789df81a98864eaf"
+      "digest": "sha256:dc9a5b92d528b998f93ca36bc148a4a0f2c248320d499cf292ec873b5a9ba812"
     }
   ],
   "familyDisposition": {
     "proofFamilyId": "fresh-command-replay-needed",
     "sourceRowCount": 0,
-    "focusedCommandsExecuted": 31,
-    "commandsGreen": 31,
-    "rowsConsumedIntoSourceReplay": 65,
+    "focusedCommandsExecuted": 32,
+    "commandsGreen": 32,
+    "rowsConsumedIntoSourceReplay": 69,
     "rowsCertifiedCompleteByTheseReceipts": 0,
     "remainingRowsInFamily": 0,
-    "reasonRowsRemainOpen": "Sixty-five current receipts were consumed into source replay. Remaining rows require backlog census and terminal closeback provenance before final completion."
+    "reasonRowsRemainOpen": "Sixty-nine current receipts were consumed into source replay. Row-level Plan 3.x proof is now saturated; full completion still requires Plan 4, backlog disposition, terminal closeout, push provenance, and full validation audit."
   },
   "commandRuns": [
     {
@@ -249,6 +249,13 @@
       "exitCode": 0,
       "stdoutPreview": "[validate-plan32-foundation-runner-boundaries] ok rows=6 diagnostics=freshness-binding-explicit,runner-saga-digest,sealed-apply-recoverable,compose-attribution-explicit,deferral-order-deterministic,generic-plan4-fixture-boundary",
       "semanticBoundary": "objective-aligned Plan 3.2 foundation/runner boundary evidence for six rows, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "final-backlog-closeback-provenance",
+      "command": "node --strip-types scripts/validate-final-backlog-closeback-provenance.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-final-backlog-closeback-provenance] ok rows=4 diagnostics=backlog-census-machine-readable,closeback-sha-explicit,close-seam-visible,final-release-push-sha-required",
+      "semanticBoundary": "objective-aligned final backlog/closeback provenance boundary evidence for four rows, not completion evidence for full runbook"
     }
   ],
   "nextExecutionOrder": [

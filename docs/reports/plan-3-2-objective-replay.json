@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 27,
-    "not-complete": 2,
+    "verified": 29,
+    "not-complete": 0,
     "unknown": 0,
     "conflicting": 0
   },
@@ -123,25 +123,24 @@
     {
       "objectiveId": "P32-OBJ-06",
       "title": "Target/planning close seam is visible",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0341",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/"
+        "tests/fixtures/plan3-fake-green/final-backlog-closeback-provenance.json",
+        "scripts/validate-final-backlog-closeback-provenance.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "closeback",
-          "source": "C:/Users/User/3KLife",
+          "kind": "final-backlog-closeback-provenance-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "final-backlog-closeback-provenance",
           "expectedTaskId": "ATM-GOV-0341"
         }
       ],
-      "blockers": [
-        "planning closeback is a successor task"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-07",
@@ -600,25 +599,24 @@
     {
       "objectiveId": "P32-OBJ-28",
       "title": "Final release provenance waits for terminal card",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0341",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        ".atm/history/evidence/"
+        "tests/fixtures/plan3-fake-green/final-backlog-closeback-provenance.json",
+        "scripts/validate-final-backlog-closeback-provenance.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "release-provenance",
-          "source": ".atm/history/evidence/ATM-GOV-0341.closure-packet.json",
+          "kind": "final-backlog-closeback-provenance-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "final-backlog-closeback-provenance",
           "expectedTaskId": "ATM-GOV-0341"
         }
       ],
-      "blockers": [
-        "final release and push provenance does not exist yet"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-29",
