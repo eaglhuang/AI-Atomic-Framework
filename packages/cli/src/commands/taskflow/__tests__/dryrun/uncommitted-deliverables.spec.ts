@@ -387,6 +387,26 @@ assert.ok(
   'non-bundle staged remediation must route through ATM stage-override lease, not raw git restore --staged'
 );
 
+const preCloseDeferredNonBundle = await runTaskflow([
+  'pre-close',
+  '--cwd', preCloseNonBundleFixture.targetRepo,
+  '--profile', preCloseNonBundleFixture.profilePath,
+  '--task', preCloseNonBundleFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', preCloseNonBundleFixture.deliveryCommit,
+  '--defer-foreign-state',
+  '--json'
+]) as any;
+assert.equal(
+  preCloseDeferredNonBundle.evidence.historicalClosePreflight.blockers.some((entry: any) => entry.id === 'unexpectedStagedNonBundleFiles'),
+  false,
+  'pre-close must share the deferred transaction contract used by close --write'
+);
+assert.ok(
+  preCloseDeferredNonBundle.evidence.historicalClosePreflight.unexpectedNonBundleStaged[0]?.stagedFiles.includes('packages/cli/src/commands/hook-hotfix.ts'),
+  'deferred staged files remain visible as diagnostic evidence rather than being silently ignored'
+);
+
 const preCloseMixed = await runTaskflow([
   'pre-close',
   '--cwd', outOfScopeFixture.targetRepo,

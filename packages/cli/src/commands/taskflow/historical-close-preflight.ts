@@ -456,6 +456,7 @@ export function buildHistoricalClosePreflight(input: {
   taskDocument: Record<string, unknown>;
   previewCommitBundle: PreflightCommitBundle;
   historicalDeliveryRefs: readonly string[];
+  deferForeignStaged?: boolean;
   waiverOutOfScopeDelivery: boolean;
   waiverReason: string | null;
 }): HistoricalClosePreflightSummary {
@@ -542,7 +543,11 @@ export function buildHistoricalClosePreflight(input: {
   const operationalBlockers = [
     buildScopeDirtyBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
     buildIncorrectPlanningMirrorBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
-    buildUnexpectedNonBundleStagedBlocker(unexpectedNonBundleStaged),
+    // `taskflow close --defer-foreign-state` is an explicit request for the
+    // close transaction's park/temporary-index/restore boundary.  Preserve
+    // the report for diagnostics, but do not reject that very transaction as
+    // though it would use the shared index.
+    input.deferForeignStaged ? null : buildUnexpectedNonBundleStagedBlocker(unexpectedNonBundleStaged),
     buildMixedDeliveryBlocker({
       taskId: input.taskId,
       actorId: input.actorId,
