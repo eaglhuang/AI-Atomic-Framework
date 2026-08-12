@@ -15,8 +15,8 @@ assert.equal(goodJson.schemaId, 'atm.planObjectiveReplayValidation.v1');
 assert.equal(goodJson.ok, true);
 assert.equal(goodJson.planId, '3.0');
 assert.equal(goodJson.rowCount, 17);
-assert.equal(goodJson.verified, 5);
-assert.equal(goodJson.notComplete, 12);
+assert.equal(goodJson.verified, 9);
+assert.equal(goodJson.notComplete, 8);
 
 const plan31 = spawnSync(process.execPath, [
   '--strip-types',

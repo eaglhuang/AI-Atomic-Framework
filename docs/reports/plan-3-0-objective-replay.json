@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 17,
   "statusCounts": {
-    "verified": 5,
-    "not-complete": 12,
+    "verified": 9,
+    "not-complete": 8,
     "unknown": 0,
     "conflicting": 0
   },
@@ -16,22 +16,44 @@
     {
       "objectiveId": "P30-OBJ-01",
       "title": "Divergence evidence is command-backed",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0300",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["governance-optimization/tasks/ATM-GOV-0333-replay-and-certify-every-plan-3-0-objective.task.md"],
-      "evidenceTuples": [{"kind": "closure", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300"}],
-      "blockers": ["current objective row has not been independently replayed from sealed raw inputs"],
-      "nextSafeCommand": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate"
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/plan30-closure-evidence-boundaries.json",
+        "scripts/validate-plan30-closure-evidence-boundaries.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "plan30-closure-evidence-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-closure-evidence-boundaries",
+          "expectedTaskId": "ATM-GOV-0300"
+        }
+      ],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-02",
       "title": "Protected faults fail closed",
       "status": "verified",
       "ownerTaskId": "ATM-GOV-0300",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["packages/cli/src/commands/tasks/close-orchestrator.ts"],
-      "evidenceTuples": [{"kind": "current-protected-fail-closed", "source": "docs/reports/plan-3x-positive-current-receipts.json", "receiptId": "plan30-protected-closure-fail-closed", "expectedTaskId": "ATM-GOV-0300"}],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "packages/cli/src/commands/tasks/close-orchestrator.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "current-protected-fail-closed",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-protected-closure-fail-closed",
+          "expectedTaskId": "ATM-GOV-0300"
+        }
+      ],
       "blockers": []
     },
     {
@@ -39,10 +61,22 @@
       "title": "Source/frozen runner parity is explicit",
       "status": "not-complete",
       "ownerTaskId": "ATM-GOV-0307",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["scripts/run-sealed-runner-build.ts"],
-      "evidenceTuples": [{"kind": "replay", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307"}],
-      "blockers": ["parity evidence exists only as historical closure packet, not current final replay"],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "scripts/run-sealed-runner-build.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "replay",
+          "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0307"
+        }
+      ],
+      "blockers": [
+        "parity evidence exists only as historical closure packet, not current final replay"
+      ],
       "nextSafeCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
     },
     {
@@ -50,10 +84,23 @@
       "title": "Release/adopter parity is observable",
       "status": "not-complete",
       "ownerTaskId": "ATM-GOV-0307",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["release/atm-onefile/atm.mjs", "release/atm-root-drop/"],
-      "evidenceTuples": [{"kind": "release-parity", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307"}],
-      "blockers": ["current adopter parity digest is not attached to this row"],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "release-parity",
+          "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0307"
+        }
+      ],
+      "blockers": [
+        "current adopter parity digest is not attached to this row"
+      ],
       "nextSafeCommand": "node release/atm-onefile/atm.mjs next --json"
     },
     {
@@ -61,10 +108,22 @@
       "title": "Migration rollback path is preserved",
       "status": "not-complete",
       "ownerTaskId": "ATM-GOV-0300",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["packages/cli/src/commands/tasks/"],
-      "evidenceTuples": [{"kind": "rollback", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300"}],
-      "blockers": ["rollback path has not been replayed against current HEAD"],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "packages/cli/src/commands/tasks/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "rollback",
+          "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0300"
+        }
+      ],
+      "blockers": [
+        "rollback path has not been replayed against current HEAD"
+      ],
       "nextSafeCommand": "node atm.mjs tasks audit --all --summary --json"
     },
     {
@@ -72,10 +131,22 @@
       "title": "Exactly-once transition evidence is durable",
       "status": "not-complete",
       "ownerTaskId": "ATM-GOV-0300",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": [".atm/history/task-events/"],
-      "evidenceTuples": [{"kind": "transition", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300"}],
-      "blockers": ["current exactly-once event replay not attached"],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        ".atm/history/task-events/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "transition",
+          "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0300"
+        }
+      ],
+      "blockers": [
+        "current exactly-once event replay not attached"
+      ],
       "nextSafeCommand": "node atm.mjs tasks audit --all --summary --json"
     },
     {
@@ -83,9 +154,19 @@
       "title": "Continuation replay is command-backed",
       "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["scripts/diagnose-plan3-evidence-closure.ts"],
-      "evidenceTuples": [{"kind": "continuation-replay", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0307"}],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "scripts/diagnose-plan3-evidence-closure.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "continuation-replay",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "expectedTaskId": "ATM-GOV-0307"
+        }
+      ],
       "blockers": []
     },
     {
@@ -93,52 +174,106 @@
       "title": "Semantic union remains explicit",
       "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["packages/cli/src/commands/broker/replay/closure-policy.ts"],
-      "evidenceTuples": [{"kind": "semantic-closure", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0307"}],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "packages/cli/src/commands/broker/replay/closure-policy.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "semantic-closure",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "expectedTaskId": "ATM-GOV-0307"
+        }
+      ],
       "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-09",
       "title": "Closure predicates are not caller asserted",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0300",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["packages/cli/src/commands/broker/parallel-admission/final-verdict.ts"],
-      "evidenceTuples": [{"kind": "closure-predicate", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300"}],
-      "blockers": ["current final certificate has not consumed this row"],
-      "nextSafeCommand": "node --strip-types tests/cli/atm-3-final-closure.test.ts"
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/plan30-closure-evidence-boundaries.json",
+        "scripts/validate-plan30-closure-evidence-boundaries.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "plan30-closure-evidence-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-closure-evidence-boundaries",
+          "expectedTaskId": "ATM-GOV-0300"
+        }
+      ],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-10",
       "title": "Locked policy state has no correctness debt",
       "status": "not-complete",
       "ownerTaskId": "ATM-GOV-0300",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": [".atm/runtime/default-guards.json"],
-      "evidenceTuples": [{"kind": "policy-lock", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300"}],
-      "blockers": ["policy lock digest is not current-row proof"],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        ".atm/runtime/default-guards.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "policy-lock",
+          "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json",
+          "expectedTaskId": "ATM-GOV-0300"
+        }
+      ],
+      "blockers": [
+        "policy lock digest is not current-row proof"
+      ],
       "nextSafeCommand": "node atm.mjs doctor --json"
     },
     {
       "objectiveId": "P30-OBJ-11",
       "title": "Telemetry is separated from correctness",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["packages/core/src/evidence/plan-closeout-dashboard.ts"],
-      "evidenceTuples": [{"kind": "telemetry", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307"}],
-      "blockers": ["telemetry is available only as a signal, not closure proof"],
-      "nextSafeCommand": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate"
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/plan30-closure-evidence-boundaries.json",
+        "scripts/validate-plan30-closure-evidence-boundaries.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "plan30-closure-evidence-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-closure-evidence-boundaries",
+          "expectedTaskId": "ATM-GOV-0307"
+        }
+      ],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-12",
       "title": "Overlap/admission/starvation metrics are non-extrapolated",
       "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["packages/core/src/broker/replay/"],
-      "evidenceTuples": [{"kind": "parallel-replay", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0307"}],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "packages/core/src/broker/replay/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "parallel-replay",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "expectedTaskId": "ATM-GOV-0307"
+        }
+      ],
       "blockers": []
     },
     {
@@ -146,31 +281,64 @@
       "title": "A/B and B/A order effects are represented",
       "status": "verified",
       "ownerTaskId": "ATM-GOV-0307",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["artifacts/generated/atm-ab-v4/summary.json"],
-      "evidenceTuples": [{"kind": "paired-ab", "source": "docs/reports/plan-3x-positive-current-receipts.json", "expectedTaskId": "ATM-GOV-0307"}],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "artifacts/generated/atm-ab-v4/summary.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "paired-ab",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "expectedTaskId": "ATM-GOV-0307"
+        }
+      ],
       "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-14",
       "title": "Circuit breaker reset has digest evidence",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0300",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["packages/cli/src/commands/broker/parallel-admission/final-verdict.ts"],
-      "evidenceTuples": [{"kind": "circuit-breaker", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300"}],
-      "blockers": ["reset evidence digest is not consumed by terminal certificate"],
-      "nextSafeCommand": "node --strip-types tests/cli/atm-3-final-closure.test.ts"
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "tests/fixtures/plan3-fake-green/plan30-closure-evidence-boundaries.json",
+        "scripts/validate-plan30-closure-evidence-boundaries.ts"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "plan30-closure-evidence-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan30-closure-evidence-boundaries",
+          "expectedTaskId": "ATM-GOV-0300"
+        }
+      ],
+      "blockers": []
     },
     {
       "objectiveId": "P30-OBJ-15",
       "title": "Backlog open-item rule is machine checkable",
       "status": "not-complete",
       "ownerTaskId": "ATM-GOV-0340",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["docs/governance/atm-bug-and-optimization-backlog.md"],
-      "evidenceTuples": [{"kind": "backlog-census", "source": "docs/governance/atm-bug-and-optimization-backlog.md", "expectedTaskId": "ATM-GOV-0340"}],
-      "blockers": ["machine-readable backlog census is scheduled for ATM-GOV-0340"],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "docs/governance/atm-bug-and-optimization-backlog.md"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "backlog-census",
+          "source": "docs/governance/atm-bug-and-optimization-backlog.md",
+          "expectedTaskId": "ATM-GOV-0340"
+        }
+      ],
+      "blockers": [
+        "machine-readable backlog census is scheduled for ATM-GOV-0340"
+      ],
       "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --auto-intent --json"
     },
     {
@@ -178,10 +346,22 @@
       "title": "Target/planning closeback SHA provenance is explicit",
       "status": "not-complete",
       "ownerTaskId": "ATM-GOV-0341",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/"],
-      "evidenceTuples": [{"kind": "closeback", "source": "C:/Users/User/3KLife", "expectedTaskId": "ATM-GOV-0341"}],
-      "blockers": ["terminal governed release and push provenance does not exist yet"],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "closeback",
+          "source": "C:/Users/User/3KLife",
+          "expectedTaskId": "ATM-GOV-0341"
+        }
+      ],
+      "blockers": [
+        "terminal governed release and push provenance does not exist yet"
+      ],
       "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --auto-intent --json"
     },
     {
@@ -189,10 +369,22 @@
       "title": "Legacy authority retirement waits for final certificate",
       "status": "not-complete",
       "ownerTaskId": "ATM-GOV-0341",
-      "caseIds": ["test_plan30_exact_17_objectives_0333"],
-      "sourceAnchors": ["governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json"],
-      "evidenceTuples": [{"kind": "legacy-authority", "source": "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json", "expectedTaskId": "ATM-GOV-0341"}],
-      "blockers": ["legacy authority remains active until final certificate is proven"],
+      "caseIds": [
+        "test_plan30_exact_17_objectives_0333"
+      ],
+      "sourceAnchors": [
+        "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json"
+      ],
+      "evidenceTuples": [
+        {
+          "kind": "legacy-authority",
+          "source": "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+          "expectedTaskId": "ATM-GOV-0341"
+        }
+      ],
+      "blockers": [
+        "legacy authority remains active until final certificate is proven"
+      ],
       "nextSafeCommand": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.0 --mode validate"
     }
   ]

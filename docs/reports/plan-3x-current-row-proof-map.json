@@ -7,7 +7,7 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
-      "digest": "sha256:7ddf7ed16f8c5abf46fe697e79fdcb48d36f0bd7e365b283d3faf9f24bf393ec",
+      "digest": "sha256:2a878d7b2023da4782b5d878dc10fe6fe1a3031e70dd4fbcfd0b3fd021218b8e",
       "planId": "3.0",
       "expectedRows": 17
     },
@@ -27,8 +27,8 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsVerified": 27,
-    "sourceRowsNotComplete": 42,
+    "sourceRowsVerified": 31,
+    "sourceRowsNotComplete": 38,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
     "proofFamilies": 5
@@ -37,7 +37,7 @@
     {
       "id": "verified-current-receipt",
       "status": "verified",
-      "rowCount": 27,
+      "rowCount": 31,
       "meaning": "The row now has a current command-backed receipt or objective-aligned negative-control receipt replayed into the source objective report.",
       "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
       "rowRefs": [
@@ -67,25 +67,25 @@
         "P32-OBJ-26",
         "P32-OBJ-27",
         "P32-OBJ-29",
-        "P32-OBJ-22"
+        "P32-OBJ-22",
+        "P30-OBJ-01",
+        "P30-OBJ-09",
+        "P30-OBJ-11",
+        "P30-OBJ-14"
       ]
     },
     {
       "id": "fresh-command-replay-needed",
       "status": "not-complete",
-      "rowCount": 23,
+      "rowCount": 19,
       "meaning": "The row references historical, stale, descriptive, or shape-only evidence and needs a fresh command-backed receipt before it can become verified.",
       "nextExecutionRule": "Run the row's nextSafeCommand or the shared validator named by the row, record command output/digest, then recompute the source replay row.",
       "rowRefs": [
-        "P30-OBJ-01",
         "P30-OBJ-03",
         "P30-OBJ-04",
         "P30-OBJ-05",
         "P30-OBJ-06",
-        "P30-OBJ-09",
         "P30-OBJ-10",
-        "P30-OBJ-11",
-        "P30-OBJ-14",
         "P30-OBJ-17",
         "P31-OBJ-01",
         "P31-OBJ-05",
@@ -152,11 +152,11 @@
     {
       "planId": "3.0",
       "rows": 17,
-      "verifiedRows": 5,
-      "notCompleteRows": 12,
+      "verifiedRows": 9,
+      "notCompleteRows": 8,
       "proofFamilyCounts": {
-        "verified-current-receipt": 5,
-        "fresh-command-replay-needed": 10,
+        "verified-current-receipt": 9,
+        "fresh-command-replay-needed": 6,
         "governed-state-replay-needed": 2,
         "runner-release-parity-needed": 0,
         "negative-control-only": 0
