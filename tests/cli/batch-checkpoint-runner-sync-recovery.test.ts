@@ -1,15 +1,27 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildBatchCheckpointRunnerRecoveryArgs, categorizeCheckpointCloseFailure } from '../../packages/cli/src/commands/batch/runner-recovery-forwarding.ts';
+import { isTaskflowOperatorLaneActive, withTaskflowOperatorLane } from '../../packages/cli/src/commands/emergency/context.ts';
 
 assert.deepEqual(
   buildBatchCheckpointRunnerRecoveryArgs('EMG-RECOVERY-VALID'),
   ['--emergency-approval', 'EMG-RECOVERY-VALID', '--allow-stale-runner'],
   'a supplied recovery approval must make the batch adapter request the protected stale-runner path'
 );
+
+assert.equal(isTaskflowOperatorLaneActive(), false, 'test must begin outside the taskflow operator lane');
+await withTaskflowOperatorLane(async () => {
+  assert.equal(isTaskflowOperatorLaneActive(), true, 'batch checkpoint may use the operator lane for its ordinary close backend');
+});
+assert.equal(isTaskflowOperatorLaneActive(), false, 'operator lane must be released after the batch close callback');
+
+const batchImplementation = readFileSync(path.join(process.cwd(), 'packages/cli/src/commands/batch/implementation.ts'), 'utf8');
+const closeRunnerRecovery = readFileSync(path.join(process.cwd(), 'packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts'), 'utf8');
+assert.match(batchImplementation, /withTaskflowOperatorLane\(\(\) => runTasks\(\[ 'close'/, 'batch checkpoint must run its ordinary backend close in the taskflow operator lane');
+assert.match(closeRunnerRecovery, /permission: 'backend\.runnerRecovery'[\s\S]*allowTaskflowOperatorLane: false/, 'stale-runner recovery must still require and consume its dedicated lease inside an operator lane');
 assert.deepEqual(
   buildBatchCheckpointRunnerRecoveryArgs(null),
   [],

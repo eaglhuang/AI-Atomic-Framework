@@ -10,6 +10,7 @@ import { buildBatchCheckpointRunnerRecoveryArgs, categorizeCheckpointCloseFailur
 import { buildBatchDeliverAndCloseArgs, parseBatchDeliverAndCloseExtras, stripBatchDeliverAndCloseExtras } from './deliver-and-close-forwarding.ts';
 import { CliError, makeResult, message, parseOptions } from '../shared.ts';
 import { resolveActorId } from '../actor-registry.ts';
+import { withTaskflowOperatorLane } from '../emergency/context.ts';
 import { runNext } from '../next.ts';
 import { runTasks } from '../tasks.ts';
 import { abandonTaskQueue, advanceTaskQueueHead, findActiveTaskQueue, partitionTaskScope, restoreTaskQueueHead,
@@ -95,7 +96,7 @@ const completed = releaseBatchRun(options.cwd, active, 'completed'); return make
 });
 }
 const capturedHeadBeforeClose = readGitHead(options.cwd);
-const closeResult = await runTasks([ 'close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), ...(batchHistoricalDeliveryWaiver?.enabled ? ['--waiver-out-of-scope-delivery', '--reason', batchHistoricalDeliveryWaiver.reason] : []), ...buildBatchCheckpointRunnerRecoveryArgs(batchEmergencyApproval), '--json' ]); if (!closeResult.ok) {
+const closeResult = await withTaskflowOperatorLane(() => runTasks([ 'close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--status', 'done', '--from-batch-checkpoint', '--batch', active.batchId, ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]), ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]), ...(batchHistoricalDeliveryWaiver?.enabled ? ['--waiver-out-of-scope-delivery', '--reason', batchHistoricalDeliveryWaiver.reason] : []), ...buildBatchCheckpointRunnerRecoveryArgs(batchEmergencyApproval), '--json' ])); if (!closeResult.ok) {
 const closeCategory = categorizeCheckpointCloseFailure(closeResult, currentTaskId, resolvedActor.actorId, options.cwd); return makeResult({ ok: false, command: 'batch', cwd: options.cwd, messages: [message('error', 'ATM_BATCH_CHECKPOINT_CLOSE_FAILED', closeCategory.tldr ?? `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, { batchId: active.batchId, closedTaskId: currentTaskId,
 category: closeCategory.category, reason: closeCategory.reason, requiredCommand: closeCategory.requiredCommand, tldr: closeCategory.tldr, missingValidationPasses: closeCategory.missingValidationPasses, blockingFindings: closeCategory.blockingFindings })], evidence: { action: 'checkpoint', actorId: resolvedActor.actorId, closedTaskId: currentTaskId, held: holdNextClaim,
 historicalDeliveryRefs: batchHistoricalDeliveryRefs, historicalBatchRefs: batchHistoricalBatchRefs, closeHeadCapture: { schemaId: 'atm.batchCheckpointHeadCapture.v1', taskId: currentTaskId, batchId: active.batchId, headBeforeClose: capturedHeadBeforeClose, headAfterClose: readGitHead(options.cwd) }, closeResult: closeResult.evidence, failureCategory: closeCategory }

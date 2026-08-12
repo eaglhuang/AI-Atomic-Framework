@@ -25,7 +25,10 @@ export async function authorizeCloseRunnerRecovery(input: {
         emergencyApproval: input.emergencyApproval,
         flags: ['--allow-stale-runner'],
         reason: input.reason ?? 'Stale frozen runner recovery for a governed close.',
-        command: `node atm.mjs tasks close --task ${input.taskId} --actor ${input.actorId} --allow-stale-runner --json`
+        command: `node atm.mjs tasks close --task ${input.taskId} --actor ${input.actorId} --allow-stale-runner --json`,
+        // A batch operator lane replaces the normal close backend lease only.
+        // Stale-runner recovery remains an explicit, consumed emergency action.
+        allowTaskflowOperatorLane: false
       })
     : null;
   if (input.allowStaleRunner && staleGate.warning) {
