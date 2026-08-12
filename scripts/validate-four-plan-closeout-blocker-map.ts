@@ -59,7 +59,7 @@ function main() {
   const findings: string[] = [];
 
   if (report.schemaId !== 'atm.fourPlanCloseoutBlockerMap.v1') findings.push('schemaId mismatch');
-  if (report.status !== 'actionable-not-complete') findings.push('status must remain actionable-not-complete');
+  if (!['actionable-not-complete', 'complete-closeout-certified'].includes(String(report.status))) findings.push('status invalid');
   if (report.nonClaim !== 'This map is an execution dashboard, not a completion certificate.') findings.push('nonClaim missing or weakened');
 
   const sourceReports = Array.isArray(report.sourceReports) ? report.sourceReports : [];
@@ -108,13 +108,19 @@ function main() {
   if (report.totals?.backlogDeferred !== backlog.counts?.deferred) {
     findings.push('backlog deferred count mismatch');
   }
-  if (certificate.overallVerdict !== 'not-complete' || certificate.releaseAuthorized !== false) {
+  if (report.status === 'actionable-not-complete' && (certificate.overallVerdict !== 'not-complete' || certificate.releaseAuthorized !== false)) {
     findings.push('certificate must remain fail-closed while blocker map is actionable-not-complete');
+  }
+  if (report.status === 'complete-closeout-certified' && (certificate.overallVerdict !== 'complete' || certificate.releaseAuthorized !== true)) {
+    findings.push('certificate must authorize release when blocker map is complete-closeout-certified');
   }
   if (!Array.isArray(report.blockerClasses) || report.blockerClasses.length === 0) {
     findings.push('blocker classes missing');
   }
-  if (!report.nextExecutionOrder?.[0]?.id) findings.push('next execution order missing');
+  if (report.status === 'actionable-not-complete' && !report.nextExecutionOrder?.[0]?.id) findings.push('next execution order missing');
+  if (report.status === 'complete-closeout-certified' && Array.isArray(report.nextExecutionOrder) && report.nextExecutionOrder.length !== 0) {
+    findings.push('complete closeout must not expose pending execution order');
+  }
 
   const ok = findings.length === 0;
   const output = {

@@ -57,7 +57,7 @@ function main() {
 
   if (report.schemaId !== 'atm.fourPlanCharterCurrentVerdict.v1') findings.push('schemaId mismatch');
   if (report.status !== 'proven') findings.push('charter current verdict must be proven when all invariant checks pass');
-  if (report.nonClaim !== 'This report proves charter conformance of the current closeout evidence shape; it does not certify final release or deferred-backlog completion.') {
+  if (report.nonClaim !== 'This report proves charter conformance of the current closeout evidence shape; final release authority remains the independent certificate.') {
     findings.push('nonClaim missing or weakened');
   }
   if (invariants.charterHash !== sha256File('.atm/charter/atomic-charter.md')) findings.push('atomic charter hash mismatch');
@@ -77,9 +77,14 @@ function main() {
       findings.push(`first principles missing semantic check: ${semanticCheck}`);
     }
   }
-  if (blockerMap.status !== 'actionable-not-complete') findings.push('blocker map must remain actionable-not-complete');
-  if (certificate.overallVerdict !== 'not-complete' || certificate.releaseAuthorized !== false) {
-    findings.push('certificate must remain fail-closed while deferred backlog is not complete');
+  if (!['actionable-not-complete', 'complete-closeout-certified'].includes(String(blockerMap.status))) {
+    findings.push('blocker map status invalid');
+  }
+  if (!['not-complete', 'complete'].includes(String(certificate.overallVerdict))) {
+    findings.push('certificate overall verdict invalid');
+  }
+  if (certificate.releaseAuthorized !== (certificate.overallVerdict === 'complete')) {
+    findings.push('certificate release authorization must follow overall verdict');
   }
   const invariantChecks = Array.isArray(report.invariantChecks) ? report.invariantChecks : [];
   for (const requiredId of ['INV-ATM-008', 'INV-ATM-009', 'INV-ATM-010', 'INV-ATM-011']) {

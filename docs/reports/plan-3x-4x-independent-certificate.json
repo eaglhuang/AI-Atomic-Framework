@@ -34,11 +34,11 @@
   "dimensions": [
     {
       "dimensionId": "backlog-deferred-verdict",
-      "status": "not-complete",
-      "digest": "sha256:991fff85e018c6ab235207861728b8aa3cc07e9d2281e772ccf90de4a7fb9829",
+      "status": "proven",
+      "digest": "sha256:3d55e35c388d7a5e53e4e2112b57d049c2f89984b4aed24909a115126a826829",
       "evidenceRefs": [
-        "docs/reports/plan-3x-4x-backlog-disposition-census.json",
-        "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json"
+        "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json",
+        "scripts/validate-backlog-deferred-waiver-register.ts"
       ],
       "reviewerRole": null
     },
@@ -135,20 +135,16 @@
     "independent-reviewer-role-separation",
     "no-legacy-retirement-with-stale-or-unpushed-surface"
   ],
-  "status": "blocked",
-  "overallVerdict": "not-complete",
-  "diagnostics": [
-    "dimension-fail-closed:backlog-deferred-verdict:not-complete"
-  ],
-  "nonClaims": [
-    "does-not-claim-complete:backlog-deferred-verdict"
-  ],
-  "releaseAuthorized": false,
+  "status": "proven",
+  "overallVerdict": "complete",
+  "diagnostics": [],
+  "nonClaims": [],
+  "releaseAuthorized": true,
   "provenance": {
     "taskId": "ATM-GOV-0341",
     "head": "074ff8c0bfceee861d1e4c655464dfaa85dd4953",
     "originMain": "074ff8c0bfceee861d1e4c655464dfaa85dd4953",
     "closebackDigest": "sha256:47ed9781360baaea19d92d6fa9673c085f3efe096f049169ffaa3e2580040176"
   },
-  "certificateDigest": "sha256:7a9018c3c124c310a57cd177fe247cb6a7b8a85a8b3c92ae005299ced4f96206"
+  "certificateDigest": "sha256:1e62b12c0a690b4e01d081b78c67b840abcb5f176e0109daaaf5a1bfdd9fef43"
 }

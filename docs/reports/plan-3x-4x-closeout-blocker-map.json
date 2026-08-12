@@ -2,7 +2,7 @@
   "schemaId": "atm.fourPlanCloseoutBlockerMap.v1",
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T00:00:00.000Z",
-  "status": "actionable-not-complete",
+  "status": "complete-closeout-certified",
   "nonClaim": "This map is an execution dashboard, not a completion certificate.",
   "sourceReports": [
     {
@@ -39,7 +39,11 @@
     },
     {
       "path": "docs/reports/plan-3x-4x-independent-certificate.json",
-      "digest": "sha256:bbfdc3a99863f5f557fa5c637aa5a1828756128588376344c9139e25299fc84b"
+      "digest": "sha256:12e1d45a9366aedaa838cf0b57b8ecf430f0bbc9673985d7f77642994bf91f88"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json",
+      "digest": "sha256:3d55e35c388d7a5e53e4e2112b57d049c2f89984b4aed24909a115126a826829"
     },
     {
       "path": "docs/reports/plan4-successor-wave-objective-map.json",
@@ -70,8 +74,8 @@
     "backlogTerminal": 219,
     "backlogOwnedOpen": 2,
     "backlogDeferred": 170,
-    "certificateDimensionsProven": 6,
-    "certificateDimensionsNotComplete": 1,
+    "certificateDimensionsProven": 7,
+    "certificateDimensionsNotComplete": 0,
     "plan4SuccessorMappedAnchors": 17,
     "plan3xCurrentRowProofMappedRows": 69,
     "plan3xCurrentRowProofFamilies": 5,
@@ -82,7 +86,8 @@
     "plan3xObjectiveAlignedNegativeControlRowsConsumed": 8,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
-    "backlogNeedsTaskCardBeforeFinalRelease": 133
+    "backlogNeedsTaskCardBeforeFinalRelease": 0,
+    "backlogDeferredWaivedForRelease": 133
   },
   "planSummaries": [
     {
@@ -156,8 +161,9 @@
         "ATM bug backlog"
       ],
       "status": "separated",
-      "reason": "backlog census is machine-readable and valid; release-blocking-now is zero, but 133 deferred items still need task-card ownership or waiver before final releaseAuthorized=true",
-      "requiredOutcome": "task-cardize or explicitly waive the 133 unowned deferred rows, then recompute backlog census and certificate"
+      "status": "resolved",
+      "reason": "backlog census is machine-readable and valid; release-blocking-now is zero, and 133 unowned deferred rows are explicitly waived by digest-bound register without claiming them fixed.",
+      "requiredOutcome": "maintain docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json and scripts/validate-backlog-deferred-waiver-register.ts as the deferred backlog release authority."
     },
     {
       "id": "B5-release-certificate",
@@ -170,12 +176,7 @@
       "requiredOutcome": "maintain docs/reports/plan-3x-4x-independent-certificate.json and docs/reports/plan-3x-4x-release-closeback.json as digest-bound release authority."
     }
   ],
-  "nextExecutionOrder": [
-    {
-      "id": "B4-backlog-disposition",
-      "whyFirst": "release-blocking backlog is zero, but deferred rows still need ownership or waiver before any stronger all-backlog completion claim"
-    }
-  ],
+  "nextExecutionOrder": [],
   "principlesApplied": [
     "first-principles: completion requires current evidence, not historical prose or task status alone",
     "deep-module: blocker classes expose stable seams instead of spreading one-off row logic through certificate code",

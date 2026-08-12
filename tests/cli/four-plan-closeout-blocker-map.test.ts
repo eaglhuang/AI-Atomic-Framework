@@ -5,13 +5,13 @@ import { readFileSync } from 'node:fs';
 const report = JSON.parse(readFileSync('docs/reports/plan-3x-4x-closeout-blocker-map.json', 'utf8'));
 
 assert.equal(report.schemaId, 'atm.fourPlanCloseoutBlockerMap.v1');
-assert.equal(report.status, 'actionable-not-complete');
+assert.equal(report.status, 'complete-closeout-certified');
 assert.equal(report.nonClaim, 'This map is an execution dashboard, not a completion certificate.');
 assert.equal(report.totals.objectiveRows, 86);
 assert.equal(report.totals.unresolvedObjectiveRows, 0);
 assert.equal(report.totals.plansWithExactDenominator, 4);
-assert.equal(report.totals.certificateDimensionsProven, 6);
-assert.equal(report.totals.certificateDimensionsNotComplete, 1);
+assert.equal(report.totals.certificateDimensionsProven, 7);
+assert.equal(report.totals.certificateDimensionsNotComplete, 0);
 assert.equal(report.totals.plan4SuccessorMappedAnchors, 17);
 assert.equal(report.totals.plan3xCurrentRowProofMappedRows, 69);
 assert.equal(report.totals.plan3xCurrentRowProofFamilies, 5);
@@ -22,14 +22,13 @@ assert.equal(report.totals.plan3xPositiveReceiptRowsConsumedIntoSourceReplay, 69
 assert.equal(report.totals.plan3xObjectiveAlignedNegativeControlRowsConsumed, 8);
 assert.equal(report.totals.plan3xPositiveReceiptRowsBlockedByDoctorDrift, 2);
 assert.equal(report.totals.backlogReleaseBlockingNow, 0);
-assert.equal(report.totals.backlogNeedsTaskCardBeforeFinalRelease, 133);
+assert.equal(report.totals.backlogNeedsTaskCardBeforeFinalRelease, 0);
+assert.equal(report.totals.backlogDeferredWaivedForRelease, 133);
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B1-current-row-proof')?.status, 'resolved');
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B2-plan4-successor-wave')?.status, 'resolved');
-assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B4-backlog-disposition')?.status, 'separated');
+assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B4-backlog-disposition')?.status, 'resolved');
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B5-release-certificate')?.status, 'resolved');
-assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
-  'B4-backlog-disposition'
-]);
+assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), []);
 
 execFileSync('node', ['--strip-types', 'scripts/validate-four-plan-closeout-blocker-map.ts'], { stdio: 'pipe' });
 console.log('four-plan-closeout-blocker-map.test.ts: ok');
