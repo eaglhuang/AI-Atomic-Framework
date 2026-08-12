@@ -19,7 +19,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:8b7e4177add3ead009ade3fd372f1343b0fc3afd69a4f38b3d6182f58822310a",
+      "digest": "sha256:8315266a32e851a4c450d79f6134ab271ec3d9fdd18913ce5bd33767fad63694",
       "planId": "3.2",
       "expectedRows": 29
     }
@@ -27,8 +27,8 @@
   "totals": {
     "plans": 3,
     "objectiveRows": 69,
-    "sourceRowsVerified": 26,
-    "sourceRowsNotComplete": 43,
+    "sourceRowsVerified": 27,
+    "sourceRowsNotComplete": 42,
     "rowsMappedToProofFamily": 69,
     "rowsCertifiedCompleteByThisMap": 0,
     "proofFamilies": 5
@@ -37,7 +37,7 @@
     {
       "id": "verified-current-receipt",
       "status": "verified",
-      "rowCount": 26,
+      "rowCount": 27,
       "meaning": "The row now has a current command-backed receipt or objective-aligned negative-control receipt replayed into the source objective report.",
       "nextExecutionRule": "Preserve the receipt digest and source replay status; do not rerun long validators unless the touched source or receipt changes.",
       "rowRefs": [
@@ -59,6 +59,7 @@
         "P32-OBJ-09",
         "P32-OBJ-11",
         "P32-OBJ-12",
+        "P32-OBJ-16",
         "P32-OBJ-18",
         "P32-OBJ-19",
         "P32-OBJ-23",
@@ -72,7 +73,7 @@
     {
       "id": "fresh-command-replay-needed",
       "status": "not-complete",
-      "rowCount": 24,
+      "rowCount": 23,
       "meaning": "The row references historical, stale, descriptive, or shape-only evidence and needs a fresh command-backed receipt before it can become verified.",
       "nextExecutionRule": "Run the row's nextSafeCommand or the shared validator named by the row, record command output/digest, then recompute the source replay row.",
       "rowRefs": [
@@ -98,8 +99,7 @@
         "P31-OBJ-18",
         "P31-OBJ-19",
         "P31-OBJ-20",
-        "P31-OBJ-22",
-        "P32-OBJ-16"
+        "P31-OBJ-22"
       ]
     },
     {
@@ -178,11 +178,11 @@
     {
       "planId": "3.2",
       "rows": 29,
-      "verifiedRows": 16,
-      "notCompleteRows": 13,
+      "verifiedRows": 17,
+      "notCompleteRows": 12,
       "proofFamilyCounts": {
-        "verified-current-receipt": 16,
-        "fresh-command-replay-needed": 1,
+        "verified-current-receipt": 17,
+        "fresh-command-replay-needed": 0,
         "governed-state-replay-needed": 10,
         "runner-release-parity-needed": 2,
         "negative-control-only": 0

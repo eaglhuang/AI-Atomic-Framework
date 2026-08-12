@@ -15,7 +15,7 @@
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:8b7e4177add3ead009ade3fd372f1343b0fc3afd69a4f38b3d6182f58822310a"
+      "digest": "sha256:8315266a32e851a4c450d79f6134ab271ec3d9fdd18913ce5bd33767fad63694"
     },
     {
       "path": "docs/reports/plan-4-foundation-replay.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:f75680f434eacba8b1572bd64155d0918e4002d38d96886c5f0e1fe4581b15cc"
+      "digest": "sha256:df228c3eeb505c9e3b4619c651def36b4ad2bb2ad1658bf5b7f9ecf6d7a652a8"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:b84dfe08e1b1f608155a1b1a47b63c0c8ea34194fad6c8c6654c43ce15216cc4"
+      "digest": "sha256:93e73a82fca630d85d48ed25bd39265f162752f201ad8c250e7d4d2886f3c6b1"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
@@ -59,12 +59,12 @@
     },
     {
       "path": "docs/reports/plan-3x-positive-current-receipts.json",
-      "digest": "sha256:d8d968d8615dd11aa3c05e3bb1777c126d7dd95574b92e18d09482112981e91d"
+      "digest": "sha256:328930542c47f20bfb60ab97c1b52c3d09bf654567ccd6ba0161dfcfe156bf82"
     }
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 60,
+    "unresolvedObjectiveRows": 59,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -78,7 +78,7 @@
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
     "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
-    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 26,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 27,
     "plan3xObjectiveAlignedNegativeControlRowsConsumed": 8,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
@@ -105,9 +105,9 @@
       "planId": "3.2",
       "source": "docs/reports/plan-3-2-objective-replay.json",
       "objectiveRows": 29,
-      "verifiedRows": 16,
-      "unresolvedRows": 13,
-      "primaryBlocker": "13 Plan 3.2 rows still require governed-state, runner-parity, or fresh command receipts; shared delivery is now explicitly separated from override"
+      "verifiedRows": 17,
+      "unresolvedRows": 12,
+      "primaryBlocker": "12 Plan 3.2 rows still require governed-state or runner-parity receipts; all Plan 3.2 fresh-command rows now have focused evidence"
     },
     {
       "planId": "4.0",

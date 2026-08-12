@@ -1,0 +1,22 @@
+{
+  "schemaId": "atm.plan3BatchSplitHandoffBoundaryFixture.v1",
+  "specVersion": "0.1.0",
+  "batchSplit": {
+    "batchId": "batch-2522d44aebb6",
+    "childTasks": ["ATM-GOV-0335", "ATM-GOV-0338"],
+    "checkpointRequired": true,
+    "queueHeadOnly": true
+  },
+  "handoff": {
+    "continuationSummaryPresent": true,
+    "claimsCompletion": false,
+    "canReplaceCheckpoint": false
+  },
+  "expectedVerdict": "batch-split-and-handoff-separated",
+  "diagnostics": [
+    "batch-checkpoint-required",
+    "handoff-is-continuation-only",
+    "handoff-cannot-close-batch",
+    "queue-head-only"
+  ]
+}

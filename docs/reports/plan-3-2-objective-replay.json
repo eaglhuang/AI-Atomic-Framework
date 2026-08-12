@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 16,
-    "not-complete": 13,
+    "verified": 17,
+    "not-complete": 12,
     "unknown": 0,
     "conflicting": 0
   },
@@ -347,25 +347,24 @@
     {
       "objectiveId": "P32-OBJ-16",
       "title": "Batch split and handoff are not conflated",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0335",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        ".atm/runtime/batches/"
+        "tests/fixtures/plan3-fake-green/batch-split-handoff-boundary.json",
+        "scripts/validate-plan32-batch-split-handoff-boundary.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "batch-handoff",
-          "source": ".atm/history/tasks/ATM-GOV-0335.json",
+          "kind": "batch-split-handoff-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan32-batch-split-handoff-boundary",
           "expectedTaskId": "ATM-GOV-0335"
         }
       ],
-      "blockers": [
-        "current row records shape only; final close waits for batch checkpoint"
-      ],
-      "nextSafeCommand": "node atm.mjs batch checkpoint --actor codex-gpt-5.4-mini --batch batch-2522d44aebb6 --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-17",
