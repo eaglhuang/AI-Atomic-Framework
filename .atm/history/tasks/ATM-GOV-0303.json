@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0303",
   "title": "performance, memory, resilience ratchet and benchmark evidence",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0285"
@@ -170,8 +170,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T09-26-28-418Z-claim-045c47912491",
-  "lastTransitionAt": "2026-08-12T09:26:28.418Z",
+  "lastTransitionId": "2026-08-12T09-33-09-009Z-lock-cleanup-d959263e6342",
+  "lastTransitionAt": "2026-08-12T09:33:09.009Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T09:26:26.372Z",
@@ -180,7 +180,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-ee13ad2a5e13",
     "claimedAt": "2026-08-12T09:26:26.382Z",
-    "heartbeatAt": "2026-08-12T09:26:26.382Z",
+    "heartbeatAt": "2026-08-12T09:33:08.739Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0303.json",
@@ -191,14 +191,14 @@
       "tests/cli/plan4-performance-resilience-ratchet-negative.test.ts",
       "tests/cli/plan4-performance-resilience-ratchet.test.ts"
     ],
-    "state": "active",
-    "intent": "closeout-only",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812050748-codex-gpt-5.4-mini-03844dbb9a",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812050748-codex-gpt-5.4-mini-03844dbb9a\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T09:26:26.382Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -235,6 +235,13 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812050748-codex-gpt-5.4-mini-03844dbb9a\""
     },
     "createdAt": "2026-08-12T09:26:28.418Z",
-    "status": "active"
-  }
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T09:33:09.005Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-12T09:33:08.739Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812092626-codex-gpt-5.4-mini-ATM-GOV-0303-851f1c03e3",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0303.closure-packet.json"
 }
