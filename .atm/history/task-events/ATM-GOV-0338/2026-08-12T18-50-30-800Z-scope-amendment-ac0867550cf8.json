@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T18-50-30-800Z-scope-amendment-ac0867550cf8",
+  "taskId": "ATM-GOV-0338",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0338.json",
+  "taskSha256": "sha256:74e9aae06e55e42622112ff770500e606bd6db1efc37926a47be4e258e734e2f",
+  "createdAt": "2026-08-12T18:50:30.800Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0338 --actor codex-gpt-5.4-mini --add \"docs/reports/plan4-six-editor-adapter-parity.json,tests/cli/six-editor-adapter-parity.test.ts,packages/core/src/evidence/adapter-parity.ts,tests/catalog/groups/test_group_plan4_adapter_parity.shard.json\" --reason \"Add declared report/test deliverables and existing adapter parity evidence seam required by ATM-GOV-0338.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add declared report/test deliverables and existing adapter parity evidence seam required by ATM-GOV-0338."
+  }
+}

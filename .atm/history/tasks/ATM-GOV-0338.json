@@ -1,0 +1,318 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0338",
+  "title": "Prove six-editor adapter parity from sealed source",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0337"
+  ],
+  "acceptance": [
+    "ACC-1: 六 adapter 都保存 source digest、compiler version、manifest digest、install/verify command、exit、degradation diagnostics。",
+    "ACC-2: 每個 adapter 各自執行 frozen-runner smoke；缺 early hook 的 adapter 必須明示 external write unsupported，不能以提示文字替代 admission gate。",
+    "ACC-3: direct-only installed edit、manifest mismatch、missing command、provider-specific authority、stale projection 全部會紅。",
+    "ACC-4: reinstall byte-stable；source template、projection、manifest 與 frozen runner 版本綁定，rollback 可重現。"
+  ],
+  "deliverables": [
+    "docs/reports/plan4-six-editor-adapter-parity.json",
+    "tests/cli/six-editor-adapter-parity.test.ts"
+  ],
+  "scopePaths": [
+    "templates/skills/",
+    "integrations/",
+    ".claude/skills/",
+    ".cursor/rules/skills/",
+    ".github/instructions/",
+    ".gemini/commands/",
+    "scripts/validate-integration-adapter.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/six-editor-adapter-parity.test.ts",
+    "npm run validate:integration-adapter",
+    "npm run validate:skill-templates"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "reinstall-last-known-good-sealed-corpus-and-preserve-degradation-report",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.integration-projection",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0338-prove-six-editor-adapter-parity-from-sealed-source.task.md",
+    "sectionTitle": "ATM-GOV-0338",
+    "headingLine": 64,
+    "hash": "a8c3d61b643917b8",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0338-prove-six-editor-adapter-parity-from-sealed-source.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:a8c3d61b643917b81c0d8cdb96335275f2a69741cd17dca2c5aa7e4827aa2b11",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:41.306Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:41.306Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0337"
+    ],
+    "startConditions": [
+      "Shadow comparison has no escaped defect and its policy epoch is valid.",
+      "One sealed source template corpus and compiler version are available."
+    ],
+    "softRelations": [
+      "ATM-GOV-0339"
+    ],
+    "changedPublicSeams": [
+      "atm.integrationAdapterParity.v1"
+    ],
+    "causalImpactEdges": [
+      "codex-adapter",
+      "claude-adapter",
+      "cursor-adapter",
+      "copilot-adapter",
+      "gemini-adapter",
+      "antigravity-adapter"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-template-corpus",
+      "integration-compiler",
+      "manifests"
+    ],
+    "validatorReferences": [
+      "validate-integration-adapter",
+      "validate-skill-templates",
+      "validate-runner-entrypoints"
+    ],
+    "phaseOwner": "closeout-wave-8-adapters"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_six_editor_sealed_source_parity_0338",
+      "targetGroupId": null,
+      "semanticKey": "six_editor_sealed_source_parity",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "codex-adapter",
+        "claude-adapter",
+        "cursor-adapter",
+        "copilot-adapter",
+        "gemini-adapter",
+        "antigravity-adapter"
+      ],
+      "expectedRedPredicate": "direct-only installed copy edits source drift or missing frozen smoke fail parity",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.integrationAdapterParity.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_six_editor_sealed_source_parity_0338"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_adapter_parity"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T18-50-30-800Z-scope-amendment-ac0867550cf8",
+  "lastTransitionAt": "2026-08-12T18:50:30.800Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T18:49:24.772Z",
+  "promotedAt": "2026-08-12T18:49:24.776Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-61b4d4773205",
+    "claimedAt": "2026-08-12T18:49:24.781Z",
+    "heartbeatAt": "2026-08-12T18:49:24.781Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0338.*",
+      ".atm/history/task-events/ATM-GOV-0338/**",
+      ".atm/history/tasks/ATM-GOV-0338.json",
+      ".claude/skills/",
+      ".cursor/rules/skills/",
+      ".gemini/commands/",
+      ".github/instructions/",
+      "docs/reports/plan4-six-editor-adapter-parity.json",
+      "integrations/",
+      "packages/core/src/evidence/adapter-parity.ts",
+      "scripts/validate-integration-adapter.ts",
+      "templates/skills/",
+      "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+      "tests/cli/six-editor-adapter-parity.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
+    }
+  },
+  "startedAt": "2026-08-12T18:49:24.781Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-703363f9a681e616",
+    "ticketDigest": "sha256:703363f9a681e61622358cd58062139fcf6ad53a06c4b33ee68a3f9cb647416d",
+    "taskId": "ATM-GOV-0338",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+    "claimGeneration": "lease-61b4d4773205",
+    "issuedAt": "2026-08-12T18:49:24.781Z",
+    "expiresAt": "2026-08-12T19:19:24.781Z",
+    "scopeDigest": "sha256:171c8367bd44fdb3bc1c262519d6fb5bfe58793dcf498641e42043b65fa9ba70",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T18:49:24.781Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0338.*",
+          ".atm/history/task-events/ATM-GOV-0338/**",
+          ".atm/history/tasks/ATM-GOV-0338.json",
+          ".claude/skills/",
+          ".cursor/rules/skills/",
+          ".gemini/commands/",
+          ".github/instructions/",
+          "integrations/",
+          "scripts/validate-integration-adapter.ts",
+          "templates/skills/"
+        ],
+        "digest": "sha256:8b5d847f75dd55703e4aeba0e6a790c5d04f0aa28a2644c31101607c7d184bc8"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260812184924-codex-gpt-5.4-mini-ATM-GOV-0338-2f0e134b99",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0338",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-b990f53cd6ba8a5a",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0338.*",
+      ".atm/history/task-events/ATM-GOV-0338/**",
+      ".atm/history/tasks/ATM-GOV-0338.json",
+      ".claude/skills/",
+      ".cursor/rules/skills/",
+      ".gemini/commands/",
+      ".github/instructions/",
+      "docs/reports/plan4-six-editor-adapter-parity.json",
+      "integrations/",
+      "packages/core/src/evidence/adapter-parity.ts",
+      "scripts/validate-integration-adapter.ts",
+      "templates/skills/",
+      "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
+      "tests/cli/six-editor-adapter-parity.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0338-prove-six-editor-adapter-parity-from-sealed-source.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0338-prove-six-editor-adapter-parity-from-sealed-source.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
+    },
+    "createdAt": "2026-08-12T18:49:29.528Z",
+    "status": "active"
+  }
+}
