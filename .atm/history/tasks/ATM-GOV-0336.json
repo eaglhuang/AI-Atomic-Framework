@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0336",
   "title": "Rebuild and revalidate the Plan 4 foundation chain",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0335"
@@ -160,8 +160,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T18-30-59-626Z-renew-b1d02e5ce708",
-  "lastTransitionAt": "2026-08-12T18:30:59.626Z",
+  "lastTransitionId": "2026-08-12T18-35-33-690Z-lock-cleanup-79d6ce090aab",
+  "lastTransitionAt": "2026-08-12T18:35:33.690Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T18:28:47.591Z",
@@ -170,7 +170,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-ba30531df458",
     "claimedAt": "2026-08-12T18:28:47.598Z",
-    "heartbeatAt": "2026-08-12T18:30:59.014Z",
+    "heartbeatAt": "2026-08-12T18:35:33.539Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0336.*",
@@ -185,13 +185,14 @@
       "tests/cli/plan4-foundation-topology.test.ts",
       "tests/fixtures/governance-incidents/"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
       "status": "active",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T18:28:47.598Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -305,6 +306,13 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
     },
     "createdAt": "2026-08-12T18:28:51.824Z",
-    "status": "active"
-  }
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T18:35:33.688Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-12T18:35:33.539Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812182847-codex-gpt-5.4-mini-ATM-GOV-0336-be3462fd82",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0336.closure-packet.json"
 }

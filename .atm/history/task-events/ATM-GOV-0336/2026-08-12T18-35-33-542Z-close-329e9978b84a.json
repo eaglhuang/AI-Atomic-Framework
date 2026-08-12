@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T18-35-33-542Z-close-329e9978b84a",
+  "taskId": "ATM-GOV-0336",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812182847-codex-gpt-5.4-mini-ATM-GOV-0336-be3462fd82",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0336.json",
+  "taskSha256": "sha256:234062878585897839969de149f5179ec4d86f909d4d499c886f410a3920b6f7",
+  "createdAt": "2026-08-12T18:35:33.542Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0336 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-2522d44aebb6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-2522d44aebb6",
+    "sessionId": "session-20260812182847-codex-gpt-5.4-mini-ATM-GOV-0336-be3462fd82",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0336.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:four-plan-objectives",
+      "validate:git-head-evidence",
+      "validate:governance-fix-wave"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-12T18:35:33.531Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0336.*",
+        ".atm/history/task-events/ATM-GOV-0336/**",
+        ".atm/history/tasks/ATM-GOV-0336.json",
+        "docs/reports/plan-4-foundation-replay.json",
+        "docs/reports/plan-4-foundation-replay.md",
+        "packages/core/src/evidence/phase-suite.ts",
+        "packages/core/src/evidence/quality-authority.ts",
+        "packages/core/src/evidence/state-replay.ts",
+        "tests/catalog/groups/test_group_plan4_*.shard.json",
+        "tests/cli/plan4-foundation-topology.test.ts",
+        "tests/fixtures/governance-incidents/"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/phase-suite.ts",
+        "packages/core/src/evidence/quality-authority.ts",
+        "packages/core/src/evidence/state-replay.ts",
+        "tests/catalog/groups/test_group_plan4_*.shard.json",
+        "tests/cli/plan4-foundation-topology.test.ts",
+        "tests/fixtures/governance-incidents/"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
