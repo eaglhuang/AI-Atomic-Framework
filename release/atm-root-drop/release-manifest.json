@@ -3036,6 +3036,7 @@
     "release/atm-root-drop/packages/core/dist/evidence/concurrency-fuzz-generators.js",
     "release/atm-root-drop/packages/core/dist/evidence/concurrency-schedule-obligations.js",
     "release/atm-root-drop/packages/core/dist/evidence/constraint-solver.js",
+    "release/atm-root-drop/packages/core/dist/evidence/coverage-certificate.d.ts",
     "release/atm-root-drop/packages/core/dist/evidence/coverage-certificate.js",
     "release/atm-root-drop/packages/core/dist/evidence/coverage-ratchet-baseline.js",
     "release/atm-root-drop/packages/core/dist/evidence/coverage-semantics.js",
@@ -3064,6 +3065,7 @@
     "release/atm-root-drop/packages/core/dist/evidence/property-metamorphic-generators.js",
     "release/atm-root-drop/packages/core/dist/evidence/quality-authority.js",
     "release/atm-root-drop/packages/core/dist/evidence/quality-gauntlet.js",
+    "release/atm-root-drop/packages/core/dist/evidence/quality-vector.d.ts",
     "release/atm-root-drop/packages/core/dist/evidence/quality-vector.js",
     "release/atm-root-drop/packages/core/dist/evidence/realness.js",
     "release/atm-root-drop/packages/core/dist/evidence/regression-family.js",
@@ -5552,8 +5554,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 839,
-    "unchanged": 4678,
+    "copied": 827,
+    "unchanged": 4692,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6925,7 +6927,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:1b7788e4d84a098da91476d7c6a821d2e87d2bfd78f7cefc0230b7a561c49c09"
+    "digest": "sha256:6e7cba556546c9dfcce898ae39404d1491c7f512f2dcc922beffbe5a80c2ad8a"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -9935,6 +9937,7 @@
       "release/atm-root-drop/packages/core/dist/evidence/concurrency-fuzz-generators.js",
       "release/atm-root-drop/packages/core/dist/evidence/concurrency-schedule-obligations.js",
       "release/atm-root-drop/packages/core/dist/evidence/constraint-solver.js",
+      "release/atm-root-drop/packages/core/dist/evidence/coverage-certificate.d.ts",
       "release/atm-root-drop/packages/core/dist/evidence/coverage-certificate.js",
       "release/atm-root-drop/packages/core/dist/evidence/coverage-ratchet-baseline.js",
       "release/atm-root-drop/packages/core/dist/evidence/coverage-semantics.js",
@@ -9963,6 +9966,7 @@
       "release/atm-root-drop/packages/core/dist/evidence/property-metamorphic-generators.js",
       "release/atm-root-drop/packages/core/dist/evidence/quality-authority.js",
       "release/atm-root-drop/packages/core/dist/evidence/quality-gauntlet.js",
+      "release/atm-root-drop/packages/core/dist/evidence/quality-vector.d.ts",
       "release/atm-root-drop/packages/core/dist/evidence/quality-vector.js",
       "release/atm-root-drop/packages/core/dist/evidence/realness.js",
       "release/atm-root-drop/packages/core/dist/evidence/regression-family.js",
@@ -12454,34 +12458,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:bb443d031e988eca1414c4d1694592482d25b970f1bf750887ba813a777efcaa",
-  "sealedSourceCommit": "90d491b618dc405561cd89939e55d96bb3cb0024",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "missing-previous-sealed-source",
-  "incrementalPlanDigest": "sha256:64fffad9d88b0e086ea9c6e1d3189a97383c7cd1fab2497d06d36e3c5039b913",
-  "tsBuildCacheDigest": "sha256:853ae89987c0e94ec49ce3c6278393d768ef6224d57e514485e39bb8ad49918c",
+  "buildInputsTreeHash": "sha256:7f070e845945c057856be588bf27e693d7809834173f412e0084f51885fd9b33",
+  "sealedSourceCommit": "c23c0dbced685ab65deb21c92c47403cddd6060a",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:3b9c54a07348e9ce901a91b4a276fe76cbb47086f360bc29c69b6d71e8a816de",
+  "tsBuildCacheDigest": "sha256:7ddf21c36f99e6bb84c92ea38d6c238f154c89c12332eed9e83e5c771880e021",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 20465,
-    "totalElapsedMs": 65146,
-    "dominanceRatio": 0.3141,
-    "phaseMedianMs": 2647,
-    "phaseP95Ms": 20465,
+    "dominantPhaseMs": 20881,
+    "totalElapsedMs": 71499,
+    "dominanceRatio": 0.292,
+    "phaseMedianMs": 3137,
+    "phaseP95Ms": 20881,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 44,
-    "skipDecision": 6,
-    "worktreeSetup": 9872,
-    "typescriptBuild": 15140,
-    "rootDropReleaseAssembly": 20465,
-    "onefileReleaseAssembly": 2647,
-    "artifactSync": 9285,
+    "inputHashCalculation": 48,
+    "skipDecision": 50,
+    "worktreeSetup": 11300,
+    "typescriptBuild": 20740,
+    "rootDropReleaseAssembly": 20881,
+    "onefileReleaseAssembly": 3137,
+    "artifactSync": 7269,
     "cleanup": 0,
-    "totalElapsed": 65146
+    "totalElapsed": 71499
   }
 }

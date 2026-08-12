@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0312",
   "title": "Coverage certificate, quality vector, and explicit non-claims",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0318",
@@ -223,8 +223,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T09-33-22-808Z-claim-334051a7a9df",
-  "lastTransitionAt": "2026-08-12T09:33:22.808Z",
+  "lastTransitionId": "2026-08-12T09-39-59-023Z-lock-cleanup-df903cc2b41b",
+  "lastTransitionAt": "2026-08-12T09:39:59.023Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T09:33:18.514Z",
@@ -233,7 +233,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-1d2f31f6499e",
     "claimedAt": "2026-08-12T09:33:18.524Z",
-    "heartbeatAt": "2026-08-12T09:33:18.524Z",
+    "heartbeatAt": "2026-08-12T09:39:58.694Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0312.json",
@@ -245,14 +245,14 @@
       "tests/cli/plan4-coverage-certificate.test.ts",
       "tests/cli/plan4-quality-vector.test.ts"
     ],
-    "state": "active",
-    "intent": "closeout-only",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260812093319-codex-gpt-5.4-mini-a84f7adbd5",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812093319-codex-gpt-5.4-mini-a84f7adbd5\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T09:33:18.524Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -290,6 +290,13 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812093319-codex-gpt-5.4-mini-a84f7adbd5\""
     },
     "createdAt": "2026-08-12T09:33:22.807Z",
-    "status": "active"
-  }
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-12T09:39:59.019Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-12T09:39:58.694Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260812093318-codex-gpt-5.4-mini-ATM-GOV-0312-2113f790c2",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0312.closure-packet.json"
 }
