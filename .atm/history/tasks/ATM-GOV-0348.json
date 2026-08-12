@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0348",
   "title": "Scope commit work admission to the ticket bundle, not the whole staged index",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -177,53 +177,50 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-11T23-27-19-941Z-renew-d8780d82c5cc",
-  "lastTransitionAt": "2026-08-11T23:27:19.941Z",
+  "lastTransitionId": "2026-08-12T01-24-34-314Z-close-360be6696d62",
+  "lastTransitionAt": "2026-08-12T01:24:34.314Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008-gov-0348",
   "reservedAt": "2026-08-11T23:06:21.804Z",
   "promotedAt": "2026-08-11T23:06:21.808Z",
   "claim": {
     "actorId": "claude-008-gov-0348",
-    "leaseId": "lease-a085448bf4a8",
-    "claimedAt": "2026-08-11T23:06:21.814Z",
-    "heartbeatAt": "2026-08-11T23:27:18.740Z",
+    "leaseId": "lease-a9dd3f455235",
+    "claimedAt": "2026-08-12T01:09:59.359Z",
+    "heartbeatAt": "2026-08-12T01:24:34.312Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/ATM-GOV-0348.*",
-      ".atm/history/task-events/ATM-GOV-0348/**",
       ".atm/history/tasks/ATM-GOV-0348.json",
       "packages/cli/src/commands/git-governance.ts",
-      "tests/cli/commit-admission-ticket-scoped-selection.test.ts",
-      "tests/cli/work-admission-ticket-deferred-index-parity.test.ts"
+      "tests/cli/commit-admission-ticket-scoped-selection.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260811230622-claude-008-gov-0348-db3eefc126",
+      "laneSessionId": "lane-20260812010940-claude-008-gov-0348-ade6897980",
       "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811230622-claude-008-gov-0348-db3eefc126\""
-    }
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812010940-claude-008-gov-0348-ade6897980\""
+    },
+    "reason": "ATM-GOV-0348 delivery landed as a shared commit with the actor-registry side effect staged automatically by the governed commit wrapper"
   },
   "startedAt": "2026-08-11T23:06:21.814Z",
   "startedByActor": "claude-008-gov-0348",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-171acd0c12488351",
-    "ticketDigest": "sha256:171acd0c12488351f4750ec1cbe734088754182c97a22518111603086ab09f6f",
+    "ticketId": "wat-453a7bf0f15469d0",
+    "ticketDigest": "sha256:453a7bf0f15469d0aa662fe23d69d1207dbd320e6bb63f39544852fed5eaa72f",
     "taskId": "ATM-GOV-0348",
     "origin": "claim",
     "actorId": "claude-008-gov-0348",
-    "laneSessionId": "lane-20260811230622-claude-008-gov-0348-db3eefc126",
-    "claimGeneration": "lease-a085448bf4a8",
-    "issuedAt": "2026-08-11T23:27:18.740Z",
-    "expiresAt": "2026-08-11T23:57:18.740Z",
-    "scopeDigest": "sha256:d8ad8fbec64dfc7fb0011eaf8b43f7f77bcb803dfb8821c154784dd96b88b89d",
+    "laneSessionId": "lane-20260812010940-claude-008-gov-0348-ade6897980",
+    "claimGeneration": "lease-a9dd3f455235",
+    "issuedAt": "2026-08-12T01:09:59.359Z",
+    "expiresAt": "2026-08-12T01:39:59.359Z",
+    "scopeDigest": "sha256:79dd5e86a6218e401b2c0d52b305101afa7c56f41a47bb8b082426f1009b9293",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-11T23:27:18.740Z"
+      "selectedAt": "2026-08-12T01:09:59.359Z"
     },
     "grants": [
       {
@@ -233,10 +230,9 @@
           ".atm/history/task-events/ATM-GOV-0348/**",
           ".atm/history/tasks/ATM-GOV-0348.json",
           "packages/cli/src/commands/git-governance.ts",
-          "tests/cli/commit-admission-ticket-scoped-selection.test.ts",
-          "tests/cli/work-admission-ticket-deferred-index-parity.test.ts"
+          "tests/cli/commit-admission-ticket-scoped-selection.test.ts"
         ],
-        "digest": "sha256:f5db496215e7bba682b090c05bb2851d2e9d1f9c03f0313a11f0e349cd2a5fdc"
+        "digest": "sha256:44af08a8ee63132570dbe5d6636ada927b8e29a2d10c6e31f01764a635180d89"
       },
       {
         "kind": "lifecycle-operation",
@@ -270,43 +266,52 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260811230621-claude-008-gov-0348-ATM-GOV-0348-3ea249c78c",
+  "startedBySessionId": "session-20260812010959-claude-008-gov-0348-ATM-GOV-0348-d0c91110d7",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0348",
+    "actorId": "claude-008-gov-0348",
+    "laneSessionId": "lane-20260812001002-claude-008-gov-0348-c8001d6abd",
+    "dirtyPaths": [
+      ".atm/history/tasks/ATM-GOV-0348.json"
+    ],
+    "retainedAt": "2026-08-12T01:09:43.736Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "claude-008-gov-0348",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0348",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-5b9f100b62135972",
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0348.*",
       ".atm/history/task-events/ATM-GOV-0348/**",
       ".atm/history/tasks/ATM-GOV-0348.json",
       "packages/cli/src/commands/git-governance.ts",
-      "tests/cli/commit-admission-ticket-scoped-selection.test.ts",
-      "tests/cli/work-admission-ticket-deferred-index-parity.test.ts"
+      "tests/cli/commit-admission-ticket-scoped-selection.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0348-scope-commit-work-admission-to-the-ticket-bundle-not-the-whole-index.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0348-scope-commit-work-admission-to-the-ticket-bundle-not-the-whole-index.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "1727baa49108553ad4c38aed9f620dffda9229e16e6f3a58e7fa84b222a0b87a",
     "actorId": "claude-008-gov-0348",
-    "sessionId": null,
+    "sessionId": "session-20260812010959-claude-008-gov-0348-ATM-GOV-0348-d0c91110d7",
     "laneSession": {
-      "laneSessionId": "lane-20260811230622-claude-008-gov-0348-db3eefc126",
+      "laneSessionId": "lane-20260812010940-claude-008-gov-0348-ade6897980",
       "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811230622-claude-008-gov-0348-db3eefc126\""
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812010940-claude-008-gov-0348-ade6897980\""
     },
-    "createdAt": "2026-08-11T23:06:38.076Z",
+    "createdAt": "2026-08-12T01:10:13.967Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-12T01:24:34.312Z",
+  "closedByActor": "claude-008-gov-0348",
+  "closedBySessionId": "session-20260812010959-claude-008-gov-0348-ATM-GOV-0348-d0c91110d7",
+  "closeReason": "ATM-GOV-0348 delivery landed as a shared commit with the actor-registry side effect staged automatically by the governed commit wrapper",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0348.closure-packet.json"
 }

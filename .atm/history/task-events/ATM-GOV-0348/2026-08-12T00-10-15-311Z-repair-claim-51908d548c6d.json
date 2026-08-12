@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T00-10-15-311Z-repair-claim-51908d548c6d",
+  "taskId": "ATM-GOV-0348",
+  "action": "repair-claim",
+  "actorId": "claude-008-gov-0348",
+  "sessionId": "session-20260811230621-claude-008-gov-0348-ATM-GOV-0348-3ea249c78c",
+  "fromStatus": "ready",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0348.json",
+  "taskSha256": "sha256:4e5ba8834a7b5c0d61acc3f398b7d5f210f214d2e7049e98184561e3de864bf9",
+  "createdAt": "2026-08-12T00:10:15.311Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0348 --actor claude-008-gov-0348 --write --reason \"Rebind ATM-GOV-0348 claim to a live lane session after the original lane TTL expired; delivery 23df1652b already landed and only governed close remains\" --json"
+}

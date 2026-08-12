@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T01-09-44-448Z-repair-claim-29a822bb5f88",
+  "taskId": "ATM-GOV-0348",
+  "action": "repair-claim",
+  "actorId": "claude-008-gov-0348",
+  "sessionId": "session-20260812001419-claude-008-gov-0348-ATM-GOV-0348-bd2f4c5607",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0348.json",
+  "taskSha256": "sha256:f2dcddee349bcd2de1d473441153043831b83e67df7647f326219a9e30290413",
+  "createdAt": "2026-08-12T01:09:44.448Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0348 --actor claude-008-gov-0348 --write --reason \"Lane session TTL expired again while waiting for the ATM-GOV-0345 close window; delivery 23df1652b already landed and only governed ledger close remains\" --json"
+}
