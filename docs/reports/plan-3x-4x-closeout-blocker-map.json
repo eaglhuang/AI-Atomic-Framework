@@ -48,6 +48,10 @@
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
       "digest": "sha256:ec981ed479f426f22a9c3f1cf667e249c5ca1424cbc3740cb035dca6b1438600"
+    },
+    {
+      "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
+      "digest": "sha256:f049b078a679b66fd9f03103096381fb38a9249d146deace87a9a026b2355ead"
     }
   ],
   "totals": {
@@ -62,7 +66,9 @@
     "certificateDimensionsNotComplete": 1,
     "plan4SuccessorMappedAnchors": 17,
     "plan3xCurrentRowProofMappedRows": 69,
-    "plan3xCurrentRowProofFamilies": 4
+    "plan3xCurrentRowProofFamilies": 4,
+    "plan3xFreshCommandReceiptsGreen": 8,
+    "plan3xFreshCommandRowsCertified": 0
   },
   "planSummaries": [
     {
@@ -103,7 +109,7 @@
       "id": "B1-current-row-proof",
       "scope": ["Plan 3.0", "Plan 3.1", "Plan 3.2"],
       "status": "triaged",
-      "reason": "replay reports currently establish denominator and row evidence surfaces, but keep every row not-complete",
+      "reason": "replay reports currently establish denominator and row evidence surfaces, and fresh replay validators now prove current execution while keeping every row not-complete",
       "requiredOutcome": "execute docs/reports/plan-3x-current-row-proof-map.json by proof family, replace historical-only references with fresh command receipts, then recompute objective verdict"
     },
     {

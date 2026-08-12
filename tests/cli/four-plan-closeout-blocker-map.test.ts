@@ -15,6 +15,8 @@ assert.equal(report.totals.certificateDimensionsNotComplete, 1);
 assert.equal(report.totals.plan4SuccessorMappedAnchors, 17);
 assert.equal(report.totals.plan3xCurrentRowProofMappedRows, 69);
 assert.equal(report.totals.plan3xCurrentRowProofFamilies, 4);
+assert.equal(report.totals.plan3xFreshCommandReceiptsGreen, 8);
+assert.equal(report.totals.plan3xFreshCommandRowsCertified, 0);
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B1-current-row-proof')?.status, 'triaged');
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
   'B1-current-row-proof',

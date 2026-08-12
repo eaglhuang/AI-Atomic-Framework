@@ -1,0 +1,106 @@
+{
+  "schemaId": "atm.plan3xFreshCommandReplayReceipts.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-13T04:30:00.000Z",
+  "status": "fresh-command-replay-observed-not-terminal",
+  "nonClaim": "These receipts prove that the focused Plan 3.x replay validators execute against current files; they do not certify any objective row complete while source replay verdicts remain not-complete.",
+  "sourceReports": [
+    {
+      "path": "docs/reports/plan-3x-current-row-proof-map.json",
+      "digest": "sha256:ec981ed479f426f22a9c3f1cf667e249c5ca1424cbc3740cb035dca6b1438600"
+    },
+    {
+      "path": "docs/reports/plan-3-0-objective-replay.json",
+      "digest": "sha256:e080a41f0f68672e83725d19286c064ac707a5208330433dae5c4d1ad0817f00"
+    },
+    {
+      "path": "docs/reports/plan-3-1-objective-replay.json",
+      "digest": "sha256:6212686585e15b2dc98d845f7637d461730e5e52666b3a6b2f038ccbe6953b8c"
+    },
+    {
+      "path": "docs/reports/plan-3-2-objective-replay.json",
+      "digest": "sha256:54f1ea49a99988b17082eab303833c8d0662fdb4acdd7adca4a9d37e1feb72b7"
+    }
+  ],
+  "familyDisposition": {
+    "proofFamilyId": "fresh-command-replay-needed",
+    "sourceRowCount": 45,
+    "focusedCommandsExecuted": 8,
+    "commandsGreen": 8,
+    "rowsCertifiedCompleteByTheseReceipts": 0,
+    "remainingRowsInFamily": 45,
+    "reasonRowsRemainOpen": "The focused validators prove denominator, replay shape, and fail-closed behavior. Positive per-row receipts still need to replace historical-only or descriptive evidence before row status can become verified."
+  },
+  "commandRuns": [
+    {
+      "id": "plan30-final-closure-replay",
+      "command": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.0 --expect-rows 17 --input docs/reports/plan-3-0-objective-replay.json",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-atm-3-final-closure] ok plan=3.0 rows=17 verdict=not-complete",
+      "semanticBoundary": "current replay shape only; terminal verdict remains not-complete"
+    },
+    {
+      "id": "plan31-final-closure-replay",
+      "command": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.1 --expect-rows 23 --input docs/reports/plan-3-1-objective-replay.json",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-atm-3-final-closure] ok plan=3.1 rows=23 verdict=not-complete",
+      "semanticBoundary": "current replay shape only; terminal verdict remains not-complete"
+    },
+    {
+      "id": "plan32-final-closure-replay",
+      "command": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.2 --expect-rows 29 --input docs/reports/plan-3-2-objective-replay.json",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-atm-3-final-closure] ok plan=3.2 rows=29 verdict=not-complete",
+      "semanticBoundary": "current replay shape only; terminal verdict remains not-complete"
+    },
+    {
+      "id": "plan30-four-plan-objectives",
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.0 --mode validate",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-four-plan-objectives] ok {\"Plan 3.0\":17,\"Plan 3.1\":0,\"Plan 3.2\":0,\"Plan 4.0\":0} digest=sha256:501d025959066a83fa3e7cd9160ff3a1e93d5a9345bfa1a39bc5677eda2b6027",
+      "semanticBoundary": "denominator and objective addressability, not completion"
+    },
+    {
+      "id": "plan31-four-plan-objectives",
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.1 --mode validate",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-four-plan-objectives] ok {\"Plan 3.0\":0,\"Plan 3.1\":23,\"Plan 3.2\":0,\"Plan 4.0\":0} digest=sha256:972d5ea61b851a84d575fc50ffd201123b6ab76791628a43e1f1eae52aa2fe68",
+      "semanticBoundary": "denominator and objective addressability, not completion"
+    },
+    {
+      "id": "plan32-four-plan-objectives",
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.2 --mode validate",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-four-plan-objectives] ok {\"Plan 3.0\":0,\"Plan 3.1\":0,\"Plan 3.2\":29,\"Plan 4.0\":0} digest=sha256:ade6d232bdb5cd65e2035981b565da2580e43f2eff9cb61030fac8d32cfd5998",
+      "semanticBoundary": "denominator and objective addressability, not completion"
+    },
+    {
+      "id": "atm3-final-closure-negative-controls",
+      "command": "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "exitCode": 0,
+      "stdoutPreview": "atm 3 final closure replay ok",
+      "semanticBoundary": "fail-closed regression coverage, not positive completion"
+    },
+    {
+      "id": "git-head-evidence-current-validator",
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutPreview": "[git-head-evidence:validate] ok (doctor git evidence states verified)",
+      "semanticBoundary": "current git-head evidence validator is green; individual Plan 3.x provenance rows still need terminal consumption"
+    }
+  ],
+  "nextExecutionOrder": [
+    {
+      "id": "positive-row-receipts",
+      "whyFirst": "Replace historical-only or shape-only evidence for the 45 fresh-command rows with command receipts that directly satisfy each row objective."
+    },
+    {
+      "id": "source-replay-row-recompute",
+      "whySecond": "Only after positive receipts exist should source replay rows be recomputed from not-complete to verified."
+    },
+    {
+      "id": "objective-verdict-recompute",
+      "whyThird": "The independent certificate objective verdict may move only after source replay rows change."
+    }
+  ]
+}
