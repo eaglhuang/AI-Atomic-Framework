@@ -1,0 +1,338 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0353",
+  "title": "Memoize planning root resolution per process for next route latency",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 `resolvePlanningRepoRootConfig` resolves at most once per distinct `cwd` per process. A focused test observes the underlying filesystem reads and proves the second and later calls perform none.",
+    "ACC-2 `node atm.mjs next --json` CLI logic time is under the 500ms budget on the current ledger, and `validate-next-warm-run-latency` reports no `ATM_NEXT_CLI_LOGIC_BUDGET_EXCEEDED` finding.",
+    "ACC-3 The cache is keyed by resolved `cwd` and by the planning-root environment input, so two different repositories in one process never observe each other's roots.",
+    "ACC-4 An explicit reset entry point exists and is used by tests that mutate planning roots inside a single process; without it those tests would observe a stale result.",
+    "ACC-5 Every resolution result is byte-identical to the pre-change result for the same inputs. This card changes timing only."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/planning-root-resolution-cache.ts",
+    "packages/cli/src/commands/planning-repo-root.ts",
+    "tests/cli/planning-root-resolution-cache.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/planning-root-resolution-cache.ts",
+    "packages/cli/src/commands/planning-repo-root.ts",
+    "tests/cli/planning-root-resolution-cache.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/planning-root-resolution-cache.test.ts",
+    "npm run typecheck",
+    "npm run validate:module-boundaries",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/cli/src/commands/next/planning-root-preference.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/next/route-resolution/**"
+  ],
+  "nonGoals": [
+    "Changing which planning roots are resolved. This card must not alter a single resolution result; it only stops recomputing the same one.",
+    "Caching across processes, or persisting the resolution to disk.",
+    "Reducing the 793-file task ledger scan. That scan measures 49ms and is not the cost."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the cache module and its single call site together. Correctness outranks latency; if any caller can observe a stale planning root, revert rather than widening the key.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.planning-repo-root",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.planning-root-resolution-cache",
+        "pattern": "Memoized Result Contract",
+        "source": "packages/cli/src/commands/planning-repo-root.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/planning-root-resolution-cache.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "tests/cli/planning-root-resolution-cache.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "Extract the memoization, do not scatter it. One small module owning a\n`Map<cacheKey, PlanningRepoRootConfig>` plus a reset, consumed by\n`resolvePlanningRepoRootConfig` alone. Callers keep their current signatures and\nlearn nothing about caching — that is the whole point of putting the seam here\nrather than at the twenty call sites in `partitionTaskScope`.\n\nThe key must include the planning-root environment variable, not just `cwd`.\n`resolvePlanningRepoRootConfig` reads `ATM_PLANNING_REPO_ROOT` through\n`readPlanningRootEnv()`, and long-lived test processes change it between cases;\nkeying on `cwd` alone would hand one fixture another fixture's roots and produce\na false green somewhere far away.\n\nProve ACC-1 by counting real filesystem reads, not by timing. A timing\nassertion on a shared CI host is exactly the kind of margin flake this plan is\ncorrecting elsewhere.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0353-memoize-planning-root-resolution-per-process-for-next-route-latency.task.md",
+    "sectionTitle": "ATM-GOV-0353",
+    "headingLine": 103,
+    "hash": "fcfdcb5eeeda2a70",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0353-memoize-planning-root-resolution-per-process-for-next-route-latency.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:fcfdcb5eeeda2a709fa64e6490477e9e6e22fc7a99c3e9e58897286f14da941f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-12T23:08:50.257Z"
+    }
+  },
+  "importedAt": "2026-08-12T23:08:50.257Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The full validator profile fails ATM_NEXT_CLI_LOGIC_BUDGET_EXCEEDED because next route logic exceeds the 500ms budget."
+    ],
+    "softRelations": [
+      "ATM-GOV-0346"
+    ],
+    "changedPublicSeams": [
+      "atm.planningRootResolutionCache.v1"
+    ],
+    "causalImpactEdges": [
+      "repeated-planning-root-resolution-to-next-route-latency",
+      "next-route-latency-to-full-profile-red"
+    ],
+    "parallelFrontierInputs": [
+      "planning-root-config",
+      "task-scope-partition",
+      "next-queue-inspection"
+    ],
+    "validatorReferences": [
+      "validate-next-warm-run-latency",
+      "test_atm_gov_0353_planning_root_resolution_is_memoized"
+    ],
+    "phaseOwner": "wave-3-validator-and-ci-baseline"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0353_planning_root_resolution_is_memoized",
+      "targetGroupId": "null",
+      "semanticKey": "planning_root_config_is_resolved_once_per_process_per_cwd",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "repeated-planning-root-resolution-to-next-route-latency",
+        "next-route-latency-to-full-profile-red"
+      ],
+      "expectedRedPredicate": "resolving the same planning root config repeatedly re-reads .atm/config.json and re-scans sibling roots on every call",
+      "contributionResourceKey": "planning-root-resolution-cache",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.planningRootResolutionCache.v1",
+      "resourceKey": "planning-root-resolution-cache"
+    },
+    {
+      "caseId": "test_atm_gov_0353_cache_is_keyed_and_resettable",
+      "targetGroupId": "null",
+      "semanticKey": "cached_planning_roots_never_leak_across_cwd_or_env",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "repeated-planning-root-resolution-to-next-route-latency"
+      ],
+      "expectedRedPredicate": "a process-lifetime cache returns one repository's planning roots for a different cwd or after the planning-root environment changes",
+      "contributionResourceKey": "planning-root-resolution-cache-isolation",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.planningRootResolutionCache.v1",
+      "resourceKey": "planning-root-resolution-cache-isolation"
+    },
+    {
+      "caseId": "test_atm_gov_0353_cached_result_equals_uncached_result",
+      "targetGroupId": "null",
+      "semanticKey": "memoized_planning_root_config_is_byte_identical_to_a_fresh_resolution",
+      "coversAcceptance": [
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "repeated-planning-root-resolution-to-next-route-latency"
+      ],
+      "expectedRedPredicate": "a cached planning root config can diverge from the value a fresh resolution would produce for the same inputs",
+      "contributionResourceKey": "planning-root-resolution-cache-equivalence",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.planningRootResolutionCache.v1",
+      "resourceKey": "planning-root-resolution-cache-equivalence"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0353_planning_root_resolution_is_memoized",
+    "test_atm_gov_0353_cache_is_keyed_and_resettable",
+    "test_atm_gov_0353_cached_result_equals_uncached_result"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck",
+    "validate:cli"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T23-09-22-755Z-claim-df44fc4043c2",
+  "lastTransitionAt": "2026-08-12T23:09:22.755Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008-captain",
+  "reservedAt": "2026-08-12T23:09:16.835Z",
+  "promotedAt": "2026-08-12T23:09:16.842Z",
+  "claim": {
+    "actorId": "claude-008-captain",
+    "leaseId": "lease-97fcd29ccd0a",
+    "claimedAt": "2026-08-12T23:09:16.847Z",
+    "heartbeatAt": "2026-08-12T23:09:16.847Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0353.json",
+      "packages/cli/src/commands/planning-repo-root.ts",
+      "packages/cli/src/commands/planning-root-resolution-cache.ts",
+      "tests/cli/planning-root-resolution-cache.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260812230852-claude-008-captain-67ba2cd406",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812230852-claude-008-captain-67ba2cd406\""
+    }
+  },
+  "startedAt": "2026-08-12T23:09:16.847Z",
+  "startedByActor": "claude-008-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-052658ccf491e0a6",
+    "ticketDigest": "sha256:052658ccf491e0a6c9d8f01eed2f54edd19aae1f0d0cdcfb83b199b9dbae6eee",
+    "taskId": "ATM-GOV-0353",
+    "origin": "claim",
+    "actorId": "claude-008-captain",
+    "laneSessionId": "lane-20260812230852-claude-008-captain-67ba2cd406",
+    "claimGeneration": "lease-97fcd29ccd0a",
+    "issuedAt": "2026-08-12T23:09:16.847Z",
+    "expiresAt": "2026-08-12T23:39:16.847Z",
+    "scopeDigest": "sha256:d0fa5d9dfdf5a8e4baa53c56a67f4f80258a7d511a88971df5e14092b3fd15ed",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T23:09:16.847Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0353.*",
+          ".atm/history/task-events/ATM-GOV-0353/**",
+          ".atm/history/tasks/ATM-GOV-0353.json",
+          "packages/cli/src/commands/planning-repo-root.ts",
+          "packages/cli/src/commands/planning-root-resolution-cache.ts",
+          "tests/cli/planning-root-resolution-cache.test.ts"
+        ],
+        "digest": "sha256:0af3fae07b0c674a49975120d14b07742d2fef1a136fbaea195d1cea9d531ad6"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260812230916-claude-008-captain-ATM-GOV-0353-0087dbdacd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0353",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0353.*",
+      ".atm/history/task-events/ATM-GOV-0353/**",
+      ".atm/history/tasks/ATM-GOV-0353.json",
+      "packages/cli/src/commands/planning-repo-root.ts",
+      "packages/cli/src/commands/planning-root-resolution-cache.ts",
+      "tests/cli/planning-root-resolution-cache.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f62f5d21262ce1e733f90b9ba8e3cbafffc39e89b08096636779b6449f50f7dc",
+    "actorId": "claude-008-captain",
+    "sessionId": "session-20260812230916-claude-008-captain-ATM-GOV-0353-0087dbdacd",
+    "laneSession": {
+      "laneSessionId": "lane-20260812230852-claude-008-captain-67ba2cd406",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812230852-claude-008-captain-67ba2cd406\""
+    },
+    "createdAt": "2026-08-12T23:09:22.754Z",
+    "status": "active"
+  }
+}

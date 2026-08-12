@@ -6,6 +6,9 @@ import {
   resolveCandidatePlanningRoots,
   type PlanningRootResolution
 } from './next/planning-root-preference.ts';
+import { resolvePlanningRootScopedOnce } from './planning-root-resolution-cache.ts';
+
+export { resetPlanningRootResolutionCache } from './planning-root-resolution-cache.ts';
 
 export const PLANNING_REPO_ROOT_ENV = 'ATM_PLANNING_REPO_ROOT';
 
@@ -102,7 +105,14 @@ export function readConfiguredPlanningRoots(cwd: string): readonly string[] {
   }
 }
 
+// ATM-GOV-0353: this resolution is pure in (cwd, planning-root env, .atm/config.json)
+// but costs ~3.75ms, and the `next` route asks for it once per declared scope path
+// per routable task. Memoize it rather than teaching every caller to.
 export function resolvePlanningRepoRootConfig(cwd: string): PlanningRepoRootConfig {
+  return resolvePlanningRootScopedOnce(cwd, 'planningRepoRootConfig', () => computePlanningRepoRootConfig(cwd));
+}
+
+function computePlanningRepoRootConfig(cwd: string): PlanningRepoRootConfig {
   const envRoot = readPlanningRootEnv();
   const configRoots = readConfiguredPlanningRoots(cwd);
   const resolvedConfigRoots = uniqueSorted([
