@@ -127,11 +127,19 @@ export function scanSealedRunnerBuildOutputInventory(input: {
     outputPaths.push(...listDirtyPaths(input.cwd).filter(isRunnerPublicationArtifactPath));
   }
   if (input.taskId) outputPaths.push(`.atm/history/evidence/${input.taskId}.runner-sync-receipt.json`);
+  const preexistingDirtyPaths = new Set(input.beforeBuildSnapshot.preexistingDirtyPaths.map(normalizePath));
   return deriveRunnerBuildOutputInventory({
     sealedSourceSha: input.sealedSourceSha,
     observedPaths: outputPaths,
     currentTaskId: input.taskId,
-    ownership: outputPaths.map((entry) => ({ path: entry, ownerTaskId: input.taskId }))
+    // A queue-head build may observe pre-existing generated WIP, but it cannot
+    // convert that observation into ownership.  Keeping those paths in the
+    // inventory makes closeout fail closed instead of silently absorbing a
+    // different lane's output into the current task receipt.
+    ownership: outputPaths.map((entry) => ({
+      path: entry,
+      ownerTaskId: preexistingDirtyPaths.has(normalizePath(entry)) ? null : input.taskId
+    }))
   });
 }
 

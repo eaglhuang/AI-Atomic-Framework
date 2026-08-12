@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {
+  captureRunnerBuildOutputSnapshot,
+  scanSealedRunnerBuildOutputInventory
+} from './runner-build-output-inventory.ts';
+
+const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-inventory-'));
+
+function git(args: readonly string[]): void {
+  execFileSync('git', args, { cwd: repo, stdio: 'ignore' });
+}
+
+try {
+  git(['init']);
+  git(['config', 'user.name', 'fixture']);
+  git(['config', 'user.email', 'fixture@example.com']);
+  const artifact = path.join(repo, 'release', 'atm-onefile', 'atm.mjs');
+  mkdirSync(path.dirname(artifact), { recursive: true });
+  writeFileSync(artifact, 'baseline\n');
+  git(['add', '.']);
+  git(['commit', '-m', 'seed']);
+
+  writeFileSync(artifact, 'foreign-dirty\n');
+  const snapshot = captureRunnerBuildOutputSnapshot({
+    cwd: repo,
+    buildTarget: 'onefile',
+    currentTaskId: 'TASK-CURRENT',
+    currentTaskAllowedFiles: ['packages/core/src']
+  });
+  writeFileSync(artifact, 'sealed-build-output\n');
+  const inventory = scanSealedRunnerBuildOutputInventory({
+    cwd: repo,
+    buildTarget: 'onefile',
+    sealedSourceSha: 'a'.repeat(40),
+    taskId: 'TASK-CURRENT',
+    beforeBuildSnapshot: snapshot,
+    includeDirtyPublicationMembers: true
+  });
+  const entry = inventory.entries.find((item) => item.path === 'release/atm-onefile/atm.mjs');
+  assert.deepEqual(entry, {
+    path: 'release/atm-onefile/atm.mjs',
+    disposition: 'unowned',
+    ownerTaskId: null,
+    ownerActorId: null
+  });
+  console.log('[runner-build-output-inventory] preserves foreign dirty ownership');
+} finally {
+  rmSync(repo, { recursive: true, force: true });
+}
