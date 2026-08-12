@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-12T19:35:45.240Z",
+  "updatedAt": "2026-08-12T19:39:15.268Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
@@ -10,6 +10,8 @@
     "validate-backlog-census",
     "validate-four-plan-objectives",
     "validate-runner-reproducibility",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:module-boundaries"
   ],
   "staleValidationPasses": [],
@@ -172,6 +174,54 @@
       "durationMs": 1786,
       "runnerKind": "dev-source",
       "sourceCommit": "a1d0306a0b50ab5cc2e40370fbd7f9e9ea7c94bd",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+      "stderrSha256": "sha256:6d26aec054d008a1f7c731da6e7225e835e9ea883d9d4e160099ca8eeb79de81",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-12T19:38:14.646Z",
+      "startedAt": "2026-08-12T19:37:56.084Z",
+      "finishedAt": "2026-08-12T19:38:14.646Z",
+      "durationMs": 18562,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-12T19:39:11.846Z",
+      "startedAt": "2026-08-12T19:38:17.195Z",
+      "finishedAt": "2026-08-12T19:39:11.846Z",
+      "durationMs": 54651,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9f64bd493e4d989e3db0664624125c0cd1d2f8297121e727678135e14bdb032f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "four-plan-independent-certificate"
+      ],
+      "generatedAt": "2026-08-12T19:39:15.266Z",
+      "startedAt": "2026-08-12T19:39:14.307Z",
+      "finishedAt": "2026-08-12T19:39:15.266Z",
+      "durationMs": 959,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
       "cached": false
     }
   ],
