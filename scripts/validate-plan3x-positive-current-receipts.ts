@@ -46,7 +46,7 @@ function main() {
   const verifiedRefs = new Set((verifiedFamily?.rowRefs ?? []).map(String));
   const positiveRows = Array.isArray(report.positiveRows) ? report.positiveRows : [];
   const positiveRefs = positiveRows.map((row: any) => String(row.objectiveId));
-  if (positiveRefs.length !== 40) findings.push(`positive row count mismatch: expected 40, observed ${positiveRefs.length}`);
+  if (positiveRefs.length !== 46) findings.push(`positive row count mismatch: expected 46, observed ${positiveRefs.length}`);
   if (new Set(positiveRefs).size !== positiveRefs.length) findings.push('duplicate positive rows');
   for (const rowRef of positiveRefs) {
     if (!verifiedRefs.has(rowRef)) findings.push(`positive row was not consumed into verified-current-receipt family: ${rowRef}`);

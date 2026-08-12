@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 23,
   "statusCounts": {
-    "verified": 8,
-    "not-complete": 15,
+    "verified": 14,
+    "not-complete": 9,
     "unknown": 0,
     "conflicting": 0
   },
@@ -126,25 +126,24 @@
     {
       "objectiveId": "P31-OBJ-06",
       "title": "Two-key close is represented as a causal requirement",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "TASK-ERR-0005",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "packages/cli/src/commands/taskflow/"
+        "tests/fixtures/plan3-fake-green/plan31-lifecycle-concurrency-boundaries.json",
+        "scripts/validate-plan31-lifecycle-concurrency-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "two-key-close",
-          "source": ".atm/history/evidence/TASK-ERR-0005.closure-packet.json",
+          "kind": "plan31-lifecycle-concurrency-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-lifecycle-concurrency-boundaries",
           "expectedTaskId": "TASK-ERR-0005"
         }
       ],
-      "blockers": [
-        "two-key close is referenced but not re-executed in this replay row"
-      ],
-      "nextSafeCommand": "node atm.mjs taskflow close --task ATM-GOV-0334 --actor codex-gpt-5.4-mini --dry-run --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-07",
@@ -236,50 +235,46 @@
     {
       "objectiveId": "P31-OBJ-11",
       "title": "Conflict queue and wakeup receipts are observable",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0253",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        ".atm/runtime/broker/",
-        ".atm/history/evidence/"
+        "tests/fixtures/plan3-fake-green/plan31-lifecycle-concurrency-boundaries.json",
+        "scripts/validate-plan31-lifecycle-concurrency-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "queue-wakeup",
-          "source": ".atm/history/evidence/ATM-GOV-0253.closure-packet.json",
+          "kind": "plan31-lifecycle-concurrency-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-lifecycle-concurrency-boundaries",
           "expectedTaskId": "ATM-GOV-0253"
         }
       ],
-      "blockers": [
-        "queue/wakeup proof is not terminally consumed by this replay"
-      ],
-      "nextSafeCommand": "node atm.mjs broker status --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-12",
       "title": "Full lifecycle receipts are command-backed",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "TASK-ERR-0006",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        ".atm/history/task-events/",
-        ".atm/history/evidence/"
+        "tests/fixtures/plan3-fake-green/plan31-lifecycle-concurrency-boundaries.json",
+        "scripts/validate-plan31-lifecycle-concurrency-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "lifecycle-receipt",
-          "source": ".atm/history/evidence/TASK-ERR-0006.closure-packet.json",
+          "kind": "plan31-lifecycle-concurrency-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-lifecycle-concurrency-boundaries",
           "expectedTaskId": "TASK-ERR-0006"
         }
       ],
-      "blockers": [
-        "lifecycle receipts are not replayed end-to-end for Plan 3.1"
-      ],
-      "nextSafeCommand": "node atm.mjs tasks status --task ATM-GOV-0334 --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-13",
@@ -304,25 +299,24 @@
     {
       "objectiveId": "P31-OBJ-14",
       "title": "Sealed set correctness is independent of live index residue",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0250",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "packages/cli/src/commands/git-governance/"
+        "tests/fixtures/plan3-fake-green/plan31-lifecycle-concurrency-boundaries.json",
+        "scripts/validate-plan31-lifecycle-concurrency-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "sealed-set",
-          "source": ".atm/history/evidence/ATM-GOV-0250.closure-packet.json",
+          "kind": "plan31-lifecycle-concurrency-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-lifecycle-concurrency-boundaries",
           "expectedTaskId": "ATM-GOV-0250"
         }
       ],
-      "blockers": [
-        "sealed-set proof is historical; current foreign staged residue must not be treated as pass/fail authority"
-      ],
-      "nextSafeCommand": "node atm.mjs git commit --task ATM-GOV-0334 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-15",
@@ -373,25 +367,24 @@
     {
       "objectiveId": "P31-OBJ-17",
       "title": "Rollback path is retained for every non-complete row",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0238",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "docs/reports/plan-3-1-objective-replay.json"
+        "tests/fixtures/plan3-fake-green/plan31-lifecycle-concurrency-boundaries.json",
+        "scripts/validate-plan31-lifecycle-concurrency-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "rollback",
-          "source": ".atm/history/evidence/ATM-GOV-0238.closure-packet.json",
+          "kind": "plan31-lifecycle-concurrency-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-lifecycle-concurrency-boundaries",
           "expectedTaskId": "ATM-GOV-0238"
         }
       ],
-      "blockers": [
-        "rollback is row-local but not terminally exercised"
-      ],
-      "nextSafeCommand": "git revert --no-commit HEAD"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-18",
@@ -443,26 +436,24 @@
     {
       "objectiveId": "P31-OBJ-20",
       "title": "Actor continuity is preserved across receipts",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0244",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        ".atm/history/task-events/",
-        ".atm/history/tasks/"
+        "tests/fixtures/plan3-fake-green/plan31-lifecycle-concurrency-boundaries.json",
+        "scripts/validate-plan31-lifecycle-concurrency-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "actor-continuity",
-          "source": ".atm/history/evidence/ATM-GOV-0244.closure-packet.json",
+          "kind": "plan31-lifecycle-concurrency-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "plan31-lifecycle-concurrency-boundaries",
           "expectedTaskId": "ATM-GOV-0244"
         }
       ],
-      "blockers": [
-        "actor continuity has not been machine-replayed across all Plan 3.1 rows"
-      ],
-      "nextSafeCommand": "node atm.mjs tasks audit --tasks ATM-GOV-0244 --summary --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-21",

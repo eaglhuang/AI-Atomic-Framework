@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:5b76265414b6e230142a958ce72e3b2cae74682925a2b38043ff20ad0ad90f2e"
+      "digest": "sha256:93d1ac52afd0c2f24207393676511f851a54de6feac1071919ad67cc5ce729fe"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:cd42a898e8df2982803103f9face5efef7f4504b953d932e4bfe99e5c86c41cc"
+      "digest": "sha256:b47996718bbc565daccf0f3bfeb00f28d9c879799d5bff7827a38481357e5f8a"
     }
   ],
   "totals": {
-    "freshCommandRows": 10,
+    "freshCommandRows": 4,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 40,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 46,
     "objectiveAlignedNegativeControlRowsConsumed": 8,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
     "remainingUncoveredRows": 0,
-    "sourceRowsMutatedByThisReport": 40
+    "sourceRowsMutatedByThisReport": 46
   },
   "commandReceipts": [
     {
@@ -404,6 +404,26 @@
         "stale-history-rejected",
         "emergency-not-autonomous-replay"
       ]
+    },
+    {
+      "id": "plan31-lifecycle-concurrency-boundaries",
+      "command": "node --strip-types scripts/validate-plan31-lifecycle-concurrency-boundaries.ts --json",
+      "exitCode": 0,
+      "verdict": "plan31-lifecycle-concurrency-boundaries-proven",
+      "rowsCovered": [
+        "P31-OBJ-06",
+        "P31-OBJ-11",
+        "P31-OBJ-12",
+        "P31-OBJ-14",
+        "P31-OBJ-17",
+        "P31-OBJ-20"
+      ],
+      "stdoutAnchors": [
+        "atm.plan31LifecycleConcurrencyBoundariesValidation.v1",
+        "two-key-close-causal",
+        "sealed-set-live-index-separated",
+        "actor-continuity-replayable"
+      ]
     }
   ],
   "positiveRows": [
@@ -733,6 +753,54 @@
         "plan31-realness-autonomy-boundaries"
       ],
       "sourceReplayAction": "recomputed row status because the current Plan 3.1 realness/autonomy validator proves exact command-backed evidence, stale-history rejection, and emergency/autonomy separation"
+    },
+    {
+      "objectiveId": "P31-OBJ-06",
+      "title": "Two-key close is represented as a causal requirement",
+      "receiptIds": [
+        "plan31-lifecycle-concurrency-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 lifecycle/concurrency validator proves causal close, queue wakeup, lifecycle receipt, sealed-set, rollback, and actor continuity boundaries"
+    },
+    {
+      "objectiveId": "P31-OBJ-11",
+      "title": "Conflict queue and wakeup receipts are observable",
+      "receiptIds": [
+        "plan31-lifecycle-concurrency-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 lifecycle/concurrency validator proves causal close, queue wakeup, lifecycle receipt, sealed-set, rollback, and actor continuity boundaries"
+    },
+    {
+      "objectiveId": "P31-OBJ-12",
+      "title": "Full lifecycle receipts are command-backed",
+      "receiptIds": [
+        "plan31-lifecycle-concurrency-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 lifecycle/concurrency validator proves causal close, queue wakeup, lifecycle receipt, sealed-set, rollback, and actor continuity boundaries"
+    },
+    {
+      "objectiveId": "P31-OBJ-14",
+      "title": "Sealed set correctness is independent of live index residue",
+      "receiptIds": [
+        "plan31-lifecycle-concurrency-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 lifecycle/concurrency validator proves causal close, queue wakeup, lifecycle receipt, sealed-set, rollback, and actor continuity boundaries"
+    },
+    {
+      "objectiveId": "P31-OBJ-17",
+      "title": "Rollback path is retained for every non-complete row",
+      "receiptIds": [
+        "plan31-lifecycle-concurrency-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 lifecycle/concurrency validator proves causal close, queue wakeup, lifecycle receipt, sealed-set, rollback, and actor continuity boundaries"
+    },
+    {
+      "objectiveId": "P31-OBJ-20",
+      "title": "Actor continuity is preserved across receipts",
+      "receiptIds": [
+        "plan31-lifecycle-concurrency-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current Plan 3.1 lifecycle/concurrency validator proves causal close, queue wakeup, lifecycle receipt, sealed-set, rollback, and actor continuity boundaries"
     }
   ],
   "blockedPositiveRows": [
@@ -749,7 +817,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Forty rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Forty-six rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",
