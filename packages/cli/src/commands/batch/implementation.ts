@@ -7,6 +7,7 @@ import { createAtomicWaveCheckpointReceipt, evaluateAtomicWaveCheckpoint } from 
 import { appendPlanBatchRunEvent, startPlanBatchRun } from '../../../../core/src/batch/plan-run-journal.ts';
 import { runBatchExecutePlan } from './plan-executor.ts';
 import { buildBatchCheckpointRunnerRecoveryArgs, categorizeCheckpointCloseFailure } from './runner-recovery-forwarding.ts';
+import { buildBatchDeliverAndCloseArgs, parseBatchDeliverAndCloseExtras, stripBatchDeliverAndCloseExtras } from './deliver-and-close-forwarding.ts';
 import { CliError, makeResult, message, parseOptions } from '../shared.ts';
 import { resolveActorId } from '../actor-registry.ts';
 import { runNext } from '../next.ts';
@@ -135,9 +136,7 @@ requiredCommand: `node atm.mjs batch repair --actor ${resolvedActor.actorId} --b
 const currentTaskId = active.currentTaskId; if (!currentTaskId) {
 const completed = releaseBatchRun(options.cwd, active, 'completed'); return makeResult({ ok: true, command: 'batch', cwd: options.cwd, messages: [message('info', 'ATM_BATCH_COMPLETED', 'Batch run is already completed.', { batchId: completed.batchId, scopeKey: completed.scopeKey })], evidence: { action: 'deliver-and-close', batchRun: completed } });
 }
-const deliverAndCloseArgv: string[] = [ 'deliver-and-close', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--from-batch-checkpoint', '--batch', active.batchId, '--json' ]; if (batchDeliverAndCloseExtras?.deliveryCommit) { deliverAndCloseArgv.push('--delivery-commit', batchDeliverAndCloseExtras.deliveryCommit); }
-if (batchDeliverAndCloseExtras?.deliveryMessage) { deliverAndCloseArgv.push('--message', batchDeliverAndCloseExtras.deliveryMessage); }
-if (batchDeliverAndCloseExtras?.reason) { deliverAndCloseArgv.push('--reason', batchDeliverAndCloseExtras.reason); }
+const deliverAndCloseArgv = buildBatchDeliverAndCloseArgs(options.cwd, currentTaskId, resolvedActor.actorId, active.batchId, batchDeliverAndCloseExtras!);
 const deliverResult = await runTasks(deliverAndCloseArgv); if (!deliverResult.ok) {
 const deliverEvidence = deliverResult.evidence as Record<string, unknown>;
 const phase = typeof deliverEvidence?.phase === 'string' ? deliverEvidence.phase : null;
@@ -305,15 +304,6 @@ return value.trim();
 }
 return null;
 }
-function parseBatchDeliverAndCloseExtras(argv: readonly string[]): { deliveryCommit: string | null; deliveryMessage: string | null; reason: string | null } {
-let deliveryCommit: string | null = null;
-let deliveryMessage: string | null = null;
-let reason: string | null = null; for (let index = 0; index < argv.length; index += 1) {
-const arg = argv[index]; if ((arg === '--delivery-commit' || arg === '--historical-delivery') && index + 1 < argv.length) { deliveryCommit = argv[index + 1]; index += 1; continue; }
-if (arg === '--message' && index + 1 < argv.length) { deliveryMessage = argv[index + 1]; index += 1; continue; }
-if (arg === '--reason' && index + 1 < argv.length) { reason = argv[index + 1]; index += 1; continue; }
-}
-return { deliveryCommit, deliveryMessage, reason }; }
 function parseBatchCheckpointReadinessArgs(argv: readonly string[]): { waveId: string | null; manifestDigest: string | null; taskIds: readonly string[]; deliveryReceipts: readonly string[]; buildReceipts: readonly string[]; projectionReceipts: readonly string[]; planningClosebackOk: boolean; evidenceOutPath: string | null } {
 let waveId: string | null = null;
 let manifestDigest: string | null = null;
@@ -353,11 +343,6 @@ mkdirSync(path.dirname(absolute), { recursive: true });
 writeFileSync(absolute, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 return path.relative(cwd, absolute).replace(/\\/g, '/');
 }
-function stripBatchDeliverAndCloseExtras(argv: readonly string[]): string[] {
-const stripped: string[] = []; for (let index = 0; index < argv.length; index += 1) {
-const arg = argv[index]; if ( (arg === '--delivery-commit' || arg === '--historical-delivery' || arg === '--message' || arg === '--reason') && index + 1 < argv.length ) { index += 1; continue; }
-stripped.push(arg); }
-return stripped; }
 function parseBatchHistoricalDeliveryRefs(argv: readonly string[]) {
 const refs: string[] = []; for (let index = 0; index < argv.length; index += 1) {
 const arg = argv[index]; if (arg !== '--historical-delivery' && arg !== '--historical-delivery-commit' && arg !== '--delivery-commit') continue;

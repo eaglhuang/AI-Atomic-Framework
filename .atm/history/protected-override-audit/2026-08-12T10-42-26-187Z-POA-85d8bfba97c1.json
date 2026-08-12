@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-85d8bfba97c1",
+  "recordedAt": "2026-08-12T10:42:26.187Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0314",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0314 --message \"fix(batch): preserve complete task bundle across atomic delivery\n\nATM-Work-Admission: wat-78c9bf1f8053e7d5 sha256:78c9bf1f8053e7d5ff008a9c6b48acce74095bcf84520bd2c157117ef9b8cd44\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0314-e284afd7cd",
+  "reason": "Frozen runner bootstrap circularity; focused acceptance, producer-consumer broker contract, typecheck, and fast CLI validation passed before this task-scoped commit.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T10-42-26-185Z-EMG-ATM-GOV-0314-e284afd7cd.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

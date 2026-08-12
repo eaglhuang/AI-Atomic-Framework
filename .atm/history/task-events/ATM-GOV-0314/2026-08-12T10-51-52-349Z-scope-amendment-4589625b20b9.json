@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T10-51-52-349Z-scope-amendment-4589625b20b9",
+  "taskId": "ATM-GOV-0314",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0314.json",
+  "taskSha256": "sha256:ca0441fb696d939f52b026d4b02ac0563070d4e53d61dc2c13876ac1da10fb65",
+  "createdAt": "2026-08-12T10:51:52.349Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0314 --actor codex-gpt-5.4-mini --add tests/cli/batch-deliver-and-close-forwarding.test.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

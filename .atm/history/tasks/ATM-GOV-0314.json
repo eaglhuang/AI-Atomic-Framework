@@ -187,8 +187,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T10-38-42-116Z-scope-amendment-e601b3d88a7f",
-  "lastTransitionAt": "2026-08-12T10:38:42.116Z",
+  "lastTransitionId": "2026-08-12T10-52-20-976Z-renew-aa8b4ee10831",
+  "lastTransitionAt": "2026-08-12T10:52:20.976Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T10:26:36.191Z",
@@ -197,7 +197,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-f836ebe5f5ed",
     "claimedAt": "2026-08-12T10:26:36.205Z",
-    "heartbeatAt": "2026-08-12T10:30:58.600Z",
+    "heartbeatAt": "2026-08-12T10:52:20.034Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0314.*",
@@ -208,6 +208,7 @@
       "packages/core/src/team-runtime/permission-broker.ts",
       "schemas/evidence",
       "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+      "tests/cli/batch-deliver-and-close-forwarding.test.ts",
       "tests/cli/plan4-shadow-comparison.test.ts"
     ],
     "state": "active",
@@ -238,6 +239,7 @@
       "packages/core/src/team-runtime/permission-broker.ts",
       "schemas/evidence",
       "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+      "tests/cli/batch-deliver-and-close-forwarding.test.ts",
       "tests/cli/plan4-shadow-comparison.test.ts"
     ],
     "planningReadOnlyPaths": [
@@ -265,35 +267,38 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-78c9bf1f8053e7d5",
-    "ticketDigest": "sha256:78c9bf1f8053e7d5ff008a9c6b48acce74095bcf84520bd2c157117ef9b8cd44",
+    "ticketId": "wat-914e775db616816f",
+    "ticketDigest": "sha256:914e775db616816fd62dc3a1b1c1a3f6d379e61b6626b8b221b0ead859d897ca",
     "taskId": "ATM-GOV-0314",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260812102637-codex-gpt-5.4-mini-68074efbfd",
     "claimGeneration": "lease-f836ebe5f5ed",
-    "issuedAt": "2026-08-12T10:30:58.600Z",
-    "expiresAt": "2026-08-12T11:00:58.600Z",
-    "scopeDigest": "sha256:da9a1bdab7c1163ed8e99424404ee5f4c3c84452b5bcbccd0a0bf0873e73f800",
+    "issuedAt": "2026-08-12T10:52:20.034Z",
+    "expiresAt": "2026-08-12T11:22:20.034Z",
+    "scopeDigest": "sha256:5afee722f44766a246627a47c403cbfeec53ada3d7078644521e410d2fe5ba00",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T10:30:58.600Z"
+      "selectedAt": "2026-08-12T10:52:20.034Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0314.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0314/**",
           ".atm/history/tasks/ATM-GOV-0314.json",
           "packages/cli/src/commands",
           "packages/core/src/evidence",
+          "packages/core/src/team-runtime/permission-broker.ts",
           "schemas/evidence",
           "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+          "tests/cli/batch-deliver-and-close-forwarding.test.ts",
           "tests/cli/plan4-shadow-comparison.test.ts"
         ],
-        "digest": "sha256:8f5d0388f1a2d64b2c76b7f4d038e8ea06ec0ea0b8252add4dd2e9814d30a0ab"
+        "digest": "sha256:ba4ba8bcc9b3df4cbc1a05437521cc6910be8bef9479e32e089fc221431fbbb0"
       },
       {
         "kind": "lifecycle-operation",

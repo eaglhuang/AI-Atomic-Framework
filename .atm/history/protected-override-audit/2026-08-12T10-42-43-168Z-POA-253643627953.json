@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-253643627953",
+  "recordedAt": "2026-08-12T10:42:43.168Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0314",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0314 --message \"fix(batch): preserve complete task bundle across atomic delivery\n\nATM-Work-Admission: wat-78c9bf1f8053e7d5 sha256:78c9bf1f8053e7d5ff008a9c6b48acce74095bcf84520bd2c157117ef9b8cd44\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0314-e284afd7cd",
+  "reason": "Frozen runner bootstrap circularity; focused acceptance, producer-consumer broker contract, typecheck, and fast CLI validation passed before this task-scoped commit.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T10-42-26-185Z-EMG-ATM-GOV-0314-e284afd7cd.json",
+  "parentEventId": "POA-85d8bfba97c1",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
