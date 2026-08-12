@@ -1,0 +1,300 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0337",
+  "title": "Run real selected-versus-full shadow comparison",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0336"
+  ],
+  "acceptance": [
+    "ACC-1: 兩 profile 綁定相同 source/runner/catalog/candidate digest，保存完整 commands、run IDs、selected/skipped/unknown 與 artifact paths。",
+    "ACC-2: 輸出 false-block、escaped-defect、latency、cache hit/miss；任一 escaped defect 使 policy epoch invalid。",
+    "ACC-3: negative controls 覆蓋 candidate mismatch、人工 outcome、missing full source、stale receipt、縮分母。",
+    "ACC-4: legacy profile 仍可獨立執行，rollback replay 成功；沒有 fixture-only 真實執行宣稱。"
+  ],
+  "deliverables": [
+    "docs/reports/plan4-real-shadow-comparison.json",
+    "tests/core/real-shadow-comparison.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/shadow-comparison.ts",
+    "packages/core/src/maps/shadow-comparator.ts",
+    "schemas/evidence/shadow-comparison.schema.json",
+    "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+    "docs/reports/plan4-real-shadow-comparison.json"
+  ],
+  "validators": [
+    "node --strip-types tests/core/real-shadow-comparison.test.ts",
+    "npm run validate:full"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "invalidate-policy-epoch-and-restore-legacy-selection",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.shadow-comparison",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0337-run-real-selected-versus-full-shadow-comparison.task.md",
+    "sectionTitle": "ATM-GOV-0337",
+    "headingLine": 61,
+    "hash": "c396d67c816d4bf4",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0337-run-real-selected-versus-full-shadow-comparison.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:c396d67c816d4bf4e5a6d0610cc685bcd71ec91dc20b957be56a771ff8ade7df",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:37.323Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:37.323Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0336"
+    ],
+    "startConditions": [
+      "Plan 4 foundation chain is green with 17 sealed anchors.",
+      "Selected and full profiles resolve from the same catalog digest."
+    ],
+    "softRelations": [
+      "ATM-GOV-0338"
+    ],
+    "changedPublicSeams": [
+      "atm.shadowComparison.v1"
+    ],
+    "causalImpactEdges": [
+      "same-candidate-shadow",
+      "escaped-defect-adjudication",
+      "policy-epoch"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-candidate",
+      "selected-profile",
+      "full-profile"
+    ],
+    "validatorReferences": [
+      "validate-shadow-comparison",
+      "validate-test-facade",
+      "validate-full"
+    ],
+    "phaseOwner": "closeout-wave-8-shadow"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_real_same_candidate_shadow_0337",
+      "targetGroupId": null,
+      "semanticKey": "real_same_candidate_shadow",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "same-candidate-shadow",
+        "escaped-defect-adjudication",
+        "policy-epoch"
+      ],
+      "expectedRedPredicate": "fixture-only self-declared or mismatched candidate shadow cannot pass",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.shadowComparison.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_real_same_candidate_shadow_0337"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_shadow_comparison"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T18-38-43-595Z-renew-3b721a1ebed4",
+  "lastTransitionAt": "2026-08-12T18:38:43.595Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T18:36:20.105Z",
+  "promotedAt": "2026-08-12T18:36:20.108Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-883db4329f5d",
+    "claimedAt": "2026-08-12T18:36:20.112Z",
+    "heartbeatAt": "2026-08-12T18:38:42.939Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0337.*",
+      ".atm/history/task-events/ATM-GOV-0337/**",
+      ".atm/history/tasks/ATM-GOV-0337.json",
+      "docs/reports/plan4-real-shadow-comparison.json",
+      "packages/core/src/evidence/shadow-comparison.ts",
+      "packages/core/src/maps/shadow-comparator.ts",
+      "schemas/evidence/shadow-comparison.schema.json",
+      "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+      "tests/cli/plan4-shadow-comparison.test.ts",
+      "tests/core/real-shadow-comparison.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
+    }
+  },
+  "startedAt": "2026-08-12T18:36:20.112Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d9336d765ade6659",
+    "ticketDigest": "sha256:d9336d765ade665953595b213fcc086f34207b94ac7e7cbff17a0c9783be81c3",
+    "taskId": "ATM-GOV-0337",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+    "claimGeneration": "lease-883db4329f5d",
+    "issuedAt": "2026-08-12T18:38:42.939Z",
+    "expiresAt": "2026-08-12T19:08:42.939Z",
+    "scopeDigest": "sha256:4dc07ee02a44bfee648ca0c993305d8ec54291e3cae1f70981bec18f21003664",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T18:38:42.939Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0337.*",
+          ".atm/history/task-events/ATM-GOV-0337/**",
+          ".atm/history/tasks/ATM-GOV-0337.json",
+          "docs/reports/plan4-real-shadow-comparison.json",
+          "packages/core/src/evidence/shadow-comparison.ts",
+          "packages/core/src/maps/shadow-comparator.ts",
+          "schemas/evidence/shadow-comparison.schema.json",
+          "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+          "tests/cli/plan4-shadow-comparison.test.ts",
+          "tests/core/real-shadow-comparison.test.ts"
+        ],
+        "digest": "sha256:c6354a6b6f315d5490c613cd2eb4085812f11e6f6b25c40c1066f929ba26ed5e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260812183620-codex-gpt-5.4-mini-ATM-GOV-0337-e62a2cc5e1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0337",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-e3a61f0b43f06a54",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0337.*",
+      ".atm/history/task-events/ATM-GOV-0337/**",
+      ".atm/history/tasks/ATM-GOV-0337.json",
+      "docs/reports/plan4-real-shadow-comparison.json",
+      "packages/core/src/evidence/shadow-comparison.ts",
+      "packages/core/src/maps/shadow-comparator.ts",
+      "schemas/evidence/shadow-comparison.schema.json",
+      "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
+      "tests/cli/plan4-shadow-comparison.test.ts",
+      "tests/core/real-shadow-comparison.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0337-run-real-selected-versus-full-shadow-comparison.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0337-run-real-selected-versus-full-shadow-comparison.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812182104-codex-gpt-5.4-mini-c645264f57",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812182104-codex-gpt-5.4-mini-c645264f57\""
+    },
+    "createdAt": "2026-08-12T18:36:24.459Z",
+    "status": "active"
+  }
+}
