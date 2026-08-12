@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T18-58-16-993Z-scope-amendment-812b7a7812e4",
+  "taskId": "ATM-GOV-0339",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0339.json",
+  "taskSha256": "sha256:182db9303192454486670d99f874c32dedda9b8356e35f7d9a292786e853cb0a",
+  "createdAt": "2026-08-12T18:58:16.993Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0339 --actor codex-gpt-5.4-mini --add \"docs/reports/plan4-hostile-dogfood-saturation.json,tests/e2e/plan4-hostile-dual-captain.test.ts\" --reason \"Task deliverables are declared in ATM-GOV-0339 but missing from imported scope; add exact deliverable paths before implementation.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Task deliverables are declared in ATM-GOV-0339 but missing from imported scope; add exact deliverable paths before implementation."
+  }
+}

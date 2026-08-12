@@ -1,0 +1,343 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0339",
+  "title": "Execute hostile dual-captain dogfood paired experiments and saturation",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0327",
+    "ATM-GOV-0338"
+  ],
+  "acceptance": [
+    "ACC-1: 八種 branch 每個都有 sealed input、actor/process、command、expected failure/recovery、HEAD/index/lock/broker before-after、exit、receipt、rollback、dashboard digest。",
+    "ACC-2: shared-write gate 一律回 broker ticket；真正 logical conflict 才 queue/revalidate，safe compose 可零等待，neutral steward 為唯一 shared writer。",
+    "ACC-3: 沒有 borrowed identity、detached worktree、alternate index、merge/rebase、override/no-verify/emergency success；foreign dirty 必須 fail-close。",
+    "ACC-4: A/A null control；AB/BA 每方向至少三次，固定 workload/seed/threshold，同時記 correctness、latency、cost、overlap、queue wait、rollback。",
+    "ACC-5: 每 incident family 有 recurrence count、事前 stopping rule、new-family count、unknown disposition；新增 family 回 backlog，不能因未飽和宣告完成。"
+  ],
+  "deliverables": [
+    "docs/reports/plan4-hostile-dogfood-saturation.json",
+    "tests/e2e/plan4-hostile-dual-captain.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/run-real-parallel-dogfood.ts",
+    "packages/core/src/evidence/hostile-dogfood.ts",
+    "packages/core/src/broker/replay/",
+    "schemas/atm.parallel-replay-scenario.v1.schema.json",
+    "schemas/atm.parallel-replay-evidence.v1.schema.json",
+    "tests/e2e/atm-3-real-parallel-replay.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/e2e/plan4-hostile-dual-captain.test.ts",
+    "node --strip-types tests/e2e/atm-3-real-parallel-replay.test.ts",
+    "npm run validate:team-brokered-write"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-real-execution",
+  "rollbackStrategy": "restore-prior-policy-epoch-and-replay-rollback-without-discarding-observations",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.hostile-dogfood",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0339-execute-hostile-dual-captain-dogfood-paired-experiments-and-saturation.task.md",
+    "sectionTitle": "ATM-GOV-0339",
+    "headingLine": 80,
+    "hash": "253a5540d98b2794",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0339-execute-hostile-dual-captain-dogfood-paired-experiments-and-saturation.task.md",
+      "planningCommitSha": "261d893658808b02643768c240a72617b3aee9fb",
+      "contentDigest": "sha256:253a5540d98b27941d5ae7e866b1674a1812b95f8397597b1514c3dfa5a84efa",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T08:22:45.180Z"
+    }
+  },
+  "importedAt": "2026-08-09T08:22:45.180Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0327",
+      "ATM-GOV-0338"
+    ],
+    "startConditions": [
+      "Six adapter parity is green.",
+      "Rescue history is fully classified and prompt-scoped next no longer fails from rescue-root ambiguity.",
+      "Two distinct actors and OS processes are available in the single canonical worktree."
+    ],
+    "softRelations": [
+      "ATM-GOV-0340"
+    ],
+    "changedPublicSeams": [
+      "atm.hostileDogfood.v1",
+      "atm.parallelReplayEvidence.v1"
+    ],
+    "causalImpactEdges": [
+      "shared-index",
+      "cas-head-moved",
+      "queue-race",
+      "close-deferral",
+      "runner-sync",
+      "provenance-mismatch",
+      "stale-batch",
+      "foreign-dirty"
+    ],
+    "parallelFrontierInputs": [
+      "two-actors",
+      "two-processes",
+      "sealed-workload",
+      "broker",
+      "canonical-head"
+    ],
+    "validatorReferences": [
+      "validate-team-brokered-write",
+      "validate-broker-recovery",
+      "validate-state-replay"
+    ],
+    "phaseOwner": "closeout-wave-8-dogfood"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_hostile_dual_captain_real_branches_0339",
+      "targetGroupId": null,
+      "semanticKey": "hostile_dual_captain_real_branches",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "shared-index",
+        "cas-head-moved",
+        "queue-race",
+        "close-deferral",
+        "runner-sync",
+        "provenance-mismatch",
+        "stale-batch",
+        "foreign-dirty"
+      ],
+      "expectedRedPredicate": "synthetic actor same-process branch or override success cannot satisfy hostile coverage",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.hostileDogfood.v1",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_paired_experiment_and_saturation_0339",
+      "targetGroupId": null,
+      "semanticKey": "paired_experiment_and_saturation",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "queue-race",
+        "runner-sync",
+        "stale-batch"
+      ],
+      "expectedRedPredicate": "missing AA control AB or BA samples stopping rule or rollback blocks phase exit",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.parallelReplayEvidence.v1",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_hostile_dual_captain_real_branches_0339",
+    "test_paired_experiment_and_saturation_0339"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_hostile_dogfood"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-12T19-01-08-752Z-scope-amendment-e43111ca3f75",
+  "lastTransitionAt": "2026-08-12T19:01:08.752Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-12T18:57:40.628Z",
+  "promotedAt": "2026-08-12T18:57:40.632Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-47690e145d49",
+    "claimedAt": "2026-08-12T18:57:40.636Z",
+    "heartbeatAt": "2026-08-12T18:57:40.636Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0339.*",
+      ".atm/history/task-events/ATM-GOV-0339/**",
+      ".atm/history/tasks/ATM-GOV-0339.json",
+      "docs/reports/plan4-hostile-dogfood-saturation.json",
+      "packages/cli/src/commands/broker/replay/implementation.ts",
+      "packages/core/src/broker/replay/",
+      "packages/core/src/evidence/hostile-dogfood.ts",
+      "schemas/atm.parallel-replay-evidence.v1.schema.json",
+      "schemas/atm.parallel-replay-scenario.v1.schema.json",
+      "scripts/run-real-parallel-dogfood.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "tests/e2e/plan4-hostile-dual-captain.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260812185740-codex-gpt-5.4-mini-538d26f40a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812185740-codex-gpt-5.4-mini-538d26f40a\""
+    }
+  },
+  "startedAt": "2026-08-12T18:57:40.636Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-291ee5ebcc995ff8",
+    "ticketDigest": "sha256:291ee5ebcc995ff8819562ab1f75c587de911fc6986af3d132b30488c459daa2",
+    "taskId": "ATM-GOV-0339",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260812185740-codex-gpt-5.4-mini-538d26f40a",
+    "claimGeneration": "lease-47690e145d49",
+    "issuedAt": "2026-08-12T18:57:40.636Z",
+    "expiresAt": "2026-08-12T19:27:40.636Z",
+    "scopeDigest": "sha256:51bc35e08f067149b344043f2d71db8c4578e0cddcd153692ec847281fb36760",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-12T18:57:40.636Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0339.*",
+          ".atm/history/task-events/ATM-GOV-0339/**",
+          ".atm/history/tasks/ATM-GOV-0339.json",
+          "packages/core/src/broker/replay/",
+          "packages/core/src/evidence/hostile-dogfood.ts",
+          "schemas/atm.parallel-replay-evidence.v1.schema.json",
+          "schemas/atm.parallel-replay-scenario.v1.schema.json",
+          "scripts/run-real-parallel-dogfood.ts",
+          "tests/e2e/atm-3-real-parallel-replay.test.ts"
+        ],
+        "digest": "sha256:660b624493abbc6383553014c2638a440d7a0dd9d98d7f77ae2158b67d1e02b2"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260812185740-codex-gpt-5.4-mini-ATM-GOV-0339-e83893b973",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0339",
+    "batchId": "batch-2522d44aebb6",
+    "scopeKey": "tasks-832d0e940d20",
+    "queueId": "queue-6126f1fdc6bdeb83",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0339.*",
+      ".atm/history/task-events/ATM-GOV-0339/**",
+      ".atm/history/tasks/ATM-GOV-0339.json",
+      "docs/reports/plan4-hostile-dogfood-saturation.json",
+      "packages/cli/src/commands/broker/replay/implementation.ts",
+      "packages/core/src/broker/replay/",
+      "packages/core/src/evidence/hostile-dogfood.ts",
+      "schemas/atm.parallel-replay-evidence.v1.schema.json",
+      "schemas/atm.parallel-replay-scenario.v1.schema.json",
+      "scripts/run-real-parallel-dogfood.ts",
+      "tests/e2e/atm-3-real-parallel-replay.test.ts",
+      "tests/e2e/plan4-hostile-dual-captain.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0339-execute-hostile-dual-captain-dogfood-paired-experiments-and-saturation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0339-execute-hostile-dual-captain-dogfood-paired-experiments-and-saturation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7858ab9fdea2561b333e469172972f8d8d862b7572f9108da3428f75aa4a875d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260812185740-codex-gpt-5.4-mini-538d26f40a",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812185740-codex-gpt-5.4-mini-538d26f40a\""
+    },
+    "createdAt": "2026-08-12T18:57:45.025Z",
+    "status": "active"
+  }
+}

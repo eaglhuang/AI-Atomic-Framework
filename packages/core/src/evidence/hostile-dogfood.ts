@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
+import type { ParallelReplayTelemetryProof } from '../telemetry/parallel-replay/index.ts';
 
 export const HOSTILE_DOGFOOD_SCHEMA_ID = 'atm.hostileDogfoodReceipt.v1' as const;
+export const HOSTILE_DOGFOOD_SATURATION_SCHEMA_ID = 'atm.hostileDogfoodSaturation.v1' as const;
 
 export type HostileOutcome = 'recovered' | 'blocked' | 'unknown';
 
@@ -46,6 +48,52 @@ export interface HostileDogfoodResult {
   readonly canonicalWorktreeIntact: boolean;
   readonly diagnostics: readonly string[];
   readonly resultDigest: string;
+}
+
+export interface HostileDogfoodSaturationInput {
+  readonly taskId: string;
+  readonly hostile: HostileDogfoodResult;
+  readonly replayProof: ParallelReplayTelemetryProof;
+  readonly pairedExperiments: readonly {
+    readonly label: 'AA' | 'AB' | 'BA';
+    readonly sampleCount: number;
+    readonly correctnessPass: boolean;
+    readonly queueWaitMs: number;
+    readonly rollbackPreserved: boolean;
+  }[];
+  readonly incidentFamilies: readonly {
+    readonly family: string;
+    readonly recurrenceCount: number;
+    readonly disposition: 'known-covered' | 'new-backlog-required' | 'unknown';
+  }[];
+  readonly stoppingRule: {
+    readonly minimumSamplesPerArm: number;
+    readonly maximumUnknownFamilies: number;
+  };
+}
+
+export interface HostileDogfoodSaturationResult {
+  readonly schemaId: typeof HOSTILE_DOGFOOD_SATURATION_SCHEMA_ID;
+  readonly taskId: string;
+  readonly verdict: 'pass' | 'blocked';
+  readonly hostileDigest: string;
+  readonly replayProofDigest: string;
+  readonly pairedExperimentSummary: {
+    readonly aaSamples: number;
+    readonly abSamples: number;
+    readonly baSamples: number;
+    readonly correctnessPass: boolean;
+    readonly queueWaitMs: number;
+    readonly rollbackPreserved: boolean;
+  };
+  readonly incidentFamilySummary: {
+    readonly familyCount: number;
+    readonly recurrenceCount: number;
+    readonly newBacklogRequiredCount: number;
+    readonly unknownDispositionCount: number;
+  };
+  readonly diagnostics: readonly string[];
+  readonly digest: string;
 }
 
 const digest = (value: unknown) =>
@@ -111,5 +159,61 @@ export function compileHostileDogfood(input: HostileDogfoodInput): HostileDogfoo
     canonicalWorktreeIntact,
     diagnostics,
     resultDigest: digest({ sealedReceiptDigest: input.sealedReceiptDigest, lanes, conditions, requiredConditions, minimumIndependentLanes, status, saturation, rollbackPreserved, canonicalWorktreeIntact })
+  };
+}
+
+export function compileHostileDogfoodSaturation(input: HostileDogfoodSaturationInput): HostileDogfoodSaturationResult {
+  const diagnostics: string[] = [];
+  const pairedExperimentSummary = summarizePairedExperiments(input.pairedExperiments);
+  const incidentFamilySummary = summarizeIncidentFamilies(input.incidentFamilies);
+
+  if (input.hostile.status !== 'proven') diagnostics.push('hostile-dogfood-not-proven');
+  if (input.replayProof.breaker.verdict !== 'pass') diagnostics.push('parallel-replay-not-pass');
+  if (input.replayProof.correctness.escapedConflictCount !== 0) diagnostics.push('escaped-conflict-observed');
+  if (input.replayProof.correctness.silentOverwriteCount !== 0) diagnostics.push('silent-overwrite-observed');
+  if (input.replayProof.breaker.timeInQueueOnlyRatio !== 0) diagnostics.push('queue-only-ratio-observed');
+  if (pairedExperimentSummary.aaSamples < input.stoppingRule.minimumSamplesPerArm) diagnostics.push('aa-samples-below-stopping-rule');
+  if (pairedExperimentSummary.abSamples < input.stoppingRule.minimumSamplesPerArm) diagnostics.push('ab-samples-below-stopping-rule');
+  if (pairedExperimentSummary.baSamples < input.stoppingRule.minimumSamplesPerArm) diagnostics.push('ba-samples-below-stopping-rule');
+  if (!pairedExperimentSummary.correctnessPass) diagnostics.push('paired-experiment-correctness-failed');
+  if (!pairedExperimentSummary.rollbackPreserved) diagnostics.push('paired-experiment-rollback-not-preserved');
+  if (incidentFamilySummary.unknownDispositionCount > input.stoppingRule.maximumUnknownFamilies) diagnostics.push('unknown-incident-family-disposition');
+
+  const verdict: HostileDogfoodSaturationResult['verdict'] = diagnostics.length ? 'blocked' : 'pass';
+  const withoutDigest = {
+    schemaId: HOSTILE_DOGFOOD_SATURATION_SCHEMA_ID,
+    taskId: input.taskId,
+    verdict,
+    hostileDigest: input.hostile.resultDigest,
+    replayProofDigest: input.replayProof.digest,
+    pairedExperimentSummary,
+    incidentFamilySummary,
+    diagnostics
+  };
+
+  return {
+    ...withoutDigest,
+    digest: digest(withoutDigest)
+  };
+}
+
+function summarizePairedExperiments(input: HostileDogfoodSaturationInput['pairedExperiments']): HostileDogfoodSaturationResult['pairedExperimentSummary'] {
+  const count = (label: 'AA' | 'AB' | 'BA') => input.filter((entry) => entry.label === label).reduce((sum, entry) => sum + entry.sampleCount, 0);
+  return {
+    aaSamples: count('AA'),
+    abSamples: count('AB'),
+    baSamples: count('BA'),
+    correctnessPass: input.length > 0 && input.every((entry) => entry.correctnessPass),
+    queueWaitMs: input.reduce((sum, entry) => sum + entry.queueWaitMs, 0),
+    rollbackPreserved: input.length > 0 && input.every((entry) => entry.rollbackPreserved)
+  };
+}
+
+function summarizeIncidentFamilies(input: HostileDogfoodSaturationInput['incidentFamilies']): HostileDogfoodSaturationResult['incidentFamilySummary'] {
+  return {
+    familyCount: new Set(input.map((entry) => entry.family)).size,
+    recurrenceCount: input.reduce((sum, entry) => sum + entry.recurrenceCount, 0),
+    newBacklogRequiredCount: input.filter((entry) => entry.disposition === 'new-backlog-required').length,
+    unknownDispositionCount: input.filter((entry) => entry.disposition === 'unknown').length
   };
 }

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T19-01-08-752Z-scope-amendment-e43111ca3f75",
+  "taskId": "ATM-GOV-0339",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0339.json",
+  "taskSha256": "sha256:820b5e20814043ab41221f4cf00a461f8875c1f0fa8bb4b2bdaf88be7338cfd1",
+  "createdAt": "2026-08-12T19:01:08.752Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0339 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/broker/replay/implementation.ts --reason \"Required ATM-GOV-0339 validator is flaky because the real parallel replay implementation measures worker overlap from process spawn variance; add the exact implementation seam to stabilize command-backed hostile dogfood evidence.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Required ATM-GOV-0339 validator is flaky because the real parallel replay implementation measures worker overlap from process spawn variance; add the exact implementation seam to stabilize command-backed hostile dogfood evidence."
+  }
+}

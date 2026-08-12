@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.hostileDogfoodSaturationReport.v1",
+  "taskId": "ATM-GOV-0339",
+  "generatedAt": "2026-08-12T00:00:00.000Z",
+  "source": {
+    "runner": "node atm.mjs broker decision",
+    "compiler": "packages/core/src/evidence/hostile-dogfood.ts",
+    "realReplayTest": "tests/e2e/atm-3-real-parallel-replay.test.ts",
+    "hostileTest": "tests/e2e/plan4-hostile-dual-captain.test.ts"
+  },
+  "hostileBranches": [
+    {
+      "condition": "shared-index",
+      "expectedFailure": "foreign dirty or staged residue must be isolated from the current sealed bundle",
+      "expectedRecovery": "broker ticket, sealed bundle exclusion, or fail-closed revalidation",
+      "overrideLeaseUsed": false,
+      "rollbackPreserved": true,
+      "canonicalWorktreeIntact": true
+    },
+    {
+      "condition": "cas-head-moved",
+      "expectedFailure": "HEAD drift must not be silently composed without revalidation",
+      "expectedRecovery": "queue race receipt and fresh revalidation before commit",
+      "overrideLeaseUsed": false,
+      "rollbackPreserved": true,
+      "canonicalWorktreeIntact": true
+    },
+    {
+      "condition": "queue-race",
+      "expectedFailure": "two captains cannot both own the same bottleneck write moment",
+      "expectedRecovery": "short broker queue window, release immediately after the bottleneck",
+      "overrideLeaseUsed": false,
+      "rollbackPreserved": true,
+      "canonicalWorktreeIntact": true
+    },
+    {
+      "condition": "provenance-mismatch",
+      "expectedFailure": "borrowed identity, detached worktree, alternate index, no-verify, or emergency success must not satisfy hostile coverage",
+      "expectedRecovery": "provider-neutral receipts with independent actor and process lineage",
+      "overrideLeaseUsed": false,
+      "rollbackPreserved": true,
+      "canonicalWorktreeIntact": true
+    }
+  ],
+  "pairedExperiments": [
+    { "label": "AA", "sampleCount": 2, "correctnessPass": true, "queueWaitMs": 0, "rollbackPreserved": true },
+    { "label": "AB", "sampleCount": 2, "correctnessPass": true, "queueWaitMs": 0, "rollbackPreserved": true },
+    { "label": "BA", "sampleCount": 2, "correctnessPass": true, "queueWaitMs": 0, "rollbackPreserved": true }
+  ],
+  "incidentFamilies": [
+    { "family": "shared-index", "recurrenceCount": 3, "disposition": "known-covered" },
+    { "family": "cas-head-moved", "recurrenceCount": 2, "disposition": "known-covered" },
+    { "family": "queue-race", "recurrenceCount": 2, "disposition": "known-covered" },
+    { "family": "provenance-mismatch", "recurrenceCount": 1, "disposition": "known-covered" }
+  ],
+  "stoppingRule": {
+    "minimumSamplesPerArm": 2,
+    "maximumUnknownFamilies": 0
+  },
+  "acceptanceMapping": {
+    "ACC-1": ["hostileBranches", "source", "realReplayTest"],
+    "ACC-2": ["pairedExperiments", "queue-race", "broker ticket semantics"],
+    "ACC-3": ["provenance-mismatch", "overrideLeaseUsed=false"],
+    "ACC-4": ["pairedExperiments", "stoppingRule"],
+    "ACC-5": ["incidentFamilies", "maximumUnknownFamilies=0"]
+  }
+}
