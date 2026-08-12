@@ -341,10 +341,15 @@ function resolveGitExecutableForRollback() {
 }
 export function buildCloseWriteRollbackSnapshot(input) {
     const evidence = input.backendEvidence ?? {};
-    const stagedArtifacts = uniqueRelativePaths([typeof evidence.taskPath === 'string' ? evidence.taskPath : `.atm/history/tasks/${input.taskId}.json`,
-        typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null, typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, `.atm/history/evidence/${input.taskId}.json`, ...(input.extraStagedArtifacts ?? [])]);
-    return { taskPath: `.atm/history/tasks/${input.taskId}.json`, previousTaskContent: input.previousTaskContent,
-        transitionPath: typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null, closurePacketPath: typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null, closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
+    const taskPath = `.atm/history/tasks/${input.taskId}.json`;
+    const taskAbsolutePath = path.join(input.cwd, taskPath);
+    const currentTask = existsSync(taskAbsolutePath) ? JSON.parse(readFileSync(taskAbsolutePath, 'utf8')) : null;
+    const liveTransitionPath = typeof currentTask?.lastTransitionId === 'string' && currentTask.lastTransitionId.trim() ? `.atm/history/task-events/${input.taskId}/${currentTask.lastTransitionId.trim()}.json` : null;
+    const transitionPath = typeof evidence.transitionPath === 'string' ? evidence.transitionPath : liveTransitionPath;
+    const stagedArtifacts = uniqueRelativePaths([typeof evidence.taskPath === 'string' ? evidence.taskPath : taskPath,
+        transitionPath, typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, `.atm/history/evidence/${input.taskId}.json`, ...(input.extraStagedArtifacts ?? [])]);
+    return { taskPath, previousTaskContent: input.previousTaskContent,
+        transitionPath, closurePacketPath: typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null, closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
         planningCard: input.planningCard, stagedArtifacts, preCloseStagedFiles: uniqueRelativePaths(input.preCloseStagedFiles ?? []) };
 }
 function uniqueRelativePaths(values) { return [...new Set(values.map((entry) => (typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '')).filter(Boolean))]; }

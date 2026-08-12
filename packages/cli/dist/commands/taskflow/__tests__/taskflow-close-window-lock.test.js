@@ -243,6 +243,31 @@ try {
     assert.ok(rollback.rolledBackArtifacts.some((entry) => entry.includes('close-window-staged-index.lock.json')));
     assert.equal(readCloseWindowStagedIndexLockReport(repoRoot), null);
     assert.equal(readFileSync(path.join(repoRoot, `.atm/history/tasks/${taskId}.json`), 'utf8'), previousTaskContent);
+    const transitionId = '2026-08-12T00-00-00-000Z-close-rollback-fixture';
+    writeJson(path.join(repoRoot, `.atm/history/tasks/${taskId}.json`), {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: taskId,
+        status: 'done',
+        lastTransitionId: transitionId
+    });
+    const transitionPath = path.join(repoRoot, '.atm', 'history', 'task-events', taskId, `${transitionId}.json`);
+    writeJson(transitionPath, { taskId, action: 'close' });
+    const derivedSnapshot = buildCloseWriteRollbackSnapshot({
+        cwd: repoRoot,
+        taskId,
+        previousTaskContent,
+        backendEvidence: {},
+        planningCard: null
+    });
+    rollbackCloseWriteTransaction({
+        cwd: repoRoot,
+        taskId,
+        actorId: 'fixture-agent',
+        snapshot: derivedSnapshot,
+        failureStep: 'commit-bundle',
+        failureCode: 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_FAILED'
+    });
+    assert.equal(existsSync(transitionPath), false, 'rollback must remove the transition inferred from the mutated live ledger');
     console.log('taskflow-close-window-lock.test.ts: all assertions passed');
 }
 finally {

@@ -307,8 +307,8 @@
     "findings": []
   },
   "reopenedAt": "2026-08-12T07:41:15.141Z",
-  "lastTransitionId": "2026-08-12T08-36-18-798Z-close-65a775542e1a",
-  "lastTransitionAt": "2026-08-12T08:36:18.798Z",
+  "lastTransitionId": "2026-08-12T08-51-07-038Z-close-981c23046c39",
+  "lastTransitionAt": "2026-08-12T08:51:07.038Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-12T07:41:36.636Z",
@@ -317,7 +317,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-097337c8ee83",
     "claimedAt": "2026-08-12T07:41:36.646Z",
-    "heartbeatAt": "2026-08-12T08:36:18.795Z",
+    "heartbeatAt": "2026-08-12T08:51:07.034Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0351.*",
@@ -345,6 +345,7 @@
       "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
       "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
       "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
       "packages/cli/src/commands/taskflow/close-preflight.ts",
       "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
       "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
@@ -360,27 +361,27 @@
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812074137-codex-gpt-5.4-mini-783ec8d57c\""
     },
-    "reason": "closed"
+    "reason": "ATM-GOV-0351 rollback repair and its only regression test were intentionally delivered atomically; the test proves the same close-transaction invariant."
   },
   "startedAt": "2026-08-12T07:41:36.646Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d980334436e0604d",
-    "ticketDigest": "sha256:d980334436e0604d4f0448d9a61cb71ef9d7b6a7df467a7ac9074e65eef49776",
+    "ticketId": "wat-c0e4c03c4d75b7cb",
+    "ticketDigest": "sha256:c0e4c03c4d75b7cb6108b8a5b31848e50fc475fb2d804ac8a8198be0dd898dc8",
     "taskId": "ATM-GOV-0351",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260812074137-codex-gpt-5.4-mini-783ec8d57c",
     "claimGeneration": "lease-097337c8ee83",
-    "issuedAt": "2026-08-12T08:33:20.411Z",
-    "expiresAt": "2026-08-12T09:03:20.411Z",
-    "scopeDigest": "sha256:208ef79edd126edb0bff327868f8fa39227e73491726cd0b50b841a379a53633",
+    "issuedAt": "2026-08-12T08:49:15.917Z",
+    "expiresAt": "2026-08-12T09:19:15.917Z",
+    "scopeDigest": "sha256:d3db1b2c46c38bf899a5b6dd10f58bab09c2275decf898f226efa1096aa67e0e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T08:33:20.411Z"
+      "selectedAt": "2026-08-12T08:49:15.917Z"
     },
     "grants": [
       {
@@ -412,6 +413,7 @@
           "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
           "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
           "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
           "packages/cli/src/commands/taskflow/close-preflight.ts",
           "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
           "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
@@ -420,7 +422,7 @@
           "packages/core/src/broker/cross-task-mutation-guard.ts",
           "tests/cli-fixtures/help-snapshots/next.json"
         ],
-        "digest": "sha256:ea1ab01298584a13a85a051bf295cb0e798c4c4b2f1481a89b71ad9173884a51"
+        "digest": "sha256:c25ea38284d135bdc1fe26f584afc8893033352fcb72c45d2d8b0e8d021ea277"
       },
       {
         "kind": "lifecycle-operation",
@@ -490,6 +492,7 @@
       "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
       "packages/cli/src/commands/next/runner-recovery-claim-authorization.ts",
       "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
       "packages/cli/src/commands/taskflow/close-preflight.ts",
       "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
       "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
@@ -517,11 +520,12 @@
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812074137-codex-gpt-5.4-mini-783ec8d57c\""
     },
-    "createdAt": "2026-08-12T08:30:10.817Z",
+    "createdAt": "2026-08-12T08:40:41.636Z",
     "status": "active"
   },
-  "closedAt": "2026-08-12T08:36:18.795Z",
+  "closedAt": "2026-08-12T08:51:07.034Z",
   "closedByActor": "codex-gpt-5.4-mini",
   "closedBySessionId": "session-20260812074136-codex-gpt-5.4-mini-ATM-GOV-0351-9be2392ce6",
+  "closeReason": "ATM-GOV-0351 rollback repair and its only regression test were intentionally delivered atomically; the test proves the same close-transaction invariant.",
   "closurePacket": ".atm/history/evidence/ATM-GOV-0351.closure-packet.json"
 }
