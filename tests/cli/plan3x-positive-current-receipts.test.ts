@@ -6,14 +6,14 @@ const report = JSON.parse(readFileSync('docs/reports/plan-3x-positive-current-re
 
 assert.equal(report.schemaId, 'atm.plan3xPositiveCurrentReceipts.v1');
 assert.equal(report.status, 'positive-current-receipts-consumed');
-assert.equal(report.totals.freshCommandRows, 34);
+assert.equal(report.totals.freshCommandRows, 33);
 assert.equal(report.totals.positiveReceiptRowsReadyForSourceRecompute, 0);
-assert.equal(report.totals.positiveReceiptRowsConsumedIntoSourceReplay, 14);
-assert.equal(report.totals.objectiveAlignedNegativeControlRowsConsumed, 3);
+assert.equal(report.totals.positiveReceiptRowsConsumedIntoSourceReplay, 15);
+assert.equal(report.totals.objectiveAlignedNegativeControlRowsConsumed, 4);
 assert.equal(report.totals.blockedByDoctorIntegrationDrift, 2);
-assert.equal(report.totals.sourceRowsMutatedByThisReport, 14);
-assert.equal(report.positiveRows.length, 14);
-assert.equal(new Set(report.positiveRows.map((entry: any) => entry.objectiveId)).size, 14);
+assert.equal(report.totals.sourceRowsMutatedByThisReport, 15);
+assert.equal(report.positiveRows.length, 15);
+assert.equal(new Set(report.positiveRows.map((entry: any) => entry.objectiveId)).size, 15);
 assert.deepEqual(report.blockedPositiveRows[0].rowRefs, ['P30-OBJ-10', 'P31-OBJ-08']);
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
   'preserve-consumed-positive-rows',

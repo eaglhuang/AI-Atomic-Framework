@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.plan3TimeoutNonterminalFixture.v1",
+  "specVersion": "0.1.0",
+  "receipt": {
+    "validatorId": "example-long-running-validator",
+    "exitCode": null,
+    "timedOut": true,
+    "status": "timeout"
+  },
+  "expectedVerdict": "not-complete",
+  "forbiddenVerdicts": ["verified", "pass", "complete"],
+  "diagnostics": ["timeout-is-nonterminal", "timeout-must-not-green"]
+}

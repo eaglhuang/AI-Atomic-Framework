@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:de89d145cb964414e095607296b18e8d34177e3c768ab606ba9753e4fd2e1978"
+      "digest": "sha256:1eb2a824d27e357d14a6bef5da0c72bdf6e9bd26d1006337f4ba9f2a41cf12e5"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:0f3b1226ab1ccaa1a9cfb8b0a49c6649aa1a13bbf70526bd8a70f9744cd1698a"
+      "digest": "sha256:f5e5efe4075f6a488b9524fe55022df0fcc0b5da732b2bf4606b1176830a58a2"
     }
   ],
   "totals": {
-    "freshCommandRows": 34,
+    "freshCommandRows": 33,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 14,
-    "objectiveAlignedNegativeControlRowsConsumed": 3,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 15,
+    "objectiveAlignedNegativeControlRowsConsumed": 4,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
-    "remainingUncoveredRows": 22,
-    "sourceRowsMutatedByThisReport": 14
+    "remainingUncoveredRows": 20,
+    "sourceRowsMutatedByThisReport": 15
   },
   "commandReceipts": [
     {
@@ -153,6 +153,20 @@
         "\"failClosed\": true",
         "task-provenance-mismatch"
       ]
+    },
+    {
+      "id": "plan32-timeout-nonterminal-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-timeout-nonterminal.ts --json",
+      "exitCode": 0,
+      "verdict": "timeout-nonterminal-fail-closed",
+      "rowsCovered": [
+        "P32-OBJ-02"
+      ],
+      "stdoutAnchors": [
+        "atm.plan32TimeoutNonterminalValidation.v1",
+        "\"failClosed\": true",
+        "timeout-must-not-green"
+      ]
     }
   ],
   "positiveRows": [
@@ -223,6 +237,12 @@
       "sourceReplayAction": "recomputed row status because the current replay validator proves row-addressable Plan 3.2 objective coverage"
     },
     {
+      "objectiveId": "P32-OBJ-02",
+      "title": "Partial timeout remains non-terminal",
+      "receiptIds": ["plan32-timeout-nonterminal-fail-closed"],
+      "sourceReplayAction": "recomputed row status because the current timeout fixture proves timed-out validator receipts remain not-complete and cannot green the row"
+    },
+    {
       "objectiveId": "P32-OBJ-11",
       "title": "HEAD CAS is observable",
       "receiptIds": ["git-head-evidence-current-validator"],
@@ -252,7 +272,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Fourteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Fifteen rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

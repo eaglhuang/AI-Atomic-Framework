@@ -6,15 +6,15 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 4,
-    "not-complete": 25,
+    "verified": 5,
+    "not-complete": 24,
     "unknown": 0,
     "conflicting": 0
   },
   "nonClaim": "This replay proves the Plan 3.2 denominator and row-level evidence surface, but does not certify Plan 3.2 complete.",
   "rows": [
     {"objectiveId":"P32-OBJ-01","title":"Validator progress is row-addressable","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["governance-optimization/tasks/ATM-GOV-0335-replay-and-certify-every-plan-3-2-objective.task.md"],"evidenceTuples":[{"kind":"current-row-addressability-validator","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-final-closure-replay","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
-    {"objectiveId":"P32-OBJ-02","title":"Partial timeout remains non-terminal","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["docs/reports/plan-3-2-objective-replay.json"],"evidenceTuples":[{"kind":"timeout-policy","source":"governance-optimization/tasks/ATM-GOV-0335-replay-and-certify-every-plan-3-2-objective.task.md","expectedTaskId":"ATM-GOV-0335"}],"blockers":["timeout evidence cannot be downgraded to pass"],"nextSafeCommand":"node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.2 --mode validate"},
+    {"objectiveId":"P32-OBJ-02","title":"Partial timeout remains non-terminal","status":"verified","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["tests/fixtures/plan3-fake-green/timeout-nonterminal.json"],"evidenceTuples":[{"kind":"timeout-nonterminal-negative-control","source":"docs/reports/plan-3x-positive-current-receipts.json","receiptId":"plan32-timeout-nonterminal-fail-closed","expectedTaskId":"ATM-GOV-0335"}],"blockers":[]},
     {"objectiveId":"P32-OBJ-03","title":"Freshness binding is explicit","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".atm/history/evidence/ATM-GOV-0335.json"],"evidenceTuples":[{"kind":"freshness","source":".atm/history/evidence/ATM-GOV-0335.json","expectedTaskId":"ATM-GOV-0335"}],"blockers":["fresh command receipt exists only after this card lands"],"nextSafeCommand":"node atm.mjs evidence run --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --command \"npm run typecheck\" --runner-kind frozen-runner --json"},
     {"objectiveId":"P32-OBJ-04","title":"Legal recovery lane is named","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":[".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md"],"evidenceTuples":[{"kind":"recovery-lane","source":".agents/skills/atm-git-pathspec-emergency-commit/SKILL.md","expectedTaskId":"ATM-GOV-0335"}],"blockers":["emergency recovery remains anomaly evidence, not autonomous success"],"nextSafeCommand":"node atm.mjs git commit --task ATM-GOV-0335 --actor codex-gpt-5.4-mini --message \"dry-run\" --auto-stage --dry-run --json"},
     {"objectiveId":"P32-OBJ-05","title":"Public attestation is not substituted for machine proof","status":"not-complete","ownerTaskId":"ATM-GOV-0335","caseIds":["test_plan32_exact_29_objectives_0335"],"sourceAnchors":["docs/reports/plan-3-2-objective-replay.md"],"evidenceTuples":[{"kind":"attestation-boundary","source":"docs/reports/plan-3-2-objective-replay.md","expectedTaskId":"ATM-GOV-0335"}],"blockers":["attestation is descriptive; final proof waits for machine closure"],"nextSafeCommand":"node --strip-types tests/cli/atm-3-final-closure.test.ts"},
