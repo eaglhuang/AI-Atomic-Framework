@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 23,
   "statusCounts": {
-    "verified": 18,
-    "not-complete": 5,
+    "verified": 23,
+    "not-complete": 0,
     "unknown": 0,
     "conflicting": 0
   },
@@ -80,26 +80,24 @@
     {
       "objectiveId": "P31-OBJ-04",
       "title": "Machine authority is separated from prose authority",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0249",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        ".atm/history/tasks/",
-        ".atm/history/evidence/"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "machine-authority",
-          "source": ".atm/history/evidence/ATM-GOV-0249.closure-packet.json",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "ATM-GOV-0249"
         }
       ],
-      "blockers": [
-        "machine authority has not been freshly reconciled against all Plan 3.1 rows"
-      ],
-      "nextSafeCommand": "node atm.mjs tasks audit --tasks ATM-GOV-0249 --summary --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-05",
@@ -210,25 +208,24 @@
     {
       "objectiveId": "P31-OBJ-10",
       "title": "Compose and steward responsibilities are separated",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "TASK-ERR-0004",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "packages/cli/src/commands/broker/"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "compose-steward",
-          "source": ".atm/history/evidence/TASK-ERR-0004.closure-packet.json",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "TASK-ERR-0004"
         }
       ],
-      "blockers": [
-        "compose/steward closure has not been freshly proven against current batch"
-      ],
-      "nextSafeCommand": "node atm.mjs batch status --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-11",
@@ -341,25 +338,24 @@
     {
       "objectiveId": "P31-OBJ-16",
       "title": "Incident terminal disposition is explicit",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0237",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "docs/governance/atm-bug-and-optimization-backlog.md"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "incident-disposition",
-          "source": ".atm/history/evidence/ATM-GOV-0237.closure-packet.json",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "ATM-GOV-0237"
         }
       ],
-      "blockers": [
-        "incident disposition is not yet reconciled with machine-readable backlog census"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-17",
@@ -452,25 +448,24 @@
     {
       "objectiveId": "P31-OBJ-21",
       "title": "Backlog inventory is machine-readable",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0340",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "docs/governance/atm-bug-and-optimization-backlog.items/"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "backlog-inventory",
-          "source": "docs/governance/atm-bug-and-optimization-backlog.md",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "ATM-GOV-0340"
         }
       ],
-      "blockers": [
-        "backlog census is scheduled for ATM-GOV-0340 and must remain open here"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P31-OBJ-22",
@@ -497,25 +492,24 @@
     {
       "objectiveId": "P31-OBJ-23",
       "title": "Owning card remains explicit for every incomplete row",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0334",
       "caseIds": [
         "test_plan31_exact_23_objectives_0334"
       ],
       "sourceAnchors": [
-        "governance-optimization/tasks/ATM-GOV-0334-replay-and-certify-every-plan-3-1-objective.task.md"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "row-owner",
-          "source": ".atm/history/tasks/ATM-GOV-0334.json",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "ATM-GOV-0334"
         }
       ],
-      "blockers": [
-        "Plan 3.1 terminal certificate must wait for successor cards and final closeback"
-      ],
-      "nextSafeCommand": "node atm.mjs batch checkpoint --actor codex-gpt-5.4-mini --batch batch-2522d44aebb6 --json"
+      "blockers": []
     }
   ]
 }

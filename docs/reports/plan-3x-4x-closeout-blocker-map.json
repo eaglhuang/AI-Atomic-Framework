@@ -11,11 +11,11 @@
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
-      "digest": "sha256:361c4d3e445d5cfb76215bf3f859ac891c9708451ebace9c1b26d8448a3170f7"
+      "digest": "sha256:21fb2c2cf9b09d021eb85afc8e951f4260db5f06c385048fd9f12431d423946e"
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:8315266a32e851a4c450d79f6134ab271ec3d9fdd18913ce5bd33767fad63694"
+      "digest": "sha256:44055110eb5a7ea69fb6e5885688e00758928fce07e627cb0cc67ebbf5d9681b"
     },
     {
       "path": "docs/reports/plan-4-foundation-replay.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:138f5c2bc6fb01dda77e954b456c541e3fe45bbddc744ee02e1f91b0ce795204"
+      "digest": "sha256:7c253a2dc41744b1481a5c8d21c0b91db5e89abde1a3245ba7171fd2320f5917"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:579410e8b2ef778cb923f7729d44eb055fc6f20b5f9ccfbd41185844059c6f61"
+      "digest": "sha256:749582397415acdcf5a261fd8b61ec8f0e409d66e161ebb7262f833d53a4879e"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
@@ -59,12 +59,12 @@
     },
     {
       "path": "docs/reports/plan-3x-positive-current-receipts.json",
-      "digest": "sha256:90c58f686f593ab62a2bc3bbff2bb54a0aa083607f8075939728b4ebe3a2ff61"
+      "digest": "sha256:0b197052af1f8a2f4ddb9a5c5b2a145444379e49ffcb7eeb1f65a9a0982f0a65"
     }
   ],
   "totals": {
     "objectiveRows": 86,
-    "unresolvedObjectiveRows": 36,
+    "unresolvedObjectiveRows": 27,
     "plansWithExactDenominator": 4,
     "backlogTotal": 391,
     "backlogTerminal": 219,
@@ -78,7 +78,7 @@
     "plan3xFreshCommandReceiptsGreen": 8,
     "plan3xFreshCommandRowsCertified": 0,
     "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
-    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 50,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 59,
     "plan3xObjectiveAlignedNegativeControlRowsConsumed": 8,
     "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
     "backlogReleaseBlockingNow": 0,
@@ -97,17 +97,17 @@
       "planId": "3.1",
       "source": "docs/reports/plan-3-1-objective-replay.json",
       "objectiveRows": 23,
-      "verifiedRows": 18,
-      "unresolvedRows": 5,
-      "primaryBlocker": "5 Plan 3.1 rows still require governed-state receipts; all Plan 3.1 fresh-command rows now have focused current receipts"
+      "verifiedRows": 23,
+      "unresolvedRows": 0,
+      "primaryBlocker": "Plan 3.1 source rows are all currently verified; final release still waits for aggregate closeout evidence."
     },
     {
       "planId": "3.2",
       "source": "docs/reports/plan-3-2-objective-replay.json",
       "objectiveRows": 29,
-      "verifiedRows": 17,
-      "unresolvedRows": 12,
-      "primaryBlocker": "12 Plan 3.2 rows still require governed-state or runner-parity receipts; all Plan 3.2 fresh-command rows now have focused evidence"
+      "verifiedRows": 21,
+      "unresolvedRows": 8,
+      "primaryBlocker": "8 Plan 3.2 rows still require closeback, Plan 4 foundation, or runner-release parity receipts."
     },
     {
       "planId": "4.0",

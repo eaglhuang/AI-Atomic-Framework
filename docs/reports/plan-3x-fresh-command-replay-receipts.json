@@ -3,11 +3,11 @@
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T04:30:00.000Z",
   "status": "fresh-command-replay-partially-consumed",
-  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 50 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
+  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 59 rows were consumed into source replay; they do not certify any plan complete while source replay verdicts remain not-complete.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:138f5c2bc6fb01dda77e954b456c541e3fe45bbddc744ee02e1f91b0ce795204"
+      "digest": "sha256:7c253a2dc41744b1481a5c8d21c0b91db5e89abde1a3245ba7171fd2320f5917"
     },
     {
       "path": "docs/reports/plan-3-0-objective-replay.json",
@@ -15,22 +15,22 @@
     },
     {
       "path": "docs/reports/plan-3-1-objective-replay.json",
-      "digest": "sha256:361c4d3e445d5cfb76215bf3f859ac891c9708451ebace9c1b26d8448a3170f7"
+      "digest": "sha256:21fb2c2cf9b09d021eb85afc8e951f4260db5f06c385048fd9f12431d423946e"
     },
     {
       "path": "docs/reports/plan-3-2-objective-replay.json",
-      "digest": "sha256:8315266a32e851a4c450d79f6134ab271ec3d9fdd18913ce5bd33767fad63694"
+      "digest": "sha256:44055110eb5a7ea69fb6e5885688e00758928fce07e627cb0cc67ebbf5d9681b"
     }
   ],
   "familyDisposition": {
     "proofFamilyId": "fresh-command-replay-needed",
     "sourceRowCount": 0,
-    "focusedCommandsExecuted": 29,
-    "commandsGreen": 29,
-    "rowsConsumedIntoSourceReplay": 50,
+    "focusedCommandsExecuted": 30,
+    "commandsGreen": 30,
+    "rowsConsumedIntoSourceReplay": 59,
     "rowsCertifiedCompleteByTheseReceipts": 0,
     "remainingRowsInFamily": 0,
-    "reasonRowsRemainOpen": "Fifty current receipts were consumed into source replay. The fresh-command proof family is now empty; remaining rows require governed-state or runner-release parity evidence before final completion."
+    "reasonRowsRemainOpen": "Fifty-nine current receipts were consumed into source replay. The fresh-command proof family is empty; remaining rows require closeback, Plan 4 foundation, or runner-release parity evidence before final completion."
   },
   "commandRuns": [
     {
@@ -235,6 +235,13 @@
       "exitCode": 0,
       "stdoutPreview": "[validate-plan31-parity-cost-digest-boundaries] ok rows=4 diagnostics=old-new-frozen-digest-replayable,cost-correctness-separated,parity-breaker-digests,runner-sync-digest-visible",
       "semanticBoundary": "objective-aligned Plan 3.1 parity/cost/digest boundary evidence for four rows, not completion evidence for Plan 3.1"
+    },
+    {
+      "id": "governed-state-ownership-routing-boundaries",
+      "command": "node --strip-types scripts/validate-governed-state-ownership-routing-boundaries.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-governed-state-ownership-routing-boundaries] ok rows=9 diagnostics=machine-authority-over-prose,compose-steward-separated,incident-and-backlog-machine-readable,row-owner-not-completion,foreign-work-fail-closed,generic-stale-routing",
+      "semanticBoundary": "objective-aligned governed-state ownership/routing boundary evidence for nine rows, not completion evidence for Plan 3.x"
     }
   ],
   "nextExecutionOrder": [

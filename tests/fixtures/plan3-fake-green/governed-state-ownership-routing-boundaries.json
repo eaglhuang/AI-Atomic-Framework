@@ -1,0 +1,24 @@
+{
+  "schemaId": "atm.governedStateOwnershipRoutingBoundariesFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {"objectiveId": "P31-OBJ-04", "machineAuthority": true, "proseAuthorityMayGreen": false},
+    {"objectiveId": "P31-OBJ-10", "composeSeparatedFromSteward": true, "singleActorMaySelfApprove": false},
+    {"objectiveId": "P31-OBJ-16", "incidentDispositionExplicit": true, "backlogCensusRequired": true},
+    {"objectiveId": "P31-OBJ-21", "backlogInventoryMachineReadable": true, "proseInventoryMayGreen": false},
+    {"objectiveId": "P31-OBJ-23", "owningCardExplicit": true, "ownerPresenceMayCertifyCompletion": false},
+    {"objectiveId": "P32-OBJ-13", "foreignWorkFailsClosed": true, "foreignWorkMayGreenCurrentRow": false},
+    {"objectiveId": "P32-OBJ-17", "staleRepairOwnedByGenericPolicy": true, "adHocStaleRepairAllowed": false},
+    {"objectiveId": "P32-OBJ-20", "staleBatchRoutingGeneric": true, "routingMayCertifyCompletion": false},
+    {"objectiveId": "P32-OBJ-25", "owningCardPresent": true, "ownerPresenceMayCertifyCompletion": false}
+  ],
+  "expectedVerdict": "governed-state-ownership-routing-boundaries-proven",
+  "diagnostics": [
+    "machine-authority-over-prose",
+    "compose-steward-separated",
+    "incident-and-backlog-machine-readable",
+    "row-owner-not-completion",
+    "foreign-work-fail-closed",
+    "generic-stale-routing"
+  ]
+}

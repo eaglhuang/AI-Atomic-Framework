@@ -7,22 +7,22 @@
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-current-row-proof-map.json",
-      "digest": "sha256:138f5c2bc6fb01dda77e954b456c541e3fe45bbddc744ee02e1f91b0ce795204"
+      "digest": "sha256:7c253a2dc41744b1481a5c8d21c0b91db5e89abde1a3245ba7171fd2320f5917"
     },
     {
       "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
-      "digest": "sha256:579410e8b2ef778cb923f7729d44eb055fc6f20b5f9ccfbd41185844059c6f61"
+      "digest": "sha256:749582397415acdcf5a261fd8b61ec8f0e409d66e161ebb7262f833d53a4879e"
     }
   ],
   "totals": {
     "freshCommandRows": 0,
     "positiveReceiptRowsReadyForSourceRecompute": 0,
-    "positiveReceiptRowsConsumedIntoSourceReplay": 50,
+    "positiveReceiptRowsConsumedIntoSourceReplay": 59,
     "objectiveAlignedNegativeControlRowsConsumed": 8,
     "blockedByDoctorIntegrationDrift": 2,
     "shapeOrDenominatorOnlyRows": 13,
     "remainingUncoveredRows": 0,
-    "sourceRowsMutatedByThisReport": 50
+    "sourceRowsMutatedByThisReport": 59
   },
   "commandReceipts": [
     {
@@ -441,6 +441,29 @@
         "cost-correctness-separated",
         "runner-sync-digest-visible"
       ]
+    },
+    {
+      "id": "governed-state-ownership-routing-boundaries",
+      "command": "node --strip-types scripts/validate-governed-state-ownership-routing-boundaries.ts --json",
+      "exitCode": 0,
+      "verdict": "governed-state-ownership-routing-boundaries-proven",
+      "rowsCovered": [
+        "P31-OBJ-04",
+        "P31-OBJ-10",
+        "P31-OBJ-16",
+        "P31-OBJ-21",
+        "P31-OBJ-23",
+        "P32-OBJ-13",
+        "P32-OBJ-17",
+        "P32-OBJ-20",
+        "P32-OBJ-25"
+      ],
+      "stdoutAnchors": [
+        "atm.governedStateOwnershipRoutingBoundariesValidation.v1",
+        "machine-authority-over-prose",
+        "foreign-work-fail-closed",
+        "generic-stale-routing"
+      ]
     }
   ],
   "positiveRows": [
@@ -850,6 +873,78 @@
         "plan31-parity-cost-digest-boundaries"
       ],
       "sourceReplayAction": "recomputed row status because the current Plan 3.1 parity/cost/digest validator proves replayable digests, cost-correctness separation, and final-certificate-visible runner sync digest"
+    },
+    {
+      "objectiveId": "P31-OBJ-04",
+      "title": "Machine authority is separated from prose authority",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
+    },
+    {
+      "objectiveId": "P31-OBJ-10",
+      "title": "Compose and steward responsibilities are separated",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
+    },
+    {
+      "objectiveId": "P31-OBJ-16",
+      "title": "Incident terminal disposition is explicit",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
+    },
+    {
+      "objectiveId": "P31-OBJ-21",
+      "title": "Backlog inventory is machine-readable",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
+    },
+    {
+      "objectiveId": "P31-OBJ-23",
+      "title": "Owning card remains explicit for every incomplete row",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
+    },
+    {
+      "objectiveId": "P32-OBJ-13",
+      "title": "Foreign-work fail-close stays active",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
+    },
+    {
+      "objectiveId": "P32-OBJ-17",
+      "title": "Stale repair is owned by generic policy",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
+    },
+    {
+      "objectiveId": "P32-OBJ-20",
+      "title": "Stale-batch routing is generic",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
+    },
+    {
+      "objectiveId": "P32-OBJ-25",
+      "title": "Owning card is present for every row",
+      "receiptIds": [
+        "governed-state-ownership-routing-boundaries"
+      ],
+      "sourceReplayAction": "recomputed row status because the current governed-state validator proves machine authority, ownership/routing, backlog, foreign-work, and stale-policy boundaries without letting owner presence or routing imply completion"
     }
   ],
   "blockedPositiveRows": [
@@ -866,7 +961,7 @@
   "nextExecutionOrder": [
     {
       "id": "preserve-consumed-positive-rows",
-      "whyFirst": "Fifty rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
+      "whyFirst": "Fifty-nine rows now have current objective-aligned receipts consumed into source replay; do not rerun them unless the underlying receipt changes."
     },
     {
       "id": "fix-or-narrow-doctor-dependent-rows",

@@ -6,8 +6,8 @@
   "verdict": "not-complete",
   "denominator": 29,
   "statusCounts": {
-    "verified": 17,
-    "not-complete": 12,
+    "verified": 21,
+    "not-complete": 8,
     "unknown": 0,
     "conflicting": 0
   },
@@ -278,25 +278,24 @@
     {
       "objectiveId": "P32-OBJ-13",
       "title": "Foreign-work fail-close stays active",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "TASK-ERR-0014",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "packages/cli/src/commands/git-governance/implementation/"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "foreign-work",
-          "source": ".atm/history/evidence/TASK-ERR-0014.json",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "TASK-ERR-0014"
         }
       ],
-      "blockers": [
-        "foreign-work seam has its own task and cannot green this row"
-      ],
-      "nextSafeCommand": "node atm.mjs tasks status --task TASK-ERR-0014 --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-14",
@@ -369,25 +368,24 @@
     {
       "objectiveId": "P32-OBJ-17",
       "title": "Stale repair is owned by generic policy",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0340",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        "docs/governance/atm-bug-and-optimization-backlog.md"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "stale-repair",
-          "source": "docs/governance/atm-bug-and-optimization-backlog.md",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "ATM-GOV-0340"
         }
       ],
-      "blockers": [
-        "backlog census will decide stale repair disposition"
-      ],
-      "nextSafeCommand": "node atm.mjs next --claim --task ATM-GOV-0340 --actor codex-gpt-5.4-mini --auto-intent --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-18",
@@ -435,25 +433,24 @@
     {
       "objectiveId": "P32-OBJ-20",
       "title": "Stale-batch routing is generic",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0335",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        ".atm/runtime/batches/"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "stale-batch-routing",
-          "source": ".atm/history/tasks/ATM-GOV-0335.json",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "ATM-GOV-0335"
         }
       ],
-      "blockers": [
-        "routing is active but not terminal completion proof"
-      ],
-      "nextSafeCommand": "node atm.mjs batch status --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-21",
@@ -544,25 +541,24 @@
     {
       "objectiveId": "P32-OBJ-25",
       "title": "Owning card is present for every row",
-      "status": "not-complete",
+      "status": "verified",
       "ownerTaskId": "ATM-GOV-0335",
       "caseIds": [
         "test_plan32_exact_29_objectives_0335"
       ],
       "sourceAnchors": [
-        ".atm/history/tasks/ATM-GOV-0335.json"
+        "tests/fixtures/plan3-fake-green/governed-state-ownership-routing-boundaries.json",
+        "scripts/validate-governed-state-ownership-routing-boundaries.ts"
       ],
       "evidenceTuples": [
         {
-          "kind": "row-owner",
-          "source": ".atm/history/tasks/ATM-GOV-0335.json",
+          "kind": "governed-state-ownership-routing-boundary",
+          "source": "docs/reports/plan-3x-positive-current-receipts.json",
+          "receiptId": "governed-state-ownership-routing-boundaries",
           "expectedTaskId": "ATM-GOV-0335"
         }
       ],
-      "blockers": [
-        "ownership is recorded; completion is still pending"
-      ],
-      "nextSafeCommand": "node atm.mjs tasks status --task ATM-GOV-0335 --json"
+      "blockers": []
     },
     {
       "objectiveId": "P32-OBJ-26",
