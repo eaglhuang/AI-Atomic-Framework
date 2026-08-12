@@ -10,7 +10,7 @@ assert.equal(report.nonClaim, 'This map is an execution dashboard, not a complet
 assert.equal(report.totals.objectiveRows, 86);
 assert.equal(report.totals.unresolvedObjectiveRows, 0);
 assert.equal(report.totals.plansWithExactDenominator, 4);
-assert.equal(report.totals.certificateDimensionsProven, 5);
+assert.equal(report.totals.certificateDimensionsProven, 6);
 assert.equal(report.totals.certificateDimensionsNotComplete, 1);
 assert.equal(report.totals.plan4SuccessorMappedAnchors, 17);
 assert.equal(report.totals.plan3xCurrentRowProofMappedRows, 69);
@@ -26,8 +26,8 @@ assert.equal(report.totals.backlogNeedsTaskCardBeforeFinalRelease, 133);
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B1-current-row-proof')?.status, 'resolved');
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B2-plan4-successor-wave')?.status, 'resolved');
 assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B4-backlog-disposition')?.status, 'separated');
+assert.equal(report.blockerClasses.find((entry: any) => entry.id === 'B5-release-certificate')?.status, 'resolved');
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
-  'B5-release-certificate',
   'B4-backlog-disposition'
 ]);
 

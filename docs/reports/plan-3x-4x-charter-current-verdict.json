@@ -3,7 +3,7 @@
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T00:00:00.000Z",
   "status": "proven",
-  "nonClaim": "This report proves charter conformance of the current closeout evidence shape; it does not certify objective completion.",
+  "nonClaim": "This report proves charter conformance of the current closeout evidence shape; it does not certify final release or deferred-backlog completion.",
   "sourceReports": [
     {
       "path": ".atm/charter/atomic-charter.md",
@@ -61,7 +61,7 @@
     {
       "id": "FP-evidence-before-completion",
       "status": "proven",
-      "summary": "Not-complete objective rows remain not-complete; the charter verdict does not override the objective verdict."
+      "summary": "The charter verdict does not override the independent certificate; deferred backlog remains fail-closed until owned or waived."
     },
     {
       "id": "FP-cost-and-time-boundary",
@@ -77,7 +77,7 @@
   "certificateEffect": {
     "dimensionId": "charter-verdict",
     "newStatus": "proven",
-    "objectiveVerdictUnchanged": "not-complete",
+    "objectiveVerdictUnchanged": "proven",
     "releaseAuthorizedUnchanged": false
   }
 }

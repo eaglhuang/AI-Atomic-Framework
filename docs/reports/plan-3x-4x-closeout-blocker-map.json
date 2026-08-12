@@ -39,7 +39,7 @@
     },
     {
       "path": "docs/reports/plan-3x-4x-independent-certificate.json",
-      "digest": "sha256:495dd976b68bc1863dcdad9dd98fcc3ab171426ea2e57a2db5f3da805f5c7a4e"
+      "digest": "sha256:bbfdc3a99863f5f557fa5c637aa5a1828756128588376344c9139e25299fc84b"
     },
     {
       "path": "docs/reports/plan4-successor-wave-objective-map.json",
@@ -70,7 +70,7 @@
     "backlogTerminal": 219,
     "backlogOwnedOpen": 2,
     "backlogDeferred": 170,
-    "certificateDimensionsProven": 5,
+    "certificateDimensionsProven": 6,
     "certificateDimensionsNotComplete": 1,
     "plan4SuccessorMappedAnchors": 17,
     "plan3xCurrentRowProofMappedRows": 69,
@@ -165,19 +165,15 @@
         "final certificate",
         "release closeback"
       ],
-      "status": "ready-for-recompute",
-      "reason": "release surface is pushed and reachable, and all objective rows are now verified; certificate still correctly blocks releaseAuthorized until it is recomputed from the current objective artifacts.",
-      "requiredOutcome": "recompute docs/reports/plan-3x-4x-independent-certificate.json against the current objective and closeout artifacts, then keep releaseAuthorized fail-closed unless every dimension is proven."
+      "status": "resolved",
+      "reason": "release surface is pushed and reachable, objective verdict is proven, and the independent certificate has been recomputed; it now blocks only on the explicit backlog-deferred dimension.",
+      "requiredOutcome": "maintain docs/reports/plan-3x-4x-independent-certificate.json and docs/reports/plan-3x-4x-release-closeback.json as digest-bound release authority."
     }
   ],
   "nextExecutionOrder": [
     {
-      "id": "B5-release-certificate",
-      "whyFirst": "objective evidence is now consumed, so the next scarce work is a focused independent certificate recompute rather than more row replay"
-    },
-    {
       "id": "B4-backlog-disposition",
-      "whySecond": "release-blocking backlog is zero, but deferred rows still need ownership or waiver before any stronger all-backlog completion claim"
+      "whyFirst": "release-blocking backlog is zero, but deferred rows still need ownership or waiver before any stronger all-backlog completion claim"
     }
   ],
   "principlesApplied": [

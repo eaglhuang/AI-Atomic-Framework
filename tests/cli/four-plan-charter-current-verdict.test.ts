@@ -6,10 +6,10 @@ const report = JSON.parse(readFileSync('docs/reports/plan-3x-4x-charter-current-
 
 assert.equal(report.schemaId, 'atm.fourPlanCharterCurrentVerdict.v1');
 assert.equal(report.status, 'proven');
-assert.equal(report.nonClaim, 'This report proves charter conformance of the current closeout evidence shape; it does not certify objective completion.');
+assert.equal(report.nonClaim, 'This report proves charter conformance of the current closeout evidence shape; it does not certify final release or deferred-backlog completion.');
 assert.equal(report.certificateEffect.dimensionId, 'charter-verdict');
 assert.equal(report.certificateEffect.newStatus, 'proven');
-assert.equal(report.certificateEffect.objectiveVerdictUnchanged, 'not-complete');
+assert.equal(report.certificateEffect.objectiveVerdictUnchanged, 'proven');
 assert.equal(report.certificateEffect.releaseAuthorizedUnchanged, false);
 assert.deepEqual(report.invariantChecks.map((entry: any) => entry.invariantId), [
   'INV-ATM-008',
