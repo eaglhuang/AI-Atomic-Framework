@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-11T16-48-01-079Z-scope-amendment-46195f4b2459",
+  "taskId": "ATM-GOV-0330",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0330.json",
+  "taskSha256": "sha256:e305b6db3b72fe70b220a099ec90f41658f8e0116823952608377119a9b89410",
+  "createdAt": "2026-08-11T16:48:01.079Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0330 --actor codex-gpt-5.4-mini --add \"packages/core/src/evidence/observed-source.ts,packages/core/src/evidence/observed-source-adapters.ts,schemas/evidence/observed-evidence-source.schema.json,tests/core/observed-evidence-source.test.ts,docs/reports/observed-evidence-source-deep-module-review.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

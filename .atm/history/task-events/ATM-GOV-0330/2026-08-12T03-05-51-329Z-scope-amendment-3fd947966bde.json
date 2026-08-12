@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T03-05-51-329Z-scope-amendment-3fd947966bde",
+  "taskId": "ATM-GOV-0330",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0330.json",
+  "taskSha256": "sha256:1b2b85b38b95eabb882d0c572e737a850220fcb038db6c5e97ae1863fb827035",
+  "createdAt": "2026-08-12T03:05:51.329Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0330 --actor codex-gpt-5.4-mini --add \"packages/core/src/evidence/observed-source.ts,packages/core/src/evidence/observed-source-adapters.ts,docs/reports/observed-evidence-source-deep-module-review.json\" --reason \"Repair active direction-lock projection from the task's already recorded linked-surface scope amendments; no new delivery surface.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Repair active direction-lock projection from the task's already recorded linked-surface scope amendments; no new delivery surface."
+  }
+}

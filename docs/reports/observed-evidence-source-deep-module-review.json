@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.deepModuleReviewReport.v1",
+  "specVersion": "0.1.0",
+  "module": "atm.observed-evidence-source",
+  "interface": ["ObservedEvidenceSource.read", "collectObservedEvidence", "verifyObservedEvidence"],
+  "invariants": ["No caller-supplied success verdict", "Unavailable and conflicting sources fail closed", "Digest is derived from observed values"],
+  "dependencyClasses": ["in-process", "local-substitutable", "remote-owned", "true-external"],
+  "adapterCount": 2,
+  "adapters": ["createInMemoryObservedEvidenceSource", "createReaderObservedEvidenceSource"],
+  "deletionTest": "Removing the module would force each consumer to rediscover source availability, conflict detection, canonical digesting, and verification.",
+  "rollback": "Switch consumers back to their last-known-good adapter while retaining snapshot schema compatibility.",
+  "validators": ["tests/core/observed-evidence-source.test.ts", "npm run validate:schemas", "npm run validate:module-boundaries"],
+  "nonClaims": ["No remote transport implementation", "No migration of every legacy evidence caller in this card"]
+}
