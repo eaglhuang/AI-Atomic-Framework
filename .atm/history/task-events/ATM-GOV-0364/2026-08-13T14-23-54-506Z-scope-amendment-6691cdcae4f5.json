@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T14-23-54-506Z-scope-amendment-6691cdcae4f5",
+  "taskId": "ATM-GOV-0364",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0364",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0364.json",
+  "taskSha256": "sha256:6609a8137fab6ae833502e948342e37bb25c0e9fdf10be617c289d0c3eaa925a",
+  "createdAt": "2026-08-13T14:23:54.506Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0364 --actor claude-008-gov-0364 --add docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json --reason \"This backlog item carries an uncommitted severity upgrade from an earlier session and is the staged entry blocking close; committing it under the backlog-maintenance card is the sanctioned commit-separately route\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "This backlog item carries an uncommitted severity upgrade from an earlier session and is the staged entry blocking close; committing it under the backlog-maintenance card is the sanctioned commit-separately route"
+  }
+}

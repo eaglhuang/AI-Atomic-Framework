@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T14-56-00-579Z-repair-claim-e45f60499e56",
+  "taskId": "ATM-GOV-0364",
+  "action": "repair-claim",
+  "actorId": "claude-008-gov-0364",
+  "sessionId": "session-20260813142014-claude-008-gov-0364-ATM-GOV-0364-089954b98c",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0364.json",
+  "taskSha256": "sha256:9d95ba28941e893876913db3a7a938350c40e28ce772865f261e0f1fc9a9f56c",
+  "createdAt": "2026-08-13T14:56:00.579Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0364 --actor claude-008-gov-0364 --write --reason \"tasks import --force rewrote the ledger claim with a new leaseId (lease-8f088e31d6af) while the runtime lock kept lease-2026-08-13T14-20-19-774Z; the two can no longer be reconciled by renew, release or re-claim\" --json"
+}
