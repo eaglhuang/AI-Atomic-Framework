@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-020",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in source; frozen publication pending",
+  "area": "Runner takeover producer and publication consumer resolve different authority stores",
+  "finding": "A framework-temp runner claim is represented by an active runtime lock without a task-ledger row. takeover-publication reads that lock and excludes its allowed output scope from the foreign snapshot, while resolveSealedRunnerPublication previously read only active task ledgers. The producer therefore sealed an 18-member takeover plan and the consumer recomputed a 69-member snapshot, deterministically rejecting the valid plan as stale.",
+  "expectedBehavior": "Every producer and consumer of a digest-bound publication plan must resolve one authority aggregate. Active ordinary tasks may obtain allowed files from the ledger; lock-backed framework-temp tasks must obtain them from the same actor-bound, task-bound, TTL-valid runtime lock used by queue health and takeover authorization.",
+  "evidenceOrRepro": "For queue-head ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-hotfix at sealed SHA d2d6a3fea, broker runner-sync takeover-publication authorized plan digest sha256:5580dad5 with 18 members. The following publication failed with 'plan snapshot does not match current pre-build bytes' although no competing build process existed. The task had an active runtime lock and no .atm/history/tasks row.",
+  "followUp": "The source fix adds a fail-closed lock-backed authority fallback at the publication boundary and a focused framework-temp round-trip regression. Consolidate the duplicated broker and publication authority readers into one core deep module when the next claim-identity refactor addresses ATM-BUG-2026-08-13-017."
+}

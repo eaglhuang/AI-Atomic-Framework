@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runBroker } from '../../packages/cli/src/commands/broker/implementation.ts';
 import { inspectRunnerSyncAdmission } from '../../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
+import { resolveSealedRunnerPublication } from '../../scripts/sealed-runner-publication.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-framework-temp-'));
 const taskId = 'ATM-FRAMEWORK-TEMP-codex-hotfix';
@@ -89,6 +90,19 @@ try {
   assert.deepEqual(takeover.evidence.plan.entries.map((entry: any) => entry.path), ['release/atm-onefile/release-manifest.json']);
   assert.equal(existsSync(path.join(repo, takeover.evidence.receiptPath)), true);
   assert.equal(JSON.parse(readFileSync(path.join(repo, takeover.evidence.receiptPath), 'utf8')).taskId, taskId, 'persisted takeover evidence must carry semantic task identity');
+
+  const publication = resolveSealedRunnerPublication({
+    cwd: repo,
+    stewardActorId: actorId,
+    sealedSourceSha,
+    buildTarget: 'full',
+    publicationTaskId: taskId
+  });
+  assert.deepEqual(
+    publication.takeoverPaths,
+    ['release/atm-onefile/release-manifest.json'],
+    'lock-backed framework-temp authority must produce the same snapshot at takeover and publication'
+  );
 
   await assert.rejects(
     () => runBroker([

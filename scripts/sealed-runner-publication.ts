@@ -36,11 +36,18 @@ export function resolveSealedRunnerPublication(input: {
   const currentTask = currentTaskId
     ? getActiveTasks(input.cwd).find((entry) => entry.taskId === currentTaskId.toUpperCase())
     : null;
+  const currentTaskAllowedFiles = currentTask?.allowedFiles
+    ?? readActivePublicationLockFiles({
+      cwd: input.cwd,
+      taskId: currentTaskId,
+      actorId: input.stewardActorId,
+      now: new Date().toISOString()
+    });
   const beforeBuildSnapshot = captureRunnerBuildOutputSnapshot({
     cwd: input.cwd,
     buildTarget: input.buildTarget,
     currentTaskId,
-    currentTaskAllowedFiles: currentTask?.allowedFiles
+    currentTaskAllowedFiles
   });
   return {
     admission,
@@ -53,6 +60,42 @@ export function resolveSealedRunnerPublication(input: {
       snapshot: beforeBuildSnapshot
     })
   };
+}
+
+/**
+ * Framework-temporary publication authority is intentionally lock-backed and
+ * has no task-ledger row. The takeover producer and publication consumer must
+ * therefore resolve the same active lock, or their snapshot digests diverge.
+ */
+export function readActivePublicationLockFiles(input: {
+  readonly cwd: string;
+  readonly taskId: string | null;
+  readonly actorId: string;
+  readonly now: string;
+}): readonly string[] | undefined {
+  if (!input.taskId) return undefined;
+  const lockPath = path.join(input.cwd, '.atm', 'runtime', 'locks', `${input.taskId}.lock.json`);
+  if (!existsSync(lockPath)) return undefined;
+  try {
+    const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+    const lockTaskId = String(lock.workItemId ?? '').trim();
+    const lockActorId = String(lock.actorId ?? lock.lockedBy ?? '').trim();
+    const heartbeatAt = Date.parse(String(lock.heartbeatAt ?? lock.lockedAt ?? ''));
+    const ttlSeconds = Number(lock.ttlSeconds ?? 0);
+    const nowMs = Date.parse(input.now);
+    const active = lock.released !== true
+      && String(lock.status ?? '').trim().toLowerCase() !== 'released'
+      && lockTaskId === input.taskId
+      && lockActorId === input.actorId
+      && Number.isFinite(nowMs)
+      && Number.isFinite(heartbeatAt)
+      && Number.isFinite(ttlSeconds)
+      && ttlSeconds > 0
+      && nowMs < heartbeatAt + ttlSeconds * 1000;
+    return active && Array.isArray(lock.files) ? lock.files.map(String) : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /**
