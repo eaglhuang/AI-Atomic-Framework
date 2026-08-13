@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T05-37-24-354Z-scope-amendment-cd9dc4c9c436",
+  "taskId": "ATM-GOV-0357",
+  "action": "scope-amendment",
+  "actorId": "claude-008-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0357.json",
+  "taskSha256": "sha256:e5384c386bc5b37ec43948ba6ae3f4dc3705a96e16afab33795372fb5761757e",
+  "createdAt": "2026-08-13T05:37:24.354Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0357 --actor claude-008-captain --add \"scripts/lib/validator-contract-subject.ts,scripts/validate-branch-commit-queue.ts,scripts/validate-bridge-minor.ts,tests/cli/validator-contract-subject.test.ts\" --reason \"restore the card deliverables into the narrowed claim scope\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "restore the card deliverables into the narrowed claim scope"
+  }
+}

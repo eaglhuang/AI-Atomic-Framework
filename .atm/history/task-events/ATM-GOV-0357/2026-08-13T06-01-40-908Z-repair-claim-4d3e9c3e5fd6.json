@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T06-01-40-908Z-repair-claim-4d3e9c3e5fd6",
+  "taskId": "ATM-GOV-0357",
+  "action": "repair-claim",
+  "actorId": "claude-008-captain",
+  "sessionId": "session-20260813053028-claude-008-captain-ATM-GOV-0357-f99fa18578",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0357.json",
+  "taskSha256": "sha256:8637575b19f1b72dd22af7b4c388505a6c9103bd96682906b8973a18e5ac176d",
+  "createdAt": "2026-08-13T06:01:40.908Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0357 --actor claude-008-captain --write --reason \"re-mint ticket after lane rotation\" --json"
+}

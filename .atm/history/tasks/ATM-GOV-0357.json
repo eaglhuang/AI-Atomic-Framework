@@ -144,29 +144,34 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T05-30-33-326Z-claim-2b4a8c5a8302",
-  "lastTransitionAt": "2026-08-13T05:30:33.326Z",
+  "lastTransitionId": "2026-08-13T06-10-37-856Z-scope-amendment-12a7a5025308",
+  "lastTransitionAt": "2026-08-13T06:10:37.856Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008-captain",
   "reservedAt": "2026-08-13T05:30:28.582Z",
   "promotedAt": "2026-08-13T05:30:28.586Z",
   "claim": {
     "actorId": "claude-008-captain",
-    "leaseId": "lease-093fabb6f79f",
-    "claimedAt": "2026-08-13T05:30:28.591Z",
-    "heartbeatAt": "2026-08-13T05:30:28.591Z",
+    "leaseId": "lease-7297c0d839c1",
+    "claimedAt": "2026-08-13T06:09:55.057Z",
+    "heartbeatAt": "2026-08-13T06:09:55.057Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0357.*",
+      ".atm/history/task-events/ATM-GOV-0357/**",
       ".atm/history/tasks/ATM-GOV-0357.json",
-      "docs/governance/handoff-2026-08-13-captain-claude-008.md"
+      "docs/governance/handoff-2026-08-13-captain-claude-008.md",
+      "scripts/lib/validator-contract-subject.ts",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-bridge-minor.ts",
+      "tests/cli/validator-contract-subject.test.ts"
     ],
     "state": "active",
     "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+      "laneSessionId": "lane-20260813060058-claude-008-captain-bf95179b2a",
       "status": "active",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813051440-claude-008-captain-89e6f0395c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813060058-claude-008-captain-bf95179b2a\""
     }
   },
   "startedAt": "2026-08-13T05:30:28.591Z",
@@ -174,20 +179,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-f99933c22352edf4",
-    "ticketDigest": "sha256:f99933c22352edf4fc0ed2cf40d010d1ed326bd7e1d0a5817c5156fdc402de13",
+    "ticketId": "wat-1bd3eee51bfc959c",
+    "ticketDigest": "sha256:1bd3eee51bfc959cd47cc1cd8daff5c231d983172b8e0e92074f8d479452dd5c",
     "taskId": "ATM-GOV-0357",
     "origin": "claim",
     "actorId": "claude-008-captain",
-    "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
-    "claimGeneration": "lease-093fabb6f79f",
-    "issuedAt": "2026-08-13T05:30:28.591Z",
-    "expiresAt": "2026-08-13T06:00:28.591Z",
+    "laneSessionId": "lane-20260813060058-claude-008-captain-bf95179b2a",
+    "claimGeneration": "lease-7297c0d839c1",
+    "issuedAt": "2026-08-13T06:09:55.057Z",
+    "expiresAt": "2026-08-13T06:39:55.057Z",
     "scopeDigest": "sha256:f32c43864b3bc65d67e20bd932df549a7c5ba111e1b719ff28989e234c81b4bd",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T05:30:28.591Z"
+      "selectedAt": "2026-08-13T06:09:55.057Z"
     },
     "grants": [
       {
@@ -235,7 +240,39 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260813053028-claude-008-captain-ATM-GOV-0357-f99fa18578",
+  "startedBySessionId": "session-20260813060955-claude-008-captain-ATM-GOV-0357-924a075b81",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0357",
+    "actorId": "claude-008-captain",
+    "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+    "dirtyPaths": [
+      ".atm/history/evidence/ATM-GOV-0357.live-index-reconciliation.json",
+      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-30-24-136Z-import-7c2829b118ea.json",
+      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-30-28-582Z-reserve-5639758a892a.json",
+      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-30-28-586Z-promote-8e1bb48a30f2.json",
+      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-30-33-326Z-claim-2b4a8c5a8302.json",
+      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-37-24-354Z-scope-amendment-cd9dc4c9c436.json",
+      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-55-43-614Z-scope-amendment-c9f1195b4544.json",
+      ".atm/history/tasks/ATM-GOV-0357.json",
+      "docs/governance/handoff-2026-08-13-captain-claude-008.md",
+      "scripts/lib/validator-contract-subject.ts",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-bridge-minor.ts",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "tests/cli/observed-evidence-production-callers.test.ts",
+      "tests/cli/plan-level-executor-live-loop.test.ts",
+      "tests/cli/plan4-final-certification.test.ts",
+      "tests/cli/runner-sync-self-hosting-loop.test.ts",
+      "tests/cli/six-editor-adapter-parity.test.ts",
+      "tests/cli/test-case-catalog-shards.test.ts",
+      "tests/cli/unified-patch-application.test.ts",
+      "tests/cli/validator-contract-subject.test.ts"
+    ],
+    "retainedAt": "2026-08-13T06:01:40.364Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "claude-008-captain",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -248,21 +285,32 @@
       ".atm/history/evidence/ATM-GOV-0357.*",
       ".atm/history/task-events/ATM-GOV-0357/**",
       ".atm/history/tasks/ATM-GOV-0357.json",
-      "docs/governance/handoff-2026-08-13-captain-claude-008.md"
+      "docs/governance/handoff-2026-08-13-captain-claude-008.md",
+      "scripts/lib/validator-contract-subject.ts",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-bridge-minor.ts",
+      "tests/cli/validator-contract-subject.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0357-land-validator-contract-subject-resolver-deliverables.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0357-land-validator-contract-subject-resolver-deliverables.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "3c3c5a3d13b074999b887d71d65628d8f9c7daeaf3290fef931651943aad580d",
     "actorId": "claude-008-captain",
-    "sessionId": "session-20260813053028-claude-008-captain-ATM-GOV-0357-f99fa18578",
+    "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+      "laneSessionId": "lane-20260813060058-claude-008-captain-bf95179b2a",
       "status": "active",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813051440-claude-008-captain-89e6f0395c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813060058-claude-008-captain-bf95179b2a\""
     },
-    "createdAt": "2026-08-13T05:30:33.325Z",
+    "createdAt": "2026-08-13T06:09:59.817Z",
     "status": "active"
   }
 }

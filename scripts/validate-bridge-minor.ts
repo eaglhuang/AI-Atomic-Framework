@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { locateWorkflowStepByCommand } from './lib/validator-contract-subject.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = readArg('--mode') ?? 'validate';
@@ -68,7 +69,19 @@ assert(/listExperimentalApis/.test(welcomeSource), 'EXPERIMENTAL_API_WELCOME_LIS
 
 const workflow = readText('.github/workflows/release-npm.yml');
 assert(/validate-bridge-minor\.ts --mode validate/.test(workflow), 'BRIDGE_MINOR_WORKFLOW_GATE_MISSING', 'release workflow must run validate-bridge-minor.ts before publish');
-assert(workflow.indexOf('Validate bridge minor policy') < workflow.indexOf('Compute gate standard'), 'BRIDGE_MINOR_WORKFLOW_ORDER_INVALID', 'bridge minor gate must run before validate:standard');
+// ATM-GOV-0354: identify the heavy gate by the command it runs, not by its step
+// name. The step was renamed from "Compute gate standard" to "Compute gate full
+// with resumable receipt"; the old indexOf returned -1 and reported a false red
+// while the ordering it guards was still correct.
+const bridgeGateStep = locateWorkflowStepByCommand(workflow, /validate-bridge-minor\.ts\s+--mode\s+validate/);
+const heavyGateStep = locateWorkflowStepByCommand(workflow, /npm run validate:(standard|full)\b/);
+assert(bridgeGateStep !== null, 'BRIDGE_MINOR_WORKFLOW_GATE_STEP_MISSING', 'release workflow must contain a step running the bridge minor gate');
+assert(heavyGateStep !== null, 'BRIDGE_MINOR_WORKFLOW_HEAVY_GATE_MISSING', 'release workflow must contain a step running a validate:standard or validate:full gate');
+assert(
+  bridgeGateStep !== null && heavyGateStep !== null && bridgeGateStep.index < heavyGateStep.index,
+  'BRIDGE_MINOR_WORKFLOW_ORDER_INVALID',
+  `bridge minor gate must run before the heavy validator gate (${heavyGateStep?.name ?? 'not found'})`
+);
 
 const withoutBridge = evaluateBridgeFixture(readJson('tests/bridge-minor/major-without-bridge.json'));
 assert(withoutBridge.ok === false && withoutBridge.code === 'BRIDGE_MINOR_REQUIRED', 'BRIDGE_MINOR_MISSING_FIXTURE_NOT_BLOCKED', 'major bump without bridge minor must be blocked');

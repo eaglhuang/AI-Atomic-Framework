@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T05-55-43-614Z-scope-amendment-c9f1195b4544",
+  "taskId": "ATM-GOV-0357",
+  "action": "scope-amendment",
+  "actorId": "claude-008-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0357.json",
+  "taskSha256": "sha256:11ea96e19d96e446d830ecc8de66fbc06eb66a8a8c684bde89c827b8e05f1d9e",
+  "createdAt": "2026-08-13T05:55:43.614Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0357 --actor claude-008-captain --add \"tests/cli/validator-contract-subject.test.ts,tests/cli/**\" --reason \"direction lock allowed files mismatch on the regression test path\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "direction lock allowed files mismatch on the regression test path"
+  }
+}
