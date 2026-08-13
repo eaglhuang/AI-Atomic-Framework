@@ -15,8 +15,8 @@ assert.deepEqual(
 
 assert.deepEqual(
   buildTaskflowRunnerRecoveryArgs({ runnerPublicationAccepted: false, emergencyApproval: 'EMG-UNUSED' }),
-  [],
-  'an approval must not be forwarded or consumed outside runner recovery'
+  ['--emergency-approval', 'EMG-UNUSED', '--allow-stale-runner'],
+  'an explicit recovery lease is canonical authority even when the publication receipt is unavailable'
 );
 
 assert.ok(
