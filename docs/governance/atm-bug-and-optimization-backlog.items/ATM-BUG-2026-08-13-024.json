@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-024",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "taskflow close --write rolls back once, then a byte-identical retry succeeds",
+  "finding": "Observed twice in one session on two unrelated cards. The first taskflow close --write returns ATM_TASKFLOW_CLOSE_WRITE_ROLLED_BACK after its backend has already reported ATM_TASKS_CLOSED; the ledger is correctly restored; the same command, re-run with no argument change and no state change by the operator, then completes with ATM_TASKFLOW_CLOSE_WRITE_ORCHESTRATED. No mechanism is claimed here — this record exists so the next person to hit it has two payloads instead of a rumour. The reason it is filed as High despite being self-recovering is behavioural: a gate that a bare retry passes teaches operators to retry gates, and from the operator's side that is indistinguishable from a gate that means nothing.",
+  "expectedBehavior": "A close that will succeed on retry should succeed the first time. If the first attempt is doing preparatory work that only the second can consume — writing a manifest, reconciling the live index, settling a lock — that is a two-phase operation and should either complete both phases or report which phase it completed and what the retry will do, rather than reporting a rollback that reads as a refusal.",
+  "evidenceOrRepro": "ATM-GOV-0365, 2026-08-13T16:00Z: first --write returned ATM_TASKFLOW_CLOSE_WRITE_ROLLED_BACK with commitBundle.failClosed true, while its own backendResult carried ATM_TASKS_CLOSED; the identical retry sealed as 1f2674a50. ATM-GOV-0366, 2026-08-13T16:57Z: same first-attempt code with the same three --historical-delivery refs, same lane, same actor; the identical retry sealed as 94ae4e895. Between attempts the operator ran no command in either case. Both first-attempt payloads were captured at the time.",
+  "followUp": "Diagnose from the two captured payloads rather than by reproduction, since reproducing needs a live repository with a second active lane. The specific question worth answering first: what does the first attempt write that the second attempt reads, and is the rollback restoring the ledger while deliberately keeping that artifact. If it is, the operation is two-phase by design and only its reporting is wrong, which is a much cheaper fix than it currently looks. Related to [ATM-BUG-2026-08-13-023] and [ATM-BUG-2026-08-13-017] only in that all three are cases where governed state is correct in one store and stale in another."
+}
