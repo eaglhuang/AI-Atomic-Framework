@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0355",
   "title": "Make neutral steward patch application real and fail closed",
-  "status": "ready",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -229,16 +229,16 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T12-37-42-051Z-repair-claim-702d4cd2dcd4",
-  "lastTransitionAt": "2026-08-13T12:37:42.051Z",
+  "lastTransitionId": "2026-08-13T18-56-20-321Z-lock-cleanup-dc35eab0f4b2",
+  "lastTransitionAt": "2026-08-13T18:56:20.321Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-13T03:40:32.392Z",
   "promotedAt": "2026-08-13T03:40:32.397Z",
   "claim": {
-    "actorId": "claude-008-captain",
-    "leaseId": "lease-b5963c08d670",
-    "claimedAt": "2026-08-13T04:57:36.165Z",
-    "heartbeatAt": "2026-08-13T12:37:40.711Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-807e3c6306bd",
+    "claimedAt": "2026-08-13T18:39:45.275Z",
+    "heartbeatAt": "2026-08-13T18:56:20.138Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0355.json",
@@ -248,12 +248,12 @@
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260813045711-claude-008-captain-14e3f037d4",
+      "laneSessionId": "lane-20260813183945-codex-gpt-5.4-mini-0448df4da9",
       "status": "active",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813045711-claude-008-captain-14e3f037d4\""
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813183945-codex-gpt-5.4-mini-0448df4da9\""
     },
-    "reason": "expired Claude lease after verified delivery 8cef64b8f"
+    "reason": "closed"
   },
   "startedAt": "2026-08-13T03:40:32.403Z",
   "startedByActor": "claude-008-captain",
@@ -320,7 +320,7 @@
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
   },
-  "startedBySessionId": "session-20260813045736-claude-008-captain-ATM-GOV-0355-3045c0d64c",
+  "startedBySessionId": "session-20260813183945-codex-gpt-5.4-mini-ATM-GOV-0355-2ec9344008",
   "wipOwnership": {
     "schemaId": "atm.retainedWipOwnership.v1",
     "taskId": "ATM-GOV-0355",
@@ -334,5 +334,44 @@
     ],
     "retainedAt": "2026-08-13T04:57:30.737Z",
     "transitionClass": "release-wip-retained"
-  }
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0355",
+    "batchId": "batch-fadd25dad86b",
+    "scopeKey": "tasks-b84e03b8c6f5",
+    "queueId": "queue-beb36854627a02a4",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0355.*",
+      ".atm/history/task-events/ATM-GOV-0355/**",
+      ".atm/history/tasks/ATM-GOV-0355.json",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/unified-patch.ts",
+      "tests/cli/unified-patch-application.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "291fb4995596db8b9b65120717dddf3fb58daa370dca70cc8ff3a67a929a41f7",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260813183945-codex-gpt-5.4-mini-ATM-GOV-0355-2ec9344008",
+    "laneSession": {
+      "laneSessionId": "lane-20260813183945-codex-gpt-5.4-mini-0448df4da9",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813183945-codex-gpt-5.4-mini-0448df4da9\""
+    },
+    "createdAt": "2026-08-13T18:39:46.220Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-13T18:56:20.318Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-13T18:56:20.138Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260813183945-codex-gpt-5.4-mini-ATM-GOV-0355-2ec9344008",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0355.closure-packet.json"
 }

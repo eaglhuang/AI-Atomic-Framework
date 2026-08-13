@@ -1,0 +1,130 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0355",
+  "updatedAt": "2026-08-13T18:56:31.769Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/unified-patch-application.test.ts",
+    "typecheck",
+    "validate:broker-steward",
+    "validate:brokered-write",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/unified-patch-application.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:76dafa11596c1c9a14e056de416b20c4c89beba496a5e9642e9319ea0a394e92",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/unified-patch-application.test.ts"
+      ],
+      "generatedAt": "2026-08-13T18:40:53.801Z",
+      "startedAt": "2026-08-13T18:40:51.101Z",
+      "finishedAt": "2026-08-13T18:40:53.801Z",
+      "durationMs": 2700,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-brokered-write.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2b82a32bfbb256d3cb0acbe9ca869860a77605a45bab378852fb0316f6de072a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:brokered-write"
+      ],
+      "generatedAt": "2026-08-13T18:40:56.897Z",
+      "startedAt": "2026-08-13T18:40:55.655Z",
+      "finishedAt": "2026-08-13T18:40:56.897Z",
+      "durationMs": 1242,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-steward.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c4e3734903aa3ad77f63c14a32370a6e8b7c487bac22921ed736cbaa74de81f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:broker-steward"
+      ],
+      "generatedAt": "2026-08-13T18:41:00.253Z",
+      "startedAt": "2026-08-13T18:40:58.762Z",
+      "finishedAt": "2026-08-13T18:41:00.253Z",
+      "durationMs": 1491,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-13T18:41:14.915Z",
+      "startedAt": "2026-08-13T18:41:06.467Z",
+      "finishedAt": "2026-08-13T18:41:14.915Z",
+      "durationMs": 8448,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:a0f3fbb0ab8bb7e2d32ce57ff812cc4d6b3b8d0bb01c60de749a5b90e2e47791",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-13T18:54:40.209Z",
+      "startedAt": "2026-08-13T18:54:18.669Z",
+      "finishedAt": "2026-08-13T18:54:40.209Z",
+      "durationMs": 21540,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-13T18:55:58.475Z",
+      "startedAt": "2026-08-13T18:54:42.180Z",
+      "finishedAt": "2026-08-13T18:55:58.475Z",
+      "durationMs": 76295,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-13T18:56:31.768Z",
+      "startedAt": "2026-08-13T18:55:18.642Z",
+      "finishedAt": "2026-08-13T18:56:31.768Z",
+      "durationMs": 73126,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
