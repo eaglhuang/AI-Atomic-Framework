@@ -233,43 +233,26 @@
     "findings": []
   },
   "claim": {
-    "actorId": "claude-008-gov-0364",
-    "leaseId": "lease-35b605fbe2e2",
-    "claimedAt": "2026-08-13T14:58:02.743Z",
-    "heartbeatAt": "2026-08-13T14:58:02.743Z",
-    "ttlSeconds": 1800,
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-aa48cd7b7ea1",
+    "claimedAt": "2026-08-13T15:28:27.200Z",
+    "heartbeatAt": "2026-08-13T15:29:42.081Z",
+    "ttlSeconds": 3600,
     "files": [
-      ".atm/history/evidence/ATM-GOV-0364.*",
-      ".atm/history/task-events/ATM-GOV-0364/**",
-      ".atm/history/tasks/ATM-GOV-0364.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-007.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-009.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-010.json",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/shared/command-spec-output.ts",
+      "tests/cli/governance-round-trip-cost.test.ts",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-013.json",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-015.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-016.json",
-      "packages/cli/dist/**",
-      "packages/cli/src/atm.ts",
-      "packages/cli/src/commands/command-specs/tasks.spec.ts",
-      "packages/cli/src/commands/shared/command-spec-output.ts",
-      "packages/cli/src/commands/tasks/legacy/implementation.ts",
-      "release/**",
-      "tests/cli/governance-round-trip-cost.test.ts"
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-016.json"
     ],
     "state": "active",
-    "intent": "write",
-    "laneSession": {
-      "laneSessionId": "lane-20260813144935-claude-008-gov-0364-c0ebf92f20",
-      "status": "active",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813144935-claude-008-gov-0364-c0ebf92f20\""
-    }
+    "reason": "predecessor lease expired; retain and complete task-scoped WIP without discarding bytes"
   },
   "startedAt": "2026-08-13T14:20:14.669Z",
   "startedBySessionId": "session-20260813145802-claude-008-gov-0364-ATM-GOV-0364-c02467caff",
-  "lastTransitionId": "2026-08-13T15-27-12-035Z-scope-amendment-cab1ea2f818c",
-  "lastTransitionAt": "2026-08-13T15:27:12.035Z",
+  "lastTransitionId": "2026-08-13T15-29-42-371Z-renew-b268ace10114",
+  "lastTransitionAt": "2026-08-13T15:29:42.371Z",
   "ledgerContractVersion": "task-ledger/v1",
   "wipOwnership": {
     "schemaId": "atm.retainedWipOwnership.v1",
@@ -290,45 +273,50 @@
     "retainedAt": "2026-08-13T14:55:59.962Z",
     "transitionClass": "release-wip-retained"
   },
-  "owner": "claude-008-gov-0364",
+  "owner": "codex-gpt-5.4-mini",
   "startedByActor": "claude-008-gov-0364",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-a9af26406323646f",
-    "ticketDigest": "sha256:a9af26406323646f4c6345068ceae856d9c897f9bfd90ee716c8969f964320a4",
+    "ticketId": "wat-89b9afbbd141d345",
+    "ticketDigest": "sha256:89b9afbbd141d345383d6e0205c42d22c3d8bc4e6510207f273dd6e544572779",
     "taskId": "ATM-GOV-0364",
     "origin": "claim",
-    "actorId": "claude-008-gov-0364",
-    "laneSessionId": "lane-20260813144935-claude-008-gov-0364-c0ebf92f20",
-    "claimGeneration": "lease-35b605fbe2e2",
-    "issuedAt": "2026-08-13T14:58:02.743Z",
-    "expiresAt": "2026-08-13T15:28:02.743Z",
-    "scopeDigest": "sha256:c4ee86d463768c20d80044c273df30d5bca92b33fdd687a6a4d8276549dd07a8",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": null,
+    "claimGeneration": "lease-aa48cd7b7ea1",
+    "issuedAt": "2026-08-13T15:29:42.081Z",
+    "expiresAt": "2026-08-13T16:29:42.081Z",
+    "scopeDigest": "sha256:6385d3f0737db286b709cbba63330fb46d89bc6e22642c7d44e5f448b25125d2",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T14:58:02.743Z"
+      "selectedAt": "2026-08-13T15:29:42.081Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0364.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0364/**",
           ".atm/history/tasks/ATM-GOV-0364.json",
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json",
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-007.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-008.json",
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-009.json",
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-010.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-011.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-012.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-013.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-015.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-016.json",
+          "packages/cli/dist/**",
+          "packages/cli/src/atm.ts",
+          "packages/cli/src/commands/command-specs/tasks.spec.ts",
           "packages/cli/src/commands/shared/command-spec-output.ts",
           "packages/cli/src/commands/tasks/legacy/implementation.ts",
+          "release/**",
           "tests/cli/governance-round-trip-cost.test.ts"
         ],
-        "digest": "sha256:350b9e5049ebe1d25b55f89154f8c94b2d992236abe0268f4d9255f2d7acd575"
+        "digest": "sha256:746737ecb1caf1dfe8d0b05b62769ab6de02a1e1f8c3014ffd6f55a2da87d555"
       },
       {
         "kind": "lifecycle-operation",
