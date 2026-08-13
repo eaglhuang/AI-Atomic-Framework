@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.fourPlanCertificate.v1",
   "specVersion": "0.3.0",
-  "status": "proven",
+  "status": "not-certified",
   "decision": {
     "rule": "certify only when every exact objective denominator and every shared closure control is independently recomputed as proven",
     "failClosed": true
@@ -60,16 +60,31 @@
     "nonClaim": "The bound release commit must remain an ancestor of origin/main; later unrelated commits do not invalidate its proven release surfaces."
   },
   "independentReview": {
-    "status": "proven",
+    "status": "not-complete",
     "source": "docs/reports/plan-3x-4x-independent-certificate.json",
     "nonClaim": "The canonical certificate consumes the independent verdict but recomputes its required dimensions and reviewer count."
   },
   "legacyAuthority": {
-    "retired": true,
+    "retired": false,
     "reversible": true,
     "retirementRule": "Any missing, stale, contradictory, unreachable, unresolved, or unknown input restores legacy authority and changes this certificate to not-certified."
   },
   "unknownRows": [],
   "unresolvedRows": [],
-  "resultDigest": "sha256:1e62b12c0a690b4e01d081b78c67b840abcb5f176e0109daaaf5a1bfdd9fef43"
+  "supersession": {
+    "taskId": "ATM-GOV-0360",
+    "appliedRule": "legacyAuthority.retirementRule",
+    "reason": "The independent certificate this audit binds to was recompiled against observed evidence and the live remote and returned not-complete. Under this audit's own retirement rule a stale or contradictory input restores legacy authority and downgrades the certification, so the previous proven status and retired legacy authority no longer hold.",
+    "blockers": [
+      "reviewer-digest-malformed: an unfinished review was recorded with the literal placeholder sha256:pending-self-digest",
+      "reviewer-output-self-reference: the second declared reviewer's only output was this certificate itself",
+      "reviewer-output-is-certified-evidence: the first declared reviewer's output is the release closeback it was meant to confirm",
+      "reviewer-input-digests-missing: neither declared reviewer recorded what it recomputed from",
+      "dimension-digest-unreproducible: the charter, freshness and objective dimension digests do not follow from the evidence they cite",
+      "release-digest-mismatch: origin-main, target-head and frozen-runner no longer match the surfaces this certification was granted over"
+    ],
+    "nonClaim": "This downgrade does not retract the objective denominators. Plan 3.0 17/17, Plan 3.1 23/23, Plan 3.2 29/29 and Plan 4.0 17/17 remain independently replayed; what is withdrawn is the final certification and the retirement of legacy authority.",
+    "restoreCondition": "Two genuinely independent reviewer outputs, reproducible dimension digests, and a certificate recompiled against the remote at that moment, all recorded by scripts/compile-four-plan-independent-certificate.ts --mode write."
+  },
+  "resultDigest": "sha256:9fd47f258d5e0c7901d712220b2ae67c923899cd55a04b145638571f8291398f"
 }

@@ -2,7 +2,7 @@
   "schemaId": "atm.fourPlanCloseoutBlockerMap.v1",
   "specVersion": "0.1.0",
   "generatedAt": "2026-08-13T00:00:00.000Z",
-  "status": "complete-closeout-certified",
+  "status": "actionable-not-complete",
   "nonClaim": "This map is an execution dashboard, not a completion certificate.",
   "sourceReports": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "path": "docs/reports/plan-3x-4x-independent-certificate.json",
-      "digest": "sha256:12e1d45a9366aedaa838cf0b57b8ecf430f0bbc9673985d7f77642994bf91f88"
+      "digest": "sha256:af7ec72c0f87233ebda4b44ce1ecc5ecd20df7ccb5ddd17fc0356f6e147ade00"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json",
@@ -171,12 +171,31 @@
         "final certificate",
         "release closeback"
       ],
-      "status": "resolved",
-      "reason": "release surface is pushed and reachable, objective verdict is proven, and the independent certificate has been recomputed; it now blocks only on the explicit backlog-deferred dimension.",
-      "requiredOutcome": "maintain docs/reports/plan-3x-4x-independent-certificate.json and docs/reports/plan-3x-4x-release-closeback.json as digest-bound release authority."
+      "status": "open",
+      "reason": "ATM-GOV-0360 recompiled the independent certificate against observed evidence and the remote at execution time, and it returned not-complete. The previous recompute accepted a placeholder reviewer digest, a reviewer whose only output was the certificate itself, and dimension digests that do not follow from the evidence they cite; its release surfaces were also bound to a commit the remote has since passed.",
+      "requiredOutcome": "two genuinely independent reviewer outputs, dimension digests reproducible from the artifacts they cite, and a certificate recompiled against the remote at that moment via scripts/compile-four-plan-independent-certificate.ts --mode write."
     }
   ],
-  "nextExecutionOrder": [],
+  "nextExecutionOrder": [
+    {
+      "id": "N1-independent-reviewer-outputs",
+      "blockerClass": "B5-release-certificate",
+      "outcome": "Produce two reviewer outputs from reviewers that took no part in authoring the certificate or its evidence, each recording the input digests it recomputed from and writing to its own path. Renaming an actor does not create independence.",
+      "failClosedIf": "fewer than minimumIndependentReviewers reviewers survive the certificate's own independence checks"
+    },
+    {
+      "id": "N2-reproducible-dimension-digests",
+      "blockerClass": "B5-release-certificate",
+      "outcome": "Restate the charter, freshness and objective dimension digests so each is either the digest of one cited artifact or the canonical composite over all of them.",
+      "failClosedIf": "any dimension digest cannot be reproduced from the evidence the dimension cites"
+    },
+    {
+      "id": "N3-current-remote-release-verdict",
+      "blockerClass": "B5-release-certificate",
+      "outcome": "Recompile the certificate against the remote as it stands at that moment so target-head, origin-main and the frozen-runner surface are observed rather than restated.",
+      "failClosedIf": "the recorded remote differs from the live remote at verification time"
+    }
+  ],
   "principlesApplied": [
     "first-principles: completion requires current evidence, not historical prose or task status alone",
     "deep-module: blocker classes expose stable seams instead of spreading one-off row logic through certificate code",

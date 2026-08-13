@@ -101,9 +101,14 @@ function observe(paths: readonly string[], targetHead: string): FourPlanEvidence
   });
 }
 
+/**
+ * Both required surfaces are observed on the remote, never on the local HEAD.
+ * A certificate authorizes what is published; a commit that exists only in this
+ * working copy is not published, and binding to the local HEAD would make every
+ * certificate invalidate itself the moment it is committed.
+ */
 function buildReleaseSurfaces(
   closeback: Record<string, any>,
-  targetHead: string,
   originMain: string
 ): FourPlanReleaseSurface[] {
   const declared: readonly Record<string, any>[] = Array.isArray(closeback.releaseSurfaces) ? closeback.releaseSurfaces : [];
@@ -111,7 +116,7 @@ function buildReleaseSurfaces(
     {
       surfaceId: 'target-head',
       expectedDigest: String(closeback.targetHead ?? ''),
-      observedDigest: targetHead,
+      observedDigest: originMain,
       reachable: true
     },
     {
@@ -139,8 +144,11 @@ function buildReleaseSurfaces(
 function compile(generatedAt: string): CompileOutcome {
   const prior = JSON.parse(readFileSync(CERTIFICATE_PATH, 'utf8')) as Record<string, any>;
   const closeback = JSON.parse(readFileSync(CLOSEBACK_PATH, 'utf8')) as Record<string, any>;
-  const targetHead = git(['rev-parse', 'HEAD']);
   const originMain = resolveOriginMain();
+  // Evidence freshness is judged against the published branch for the same
+  // reason the release surfaces are: a report whose last commit is not on the
+  // remote has not been published and cannot support a release verdict.
+  const targetHead = originMain;
 
   const dimensions = (prior.dimensions ?? []).map((dimension: Record<string, any>) => ({
     dimensionId: String(dimension.dimensionId ?? ''),
@@ -176,11 +184,11 @@ function compile(generatedAt: string): CompileOutcome {
     forbiddenReviewerRoles: (prior.forbiddenReviewerRoles ?? []).map(String),
     dimensions,
     evidenceObservations: observe(referenced, targetHead),
-    releaseSurfaces: buildReleaseSurfaces(closeback, targetHead, originMain),
+    releaseSurfaces: buildReleaseSurfaces(closeback, originMain),
     mutationControls: (prior.mutationControls ?? []).map(String),
     provenance: {
       compiledBy: 'scripts/compile-four-plan-independent-certificate.ts',
-      head: targetHead,
+      observedRemoteHead: originMain,
       originMain,
       remoteRef: `${REMOTE}/${BRANCH}`,
       closebackDigest: digestOf(CLOSEBACK_PATH),
@@ -206,7 +214,7 @@ function main(): number {
     process.stdout.write(
       `wrote ${CERTIFICATE_PATH}\n`
         + `  verdict: ${certificate.overallVerdict} (status ${certificate.status})\n`
-        + `  head: ${targetHead}\n  ${REMOTE}/${BRANCH}: ${originMain}\n`
+        + `  observed ${REMOTE}/${BRANCH}: ${originMain} (local HEAD ${targetHead === originMain ? 'not used' : targetHead})\n`
         + `  independent reviewers: ${certificate.independentReviewerCount}/${certificate.minimumIndependentReviewers}\n`
         + `  digest: ${certificate.certificateDigest}\n`
         + certificate.diagnostics.map((entry) => `  - ${entry}\n`).join('')

@@ -8,7 +8,8 @@
   "acceptance": [
     "ACC-1 A reviewer or dimension digest that is not a well-formed `sha256:<64 hex>` is a fail-closed diagnostic naming the offender. `sha256:pending-self-digest` must not satisfy any check.",
     "ACC-2 A reviewer whose declared output is the certificate itself, whose id or role coincides with the writer, or whose output is one of the evidence artifacts the certificate cites, is not independent and does not count toward `minimumIndependentReviewers`.",
-    "ACC-3 Every reviewer declares the input digests it recomputed from as well as its own output digest. A reviewer with no declared inputs is incomplete.",
+    "ACC-3 Every reviewer declares path-bound input observations it recomputed from as well as a reproducible output receipt digest. Every input path/digest must match an observed raw artifact, and the output receipt digest must be recomputable from reviewer identity, roles, sorted inputs, verdict and provenance. Missing, unrelated or unverifiable inputs are incomplete.",
+    "ACC-3A `independentReviewerCount` is derived from a deduplicated set of reviewers that each pass a local validity result. Repeated invalid reviewers and repeated diagnostics can never increase the count.",
     "ACC-4 Every cited evidence path and reviewer output is observed on disk at compile time. Missing, unreadable, digest-mismatched, or modified-after- `generatedAt` artifacts each produce a distinct diagnostic and `not-complete`.",
     "ACC-5 `target-head` and `origin-main` are resolved from the local repository and from the remote at execution time, not from a recorded literal. A certificate whose recorded remote differs from the live remote is `stale` and `not-complete`.",
     "ACC-6 The regenerated report and both focused tests recompute the verdict from the certificate's own inputs instead of asserting a literal `complete`. The committed report states the true current verdict."
@@ -19,7 +20,9 @@
     "scripts/compile-four-plan-independent-certificate.ts",
     "docs/reports/plan-3x-4x-independent-certificate.json",
     "tests/cli/four-plan-independent-certificate.test.ts",
-    "tests/cli/plan4-final-certification.test.ts"
+    "tests/cli/plan4-final-certification.test.ts",
+    "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+    "docs/reports/plan-3x-4x-closeout-blocker-map.json"
   ],
   "scopePaths": [
     "packages/core/src/evidence/four-plan-independent-certificate.ts",
@@ -27,7 +30,9 @@
     "scripts/compile-four-plan-independent-certificate.ts",
     "docs/reports/plan-3x-4x-independent-certificate.json",
     "tests/cli/four-plan-independent-certificate.test.ts",
-    "tests/cli/plan4-final-certification.test.ts"
+    "tests/cli/plan4-final-certification.test.ts",
+    "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+    "docs/reports/plan-3x-4x-closeout-blocker-map.json"
   ],
   "validators": [
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
@@ -77,20 +82,20 @@
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0360-bind-the-four-plan-independent-certificate-to-observed-evidence-and-the-live-remote.task.md",
     "sectionTitle": "ATM-GOV-0360",
-    "headingLine": 123,
-    "hash": "841f82bc22df203b",
+    "headingLine": 127,
+    "hash": "38213ea4ef5c69bb",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0360-bind-the-four-plan-independent-certificate-to-observed-evidence-and-the-live-remote.task.md",
-      "planningCommitSha": null,
-      "contentDigest": "sha256:841f82bc22df203b06fdbda5cd07e0a562e57d2f04596157e3359db95870cc8a",
+      "planningCommitSha": "e6159f9aa37a826cc48baa245c247cf1b43536d2",
+      "contentDigest": "sha256:38213ea4ef5c69bbf30531861c122cdb2d10243b65b1a335e31fb6997c539fbb",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-13T13:11:03.475Z"
+      "sealedAt": "2026-08-13T13:43:57.727Z"
     }
   },
-  "importedAt": "2026-08-13T13:11:03.475Z",
+  "importedAt": "2026-08-13T13:43:57.727Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
@@ -152,7 +157,8 @@
       "semanticKey": "a_reviewer_cannot_review_its_own_certificate_or_the_evidence_it_certifies",
       "coversAcceptance": [
         "ACC-2",
-        "ACC-3"
+        "ACC-3",
+        "ACC-3A"
       ],
       "coversImpactEdges": [
         "self-referential-reviewer-to-false-independence"
@@ -230,21 +236,19 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T13-28-03-155Z-scope-amendment-4d0625f255d5",
-  "lastTransitionAt": "2026-08-13T13:28:03.155Z",
+  "lastTransitionId": "2026-08-13T13-45-11-720Z-claim-b2a378065ed4",
+  "lastTransitionAt": "2026-08-13T13:45:11.720Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-008-gov-0360",
-  "reservedAt": "2026-08-13T13:11:35.056Z",
-  "promotedAt": "2026-08-13T13:11:35.064Z",
+  "reservedAt": "2026-08-13T13:44:07.902Z",
+  "promotedAt": "2026-08-13T13:44:07.906Z",
   "claim": {
     "actorId": "claude-008-gov-0360",
-    "leaseId": "lease-06ee29469324",
-    "claimedAt": "2026-08-13T13:11:35.069Z",
-    "heartbeatAt": "2026-08-13T13:11:35.069Z",
+    "leaseId": "lease-c41f628c87b6",
+    "claimedAt": "2026-08-13T13:45:10.420Z",
+    "heartbeatAt": "2026-08-13T13:45:10.420Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/ATM-GOV-0360.*",
-      ".atm/history/task-events/ATM-GOV-0360/**",
       ".atm/history/tasks/ATM-GOV-0360.json",
       "docs/reports/plan-3x-4x-closeout-blocker-map.json",
       "docs/reports/plan-3x-4x-independent-certificate.json",
@@ -258,47 +262,50 @@
     "state": "active",
     "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260813131135-claude-008-gov-0360-22f2c4d9a9",
+      "laneSessionId": "lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813131135-claude-008-gov-0360-22f2c4d9a9\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc\""
     }
   },
-  "startedAt": "2026-08-13T13:11:35.069Z",
+  "startedAt": "2026-08-13T13:45:10.420Z",
   "startedByActor": "claude-008-gov-0360",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-22106c482c9eb828",
-    "ticketDigest": "sha256:22106c482c9eb82834160c7b6f8ed53e7fd015fb159dec67cb6121f21a19a113",
+    "ticketId": "wat-d524e35183c8b0d1",
+    "ticketDigest": "sha256:d524e35183c8b0d13b931114161302e04a2e460fead97653175ebb4287ac09de",
     "taskId": "ATM-GOV-0360",
     "origin": "claim",
     "actorId": "claude-008-gov-0360",
-    "laneSessionId": "lane-20260813131135-claude-008-gov-0360-22f2c4d9a9",
-    "claimGeneration": "lease-06ee29469324",
-    "issuedAt": "2026-08-13T13:11:35.069Z",
-    "expiresAt": "2026-08-13T13:41:35.069Z",
-    "scopeDigest": "sha256:13ec4639eb34130078ef1bf2c1c77ffb3f8467fc9043c9bd6d16006c8a5b4c0a",
+    "laneSessionId": "lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc",
+    "claimGeneration": "lease-c41f628c87b6",
+    "issuedAt": "2026-08-13T13:45:10.420Z",
+    "expiresAt": "2026-08-13T14:15:10.420Z",
+    "scopeDigest": "sha256:a7fcbb0f354e0bb61a7fd16d657b97e17c81aa7d7507bb05956cf62c98ed8246",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T13:11:35.069Z"
+      "selectedAt": "2026-08-13T13:45:10.420Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0360.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0360/**",
           ".atm/history/tasks/ATM-GOV-0360.json",
+          "docs/reports/plan-3x-4x-closeout-blocker-map.json",
           "docs/reports/plan-3x-4x-independent-certificate.json",
+          "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
           "packages/core/src/evidence/four-plan-independent-certificate.ts",
           "schemas/evidence/four-plan-independent-certificate.schema.json",
           "scripts/compile-four-plan-independent-certificate.ts",
           "tests/cli/four-plan-independent-certificate.test.ts",
           "tests/cli/plan4-final-certification.test.ts"
         ],
-        "digest": "sha256:700953010d93de2c098de66e4514b8c9dc2f75b0c1ab66e3e529bceb8d6c013e"
+        "digest": "sha256:2b415f21520f0cc2b419426563b6eca667f9024e0453ff62e60962becd724886"
       },
       {
         "kind": "lifecycle-operation",
@@ -332,7 +339,7 @@
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
   },
-  "startedBySessionId": "session-20260813131135-claude-008-gov-0360-ATM-GOV-0360-b61f7cf2b6",
+  "startedBySessionId": "session-20260813134510-claude-008-gov-0360-ATM-GOV-0360-24bd011ceb",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -354,26 +361,19 @@
       "tests/cli/four-plan-independent-certificate.test.ts",
       "tests/cli/plan4-final-certification.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0360-bind-the-four-plan-independent-certificate-to-observed-evidence-and-the-live-remote.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0360-bind-the-four-plan-independent-certificate-to-observed-evidence-and-the-live-remote.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "687adf5a469e10ff6b3f9d057482aac115015c0f66f1e37dda9e69368b53d5e2",
     "actorId": "claude-008-gov-0360",
-    "sessionId": null,
+    "sessionId": "session-20260813134510-claude-008-gov-0360-ATM-GOV-0360-24bd011ceb",
     "laneSession": {
-      "laneSessionId": "lane-20260813131135-claude-008-gov-0360-22f2c4d9a9",
+      "laneSessionId": "lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813131135-claude-008-gov-0360-22f2c4d9a9\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc\""
     },
-    "createdAt": "2026-08-13T13:11:40.551Z",
+    "createdAt": "2026-08-13T13:45:11.718Z",
     "status": "active"
   }
 }
