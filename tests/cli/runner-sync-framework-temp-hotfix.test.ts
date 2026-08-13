@@ -88,6 +88,7 @@ try {
   assert.equal(takeover.ok, true, 'active framework-temp queue head should authorize a digest-bound publication takeover');
   assert.deepEqual(takeover.evidence.plan.entries.map((entry: any) => entry.path), ['release/atm-onefile/release-manifest.json']);
   assert.equal(existsSync(path.join(repo, takeover.evidence.receiptPath)), true);
+  assert.equal(JSON.parse(readFileSync(path.join(repo, takeover.evidence.receiptPath), 'utf8')).taskId, taskId, 'persisted takeover evidence must carry semantic task identity');
 
   await assert.rejects(
     () => runBroker([

@@ -49,7 +49,11 @@ mkdirSync(path.join(targetRepo, 'src'), { recursive: true });
 writeFileSync(path.join(targetRepo, 'src', 'value.ts'), 'export const value = true;\n', { encoding: 'utf8' });
 const reconciliationPath = `.atm/history/evidence/${taskId}.live-index-reconciliation.json`;
 writeJson(path.join(targetRepo, reconciliationPath), { schemaId: 'atm.liveIndexReconciliation.v1', taskId, clean: false });
+const takeoverPath = `.atm/history/evidence/${taskId}.runner-publication-takeover.json`;
+writeJson(path.join(targetRepo, takeoverPath), { schemaId: 'atm.runnerPublicationTakeoverPlan.v1', sealedSourceSha: 'fixture' });
 assert.deepEqual(listCurrentTaskCloseEvidenceFiles(targetRepo, taskId), [reconciliationPath]);
+writeJson(path.join(targetRepo, takeoverPath), { schemaId: 'atm.runnerPublicationTakeoverPlan.v1', taskId, sealedSourceSha: 'fixture' });
+assert.deepEqual(listCurrentTaskCloseEvidenceFiles(targetRepo, taskId), [reconciliationPath, takeoverPath]);
 
 const bundle = buildTaskflowCommitBundle({
   cwd: targetRepo,
@@ -61,6 +65,7 @@ const bundle = buildTaskflowCommitBundle({
   planningAuthorityDeliveryOk: false
 });
 assert.ok(bundle.targetRepo.stageFiles.includes(reconciliationPath), 'bundle must include supported current-task reconciliation evidence');
+assert.ok(bundle.targetRepo.stageFiles.includes(takeoverPath), 'bundle must include semantically attributed takeover evidence');
 execFileSync('git', ['add', '--', reconciliationPath], { cwd: targetRepo, stdio: 'ignore' });
 const preflight = buildHistoricalClosePreflight({
   cwd: targetRepo,

@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 export interface CurrentTaskCloseEvidence {
@@ -46,5 +46,16 @@ export function isCurrentTaskCloseEvidenceFile(taskId: string, filePath: string)
 
 export function listCurrentTaskCloseEvidenceFiles(root: string, taskId: string): string[] {
   return buildCurrentTaskCloseEvidence(taskId).supportedPaths
-    .filter((relativePath) => existsSync(path.join(root, relativePath)));
+    .filter((relativePath) => existsSync(path.join(root, relativePath)))
+    .filter((relativePath) => hasSemanticTaskIdentity(root, relativePath, taskId));
+}
+
+function hasSemanticTaskIdentity(root: string, relativePath: string, taskId: string): boolean {
+  if (!relativePath.endsWith('.runner-publication-takeover.json')) return true;
+  try {
+    const document = JSON.parse(readFileSync(path.join(root, relativePath), 'utf8')) as Record<string, unknown>;
+    return String(document.taskId ?? '').trim() === taskId.trim();
+  } catch {
+    return false;
+  }
 }

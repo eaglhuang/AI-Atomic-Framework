@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-015",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in source; frozen publication pending",
+  "area": "Runner publication evidence semantic attribution",
+  "finding": "authorizeRunnerPublicationTakeover persisted a digest-valid plan without taskId. Taskflow close included that protected evidence solely from its task-shaped filename, while the pre-commit protected-state validator correctly refuses filenames as authority. A legitimate close therefore rolled back with ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT.",
+  "expectedBehavior": "Every protected evidence producer must persist one semantic task identity. Close bundle assembly must include takeover evidence only when its payload taskId matches the closing task; legacy contextless diagnostics remain visible in the worktree but cannot be staged or committed by filename inference.",
+  "evidenceOrRepro": "ATM-GOV-0359 taskflow close reached write-ready after runner publication f6ed90b5c, then rolled back because .atm/history/evidence/ATM-GOV-0359.runner-publication-takeover.json had schema atm.runnerPublicationTakeoverPlan.v1 but no taskId. The hook classified it as evidence-without-semantic-task-id/current-task. Focused regressions: runner-sync-framework-temp-hotfix.test.ts and current-task-close-evidence.spec.ts.",
+  "followUp": "Publish the frozen runner, retry ATM-GOV-0359 close, and add a producer-consumer contract check covering all protected evidence schemas so task identity cannot be dropped between evidence generation, close bundle assembly, and pre-commit validation."
+}
