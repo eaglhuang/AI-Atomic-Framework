@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T05-06-46-646Z-scope-amendment-172568bc5cdc",
+  "taskId": "ATM-GOV-0353",
+  "action": "scope-amendment",
+  "actorId": "claude-008-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0353.json",
+  "taskSha256": "sha256:77cb7b4d8ff2840aab77b6140ef1cabefbf10c5f11a650d0b7a32f7efda38483",
+  "createdAt": "2026-08-13T05:06:46.646Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0353 --actor claude-008-captain --add \"packages/cli/dist/**,release/**,.atm/history/evidence/ATM-GOV-0353.*\" --reason \"runner publication release surfaces for the sealed build of c486a5041\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "runner publication release surfaces for the sealed build of c486a5041"
+  }
+}

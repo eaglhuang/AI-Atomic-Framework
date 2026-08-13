@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T23-58-22-944Z-scope-amendment-06bd0db5dec5",
+  "taskId": "ATM-GOV-0353",
+  "action": "scope-amendment",
+  "actorId": "claude-008-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0353.json",
+  "taskSha256": "sha256:250afde69d52ddaa479409fd44c0a64549beae42bd1bebae06860cec841f5913",
+  "createdAt": "2026-08-12T23:58:22.944Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0353 --actor claude-008-captain --add \"packages/cli/dist/**,release/**,.atm/history/evidence/ATM-GOV-0353.*\" --reason \"runner publication release surfaces for the sealed build of delivery commit c486a504\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "runner publication release surfaces for the sealed build of delivery commit c486a504"
+  }
+}

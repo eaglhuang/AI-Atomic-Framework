@@ -211,31 +211,34 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T23-09-22-755Z-claim-df44fc4043c2",
-  "lastTransitionAt": "2026-08-12T23:09:22.755Z",
+  "lastTransitionId": "2026-08-13T05-06-46-646Z-scope-amendment-172568bc5cdc",
+  "lastTransitionAt": "2026-08-13T05:06:46.646Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008-captain",
   "reservedAt": "2026-08-12T23:09:16.835Z",
   "promotedAt": "2026-08-12T23:09:16.842Z",
   "claim": {
     "actorId": "claude-008-captain",
-    "leaseId": "lease-97fcd29ccd0a",
-    "claimedAt": "2026-08-12T23:09:16.847Z",
-    "heartbeatAt": "2026-08-12T23:09:16.847Z",
+    "leaseId": "lease-6bd8227ee414",
+    "claimedAt": "2026-08-13T05:06:28.033Z",
+    "heartbeatAt": "2026-08-13T05:06:28.033Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0353.*",
+      ".atm/history/task-events/ATM-GOV-0353/**",
       ".atm/history/tasks/ATM-GOV-0353.json",
+      "packages/cli/dist/**",
       "packages/cli/src/commands/planning-repo-root.ts",
       "packages/cli/src/commands/planning-root-resolution-cache.ts",
+      "release/**",
       "tests/cli/planning-root-resolution-cache.test.ts"
     ],
     "state": "active",
     "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260812230852-claude-008-captain-67ba2cd406",
+      "laneSessionId": "lane-20260813050131-claude-008-captain-79a8a031f8",
       "status": "active",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812230852-claude-008-captain-67ba2cd406\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813050131-claude-008-captain-79a8a031f8\""
     }
   },
   "startedAt": "2026-08-12T23:09:16.847Z",
@@ -243,20 +246,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-052658ccf491e0a6",
-    "ticketDigest": "sha256:052658ccf491e0a6c9d8f01eed2f54edd19aae1f0d0cdcfb83b199b9dbae6eee",
+    "ticketId": "wat-2a314db88638d27d",
+    "ticketDigest": "sha256:2a314db88638d27dd302a0b67fa57dd1ba9b033e424b0d2ad3fa8234178c405d",
     "taskId": "ATM-GOV-0353",
     "origin": "claim",
     "actorId": "claude-008-captain",
-    "laneSessionId": "lane-20260812230852-claude-008-captain-67ba2cd406",
-    "claimGeneration": "lease-97fcd29ccd0a",
-    "issuedAt": "2026-08-12T23:09:16.847Z",
-    "expiresAt": "2026-08-12T23:39:16.847Z",
+    "laneSessionId": "lane-20260813050131-claude-008-captain-79a8a031f8",
+    "claimGeneration": "lease-6bd8227ee414",
+    "issuedAt": "2026-08-13T05:06:28.033Z",
+    "expiresAt": "2026-08-13T05:36:28.033Z",
     "scopeDigest": "sha256:d0fa5d9dfdf5a8e4baa53c56a67f4f80258a7d511a88971df5e14092b3fd15ed",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T23:09:16.847Z"
+      "selectedAt": "2026-08-13T05:06:28.033Z"
     },
     "grants": [
       {
@@ -303,7 +306,35 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260812230916-claude-008-captain-ATM-GOV-0353-0087dbdacd",
+  "startedBySessionId": "session-20260813050628-claude-008-captain-ATM-GOV-0353-7ba6712223",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0353",
+    "actorId": "claude-008-captain",
+    "laneSessionId": "lane-20260812235734-claude-008-captain-b9c7037cd5",
+    "dirtyPaths": [
+      ".atm/history/evidence/ATM-GOV-0353.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0353.json",
+      ".atm/history/evidence/ATM-GOV-0353.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0353.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0353.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0353/2026-08-12T23-52-47-688Z-scope-amendment-bc1f1347f791.json",
+      ".atm/history/task-events/ATM-GOV-0353/2026-08-12T23-57-37-031Z-repair-claim-251298e43f04.json",
+      ".atm/history/task-events/ATM-GOV-0353/2026-08-12T23-57-43-631Z-claim-fa3e30935a61.json",
+      ".atm/history/task-events/ATM-GOV-0353/2026-08-12T23-58-22-944Z-scope-amendment-06bd0db5dec5.json",
+      ".atm/history/tasks/ATM-GOV-0353.json",
+      "packages/cli/dist/commands/planning-repo-root.js",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/planning-repo-root.js",
+      "release/atm-root-drop/packages/cli/src/commands/planning-repo-root.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/atm-3-final-closure.test.ts"
+    ],
+    "retainedAt": "2026-08-13T05:06:22.762Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "claude-008-captain",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -316,23 +347,32 @@
       ".atm/history/evidence/ATM-GOV-0353.*",
       ".atm/history/task-events/ATM-GOV-0353/**",
       ".atm/history/tasks/ATM-GOV-0353.json",
+      "packages/cli/dist/**",
       "packages/cli/src/commands/planning-repo-root.ts",
       "packages/cli/src/commands/planning-root-resolution-cache.ts",
+      "release/**",
       "tests/cli/planning-root-resolution-cache.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0353-memoize-planning-root-resolution-per-process-for-next-route-latency.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0353-memoize-planning-root-resolution-per-process-for-next-route-latency.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "f62f5d21262ce1e733f90b9ba8e3cbafffc39e89b08096636779b6449f50f7dc",
     "actorId": "claude-008-captain",
-    "sessionId": "session-20260812230916-claude-008-captain-ATM-GOV-0353-0087dbdacd",
+    "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260812230852-claude-008-captain-67ba2cd406",
+      "laneSessionId": "lane-20260813050131-claude-008-captain-79a8a031f8",
       "status": "active",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812230852-claude-008-captain-67ba2cd406\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813050131-claude-008-captain-79a8a031f8\""
     },
-    "createdAt": "2026-08-12T23:09:22.754Z",
+    "createdAt": "2026-08-13T05:06:29.504Z",
     "status": "active"
   }
 }

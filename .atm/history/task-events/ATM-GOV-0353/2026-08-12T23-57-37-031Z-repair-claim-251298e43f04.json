@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T23-57-37-031Z-repair-claim-251298e43f04",
+  "taskId": "ATM-GOV-0353",
+  "action": "repair-claim",
+  "actorId": "claude-008-captain",
+  "sessionId": "session-20260812230916-claude-008-captain-ATM-GOV-0353-0087dbdacd",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0353.json",
+  "taskSha256": "sha256:04134e4adc7b06587ce0bd1dc20c411ea7ce606652f474dac31f0372b50a0b10",
+  "createdAt": "2026-08-12T23:57:37.031Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0353 --actor claude-008-captain --write --reason \"lane session TTL expired mid-publication; re-mint claim to complete the sealed runner build\" --json"
+}
