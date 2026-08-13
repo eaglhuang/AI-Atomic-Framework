@@ -21,6 +21,7 @@ import { deriveAtmScopeClass } from '../../../../core/dist/broker/atm-core-scope
 import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, readStagedFiles, restoreDeferredGovernanceDirtyFiles } from './commit-bundle-assembly.js';
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js';
 import { resolveRunnerPublicationCloseHandoff } from '../framework-development/runner-publication-close-handoff.js';
+import { buildTaskflowRunnerRecoveryArgs } from './runner-recovery-forwarding.js';
 import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../../core/dist/team-runtime/handoff-ledger.js';
 import { clearBrokerRuntimeStateForTask } from '../../../../core/dist/broker/lifecycle.js';
 import { classifyRunnerAffectingPaths, filterRunnerInputTreeListing, RUNNER_INPUT_TREE_PATHS } from '../../../../core/dist/broker/runner-version-contract.js';
@@ -492,8 +493,8 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
             const backendArgv = buildCloseBackendArgv({ cwd, taskId,
                 actorId, backendSurface: closebackPlan.backendSurface, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs, historicalBatchRef, historicalDeliveryRepo: closebackPlan.planningAuthorityDeliveryGate.ok ? closebackPlan.planningAuthorityDeliveryGate.repoRoot : null, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason,
                 planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, forceImport: diagnosis.bucket === 'stale-import' });
-            if (closebackPlan.backendSurface === 'tasks-close' && runnerReceiptPublicationClosure.status === 'accepted') {
-                backendArgv.push('--allow-stale-runner');
+            if (closebackPlan.backendSurface === 'tasks-close') {
+                backendArgv.push(...buildTaskflowRunnerRecoveryArgs({ runnerPublicationAccepted: runnerReceiptPublicationClosure.status === 'accepted', emergencyApproval: parsed.options.emergencyApproval }));
             }
             const ledgerAlreadyClosedHistoricalCloseback = closebackPlan.backendSurface === 'tasks-close' && closebackPlan.closeMode === 'historical-delivery-close' && enrichedDiagnosis.triangulation.liveLedger.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0;
             const backendResult = ledgerAlreadyClosedHistoricalCloseback ? makeResult({ ok: true, command: 'tasks close', cwd, mode: 'taskflow-closeback-reconcile', messages: [message('info', 'ATM_TASKFLOW_CLOSE_LEDGER_ALREADY_DONE', 'Live task ledger is already done; taskflow is reconciling planning closeback only.', { taskId, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs })], evidence: {

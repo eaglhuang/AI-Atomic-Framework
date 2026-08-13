@@ -155,20 +155,69 @@ export function parseArgsForCommand(spec, argv = [], options = {}) {
     }
     return state;
 }
-export function makeHelpResult(spec, cwd = process.cwd()) {
+/**
+ * ATM-GOV-0364 / ATM-BUG-2026-08-13-011. Narrow a command's option list to the
+ * flags a subcommand accepts.
+ *
+ * A flag is kept when it names this subcommand, and also when it names no
+ * subcommand at all — an undeclared flag might belong here, and hiding a flag
+ * that works is worse than showing one that does not. The distinction is
+ * reported rather than hidden: the caller is told how many options were
+ * declared for this subcommand and how many are still undeclared, so an
+ * unfiltered list reads as an incomplete spec instead of as an answer.
+ */
+export function scopeOptionsToSubcommand(options, subcommand) {
+    const target = subcommand.trim();
+    if (!target)
+        return { options, declared: 0, undeclared: options.length };
+    let declared = 0;
+    let undeclared = 0;
+    const kept = [];
+    for (const option of options) {
+        const owners = option.subcommands;
+        if (!owners || owners.length === 0) {
+            undeclared += 1;
+            kept.push(option);
+            continue;
+        }
+        if (owners.includes(target)) {
+            declared += 1;
+            kept.push(option);
+        }
+    }
+    return { options: kept, declared, undeclared };
+}
+export function makeHelpResult(spec, cwd = process.cwd(), subcommand) {
+    const allOptions = spec.options ?? [];
+    const scoped = subcommand ? scopeOptionsToSubcommand(allOptions, subcommand) : null;
     const usage = {
         command: spec.name,
         summary: spec.summary,
         positional: spec.positional ?? [],
-        options: spec.options ?? [],
+        options: scoped ? scoped.options : allOptions,
         examples: spec.examples ?? [],
-        ...(spec.help ? { help: spec.help } : {})
+        ...(spec.help ? { help: spec.help } : {}),
+        ...(scoped
+            ? {
+                subcommand,
+                optionScope: {
+                    schemaId: 'atm.commandOptionScope.v1',
+                    subcommand,
+                    declaredForSubcommand: scoped.declared,
+                    undeclaredOwnership: scoped.undeclared,
+                    totalCommandOptions: allOptions.length,
+                    note: scoped.declared === 0
+                        ? `No option in ${spec.name} declares ownership by "${subcommand}" yet, so every flag is still listed. Declaring subcommand ownership on the spec narrows this.`
+                        : `${scoped.declared} option(s) declare "${subcommand}"; ${scoped.undeclared} more have not declared ownership and are listed conservatively.`
+                }
+            }
+            : {})
     };
     return makeResult({
         ok: true,
         command: spec.name,
         cwd,
-        messages: [message('info', 'ATM_CLI_HELP_READY', `Help for ${spec.name}.`)],
+        messages: [message('info', 'ATM_CLI_HELP_READY', subcommand ? `Help for ${spec.name} ${subcommand}.` : `Help for ${spec.name}.`)],
         evidence: {
             usage
         }

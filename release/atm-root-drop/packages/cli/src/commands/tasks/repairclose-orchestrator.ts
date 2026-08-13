@@ -26,7 +26,12 @@ type EmergencyUseEvidence = ReturnType<typeof assertEmergencyApproval>;
 
 export async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
   const options = parseRepairClosureOptions(argv);
-  const resolvedActor = options.actorId ? resolveActorId(options.actorId, options.cwd) : null;
+  // ATM-GOV-0356: resolve the actor the way every other governed surface does,
+  // including the ATM_ACTOR_ID fallback. The previous form only resolved when
+  // --actor was passed explicitly, so an actorless repair silently skipped the
+  // bridging work-admission ticket below and staged changes that no governed
+  // commit could ever accept.
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   let emergencyUse: EmergencyUseEvidence = null;
   if (!options.dryRun) {
     const staleGate = assertRunnerFreshForWriteAction({
@@ -131,13 +136,24 @@ function writeRepairClosureTransition(input: {
   const taskPath = taskPathFor(input.cwd, input.taskId);
   if (!existsSync(taskPath)) return null;
   const taskDocument = readJsonRecord(taskPath);
-  if (input.actorId) {
-    taskDocument.workAdmissionTicket = issueRepairClosureAdmissionTicket({
-      cwd: input.cwd,
-      taskId: input.taskId,
-      actorId: input.actorId
+  // The ticket is the only bridge from a staged closure repair to its follow-up
+  // governed commit. Staging without it leaves changes that fail closed at
+  // commit time with ATM_WRITE_TICKET_MISSING and no route forward, so an
+  // unresolvable actor must stop the repair rather than silently skip the bridge.
+  if (!input.actorId) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks repair-closure requires --actor or ATM_ACTOR_ID: without an actor it cannot issue the work-admission ticket that admits the follow-up governed commit.', {
+      exitCode: 2,
+      details: {
+        taskId: input.taskId,
+        requiredCommand: `node atm.mjs tasks repair-closure --task ${input.taskId} --actor <id> --json`
+      }
     });
   }
+  taskDocument.workAdmissionTicket = issueRepairClosureAdmissionTicket({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    actorId: input.actorId
+  });
   const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
   const transitionPath = writeTaskDocumentWithTransition({
     cwd: input.cwd,

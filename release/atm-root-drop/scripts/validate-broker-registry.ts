@@ -98,9 +98,16 @@ const populatedRegistry: WriteBrokerRegistryDocument = {
   ]
 };
 
+// Atom-write ownership is a second-layer check over a material shared write
+// surface: an atom overlap between two intents that touch disjoint files is not
+// a conflict, because INV-ATM-008 makes parallel the default and reserves
+// refusal for a real contended surface. This fixture asserts both sides of that
+// rule; asserting only the blocking side is what made it read as a regression
+// after the refinement landed.
 const intentCidConflict: WriteIntent = {
   ...baseIntent,
   taskId: 'TASK-C',
+  targetFiles: ['src/file-b.ts'],
   atomRefs: [
     { atomId: 'atom-existing-1', atomCid: 'cid-new', operation: 'modify' }
   ]
@@ -108,6 +115,21 @@ const intentCidConflict: WriteIntent = {
 const decCid = calculateBrokerDecision(intentCidConflict, populatedRegistry);
 check(decCid.verdict === 'blocked-cid-conflict', `Expected verdict 'blocked-cid-conflict', got '${decCid.verdict}'`);
 check(decCid.lane === 'blocked', `Expected lane 'blocked', got '${decCid.lane}'`);
+
+// Same atom overlap, disjoint write surface: must stay parallel-safe.
+const intentAtomOverlapDisjointSurface: WriteIntent = {
+  ...baseIntent,
+  taskId: 'TASK-C2',
+  targetFiles: ['src/file-c.ts'],
+  atomRefs: [
+    { atomId: 'atom-existing-1', atomCid: 'cid-new', operation: 'modify' }
+  ]
+};
+const decDisjoint = calculateBrokerDecision(intentAtomOverlapDisjointSurface, populatedRegistry);
+check(
+  decDisjoint.verdict === 'parallel-safe',
+  `Expected atom overlap without a shared write surface to stay 'parallel-safe', got '${decDisjoint.verdict}'`
+);
 
 const intentGenConflict: WriteIntent = {
   ...baseIntent,

@@ -15,7 +15,13 @@ export function inspectRunnerSyncAdmission(input) {
         foreignClaims,
         landedFiles: input.landedFiles ?? null
     });
-    const foreignNonReleaseWip = uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
+    // A detached sealed candidate cannot observe later live-worktree source WIP.
+    // Keep those conflicts in the report for auditability, but only live-source
+    // candidates may turn them into publication blockers.
+    const candidateSourceIsolation = input.candidateSourceIsolation ?? 'live-worktree';
+    const foreignNonReleaseWip = candidateSourceIsolation === 'sealed-detached'
+        ? []
+        : uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
     const steward = normalizeInputRunnerSyncSteward(input.runnerSyncSteward) ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
     const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input, steward);
     const activeClaimOwnerActorId = resolveActiveClaimOwnerActorId(input.cwd);
@@ -75,6 +81,7 @@ export function inspectRunnerSyncAdmission(input) {
         ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok && !continuityBlocked,
         stewardActorId: input.stewardActorId,
         sealedSourceSha: input.sealedSourceSha ?? null,
+        candidateSourceIsolation,
         actorAuthority,
         runnerSyncSteward: steward,
         queueHeadOwnership,

@@ -195,7 +195,7 @@ export function handleBrokerStewardQueues(options, context) {
             if (!options.task || !options.actorId || !options.sealedSourceSha || options.surfaces.length !== 1) {
                 throw new CliError('ATM_CLI_USAGE', 'broker runner-sync takeover-publication requires --task, --actor, --sealed-source-sha, and exactly one --surface <full|packages|root-drop|onefile>.', { exitCode: 2 });
             }
-            assertRunnerSyncRecoveryAuthority(options.cwd, options.task, options.actorId);
+            const currentTaskAllowedFiles = assertRunnerSyncRecoveryAuthority(options.cwd, options.task, options.actorId);
             const buildTarget = options.surfaces[0];
             if (!['full', 'packages', 'root-drop', 'onefile'].includes(buildTarget)) {
                 throw new CliError('ATM_CLI_USAGE', 'takeover-publication surface must be one of: full, packages, root-drop, onefile.', { exitCode: 2 });
@@ -206,8 +206,7 @@ export function handleBrokerStewardQueues(options, context) {
             if (!head || head.sealedSourceSha !== sealedSourceSha || !head.waitingTasks.includes(options.task)) {
                 throw new CliError('ATM_RUNNER_PUBLICATION_PENDING', 'Publication takeover requires the active queue-head task and its exact sealed source SHA.', { exitCode: 1 });
             }
-            const task = JSON.parse(readFileSync(path.join(options.cwd, '.atm', 'history', 'tasks', `${options.task}.json`), 'utf8'));
-            const plan = authorizeRunnerPublicationTakeover({ cwd: options.cwd, taskId: options.task, sealedSourceSha, buildTarget: buildTarget, currentTaskAllowedFiles: task.allowedFiles ?? [] });
+            const plan = authorizeRunnerPublicationTakeover({ cwd: options.cwd, taskId: options.task, sealedSourceSha, buildTarget: buildTarget, currentTaskAllowedFiles });
             return makeResult({
                 ok: true,
                 command: 'broker',
@@ -325,7 +324,24 @@ function resolveRunnerSyncTaskIdHealth(cwd, taskId) {
 function assertRunnerSyncRecoveryAuthority(cwd, taskId, actorId) {
     const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
     if (!existsSync(taskPath)) {
-        throw new CliError('ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE', `Recovery task ${taskId} does not exist.`, { exitCode: 1 });
+        const health = resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId);
+        const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+        if (health !== 'task-active' || !existsSync(lockPath)) {
+            throw new CliError('ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE', `Recovery task ${taskId} has neither an active task claim nor an active framework-temp claim.`, { exitCode: 1 });
+        }
+        try {
+            const lock = JSON.parse(readFileSync(lockPath, 'utf8'));
+            const lockActor = String(lock.actorId ?? lock.lockedBy ?? '').trim();
+            if (lockActor !== actorId) {
+                throw new CliError('ATM_RUNNER_PUBLICATION_PENDING', `Framework-temp publication recovery for ${taskId} is held by ${lockActor || 'another actor'}, not ${actorId}.`, { exitCode: 1 });
+            }
+            return Array.isArray(lock.files) ? lock.files.map(String) : [];
+        }
+        catch (error) {
+            if (error instanceof CliError)
+                throw error;
+            throw new CliError('ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE', `Framework-temp recovery claim ${taskId} could not be read.`, { exitCode: 1 });
+        }
     }
     try {
         const task = JSON.parse(readFileSync(taskPath, 'utf8'));
@@ -333,6 +349,7 @@ function assertRunnerSyncRecoveryAuthority(cwd, taskId, actorId) {
         if (task.status !== 'running' || claim?.state !== 'active' || claim.actorId !== actorId) {
             throw new CliError('ATM_RUNNER_PUBLICATION_PENDING', `Receipt-only reconciliation requires an active claim for ${taskId} held by ${actorId}.`, { exitCode: 1 });
         }
+        return Array.isArray(task.allowedFiles) ? task.allowedFiles.map(String) : [];
     }
     catch (error) {
         if (error instanceof CliError)
@@ -361,7 +378,12 @@ function resolveFrameworkTempRunnerSyncTaskHealth(cwd, taskId) {
         if (workItemId !== normalizedTaskId || !leaseId || !heartbeatAt || ttlSeconds <= 0) {
             return 'task-missing';
         }
-        return released ? 'task-terminal' : 'task-active';
+        if (released)
+            return 'task-terminal';
+        const heartbeatMs = Date.parse(heartbeatAt);
+        return Number.isFinite(heartbeatMs) && heartbeatMs + ttlSeconds * 1000 > Date.now()
+            ? 'task-active'
+            : 'task-lease-expired';
     }
     catch {
         return 'task-missing';

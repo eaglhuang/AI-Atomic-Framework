@@ -304,6 +304,9 @@ export function runPreCommitHook(cwd: string) {
     && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles));
   const directionLockCoversFrameworkCriticalFiles = frameworkStatus.criticalChangedFiles.length > 0
     && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, directionLockAllowedFiles));
+  const frameworkTempClaimAllowedFiles = collectFrameworkTempClaimAllowedFiles(root);
+  const frameworkTempClaimCoversFrameworkCriticalFiles = frameworkStatus.criticalChangedFiles.length > 0
+    && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, frameworkTempClaimAllowedFiles));
   const runnerPublicationReceiptPath = committingTaskIdForHook
     ? path.join(root, '.atm', 'history', 'evidence', `${committingTaskIdForHook}.runner-sync-receipt.json`)
     : null;
@@ -319,7 +322,7 @@ export function runPreCommitHook(cwd: string) {
     : false;
   const rawBlockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => {
     if (entry === 'git-head-evidence-missing') return false;
-    if (entry === 'active-framework-claim-required' && (checkpointCoversFrameworkCriticalFiles || directionLockCoversFrameworkCriticalFiles || runnerPublicationCoversFrameworkCriticalFiles)) return false;
+    if (entry === 'active-framework-claim-required' && (checkpointCoversFrameworkCriticalFiles || directionLockCoversFrameworkCriticalFiles || frameworkTempClaimCoversFrameworkCriticalFiles || runnerPublicationCoversFrameworkCriticalFiles)) return false;
     if (entry === 'closure-authority-belongs-to-target-repo' && allowAdopterInfrastructureSync) return false;
     return true;
   });
@@ -330,9 +333,6 @@ export function runPreCommitHook(cwd: string) {
     commitActorId: process.env.ATM_COMMIT_ACTOR_ID
   });
   const blockingFrameworkIssues = frameworkLockContext.blockers;
-  const frameworkTempClaimAllowedFiles = relevantDirectionLocks.length > 0
-    ? collectFrameworkTempClaimAllowedFiles(root)
-    : [];
   const directionLockPlanningMirrorPaths = uniqueSorted(relevantDirectionLocks.flatMap((lock) => lock.planningMirrorPaths ?? []));
   const directionLockAllowsPlanningMirror = relevantDirectionLocks.some((lock) => lock.allowPlanningMirror === true);
   const taskOpenImportBundle = inspectTaskOpenImportBundleStagedArtifacts(root, stagedFiles);

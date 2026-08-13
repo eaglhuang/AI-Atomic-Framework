@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseJsonText, relativePathFrom } from './shared.js';
 import { PLANNING_ROOT_RELATIVE_SUFFIX, resolveCandidatePlanningRoots } from './next/planning-root-preference.js';
+import { resolvePlanningRootScopedOnce } from './planning-root-resolution-cache.js';
+export { resetPlanningRootResolutionCache } from './planning-root-resolution-cache.js';
 export const PLANNING_REPO_ROOT_ENV = 'ATM_PLANNING_REPO_ROOT';
 const PLANNING_ROOT_DOC_PREFIX = `${PLANNING_ROOT_RELATIVE_SUFFIX.replace(/\\/g, '/')}/`;
 export function isPlanningRootDocStoredPath(storedPath) {
@@ -71,7 +73,13 @@ export function readConfiguredPlanningRoots(cwd) {
         return [];
     }
 }
+// ATM-GOV-0353: this resolution is pure in (cwd, planning-root env, .atm/config.json)
+// but costs ~3.75ms, and the `next` route asks for it once per declared scope path
+// per routable task. Memoize it rather than teaching every caller to.
 export function resolvePlanningRepoRootConfig(cwd) {
+    return resolvePlanningRootScopedOnce(cwd, 'planningRepoRootConfig', () => computePlanningRepoRootConfig(cwd));
+}
+function computePlanningRepoRootConfig(cwd) {
     const envRoot = readPlanningRootEnv();
     const configRoots = readConfiguredPlanningRoots(cwd);
     const resolvedConfigRoots = uniqueSorted([

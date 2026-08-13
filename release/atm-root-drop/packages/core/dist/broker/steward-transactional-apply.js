@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import os from 'node:os';
 import path from 'node:path';
 import { sortProposalsForCompose } from './merge-plan.js';
+import { applyUnifiedPatch } from './unified-patch.js';
 export function buildPatchProposalComposition(input) {
     const sorted = sortProposalsForCompose(input.proposals);
     const byFile = new Map();
@@ -250,16 +251,6 @@ function hashJson(value) {
 }
 function hashContent(value) {
     return `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
-}
-function applyUnifiedPatch(before, patchText) {
-    const additions = patchText
-        .split(/\r?\n/)
-        .filter((line) => line.startsWith('+') && !line.startsWith('+++'))
-        .map((line) => line.slice(1));
-    if (additions.length === 0)
-        return before;
-    const suffix = before.endsWith('\n') ? '' : '\n';
-    return `${before}${suffix}${additions.join('\n')}\n`;
 }
 function extractProposalTransactionIds(proposal) {
     const values = [

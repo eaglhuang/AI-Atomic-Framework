@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import os from 'node:os';
 import path from 'node:path';
 import { sortProposalsForCompose } from './merge-plan.ts';
+import { applyUnifiedPatch } from './unified-patch.ts';
 import type {
   CompositionFileSlice,
   CompositionMemberAttribution,
@@ -342,15 +343,6 @@ function hashContent(value: string): string {
   return `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
 }
 
-function applyUnifiedPatch(before: string, patchText: string): string {
-  const additions = patchText
-    .split(/\r?\n/)
-    .filter((line) => line.startsWith('+') && !line.startsWith('+++'))
-    .map((line) => line.slice(1));
-  if (additions.length === 0) return before;
-  const suffix = before.endsWith('\n') ? '' : '\n';
-  return `${before}${suffix}${additions.join('\n')}\n`;
-}
 
 function extractProposalTransactionIds(proposal: PatchProposal): readonly string[] {
   const values = [

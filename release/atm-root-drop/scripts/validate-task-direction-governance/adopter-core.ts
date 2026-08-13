@@ -251,7 +251,7 @@ export async function validateAdopterGoverned(tempRoot: string) {
     '--files', 'src/two.ts'
   ]);
   assert(outOfScope.ok === false, 'adopter queue must block edits to the next task before queue head closes');
-  assert(outOfScope.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), 'adopter out-of-scope edit must report scope drift');
+  assert(outOfScope.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), `adopter out-of-scope edit must report scope drift; observed codes: ${outOfScope.messages.map((entry) => entry.code).join(', ') || '<none>'}`);
 
   fixtureStep('adopter-cross-repo setup');
   const crossRepo = makeAdopterRepo(tempRoot, 'adopter-cross-repo');
@@ -276,7 +276,7 @@ export async function validateAdopterGoverned(tempRoot: string) {
     '--files', 'docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-CROSS-PLAN-0001.task.md'
   ]);
   assert(mirrorBlock.ok === false, 'cross planning mirror edit must be blocked');
-  assert(mirrorBlock.messages.some((entry) => entry.code === 'ATM_PLANNING_MIRROR_BLOCKED'), 'cross planning mirror edit must report the planning mirror blocker');
+  assert(mirrorBlock.messages.some((entry) => entry.code === 'ATM_PLANNING_MIRROR_BLOCKED'), `cross planning mirror edit must report the planning mirror blocker; observed codes: ${mirrorBlock.messages.map((entry) => entry.code).join(', ') || '<none>'}`);
   initializeGit(crossRepo);
   mkdirSync(path.join(crossRepo, 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks'), { recursive: true });
   writeFileSync(path.join(crossRepo, 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks', 'TASK-CROSS-PLAN-0001.task.md'), '# mirror\n', 'utf8');
@@ -317,12 +317,14 @@ export async function validateAdopterGoverned(tempRoot: string) {
   // 敹???stage嚗??TASK-AAO-0011 銋? scope expansion guard ?芸? staged/modified-tracked 瑼?雿
   runGit(scopeExpansionRepo, ['add', 'atomic_workbench/atomization-coverage/exclusion-inventory.json']);
   let scopeExpansionBlocked = false;
+  let scopeExpansionObserved = '<no error thrown>';
   try {
     await runNext(['--cwd', scopeExpansionRepo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-EXPAND-0005']);
   } catch (error) {
+    scopeExpansionObserved = String((error as { code?: string }).code ?? error);
     scopeExpansionBlocked = (error as { code?: string }).code === 'ATM_TASK_SCOPE_EXPANSION_REQUIRED';
   }
-  assert(scopeExpansionBlocked, 'next --claim must require task scope expansion for deliverable-like pending files outside allowedFiles');
+  assert(scopeExpansionBlocked, `next --claim must require task scope expansion for deliverable-like pending files outside allowedFiles; observed: ${scopeExpansionObserved}`);
 
   try {
     await runTasks(['close', '--cwd', repo, '--task', 'TASK-ADOPT-0002', '--actor', 'adopter-agent', '--status', 'done']);

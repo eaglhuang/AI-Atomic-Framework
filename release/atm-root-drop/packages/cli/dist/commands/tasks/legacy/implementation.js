@@ -462,7 +462,17 @@ function syncScopeAmendmentState(input) { syncScopeAmendmentRuntimeLock(input); 
     const claimRecord = claim;
     claimRecord.files = [...input.mergedAllowed];
     input.taskDocument.claim = claimRecord;
-} }
+} syncScopeAmendmentScopePaths(input); }
+/**
+ * ATM-GOV-0364 / ATM-BUG-2026-08-13-007. A task has two views of its own scope:
+ * the direction lock, which decides what may be edited, and the ledger's
+ * scopePaths, from which the governed delivery bundle is resolved. An amendment
+ * that reaches only the first authorises an edit that can never be delivered,
+ * and says nothing about it. Union, never replace: an amendment adds reach, it
+ * does not redefine what the card already declared.
+ */
+export function syncScopeAmendmentScopePaths(input) { const existing = Array.isArray(input.taskDocument.scopePaths) ? input.taskDocument.scopePaths.map((entry) => String(entry ?? '').replace(/\\/g, '/').trim()).filter((entry) => entry.length > 0) : []; const known = new Set(existing); const additions = input.mergedAllowed.map((entry) => String(entry ?? '').replace(/\\/g, '/').trim()).filter((entry) => entry.length > 0 && !known.has(entry)); if (additions.length === 0)
+    return; input.taskDocument.scopePaths = [...existing, ...additions]; }
 function syncScopeAmendmentRuntimeLock(input) { input.outerLock.taskDirectionLock = { ...input.embeddedLockRecord, allowedFiles: [...input.mergedAllowed] }; input.outerLock.files = [...input.mergedAllowed]; }
 function persistScopeAmendmentTransition(input) { const createdAt = new Date().toISOString(); const transitionSeedDocument = { ...input.taskDocument, lastTransitionId: 'pending-scope-amendment', lastTransitionAt: createdAt }; const transitionId = createTaskTransitionId({ createdAt, taskId: input.taskId, action: 'scope-amendment', taskDocument: transitionSeedDocument }); input.taskDocument.lastTransitionId = transitionId; input.taskDocument.lastTransitionAt = createdAt; input.taskDocument.ledgerContractVersion = 'task-ledger/v1'; appendTaskTransitionEvent({ cwd: input.cwd, taskId: input.taskId, action: 'scope-amendment', actorId: input.actorId, fromStatus: String(input.taskDocument.status ?? 'running'), toStatus: String(input.taskDocument.status ?? 'running'), taskPath: input.taskPath, taskDocument: input.taskDocument, command: input.command, createdAt, transitionId, amendmentMetadata: input.amendmentMetadata }); writeTaskDocument(input.taskPath, input.taskDocument); }
 function readLegacyLedgerTaskFiles(cwd) { const root = path.resolve(cwd); const taskLedger = readTaskLedgerPolicy(root); const jsonTasks = listTaskFiles(path.join(root, taskLedger.taskRoot), (filePath) => filePath.endsWith('.json')).map((absolutePath) => { const document = readJsonRecord(absolutePath); const taskId = normalizeTaskDocumentId(document, path.basename(absolutePath, '.json')); return { absolutePath, relativePath: relativePathFrom(root, absolutePath), taskId, status: normalizeTaskStatus(document.status), format: 'json', document }; }); const markdownTasks = listTaskFiles(root, (filePath) => filePath.endsWith('.task.md')).map((absolutePath) => { const rawText = readFileSync(absolutePath, 'utf8'); const document = parseTaskMarkdownFrontmatter(rawText); const taskId = normalizeTaskDocumentId(document, path.basename(absolutePath).replace(/\.task\.md$/, '')); return { absolutePath, relativePath: relativePathFrom(root, absolutePath), taskId, status: normalizeTaskStatus(document.status), format: 'markdown', document, rawText }; }); return [...jsonTasks, ...markdownTasks].sort((left, right) => left.relativePath.localeCompare(right.relativePath)); }
@@ -844,7 +854,19 @@ function parseTaskSection(input) { const { section } = input; const diagnostics 
 } const task = { schemaVersion: 'atm.workItem.v0.2', workItemId: section.workItemId, title: section.title || input.tableMetadata?.title || section.workItemId, status, milestone: milestone ?? null, dependencies, acceptance, deliverables, tags, notes, source: { planPath: input.planRelativePath, sectionTitle: section.title || section.workItemId, headingLine: section.headingLine, hash }, importedAt: input.importedAt }; return { task, diagnostics }; }
 function createTaskFromTableMetadata(input) { return delegatedCreateTaskFromTableMetadata({ ...input, hashSection }); }
 function hasProtectedActiveClaim(document) { if (!document)
-    return false; const claim = parseClaimRecord(document.claim); return Boolean(claim && (claim.state === 'active' || claim.state === 'handoff')); }
+    return false; const claim = parseClaimRecord(document.claim); return Boolean(claim && (claim.state === 'active' || claim.state === 'handoff')); } /**
+ * ATM-GOV-0364 / ATM-BUG-2026-08-13-008. Claim preservation across a forced
+ * re-import used to depend on parseClaimRecord returning a fully-formed record,
+ * so a claim that was live but missing an optional field was read as no claim at
+ * all and silently dropped, leaving an orphaned runtime lock behind it. Whether
+ * a claim parses cleanly is a question about the record's shape; whether it is
+ * someone's live hold on the task is a question about its state. Only the second
+ * one may decide whether --force is allowed to discard it.
+ */
+export function hasPreservableClaimState(document) { if (!document)
+    return false; if (hasProtectedActiveClaim(document))
+    return true; const claim = document.claim; if (!claim || typeof claim !== 'object' || Array.isArray(claim))
+    return false; const state = String(claim.state ?? '').trim(); return state.length > 0 && state !== 'released'; }
 function isCreatePlaceholderLedger(document) { if (normalizeTaskStatus(document.status) !== 'planned')
     return false; const source = document.source; const sourceHash = source && typeof source === 'object' && !Array.isArray(source) ? String(source.hash ?? '').trim() : ''; const legacyHash = typeof document.hash === 'string' ? document.hash.trim() : ''; if (sourceHash.length > 0 || legacyHash.length > 0)
     return false; if (typeof document.importedAt === 'string' && document.importedAt.trim().length > 0)
@@ -956,19 +978,16 @@ export function writeTaskFiles(input) { const writtenPaths = []; const diagnosti
         delete taskDocument.closurePacket;
         delete taskDocument.closeReason;
     }
-    else if (existingDocument && hasProtectedActiveClaim(existingDocument) && input.force && !input.forceOverwriteClaims) {
-        const currentClaim = parseClaimRecord(existingDocument.claim);
-        if (currentClaim) {
-            taskDocument.claim = existingDocument.claim;
-            if (existingDocument.status)
-                taskDocument.status = existingDocument.status;
-            if (existingDocument.owner)
-                taskDocument.owner = existingDocument.owner;
-            if (existingDocument.startedAt)
-                taskDocument.startedAt = existingDocument.startedAt;
-            if (existingDocument.startedBySessionId)
-                taskDocument.startedBySessionId = existingDocument.startedBySessionId;
-        }
+    else if (existingDocument && hasPreservableClaimState(existingDocument) && input.force && !input.forceOverwriteClaims) {
+        taskDocument.claim = existingDocument.claim;
+        if (existingDocument.status)
+            taskDocument.status = existingDocument.status;
+        if (existingDocument.owner)
+            taskDocument.owner = existingDocument.owner;
+        if (existingDocument.startedAt)
+            taskDocument.startedAt = existingDocument.startedAt;
+        if (existingDocument.startedBySessionId)
+            taskDocument.startedBySessionId = existingDocument.startedBySessionId;
         if (existingDocument.taskDirectionLock) {
             taskDocument.taskDirectionLock = existingDocument.taskDirectionLock;
         }

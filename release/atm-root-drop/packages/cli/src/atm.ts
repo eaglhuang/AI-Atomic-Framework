@@ -214,7 +214,11 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       writeResult(result, io.stderr, outputFormat);
       return result.exitCode;
     }
-    const result = enrichCommandResult(makeHelpResult(spec, process.cwd()));
+    // ATM-GOV-0364: `atm tasks import --help` asks about `import`, not about
+    // every flag registered under `tasks`. The first bare token is the
+    // subcommand the caller is actually asking about.
+    const helpSubcommand = commandArgs.find((arg) => !arg.startsWith('-'));
+    const result = enrichCommandResult(makeHelpResult(spec, process.cwd(), helpSubcommand));
     writeResult(result, io.stdout, outputFormat);
     return result.exitCode;
   }

@@ -157,11 +157,6 @@ reasonCode: restrictedExecutionFinding.reasonCode, executableClass: restrictedEx
 restrictedExecution: restrictedExecutionFinding, restrictedExecutionReceipt: restrictedExecutionFinding.receipt, frameworkStatus: status }
 });
 }
-if (activeWorkAdmission && !activeWorkAdmission.decision.ok) {
-return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', activeWorkAdmission.decision.code, 'Active task write is missing current work-admission coverage.', { taskId: activeDirectionLocks[0]?.taskId ?? null, reason: activeWorkAdmission.decision.reason })], evidence: {
-action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, workAdmission: activeWorkAdmission, frameworkStatus: status }
-});
-}
 if (status.mode === 'cross-repo-target-required' && gitCommitIntent) { return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_COMMIT_BLOCKED', 'Git commit is blocked in the planning repository while ATM framework closure authority belongs to the target repository.', { editor: options.editor, targetRepo: status.targetRepo,
 nextStep: status.targetRepo ? `cd "${status.targetRepo}" ; node atm.mjs next --claim --actor <id> --json` : 'node atm.mjs next --json' })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, gitCommitIntent, frameworkStatus: status }
 });
@@ -217,6 +212,16 @@ toolName: options.toolName, toolFiles, promptScopedPlanningMirrorDriftFiles, pro
 if (promptScopeDriftFiles.length > 0) { return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_TOOL_SCOPE_DRIFT_BLOCKED', 'Tool edit scope drifted away from the prompt-scoped task route; narrow edits to the selected task scope or refine the prompt.', { editor: options.editor, blockedFiles: promptScopeDriftFiles,
 selectedTaskIds: promptScope?.selectedTasks.map((task) => task.workItemId) ?? [], scopePaths: promptScopedAllowedPaths.slice(0, 40), nextStep: 'node atm.mjs next --prompt "<more specific prompt with task id or plan path>" --json' })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, promptScopeDriftFiles, promptScopedContext, promptScopedAllowedPaths,
 frameworkStatus: status }
+});
+}
+// ATM-BUG-2026-08-13-003: the specific scope guards above run first on purpose.
+// This gate is the backstop, and its generic code must not stand in for the
+// blocker that actually understands why an edit is wrong. Every branch here is a
+// deny either way, so the ordering changes which code is reported, never whether
+// the edit is allowed.
+if (activeWorkAdmission && !activeWorkAdmission.decision.ok) {
+return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', activeWorkAdmission.decision.code, 'Active task write is missing current work-admission coverage.', { taskId: activeDirectionLocks[0]?.taskId ?? null, reason: activeWorkAdmission.decision.reason })], evidence: {
+action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, workAdmission: activeWorkAdmission, frameworkStatus: status }
 });
 }
 if (criticalFiles.length > 0 && !hasFrameworkClaim) {

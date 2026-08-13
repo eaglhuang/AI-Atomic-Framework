@@ -62,6 +62,16 @@ try {
     () => resolveActiveRunnerPublicationTask({ cwd: fixtureRoot, actorId: 'runner-steward', now }),
     /exactly one active release-surface claim.*found 2/
   );
+
+  writeFileSync(path.join(lockRoot, 'ambiguous.lock.json'), JSON.stringify({
+    workItemId: 'ATM-FRAMEWORK-TEMP-runner-steward-current', actorId: 'runner-steward',
+    heartbeatAt: '2026-08-11T11:59:30.000Z', ttlSeconds: 300, files: ['release/**']
+  }), 'utf8');
+  assert.equal(
+    resolveActiveRunnerPublicationTask({ cwd: fixtureRoot, actorId: 'runner-steward', now, taskId: 'ATM-FRAMEWORK-TEMP-runner-steward-current' }),
+    'ATM-FRAMEWORK-TEMP-runner-steward-current',
+    'a live framework-temp wildcard claim must authorize runner publication without a task-ledger row'
+  );
 } finally {
   rmSync(fixtureRoot, { recursive: true, force: true });
 }

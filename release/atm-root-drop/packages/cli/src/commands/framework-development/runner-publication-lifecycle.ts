@@ -20,7 +20,10 @@ export function authorizeRunnerPublicationTakeover(input: { readonly cwd: string
   const plan = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot });
   if (plan.entries.length === 0) throw new Error('ATM_RUNNER_PUBLICATION_PENDING: takeover requires at least one pre-existing generated publication member.');
   const receiptPath = path.join(input.cwd, '.atm', 'history', 'evidence', `${input.taskId}.runner-publication-takeover.json`);
-  writeFileSync(receiptPath, `${JSON.stringify(plan, null, 2)}\n`, 'utf8');
+  // The plan digest remains provider-neutral, while the persisted evidence
+  // carries semantic task identity required by protected-state consumers.
+  // A filename is never authority.
+  writeFileSync(receiptPath, `${JSON.stringify({ ...plan, taskId: input.taskId }, null, 2)}\n`, 'utf8');
   return plan;
 }
 

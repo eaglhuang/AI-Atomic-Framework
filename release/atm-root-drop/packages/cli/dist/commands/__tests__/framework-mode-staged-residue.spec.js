@@ -51,8 +51,16 @@ async function testCrossFileConsistency() {
         execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempRoot });
         // 修改 b.ts 但「不 stage」它（即 unstaged changes 影響 foo 符號）
         writeFileSync(path.join(tempRoot, bFile), 'export const foo = 2;\nexport const bar = 3;\n', 'utf8');
-        // 修改 a.ts 並 stage 它
+        // 先確認「窄化」那一側：a.ts 的 staged 改動沒有碰到 import 或其符號時，
+        // 這個 commit 本身是一致的（b.ts 已提交版本仍定義 foo），不得被攔。
+        // 舊 fixture 只斷言攔截側，於是 stagedImporterTouchesImport 這道窄化上線後
+        // 讀起來像回歸，實際上是移除過度攔截。
         writeFileSync(path.join(tempRoot, aFile), 'import { foo } from "./b";\nconsole.log(foo);\n// modified a\n', 'utf8');
+        execFileSync('git', ['add', aFile], { cwd: tempRoot });
+        const unrelatedResult = await runHook(['pre-commit', '--cwd', tempRoot]);
+        assert.equal(unrelatedResult.evidence.blockingFindings.some((finding) => finding.code === 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY'), false, 'a staged change that does not touch the import must not be blocked by cross-file consistency');
+        // 修改 a.ts 且這次真的碰到 import 本身，並 stage 它
+        writeFileSync(path.join(tempRoot, aFile), 'import { foo, bar } from "./b";\nconsole.log(foo, bar);\n', 'utf8');
         execFileSync('git', ['add', aFile], { cwd: tempRoot });
         // 1. 執行 pre-commit hook，應因為 b.ts 修改了 foo 且未 staged 被拒絕
         const hookResult1 = await runHook(['pre-commit', '--cwd', tempRoot]);

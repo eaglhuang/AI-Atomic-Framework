@@ -2,10 +2,10 @@ import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, relativePathFrom } from './shared.js';
 import { readActiveTaskDirectionLocks } from './task-direction/active-locks.js';
-import { isExternalPlanningStoredPath, normalizeStoredPlanningPathForIdentity, resolveStoredPlanningPath } from './planning-repo-root.js';
-import { isPathAllowedByScope } from './work-channels.js';
-import { buildQueueId, derivePlanningMirrorGuardPaths, deriveQueueScopeKey, isExternalPlanningPath, isPlanningMirrorPath, isTaskDirectionLock, listTaskQueues, normalizeRelativePath, readGovernanceDirectionLockForTask, readTaskQueue, resolveQueueSourcePlan, resolveQueueTargetRepo, sanitizeTaskDirectionAllowedFiles, sha256, uniqueInOrder, uniqueSorted, writeJson, writeTaskQueue } from './task-direction/support.js';
+import { buildTaskSelfAllowPaths } from './task-direction/scope-policy.js';
+import { buildQueueId, deriveQueueScopeKey, listTaskQueues, readGovernanceDirectionLockForTask, readTaskQueue, resolveQueueSourcePlan, resolveQueueTargetRepo, sanitizeTaskDirectionAllowedFiles, sha256, uniqueInOrder, writeJson, writeTaskQueue } from './task-direction/support.js';
 export { isPlanningMirrorPath, isTaskDirectionPathCandidate, sanitizeTaskDirectionAllowedFiles } from './task-direction/support.js';
+export { buildAllowedFilesForTask, buildTaskSelfAllowPaths, diagnoseTaskDirectionLockAllowedFiles, getCanonicalAllowedFilesForTask, partitionTaskScope } from './task-direction/scope-policy.js';
 export function createOrRefreshTaskQueue(input) {
     const sourcePrompt = input.sourcePrompt.trim();
     const requestedTaskIds = input.taskIds && input.taskIds.length > 0
@@ -214,8 +214,7 @@ export function buildTaskQueueStatus(cwd) {
 }
 export function writeTaskDirectionLock(input) {
     const queueIndex = input.queue ? input.queue.taskIds.indexOf(input.taskId) : -1;
-    // TASK-AAO-0058：claim 時自動將任務自身治理路徑隱式 self-allow，
-    // 讓 agent 在 evidence 收集、checkpoint 或 close 時不受 ScopeLock 阻擋。
+    // Keep task-owned ledger, evidence, and event paths writable throughout closeout.
     const mergedAllowedFiles = sanitizeTaskDirectionAllowedFiles([
         ...input.allowedFiles,
         ...buildTaskSelfAllowPaths(input.taskId)
@@ -261,97 +260,6 @@ export function writeTaskDirectionLock(input) {
     writeJson(sidecarPath, lock);
     return lock;
 }
-export function getCanonicalAllowedFilesForTask(cwd, taskId) {
-    const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
-    if (existsSync(lockPath)) {
-        try {
-            const parsed = JSON.parse(readFileSync(lockPath, 'utf8'));
-            const released = parsed.released === true || parsed.status === 'released';
-            const embedded = parsed.taskDirectionLock;
-            if (!released && isTaskDirectionLock(embedded))
-                return embedded.allowedFiles;
-        }
-        catch {
-            // Fall through to sidecar.
-        }
-    }
-    const sidecarPath = path.join(cwd, '.atm', 'runtime', 'task-direction-locks', `${taskId}.json`);
-    if (existsSync(sidecarPath)) {
-        try {
-            const parsed = JSON.parse(readFileSync(sidecarPath, 'utf8'));
-            if (isTaskDirectionLock(parsed))
-                return parsed.allowedFiles;
-        }
-        catch {
-            // Ignore malformed runtime files.
-        }
-    }
-    return null;
-}
-export function diagnoseTaskDirectionLockAllowedFiles(cwd, taskId) {
-    const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
-    let canonicalAllowedFiles = null;
-    let governanceLockFiles = null;
-    let hasGovernanceLock = false;
-    if (existsSync(lockPath)) {
-        try {
-            const parsed = JSON.parse(readFileSync(lockPath, 'utf8'));
-            const released = parsed.released === true || parsed.status === 'released';
-            if (!released) {
-                hasGovernanceLock = true;
-                const embedded = parsed.taskDirectionLock;
-                if (isTaskDirectionLock(embedded))
-                    canonicalAllowedFiles = embedded.allowedFiles;
-                if (Array.isArray(parsed.files)) {
-                    governanceLockFiles = uniqueSorted(parsed.files.filter((entry) => typeof entry === 'string').map(normalizeRelativePath));
-                }
-            }
-        }
-        catch {
-            // Ignore malformed runtime files.
-        }
-    }
-    if (!canonicalAllowedFiles) {
-        canonicalAllowedFiles = getCanonicalAllowedFilesForTask(cwd, taskId);
-    }
-    let claimFiles = null;
-    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
-    if (existsSync(taskPath)) {
-        try {
-            const parsed = JSON.parse(readFileSync(taskPath, 'utf8'));
-            const claim = parsed.claim;
-            if (claim && typeof claim === 'object' && Array.isArray(claim.files)) {
-                claimFiles = uniqueSorted((claim.files)
-                    .filter((entry) => typeof entry === 'string')
-                    .map(normalizeRelativePath));
-            }
-        }
-        catch {
-            // Ignore malformed ledger files.
-        }
-    }
-    const mismatches = [];
-    if (canonicalAllowedFiles && governanceLockFiles) {
-        const drift = computeAllowedFilesDrift(canonicalAllowedFiles, governanceLockFiles);
-        if (drift.missingFromSource.length > 0 || drift.extraInSource.length > 0) {
-            mismatches.push({ source: 'governance-lock-files', ...drift });
-        }
-    }
-    if (canonicalAllowedFiles && claimFiles) {
-        const drift = computeAllowedFilesDrift(canonicalAllowedFiles, claimFiles);
-        if (drift.missingFromSource.length > 0 || drift.extraInSource.length > 0) {
-            mismatches.push({ source: 'claim-files', ...drift });
-        }
-    }
-    return { taskId, hasGovernanceLock, canonicalAllowedFiles, governanceLockFiles, claimFiles, mismatches };
-}
-function computeAllowedFilesDrift(canonical, source) {
-    const canonicalSet = new Set(canonical.map((value) => normalizeRelativePath(value).toLowerCase()));
-    const sourceSet = new Set(source.map((value) => normalizeRelativePath(value).toLowerCase()));
-    const missingFromSource = [...canonicalSet].filter((value) => !sourceSet.has(value)).sort();
-    const extraInSource = [...sourceSet].filter((value) => !canonicalSet.has(value)).sort();
-    return { missingFromSource, extraInSource };
-}
 export { readActiveTaskDirectionLocks };
 export function assertTaskCloseAllowedByDirection(cwd, taskId, actorId, options = {}) {
     const activeQueue = findActiveTaskQueue(cwd, null, { taskId });
@@ -391,84 +299,6 @@ export function assertTaskCloseAllowedByDirection(cwd, taskId, actorId, options 
             details: { taskId, actorId, lockActorId: matchingLock.actorId }
         });
     }
-}
-export function buildAllowedFilesForTask(task) {
-    return partitionTaskScope(task).targetWork.allowedFiles;
-}
-/**
- * TASK-AAO-0058：回傳任務自身治理路徑（task self-allow）的 canonical 三條路徑。
- * 這些路徑會在 writeTaskDirectionLock 建立鎖時自動併入 allowedFiles，
- * 讓 agent 在 evidence 收集、checkpoint 或 close 時不會被 ScopeLock 阻擋。
- *
- * 覆蓋範圍：
- *   - .atm/history/tasks/<task-id>.json
- *   - .atm/history/evidence/<task-id>.* （含 closure-packet.json）
- *   - .atm/history/task-events/<task-id>/**
- *
- * 不含整個 .atm/history/**，以保持精確邊界。
- */
-export function buildTaskSelfAllowPaths(taskId) {
-    return [
-        `.atm/history/tasks/${taskId}.json`,
-        `.atm/history/evidence/${taskId}.*`,
-        `.atm/history/task-events/${taskId}/**`
-    ];
-}
-export function partitionTaskScope(task, options) {
-    const cwd = options?.cwd ?? null;
-    const normalizeScopePath = (value) => {
-        if (!value)
-            return value;
-        return cwd ? normalizeStoredPlanningPathForIdentity(cwd, value) : normalizeRelativePath(value);
-    };
-    const normalizedScopePaths = task.scopePaths.map(normalizeScopePath);
-    const normalizedSourcePlanPath = task.sourcePlanPath ? normalizeScopePath(task.sourcePlanPath) : null;
-    const normalizedNearbyPlanPaths = task.nearbyPlanPaths.map(normalizeScopePath);
-    const classifyPlanningPath = (value) => {
-        if (!value)
-            return false;
-        if (cwd)
-            return isExternalPlanningStoredPath(cwd, value);
-        return isExternalPlanningPath(value);
-    };
-    const resolveToAbsolute = (value) => {
-        if (!value)
-            return '';
-        return cwd ? resolveStoredPlanningPath(cwd, value).absolutePath : path.resolve(value);
-    };
-    const planningReadOnlyPaths = sanitizeTaskDirectionAllowedFiles([
-        task.sourcePlanPath ?? '',
-        ...task.nearbyPlanPaths,
-        ...task.scopePaths.filter(classifyPlanningPath)
-    ].map(resolveToAbsolute));
-    const planningMirrorPaths = uniqueSorted(planningReadOnlyPaths.flatMap(derivePlanningMirrorGuardPaths));
-    const targetCandidates = sanitizeTaskDirectionAllowedFiles(normalizedScopePaths);
-    const allowedFiles = targetCandidates.filter((entry) => {
-        if (planningReadOnlyPaths.includes(entry))
-            return false;
-        if (!task.allowPlanningMirror && isPlanningMirrorPath(entry, planningMirrorPaths))
-            return false;
-        if (task.outOfScope && isPathAllowedByScope(entry, task.outOfScope)) {
-            return false;
-        }
-        return true;
-    });
-    if (task.outOfScope && task.outOfScope.length > 0) {
-        const intersections = targetCandidates.filter((entry) => isPathAllowedByScope(entry, task.outOfScope));
-        if (intersections.length > 0) {
-            console.warn(`[ATM-WARNING] Task ${task.workItemId} scope paths intersect with outOfScope: ${intersections.join(', ')}. These files are subtracted from targetAllowedFiles.`);
-        }
-    }
-    return {
-        planningContext: {
-            readOnlyPaths: planningReadOnlyPaths
-        },
-        targetWork: {
-            allowedFiles,
-            planningMirrorPaths,
-            allowPlanningMirror: task.allowPlanningMirror
-        }
-    };
 }
 export function toProjectPath(cwd, absolutePath) {
     return relativePathFrom(cwd, absolutePath).replace(/\\/g, '/');

@@ -43,10 +43,14 @@ export function runGitLease(options) {
         path: entry.path,
         stagedBlobId: entry.stagedBlobId,
         stagedMode: entry.stagedMode,
+        stagedState: entry.stagedState,
     }));
     if (options.leaseKind === "stage-override" &&
         (stagedEntries.length === 0 ||
-            stagedEntries.some((entry) => !entry.stagedBlobId || !entry.stagedMode) ||
+            stagedEntries.some((entry) => entry.stagedState === "unknown" ||
+                (entry.stagedState === "present" && (!entry.stagedBlobId || !entry.stagedMode)) ||
+                (entry.stagedState === "deleted" && (entry.stagedBlobId || entry.stagedMode)) ||
+                (!entry.stagedState && (!entry.stagedBlobId || !entry.stagedMode))) ||
             JSON.stringify(uniqueSorted(stagedEntries.map((entry) => entry.path))) !==
                 JSON.stringify(requestedPaths))) {
         throw new CliError("ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT", "Stage override lease paths must exactly match the current foreign-active staged index entries.", {
@@ -72,6 +76,7 @@ export function runGitLease(options) {
                 path: entry.path,
                 stagedBlobId: entry.stagedBlobId,
                 stagedMode: entry.stagedMode,
+                stagedState: entry.stagedState,
             }))
             : [],
         phrase,

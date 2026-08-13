@@ -28,6 +28,7 @@ export default defineCommandSpec({
         { flag: '--defer-governance-dirty', summary: 'For taskflow close --write: snapshot, temporarily restore, and then reapply deferrable governance dirty files such as git-head evidence.' },
         { flag: '--defer-foreign-state', summary: 'Alias for --defer-foreign-staged plus --defer-governance-dirty.' },
         { flag: '--auto-evidence', summary: 'For taskflow close --write: auto-run missing task-card declared validators through evidence run before backend close. Dry-run and pre-close always expose autoEvidencePlan when --actor is supplied; --validators on evidence run remains an override for extra evidence.' },
+        { flag: '--emergency-approval', value: 'leaseId', summary: 'For taskflow close: forward a human-approved protected backend lease when the orchestrator must perform stale-runner recovery.' },
         { flag: '--reason', value: 'text', summary: 'Required explanation for --waiver-out-of-scope-delivery.' },
         commonJsonOption,
         commonPrettyOption,

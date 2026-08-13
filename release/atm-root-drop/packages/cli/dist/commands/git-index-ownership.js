@@ -44,8 +44,8 @@ export function authorizeGitIndexOverrideLease(input) {
     // so active and released foreign entries share the same authorization rule.
     const liveEntries = input.report.entries.filter((entry) => entry.ownership === 'foreign-active-owned'
         || entry.ownership === 'foreign-released-or-abandoned');
-    const expected = uniqueSorted((lease.stagedEntries ?? []).map((entry) => `${entry.stagedMode}:${entry.stagedBlobId}:${entry.path}`));
-    const actual = uniqueSorted(liveEntries.map((entry) => `${entry.stagedMode ?? 'missing'}:${entry.stagedBlobId ?? 'missing'}:${entry.path}`));
+    const expected = uniqueSorted((lease.stagedEntries ?? []).map(stagedEntryIdentity));
+    const actual = uniqueSorted(liveEntries.map(stagedEntryIdentity));
     const paths = uniqueSorted(lease.paths ?? []);
     if (expected.length === 0 || JSON.stringify(expected) !== JSON.stringify(actual) || JSON.stringify(paths) !== JSON.stringify(uniqueSorted(liveEntries.map((entry) => entry.path)))) {
         return { ok: false, code: 'ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT', summary: `Stage override lease ${leaseId} does not exactly match the live foreign staged entries.` };
@@ -65,6 +65,7 @@ export function inspectGitIndexOwnership(input) {
     const currentTaskId = normalizeTaskId(input.taskId ?? null);
     const stagedFiles = uniqueSorted(input.stagedFiles ?? readStagedFiles(input.cwd));
     const stagedBlobs = readStagedBlobMap(input.cwd, stagedFiles);
+    const stagedDeletions = readStagedDeletionSet(input.cwd, stagedFiles);
     const activeLocks = readActiveTaskDirectionLocks(input.cwd);
     const sessionsByTaskActor = readActiveSessionMap(input.cwd);
     const entries = stagedFiles.map((filePath) => {
@@ -83,6 +84,11 @@ export function inspectGitIndexOwnership(input) {
         const ownerActorId = ownershipLock?.actorId ?? null;
         const ownerSessionId = ownershipLock?.sessionId ?? resolveOwnerSessionId(sessionsByTaskActor, ownerTaskId, ownerActorId);
         const stagedBlob = stagedBlobs.get(normalizeRelativePath(filePath).toLowerCase()) ?? null;
+        const stagedState = stagedDeletions.has(normalizeRelativePath(filePath).toLowerCase())
+            ? 'deleted'
+            : stagedBlob
+                ? 'present'
+                : 'unknown';
         if (ownerTaskId) {
             const normalizedOwner = normalizeTaskId(ownerTaskId);
             const isCurrent = Boolean(currentTaskId && normalizedOwner === currentTaskId);
@@ -95,6 +101,7 @@ export function inspectGitIndexOwnership(input) {
                 ownerSessionId,
                 stagedBlobId: stagedBlob?.objectId ?? null,
                 stagedMode: stagedBlob?.mode ?? null,
+                stagedState,
                 source: governanceTaskId ? 'governance-path' : 'active-direction-lock'
             };
         }
@@ -108,6 +115,7 @@ export function inspectGitIndexOwnership(input) {
                 ownerSessionId: null,
                 stagedBlobId: stagedBlob?.objectId ?? null,
                 stagedMode: stagedBlob?.mode ?? null,
+                stagedState,
                 source: 'governance-path'
             };
         }
@@ -119,6 +127,7 @@ export function inspectGitIndexOwnership(input) {
             ownerSessionId: null,
             stagedBlobId: stagedBlob?.objectId ?? null,
             stagedMode: stagedBlob?.mode ?? null,
+            stagedState,
             source: 'ordinary'
         };
     });
@@ -159,7 +168,8 @@ export function buildGitIndexLeaseParkPlan(input) {
         ownerActorId: entry.ownerActorId,
         stagedBlobId: entry.stagedBlobId,
         stagedMode: entry.stagedMode,
-        restoreIdentity: `${entry.stagedMode ?? 'missing'}:${entry.stagedBlobId ?? 'missing'}:${entry.path}`
+        stagedState: entry.stagedState,
+        restoreIdentity: stagedEntryIdentity(entry)
     }));
     const approvedPartialStagedBlobIds = uniqueSorted(foreignEntries.map((entry) => entry.stagedBlobId ?? '').filter(Boolean));
     const leaseId = input.leaseId?.trim()
@@ -223,6 +233,15 @@ export function restoreGitIndexLease(cwd, plan) {
     }
     const restored = [];
     for (const entry of plan.restoreEntries) {
+        if (entry.stagedState === 'deleted') {
+            execFileSync('git', ['update-index', '--force-remove', '--', entry.path], {
+                cwd,
+                encoding: 'utf8',
+                stdio: ['ignore', 'pipe', 'pipe']
+            });
+            restored.push(entry.path);
+            continue;
+        }
         if (!entry.stagedMode || !entry.stagedBlobId)
             continue;
         execFileSync('git', ['update-index', '--add', '--cacheinfo', `${entry.stagedMode},${entry.stagedBlobId},${entry.path}`], {
@@ -336,6 +355,34 @@ function readStagedBlobMap(cwd, stagedFiles) {
         // Missing blob metadata should not hide ownership classification.
     }
     return map;
+}
+function readStagedDeletionSet(cwd, stagedFiles) {
+    const deletions = new Set();
+    if (stagedFiles.length === 0)
+        return deletions;
+    try {
+        const output = execFileSync('git', ['diff', '--cached', '--diff-filter=D', '--name-only', '--', ...stagedFiles], {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore']
+        });
+        for (const filePath of output.split(/\r?\n/)) {
+            const normalized = normalizeRelativePath(filePath).toLowerCase();
+            if (normalized)
+                deletions.add(normalized);
+        }
+    }
+    catch {
+        // Unknown metadata remains fail-closed rather than being inferred as a deletion.
+    }
+    return deletions;
+}
+function stagedEntryIdentity(entry) {
+    const state = entry.stagedState
+        ?? (entry.stagedBlobId && entry.stagedMode ? 'present' : 'unknown');
+    return state === 'present'
+        ? `present:${entry.stagedMode ?? 'missing'}:${entry.stagedBlobId ?? 'missing'}:${entry.path}`
+        : `${state}:${entry.path}`;
 }
 function extractGovernanceTaskId(filePath) {
     const normalized = normalizeRelativePath(filePath);

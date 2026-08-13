@@ -4,6 +4,7 @@ import { readBrokerLifecycleState } from '../../../../../core/dist/broker/lifecy
 import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID, evaluateSharedWriteAdmission } from '../../../../../core/dist/broker/shared-write-provenance-policy.js';
 import { inspectTrackedActorRegistryState } from '../../actor-registry.js';
 import { readActiveCloseCommitWindows } from '../../framework-development.js';
+import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.js';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.js';
 import { relativePathFrom } from '../../shared.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate } from '../../task-direction.js';
@@ -275,15 +276,11 @@ export function collectStagedBatchCheckpointScopeFiles(cwd, stagedFiles) {
     return uniqueSorted(allowedFiles);
 }
 export function collectFrameworkTempClaimAllowedFiles(cwd) {
-    const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
-    if (!existsSync(lockRoot))
-        return [];
-    const allowedFiles = [];
-    for (const entry of readdirSync(lockRoot).filter((fileName) => fileName.startsWith('ATM-FRAMEWORK-TEMP-') && fileName.endsWith('.lock.json'))) {
-        const lock = readJsonFile(path.join(lockRoot, entry));
-        collectStringArrayField(lock?.files, allowedFiles);
-    }
-    return uniqueSorted(allowedFiles.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+    return uniqueSorted(readFrameworkTempLockProjection(cwd)
+        .filter((lock) => lock.disposition === 'foreign-live')
+        .flatMap((lock) => lock.files)
+        .map(normalizeRelativePath)
+        .filter(isTaskDirectionPathCandidate));
 }
 export function collectCloseCommitWindowPlanningMirrorFiles(cwd) {
     const files = [];

@@ -1,7 +1,6 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { deriveRunnerBuildOutputInventory, type RunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import {
@@ -22,6 +21,8 @@ import {
 import type { BuildDecision, BuildTarget, SealedBuildTimings } from './run-sealed-runner-build.ts';
 import { buildRunnerSyncBuildObservation, summarizeDominantPhase } from './runner-sync-observability.ts';
 import { buildRunnerSyncReleaseCommand, resolveRunnerSyncReceiptOwnerTaskId, resolveTemporaryStewardLinks, uniqueReceiptTaskIds } from './runner-sync-receipt-continuation.ts';
+import { digestJson, syncDirectoryHashChanged, writeJsonWithRetry } from './runner-sync-artifact-filesystem.ts';
+export { digestJson, syncDirectoryHashChanged, writeJsonWithRetry } from './runner-sync-artifact-filesystem.ts';
 export { buildRunnerSyncBuildObservation, persistTsBuildCache, prepareTsBuildCache, summarizeDominantPhase, writeRunnerBuildRuntimeTelemetry } from './runner-sync-observability.ts';
 const releaseManifestPaths = [
   path.join('release', 'atm-root-drop', 'release-manifest.json'),
@@ -246,28 +247,6 @@ export function planRunnerIncrementalBuild(input: {
     incrementalEligible: changedPaths.length > 0 && affectedPackages.size > 0 && unsafeReasons.size === 0,
     unsafeReasons: [...unsafeReasons].sort()
   };
-}
-
-export function writeJsonWithRetry(input: {
-  readonly filePath: string;
-  readonly value: unknown;
-  readonly retries?: number;
-}): void {
-  const retries = input.retries ?? 3;
-  const payload = `${JSON.stringify(input.value, null, 2)}\n`;
-  const tempPath = `${input.filePath}.tmp-${process.pid}-${Date.now()}`;
-  let lastError: unknown = null;
-  for (let attempt = 0; attempt <= retries; attempt += 1) {
-    try {
-      writeFileSync(tempPath, payload, 'utf8');
-      renameSync(tempPath, input.filePath);
-      return;
-    } catch (error) {
-      lastError = error;
-      try { if (existsSync(tempPath)) unlinkSync(tempPath); } catch {}
-    }
-  }
-  throw lastError;
 }
 
 export function buildRunnerSyncReceipt(input: {
@@ -506,27 +485,6 @@ export function writeRunnerSyncReceipt(input: {
 
 export { buildRunnerSyncReleaseCommand } from './runner-sync-receipt-continuation.ts';
 
-export function syncDirectoryHashChanged(source: string, target: string, options?: { readonly preserveRelativePaths?: readonly string[] }): void {
-  if (!existsSync(source)) return;
-  const preserved = new Set((options?.preserveRelativePaths ?? []).map((entry) => entry.replace(/\\/g, '/')));
-  mkdirSync(target, { recursive: true });
-  const expected = new Set<string>();
-  for (const sourceFile of walkFiles(source)) {
-    const relative = path.relative(source, sourceFile);
-    const normalizedRelative = relative.replace(/\\/g, '/');
-    expected.add(normalizedRelative);
-    if (preserved.has(normalizedRelative)) continue;
-    const targetFile = path.join(target, relative);
-    mkdirSync(path.dirname(targetFile), { recursive: true });
-    if (existsSync(targetFile) && fileDigest(targetFile) === fileDigest(sourceFile)) continue;
-    cpSync(sourceFile, targetFile);
-  }
-  for (const targetFile of walkFiles(target)) {
-    const relative = path.relative(target, targetFile).replace(/\\/g, '/');
-    if (!expected.has(relative) && !preserved.has(relative)) unlinkSync(targetFile);
-  }
-}
-
 export function phaseTimingsRecord(timings: SealedBuildTimings): {
   readonly inputHashCalculation: number;
   readonly skipDecision: number;
@@ -551,10 +509,6 @@ export function phaseTimingsRecord(timings: SealedBuildTimings): {
   };
 }
 
-export function digestJson(value: unknown): string {
-  return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
-}
-
 function readPreviousSealedSourceSha(cwd: string): string | null {
   for (const relative of releaseManifestPaths) {
     const absolute = path.join(cwd, relative);
@@ -574,19 +528,6 @@ function readChangedBuildInputPaths(cwd: string, previous: string, current: stri
   });
   if ((result.status ?? 1) !== 0 || result.error) return [];
   return result.stdout.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean).sort();
-}
-
-function walkFiles(directory: string): string[] {
-  if (!existsSync(directory)) return [];
-  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const absolute = path.join(directory, entry.name);
-    return entry.isDirectory() ? walkFiles(absolute) : [absolute];
-  });
-}
-
-function fileDigest(filePath: string): string {
-  const stats = statSync(filePath);
-  return `sha256:${createHash('sha256').update(readFileSync(filePath)).update(String(stats.mode & 0o777)).digest('hex')}`;
 }
 
 function normalizeBrokerTicket(admission: RunnerSyncAdmissionReport): RunnerSyncBuildObservation['brokerTicket'] {
