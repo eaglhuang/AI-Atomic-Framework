@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0317",
   "title": "Plan 4.0 final four-plan objective certification and legacy-authority retirement",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0316",
@@ -162,8 +162,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T12-05-44-160Z-claim-f76d6e4d76ec",
-  "lastTransitionAt": "2026-08-13T12:05:44.160Z",
+  "lastTransitionId": "2026-08-13T12-12-51-874Z-close-fd406dc20ba2",
+  "lastTransitionAt": "2026-08-13T12:12:51.874Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-12T13:09:14.416Z",
   "promotedAt": "2026-08-12T13:09:14.419Z",
@@ -171,7 +171,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-e7f170a3a1b1",
     "claimedAt": "2026-08-13T12:05:42.515Z",
-    "heartbeatAt": "2026-08-13T12:05:42.515Z",
+    "heartbeatAt": "2026-08-13T12:12:51.871Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0317.json",
@@ -180,14 +180,14 @@
       "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
       "tests/cli/plan4-final-certification.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260813120542-codex-gpt-5.4-mini-2db5fd4a65",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813120542-codex-gpt-5.4-mini-2db5fd4a65\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-12T13:09:14.423Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -312,5 +312,9 @@
     },
     "createdAt": "2026-08-13T12:05:44.159Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-13T12:12:51.871Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260813120542-codex-gpt-5.4-mini-ATM-GOV-0317-89b8a59ef1",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0317.closure-packet.json"
 }
