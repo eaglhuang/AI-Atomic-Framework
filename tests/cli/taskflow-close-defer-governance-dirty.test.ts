@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { runTaskflow } from '../../packages/cli/src/commands/taskflow.ts';
 import { makeDualRepoCloseFixture, writeJson } from '../../packages/cli/src/commands/taskflow/__tests__/dryrun/fixtures.ts';
@@ -55,6 +55,31 @@ try {
   assert.equal(readFileSync(taskPath, 'utf8'), taskBeforeWrite, 'fail-fast rejection must not mutate the task ledger');
 } finally {
   rmSync(path.dirname(fixture.targetRepo), { recursive: true, force: true });
+}
+
+const foreignProvenanceFixture = await makeDualRepoCloseFixture('foreign-git-head-is-advisory');
+try {
+  const gitHeadPath = path.join(foreignProvenanceFixture.targetRepo, '.atm/history/evidence/git-head.jsonl');
+  const receipt = (taskId: string) => JSON.stringify({
+    schemaVersion: 'atm.gitHeadEvidence.v0.1',
+    evidence: [{ details: { taskId } }]
+  });
+  writeFileSync(gitHeadPath, `${receipt('FOREIGN-PRODUCER-001')}\n`, 'utf8');
+  execFileSync('git', ['add', '--', path.relative(foreignProvenanceFixture.targetRepo, gitHeadPath)], { cwd: foreignProvenanceFixture.targetRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'seed governed git-head provenance'], { cwd: foreignProvenanceFixture.targetRepo, stdio: 'ignore' });
+  writeFileSync(gitHeadPath, `${receipt('FOREIGN-PRODUCER-002')}\n`, 'utf8');
+
+  const dryRun = await runTaskflow([
+    'close', '--cwd', foreignProvenanceFixture.targetRepo, '--task', foreignProvenanceFixture.taskId,
+    '--actor', 'validator', '--historical-delivery', foreignProvenanceFixture.deliveryCommit, '--json'
+  ]) as any;
+  assert.deepEqual(dryRun.evidence.historicalClosePreflight.dirtyGuard.governanceTrackedDirtyFiles, []);
+  assert.ok(
+    dryRun.evidence.historicalClosePreflight.dirtyGuard.advisoryTrackedDirtyFiles.includes('.atm/history/evidence/git-head.jsonl'),
+    'a parseable foreign git-head receipt is preserved as advisory provenance rather than misattributed to the closing task'
+  );
+} finally {
+  rmSync(path.dirname(foreignProvenanceFixture.targetRepo), { recursive: true, force: true });
 }
 
 console.log('taskflow-close-defer-governance-dirty.test passed');
