@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-009",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "taskflow pre-close discloses close prerequisites in batches",
+  "finding": "pre-close reports the blockers it can see given the current state rather than the full set of prerequisites close --write will require. Clearing one class reveals the next, so learning the complete list costs one round trip per class, and each round trip includes the work needed to clear the previous one.",
+  "expectedBehavior": "One pre-close run enumerates every prerequisite that will block close --write, whether or not other blockers are currently masking it. Required repo-level validators and the --runner-kind they must be recorded under are knowable from the task record and the profile at the first call; they should not wait until the working tree is clean and the earlier evidence is fresh.",
+  "evidenceOrRepro": "On ATM-GOV-0360 three successive pre-close runs were needed. Run 1 reported six dirty in-scope files plus foreign staged tasks. After the governed delivery commit, run 2 reported ATM_TASKFLOW_PRECLOSE_STALE_EVIDENCE. After re-recording the four card validators, run 3 finally named npm run validate:cli and npm run validate:git-head-evidence with --runner-kind frozen-runner. The two repo-level validators were required from the start and were never mentioned in runs 1 or 2.",
+  "followUp": "Owned by ATM-GOV-0364 (ACC-3). Extract the prerequisite inventory so it can be computed independently of current blocker state, then have the reporter render all of it. Compounded by [ATM-BUG-2026-08-13-010], which is what makes the extra rounds expensive rather than merely verbose."
+}

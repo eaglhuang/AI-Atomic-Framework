@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-012",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Stage-override lease cannot cover a staged deletion, so close has no route past one",
+  "finding": "taskflow pre-close refuses to close while foreign staged entries sit in the live index, and names git lease stage-override as the sanctioned route past them. That lease is rejected whenever any foreign entry lacks stagedBlobId or stagedMode: lease-command.ts checks stagedEntries.some(entry => !entry.stagedBlobId || !entry.stagedMode) and throws ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT. A staged deletion has neither, because there is no blob in the index for a removed path. The sanctioned route therefore cannot express the case, and the only remaining options are to disturb another lane's bytes or to stop.",
+  "expectedBehavior": "The override lease must be able to describe every kind of foreign index entry it is asked to authorize, including deletions. A deletion is content-bound in the same way an addition is: it can be identified by the path plus the HEAD blob it removes. Either extend the lease entry shape so a deletion is representable, or scope the close-time isolation check to the entries an override can actually cover so the refusal names a route that exists.",
+  "evidenceOrRepro": "At HEAD eba4e74dc while closing ATM-GOV-0360, git diff --cached --name-status showed four staged deletions (docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json and the ATM-GOV-0353/0356/0357 live-index-reconciliation evidence files) alongside three additions and one modification. pre-close reported ATM_TASKFLOW_PRECLOSE_UNEXPECTED_STAGED_FILES for the backlog item and ATM_INDEX_FOREIGN_ACTIVE_STAGED for an ATM-GOV-0351 task-event path that git does not know at all: absent from HEAD, from the index and from the working tree. Three separate stage-override requests (the single named path, the full eight-entry index set, and the ATM-GOV-0351 path) were each rejected with ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT.",
+  "followUp": "Belongs to the sealed-candidate-index family alongside ATM-GOV-0352. Two sub-findings worth separating: (a) the lease entry shape cannot represent a deletion; (b) pre-close reports a foreign-active staged path that is not in the index, so its foreign-entry inventory is not derived from the live index. Note that governed commit succeeded eight times against this same index because it builds a sealed candidate index; close is stricter than the mechanism it protects. Related: [ATM-BUG-2026-08-13-009]."
+}

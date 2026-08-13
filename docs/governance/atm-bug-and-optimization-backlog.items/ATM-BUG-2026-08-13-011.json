@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-011",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Low",
+  "status": "Open",
+  "area": "Subcommand help returns the whole command namespace",
+  "finding": "atm <command> <subcommand> --help returns every option registered for the command, not the options the subcommand accepts. tasks import --help lists roughly ninety flags spanning claim, close, audit, scope, queue, roster and mirror, so the caller cannot tell which of them the subcommand will accept and must discover the right one by failing.",
+  "expectedBehavior": "Help for a subcommand lists the flags that subcommand accepts. A flag belonging only to a sibling subcommand does not appear. This is the difference between help being a lookup and help being a haystack, and it is paid on every unfamiliar surface.",
+  "evidenceOrRepro": "tasks import --task and tasks import --card each returned ATM_CLI_USAGE 'tasks import does not support option'. The correct flag is --from. Reaching it required tasks import --help, whose options array contains flags such as --ttl-seconds, --historical-batch and --sync-status that tasks import does not accept. The same shape reoccurs on evidence run, where the required --command is not distinguishable from the rest of the evidence namespace.",
+  "followUp": "Owned by ATM-GOV-0364 (ACC-5) in packages/cli/src/commands/shared/command-spec-output.ts. Filtering is sufficient; no new registration format is required if subcommand ownership is already recorded. If it is not, recording it is the actual fix."
+}

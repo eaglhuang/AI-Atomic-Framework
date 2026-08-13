@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-008",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "tasks import --force erases the active claim without being asked to",
+  "finding": "tasks import --write --force resets the ledger record to status planned and drops the active claim even when --force-overwrite-claims is not passed. The existence of that separate flag is the system's own statement that --force alone must not displace claims. Recovery costs three further governed commands: tasks repair-claim to diagnose, tasks repair-claim --write to release the orphaned runtime lock, and next --claim to retake the task.",
+  "expectedBehavior": "Refreshing a ledger record from its planning card updates the record's declared fields. Claim state is not a declared field of the planning card, so it must survive the refresh. Displacing a claim requires --force-overwrite-claims and must emit the claim-displaced-by-import transition event that already exists for exactly this purpose.",
+  "evidenceOrRepro": "On ATM-GOV-0360, two import --force runs under emergency lease EMG-ATM-GOV-0360-cbdda3e03f each left status=planned and claim=undefined in .atm/history/tasks/ATM-GOV-0360.json while the runtime lock survived, so the following next --claim failed with ATM_LOCK_CONFLICT and needed tasks repair-claim --write before the task could be retaken. The transition log for the card records the full sequence: import, import, reserve, promote, repair-claim, claim.",
+  "followUp": "Owned by ATM-GOV-0364 (ACC-2). The focused test claims a task, re-imports with --force alone, and asserts the claim and status are unchanged; a second case passes --force-overwrite-claims and asserts the displacement event is written. Related to [ATM-BUG-2026-08-13-007], which is what forces the import --force in the first place."
+}

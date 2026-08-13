@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-010",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Evidence freshness is keyed on HEAD instead of the subject under test",
+  "finding": "Command-backed evidence is treated as stale once HEAD moves, regardless of whether the commit touched anything the validator examines. pre-close requires a governed delivery commit before close, and that commit is guaranteed to move HEAD, so every task must record its evidence at least twice and the second run is guaranteed to reproduce the first.",
+  "expectedBehavior": "Evidence expires when its subject changes. Freshness should be keyed on the content digests of the files the validator reads, or at minimum on whether the commit intersected them, so that a delivery commit which does not alter a validator's subject leaves that validator's evidence valid. Evidence for a validator whose subject did change must still expire; this is about precision, not leniency.",
+  "evidenceOrRepro": "On ATM-GOV-0360 the four card validators were recorded green, the governed delivery commit was made because pre-close demanded it, and pre-close then reported ATM_TASKFLOW_PRECLOSE_STALE_EVIDENCE. All four were rerun and produced identical results. The pattern is structural, not incidental: the commit that pre-close requires is what invalidates the evidence pre-close requires.",
+  "followUp": "Owned by ATM-GOV-0364 (ACC-4). The focused test records evidence, commits a file outside every validator's subject, and asserts the evidence is still fresh; a second case commits a file inside a validator's subject and asserts that validator's evidence expired."
+}
