@@ -1,6 +1,6 @@
 import { CliError } from '../shared.js';
 import { isTaskflowOperatorLaneActive } from './context.js';
-import { assertEmergencyLeaseAvailable, consumeEmergencyLease } from './leases.js';
+import { assertEmergencyLeaseAvailable, consumeEmergencyLease, readEmergencyLease } from './leases.js';
 import { recordProtectedOverrideAuthorization, recordProtectedOverrideCompletion } from './protected-override-audit.js';
 export function recordProtectedOverrideOutcome(input) {
     return recordProtectedOverrideCompletion({
@@ -10,6 +10,33 @@ export function recordProtectedOverrideOutcome(input) {
 }
 function dedupeFlags(flags) {
     return Array.from(new Set(flags.filter((flag) => typeof flag === 'string' && flag.trim().length > 0)));
+}
+/**
+ * Resolve which supplied lease authorizes this surface.
+ *
+ * A command can select more than one protected surface — closing a task under a
+ * stale runner needs both runner recovery and the close itself — so the approval
+ * argument carries a set: one id, or several separated by commas, in the same
+ * shape `--paths` and `--scope` already use. Selection is the whole of this
+ * function's authority. The selected lease is then validated exactly as a lone
+ * lease always was, so nothing an operator must approve becomes optional, and a
+ * lease is consumed only by the surface its own permission names.
+ */
+function selectLeaseForPermission(cwd, supplied, permission) {
+    const leaseIds = supplied.split(',').map((entry) => entry.trim()).filter((entry) => entry.length > 0);
+    if (leaseIds.length <= 1)
+        return supplied.trim();
+    const carried = leaseIds.map((leaseId) => ({ leaseId, permission: readEmergencyLease(cwd, leaseId).permission }));
+    const match = carried.find((entry) => entry.permission === permission);
+    if (match)
+        return match.leaseId;
+    throw new CliError('ATM_EMERGENCY_PERMISSION_MISMATCH', `No supplied emergency approval is for ${permission}. Supplied: ${carried.map((entry) => `${entry.leaseId} (${entry.permission})`).join(', ')}.`, {
+        exitCode: 1,
+        details: {
+            requiredPermission: permission,
+            suppliedLeases: carried
+        }
+    });
 }
 export function assertEmergencyApproval(input) {
     if (input.allowTaskflowOperatorLane !== false && isTaskflowOperatorLaneActive()) {
@@ -35,7 +62,7 @@ export function assertEmergencyApproval(input) {
     }
     const leaseInput = {
         cwd: input.cwd,
-        leaseId: input.emergencyApproval,
+        leaseId: selectLeaseForPermission(input.cwd, input.emergencyApproval, input.permission),
         permission: input.permission,
         surface: input.surface,
         taskId: input.taskId ?? null,

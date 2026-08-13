@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T17-51-29-271Z-scope-amendment-8dd092ee949a",
+  "taskId": "ATM-GOV-0368",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0368.json",
+  "taskSha256": "sha256:ece3036f1ed43fd22d17fb7b465b85e4636bd18c87cbbf8a70face904517b64c",
+  "createdAt": "2026-08-13T17:51:29.271Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0368 --actor claude-008-gov-0366 --add \"release/**,packages/cli/dist/**\" --reason \"This card's source fix must reach the frozen runner before any lane can use it.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "This card's source fix must reach the frozen runner before any lane can use it."
+  }
+}

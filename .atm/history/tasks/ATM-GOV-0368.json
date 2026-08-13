@@ -18,7 +18,12 @@
   "scopePaths": [
     "packages/cli/src/commands/emergency/gate.ts",
     "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
-    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json"
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+    ".atm/history/evidence/ATM-GOV-0368.*",
+    ".atm/history/task-events/ATM-GOV-0368/**",
+    ".atm/history/tasks/ATM-GOV-0368.json",
+    "packages/cli/dist/**",
+    "release/**"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/emergency/__tests__/gate.test.ts",
@@ -139,8 +144,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T17-48-58-912Z-renew-0ff292235a24",
-  "lastTransitionAt": "2026-08-13T17:48:58.912Z",
+  "lastTransitionId": "2026-08-13T17-53-34-481Z-renew-ef11e1938554",
+  "lastTransitionAt": "2026-08-13T17:53:34.481Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-008-gov-0366",
   "reservedAt": "2026-08-13T17:42:30.823Z",
@@ -149,13 +154,17 @@
     "actorId": "claude-008-gov-0366",
     "leaseId": "lease-db42fceae93f",
     "claimedAt": "2026-08-13T17:42:30.834Z",
-    "heartbeatAt": "2026-08-13T17:48:58.685Z",
+    "heartbeatAt": "2026-08-13T17:53:34.140Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0368.*",
+      ".atm/history/task-events/ATM-GOV-0368/**",
       ".atm/history/tasks/ATM-GOV-0368.json",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+      "packages/cli/dist/**",
       "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
-      "packages/cli/src/commands/emergency/gate.ts"
+      "packages/cli/src/commands/emergency/gate.ts",
+      "release/**"
     ],
     "state": "active",
     "laneSession": {
@@ -181,54 +190,66 @@
       ".atm/history/task-events/ATM-GOV-0368/**",
       ".atm/history/tasks/ATM-GOV-0368.json",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+      "packages/cli/dist/**",
       "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
-      "packages/cli/src/commands/emergency/gate.ts"
+      "packages/cli/src/commands/emergency/gate.ts",
+      "release/**"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0368-let-one-command-satisfy-every-emergency-permission-it-needs.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0368-let-one-command-satisfy-every-emergency-permission-it-needs.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "b116d861a4ca26f9d17cb62f9be56382060890e828f413cf57e392904cb8aa33",
     "actorId": "claude-008-gov-0366",
-    "sessionId": "session-20260813174230-claude-008-gov-0366-ATM-GOV-0368-40fedfe228",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260813174231-claude-008-gov-0366-0415460b86",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813174231-claude-008-gov-0366-0415460b86\""
     },
-    "createdAt": "2026-08-13T17:42:32.655Z",
+    "createdAt": "2026-08-13T17:42:32.684Z",
     "status": "active"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-dec1743d1dad5599",
-    "ticketDigest": "sha256:dec1743d1dad5599d531cc5e57b4d37c231acf6766555c0bc927734a3207eef1",
+    "ticketId": "wat-3ad4215a2020d264",
+    "ticketDigest": "sha256:3ad4215a2020d2648fa87f019f5308bc76a63074e41cdb206a37bcf2904edd8b",
     "taskId": "ATM-GOV-0368",
     "origin": "claim",
     "actorId": "claude-008-gov-0366",
     "laneSessionId": "lane-20260813174231-claude-008-gov-0366-0415460b86",
     "claimGeneration": "lease-db42fceae93f",
-    "issuedAt": "2026-08-13T17:48:58.685Z",
-    "expiresAt": "2026-08-13T18:18:58.685Z",
-    "scopeDigest": "sha256:013d59927ddcbda869bf587da08fe66b2b5dadc4478501add18f711c63a531cc",
+    "issuedAt": "2026-08-13T17:53:34.140Z",
+    "expiresAt": "2026-08-13T18:23:34.140Z",
+    "scopeDigest": "sha256:3c37a7eb0d67b1ea812af5d8112d8a69428e0dd7ee0806ee9c55eea597fb460a",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T17:48:58.685Z"
+      "selectedAt": "2026-08-13T17:53:34.140Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0368.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0368/**",
           ".atm/history/tasks/ATM-GOV-0368.json",
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+          "packages/cli/dist/**",
           "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
-          "packages/cli/src/commands/emergency/gate.ts"
+          "packages/cli/src/commands/emergency/gate.ts",
+          "release/**"
         ],
-        "digest": "sha256:90fd92ddf1d516a8a944548850d33cd1da20f2e938f37e8902908539b29f33d0"
+        "digest": "sha256:546331c78ba44968dea4cb803184fac7cff0a23a0ff574f66503e3970deb7ecc"
       },
       {
         "kind": "lifecycle-operation",
