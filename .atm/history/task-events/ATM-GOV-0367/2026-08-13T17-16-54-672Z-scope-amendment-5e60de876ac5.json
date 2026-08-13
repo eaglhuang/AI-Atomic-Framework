@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T17-16-54-672Z-scope-amendment-5e60de876ac5",
+  "taskId": "ATM-GOV-0367",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0367.json",
+  "taskSha256": "sha256:7a66a33db9a336ecebad7098cd5923b58589e53d932766d7fb9ab5cf28d74ec1",
+  "createdAt": "2026-08-13T17:16:54.672Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0367 --actor claude-008-gov-0366 --add \"release/**,packages/cli/dist/**\" --reason \"This card must republish the frozen runner: the stale-runner condition blocking its own close was created by ATM-GOV-0366 landing framework source, and no other lane holds the release surface.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "This card must republish the frozen runner: the stale-runner condition blocking its own close was created by ATM-GOV-0366 landing framework source, and no other lane holds the release surface."
+  }
+}

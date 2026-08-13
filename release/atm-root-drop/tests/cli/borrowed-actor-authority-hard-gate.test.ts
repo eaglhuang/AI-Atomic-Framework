@@ -147,6 +147,63 @@ try {
   assert.equal(noLane.allowed, false);
   assert.equal(noLane.decisionClass, 'borrowed-actor-blocked');
 
+  // test_atm_gov_0366_refusal_discloses_the_owner_lane_source
+  // A refusal decides by comparing the executing lane against the owner lane
+  // recorded on the live claim. It must name the record that decided it, so the
+  // blocked actor reads one file instead of probing its own lane sessions — and
+  // it must still refuse to hand over the capability that record holds.
+  {
+    let disclosed: CliError | null = null;
+    try {
+      authorizeLaneCapability({
+        cwd: repo,
+        taskId,
+        actorId: workerActor,
+        commandClass: 'taskflow-close-write',
+        executingLaneSessionId: captainLane
+      });
+    } catch (error) {
+      disclosed = error as CliError;
+    }
+    assert.ok(disclosed instanceof CliError, 'blocked attempt must throw');
+    const details = (disclosed.details ?? {}) as Record<string, unknown>;
+    const disclosure = details.disclosure as Record<string, unknown> | undefined;
+    assert.ok(disclosure, 'refusal must carry a disclosure block');
+    assert.equal(
+      disclosure.ownerClaimPath,
+      `.atm/history/tasks/${taskId}.json`,
+      'refusal must name the ledger record it read the owner lane from'
+    );
+    assert.equal(disclosure.ownerLaneRecorded, true, 'refusal must state that an owner lane is recorded');
+    assert.equal(disclosure.ownerLaneExportHintRecorded, true, 'refusal must state that the record carries an export hint');
+    assert.ok(
+      typeof disclosure.nextCommand === 'string' && (disclosure.nextCommand as string).includes(taskId),
+      'refusal must offer a command that reads that record'
+    );
+
+    // The disclosure names the location, never the capability. --actor is
+    // attribution, so an attempt that presents the owner actor string must not
+    // be able to read the lane value back out of the refusal.
+    const serialized = JSON.stringify({ message: disclosed.message, details });
+    assert.ok(!serialized.includes(workerLane), 'refusal must not expose the owner lane key');
+    assert.ok(!serialized.includes('lease-worker-secret-000'), 'refusal must not expose the owner lease');
+  }
+
+  // A refusal that had no owner lane to compare against must not invent one.
+  {
+    const orphanTask = 'WORK-ITEM-0002';
+    writeJson(`.atm/history/tasks/${orphanTask}.json`, { id: orphanTask, status: 'in_progress' });
+    const decision = evaluateLaneCapability({
+      cwd: repo,
+      taskId: orphanTask,
+      actorId: workerActor,
+      commandClass: 'push',
+      executingLaneSessionId: captainLane
+    });
+    assert.equal(decision.allowed, true, 'a claim with no owner lane is not lane-bound');
+    assert.equal(decision.laneBound, false);
+  }
+
   // 5. Generalization guard: no Plan3.1/0263/claude-002/codex-plan31/date/path
   //    literal appears in the production gate source.
   const gateSource = readGateSource();

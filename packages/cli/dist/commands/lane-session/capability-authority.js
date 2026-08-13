@@ -19,6 +19,9 @@ export function evaluateLaneCapability(input) {
     const ownerLaneId = claim?.laneSession?.laneSessionId ?? null;
     const ownerActorId = claim?.actorId ?? null;
     const ownerLaneFingerprint = capabilityFingerprint(ownerLaneId, 'lane');
+    // Described from the same claim read that decides the outcome, so the source
+    // a consumer reports cannot drift from the source that was consulted.
+    const disclosure = describeOwnerLaneSource(taskId, claim);
     const executingLaneSessionId = normalizeOptionalString(input.executingLaneSessionId)
         ?? normalizeOptionalString(process.env.ATM_LANE_SESSION_ID);
     const executingLaneFingerprint = capabilityFingerprint(executingLaneSessionId, 'lane');
@@ -36,7 +39,8 @@ export function evaluateLaneCapability(input) {
             executingLaneFingerprint,
             proxyReceiptFingerprint: null,
             reason: 'No lane-bound active claim; capability binding does not apply.',
-            laneBound: false
+            laneBound: false,
+            disclosure
         });
     }
     // Owner lane: the executing lane holds the exact live-claim capability.
@@ -53,7 +57,8 @@ export function evaluateLaneCapability(input) {
             executingLaneFingerprint,
             proxyReceiptFingerprint: null,
             reason: 'Executing lane matches the live-claim owner lane capability.',
-            laneBound: true
+            laneBound: true,
+            disclosure
         });
     }
     // Adopted owner lane: the executing lane is a governed adoption of the owner
@@ -70,7 +75,8 @@ export function evaluateLaneCapability(input) {
             executingLaneFingerprint,
             proxyReceiptFingerprint: null,
             reason: 'Executing lane is a governed adoption of the owner lane capability.',
-            laneBound: true
+            laneBound: true,
+            disclosure
         });
     }
     // Approved proxy/takeover: a governed receipt delegates this command class
@@ -96,7 +102,8 @@ export function evaluateLaneCapability(input) {
                 executingLaneFingerprint,
                 proxyReceiptFingerprint: proxyFingerprint(usable),
                 reason: `Approved ${usable.grantKind} receipt delegates ${commandClass} from owner lane to executing lane.`,
-                laneBound: true
+                laneBound: true,
+                disclosure
             });
         }
     }
@@ -115,7 +122,8 @@ export function evaluateLaneCapability(input) {
         reason: executingLaneSessionId
             ? 'Executing lane does not match the owner lane capability and no proxy/takeover receipt delegates this command class.'
             : 'No executing lane capability is present; mutation authority cannot be bound to an actor string alone.',
-        laneBound: true
+        laneBound: true,
+        disclosure
     });
 }
 /**
@@ -131,7 +139,10 @@ export function authorizeLaneCapability(input) {
             exitCode: 1,
             details: {
                 decision: evaluated,
-                remediation: 'Execute from the owner lane, adopt the owner lane through governance, or supply a proxy/takeover receipt via node atm.mjs lane proxy grant.'
+                // Consumed from the decision, not recomputed: the refusal reports the
+                // source the refusal itself consulted (INV-ATM-012).
+                disclosure: evaluated.disclosure,
+                remediation: 'Execute from the owner lane, adopt the owner lane through governance, or supply a proxy/takeover receipt via node atm.mjs lane proxy grant. The owner lane is recorded on the live claim; read it with the disclosed nextCommand rather than trying lane sessions in turn.'
             }
         });
     }
@@ -154,6 +165,21 @@ export function authorizeLaneCapability(input) {
         }
     }
     return { decision: evaluated, auditPath: null };
+}
+/**
+ * Describe the record a decision was read from. Takes the claim the caller
+ * already read rather than reading it again, so the described source and the
+ * consulted source are the same observation (INV-ATM-012).
+ */
+function describeOwnerLaneSource(taskId, claim) {
+    const laneSession = claim?.laneSession ?? null;
+    return {
+        schemaId: 'atm.laneCapabilityRefusalDisclosure.v1',
+        ownerClaimPath: `.atm/history/tasks/${taskId}.json`,
+        ownerLaneRecorded: Boolean(laneSession?.laneSessionId),
+        ownerLaneExportHintRecorded: Boolean(laneSession?.exportHint),
+        nextCommand: `node atm.mjs tasks status --task ${taskId} --json`
+    };
 }
 function readActiveClaim(cwd, taskId) {
     const absolutePath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);

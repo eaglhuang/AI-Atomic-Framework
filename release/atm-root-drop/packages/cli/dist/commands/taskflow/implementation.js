@@ -451,6 +451,10 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     if (writeRequested && !writeSupport.allowed) {
         throw new CliError(closebackPlan.closeMode === 'ambiguous-manual-review' ? 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE' : 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED', writeSupport.reason, { exitCode: 1, details: { closeMode: closebackPlan.closeMode, writeSupport, diagnostics, closebackPlan, recommendedCommand: diagnosis.nextCommand } });
     }
+    if (writeRequested && preCloseWriteBlocked) {
+        const blocker = writeReadinessHint.blockers[0] ?? null;
+        throw new CliError(blocker?.code ?? 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED', blocker?.summary ?? 'taskflow close --write has a known preflight blocker.', { exitCode: 1, details: { taskId, closeMode: closebackPlan.closeMode, writeReadinessHint, historicalClosePreflight, recommendedCommand: blocker?.requiredCommand ?? writeReadinessHint.nextCommand } });
+    }
     if (writeRequested && writeSupport.allowed) {
         authorizeLaneCapability({ cwd, taskId, actorId, commandClass: 'taskflow-close-write' });
     }

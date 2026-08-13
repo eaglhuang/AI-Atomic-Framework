@@ -230,6 +230,24 @@ function buildScopeDirtyBlocker(input) {
         requiredCommand: input.dirtyGuard.remediation.requiredCommand
     };
 }
+function buildGovernanceDirtyBlocker(input) {
+    if (input.dirtyGuard.governanceTrackedDirtyFiles.length === 0)
+        return null;
+    return {
+        id: 'governanceTrackedDirtyFiles',
+        // Preserve the backend code: preflight and tasks close must classify the
+        // same dirty surface into the same fail-fast result.
+        code: 'ATM_TASK_CLOSE_DIRTY_WORKTREE',
+        summary: `Task ${input.taskId} has uncommitted task-owned closure governance residue; close --write must not start a transaction until it is reconciled.`,
+        files: input.dirtyGuard.governanceTrackedDirtyFiles,
+        remediationChoices: [{
+                id: 'restore-accidental-drift',
+                summary: 'Do not alter governance history manually. Use the guarded remediation supplied by the dirty-worktree diagnostic.',
+                requiredCommand: input.dirtyGuard.remediation.requiredCommand
+            }],
+        requiredCommand: input.dirtyGuard.remediation.requiredCommand
+    };
+}
 function buildUnexpectedStagedBlocker(unexpectedStagedTasks) {
     if (unexpectedStagedTasks.length === 0)
         return null;
@@ -410,6 +428,7 @@ export function buildHistoricalClosePreflight(input) {
         : [];
     const operationalBlockers = [
         buildScopeDirtyBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
+        buildGovernanceDirtyBlocker({ taskId: input.taskId, dirtyGuard }),
         buildIncorrectPlanningMirrorBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
         // `taskflow close --defer-foreign-state` is an explicit request for the
         // close transaction's park/temporary-index/restore boundary.  Preserve
