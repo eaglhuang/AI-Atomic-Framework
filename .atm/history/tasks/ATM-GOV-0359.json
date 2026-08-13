@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0359",
   "title": "Compile complete runbook item and wave-exit evidence",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0358"
@@ -148,8 +148,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T14-27-56-222Z-renew-23d2cd30af16",
-  "lastTransitionAt": "2026-08-13T14:27:56.222Z",
+  "lastTransitionId": "2026-08-13T14-57-09-079Z-close-88fd7024665c",
+  "lastTransitionAt": "2026-08-13T14:57:09.079Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-13T12:48:44.093Z",
@@ -158,7 +158,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-4cc9be832130",
     "claimedAt": "2026-08-13T12:48:44.102Z",
-    "heartbeatAt": "2026-08-13T14:27:55.981Z",
+    "heartbeatAt": "2026-08-13T14:57:09.075Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0359.json",
@@ -167,39 +167,41 @@
       "scripts/validate-runbook-completion-evidence.ts",
       "tests/cli/runbook-completion-evidence.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-13T12:48:44.102Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d569344e53f3085d",
-    "ticketDigest": "sha256:d569344e53f3085db62c709a6363d3fbe0e5c688526d7e460051d25aade4d0d0",
+    "ticketId": "wat-2b87a6c4ce0a3582",
+    "ticketDigest": "sha256:2b87a6c4ce0a3582f53546c6a9de420fe31a68cf4ab987dfb6d35b7e899bd55f",
     "taskId": "ATM-GOV-0359",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4",
     "claimGeneration": "lease-4cc9be832130",
-    "issuedAt": "2026-08-13T14:27:55.981Z",
-    "expiresAt": "2026-08-13T14:57:55.981Z",
-    "scopeDigest": "sha256:9b3e0181642fe8b468a472d740b738010d7493fdf39bcdd08b007d179eb6500b",
+    "issuedAt": "2026-08-13T14:49:37.865Z",
+    "expiresAt": "2026-08-13T15:19:37.865Z",
+    "scopeDigest": "sha256:79907f8718c7e1c3fb9b4b05ef496866247734612a40fd267593ea3738548188",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T14:27:55.981Z"
+      "selectedAt": "2026-08-13T14:49:37.865Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0359.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0359/**",
           ".atm/history/tasks/ATM-GOV-0359.json",
           "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
@@ -207,7 +209,7 @@
           "scripts/validate-runbook-completion-evidence.ts",
           "tests/cli/runbook-completion-evidence.test.ts"
         ],
-        "digest": "sha256:50c8dd5f64fe9fc25f65f6429a6dc0c05665d3d4354f26abc3723d0ec84bb31b"
+        "digest": "sha256:2861a0be8244d8546ed80cdd4f8548407e4b8c9fe44130d0a8af8af3b665fb91"
       },
       {
         "kind": "lifecycle-operation",
@@ -273,5 +275,9 @@
     },
     "createdAt": "2026-08-13T12:48:48.506Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-13T14:57:09.075Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260813124844-codex-gpt-5.4-mini-ATM-GOV-0359-a19ca98515",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0359.closure-packet.json"
 }
