@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-12-003",
+  "date": "2026-08-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Sealed-candidate hook and record-commit analysis",
+  "finding": "Pre-commit cross-file consistency and git record-commit scope analysis enumerate the live worktree or entire staged index instead of the sealed candidate being committed. Unrelated half-staged symbols from another lane can therefore block a task-scoped commit and be misclassified as classification=current-task even though the candidate contains none of those bytes.",
+  "expectedBehavior": "Every validator and scope guard participating in a governed commit must analyze the same sealed candidate tree and attribution envelope. Live worktree/index state outside that candidate may be preserved and reported as foreign context, but cannot become current-task content or block an unrelated commit unless a proven dependency edge intersects the candidate.",
+  "evidenceOrRepro": "Observed on 2026-08-12 with foreign staged entries preserved byte-identically by the task-scoped commit facade: the pre-commit cross-file consistency gate still read a peer lane's incomplete symbol surface and emitted a current-task finding; record-commit likewise enumerated the whole staged surface. The task-scoped facade succeeded only after the peer WIP landed, without any change to the intended candidate. Detailed commands and error envelopes remain available from the reporting captain.",
+  "followUp": "Create a separate cohesive successor card from ATM-GOV-0352, whose formal scope is only taskflow close-window dry-run disclosure and explicitly excludes git-governance. Route hook and record-commit through one sealed-candidate analysis interface, then add two-lane tests proving foreign staged/worktree symbols remain outside findings and current-task classification. Preserve fail-closed behavior for dependencies actually present in the candidate."
+}

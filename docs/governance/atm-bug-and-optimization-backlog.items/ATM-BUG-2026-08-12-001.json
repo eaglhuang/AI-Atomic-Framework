@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-12-001",
+  "date": "2026-08-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Governed commit live-index reconciliation concurrency",
+  "finding": "A task-scoped governed commit can successfully advance HEAD from its sealed candidate and then fail while reconciling the committed paths back into the shared live index because another Git process briefly owns .git/index.lock. The durable ATM_LIVE_INDEX_RECONCILIATION_FAILED receipt correctly preserves this non-green postcondition, but recovery still requires an operator to wait for the lock and restage paths manually.",
+  "expectedBehavior": "The sealed commit and live-index reconciliation boundary must model HEAD-advanced/index-not-yet-reconciled as a durable, idempotently retryable transition. Transient index-lock contention must enqueue or retry only the irreducible reconciliation write window, preserve every foreign staged blob exactly, and release immediately after success. A successful Git commit must never be rolled back or repeated, and a reconciliation failure must never be reported as a fully clean commit result.",
+  "evidenceOrRepro": "Two independent governed commits on 2026-08-12 advanced HEAD while 125 and 140 foreign staged entries remained byte-identical, then encountered .git/index.lock during live-index reconciliation. The first failure was observed at 2026-08-12T14:54:13Z and the second is preserved at .atm/history/evidence/ATM-GOV-0352.live-index-reconciliation.json with createdAt 2026-08-12T15:12:52.706Z, headAdvanced=true, clean=false, and code ATM_LIVE_INDEX_RECONCILIATION_FAILED. Commits 1b5a8e84 and e16e5894 remained valid; after the lock cleared, targeted staging restored the live index. TASK-ERR-0014 therefore proved observability and commit preservation, while the automatic retry/short-queue postcondition remains open.",
+  "followUp": "Attach a successor repair card to the ATM-GOV-0351/TASK-ERR-0014 semantic family. Implement one public reconciliation operation that consumes the durable receipt, verifies the recorded HEAD and candidate lineage, waits or queues only for the short index mutation, retries idempotently, preserves concurrent foreign blob ids, and marks the receipt clean only after an independent index oracle passes. Add deterministic tests for lock held before reconciliation, lock released then retry, HEAD moved after receipt, repeated retry, and concurrent foreign index mutation. Treat candidate-scope contamination and live-surface pre-commit/record-commit analysis as related but separately testable seams; do not hard-code task IDs, path lists, entry counts, or sleep durations."
+}

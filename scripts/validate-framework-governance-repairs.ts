@@ -60,7 +60,7 @@ try {
 
   const missingPush = runCli(repo, ['hook', 'pre-push', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });
   const missingPushPayload = parsePayload(missingPush);
-  assert.equal(missingPush.status, 0, 'pre-push must stay passable when historical git-head evidence is missing');
+  assert.equal(missingPush.status, 0, `pre-push must stay passable when historical git-head evidence is missing; observed codes: ${(missingPushPayload?.messages ?? []).map((entry: any) => entry.code).join(', ') || '<none>'}; findings: ${JSON.stringify((missingPushPayload?.messages ?? []).flatMap((entry: any) => (entry?.data?.findings ?? []).map((f: any) => f.code))) }`);
   assert.equal(missingPushPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_OK'), true);
 
   const headSha = String(runGit(repo, ['rev-parse', 'HEAD']).stdout || '').trim();

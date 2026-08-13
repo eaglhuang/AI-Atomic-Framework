@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-006",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "No claim-time adoption route for diagnosis-driven work in progress",
+  "finding": "next --claim refuses with ATM_CLAIM_FOREIGN_UNSTAGED_WIP when the task's own in-scope files already carry unattributed changes, and passing --files that name exactly those changes does not help. The release side has --wip-commit and --discard-wip, but the claim side has no counterpart, so there is no governed way to adopt existing work into the card that should own it. The only documented escape is a pathspec-only quarantine commit, which needs owner approval, or an emergency lease.",
+  "expectedBehavior": "Repair work driven by diagnosis inherently produces changes before the owning card can be written, because what the card must scope is only known after the cause is found. That is the normal shape of fixing a red validator, not an anomaly. The claim path needs an explicit, auditable adoption route — the mirror of --wip-commit — that binds pre-existing unattributed changes to the claim being taken, records what was adopted, and stays fail-closed for anything outside the declared scope. Without it the governed sequence is only usable when the fix is known in advance.",
+  "evidenceOrRepro": "At HEAD bc9cbc453e, eight repaired files (integration-hooks/implementation.ts, tasks/repairclose-orchestrator.ts, __tests__/framework-mode-staged-residue.spec.ts, validate-broker-registry.ts, validate-framework-development-governance.ts, validate-framework-governance-repairs.ts, validate-task-direction-governance/adopter-core.ts, validators/task-ledger/suite-impl/implementation.ts) were left unattributed after ATM-GOV-0356 was authored to own them. next --claim reports ATM_CLAIM_FOREIGN_UNSTAGED_WIP listing those exact files with ownership 'unowned'; tasks claim reports ATM_TASK_CLAIM_NOT_READY for a planned card; next --claim --files naming the same set is refused identically.",
+  "followUp": "Add the claim-side adoption route and a focused fixture proving that adoption is bounded by the declared scope and that anything outside it still fails closed. Until then, the repairs listed above stay in the working tree with ATM-GOV-0356 imported and unclaimed; they are individually verified (typecheck green, and validate-framework-development-governance, validate-broker-registry, validate-framework-hook-scope-filtering, validate-branch-commit-queue all green) and need only a claim to land. Do not resolve this by folding them into an unrelated claimed card; the scope conflation would be worse than the delay."
+}

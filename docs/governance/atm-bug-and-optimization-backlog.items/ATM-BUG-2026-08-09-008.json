@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed by TASK-ERR-0008",
   "area": "Taskflow close index-lane admission",
   "finding": "taskflow close classifies .atm/history/evidence/git-head.jsonl as a foreign-active staged entry and mandates a stage-override lease, but the prescribed git lease stage-override command simultaneously reports foreignActiveStaged as empty and rejects the identical path with ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT.",
   "expectedBehavior": "The close readiness gate and the stage-override issuer must share one ownership snapshot. A path required by taskflow close must either receive a lease for that exact snapshot or be reclassified before close is reported blocked; they must never prescribe an impossible recovery command.",
-  "evidenceOrRepro": "2026-08-09, ATM-GOV-0328 after governed delivery a2e441037d15abd0ab64d2812ede1752b2356273: node atm.mjs taskflow close --task ATM-GOV-0328 --actor codex-gpt-5.4-mini --historical-delivery a2e441037d15abd0ab64d2812ede1752b2356273 --dry-run --json returned ATM_INDEX_FOREIGN_ACTIVE_STAGED for .atm/history/evidence/git-head.jsonl and required git lease stage-override. Two immediate invocations of that exact lease command failed ATM_GIT_INDEX_OVERRIDE_LEASE_INDEX_DRIFT with foreignActiveStaged: []. The staged line was produced by the same actor's governed commit hook at 2026-08-09T10:24:44.726Z.",
-  "followUp": "Unify the staged-index ownership resolver used by taskflow close and git lease stage-override, bind both to one index-tree digest, and add a regression covering a hook-generated git-head receipt after a task-scoped delivery commit. The regression must prove either successful exact-path lease issuance or an automatically non-blocking close classification; no manual index edit or broad staging is permitted."
+  "evidenceOrRepro": "TASK-ERR-0008 repaired the shared ownership snapshot in commits ce2f2cb2b454fcfe7d884978defc8ffe6f3b7737 and c442cf0bae445b7d076e97669a4dc66169b5121f. The task ledger and planning mirror are both done with no residue at transition 2026-08-09T12-25-04-961Z-close-5d6925a88cef. Fresh 2026-08-12 validation: node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts exited 0 and proved inspectGitIndexOwnership, stage-override issuance, and historical close preflight consume one live-claim-backed ownership snapshot for .atm/history/evidence/git-head.jsonl.",
+  "followUp": "Closed by TASK-ERR-0008. Keep the focused snapshot-consistency fixture live-claim-backed so stronger direction-lock validity rules cannot silently turn the ownership test into a false fixture failure."
 }

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-003",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Resolved",
+  "area": "Work-admission ticket gate masks specific hook blockers",
+  "finding": "The pre-tool hook returned on the work-admission ticket gate before reaching the specific scope guards, so three distinct protections collapsed into one generic ATM_WRITE_TICKET_SCOPE_VIOLATION: an out-of-scope edit that owns ATM_TOOL_SCOPE_DRIFT_BLOCKED, a cross-repo planning mirror edit that owns ATM_PLANNING_MIRROR_BLOCKED, and a static evidence impersonation block. Every edit was still refused, so this was a diagnostic loss rather than a safety loss, but the operator received 'missing work-admission coverage' where the system knew something far more specific and actionable.",
+  "expectedBehavior": "A refusal must carry the most specific code the system can justify. The ticket gate is a backstop, not a replacement for the blocker that understands why an edit is wrong.",
+  "evidenceOrRepro": "Diagnosed by making each assertion self-reporting before reading it: 'adopter out-of-scope edit must report scope drift; observed codes: ATM_WRITE_TICKET_SCOPE_VIOLATION' and the same substitution for the planning mirror and impersonation cases. Position analysis of packages/cli/src/commands/integration-hooks/implementation.ts showed the drift variables were already computed at offsets 13731, 14085 and 15101 while the ticket gate returned at 19919 and the specific guards only ran at 25430, 26373 and 29404.",
+  "followUp": "Resolved by moving the generic work-admission early return after the three specific scope guards. This is a pure reorder: every variable involved was already computed earlier, and every branch touched is a deny, so it changes which code is reported and never whether an edit is allowed. validate-framework-development-governance is now fully green. In validate-task-direction-governance the three scope assertions pass and the suite advanced to an unrelated later section (task scope expansion for deliverable-like pending files), tracked separately. The two assertions temporarily widened to a canonical code set as a stopgap have been reverted to their strict single-code form and pass against the repaired hook, so no weakened assertion remains. The observed-codes diagnostics added to those assertions were deliberately kept: an assertion that cannot say what it saw is not command-backed evidence."
+}

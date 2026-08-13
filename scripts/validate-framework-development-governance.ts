@@ -174,6 +174,27 @@ try {
     allowedFiles: ['docs/plan/tasks/TASK-SCOPE-0001.task.md', 'src/scope.ts'],
     prompt: 'TASK-SCOPE-0001'
   });
+  // A direction lock without its live matching claim is recovery residue and must
+  // not grant write authority (see readActiveTaskDirectionLocks). The governed
+  // route mints both together via next --claim, so the fixture has to as well;
+  // writing only the lock asserted a pre-hardening shortcut.
+  mkdirSync(path.join(promptScopedRepo, '.atm', 'history', 'tasks'), { recursive: true });
+  writeFileSync(path.join(promptScopedRepo, '.atm', 'history', 'tasks', 'TASK-SCOPE-0001.json'), JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-SCOPE-0001',
+    title: 'Prompt scoped task',
+    status: 'running',
+    claim: {
+      state: 'active',
+      actorId: 'governance-test',
+      leaseId: 'lease-governance-test-scope-0001',
+      intent: 'write',
+      claimedAt: new Date().toISOString(),
+      heartbeatAt: new Date().toISOString(),
+      ttlSeconds: 1800,
+      files: ['docs/plan/tasks/TASK-SCOPE-0001.task.md', 'src/scope.ts']
+    }
+  }, null, 2), 'utf8');
   const preToolPromptScopedOk = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', promptScopedRepo,
@@ -182,7 +203,7 @@ try {
     '--prompt', '隢祕雿?TASK-SCOPE-0001',
     '--files', 'src/scope.ts'
   ]);
-  assert(preToolPromptScopedOk.ok === true, 'pre-tool hook must allow in-scope edits after a task direction lock exists');
+  assert(preToolPromptScopedOk.ok === true, `pre-tool hook must allow in-scope edits after a task direction lock exists; observed codes: ${preToolPromptScopedOk.messages.map((entry) => entry.code).join(', ') || '<none>'}`);
   const preToolPromptScopedDrift = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', promptScopedRepo,
