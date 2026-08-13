@@ -1,0 +1,205 @@
+{
+  "schemaId": "atm.fourPlanCloseoutBlockerMap.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-13T00:00:00.000Z",
+  "status": "actionable-not-complete",
+  "nonClaim": "This map is an execution dashboard, not a completion certificate.",
+  "sourceReports": [
+    {
+      "path": "docs/reports/plan-3-0-objective-replay.json",
+      "digest": "sha256:ab25f5d87e1fdc26bb559f943c00f690dc1e30d8a815dcb9bcf75656edaabd36"
+    },
+    {
+      "path": "docs/reports/plan-3-1-objective-replay.json",
+      "digest": "sha256:21fb2c2cf9b09d021eb85afc8e951f4260db5f06c385048fd9f12431d423946e"
+    },
+    {
+      "path": "docs/reports/plan-3-2-objective-replay.json",
+      "digest": "sha256:dc9a5b92d528b998f93ca36bc148a4a0f2c248320d499cf292ec873b5a9ba812"
+    },
+    {
+      "path": "docs/reports/plan-4-foundation-replay.json",
+      "digest": "sha256:b2c2c0091b397c9d8b0944c1e0043d23332a632b649ad24a24a7fa167ef08dde"
+    },
+    {
+      "path": "docs/reports/plan4-real-shadow-comparison.json",
+      "digest": "sha256:26a9074b8d5a8680f92ef7f284d2fbf7edd47490ec23fb58aac1c66be0cd5280"
+    },
+    {
+      "path": "docs/reports/plan4-six-editor-adapter-parity.json",
+      "digest": "sha256:b70410de1ac69a13a186d5d9dc8203d2bd7f78fdbeb61c66dbffcd3fe9086f47"
+    },
+    {
+      "path": "docs/reports/plan4-hostile-dogfood-saturation.json",
+      "digest": "sha256:216e9dbb835198890ced00bd9cb0838ada447408e5bd95a92a8faf01024cdd84"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+      "digest": "sha256:a2074fc99dbc7ff8faf9ae3670839f73058cf4103082034dd2f1ff6331170906"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-independent-certificate.json",
+      "digest": "sha256:870f3bc6359b4f124ec9f075feeb27bbc41eba57ac1e01b8f26f498c6cfe6046"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json",
+      "digest": "sha256:3d55e35c388d7a5e53e4e2112b57d049c2f89984b4aed24909a115126a826829"
+    },
+    {
+      "path": "docs/reports/plan4-successor-wave-objective-map.json",
+      "digest": "sha256:c06472ebd2b0c9a594afaa353d0ac9a67c5d6076cbb3920958dd38bd1aaf59ca"
+    },
+    {
+      "path": "docs/reports/plan-3x-current-row-proof-map.json",
+      "digest": "sha256:6612b4bf3748f822178c72c1dca87eca32ffa8a3fe8993c196338b88ae96e13f"
+    },
+    {
+      "path": "docs/reports/plan-3x-fresh-command-replay-receipts.json",
+      "digest": "sha256:1a3f16bb4d6355e20388c16b8bbebc3d4c2b2a0c691314fcf91954fee9f45aa2"
+    },
+    {
+      "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
+      "digest": "sha256:991fff85e018c6ab235207861728b8aa3cc07e9d2281e772ccf90de4a7fb9829"
+    },
+    {
+      "path": "docs/reports/plan-3x-positive-current-receipts.json",
+      "digest": "sha256:eb2072e233d11bf5e9cd1d861ecf55d50bdad74c62dcc9b44481face21035343"
+    }
+  ],
+  "totals": {
+    "objectiveRows": 86,
+    "unresolvedObjectiveRows": 0,
+    "plansWithExactDenominator": 4,
+    "backlogTotal": 391,
+    "backlogTerminal": 219,
+    "backlogOwnedOpen": 2,
+    "backlogDeferred": 170,
+    "certificateDimensionsProven": 7,
+    "certificateDimensionsNotComplete": 0,
+    "plan4SuccessorMappedAnchors": 17,
+    "plan3xCurrentRowProofMappedRows": 69,
+    "plan3xCurrentRowProofFamilies": 5,
+    "plan3xFreshCommandReceiptsGreen": 8,
+    "plan3xFreshCommandRowsCertified": 0,
+    "plan3xPositiveReceiptRowsReadyForSourceRecompute": 0,
+    "plan3xPositiveReceiptRowsConsumedIntoSourceReplay": 69,
+    "plan3xObjectiveAlignedNegativeControlRowsConsumed": 8,
+    "plan3xPositiveReceiptRowsBlockedByDoctorDrift": 2,
+    "backlogReleaseBlockingNow": 0,
+    "backlogNeedsTaskCardBeforeFinalRelease": 0,
+    "backlogDeferredWaivedForRelease": 133
+  },
+  "planSummaries": [
+    {
+      "planId": "3.0",
+      "source": "docs/reports/plan-3-0-objective-replay.json",
+      "objectiveRows": 17,
+      "verifiedRows": 17,
+      "unresolvedRows": 0,
+      "primaryBlocker": "Plan 3.0 source rows are all currently verified; full runbook closeout still waits for aggregate Plan 4/backlog/final validation audit."
+    },
+    {
+      "planId": "3.1",
+      "source": "docs/reports/plan-3-1-objective-replay.json",
+      "objectiveRows": 23,
+      "verifiedRows": 23,
+      "unresolvedRows": 0,
+      "primaryBlocker": "Plan 3.1 source rows are all currently verified; final release still waits for aggregate closeout evidence."
+    },
+    {
+      "planId": "3.2",
+      "source": "docs/reports/plan-3-2-objective-replay.json",
+      "objectiveRows": 29,
+      "verifiedRows": 29,
+      "unresolvedRows": 0,
+      "primaryBlocker": "Plan 3.2 source rows are all currently verified; full runbook closeout still waits for aggregate Plan 4/backlog/final validation audit."
+    },
+    {
+      "planId": "4.0",
+      "source": "docs/reports/plan-4-foundation-replay.json",
+      "objectiveRows": 17,
+      "verifiedRows": 17,
+      "unresolvedRows": 0,
+      "primaryBlocker": "Plan 4 successor-wave evidence has been consumed into all 17 foundation anchors; final closeout still waits for the independent release certificate recompute."
+    }
+  ],
+  "blockerClasses": [
+    {
+      "id": "B1-current-row-proof",
+      "scope": [
+        "Plan 3.0",
+        "Plan 3.1",
+        "Plan 3.2"
+      ],
+      "status": "resolved",
+      "reason": "Plan 3.0, Plan 3.1, and Plan 3.2 source replay rows are all verified and the positive current receipts have been consumed into source replay.",
+      "requiredOutcome": "maintain docs/reports/plan-3x-current-row-proof-map.json plus the positive/fresh receipt reports as the Plan 3.x objective proof authority."
+    },
+    {
+      "id": "B2-plan4-successor-wave",
+      "scope": [
+        "Plan 4.0"
+      ],
+      "status": "resolved",
+      "reason": "Plan 4 successor-wave evidence is mapped and consumed into all 17 foundation objective anchors.",
+      "requiredOutcome": "maintain docs/reports/plan4-successor-wave-objective-map.json, docs/reports/plan-4-foundation-replay.json, and scripts/validate-plan4-successor-wave-consumption.ts as Plan 4 objective coverage authority."
+    },
+    {
+      "id": "B3-charter-verdict",
+      "scope": [
+        "AtomicCharter",
+        "deep-module",
+        "first-principles"
+      ],
+      "status": "resolved",
+      "reason": "independent certificate now references the current charter verdict report instead of the legacy objective evidence matrix",
+      "requiredOutcome": "maintain docs/reports/plan-3x-4x-charter-current-verdict.json and scripts/validate-four-plan-charter-current-verdict.ts as the charter-verdict authority"
+    },
+    {
+      "id": "B4-backlog-disposition",
+      "scope": [
+        "ATM bug backlog"
+      ],
+      "status": "separated",
+      "status": "resolved",
+      "reason": "backlog census is machine-readable and valid; release-blocking-now is zero, and 133 unowned deferred rows are explicitly waived by digest-bound register without claiming them fixed.",
+      "requiredOutcome": "maintain docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json and scripts/validate-backlog-deferred-waiver-register.ts as the deferred backlog release authority."
+    },
+    {
+      "id": "B5-release-certificate",
+      "scope": [
+        "final certificate",
+        "release closeback"
+      ],
+      "status": "open",
+      "reason": "ATM-GOV-0360 recompiled the independent certificate against observed evidence and the remote at execution time, and it returned not-complete. The previous recompute accepted a placeholder reviewer digest, a reviewer whose only output was the certificate itself, and dimension digests that do not follow from the evidence they cite; its release surfaces were also bound to a commit the remote has since passed.",
+      "requiredOutcome": "two genuinely independent reviewer outputs, dimension digests reproducible from the artifacts they cite, and a certificate recompiled against the remote at that moment via scripts/compile-four-plan-independent-certificate.ts --mode write."
+    }
+  ],
+  "nextExecutionOrder": [
+    {
+      "id": "N1-independent-reviewer-outputs",
+      "blockerClass": "B5-release-certificate",
+      "outcome": "Produce two reviewer outputs from reviewers that took no part in authoring the certificate or its evidence, each recording the input digests it recomputed from and writing to its own path. Renaming an actor does not create independence.",
+      "failClosedIf": "fewer than minimumIndependentReviewers reviewers survive the certificate's own independence checks"
+    },
+    {
+      "id": "N2-reproducible-dimension-digests",
+      "blockerClass": "B5-release-certificate",
+      "outcome": "Restate the charter, freshness and objective dimension digests so each is either the digest of one cited artifact or the canonical composite over all of them.",
+      "failClosedIf": "any dimension digest cannot be reproduced from the evidence the dimension cites"
+    },
+    {
+      "id": "N3-current-remote-release-verdict",
+      "blockerClass": "B5-release-certificate",
+      "outcome": "Recompile the certificate against the remote as it stands at that moment so target-head, origin-main and the frozen-runner surface are observed rather than restated.",
+      "failClosedIf": "the recorded remote differs from the live remote at verification time"
+    }
+  ],
+  "principlesApplied": [
+    "first-principles: completion requires current evidence, not historical prose or task status alone",
+    "deep-module: blocker classes expose stable seams instead of spreading one-off row logic through certificate code",
+    "queue-minimization: long replay preparation stays outside scarce commit/runner queues; only final bottleneck writes serialize",
+    "false-green prevention: not-complete remains a valid, useful, machine-checked output"
+  ]
+}

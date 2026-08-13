@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-007",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Resolved",
+  "area": "A scope amendment never reaches the governed delivery bundle",
+  "finding": "tasks scope add extends the active direction lock's allowedFiles, but git commit --auto-stage resolves the delivery bundle from the ledger record's scopePaths. The two are never reconciled, so an amended path is editable, passes its validators, and is then silently excluded from the commit with no diagnostic. The only route to land it is tasks import --force, which is a protected emergency surface requiring a lease.",
+  "expectedBehavior": "A path the governance layer just authorised for this task must be deliverable by that task. Either the bundle reads the direction lock, or scope add writes both; which one is an implementation choice, but the two views of the task's scope must agree. Silent exclusion is the worst available outcome because the amendment reported success.",
+  "evidenceOrRepro": "Cleanest reproduction, on ATM-GOV-0364 at HEAD f9da40a4a: tasks scope add --write returned ATM_SCOPE_AMENDMENT_APPLIED for docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json, and the immediately following git commit --auto-stage --dry-run resolved a sealed bundle of four entries, all of them governance records (the task ledger, the scope-amendment event, git-head.jsonl and the live-index reconciliation). The amended path does not appear at all. Earlier, on ATM-GOV-0360 at HEAD f8f7789a3, two paths (governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json and docs/reports/plan-3x-4x-closeout-blocker-map.json) were added with tasks scope add --write, which returned ATM_SCOPE_AMENDMENT_APPLIED. Both were edited, both passed their validators, and git commit --auto-stage produced a commit containing the six original scopePaths and neither amended path. The ledger scopePaths array still had length 6 after both amendments.",
+  "followUp": "Resolved by ATM-GOV-0364 in commit b5bf02d16e2e837b3533596b31d9a284133dbc57. syncScopeAmendmentState now also unions the amended paths into the ledger's scopePaths, so the direction lock and the delivery bundle describe the same scope. Union, never replace: an amendment adds reach and does not redefine what the card declared. Verified live after republishing the frozen runner from 88230861e — the same scope add that previously left scopePaths untouched now carries three new paths into it. Regression guard: test_atm_gov_0364_scope_amendment_reaches_the_delivery_bundle in tests/cli/governance-round-trip-cost.test.ts, which covers the union, idempotence, Windows separators, and a task with no declared scope."
+}

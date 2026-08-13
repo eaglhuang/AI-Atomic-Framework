@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-010",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Low",
+  "status": "Resolved",
+  "area": "Withdrawn: a delivery commit does not expire task validator evidence",
+  "finding": "This item claimed that evidence freshness is keyed on HEAD, so the delivery commit pre-close requires is what expires the evidence pre-close requires, forcing every card to record its validators twice. That claim is false and the item is withdrawn. Across three pre-close runs on ATM-GOV-0360, spanning two governed delivery commits, staleEvidence was the identical pair ['validate:cli','validate:git-head-evidence'] every time. The four card validators recorded before the first commit were never reported stale. The second recording of those four was work the author chose to do, not work the system asked for.",
+  "expectedBehavior": "Behaviour as built is already correct on the point this item raised. The two entries that persisted were repo-level validators that had genuinely never been recorded, not card validators invalidated by a commit.",
+  "evidenceOrRepro": "staleEvidence across the three captured pre-close responses at HEAD f8f7789a3 and eba4e74dc: run 1 ['validate:cli','validate:git-head-evidence'], run 2 identical, run 3 identical, run 4 [] after both were recorded with --runner-kind frozen-runner. At no point did any of node --strip-types tests/cli/four-plan-independent-certificate.test.ts, tests/cli/plan4-final-certification.test.ts, scripts/compile-four-plan-independent-certificate.ts --mode validate or npm run typecheck appear in the list.",
+  "followUp": "No product change. The reusable lesson is the same one recorded in [ATM-BUG-2026-08-13-009]: the system named exactly what it wanted and the author inferred a broader requirement from a partially-read response, then paid for the inference. If evidence freshness genuinely needs content-keying for some other reason, that is a separate proposal and needs its own reproduction. Withdrawn from ATM-GOV-0364, whose ACC-4 was removed."
+}
