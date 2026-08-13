@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0354",
+  "title": "Resolve validator contract anchors from owning surfaces not frozen paths",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 A contract token that moves to another file inside the same declared owning surface keeps `validate-branch-commit-queue` green, with no change to the token list.",
+    "ACC-2 Deleting the token from the owning surface entirely still fails, with the same detail message.",
+    "ACC-3 A declared subject path that does not exist, or that resolves to no readable source, fails closed and names the missing subject. It must never reduce to an empty string that satisfies every anchor.",
+    "ACC-4 `validate-bridge-minor` asserts that the bridge-minor gate precedes the workflow's heavy validator gate whatever that step is called, and fails closed when no such step can be identified.",
+    "ACC-5 Both validators pass at current HEAD and their token lists are unchanged."
+  ],
+  "deliverables": [
+    "scripts/lib/validator-contract-subject.ts",
+    "scripts/validate-branch-commit-queue.ts",
+    "scripts/validate-bridge-minor.ts",
+    "tests/cli/validator-contract-subject.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/lib/validator-contract-subject.ts",
+    "scripts/validate-branch-commit-queue.ts",
+    "scripts/validate-bridge-minor.ts",
+    "tests/cli/validator-contract-subject.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validator-contract-subject.test.ts",
+    "node --strip-types scripts/validate-branch-commit-queue.ts --mode validate",
+    "node --strip-types scripts/validate-bridge-minor.ts --mode validate",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/cli/src/commands/git-governance/**",
+    ".github/workflows/**"
+  ],
+  "nonGoals": [
+    "Relaxing what the anchors assert. Every token this card touches must still be required; only where it is looked for changes.",
+    "Fixing the other standard-profile failures. The hook, broker, and ledger reds are separate behaviours with their own owners."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the subject resolver together with both consumers. Widening a subject must never be used to make a genuinely deleted contract look present.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-envelope",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-contract-subject",
+        "pattern": "Result Contract Object",
+        "source": "scripts/validate-branch-commit-queue.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/lib/validator-contract-subject.ts",
+        "scripts/validate-branch-commit-queue.ts",
+        "scripts/validate-bridge-minor.ts",
+        "tests/cli/validator-contract-subject.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "Extract one subject resolver rather than patching both call sites. It takes\ndeclared roots — a file or a directory — expands directories over source files,\nand returns a result carrying both the concatenated text and the resolved file\nlist so a caller can report what it actually inspected. Returning the file list\nis what makes ACC-3 checkable; a bare string cannot distinguish \"no match\" from\n\"nothing was read\".\n\nScope the expansion to the owning module directory, not to `packages/`. The\npoint is to survive a move *within* the surface that owns the behaviour, not to\nfind the token anywhere in the repository. A token found in an unrelated module\nis not evidence that this module still honours the contract.\n\nFor the workflow ordering, identify the heavy gate by what it runs — the\nvalidator-profile command — rather than by its display name. Names are prose;\nthe command is the contract.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-08-13T01:09:11.707Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"governance-optimization/tasks/ATM-GOV-0354-resolve-validator-contract-anchors-from-owning-surfaces-not-frozen-paths.task.md\",\"contentDigest\":\"sha256:16542d87da1f5bf8cd99e1d28d32202b9e8f2a3e7caae38ffce3d886fe31308d\"} -->",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0354-resolve-validator-contract-anchors-from-owning-surfaces-not-frozen-paths.task.md",
+    "sectionTitle": "ATM-GOV-0354",
+    "headingLine": 101,
+    "hash": "f1b3c47765937c60",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0354-resolve-validator-contract-anchors-from-owning-surfaces-not-frozen-paths.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f1b3c47765937c60269f9d3ad0e650c21f37447ce667a64cf8ab0dfc82f9d689",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T11:01:23.522Z"
+    }
+  },
+  "importedAt": "2026-08-13T11:01:23.522Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The standard validator profile is red because contract anchors are pinned to file paths and CI step labels that a legitimate refactor moved."
+    ],
+    "softRelations": [
+      "ATM-GOV-0329",
+      "ATM-GOV-0331",
+      "ATM-GOV-0353"
+    ],
+    "changedPublicSeams": [
+      "atm.validatorContractSubject.v1"
+    ],
+    "causalImpactEdges": [
+      "module-split-to-contract-anchor-false-red",
+      "ci-step-rename-to-workflow-order-false-red"
+    ],
+    "parallelFrontierInputs": [
+      "validator-envelope-library",
+      "git-governance-module-tree",
+      "release-workflow"
+    ],
+    "validatorReferences": [
+      "validate-branch-commit-queue",
+      "validate-bridge-minor",
+      "test_atm_gov_0354_contract_subject_follows_owning_surface"
+    ],
+    "phaseOwner": "wave-3-validator-and-ci-baseline"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0354_contract_subject_follows_owning_surface",
+      "targetGroupId": "null",
+      "semanticKey": "contract_anchors_survive_a_move_inside_the_owning_surface",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "module-split-to-contract-anchor-false-red"
+      ],
+      "expectedRedPredicate": "moving a contract token to a sibling file inside the same owning module makes the anchor check fail even though the contract still holds",
+      "contributionResourceKey": "validator-contract-subject",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.validatorContractSubject.v1",
+      "resourceKey": "validator-contract-subject"
+    },
+    {
+      "caseId": "test_atm_gov_0354_missing_subject_fails_closed",
+      "targetGroupId": "null",
+      "semanticKey": "an_absent_or_empty_contract_subject_is_a_red_not_a_silent_pass",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "module-split-to-contract-anchor-false-red",
+        "ci-step-rename-to-workflow-order-false-red"
+      ],
+      "expectedRedPredicate": "a missing subject path or an absent CI gate step is treated as satisfied because indexOf returns -1 or the read yields empty text",
+      "contributionResourceKey": "validator-contract-subject-fail-closed",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.validatorContractSubject.v1",
+      "resourceKey": "validator-contract-subject-fail-closed"
+    },
+    {
+      "caseId": "test_atm_gov_0354_both_validators_green_with_unchanged_tokens",
+      "targetGroupId": "null",
+      "semanticKey": "the_two_repaired_validators_pass_without_weakening_their_token_lists",
+      "coversAcceptance": [
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "module-split-to-contract-anchor-false-red",
+        "ci-step-rename-to-workflow-order-false-red"
+      ],
+      "expectedRedPredicate": "validate-branch-commit-queue and validate-bridge-minor exit non-zero at current HEAD",
+      "contributionResourceKey": "validator-contract-subject-regression",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.validatorContractSubject.v1",
+      "resourceKey": "validator-contract-subject-regression"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0354_contract_subject_follows_owning_surface",
+    "test_atm_gov_0354_missing_subject_fails_closed",
+    "test_atm_gov_0354_both_validators_green_with_unchanged_tokens"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T11-17-04-740Z-lock-cleanup-f70ed8579c25",
+  "lastTransitionAt": "2026-08-13T11:17:04.740Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-13T11:01:36.179Z",
+  "promotedAt": "2026-08-13T11:01:36.184Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-23a0f461507e",
+    "claimedAt": "2026-08-13T11:01:36.189Z",
+    "heartbeatAt": "2026-08-13T11:17:04.509Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0354.json",
+      "scripts/lib/validator-contract-subject.ts",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-bridge-minor.ts",
+      "tests/cli/validator-contract-subject.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260813110136-codex-gpt-5.4-mini-bd3949b2db",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813110136-codex-gpt-5.4-mini-bd3949b2db\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-13T11:01:36.189Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260813110136-codex-gpt-5.4-mini-ATM-GOV-0354-077ceba8df",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0354",
+    "batchId": null,
+    "scopeKey": "tasks-ef550ed3c5c4",
+    "queueId": "queue-0589823a93f6ec70",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0354.*",
+      ".atm/history/task-events/ATM-GOV-0354/**",
+      ".atm/history/tasks/ATM-GOV-0354.json",
+      "scripts/lib/validator-contract-subject.ts",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-bridge-minor.ts",
+      "tests/cli/validator-contract-subject.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bbc4dcc64c23703e49b4e1bac1854569d69f8df06d630b6040c6ae4a62a80e0c",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260813110136-codex-gpt-5.4-mini-ATM-GOV-0354-077ceba8df",
+    "laneSession": {
+      "laneSessionId": "lane-20260813110136-codex-gpt-5.4-mini-bd3949b2db",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813110136-codex-gpt-5.4-mini-bd3949b2db\""
+    },
+    "createdAt": "2026-08-13T11:01:37.790Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-13T11:17:04.737Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-13T11:17:04.509Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260813110136-codex-gpt-5.4-mini-ATM-GOV-0354-077ceba8df",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0354.closure-packet.json"
+}

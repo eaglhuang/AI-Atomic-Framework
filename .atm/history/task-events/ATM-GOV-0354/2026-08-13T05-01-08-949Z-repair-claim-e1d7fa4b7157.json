@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T05-01-08-949Z-repair-claim-e1d7fa4b7157",
+  "taskId": "ATM-GOV-0354",
+  "action": "repair-claim",
+  "actorId": "claude-008-captain",
+  "sessionId": "session-20260813011138-claude-008-captain-ATM-GOV-0354-ceca5a2350",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0354.json",
+  "taskSha256": "sha256:02f69d8c86a56f233b7e0d0c0756ffba0058032f99510f374fec2acb19abe607",
+  "createdAt": "2026-08-13T05:01:08.949Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0354 --actor claude-008-captain --write --reason \"lane TTL expired during the index-lock wait\" --json"
+}
