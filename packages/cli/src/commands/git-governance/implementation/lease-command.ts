@@ -95,12 +95,16 @@ export function runGitLease(options: LegacyValue) {
     path: entry.path,
     stagedBlobId: entry.stagedBlobId,
     stagedMode: entry.stagedMode,
+    stagedState: entry.stagedState,
   }));
   if (
     options.leaseKind === "stage-override" &&
     (stagedEntries.length === 0 ||
-      stagedEntries.some(
-        (entry: LegacyValue) => !entry.stagedBlobId || !entry.stagedMode,
+      stagedEntries.some((entry: LegacyValue) =>
+        entry.stagedState === "unknown" ||
+        (entry.stagedState === "present" && (!entry.stagedBlobId || !entry.stagedMode)) ||
+        (entry.stagedState === "deleted" && (entry.stagedBlobId || entry.stagedMode)) ||
+        (!entry.stagedState && (!entry.stagedBlobId || !entry.stagedMode)),
       ) ||
       JSON.stringify(uniqueSorted(stagedEntries.map((entry: LegacyValue) => entry.path))) !==
         JSON.stringify(requestedPaths))
@@ -134,6 +138,7 @@ export function runGitLease(options: LegacyValue) {
             path: entry.path,
             stagedBlobId: entry.stagedBlobId,
             stagedMode: entry.stagedMode,
+            stagedState: entry.stagedState,
           }))
         : [],
     phrase,
