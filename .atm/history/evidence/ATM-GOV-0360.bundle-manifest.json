@@ -1,13 +1,15 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0360",
-  "updatedAt": "2026-08-13T13:49:13.091Z",
+  "updatedAt": "2026-08-13T14:04:07.206Z",
   "updatedBy": "claude-008-gov-0360",
   "freshValidationPasses": [
     "node --strip-types scripts/compile-four-plan-independent-certificate.ts --mode validate",
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
     "node --strip-types tests/cli/plan4-final-certification.test.ts",
-    "typecheck"
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -137,6 +139,102 @@
       "durationMs": 15210,
       "runnerKind": "dev-source",
       "sourceCommit": "f8f7789a3cac4efebbc26f1efadbc43f26e66f70",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9f64bd493e4d989e3db0664624125c0cd1d2f8297121e727678135e14bdb032f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/four-plan-independent-certificate.test.ts"
+      ],
+      "generatedAt": "2026-08-13T13:55:27.984Z",
+      "startedAt": "2026-08-13T13:55:26.739Z",
+      "finishedAt": "2026-08-13T13:55:27.984Z",
+      "durationMs": 1245,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-final-certification.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:485059e2aa1ebe426bc1cee83e07fd655da7b5725c1bb19d0dbeb0b1313faa0e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan4-final-certification.test.ts"
+      ],
+      "generatedAt": "2026-08-13T13:55:32.748Z",
+      "startedAt": "2026-08-13T13:55:31.756Z",
+      "finishedAt": "2026-08-13T13:55:32.748Z",
+      "durationMs": 992,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/compile-four-plan-independent-certificate.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e7a20515497fbaf0e499272254397e195d89e36963563f0198599f2cbd1bf262",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/compile-four-plan-independent-certificate.ts --mode validate"
+      ],
+      "generatedAt": "2026-08-13T13:55:40.555Z",
+      "startedAt": "2026-08-13T13:55:36.121Z",
+      "finishedAt": "2026-08-13T13:55:40.555Z",
+      "durationMs": 4434,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-13T13:55:56.989Z",
+      "startedAt": "2026-08-13T13:55:43.315Z",
+      "finishedAt": "2026-08-13T13:55:56.989Z",
+      "durationMs": 13674,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-13T14:02:53.515Z",
+      "startedAt": "2026-08-13T14:01:33.809Z",
+      "finishedAt": "2026-08-13T14:02:53.515Z",
+      "durationMs": 79706,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed3191a4c1f1fab9439f3a0e8acb4476288e5a83f736ef41e730857cb8dc43d6",
+      "stderrSha256": "sha256:2be0db2c705016ca0f99ad2ee7e1c253b179efd6920fb4ce168dcb25b5987d5a",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-13T14:04:07.204Z",
+      "startedAt": "2026-08-13T14:03:30.563Z",
+      "finishedAt": "2026-08-13T14:04:07.204Z",
+      "durationMs": 36641,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
       "cached": false
     }
   ],

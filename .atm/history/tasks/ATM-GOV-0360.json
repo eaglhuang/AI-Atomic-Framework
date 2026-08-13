@@ -236,64 +236,49 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T13-45-11-720Z-claim-b2a378065ed4",
-  "lastTransitionAt": "2026-08-13T13:45:11.720Z",
+  "lastTransitionId": "2026-08-13T16-33-58-525Z-renew-72b338149028",
+  "lastTransitionAt": "2026-08-13T16:33:58.525Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008-gov-0360",
+  "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-13T13:44:07.902Z",
   "promotedAt": "2026-08-13T13:44:07.906Z",
   "claim": {
-    "actorId": "claude-008-gov-0360",
-    "leaseId": "lease-c41f628c87b6",
-    "claimedAt": "2026-08-13T13:45:10.420Z",
-    "heartbeatAt": "2026-08-13T13:45:10.420Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-b40afd19ee74",
+    "claimedAt": "2026-08-13T14:58:01.584Z",
+    "heartbeatAt": "2026-08-13T16:33:58.338Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/ATM-GOV-0360.json",
-      "docs/reports/plan-3x-4x-closeout-blocker-map.json",
-      "docs/reports/plan-3x-4x-independent-certificate.json",
-      "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
-      "packages/core/src/evidence/four-plan-independent-certificate.ts",
-      "schemas/evidence/four-plan-independent-certificate.schema.json",
-      "scripts/compile-four-plan-independent-certificate.ts",
-      "tests/cli/four-plan-independent-certificate.test.ts",
-      "tests/cli/plan4-final-certification.test.ts"
+      ".atm/history/tasks/ATM-GOV-0360.json"
     ],
     "state": "active",
-    "intent": "write",
-    "laneSession": {
-      "laneSessionId": "lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc\""
-    }
+    "reason": "Predecessor lease expired after source delivery eba4e74dc; continue governance-only closeout without modifying delivered certificate semantics."
   },
   "startedAt": "2026-08-13T13:45:10.420Z",
   "startedByActor": "claude-008-gov-0360",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d524e35183c8b0d1",
-    "ticketDigest": "sha256:d524e35183c8b0d13b931114161302e04a2e460fead97653175ebb4287ac09de",
+    "ticketId": "wat-d64460335dc99149",
+    "ticketDigest": "sha256:d64460335dc99149bf8fcbcff86d91bc71f4ab45d8aaa4b8c6a28e9bed083957",
     "taskId": "ATM-GOV-0360",
     "origin": "claim",
-    "actorId": "claude-008-gov-0360",
-    "laneSessionId": "lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc",
-    "claimGeneration": "lease-c41f628c87b6",
-    "issuedAt": "2026-08-13T13:45:10.420Z",
-    "expiresAt": "2026-08-13T14:15:10.420Z",
-    "scopeDigest": "sha256:a7fcbb0f354e0bb61a7fd16d657b97e17c81aa7d7507bb05956cf62c98ed8246",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": null,
+    "claimGeneration": "lease-b40afd19ee74",
+    "issuedAt": "2026-08-13T16:33:58.338Z",
+    "expiresAt": "2026-08-13T17:03:58.338Z",
+    "scopeDigest": "sha256:71d91ceaaafd21e00ebec5fdf675e084ef6e46a5a4e08183ddb0cb199f6b03d0",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T13:45:10.420Z"
+      "selectedAt": "2026-08-13T16:33:58.338Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0360.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0360/**",
           ".atm/history/tasks/ATM-GOV-0360.json",
           "docs/reports/plan-3x-4x-closeout-blocker-map.json",
@@ -305,7 +290,7 @@
           "tests/cli/four-plan-independent-certificate.test.ts",
           "tests/cli/plan4-final-certification.test.ts"
         ],
-        "digest": "sha256:2b415f21520f0cc2b419426563b6eca667f9024e0453ff62e60962becd724886"
+        "digest": "sha256:66f8ddba75bce1be7395b100c16af00c4e8e74684301bbb2c0a21d63e6054773"
       },
       {
         "kind": "lifecycle-operation",
