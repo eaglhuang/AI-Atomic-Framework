@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T12-04-25-658Z-close-f1f9b66c3c11",
+  "taskId": "ATM-GOV-0347",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260811171039-codex-gpt-5.4-mini-ATM-GOV-0347-d052228ba2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0347.json",
+  "taskSha256": "sha256:194658c594d1b61fbf6059e75a8a8036256eb0742e9ce0cbb1a86681eed5cd27",
+  "createdAt": "2026-08-13T12:04:25.658Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0347 --actor codex-gpt-5.4-mini --status done --historical-delivery 12d5f227b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260811171039-codex-gpt-5.4-mini-ATM-GOV-0347-d052228ba2",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0347.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T12:04:25.642Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0347.*",
+        ".atm/history/task-events/ATM-GOV-0347/**",
+        ".atm/history/tasks/ATM-GOV-0347.json",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/next-active-batch.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+        "packages/cli/src/commands/tasks/scope-queue.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/next-active-batch.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+        "packages/cli/src/commands/tasks/scope-queue.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

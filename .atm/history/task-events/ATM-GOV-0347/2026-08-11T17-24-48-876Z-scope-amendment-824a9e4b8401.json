@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-11T17-24-48-876Z-scope-amendment-824a9e4b8401",
+  "taskId": "ATM-GOV-0347",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0347.json",
+  "taskSha256": "sha256:44084f19a905d923ceca5e4365de632c2faba76fd5086d8a3fe726ebb25b299a",
+  "createdAt": "2026-08-11T17:24:48.876Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0347 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts,packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts\" --class linked-surface --phase during-implementation --reason \"Prevent un-staged foreign generated evidence from globally blocking a path-bounded commit while preserving staged and unknown residue fail-closed.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Prevent un-staged foreign generated evidence from globally blocking a path-bounded commit while preserving staged and unknown residue fail-closed."
+  }
+}

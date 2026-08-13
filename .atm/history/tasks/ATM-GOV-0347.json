@@ -1,0 +1,349 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0347",
+  "title": "Recover active claim direction locks and honor explicit task claims",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A live claim with matching actor/lane and a released direction lock is diagnosed as recoverable; the official claim-first or scope-repair path restores one active lock without changing the claim owner or dropping allowed files.",
+    "ACC-2: Missing, expired, actor-mismatched, or lane-mismatched claims remain fail-closed and do not create a direction lock.",
+    "ACC-3: An explicit `next --claim --task X` selects X before consulting any active batch; if X is ineligible, the result names X and its actual blocker rather than another batch head.",
+    "ACC-4: A taskless/broad prompt retains current batch queue behavior, and stale-batch recovery stays explicit rather than being silently bypassed.",
+    "ACC-5: Both focused regressions and `validate:cli` pass with command-backed evidence; all recovery decisions expose a precise next action."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+    "packages/cli/src/commands/tasks/scope-queue.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next-active-batch.ts",
+    "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the unified claim-lock recovery and explicit-task precedence change; stale batches remain fail-closed and no runtime state is hand-repaired.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-claim-routing",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.active-claim-direction-recovery",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+        "disposition": "inline",
+        "inlineReason": "The scope-amendment module is the sole public owner of direction-lock recovery policy."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0347-recover-active-claim-direction-locks-and-honor-explicit-task-claims.task.md",
+    "sectionTitle": "ATM-GOV-0347",
+    "headingLine": 100,
+    "hash": "408320a9ed39c185",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0347-recover-active-claim-direction-locks-and-honor-explicit-task-claims.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:408320a9ed39c185c1181b97d736272b324251ce2aa2e2e17638519e06b5e347",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-11T17:10:27.940Z"
+    }
+  },
+  "importedAt": "2026-08-11T17:10:27.940Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "An adopted, active claim can retain a released direction-lock snapshot after an interrupted close/checkpoint path.",
+      "An explicit task claim can be redirected to an unrelated stale batch head before claim admission."
+    ],
+    "startConditions": [
+      "Reproduce both defects in isolated fixtures without editing runtime state directly."
+    ],
+    "softRelations": [
+      "ATM-GOV-0345 is the blocked consumer; 0347 must be independently claimable to repair its lifecycle state.",
+      "ATM-GOV-0330 resumes after its explicit claim reaches the requested task."
+    ],
+    "changedPublicSeams": [
+      "task-scope-amendment-recovery",
+      "explicit-task-claim-routing"
+    ],
+    "causalImpactEdges": [
+      "active-claim -> direction-lock-repair -> scoped-mutation",
+      "explicit-task-intent -> task-selection -> batch-admission"
+    ],
+    "parallelFrontierInputs": [
+      "active-claim-and-released-direction-lock",
+      "stale-batch-run"
+    ],
+    "validatorReferences": [
+      "test_scope_repair_active_claim_0347",
+      "test_explicit_task_claim_precedes_batch_0347",
+      "validate=cli"
+    ],
+    "phaseOwner": "correction-wave-3-lifecycle-recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_scope_repair_active_claim_0347",
+      "targetGroupId": "null",
+      "semanticKey": "active_claim_rebuilds_released_direction_lock",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "active-claim -> direction-lock-repair -> scoped-mutation"
+      ],
+      "expectedRedPredicate": "a valid active claim with a released direction lock cannot use the advertised claim-first or repair route",
+      "contributionResourceKey": "atm.task-scope-amendment",
+      "responsibility": "task-required",
+      "dependencyEdge": "task-scope-amendment-recovery",
+      "contractEdge": "active-claim-direction-lock",
+      "resourceKey": "atm.task-scope-amendment"
+    },
+    {
+      "caseId": "test_explicit_task_claim_precedes_batch_0347",
+      "targetGroupId": "null",
+      "semanticKey": "explicit_task_claim_precedes_stale_batch",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "explicit-task-intent -> task-selection -> batch-admission"
+      ],
+      "expectedRedPredicate": "next --claim --task X selects a different active-batch head instead of X",
+      "contributionResourceKey": "atm.next-routing",
+      "responsibility": "task-required",
+      "dependencyEdge": "explicit-task-claim-routing",
+      "contractEdge": "explicit-task-precedence",
+      "resourceKey": "atm.next-routing"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_scope_repair_active_claim_0347",
+    "test_explicit_task_claim_precedes_batch_0347"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T12-04-25-658Z-close-f1f9b66c3c11",
+  "lastTransitionAt": "2026-08-13T12:04:25.658Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-11T17:10:39.104Z",
+  "promotedAt": "2026-08-11T17:10:39.107Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-de98733778f5",
+    "claimedAt": "2026-08-11T17:10:39.110Z",
+    "heartbeatAt": "2026-08-13T12:04:25.656Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0347.*",
+      ".atm/history/task-events/ATM-GOV-0347/**",
+      ".atm/history/tasks/ATM-GOV-0347.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/next-active-batch.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+      "packages/cli/src/commands/tasks/scope-queue.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260811171039-codex-gpt-5.4-mini-cd124bb108",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811171039-codex-gpt-5.4-mini-cd124bb108\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-11T17:10:39.110Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-86cc25a74bf6ade1",
+    "ticketDigest": "sha256:86cc25a74bf6ade14cd5ecaafe66b18fe444ecb10c7da78d1f972ddd3c7321af",
+    "taskId": "ATM-GOV-0347",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260811171039-codex-gpt-5.4-mini-cd124bb108",
+    "claimGeneration": "lease-de98733778f5",
+    "issuedAt": "2026-08-13T12:02:29.437Z",
+    "expiresAt": "2026-08-13T12:32:29.437Z",
+    "scopeDigest": "sha256:9ab54dbc36a2adf6a68c1974460e1fab3a754a6408e808d9036fe19ab4508726",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T12:02:29.437Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0347.*",
+          ".atm/history/task-events/ATM-GOV-0347/**",
+          ".atm/history/tasks/ATM-GOV-0347.json",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/next-active-batch.ts",
+          "packages/cli/src/commands/next.ts",
+          "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+          "packages/cli/src/commands/next/claim-orchestration.ts",
+          "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+          "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+          "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+          "packages/cli/src/commands/tasks/claim-work-admission.ts",
+          "packages/cli/src/commands/tasks/legacy/implementation.ts",
+          "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+          "packages/cli/src/commands/tasks/scope-queue.ts"
+        ],
+        "digest": "sha256:5cf78ce7275783a800c7c14f288187a56326409f69b0fbb53064e96056d607e1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260811171039-codex-gpt-5.4-mini-ATM-GOV-0347-d052228ba2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0347",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0347.*",
+      ".atm/history/task-events/ATM-GOV-0347/**",
+      ".atm/history/tasks/ATM-GOV-0347.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/next-active-batch.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+      "packages/cli/src/commands/tasks/scope-queue.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0347-recover-active-claim-direction-locks-and-honor-explicit-task-claims.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0347-recover-active-claim-direction-locks-and-honor-explicit-task-claims.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "acd772356fbd125edc5e36cccabcb36291d069164a73401e70344e1e3b64ad9d",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260811171039-codex-gpt-5.4-mini-cd124bb108",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811171039-codex-gpt-5.4-mini-cd124bb108\""
+    },
+    "createdAt": "2026-08-11T17:10:46.340Z",
+    "status": "active"
+  },
+  "closedAt": "2026-08-13T12:04:25.656Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260811171039-codex-gpt-5.4-mini-ATM-GOV-0347-d052228ba2",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0347.closure-packet.json"
+}

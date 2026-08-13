@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T12-02-27-964Z-scope-amendment-be146d45ec4b",
+  "taskId": "ATM-GOV-0347",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0347.json",
+  "taskSha256": "sha256:20f4d11c804722f4b2abe5526cfb04760a275d0fc692aa48c76629a0abe3e85b",
+  "createdAt": "2026-08-13T12:02:27.964Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0347 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/next/claim-orchestration.ts --reason \"Historical delivery routes explicit task selection through the claim orchestration seam; include the actual changed public seam in task scope.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Historical delivery routes explicit task selection through the claim orchestration seam; include the actual changed public seam in task scope."
+  }
+}
