@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T18-03-00-565Z-close-b11bc55c4f87",
+  "taskId": "ATM-GOV-0368",
+  "action": "close",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": "session-20260813174230-claude-008-gov-0366-ATM-GOV-0368-40fedfe228",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0368.json",
+  "taskSha256": "sha256:44e9d20635de501028fdba25e423e918cf7b0385cbd65816745d7a252dd4dac6",
+  "createdAt": "2026-08-13T18:03:00.565Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0368 --actor claude-008-gov-0366 --status done --historical-delivery 4429f761dc35625381e69d3135e9b81ebf1991f8 --historical-delivery 50e806e85d8166cda1961d170bc4f6f16de3c8bd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260813174230-claude-008-gov-0366-ATM-GOV-0368-40fedfe228",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0368.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+      "typecheck",
+      "validate:backlog-census",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T18:03:00.557Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0368.*",
+        ".atm/history/task-events/ATM-GOV-0368/**",
+        ".atm/history/tasks/ATM-GOV-0368.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+        "packages/cli/src/commands/emergency/gate.ts",
+        "release/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+        "packages/cli/src/commands/emergency/gate.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0368",
   "title": "Let one command satisfy every emergency permission it needs",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -144,8 +144,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T18-00-32-256Z-renew-b4b46bb3cc93",
-  "lastTransitionAt": "2026-08-13T18:00:32.256Z",
+  "lastTransitionId": "2026-08-13T18-03-00-565Z-close-b11bc55c4f87",
+  "lastTransitionAt": "2026-08-13T18:03:00.565Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-008-gov-0366",
   "reservedAt": "2026-08-13T17:42:30.823Z",
@@ -154,7 +154,7 @@
     "actorId": "claude-008-gov-0366",
     "leaseId": "lease-db42fceae93f",
     "claimedAt": "2026-08-13T17:42:30.834Z",
-    "heartbeatAt": "2026-08-13T18:00:31.988Z",
+    "heartbeatAt": "2026-08-13T18:03:00.561Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0368.*",
@@ -166,13 +166,14 @@
       "packages/cli/src/commands/emergency/gate.ts",
       "release/**"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260813174231-claude-008-gov-0366-0415460b86",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813174231-claude-008-gov-0366-0415460b86\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-13T17:42:30.834Z",
   "startedByActor": "claude-008-gov-0366",
@@ -281,5 +282,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-13T18:03:00.561Z",
+  "closedByActor": "claude-008-gov-0366",
+  "closedBySessionId": "session-20260813174230-claude-008-gov-0366-ATM-GOV-0368-40fedfe228",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0368.closure-packet.json"
 }
