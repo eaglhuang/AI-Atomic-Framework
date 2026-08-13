@@ -1,0 +1,268 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0357",
+  "title": "Land validator contract subject resolver deliverables",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 The resolver, both repaired validators and the regression test are reachable from HEAD, and validate-branch-commit-queue and validate-bridge-minor pass with their token lists unweakened.",
+    "ACC-2 A missing or empty contract subject still fails closed rather than satisfying every anchor through an empty string."
+  ],
+  "deliverables": [
+    "scripts/lib/validator-contract-subject.ts",
+    "scripts/validate-branch-commit-queue.ts",
+    "scripts/validate-bridge-minor.ts",
+    "tests/cli/validator-contract-subject.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/lib/validator-contract-subject.ts",
+    "scripts/validate-branch-commit-queue.ts",
+    "scripts/validate-bridge-minor.ts",
+    "tests/cli/validator-contract-subject.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validator-contract-subject.test.ts",
+    "node --strip-types scripts/validate-branch-commit-queue.ts --mode validate",
+    "node --strip-types scripts/validate-bridge-minor.ts --mode validate",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/cli/src/commands/git-governance/**"
+  ],
+  "nonGoals": [
+    "Re-litigating the anchor decisions already made and verified under ATM-GOV-0354."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the resolver with both consumers. Widening a subject must never be used to make a genuinely deleted contract look present.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-envelope",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Nothing to design. The decisions were made and evidenced under ATM-GOV-0354;\nthis card exists only to give that work a clean planning identity so it can land.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-08-13T05:30:04.075Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"governance-optimization/tasks/ATM-GOV-0357-land-validator-contract-subject-resolver-deliverables.task.md\",\"contentDigest\":\"sha256:0ea64ed24f1c78ba7b9a1e6ccb2e001e68772893df00a0357e0ec8e224112647\"} -->",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0357-land-validator-contract-subject-resolver-deliverables.task.md",
+    "sectionTitle": "ATM-GOV-0357",
+    "headingLine": 70,
+    "hash": "43071609215a4401",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0357-land-validator-contract-subject-resolver-deliverables.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:43071609215a44017fca665a6ccf106bd9f09442ce453f1b27fa4641e1016a87",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T05:30:23.955Z"
+    }
+  },
+  "importedAt": "2026-08-13T05:30:23.955Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The validator contract subject resolver is verified green but unattributed because its original card lost its planning creation seal."
+    ],
+    "softRelations": [
+      "ATM-GOV-0354",
+      "ATM-GOV-0356"
+    ],
+    "changedPublicSeams": [
+      "atm.validatorContractSubject.v1"
+    ],
+    "causalImpactEdges": [
+      "module-split-to-contract-anchor-false-red"
+    ],
+    "parallelFrontierInputs": [
+      "validator-envelope-library"
+    ],
+    "validatorReferences": [
+      "validate-branch-commit-queue",
+      "validate-bridge-minor"
+    ],
+    "phaseOwner": "wave-3-validator-and-ci-baseline"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0357_contract_subject_resolver_landed",
+      "targetGroupId": "null",
+      "semanticKey": "contract_anchors_resolve_from_the_owning_surface_and_fail_closed_when_absent",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "module-split-to-contract-anchor-false-red"
+      ],
+      "expectedRedPredicate": "the resolver and its regression test exist only in the working tree, so neither validator repair is reproducible from HEAD",
+      "contributionResourceKey": "validator-contract-subject-landing",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.validatorContractSubject.v1",
+      "resourceKey": "validator-contract-subject-landing"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0357_contract_subject_resolver_landed"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T05-30-33-326Z-claim-2b4a8c5a8302",
+  "lastTransitionAt": "2026-08-13T05:30:33.326Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008-captain",
+  "reservedAt": "2026-08-13T05:30:28.582Z",
+  "promotedAt": "2026-08-13T05:30:28.586Z",
+  "claim": {
+    "actorId": "claude-008-captain",
+    "leaseId": "lease-093fabb6f79f",
+    "claimedAt": "2026-08-13T05:30:28.591Z",
+    "heartbeatAt": "2026-08-13T05:30:28.591Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0357.json",
+      "docs/governance/handoff-2026-08-13-captain-claude-008.md"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813051440-claude-008-captain-89e6f0395c\""
+    }
+  },
+  "startedAt": "2026-08-13T05:30:28.591Z",
+  "startedByActor": "claude-008-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f99933c22352edf4",
+    "ticketDigest": "sha256:f99933c22352edf4fc0ed2cf40d010d1ed326bd7e1d0a5817c5156fdc402de13",
+    "taskId": "ATM-GOV-0357",
+    "origin": "claim",
+    "actorId": "claude-008-captain",
+    "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+    "claimGeneration": "lease-093fabb6f79f",
+    "issuedAt": "2026-08-13T05:30:28.591Z",
+    "expiresAt": "2026-08-13T06:00:28.591Z",
+    "scopeDigest": "sha256:f32c43864b3bc65d67e20bd932df549a7c5ba111e1b719ff28989e234c81b4bd",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T05:30:28.591Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0357.*",
+          ".atm/history/task-events/ATM-GOV-0357/**",
+          ".atm/history/tasks/ATM-GOV-0357.json",
+          "scripts/lib/validator-contract-subject.ts",
+          "scripts/validate-branch-commit-queue.ts",
+          "scripts/validate-bridge-minor.ts",
+          "tests/cli/validator-contract-subject.test.ts"
+        ],
+        "digest": "sha256:366183f879ac78cb91ba0dfe024f9a7cacc10a38a87f0240a0c490e18bf413ca"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260813053028-claude-008-captain-ATM-GOV-0357-f99fa18578",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0357",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0357.*",
+      ".atm/history/task-events/ATM-GOV-0357/**",
+      ".atm/history/tasks/ATM-GOV-0357.json",
+      "docs/governance/handoff-2026-08-13-captain-claude-008.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3c3c5a3d13b074999b887d71d65628d8f9c7daeaf3290fef931651943aad580d",
+    "actorId": "claude-008-captain",
+    "sessionId": "session-20260813053028-claude-008-captain-ATM-GOV-0357-f99fa18578",
+    "laneSession": {
+      "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813051440-claude-008-captain-89e6f0395c\""
+    },
+    "createdAt": "2026-08-13T05:30:33.325Z",
+    "status": "active"
+  }
+}
