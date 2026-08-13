@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-019",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in source; frozen publication pending",
+  "area": "Sealed runner publication rechecks unrelated live source WIP",
+  "finding": "The runner is built from a detached sealed candidate, but the final publication admission re-reads live source paths and blocks on another task's dirty packages/** or scripts/** files. That work cannot affect candidate bytes, so the gate serializes ordinary development for longer than the actual shared publication mutation and recreates a bootstrap circularity.",
+  "expectedBehavior": "Source-conflict policy must follow candidate provenance. Live-worktree builds may block on conflicting source WIP; sealed-detached builds must retain conflicts as diagnostics but only serialize the short mutation of shared runner output surfaces. The queue must be acquired at the publication boundary and released immediately afterward.",
+  "evidenceOrRepro": "run-sealed-runner-build.ts constructs the candidate in a detached worktree before ensureRunnerPublicationReservation. ATM-GOV-0364 source WIP was absent from the sealed commit yet runner-sync-admission returned ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED during publication, preventing a previously built candidate from publishing.",
+  "followUp": "Publish the runner containing the candidate-provenance admission mode and keep focused regressions for both live-worktree blocking and sealed-detached non-blocking behavior."
+}

@@ -44,6 +44,30 @@ assert.equal(blocked.stewardActorId, 'release-steward');
 assert.equal(blocked.sealedSourceSha, 'abc123');
 assert.equal(blocked.ordinaryTaskReleaseAutoStageAllowed, false);
 
+const sealedDetached = inspectRunnerSyncAdmission({
+  cwd: process.cwd(),
+  stewardActorId: 'release-steward',
+  sealedSourceSha: 'sealed-detached-candidate',
+  candidateSourceIsolation: 'sealed-detached',
+  runnerSyncSteward: {
+    stewardWorkId: 'runner-sync-sealed-detached',
+    queuePosition: 1,
+    suggestedNextAction: 'publish sealed runner'
+  },
+  dirtyFiles: ['packages/cli/src/commands/internal-release.ts'],
+  foreignClaims: [{
+    taskId: 'ATM-GOV-CONCURRENT-SOURCE',
+    actorId: 'other-agent',
+    claimedAt: '2026-07-18T00:00:00.000Z',
+    files: ['packages/cli/src/commands/internal-release.ts']
+  }],
+  landedFiles: ['packages/cli/src/commands/internal-release.ts']
+});
+assert.equal(sealedDetached.ok, true);
+assert.equal(sealedDetached.candidateSourceIsolation, 'sealed-detached');
+assert.deepEqual(sealedDetached.foreignNonReleaseWip, []);
+assert.equal(sealedDetached.foreignBuildInputConflicts[0]?.blockingTaskId, 'ATM-GOV-CONCURRENT-SOURCE');
+
 const dirtyButUnlanded = inspectRunnerSyncAdmission({
   cwd: process.cwd(),
   stewardActorId: 'release-steward',

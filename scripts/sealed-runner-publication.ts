@@ -71,7 +71,8 @@ export function ensureRunnerPublicationReservation(input: {
   const inspect = () => inspectRunnerSyncAdmission({
     cwd: input.cwd,
     stewardActorId: input.stewardActorId,
-    sealedSourceSha: input.sealedSourceSha
+    sealedSourceSha: input.sealedSourceSha,
+    candidateSourceIsolation: 'sealed-detached'
   });
   const initial = inspect();
   if (initial.queueHeadOwnership.ok) return initial;
