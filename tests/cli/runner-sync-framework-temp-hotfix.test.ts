@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -8,7 +9,6 @@ import { inspectRunnerSyncAdmission } from '../../packages/cli/src/commands/fram
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-framework-temp-'));
 const taskId = 'ATM-FRAMEWORK-TEMP-codex-hotfix';
 const actorId = 'codex-hotfix';
-const sealedSourceSha = '0123456789abcdef0123456789abcdef01234567';
 
 function writeJson(relativePath: string, value: unknown) {
   const filePath = path.join(repo, relativePath);
@@ -17,6 +17,15 @@ function writeJson(relativePath: string, value: unknown) {
 }
 
 try {
+  execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'fixture'], { cwd: repo });
+  execFileSync('git', ['config', 'user.email', 'fixture@example.com'], { cwd: repo });
+  writeFileSync(path.join(repo, 'seed.txt'), 'seed\n');
+  writeJson('release/atm-onefile/release-manifest.json', { baseline: true });
+  execFileSync('git', ['add', 'seed.txt', 'release/atm-onefile/release-manifest.json'], { cwd: repo });
+  execFileSync('git', ['commit', '-m', 'seed'], { cwd: repo, stdio: 'ignore' });
+  const sealedSourceSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+  mkdirSync(path.join(repo, '.atm', 'history', 'evidence'), { recursive: true });
   const now = new Date().toISOString();
   writeJson(`.atm/runtime/locks/${taskId}.lock.json`, {
     schemaId: 'atm.governanceScopeLock',
@@ -65,6 +74,34 @@ try {
   assert.equal(admission.queueHeadOwnership.queueHeadHealth, 'task-active');
   assert.equal(admission.queueHeadOwnership.stewardWorkId, enqueue.evidence.runnerSync.stewardWorkId);
   assert.deepEqual(admission.queueHeadOwnership.ownerActorIds, [actorId]);
+
+  writeJson('release/atm-onefile/release-manifest.json', { stale: true });
+  const takeover = await runBroker([
+    'runner-sync',
+    'takeover-publication',
+    '--cwd', repo,
+    '--task', taskId,
+    '--actor', actorId,
+    '--sealed-source-sha', sealedSourceSha,
+    '--surface', 'full'
+  ]) as any;
+  assert.equal(takeover.ok, true, 'active framework-temp queue head should authorize a digest-bound publication takeover');
+  assert.deepEqual(takeover.evidence.plan.entries.map((entry: any) => entry.path), ['release/atm-onefile/release-manifest.json']);
+  assert.equal(existsSync(path.join(repo, takeover.evidence.receiptPath)), true);
+
+  await assert.rejects(
+    () => runBroker([
+      'runner-sync',
+      'takeover-publication',
+      '--cwd', repo,
+      '--task', taskId,
+      '--actor', 'foreign-actor',
+      '--sealed-source-sha', sealedSourceSha,
+      '--surface', 'full'
+    ]),
+    /not foreign-actor/,
+    'framework-temp takeover must remain actor-bound'
+  );
 
   const missingTempAdmission = inspectRunnerSyncAdmission({
     cwd: repo,
