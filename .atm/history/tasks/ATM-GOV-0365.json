@@ -1,0 +1,257 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0365",
+  "title": "Land subcommand help dispatch and the round-trip backlog dispositions",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 ATM-BUG-2026-08-13-007 is `Resolved` in the committed backlog, naming the commit that fixed it and the focused test that guards it.",
+    "ACC-2 The backlog census stays green with `unclassified` zero, and the regression test for the withdrawn findings still passes, so closing this disposition does not disturb the two that were withdrawn."
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-007.json"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-007.json"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-backlog-census.ts --mode validate",
+    "node --strip-types tests/cli/governance-round-trip-cost.test.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/cli/src/atm.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "packages/cli/src/commands/tasks/legacy/implementation.ts",
+    "packages/cli/src/commands/shared/command-spec-output.ts",
+    "tests/cli/governance-round-trip-cost.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-008.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-011.json"
+  ],
+  "nonGoals": [
+    "Re-opening the two findings that verification withdrew.",
+    "Carrying any file another lane currently claims. This card is deliberately one file wide."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Reverting restores an Open disposition for a defect that is fixed, which is worse than the original state. Only revert together with the fix itself.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.governance-lifecycle",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0365-land-subcommand-help-dispatch-and-the-round-trip-backlog-dispositions.task.md",
+    "sectionTitle": "ATM-GOV-0365",
+    "headingLine": 68,
+    "hash": "763cf0d468c966e4",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0365-land-subcommand-help-dispatch-and-the-round-trip-backlog-dispositions.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:763cf0d468c966e49564f4ed2fa7e67db397c3cd733e038e8bb79ca3efb5e99e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T15:46:55.221Z"
+    }
+  },
+  "importedAt": "2026-08-13T15:46:55.221Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A defect that was fixed, verified live and covered by a focused test is still recorded Open in the committed backlog."
+    ],
+    "softRelations": [
+      "ATM-GOV-0364"
+    ],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [
+      "verified-fix-recorded-open-invites-re-report"
+    ],
+    "parallelFrontierInputs": [
+      "round-trip-backlog"
+    ],
+    "validatorReferences": [
+      "validate-backlog-census",
+      "governance-round-trip-cost"
+    ],
+    "phaseOwner": "governance-substrate"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0365_resolved_dispositions_are_committed",
+      "targetGroupId": "null",
+      "semanticKey": "a_verified_fix_is_recorded_as_resolved_in_the_committed_backlog",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "verified-fix-recorded-open-invites-re-report"
+      ],
+      "expectedRedPredicate": "a defect that was fixed and verified is still recorded Open in the committed backlog, so the next reader re-reports it",
+      "contributionResourceKey": "governance-round-trip-dispositions",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.governanceBacklogItem.v1",
+      "resourceKey": "governance-round-trip-dispositions"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0365_resolved_dispositions_are_committed"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T15-47-02-922Z-claim-2f5220e5aafd",
+  "lastTransitionAt": "2026-08-13T15:47:02.922Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008-gov-0365",
+  "reservedAt": "2026-08-13T15:46:58.842Z",
+  "promotedAt": "2026-08-13T15:46:58.847Z",
+  "claim": {
+    "actorId": "claude-008-gov-0365",
+    "leaseId": "lease-607d7c3649c8",
+    "claimedAt": "2026-08-13T15:46:58.852Z",
+    "heartbeatAt": "2026-08-13T15:46:58.852Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0365.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-007.json"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260813154659-claude-008-gov-0365-cc1e754c97",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813154659-claude-008-gov-0365-cc1e754c97\""
+    }
+  },
+  "startedAt": "2026-08-13T15:46:58.852Z",
+  "startedByActor": "claude-008-gov-0365",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-e0d66f5dafd0ece4",
+    "ticketDigest": "sha256:e0d66f5dafd0ece440a3a8fa7066516ace7296a5a615841b6166415831d4b04f",
+    "taskId": "ATM-GOV-0365",
+    "origin": "claim",
+    "actorId": "claude-008-gov-0365",
+    "laneSessionId": "lane-20260813154659-claude-008-gov-0365-cc1e754c97",
+    "claimGeneration": "lease-607d7c3649c8",
+    "issuedAt": "2026-08-13T15:46:58.852Z",
+    "expiresAt": "2026-08-13T16:16:58.852Z",
+    "scopeDigest": "sha256:742026bf4dda17cca46d739b7e8812765632667637de51988c6b7f8bf14e6f28",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T15:46:58.852Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0365.*",
+          ".atm/history/task-events/ATM-GOV-0365/**",
+          ".atm/history/tasks/ATM-GOV-0365.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-007.json"
+        ],
+        "digest": "sha256:3a4e04e59f84d8ab45978d06d58d2050d1ed898f88d618e6e942601b8010c97b"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260813154658-claude-008-gov-0365-ATM-GOV-0365-98ef118603",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0365",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0365.*",
+      ".atm/history/task-events/ATM-GOV-0365/**",
+      ".atm/history/tasks/ATM-GOV-0365.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-007.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "68fe249e2314169530aea8f1185338a96b11ebe866e9bc92e476ae7bf7ff7dd4",
+    "actorId": "claude-008-gov-0365",
+    "sessionId": "session-20260813154658-claude-008-gov-0365-ATM-GOV-0365-98ef118603",
+    "laneSession": {
+      "laneSessionId": "lane-20260813154659-claude-008-gov-0365-cc1e754c97",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813154659-claude-008-gov-0365-cc1e754c97\""
+    },
+    "createdAt": "2026-08-13T15:47:02.921Z",
+    "status": "active"
+  }
+}
