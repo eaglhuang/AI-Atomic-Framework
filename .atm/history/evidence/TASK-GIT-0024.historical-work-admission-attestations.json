@@ -676,6 +676,31 @@
       "attestedBy": "codex-gpt-5.4-mini",
       "attestedAt": "2026-08-13T11:48:40.641Z",
       "digest": "sha256:04934947dafc4cacc0e42d99ae7464a15c9ff4dba074aaf0e82c6b69fb3f825c"
+    },
+    {
+      "schemaId": "atm.historicalWorkAdmissionAttestation.v1",
+      "commitSha": "75cca5385144f3e15394e1e68fb612bd424ed498",
+      "parentCommitSha": "6284d6b7306b7901fcfcae30934c81b0e98821d1",
+      "treeSha": "7e214b96cc2396b060851cccd7f38137260179cd",
+      "provenance": {
+        "kind": "emergency",
+        "digest": "sha256:c9e7b6fb3661bf9749bec67fd9bcd7c2f2640331bc5f483cffdee74d386a1976",
+        "ref": ".atm/history/evidence/TASK-ERR-0011.runner-sync-receipt.json"
+      },
+      "reason": "Claim line-budget bootstrap: committed verified TASK-ERR-0011 deep-module extraction before claim because the original scoped module exceeded the hard claim gate.",
+      "evidenceRefs": [
+        ".atm/history/evidence/TASK-ERR-0011.runner-sync-receipt.json"
+      ],
+      "emergencyClass": "claim-line-budget-bootstrap",
+      "scope": [
+        "scripts/runner-sync-incremental-build.ts",
+        "scripts/runner-sync-artifact-filesystem.ts"
+      ],
+      "taskId": "TASK-GIT-0024",
+      "laneSessionId": "lane-20260813115143-codex-gpt-5.4-mini-acebb3f4be",
+      "attestedBy": "codex-gpt-5.4-mini",
+      "attestedAt": "2026-08-13T11:56:42.239Z",
+      "digest": "sha256:295dbc3f310c137da7468c79da586b876daf728bda13283ec6fd3fca7e3bc604"
     }
   ]
 }
