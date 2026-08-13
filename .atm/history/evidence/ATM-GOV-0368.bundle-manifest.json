@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0368",
+  "updatedAt": "2026-08-13T17:48:10.757Z",
+  "updatedBy": "claude-008-gov-0366",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+    "typecheck",
+    "validate:backlog-census",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5e5769b66a1b4982aa44023e654535d93f3fb3620555086b133a328bb3f6c1cc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/emergency/__tests__/gate.test.ts"
+      ],
+      "generatedAt": "2026-08-13T17:46:40.734Z",
+      "startedAt": "2026-08-13T17:46:40.361Z",
+      "finishedAt": "2026-08-13T17:46:40.734Z",
+      "durationMs": 373,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b5d7f4bf4bf00c17a4b6e3ae61dde6e7ec3074c0",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-13T17:46:52.286Z",
+      "startedAt": "2026-08-13T17:46:42.922Z",
+      "finishedAt": "2026-08-13T17:46:52.286Z",
+      "durationMs": 9364,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b5d7f4bf4bf00c17a4b6e3ae61dde6e7ec3074c0",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:fc7df6c42f53d98f0d79b954559333b6fcd43a45af5cc1b96e38e9fa194337a5",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-13T17:47:15.120Z",
+      "startedAt": "2026-08-13T17:46:54.237Z",
+      "finishedAt": "2026-08-13T17:47:15.120Z",
+      "durationMs": 20883,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b5d7f4bf4bf00c17a4b6e3ae61dde6e7ec3074c0",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-13T17:48:08.261Z",
+      "startedAt": "2026-08-13T17:47:17.118Z",
+      "finishedAt": "2026-08-13T17:48:08.261Z",
+      "durationMs": 51143,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b5d7f4bf4bf00c17a4b6e3ae61dde6e7ec3074c0",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-backlog-census.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae8f432b240933b023f83be95d53cefccbacfe85f3d185863d3a5aed16438b25",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:backlog-census"
+      ],
+      "generatedAt": "2026-08-13T17:48:10.756Z",
+      "startedAt": "2026-08-13T17:48:10.380Z",
+      "finishedAt": "2026-08-13T17:48:10.756Z",
+      "durationMs": 376,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b5d7f4bf4bf00c17a4b6e3ae61dde6e7ec3074c0",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

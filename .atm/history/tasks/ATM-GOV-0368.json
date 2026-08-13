@@ -1,0 +1,265 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0368",
+  "title": "Let one command satisfy every emergency permission it needs",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 A single lease id behaves exactly as it does today, including every existing refusal code and its details payload.",
+    "ACC-2 A comma-separated set authorizes a surface when one member carries the required permission, and consumes only that member.",
+    "ACC-3 When no member matches, the refusal is `ATM_EMERGENCY_PERMISSION_MISMATCH` and its details list every supplied lease with its permission, plus the permission required. No member is consumed."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/emergency/gate.ts",
+    "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/emergency/gate.ts",
+    "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/cli/src/commands/emergency/leases.ts",
+    "packages/cli/src/commands/emergency/registry.ts",
+    "packages/cli/src/commands/tasks",
+    "packages/cli/src/commands/taskflow"
+  ],
+  "nonGoals": [
+    "Changing what any single lease authorizes. Task, actor, flag, expiry and use-count bounds are untouched.",
+    "Refactoring the many call sites that pass the approval through as a string. The argument stays one string; only its contents gain set semantics."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Reverting restores a lane that cannot authorize a two-permission command at all. It does not restore any protection, because each lease is validated exactly as before.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.emergency-lane",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0368-let-one-command-satisfy-every-emergency-permission-it-needs.task.md",
+    "sectionTitle": "ATM-GOV-0368",
+    "headingLine": 70,
+    "hash": "f05c5891c1fb86c7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0368-let-one-command-satisfy-every-emergency-permission-it-needs.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f05c5891c1fb86c7100e27597cd3fe6d22ccbd27587c2f0cdadadf6c5e40f359",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T17:42:26.703Z"
+    }
+  },
+  "importedAt": "2026-08-13T17:42:26.703Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A command that selects two protected surfaces cannot be authorized, because the approval argument binds exactly one lease."
+    ],
+    "softRelations": [
+      "ATM-GOV-0367"
+    ],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [
+      "single-lease-argument-closes-the-emergency-lane"
+    ],
+    "parallelFrontierInputs": [
+      "emergency-lane"
+    ],
+    "validatorReferences": [
+      "emergency-gate",
+      "validate-cli"
+    ],
+    "phaseOwner": "governance-substrate"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0368_one_command_satisfies_every_permission_it_needs",
+      "targetGroupId": "null",
+      "semanticKey": "an_approval_argument_carries_a_set_of_leases",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "single-lease-argument-closes-the-emergency-lane"
+      ],
+      "expectedRedPredicate": "a command needing two protected permissions is refused whichever single lease it presents, so the emergency lane is closed to it entirely",
+      "contributionResourceKey": "emergency-lane-authorization",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.emergencyMaintenanceLease.v1",
+      "resourceKey": "emergency-lane-authorization"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0368_one_command_satisfies_every_permission_it_needs"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T17-48-58-912Z-renew-0ff292235a24",
+  "lastTransitionAt": "2026-08-13T17:48:58.912Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008-gov-0366",
+  "reservedAt": "2026-08-13T17:42:30.823Z",
+  "promotedAt": "2026-08-13T17:42:30.829Z",
+  "claim": {
+    "actorId": "claude-008-gov-0366",
+    "leaseId": "lease-db42fceae93f",
+    "claimedAt": "2026-08-13T17:42:30.834Z",
+    "heartbeatAt": "2026-08-13T17:48:58.685Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0368.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+      "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+      "packages/cli/src/commands/emergency/gate.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260813174231-claude-008-gov-0366-0415460b86",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813174231-claude-008-gov-0366-0415460b86\""
+    }
+  },
+  "startedAt": "2026-08-13T17:42:30.834Z",
+  "startedByActor": "claude-008-gov-0366",
+  "startedBySessionId": "session-20260813174230-claude-008-gov-0366-ATM-GOV-0368-40fedfe228",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0368",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0368.*",
+      ".atm/history/task-events/ATM-GOV-0368/**",
+      ".atm/history/tasks/ATM-GOV-0368.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+      "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+      "packages/cli/src/commands/emergency/gate.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b116d861a4ca26f9d17cb62f9be56382060890e828f413cf57e392904cb8aa33",
+    "actorId": "claude-008-gov-0366",
+    "sessionId": "session-20260813174230-claude-008-gov-0366-ATM-GOV-0368-40fedfe228",
+    "laneSession": {
+      "laneSessionId": "lane-20260813174231-claude-008-gov-0366-0415460b86",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813174231-claude-008-gov-0366-0415460b86\""
+    },
+    "createdAt": "2026-08-13T17:42:32.655Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-dec1743d1dad5599",
+    "ticketDigest": "sha256:dec1743d1dad5599d531cc5e57b4d37c231acf6766555c0bc927734a3207eef1",
+    "taskId": "ATM-GOV-0368",
+    "origin": "claim",
+    "actorId": "claude-008-gov-0366",
+    "laneSessionId": "lane-20260813174231-claude-008-gov-0366-0415460b86",
+    "claimGeneration": "lease-db42fceae93f",
+    "issuedAt": "2026-08-13T17:48:58.685Z",
+    "expiresAt": "2026-08-13T18:18:58.685Z",
+    "scopeDigest": "sha256:013d59927ddcbda869bf587da08fe66b2b5dadc4478501add18f711c63a531cc",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T17:48:58.685Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0368.*",
+          ".atm/history/task-events/ATM-GOV-0368/**",
+          ".atm/history/tasks/ATM-GOV-0368.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+          "packages/cli/src/commands/emergency/__tests__/gate.test.ts",
+          "packages/cli/src/commands/emergency/gate.ts"
+        ],
+        "digest": "sha256:90fd92ddf1d516a8a944548850d33cd1da20f2e938f37e8902908539b29f33d0"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  }
+}
