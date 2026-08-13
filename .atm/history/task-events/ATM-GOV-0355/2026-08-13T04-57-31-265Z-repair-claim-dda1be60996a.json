@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T04-57-31-265Z-repair-claim-dda1be60996a",
+  "taskId": "ATM-GOV-0355",
+  "action": "repair-claim",
+  "actorId": "claude-008-captain",
+  "sessionId": "session-20260813034032-claude-008-captain-ATM-GOV-0355-0740969475",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0355.json",
+  "taskSha256": "sha256:705d7ede861a85607eb63a58eb797d55812b655146095c0909d9387de9d1d773",
+  "createdAt": "2026-08-13T04:57:31.265Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0355 --actor claude-008-captain --write --reason \"lane session TTL expired during the orphaned index lock wait; re-mint to land the delivery\" --json"
+}

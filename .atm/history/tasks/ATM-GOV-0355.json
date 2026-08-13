@@ -1,0 +1,370 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0355",
+  "title": "Make neutral steward patch application real and fail closed",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 A unified diff that replaces lines produces exactly the file that `git apply` would produce: replaced in place, no surviving original, no appended duplicate. The shipped `disjoint-same-file` scenario reaches its declared `expected.fileAfter`.",
+    "ACC-2 Multiple hunks in one patch, and multiple proposals composed onto one file, apply at their correct positions with later offsets accounted for.",
+    "ACC-3 A hunk whose context or removed lines do not match the file at its declared position is refused. The refusal surfaces as a blocked steward apply with a reason, never as a silent success and never as an append.",
+    "ACC-4 A patch that adds a file-final line, and a file with no trailing newline, are both handled without corrupting the surrounding bytes.",
+    "ACC-5 `validate-brokered-write` and `validate-broker-steward` pass with their fixtures unchanged."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/unified-patch.ts",
+    "packages/core/src/broker/steward-transactional-apply.ts",
+    "tests/cli/unified-patch-application.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/unified-patch.ts",
+    "packages/core/src/broker/steward-transactional-apply.ts",
+    "tests/cli/unified-patch-application.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/unified-patch-application.test.ts",
+    "node --strip-types scripts/validate-brokered-write.ts --mode validate",
+    "node --strip-types scripts/validate-broker-steward.ts --mode validate",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/core/src/broker/decision.ts",
+    "packages/core/src/broker/compose.ts",
+    "scripts/validate-brokered-write.ts"
+  ],
+  "nonGoals": [
+    "Adding fuzzy or offset-tolerant patch matching. A steward write is arbitrated, not guessed; an inexact patch must be refused.",
+    "Changing the compose or merge-plan verdicts. This card only makes the write the plan authorises actually happen."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the applier and its single call site together. A steward that cannot apply a patch must block; it must never fall back to the appending behaviour this card removes.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-steward",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.unified-patch-application",
+        "pattern": "Pure Transform",
+        "source": "packages/core/src/broker/steward-transactional-apply.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/unified-patch.ts",
+        "packages/core/src/broker/steward-transactional-apply.ts",
+        "tests/cli/unified-patch-application.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "Extract the applier as a pure transform in its own module and give it one\ncontract: return the exact resulting text, or throw. Do not add a fallback\npath — the appending behaviour being removed here is precisely what let a\nfailed application look successful, and any \"best effort\" branch reintroduces\nit under a new name.\n\nDo not reach for fuzzy matching. A steward write is arbitrated, not guessed: if\na proposal's context no longer matches the base it was authored against, the\ncorrect outcome is a blocked apply that sends the proposal back for rebase.\n\nPreserve the file's existing line ending and trailing-newline state. The\ncomposer feeds the output straight into canonical writes, so a normalisation\nhere would show up as an unrelated whole-file diff in someone else's commit.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0355-make-neutral-steward-patch-application-real-and-fail-closed.task.md",
+    "sectionTitle": "ATM-GOV-0355",
+    "headingLine": 111,
+    "hash": "349b15463a56caae",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0355-make-neutral-steward-patch-application-real-and-fail-closed.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:349b15463a56caae43d2ccc190b1d3085d957de5e5fcc7e096abdb907935ef54",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T03:40:25.756Z"
+    }
+  },
+  "importedAt": "2026-08-13T03:40:25.756Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The neutral steward reports applied for patch proposals it never applied, and validate-brokered-write is red at origin/main."
+    ],
+    "softRelations": [
+      "ATM-GOV-0330",
+      "ATM-GOV-0331",
+      "ATM-GOV-0354"
+    ],
+    "changedPublicSeams": [
+      "atm.unifiedPatchApplication.v1"
+    ],
+    "causalImpactEdges": [
+      "stub-patch-apply-to-false-steward-evidence",
+      "false-steward-evidence-to-shared-write-authority-loss"
+    ],
+    "parallelFrontierInputs": [
+      "patch-proposal",
+      "transactional-composition-plan",
+      "canonical-worktree"
+    ],
+    "validatorReferences": [
+      "validate-brokered-write",
+      "validate-broker-steward",
+      "test_atm_gov_0355_unified_patch_application_is_real"
+    ],
+    "phaseOwner": "wave-4-evidence-engine-replacement"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0355_unified_patch_application_is_real",
+      "targetGroupId": "null",
+      "semanticKey": "a_unified_diff_replaces_lines_in_place_instead_of_appending_additions",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "stub-patch-apply-to-false-steward-evidence"
+      ],
+      "expectedRedPredicate": "applying a replacement hunk leaves the original line in place and appends the replacement to the end of the file",
+      "contributionResourceKey": "unified-patch-application",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.unifiedPatchApplication.v1",
+      "resourceKey": "unified-patch-application"
+    },
+    {
+      "caseId": "test_atm_gov_0355_patch_application_fails_closed",
+      "targetGroupId": "null",
+      "semanticKey": "a_patch_that_does_not_match_its_context_is_refused_not_silently_absorbed",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "false-steward-evidence-to-shared-write-authority-loss"
+      ],
+      "expectedRedPredicate": "a hunk whose context does not match the file still reports success because the applier never inspects context",
+      "contributionResourceKey": "unified-patch-fail-closed",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.unifiedPatchApplication.v1",
+      "resourceKey": "unified-patch-fail-closed"
+    },
+    {
+      "caseId": "test_atm_gov_0355_boundary_bytes_preserved",
+      "targetGroupId": "null",
+      "semanticKey": "line_endings_and_trailing_newline_state_survive_a_steward_apply",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "stub-patch-apply-to-false-steward-evidence"
+      ],
+      "expectedRedPredicate": "applying a patch rewrites line endings or adds a trailing newline the file did not have",
+      "contributionResourceKey": "unified-patch-boundary-bytes",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.unifiedPatchApplication.v1",
+      "resourceKey": "unified-patch-boundary-bytes"
+    },
+    {
+      "caseId": "test_atm_gov_0355_shipped_broker_validators_green",
+      "targetGroupId": "null",
+      "semanticKey": "the_two_broker_write_validators_pass_with_unchanged_fixtures",
+      "coversAcceptance": [
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "false-steward-evidence-to-shared-write-authority-loss"
+      ],
+      "expectedRedPredicate": "validate-brokered-write fails its disjoint-same-file scenario at current HEAD",
+      "contributionResourceKey": "unified-patch-broker-validators",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.unifiedPatchApplication.v1",
+      "resourceKey": "unified-patch-broker-validators"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0355_unified_patch_application_is_real",
+    "test_atm_gov_0355_patch_application_fails_closed",
+    "test_atm_gov_0355_boundary_bytes_preserved",
+    "test_atm_gov_0355_shipped_broker_validators_green"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T04-57-40-719Z-claim-31952415d6ae",
+  "lastTransitionAt": "2026-08-13T04:57:40.719Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-08-13T03:40:32.392Z",
+  "promotedAt": "2026-08-13T03:40:32.397Z",
+  "claim": {
+    "actorId": "claude-008-captain",
+    "leaseId": "lease-b5963c08d670",
+    "claimedAt": "2026-08-13T04:57:36.165Z",
+    "heartbeatAt": "2026-08-13T04:57:36.165Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0355.json",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/unified-patch.ts",
+      "tests/cli/unified-patch-application.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260813045711-claude-008-captain-14e3f037d4",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813045711-claude-008-captain-14e3f037d4\""
+    }
+  },
+  "startedAt": "2026-08-13T03:40:32.403Z",
+  "startedByActor": "claude-008-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-ae0a5cd5dac73538",
+    "ticketDigest": "sha256:ae0a5cd5dac735387cc6810d49ab2b1848c3fbae68660d168ed95e8cf3869deb",
+    "taskId": "ATM-GOV-0355",
+    "origin": "claim",
+    "actorId": "claude-008-captain",
+    "laneSessionId": "lane-20260813045711-claude-008-captain-14e3f037d4",
+    "claimGeneration": "lease-b5963c08d670",
+    "issuedAt": "2026-08-13T04:57:36.165Z",
+    "expiresAt": "2026-08-13T05:27:36.165Z",
+    "scopeDigest": "sha256:53292a74745a3f47355d43bad044881b3551dd31dc4c3f1b709c9049b6d2c14f",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T04:57:36.165Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0355.*",
+          ".atm/history/task-events/ATM-GOV-0355/**",
+          ".atm/history/tasks/ATM-GOV-0355.json",
+          "packages/core/src/broker/steward-transactional-apply.ts",
+          "packages/core/src/broker/unified-patch.ts",
+          "tests/cli/unified-patch-application.test.ts"
+        ],
+        "digest": "sha256:aa6a8d9dbbafe02acb60b0cc4c71f7c0516fe11495c354e1702d73ea0964e88d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260813045736-claude-008-captain-ATM-GOV-0355-3045c0d64c",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0355",
+    "actorId": "claude-008-captain",
+    "laneSessionId": "lane-20260813034027-claude-008-captain-404f7c6e5d",
+    "dirtyPaths": [
+      ".atm/history/tasks/ATM-GOV-0355.json",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/unified-patch.ts",
+      "tests/cli/unified-patch-application.test.ts"
+    ],
+    "retainedAt": "2026-08-13T04:57:30.737Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "claude-008-captain",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0355",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0355.*",
+      ".atm/history/task-events/ATM-GOV-0355/**",
+      ".atm/history/tasks/ATM-GOV-0355.json",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "packages/core/src/broker/unified-patch.ts",
+      "tests/cli/unified-patch-application.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "291fb4995596db8b9b65120717dddf3fb58daa370dca70cc8ff3a67a929a41f7",
+    "actorId": "claude-008-captain",
+    "sessionId": "session-20260813045736-claude-008-captain-ATM-GOV-0355-3045c0d64c",
+    "laneSession": {
+      "laneSessionId": "lane-20260813045711-claude-008-captain-14e3f037d4",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813045711-claude-008-captain-14e3f037d4\""
+    },
+    "createdAt": "2026-08-13T04:57:40.718Z",
+    "status": "active"
+  }
+}
