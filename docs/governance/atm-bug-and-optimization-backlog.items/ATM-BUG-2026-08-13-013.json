@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-013",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in source; frozen publication pending",
+  "area": "Taskflow protected-backend recovery forwarding",
+  "finding": "The public taskflow close operator lane automatically selects --allow-stale-runner after it accepts a runner publication receipt, but it neither declares nor forwards --emergency-approval to the protected tasks close backend. The backend correctly returns ATM_EMERGENCY_LANE_APPROVAL_REQUIRED, yet the operator cannot execute the prescribed recovery through the same public seam. This creates a bootstrap circularity: a delivered framework task cannot close until the runner is current, while publishing the current runner is itself serialized behind in-flight framework work.",
+  "expectedBehavior": "Any public orchestration command that selects a protected backend operation must expose and losslessly forward the corresponding bounded approval capability. The lease must only be forwarded when that protected operation is selected, must remain task/actor/flag bounded, and must still fail closed when absent, stale, mismatched, exhausted, or used for a different operation.",
+  "evidenceOrRepro": "At target HEAD 16582a5ef328d6332e30f3726352412f0c898297, taskflow close for ATM-GOV-0359 accepted historical delivery refs 1bc2a250f, 5a8dccf4f and 16582a5ef and reported writeReadinessHint.status=ready. The write then generated a tasks close backend call with --allow-stale-runner and failed ATM_EMERGENCY_LANE_APPROVAL_REQUIRED. Frozen and source-first taskflow help did not advertise --emergency-approval, while tasks close already accepts it. Focused regression: tests/cli/taskflow-emergency-approval-forwarding.test.ts.",
+  "followUp": "The source quickfix adds a small forwarding deep module, advertises --emergency-approval on taskflow, forwards it only when runner recovery is selected, and preserves backend fail-closed behavior. Publish the sealed runner, close ATM-GOV-0359 through the public taskflow seam, then add this semantic family to lifecycle orchestration tests so future protected backend capabilities cannot be dropped between facade and backend."
+}
