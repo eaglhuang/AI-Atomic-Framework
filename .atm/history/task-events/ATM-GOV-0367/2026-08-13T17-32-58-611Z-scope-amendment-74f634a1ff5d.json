@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T17-32-58-611Z-scope-amendment-74f634a1ff5d",
+  "taskId": "ATM-GOV-0367",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0367.json",
+  "taskSha256": "sha256:76900bc2b99320bc0d64c9575453475a06cfe205046059e947636295e8fc1bcd",
+  "createdAt": "2026-08-13T17:32:58.611Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0367 --actor claude-008-gov-0366 --add docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-021.json --reason \"This card republished the frozen runner, which makes 021's pending-publication statement false; the record must be corrected by the lane that changed the fact.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "This card republished the frozen runner, which makes 021's pending-publication statement false; the record must be corrected by the lane that changed the fact."
+  }
+}
