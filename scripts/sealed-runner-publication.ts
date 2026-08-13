@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { pathMatchesWriteScope } from '../packages/core/src/broker/write-scope-policy.ts';
+import { readFrameworkTempLockProjection } from '../packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts';
 import {
   assertRunnerSyncAdmission,
   inspectRunnerSyncAdmission,
@@ -168,6 +170,13 @@ export function resolveActiveRunnerPublicationTask(input: {
 }): string {
   const lockRoot = path.join(input.cwd, '.atm', 'runtime', 'locks');
   const nowMs = Date.parse(input.now);
+  const explicitlyRequested = input.taskId?.trim();
+  const frameworkTempCandidates = readFrameworkTempLockProjection(input.cwd, nowMs)
+    .filter((lock) => lock.workItemId.startsWith('ATM-FRAMEWORK-TEMP-'))
+    .filter((lock) => lock.actorId === input.actorId && lock.disposition === 'foreign-live')
+    .filter((lock) => !explicitlyRequested || lock.workItemId === explicitlyRequested)
+    .filter((lock) => ownsReleaseSurface(lock.files))
+    .map((lock) => lock.workItemId);
   const candidates = existsSync(lockRoot)
     ? readdirSync(lockRoot, { withFileTypes: true }).flatMap((entry) => {
       if (!entry.isFile() || !entry.name.endsWith('.lock.json')) return [];
@@ -182,14 +191,12 @@ export function resolveActiveRunnerPublicationTask(input: {
           && Number.isFinite(heartbeatAt)
           && Number.isFinite(ttlSeconds)
           && nowMs < heartbeatAt + ttlSeconds * 1000;
-        const explicitlyRequested = input.taskId?.trim();
         return actorId === input.actorId
-          && (explicitlyRequested
-            ? hasActiveLedgerClaim(input.cwd, taskId, input.actorId, nowMs)
-            : lockActive)
+          && !taskId.startsWith('ATM-FRAMEWORK-TEMP-')
+          && (explicitlyRequested ? hasActiveLedgerClaim(input.cwd, taskId, input.actorId, nowMs) : lockActive)
           && (explicitlyRequested
             ? taskId === explicitlyRequested
-            : files.some((file) => file === 'release/atm-onefile/atm.mjs' || file === 'release/atm-root-drop'))
+            : ownsReleaseSurface(files))
           ? [taskId]
           : [];
       } catch {
@@ -197,11 +204,16 @@ export function resolveActiveRunnerPublicationTask(input: {
       }
     })
     : [];
-  const unique = [...new Set(candidates)].sort();
+  const unique = [...new Set([...candidates, ...frameworkTempCandidates])].sort();
   if (unique.length !== 1) {
     throw new Error(`Runner publication requires exactly one active release-surface claim for ${input.actorId}; found ${unique.length}.`);
   }
   return unique[0];
+}
+
+function ownsReleaseSurface(files: readonly string[]): boolean {
+  return ['release/atm-onefile/atm.mjs', 'release/atm-root-drop']
+    .some((surface) => files.some((file) => pathMatchesWriteScope(surface, file)));
 }
 
 function hasActiveLedgerClaim(cwd: string, taskId: string, actorId: string, nowMs: number): boolean {

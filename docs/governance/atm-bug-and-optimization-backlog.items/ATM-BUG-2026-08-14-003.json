@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-14-003",
+  "date": "2026-08-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Critical",
+  "status": "Fixed in source; frozen publication pending",
+  "area": "Sealed runner publication does not recognize live framework-temp wildcard authority",
+  "finding": "resolveActiveRunnerPublicationTask independently scanned runtime locks, accepted only literal release/atm-onefile/atm.mjs or release/atm-root-drop entries, and treated every explicitly selected task as ledger-backed. A live ATM-FRAMEWORK-TEMP claim for release/** therefore appeared valid to framework-mode status but yielded zero release-surface claimants to runner publication.",
+  "expectedBehavior": "Runner publication must consume the canonical TTL-aware framework-temp lock projection. Framework-temp claims may authorize release surfaces through the standard write-scope matcher; ordinary task claims remain ledger-validated. The resolver must reject expired, released, partial, ambiguous, and actor-mismatched authority.",
+  "evidenceOrRepro": "On 2026-08-14, a live codex-gpt-5.4-mini framework-mode claim covered packages/cli/dist/** and release/**. Two sealed builds completed private compilation but both failed before publication with 'requires exactly one active release-surface claim ... found 0'. The focused runner-sync-build-script-admission test now verifies an active framework-temp release/** lock is accepted without a ledger row.",
+  "followUp": "Publish the frozen runner containing the resolver repair. Replace the remaining publication-specific lock scan with a shared authority-snapshot module, so status, hook, taskflow, queue admission, and publication cannot diverge on wildcard or task-kind semantics."
+}
