@@ -1,7 +1,10 @@
+
+
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, relativePathFrom } from './shared.ts';
 import { readActiveTaskDirectionLocks } from './task-direction/active-locks.ts';
+import { buildTaskSelfAllowPaths, partitionTaskScope } from './task-direction/scope-policy.ts';
 import { isExternalPlanningStoredPath, normalizeStoredPlanningPathForIdentity, resolveStoredPlanningPath } from './planning-repo-root.ts';
 import { isPathAllowedByScope } from './work-channels.ts';
 import {
@@ -27,6 +30,8 @@ import {
   writeTaskQueue
 } from './task-direction/support.ts';
 export { isPlanningMirrorPath, isTaskDirectionPathCandidate, sanitizeTaskDirectionAllowedFiles } from './task-direction/support.ts';
+export { buildAllowedFilesForTask, buildTaskSelfAllowPaths, diagnoseTaskDirectionLockAllowedFiles, getCanonicalAllowedFilesForTask, partitionTaskScope } from './task-direction/scope-policy.ts';
+export type { TaskDirectionAllowedFilesDiagnosis, TaskDirectionAllowedFilesMismatch } from './task-direction/scope-policy.ts';
 
 export interface TaskDirectionTask {
   readonly workItemId: string;
@@ -337,8 +342,7 @@ export function writeTaskDirectionLock(input: {
   readonly laneSession?: TaskDirectionLock['laneSession'] | null;
 }) {
   const queueIndex = input.queue ? input.queue.taskIds.indexOf(input.taskId) : -1;
-  // TASK-AAO-0058：claim 時自動將任務自身治理路徑隱式 self-allow，
-  // 讓 agent 在 evidence 收集、checkpoint 或 close 時不受 ScopeLock 阻擋。
+  // Keep task-owned ledger, evidence, and event paths writable throughout closeout.
   const mergedAllowedFiles = sanitizeTaskDirectionAllowedFiles([
     ...input.allowedFiles,
     ...buildTaskSelfAllowPaths(input.taskId)
@@ -382,108 +386,6 @@ export function writeTaskDirectionLock(input: {
   mkdirSync(path.dirname(sidecarPath), { recursive: true });
   writeJson(sidecarPath, lock);
   return lock;
-}
-
-export function getCanonicalAllowedFilesForTask(cwd: string, taskId: string): readonly string[] | null {
-  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
-  if (existsSync(lockPath)) {
-    try {
-      const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
-      const released = parsed.released === true || parsed.status === 'released';
-      const embedded = parsed.taskDirectionLock;
-      if (!released && isTaskDirectionLock(embedded)) return embedded.allowedFiles;
-    } catch {
-      // Fall through to sidecar.
-    }
-  }
-  const sidecarPath = path.join(cwd, '.atm', 'runtime', 'task-direction-locks', `${taskId}.json`);
-  if (existsSync(sidecarPath)) {
-    try {
-      const parsed = JSON.parse(readFileSync(sidecarPath, 'utf8'));
-      if (isTaskDirectionLock(parsed)) return parsed.allowedFiles;
-    } catch {
-      // Ignore malformed runtime files.
-    }
-  }
-  return null;
-}
-
-export interface TaskDirectionAllowedFilesDiagnosis {
-  readonly taskId: string;
-  readonly hasGovernanceLock: boolean;
-  readonly canonicalAllowedFiles: readonly string[] | null;
-  readonly governanceLockFiles: readonly string[] | null;
-  readonly claimFiles: readonly string[] | null;
-  readonly mismatches: readonly TaskDirectionAllowedFilesMismatch[];
-}
-
-export interface TaskDirectionAllowedFilesMismatch {
-  readonly source: 'governance-lock-files' | 'claim-files';
-  readonly missingFromSource: readonly string[];
-  readonly extraInSource: readonly string[];
-}
-
-export function diagnoseTaskDirectionLockAllowedFiles(cwd: string, taskId: string): TaskDirectionAllowedFilesDiagnosis {
-  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
-  let canonicalAllowedFiles: readonly string[] | null = null;
-  let governanceLockFiles: readonly string[] | null = null;
-  let hasGovernanceLock = false;
-  if (existsSync(lockPath)) {
-    try {
-      const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
-      const released = parsed.released === true || parsed.status === 'released';
-      if (!released) {
-        hasGovernanceLock = true;
-        const embedded = parsed.taskDirectionLock;
-        if (isTaskDirectionLock(embedded)) canonicalAllowedFiles = embedded.allowedFiles;
-        if (Array.isArray(parsed.files)) {
-          governanceLockFiles = uniqueSorted(parsed.files.filter((entry): entry is string => typeof entry === 'string').map(normalizeRelativePath));
-        }
-      }
-    } catch {
-      // Ignore malformed runtime files.
-    }
-  }
-  if (!canonicalAllowedFiles) {
-    canonicalAllowedFiles = getCanonicalAllowedFilesForTask(cwd, taskId);
-  }
-  let claimFiles: readonly string[] | null = null;
-  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
-  if (existsSync(taskPath)) {
-    try {
-      const parsed = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
-      const claim = (parsed as { claim?: unknown }).claim;
-      if (claim && typeof claim === 'object' && Array.isArray((claim as { files?: unknown }).files)) {
-        claimFiles = uniqueSorted(((claim as { files: unknown[] }).files)
-          .filter((entry): entry is string => typeof entry === 'string')
-          .map(normalizeRelativePath));
-      }
-    } catch {
-      // Ignore malformed ledger files.
-    }
-  }
-  const mismatches: TaskDirectionAllowedFilesMismatch[] = [];
-  if (canonicalAllowedFiles && governanceLockFiles) {
-    const drift = computeAllowedFilesDrift(canonicalAllowedFiles, governanceLockFiles);
-    if (drift.missingFromSource.length > 0 || drift.extraInSource.length > 0) {
-      mismatches.push({ source: 'governance-lock-files', ...drift });
-    }
-  }
-  if (canonicalAllowedFiles && claimFiles) {
-    const drift = computeAllowedFilesDrift(canonicalAllowedFiles, claimFiles);
-    if (drift.missingFromSource.length > 0 || drift.extraInSource.length > 0) {
-      mismatches.push({ source: 'claim-files', ...drift });
-    }
-  }
-  return { taskId, hasGovernanceLock, canonicalAllowedFiles, governanceLockFiles, claimFiles, mismatches };
-}
-
-function computeAllowedFilesDrift(canonical: readonly string[], source: readonly string[]) {
-  const canonicalSet = new Set(canonical.map((value) => normalizeRelativePath(value).toLowerCase()));
-  const sourceSet = new Set(source.map((value) => normalizeRelativePath(value).toLowerCase()));
-  const missingFromSource = [...canonicalSet].filter((value) => !sourceSet.has(value)).sort();
-  const extraInSource = [...sourceSet].filter((value) => !canonicalSet.has(value)).sort();
-  return { missingFromSource, extraInSource };
 }
 
 export { readActiveTaskDirectionLocks };
@@ -530,83 +432,9 @@ export function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, a
   }
 }
 
-export function buildAllowedFilesForTask(task: TaskDirectionTask): readonly string[] {
-  return partitionTaskScope(task).targetWork.allowedFiles;
-}
-
-/**
- * TASK-AAO-0058：回傳任務自身治理路徑（task self-allow）的 canonical 三條路徑。
- * 這些路徑會在 writeTaskDirectionLock 建立鎖時自動併入 allowedFiles，
- * 讓 agent 在 evidence 收集、checkpoint 或 close 時不會被 ScopeLock 阻擋。
- *
- * 覆蓋範圍：
- *   - .atm/history/tasks/<task-id>.json
- *   - .atm/history/evidence/<task-id>.* （含 closure-packet.json）
- *   - .atm/history/task-events/<task-id>/**
- *
- * 不含整個 .atm/history/**，以保持精確邊界。
- */
-export function buildTaskSelfAllowPaths(taskId: string): readonly string[] {
-  return [
-    `.atm/history/tasks/${taskId}.json`,
-    `.atm/history/evidence/${taskId}.*`,
-    `.atm/history/task-events/${taskId}/**`
-  ];
-}
-
-export function partitionTaskScope(task: TaskDirectionTask, options?: { readonly cwd?: string }): TaskScopePartition {
-  const cwd = options?.cwd ?? null;
-  const normalizeScopePath = (value: string) => {
-    if (!value) return value;
-    return cwd ? normalizeStoredPlanningPathForIdentity(cwd, value) : normalizeRelativePath(value);
-  };
-  const normalizedScopePaths = task.scopePaths.map(normalizeScopePath);
-  const normalizedSourcePlanPath = task.sourcePlanPath ? normalizeScopePath(task.sourcePlanPath) : null;
-  const normalizedNearbyPlanPaths = task.nearbyPlanPaths.map(normalizeScopePath);
-  const classifyPlanningPath = (value: string) => {
-    if (!value) return false;
-    if (cwd) return isExternalPlanningStoredPath(cwd, value);
-    return isExternalPlanningPath(value);
-  };
-  const resolveToAbsolute = (value: string) => {
-    if (!value) return '';
-    return cwd ? resolveStoredPlanningPath(cwd, value).absolutePath : path.resolve(value);
-  };
-  const planningReadOnlyPaths = sanitizeTaskDirectionAllowedFiles([
-    task.sourcePlanPath ?? '',
-    ...task.nearbyPlanPaths,
-    ...task.scopePaths.filter(classifyPlanningPath)
-  ].map(resolveToAbsolute));
-  const planningMirrorPaths = uniqueSorted(planningReadOnlyPaths.flatMap(derivePlanningMirrorGuardPaths));
-  const targetCandidates = sanitizeTaskDirectionAllowedFiles(normalizedScopePaths);
-  const allowedFiles = targetCandidates.filter((entry) => {
-    if (planningReadOnlyPaths.includes(entry)) return false;
-    if (!task.allowPlanningMirror && isPlanningMirrorPath(entry, planningMirrorPaths)) return false;
-    if (task.outOfScope && isPathAllowedByScope(entry, task.outOfScope)) {
-      return false;
-    }
-    return true;
-  });
-
-  if (task.outOfScope && task.outOfScope.length > 0) {
-    const intersections = targetCandidates.filter((entry) => isPathAllowedByScope(entry, task.outOfScope!));
-    if (intersections.length > 0) {
-      console.warn(`[ATM-WARNING] Task ${task.workItemId} scope paths intersect with outOfScope: ${intersections.join(', ')}. These files are subtracted from targetAllowedFiles.`);
-    }
-  }
-
-  return {
-    planningContext: {
-      readOnlyPaths: planningReadOnlyPaths
-    },
-    targetWork: {
-      allowedFiles,
-      planningMirrorPaths,
-      allowPlanningMirror: task.allowPlanningMirror
-    }
-  };
-}
-
 export function toProjectPath(cwd: string, absolutePath: string) {
   return relativePathFrom(cwd, absolutePath).replace(/\\/g, '/');
 }
+
+
+
