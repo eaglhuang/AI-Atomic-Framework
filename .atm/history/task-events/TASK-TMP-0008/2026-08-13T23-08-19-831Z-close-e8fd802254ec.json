@@ -1,0 +1,55 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T23-08-19-831Z-close-e8fd802254ec",
+  "taskId": "TASK-TMP-0008",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813190726-codex-gpt-5.4-mini-TASK-TMP-0008-2015b500d9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0008.json",
+  "taskSha256": "sha256:32b20b6212d3e1125a6edb354c7e0cbdf61086d119b2c5f7ed0409ef1cbd09e4",
+  "createdAt": "2026-08-13T23:08:19.831Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0008 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-fadd25dad86b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-fadd25dad86b",
+    "sessionId": "session-20260813190726-codex-gpt-5.4-mini-TASK-TMP-0008-2015b500d9",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0008.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:charter",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T23:08:19.825Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0008.*",
+        ".atm/history/task-events/TASK-TMP-0008/**",
+        ".atm/history/tasks/TASK-TMP-0008.json",
+        "ACC-1: 逐路徑驗證 resolved absolute path 精確位於 `C:/Users/User/ATM-rescue-*` 清單；禁止 glob、workspace root、junction traversal 或遞迴擴張。",
+        "docs/reports/rescue-worktree-cleanup-receipt.json",
+        "temporary-governance/tasks/TASK-TMP-0008-archive-and-remove-adjudicated-rescue-worktrees-after-owner-approval.task.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

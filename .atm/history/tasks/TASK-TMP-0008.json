@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0008",
   "title": "Archive and remove adjudicated rescue worktrees after owner approval",
-  "status": "open",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0327",
@@ -156,17 +156,17 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T11-59-07-907Z-release-1bb54fcdfd18",
-  "lastTransitionAt": "2026-08-13T11:59:07.907Z",
+  "lastTransitionId": "2026-08-13T23-08-19-928Z-lock-cleanup-fbc6f7fab5a4",
+  "lastTransitionAt": "2026-08-13T23:08:19.928Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-08-13T11:57:17.611Z",
-  "promotedAt": "2026-08-13T11:57:17.615Z",
+  "reservedAt": "2026-08-13T19:07:26.986Z",
+  "promotedAt": "2026-08-13T19:07:26.990Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-f07b71250479",
-    "claimedAt": "2026-08-13T11:57:17.620Z",
-    "heartbeatAt": "2026-08-13T11:59:04.037Z",
+    "leaseId": "lease-4982922a199c",
+    "claimedAt": "2026-08-13T19:07:26.995Z",
+    "heartbeatAt": "2026-08-13T23:08:19.829Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TMP-0008.json",
@@ -176,32 +176,32 @@
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260813115717-codex-gpt-5.4-mini-a155e84933",
+      "laneSessionId": "lane-20260813190727-codex-gpt-5.4-mini-aeda8952a4",
       "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813115717-codex-gpt-5.4-mini-a155e84933\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813190727-codex-gpt-5.4-mini-aeda8952a4\""
     },
-    "reason": "Batch skipped because owner explicitly requires retaining all 23 rescue worktrees; cleanup start condition remains unsatisfied."
+    "reason": "closed"
   },
   "startedAt": "2026-08-13T11:57:17.620Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-e8d6d42b52d32be4",
-    "ticketDigest": "sha256:e8d6d42b52d32be4aed425b18503a4f10179826a33e11009ea2b648cfd327b29",
+    "ticketId": "wat-169054c27ebd4a9b",
+    "ticketDigest": "sha256:169054c27ebd4a9bf54994bf99bd31df70a4373fe0c9227d66d3adcf83d53751",
     "taskId": "TASK-TMP-0008",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260813115717-codex-gpt-5.4-mini-a155e84933",
-    "claimGeneration": "lease-f07b71250479",
-    "issuedAt": "2026-08-13T11:57:17.620Z",
-    "expiresAt": "2026-08-13T12:27:17.620Z",
-    "scopeDigest": "sha256:7e8fbf97902c2675ab36be612a3cfd3ef2ec4b9bae819a0c42bf95dcf0469ab4",
+    "laneSessionId": "lane-20260813190727-codex-gpt-5.4-mini-aeda8952a4",
+    "claimGeneration": "lease-4982922a199c",
+    "issuedAt": "2026-08-13T22:59:58.949Z",
+    "expiresAt": "2026-08-13T23:29:58.949Z",
+    "scopeDigest": "sha256:168ea93cd7755a01f44ac0358daf90333f1fccca34119196a1143749d05b7acb",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T11:57:17.620Z"
+      "selectedAt": "2026-08-13T22:59:58.949Z"
     },
     "grants": [
       {
@@ -209,9 +209,12 @@
         "values": [
           ".atm/history/evidence/TASK-TMP-0008.*",
           ".atm/history/task-events/TASK-TMP-0008/**",
-          ".atm/history/tasks/TASK-TMP-0008.json"
+          ".atm/history/tasks/TASK-TMP-0008.json",
+          "ACC-1: 逐路徑驗證 resolved absolute path 精確位於 `C:/Users/User/ATM-rescue-*` 清單；禁止 glob、workspace root、junction traversal 或遞迴擴張。",
+          "docs/reports/rescue-worktree-cleanup-receipt.json",
+          "temporary-governance/tasks/TASK-TMP-0008-archive-and-remove-adjudicated-rescue-worktrees-after-owner-approval.task.md"
         ],
-        "digest": "sha256:19ba1af877faf1b31416737d144e47272703ffe75f334f1288ba5c4cb4839430"
+        "digest": "sha256:2d14087a0f3a9364aacb1db6f996ab52acb3e25c5219d3eab27c7d566c081850"
       },
       {
         "kind": "lifecycle-operation",
@@ -245,14 +248,14 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260813115717-codex-gpt-5.4-mini-TASK-TMP-0008-a50fbf0026",
+  "startedBySessionId": "session-20260813190726-codex-gpt-5.4-mini-TASK-TMP-0008-2015b500d9",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-TMP-0008",
-    "batchId": "batch-1dcfc14bbdbf",
-    "scopeKey": "tasks-ef550ed3c5c4",
-    "queueId": "queue-b439402ada9dd63c",
+    "batchId": "batch-fadd25dad86b",
+    "scopeKey": "tasks-b84e03b8c6f5",
+    "queueId": "queue-f74aa5cb8f43f544",
     "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/TASK-TMP-0008.*",
@@ -267,14 +270,21 @@
     "allowPlanningMirror": false,
     "promptHash": "ed2a9232a67a87859873eb1452b1f64468558182a308864674f0915f9a9ee334",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260813115717-codex-gpt-5.4-mini-TASK-TMP-0008-a50fbf0026",
+    "sessionId": "session-20260813190726-codex-gpt-5.4-mini-TASK-TMP-0008-2015b500d9",
     "laneSession": {
-      "laneSessionId": "lane-20260813115717-codex-gpt-5.4-mini-a155e84933",
+      "laneSessionId": "lane-20260813190727-codex-gpt-5.4-mini-aeda8952a4",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813115717-codex-gpt-5.4-mini-a155e84933\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813190727-codex-gpt-5.4-mini-aeda8952a4\""
     },
-    "createdAt": "2026-08-13T11:57:21.830Z",
-    "status": "active"
-  }
+    "createdAt": "2026-08-13T19:07:30.905Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-13T23:08:19.926Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-13T23:08:19.829Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260813190726-codex-gpt-5.4-mini-TASK-TMP-0008-2015b500d9",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0008.closure-packet.json"
 }
