@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T19-01-50-207Z-close-866c675f581f",
+  "taskId": "ATM-GOV-0357",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813185843-codex-gpt-5.4-mini-ATM-GOV-0357-5119c169fe",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0357.json",
+  "taskSha256": "sha256:a21659c078c4d6a1fa2b1b04aaf00895088932b6481b7b14225a4b6eb9cab0a4",
+  "createdAt": "2026-08-13T19:01:50.207Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0357 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-fadd25dad86b --historical-delivery 0753f75c4aadd8648b3c636243ccf37ecf3d59d2",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-fadd25dad86b",
+    "sessionId": "session-20260813185843-codex-gpt-5.4-mini-ATM-GOV-0357-5119c169fe",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0357.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/validator-contract-subject.test.ts",
+      "typecheck",
+      "validate:branch-commit-queue",
+      "validate:bridge-minor",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T19:01:50.201Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0357.*",
+        ".atm/history/task-events/ATM-GOV-0357/**",
+        ".atm/history/tasks/ATM-GOV-0357.json",
+        "scripts/lib/validator-contract-subject.ts",
+        "scripts/validate-branch-commit-queue.ts",
+        "scripts/validate-bridge-minor.ts",
+        "tests/cli/validator-contract-subject.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/lib/validator-contract-subject.ts",
+        "scripts/validate-branch-commit-queue.ts",
+        "scripts/validate-bridge-minor.ts",
+        "tests/cli/validator-contract-subject.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
