@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T16-40-43-701Z-scope-amendment-73d993ef8bf9",
+  "taskId": "ATM-GOV-0366",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0366.json",
+  "taskSha256": "sha256:749e6f71a87d85b02e5445ee9475c782b7a511d19d8303549c82b7fe5bf4b82d",
+  "createdAt": "2026-08-13T16:40:43.701Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0366 --actor claude-008-gov-0366 --add docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-022.json --reason \"A second defect family was found while delivering this card and must be recorded before close.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "A second defect family was found while delivering this card and must be recorded before close."
+  }
+}

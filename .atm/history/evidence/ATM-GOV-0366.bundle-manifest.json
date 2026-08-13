@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0366",
-  "updatedAt": "2026-08-13T16:27:11.337Z",
+  "updatedAt": "2026-08-13T16:40:59.486Z",
   "updatedBy": "claude-008-gov-0366",
   "freshValidationPasses": [
     "node --strip-types tests/cli/borrowed-actor-authority-hard-gate.test.ts",
@@ -137,6 +137,22 @@
       "durationMs": 32967,
       "runnerKind": "dev-source",
       "sourceCommit": "29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-backlog-census.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c940ed69fac618df606bf71ad26e466eedb8723bd0e3d33abcc84bf5aea39138",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:backlog-census"
+      ],
+      "generatedAt": "2026-08-13T16:40:59.486Z",
+      "startedAt": "2026-08-13T16:40:59.138Z",
+      "finishedAt": "2026-08-13T16:40:59.486Z",
+      "durationMs": 348,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3baf721bf717a828cd836a7514a61f27f9c10f45",
       "cached": false
     }
   ],

@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0366",
-  "updatedAt": "2026-08-13T16:27:11.337Z",
+  "updatedAt": "2026-08-13T16:40:59.486Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -772,6 +772,103 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:09e88a78d78191b2aa31feaa43e0ad9879a3acf30626ad51fce875dbe7b81224",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-backlog-census.ts --mode validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008-gov-0366",
+      "sessionId": "session-20260813161332-claude-008-gov-0366-ATM-GOV-0366-5a0f87bcbe",
+      "createdAt": "2026-08-13T16:40:59.486Z",
+      "details": {
+        "actorId": "claude-008-gov-0366",
+        "sessionId": "session-20260813161332-claude-008-gov-0366-ATM-GOV-0366-5a0f87bcbe",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:backlog-census"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.lane-capability-authority",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-backlog-census.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c940ed69fac618df606bf71ad26e466eedb8723bd0e3d33abcc84bf5aea39138",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-13T16:40:59.138Z",
+            "finishedAt": "2026-08-13T16:40:59.486Z",
+            "durationMs": 348,
+            "cached": false,
+            "validators": [
+              "validate:backlog-census"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "3baf721bf717a828cd836a7514a61f27f9c10f45",
+            "cacheKey": "sha256:41ead31efa693ef20bf7e0a83e57da7b1a12021377578d9ec45ffee33e024be2",
+            "generatedAt": "2026-08-13T16:40:59.486Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:41ead31efa693ef20bf7e0a83e57da7b1a12021377578d9ec45ffee33e024be2",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-13T16:40:59.486Z",
+              "observedAt": "2026-08-13T16:40:59.486Z",
+              "startedAt": "2026-08-13T16:40:59.138Z",
+              "finishedAt": "2026-08-13T16:40:59.486Z",
+              "durationMs": 348,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:2da54208d6fbc994acbca1e9245f373c0105a2ae32236b1d6a1733a927c3b434",
+              "outputDigest": "sha256:4e106264e9247d64933dd200b40d6bd4fb436f7a8cc54bf0f6176b5a35fbb039",
+              "cache": {
+                "key": "sha256:41ead31efa693ef20bf7e0a83e57da7b1a12021377578d9ec45ffee33e024be2",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types scripts/validate-backlog-census.ts --mode validate",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:backlog-census"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "3baf721bf717a828cd836a7514a61f27f9c10f45",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:59307d4d7f170ce8a3c0b4c774f0e84b7896a860ed984a507a08f1c99b9842bc",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
